@@ -1,12 +1,11 @@
 import {Footer, SelectLang, AvatarDropdown, AvatarName} from '@/components';
 import type {RunTimeLayoutConfig} from '@umijs/max';
 import React from 'react';
-import {currentUser} from "@/services/cubing-pro/auth/api";
+import {currentUser} from "@/services/cubing-pro/auth/auth";
 import defaultSettings from "../config/defaultSettings";
 import {UserSwitchOutlined} from "@ant-design/icons";
 import {AvatarProps} from "antd";
 import type {Settings as LayoutSettings} from '@ant-design/pro-components';
-import {val} from "@umijs/utils/compiled/cheerio/lib/api/attributes";
 
 /**
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state

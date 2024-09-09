@@ -13,7 +13,7 @@
 export default [
   {
     path: '/welcome',
-    name: 'welcome',
+    // name: 'welcome',
     component: './Welcome',
   },
   {
@@ -37,7 +37,12 @@ export default [
 
   // 用户相关
   {path: '/user',  component: './User/UserInfo'},
-  {path: '/login', layout: false, component: "./User/Login"}
+  {path: '/login', component: "./User/Login"},
 
+  // 比赛网页
+  {path: "/competitions", component: "./Competition/Competitions"},
+  {path: "/competition/:id", component: "./Competition/Competition"},
 
+  // 数据
+  {name: "项目列表", path: "/events", component: "./Events/Events"},
 ];

@@ -43,6 +43,7 @@ export default {
   'pages.login.loginWith': '其他登录方式 :',
   'pages.login.registerAccount': '注册账户',
   'pages.welcome.link': '欢迎使用',
-
+  'pages.404.subTitle': '页面不存在',
+  'pages.404.buttonText': '返回首页',
 
 };

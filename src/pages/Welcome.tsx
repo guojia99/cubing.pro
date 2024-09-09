@@ -123,7 +123,7 @@ const Welcome: React.FC = () => {
           >
             <InfoCard
               index={1}
-              href="./compentition"
+              href="./competitions"
               title="赛事列表"
               desc="你可以查看现在有哪些比赛在进行, 也可查看往期比赛的成绩。"
             />
