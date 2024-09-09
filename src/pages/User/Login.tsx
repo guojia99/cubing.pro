@@ -14,7 +14,7 @@ const LoginFormC: React.FC = () => {
 
   return (
     <div style={{
-      // marginTop: "20%"
+      marginTop: "12.5%"
     }}>
       <LoginForm
         form={form}

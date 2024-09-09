@@ -9,15 +9,21 @@ const Footer: React.FC = () => {
     <DefaultFooter
       style={{
         background: 'none',
-        marginTop: "20%",
+        marginTop: "5%",
       }}
       links={[
         {
-          key: 'Cubing Pro',
-          title: 'Cubing Pro',
-          href: 'https://github.com/guojia99/cubing-pro',
-          blankTarget: true,
+          key: 'index',
+          title: "CubingPro",
+          href: '/',
+          blankTarget: false,
         },
+        // {
+        //   key: 'Cubing Pro',
+        //   title: 'Cubing Pro',
+        //   href: 'https://github.com/guojia99/cubing-pro',
+        //   blankTarget: true,
+        // },
         {
           key: 'github',
           title: <GithubOutlined/>,

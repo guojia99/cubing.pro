@@ -1,4 +1,4 @@
-import {currentUser, logout} from '@/services/cubing-pro/auth/api';
+import {currentUser, logout} from '@/services/cubing-pro/auth/auth';
 import {LoginOutlined, LogoutOutlined, SettingOutlined, UserAddOutlined, UserOutlined, UserSwitchOutlined} from '@ant-design/icons';
 import {history, useModel} from '@umijs/max';
 import {createStyles} from 'antd-style';

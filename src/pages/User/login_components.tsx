@@ -5,7 +5,7 @@ import {createStyles} from "antd-style";
 import {ProFormCaptcha, ProFormInstance, ProFormText} from "@ant-design/pro-form";
 import {LockOutlined, MailOutlined, SafetyOutlined, UserOutlined} from "@ant-design/icons";
 import {FormattedMessage, useIntl} from "@umijs/max";
-import {captchaCode, getEmailCode} from "@/services/cubing-pro/auth/api";
+import {captchaCode, getEmailCode, login} from "@/services/cubing-pro/auth/auth";
 import PasswordStrengthMeter from "@/components/Inputs/password";
 import {FormInstance} from "antd/es/form/hooks/useForm";
 import * as crypto from 'crypto';
@@ -334,48 +334,13 @@ function generateRandomKey(timestamp: number): string {
   return data.slice(0, 32);
 }
 
-function encrypt(plaintext: string, key: string): string {
-  const algorithm = 'aes-256-gcm';
-  // Encoding timestamp and appending to the plaintext
-
-  // const iv = crypto.randomBytes(12); // 12 bytes IV for GCM
-  // const cipher = crypto.createCipheriv(algorithm, key, iv);
-
-  const block = crypto.createCipher(algorithm, key)
-  const gcm = crypto.randomBytes(12); // 12 bytes IV for GCM
-
-  const timestamp = Math.floor(Date.now() / 1000); // Current Unix timestamp
-  plaintext += `:${timestamp}`;
-
-
-
-
-
-  const encryptedData = Buffer.concat([iv, Buffer.from(encrypted, 'base64'), tag]);
-
-  // https://www.cnblogs.com/haima/p/12611372.html
-
-
-  let encrypted = cipher.update(plaintext, 'utf8', 'base64');
-  encrypted += cipher.final('base64');
-
-  // Get the authentication tag
-  const tag = cipher.getAuthTag();
-
-
-
-  // Concatenate IV and encrypted data
-  const encryptedData = Buffer.concat([iv, Buffer.from(encrypted, 'base64'), tag]);
-  return encryptedData.toString('base64');
-}
-
 export const loginOnfinish = async (values: any) => {
   const req = values as AuthAPI.LoginRequest
-  req.timestamp = Date.now();
-
-  const key = generateRandomKey(12345)
-  const password = await encrypt("12345", generateRandomKey(12345))
-  console.log(password, key)
+  await login(req).then((value) => {
+    console.log(value)
+  }).catch((values) => {
+    console.log(values)
+  })
 }
 
 export const registerOnfinish = async (values: any) => {

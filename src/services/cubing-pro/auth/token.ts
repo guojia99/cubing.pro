@@ -1,5 +1,5 @@
 import {history} from 'umi';
-import {refreshToken} from "@/services/cubing-pro/auth/api";
+import {refreshToken} from "@/services/cubing-pro/auth/auth";
 
 
 const AUTH_TOKEN_KEY = 'authToken_cubing_pro';
