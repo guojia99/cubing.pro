@@ -3,7 +3,7 @@
 // DO NOT CHANGE IT MANUALLY!
 // @ts-ignore
 import type { models as rawModels } from '@@/plugin-model/model';
-import isEqual from '/data/home/guojia/data/code/guojia/cubing.pro/node_modules/fast-deep-equal/index.js';
+import isEqual from '/home/guojia/数据/code/cube/cubing.pro/node_modules/fast-deep-equal/index.js';
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 type Models = typeof rawModels;

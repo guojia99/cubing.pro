@@ -5,11 +5,11 @@ import {
   createIntl,
   IntlShape,
   MessageDescriptor,
-} from '/data/home/guojia/data/code/guojia/cubing.pro/node_modules/@umijs/plugins/node_modules/react-intl';
+} from '/home/guojia/数据/code/cube/cubing.pro/node_modules/@umijs/plugins/node_modules/react-intl';
 import { getPluginManager } from '../core/plugin';
-import EventEmitter from '/data/home/guojia/data/code/guojia/cubing.pro/node_modules/event-emitter';
+import EventEmitter from '/home/guojia/数据/code/cube/cubing.pro/node_modules/event-emitter';
 // @ts-ignore
-import warning from '/data/home/guojia/data/code/guojia/cubing.pro/node_modules/warning';
+import warning from '/home/guojia/数据/code/cube/cubing.pro/node_modules/warning';
 
 export {
   createIntl,
@@ -34,7 +34,7 @@ export {
   defineMessages,
   injectIntl,
   useIntl,
-} from '/data/home/guojia/data/code/guojia/cubing.pro/node_modules/@umijs/plugins/node_modules/react-intl';
+} from '/home/guojia/数据/code/cube/cubing.pro/node_modules/@umijs/plugins/node_modules/react-intl';
 
 let g_intl: IntlShape;
 
@@ -46,11 +46,11 @@ export const event = new EventEmitter();
 export const LANG_CHANGE_EVENT = Symbol('LANG_CHANGE');
 
 import enUS0 from 'antd/es/locale/en_US';
-import lang_enUS0 from "/data/home/guojia/data/code/guojia/cubing.pro/src/locales/en-US.ts";
+import lang_enUS0 from "/home/guojia/数据/code/cube/cubing.pro/src/locales/en-US.ts";
 import zhCN0 from 'antd/es/locale/zh_CN';
-import lang_zhCN0 from "/data/home/guojia/data/code/guojia/cubing.pro/src/locales/zh-CN.ts";
+import lang_zhCN0 from "/home/guojia/数据/code/cube/cubing.pro/src/locales/zh-CN.ts";
 import zhTW0 from 'antd/es/locale/zh_TW';
-import lang_zhTW0 from "/data/home/guojia/data/code/guojia/cubing.pro/src/locales/zh-TW.ts";
+import lang_zhTW0 from "/home/guojia/数据/code/cube/cubing.pro/src/locales/zh-TW.ts";
 
 const flattenMessages=(
   nestedMessages: Record<string, any>,

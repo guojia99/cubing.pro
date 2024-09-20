@@ -17,8 +17,8 @@ export async function getRoutes() {
 '7': React.lazy(() => import(/* webpackChunkName: "p__Competition__Competitions" */'@/pages/Competition/Competitions.tsx')),
 '8': React.lazy(() => import(/* webpackChunkName: "p__Competition__Competition" */'@/pages/Competition/Competition.tsx')),
 '9': React.lazy(() => import(/* webpackChunkName: "p__Events__Events" */'@/pages/Events/Events.tsx')),
-'ant-design-pro-layout': React.lazy(() => import(/* webpackChunkName: "umi__plugin-layout__Layout" */'/data/home/guojia/data/code/guojia/cubing.pro/src/.umi/plugin-layout/Layout.tsx')),
-'umi/plugin/openapi': React.lazy(() => import(/* webpackChunkName: "umi__plugin-openapi__openapi" */'/data/home/guojia/data/code/guojia/cubing.pro/src/.umi/plugin-openapi/openapi.tsx')),
+'ant-design-pro-layout': React.lazy(() => import(/* webpackChunkName: "umi__plugin-layout__Layout" */'/home/guojia/数据/code/cube/cubing.pro/src/.umi/plugin-layout/Layout.tsx')),
+'umi/plugin/openapi': React.lazy(() => import(/* webpackChunkName: "umi__plugin-openapi__openapi" */'/home/guojia/数据/code/cube/cubing.pro/src/.umi/plugin-openapi/openapi.tsx')),
 },
   };
 }

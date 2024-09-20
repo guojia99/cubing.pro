@@ -1,12 +1,11 @@
-import React from "react";
-import {List, Table} from "antd";
-import {Result, resultString, resultTimeString} from "@/utils/cube_result/result";
-import {eventRouteM} from "@/utils/cube_result/event_route";
-import {val} from "@umijs/utils/compiled/cheerio/lib/api/attributes";
-import {CubeIcon} from "@/components/CubeIcon/cube_icon";
-import {CubesCn} from "@/components/CubeIcon/cube";
-import {Link} from "@umijs/max";
+import { CubesCn } from '@/components/CubeIcon/cube';
+import { CubeIcon } from '@/components/CubeIcon/cube_icon';
+import { eventRouteM } from '@/utils/cube_result/event_route';
+import { Result, resultStringPro, resultTimeString } from '@/utils/cube_result/result';
+import { Link } from '@umijs/max';
+import { Table } from 'antd';
 
+import './result_tables.css';
 
 const columnsMap = new Map([
   [
@@ -16,9 +15,13 @@ const columnsMap = new Map([
       dataIndex: 'Round',
       key: 'Round',
       width: 150,
-      render: (value: string, result: Result) => {
-        return (<td style={{minWidth: "100px", width: "150px"}}>{value}</td>)
-      }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      onCell: (result: any, rowIndex: number) => ({
+        className: 'custom-cell',
+      }),
+      render: (value: string) => {
+        return <td className={'cube_result_round_col'}>{value}</td>;
+      },
     },
   ],
   [
@@ -28,13 +31,19 @@ const columnsMap = new Map([
       dataIndex: 'PersonName',
       key: 'PersonName',
       width: 150,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      onCell: (result: any, rowIndex: number) => ({
+        className: 'custom-cell',
+      }),
       render: (value: string, result: Result) => {
         return (
-          <td style={{minWidth: "100px", width: "150px"}}>
-            <strong><Link to={"/player/"+result.UserID}>{value}</Link></strong>
+          <td className={'cube_result_player_name_col'}>
+            <strong>
+              <Link to={'/player/' + result.UserID}>{value}</Link>
+            </strong>
           </td>
-        )
-      }
+        );
+      },
     },
   ],
   [
@@ -43,16 +52,21 @@ const columnsMap = new Map([
       title: '单次',
       dataIndex: 'Best',
       key: 'Best',
-      render: (results: number, result: Result) => {
-        const m = eventRouteM(result.EventRoute)
-        let inter = m.integer ? m.integer : false
-        if (m.repeatedly) {
-          inter = false
-        }
-
-        return (<td style={{minWidth: "100px", width: "100px"}}>{resultTimeString(results, inter)}</td>)
-      },
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      onCell: (result: any, rowIndex: number) => ({
+        className: 'custom-cell',
+      }),
       width: 100,
+      render: (results: number, result: Result) => {
+        const m = eventRouteM(result.EventRoute);
+        let inter = m.integer ? m.integer : false;
+
+        if (m.repeatedly) {
+          inter = true;
+          return <td className={'cube_result_Best_col'}>{resultTimeString(results, inter)}</td>;
+        }
+        return <td className={'cube_result_Best_col'}>{resultTimeString(results, inter)}</td>;
+      },
     },
   ],
   [
@@ -61,15 +75,19 @@ const columnsMap = new Map([
       title: '平均',
       dataIndex: 'Average',
       key: 'Average',
+      width: 100,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      onCell: (result: any, rowIndex: number) => ({
+        className: 'custom-cell',
+      }),
       render: (results: number, result: Result) => {
-        const m = eventRouteM(result.EventRoute)
+        const m = eventRouteM(result.EventRoute);
         if (m.repeatedly) {
           // todo 多轮的
-          return <td style={{minWidth: "100px", width: "100px"}}>{}</td>
+          return <td className={'cube_result_Average_col'}>-</td>;
         }
-        return (<td style={{minWidth: "100px", width: "100px"}}>{resultTimeString(results)}</td>)
+        return <td className={'cube_result_Average_col'}>{resultTimeString(results)}</td>;
       },
-      width: 100
     },
   ],
   [
@@ -79,79 +97,104 @@ const columnsMap = new Map([
       dataIndex: 'Result',
       key: 'Result',
       render: (results: number[], result: Result) => {
-        const data = resultString(results, result.EventRoute)
-        let body: JSX.Element[] = []
+        let body: JSX.Element[] = [];
+        // eslint-disable-next-line array-callback-return
+        const data = resultStringPro(results, result.EventRoute);
+        // eslint-disable-next-line array-callback-return
         data.map((value: string) => {
-          body.push(<td style={{width: "100px", minWidth: "100px"}}>{value}</td>)
-        })
-        return (<>{body}</>)
+          if (value.includes("/")){
+            body.push(<td style={{ width: '120px', minWidth: '120px' }}>{value}</td>);
+          } else {
+            body.push(<td style={{ width: '60px', minWidth: '60px' }}>{value}</td>);
+          }
+
+        });
+        return <div className={'cube_result_results_col'}>{body}</div>;
       },
-      // width: 100*5,
     },
   ],
   [
     'EventName',
     {
       title: '项目',
-      dataIndex: 'EventName',
-      key: 'EventName',
-      width: 100,
+      dataIndex: 'EventID',
+      key: 'EventID',
+      width: 80,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      onCell: (result: any, rowIndex: number) => ({
+        className: 'custom-cell',
+      }),
       render: (value: string, result: Result) => {
-        return (<td style={{minWidth: "100px", width: "100px"}}>{CubeIcon(result.EventID, result.EventID, {})} {CubesCn(value)}</td>)
-      }
+        return (
+          <td style={{ minWidth: '80px', width: '80px' }}>
+            {CubeIcon(result.EventID, result.EventID, {})} {CubesCn(value)}
+          </td>
+        );
+      },
     },
   ],
   [
     'EventNameOnlyOne',
     {
       title: '项目',
-      dataIndex: 'EventName',
-      key: 'EventName',
-      width: 100,
+      dataIndex: 'EventID',
+      key: 'EventID',
+      width: 80,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      onCell: (result: any, rowIndex: number) => ({
+        className: 'custom-cell',
+      }),
       render: (value: string, result: Result) => {
-        if (result.RoundNumber != 1) {
-          return <td style={{minWidth: "100px", width: "100px"}}></td>
+        if (result.RoundNumber !== 1) {
+          return <td style={{ minWidth: '80px', width: '80px' }}></td>;
         }
         // todo 中英文？
-        return (<td style={{minWidth: "100px", width: "100px"}}>{CubeIcon(result.EventID, result.EventID, {})} {CubesCn(value)}</td>)
-      }
+        return (
+          <td style={{ minWidth: '80px', width: '80px' }}>
+            {CubeIcon(result.EventID, result.EventID, {})} {CubesCn(value)}
+          </td>
+        );
+      },
     },
   ],
   [
-    "Rank",
+    'Rank',
     {
-      title: "排名",
-      dataIndex: "Rank",
-      key: "Rank",
-      width: 100,
-      render: (value: number, result: Result) => {
-        return value+1
-      }
-    }
-  ]
+      title: '排名',
+      dataIndex: 'Rank',
+      key: 'Rank',
+      width: 70,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      onCell: (result: any, rowIndex: number) => ({
+        className: 'custom-cell cube_result_rank_col',
+      }),
+      render: (value: number) => {
+        return <td className={'cube_result_rank_col'}>{value+1}</td>;
+      },
+    },
+  ],
 ]);
 
-export const playerResultKeys = [
-  "EventNameOnlyOne", "Round", "Best", "Average", "Result"
-]
-
+export const playerResultKeys = ['EventNameOnlyOne', 'Round', 'Best', 'Average', 'Result'];
 
 export const ResultsTable = (dataSource: Result[], keys: string[]) => {
-  let columns = []
+  let columns = [];
   for (let key of keys) {
     let column = columnsMap.get(key);
     if (column === undefined) {
-      continue
+      continue;
     }
-    columns.push(column)
+    columns.push(column);
   }
 
 
-  return <Table
-    dataSource={dataSource}
-    columns={columns}
-    pagination={false}
-    // scroll={{x: 'max-content'}}  // 启用横向滚动
-  />;
-}
-
+  return (
+    <Table
+      dataSource={dataSource}
+      // @ts-ignore
+      columns={columns}
+      pagination={false}
+      scroll={{ x: 'max-content' }} // 启用横向滚动
+    />
+  );
+};

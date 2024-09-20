@@ -55,6 +55,7 @@
     "classnames": "^2.5.1",
     "crypto-js": "^4.2.0",
     "lodash": "^4.17.21",
+    "lucide-react": "^0.439.0",
     "moment": "^2.30.1",
     "omit.js": "^2.0.2",
     "querystring": "^0.2.1",
