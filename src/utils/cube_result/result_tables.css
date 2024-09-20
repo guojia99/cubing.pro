@@ -1,0 +1,44 @@
+
+.cube_result_Best_col {
+  min-width: 30px;
+  /*border-right: rgba(220, 220, 220, 0.74) 1px solid;*/
+  /*border: 1px red solid;*/
+
+}
+.cube_result_Average_col {
+  min-width: 30px;
+}
+
+.custom-cell {
+  position: relative;
+}
+
+.custom-cell::after {
+  content: '';
+  position: absolute;
+  top: 50%; /* 从单元格的垂直中心开始 */
+  right: 0; /* 保证线位于右侧 */
+  width: 1px; /* 线的宽度 */
+  height: 50%; /* 线的高度为单元格高度的一半 */
+  background-color: rgba(220, 220, 220, 0.74); /* 线的颜色 */
+  transform: translateY(-50%); /* 使线垂直居中 */
+}
+
+.cube_result_round_col {
+  min-width: 100px;
+  width: 100px;
+  max-width: 120px;
+}
+
+.cube_result_player_name_col {
+  min-width: 50px;
+}
+
+.cube_result_rank_col {
+  min-width: 10px;
+  max-width: 15px;
+}
+
+.cube_result_results_col {
+  /*background: rgba(225, 236, 251, 0.36);*/
+}

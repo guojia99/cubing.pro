@@ -10,6 +10,7 @@ import CompetitionResults from "@/pages/Competition/CompetitionComponents/Compet
 import {P404} from "@/components/Status/404";
 import {CompAPI} from "@/services/cubing-pro/comps/typings";
 import {NavTabs} from "@/components/Tabs/nav_tabs";
+import ScrollToTopButton from "@/components/Buttons/toTop";
 
 
 const Competition: React.FC = () => {
@@ -86,24 +87,27 @@ const Competition: React.FC = () => {
 
   const tabs = (
     <>
-      <Watermark
-        content={comp?.data.Name}
-        font={
-          {
-            color: 'rgba(117,169,251,0.27)'
-          }
-        }
-      >
-        <h1 style={{textAlign: "center"}}>{comp ? comp.data.Name : "比赛加载中"}</h1>
-        <NavTabs
-          type="line"
-          items={items}
-          tabsKey="comps_tabs"
-          style={{minHeight: "100vh"}}
-          indicator={{size: (origin: number) => origin - 20, align: "center"}}
-        />
+      <ScrollToTopButton />
+      {/*<Watermark*/}
+      {/*  content={comp?.data.Name}*/}
+      {/*  font={*/}
+      {/*    {*/}
+      {/*      color: 'rgba(117,169,251,0.27)'*/}
+      {/*    }*/}
+      {/*  }*/}
+      {/*>*/}
+      {/*  */}
 
-      </Watermark>
+      {/*</Watermark>*/}
+      <h1 style={{textAlign: "center"}}>{comp ? comp.data.Name : "比赛加载中"}</h1>
+      <NavTabs
+        type="line"
+        items={items}
+        tabsKey="comps_tabs"
+        style={{minHeight: "100vh"}}
+        indicator={{size: (origin: number) => origin - 20, align: "center"}}
+      />
+
     </>
   )
 
