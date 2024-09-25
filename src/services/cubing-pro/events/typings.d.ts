@@ -1,4 +1,4 @@
-import {func} from "prop-types";
+
 
 export declare namespace EventsAPI {
   type Event = {

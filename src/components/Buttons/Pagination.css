@@ -1,0 +1,46 @@
+.pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  width: 100%;
+
+  &.single {
+    justify-content: center; /* 当只有一个按钮时，居中对齐 */
+  }
+}
+
+.pagination-button {
+  background-color: rgb(159, 231, 255); /* 按钮背景颜色 */
+  padding: 10px 20px;
+  border-radius: 25px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s ease;
+  z-index: 1;
+  text-align: center;
+
+  &:hover {
+    background-color: rgb(0, 193, 241); /* 悬停时的背景色 */
+  }
+
+  a{
+    color: white;
+  }
+
+  & i {
+    margin-right: 8px;
+  }
+}
+
+.earliest {
+  margin-left: 20px;
+}
+
+.latest {
+  margin-right: 20px;
+}

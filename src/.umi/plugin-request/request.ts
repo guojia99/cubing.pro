@@ -6,8 +6,8 @@ import axios, {
   type AxiosRequestConfig,
   type AxiosResponse,
   type AxiosError,
-} from '/home/guojia/数据/code/cube/cubing.pro/node_modules/axios';
-import useUmiRequest, { UseRequestProvider } from '/home/guojia/数据/code/cube/cubing.pro/node_modules/@umijs/plugins/node_modules/@ahooksjs/use-request';
+} from '/home/guojia/worker/code/cube/cubing.pro/node_modules/axios';
+import useUmiRequest, { UseRequestProvider } from '/home/guojia/worker/code/cube/cubing.pro/node_modules/@umijs/plugins/node_modules/@ahooksjs/use-request';
 import { ApplyPluginsType } from 'umi';
 import { getPluginManager } from '../core/plugin';
 
@@ -26,7 +26,7 @@ import {
   PaginatedOptionsWithFormat,
   PaginatedParams,
   PaginatedResult,
-} from '/home/guojia/数据/code/cube/cubing.pro/node_modules/@umijs/plugins/node_modules/@ahooksjs/use-request/es/types';
+} from '/home/guojia/worker/code/cube/cubing.pro/node_modules/@umijs/plugins/node_modules/@ahooksjs/use-request/es/types';
 
 type ResultWithData< T = any > = { data?: T; [key: string]: any };
 

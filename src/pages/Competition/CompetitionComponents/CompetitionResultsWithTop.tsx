@@ -3,6 +3,7 @@ import { CubesCn } from '@/components/CubeIcon/cube';
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import { CompAPI } from '@/services/cubing-pro/comps/typings';
 import { EventsAPI } from '@/services/cubing-pro/events/typings';
+import { Record } from '@/utils/cube_record/record';
 import { RouteMaps } from '@/utils/cube_result/event_route';
 import { DBest, DNF, Result, resultToBest, sortResults } from '@/utils/cube_result/result';
 import { resultsToMap } from '@/utils/cube_result/result_detail';
@@ -16,6 +17,7 @@ interface CompetitionResultsWithTopProps {
   events?: EventsAPI.Event[];
   topRank: number;
   event_divider: boolean;
+  records?: Record[];
 }
 
 const CompetitionResultsWithTop: React.FC<CompetitionResultsWithTopProps> = ({
@@ -25,6 +27,7 @@ const CompetitionResultsWithTop: React.FC<CompetitionResultsWithTopProps> = ({
   events,
   topRank,
   event_divider,
+  records,
 }) => {
   if (events === undefined) {
     return <></>;
@@ -78,7 +81,13 @@ const CompetitionResultsWithTop: React.FC<CompetitionResultsWithTopProps> = ({
 
   if (!event_divider) {
     return (
-      <>{ResultsTable(dataSource, ['EventName', 'Best', 'Average', 'PersonName', 'Result'])}</>
+      <>
+        {ResultsTable(
+          dataSource,
+          ['EventName', 'Best', 'Average', 'PersonName', 'Result'],
+          records,
+        )}
+      </>
     );
   }
 
@@ -98,13 +107,11 @@ const CompetitionResultsWithTop: React.FC<CompetitionResultsWithTopProps> = ({
             </strong>
           </h4>
         </Divider>
-        {ResultsTable(dataSource.slice(last_idx, idx), [
-          'Rank',
-          'PersonName',
-          'Best',
-          'Average',
-          'Result',
-        ])}
+        {ResultsTable(
+          dataSource.slice(last_idx, idx),
+          ['Rank', 'PersonName', 'Best', 'Average', 'Result'],
+          records,
+        )}
       </div>,
     );
 

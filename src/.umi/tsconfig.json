@@ -27,7 +27,7 @@
         "src/.umi/*"
       ],
       "@umijs/max": [
-        "/home/guojia/数据/code/cube/cubing.pro/node_modules/umi"
+        "/home/guojia/worker/code/cube/cubing.pro/node_modules/umi"
       ],
       "@umijs/max/typings": [
         "src/.umi/typings"

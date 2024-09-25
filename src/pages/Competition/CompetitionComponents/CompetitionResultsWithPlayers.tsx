@@ -7,17 +7,20 @@ import { playerResultKeys, ResultsTable } from '@/utils/cube_result/result_table
 import { useNavigate } from '@@/exports';
 import { Divider } from 'antd';
 import React, { useEffect } from 'react';
+import {Record} from "@/utils/cube_record/record";
 
 interface CompetitionResultsWithPlayersProps {
   comp?: CompAPI.CompResp;
   results?: Result[];
   events?: EventsAPI.Event[];
+  records?: Record[];
 }
 
 const CompetitionResultsWithPlayers: React.FC<CompetitionResultsWithPlayersProps> = ({
   comp,
   results,
   events,
+  records,
 }) => {
   useEffect(() => {
     // 获取查询参数中的 player_name_key
@@ -78,7 +81,7 @@ const CompetitionResultsWithPlayers: React.FC<CompetitionResultsWithPlayersProps
             </strong>
           </h4>
         </Divider>
-        {ResultsTable(results, playerResultKeys)}
+        {ResultsTable(results, playerResultKeys, records)}
         <div style={{ marginTop: '40px' }}></div>
       </>,
     );

@@ -1,5 +1,5 @@
 import {ProDescriptions} from "@ant-design/pro-components";
-import React, {useEffect} from "react";
+import React from "react";
 import {Tag} from "antd";
 import {CubeIcon} from "@/components/CubeIcon/cube_icon";
 import Markdown from "@/components/Markdown/Markdown";
@@ -87,8 +87,11 @@ const CompetitionDetail: React.FC<CompetitionDetailProps> = ({comp}) => {
           {comp.data.Org.Email && <ProDescriptions.Item label="邮箱">
             {comp.data.Org.Email}
           </ProDescriptions.Item>}
-          {comp.data.Org.QQGroup && <ProDescriptions.Item label="QQ">
-            {comp.data.Org.QQGroup}
+          {comp.data.Group.qq_groups && <ProDescriptions.Item label="QQ">
+            {comp.data.Group.qq_groups}
+          </ProDescriptions.Item>}
+          {comp.data.Group.name && <ProDescriptions.Item label="QQ群" >
+            {comp.data.Group.name}
           </ProDescriptions.Item>}
         </ProDescriptions>
       </div>
@@ -136,8 +139,8 @@ const CompetitionDetail: React.FC<CompetitionDetailProps> = ({comp}) => {
     <div key={"__comps_detail_person_key"}>
       <ProDescriptions column={1} title="参赛人数" tooltip={"报名人数和参赛人数可能有延迟"}>
         <ProDescriptions.Item label="最大限制数">{comp?.data.Count}</ProDescriptions.Item>
-        <ProDescriptions.Item label="已报名人数">{11 + " / " + comp?.data.Count}</ProDescriptions.Item>
-        <ProDescriptions.Item label="已参赛人数">{8}</ProDescriptions.Item>
+        <ProDescriptions.Item label="已报名人数">{comp?.data.RegisterNum + " / " + comp?.data.Count}</ProDescriptions.Item>
+        <ProDescriptions.Item label="已参赛人数">{comp?.data.CompedNum}</ProDescriptions.Item>
       </ProDescriptions>
     </div>
   )

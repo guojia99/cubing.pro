@@ -1,4 +1,5 @@
 import {Request} from "@/services/cubing-pro/request";
+import { CompsAPI } from './typings';
 
 
 export async function apiComps(params: CompsAPI.CompsReq): Promise<CompsAPI.CompsResp> {

@@ -1,4 +1,3 @@
-import {history} from 'umi';
 import {refreshToken} from "@/services/cubing-pro/auth/auth";
 
 
