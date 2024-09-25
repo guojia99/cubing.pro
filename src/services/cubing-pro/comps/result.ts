@@ -1,4 +1,5 @@
 import {Request} from "@/services/cubing-pro/request";
+import {CompResultAPI} from "@/services/cubing-pro/comps/typings";
 
 
 export async function apiCompResult(id: number): Promise<CompResultAPI.CompResultResp> {

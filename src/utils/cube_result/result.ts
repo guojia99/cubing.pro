@@ -213,5 +213,10 @@ export const resultToBest = (result: Result): string => {
   if (m.withBest){
     return resultTimeString(result.Best)
   }
+  if (DAvg(result)){
+    return resultTimeString(result.Best) + "[单次]"
+  }
+
+
   return resultTimeString(result.Average)
 }

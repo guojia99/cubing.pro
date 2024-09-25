@@ -2,22 +2,26 @@ import { CubesCn } from '@/components/CubeIcon/cube';
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import { CompAPI } from '@/services/cubing-pro/comps/typings';
 import { EventsAPI } from '@/services/cubing-pro/events/typings';
-import { Result } from '@/utils/cube_result/result';
+import { Result, sortResults } from '@/utils/cube_result/result';
 import { resultsToMap } from '@/utils/cube_result/result_detail';
+import { ResultsTable } from '@/utils/cube_result/result_tables';
 import { useNavigate } from '@@/exports';
-import { Divider } from 'antd';
+import { Card, Divider, Space } from 'antd';
 import React, { useEffect } from 'react';
+import {Record as CubeRecord} from "@/utils/cube_record/record";
 
 interface CompetitionResultsWithEventsProps {
   comp?: CompAPI.CompResp;
   results?: Result[];
   events?: EventsAPI.Event[];
+  records?: CubeRecord[];
 }
 
 const CompetitionResultsWithEvents: React.FC<CompetitionResultsWithEventsProps> = ({
   comp,
   results,
   events,
+  records,
 }) => {
   useEffect(() => {
     // 获取查询参数中的 player_name_key
@@ -42,11 +46,10 @@ const CompetitionResultsWithEvents: React.FC<CompetitionResultsWithEventsProps> 
 
   let resultMap = resultsToMap(resultData);
 
-
   events.forEach((event) => {
-    const results = resultMap.withEvent.get(event.id)
+    const results = resultMap.withEvent.get(event.id);
     if (results === undefined || results.length === 0) {
-      return
+      return;
     }
     // todo
     // @ts-ignore
@@ -56,7 +59,7 @@ const CompetitionResultsWithEvents: React.FC<CompetitionResultsWithEventsProps> 
       }
       group[item.RoundNumber].push(item);
       return group;
-    }, {} as Record<number, Result>);
+    }, {} as Record<number, Result[]>) as Record<number, Result[]>;
 
     const handleClick = () => {
       const searchParams = new URLSearchParams(location.search);
@@ -64,7 +67,23 @@ const CompetitionResultsWithEvents: React.FC<CompetitionResultsWithEventsProps> 
       navigate(`${location.pathname}?${searchParams.toString()}`);
     };
 
-    console.log(event.id, resultWithRoundMap);
+    let tables = [];
+
+    for (let i = 1; i < 255; i++) {
+      let data = resultWithRoundMap[i];
+      if (data === null || data === undefined) {
+        break;
+      }
+      data = data as Result[];
+      data = sortResults(data);
+
+      let key: string[] = ['Rank', 'PersonName', 'Best', 'Average', 'Result'];
+      tables.push(
+        <Card title={data[0].Round} size="small">
+          {ResultsTable(data, key, records)}
+        </Card>,
+      );
+    }
 
     body.push(
       <>
@@ -75,12 +94,13 @@ const CompetitionResultsWithEvents: React.FC<CompetitionResultsWithEventsProps> 
             </strong>
           </h4>
         </Divider>
+        <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
+          {tables}
+        </Space>
+        <div style={{marginBottom: "50px"}}></div>
       </>,
     );
-
-  })
-
-
+  });
 
   return <>{body}</>;
 };

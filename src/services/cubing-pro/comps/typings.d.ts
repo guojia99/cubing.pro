@@ -1,41 +1,39 @@
-import {Result} from "@/utils/cube_result/result";
+import { Result } from '@/utils/cube_result/result';
 
 declare namespace CompsAPI {
   type Comp = {
-    id: number,
-    StrId: string,
-    Name: string,
-    country: string,
-    City: string,
-    Genre: number,
-    CompStartTime: string,
-    CompEndTime: string,
-    EventMin: string,
-    Series: string,
-    Status: string,
-    logo: string,
-  }
+    id: number;
+    StrId: string;
+    Name: string;
+    country: string;
+    City: string;
+    Genre: number;
+    CompStartTime: string;
+    CompEndTime: string;
+    EventMin: string;
+    Series: string;
+    Status: string;
+    logo: string;
+  };
 
   type CompsReq = {
-    page: number,
-    size: number,
-    name: string,
+    page: number;
+    size: number;
+    name: string;
 
     // like: Map<string, string>, // json
     // search: Map<string, string>, // json
     // start_time: number,  // json
     // end_time: number, // json
-  }
+  };
 
   type CompsResp = {
     data: {
-      items: Comp[],
-      total: number,
-    }
-  }
-
+      items: Comp[];
+      total: number;
+    };
+  };
 }
-
 
 declare namespace CompAPI {
   type Schedule = {
@@ -52,7 +50,7 @@ declare namespace CompAPI {
     FirstRound: boolean;
     FinalRound: boolean;
     AdvancedToNextRound: string | null;
-  }
+  };
 
   type Event = {
     EventName: string;
@@ -61,30 +59,37 @@ declare namespace CompAPI {
     IsComp: boolean;
     Schedule: Schedule[];
     Done: boolean;
-  }
+  };
 
   type CostDetail = {
     Value: number;
     StartTime: string;
     EndTime: string;
-  }
+  };
 
   type Cost = {
     BaseCost: CostDetail;
-    Costs: any | null;  // todo
-    EventCost: any | null;  // todo
-  }
+    Costs: any | null; // todo
+    EventCost: any | null; // todo
+  };
 
   type CompJson = {
     Events: Event[];
     Cost: Cost;
-  }
+  };
 
   type Org = {
     Name: string;
     Introduction: string;
     Email: string;
     QQGroup: string;
+  };
+
+  type Group = {
+    name: string;
+    qq_groups: string;
+    qq_group_uid: string;
+    wechat_groups: string;
   }
 
   type Data = {
@@ -108,29 +113,45 @@ declare namespace CompAPI {
     CompEndTime: string;
     IsDone: boolean;
 
-
-    RegistrationStartTime: string;        // 报名开始时间
-    RegistrationEndTime: string;    // 报名结束时间
+    RegistrationStartTime: string; // 报名开始时间
+    RegistrationEndTime: string; // 报名结束时间
     RegistrationCancelDeadlineTime: string; // 退赛截止时间
     IsRegisterRestart: string;
-    RegistrationRestartTime: string;// 报名重开时间
+    RegistrationRestartTime: string; // 报名重开时间
 
     OrganizersID: number;
     Org: Org;
-  }
+    Group: Group;
+
+    RegisterNum: number;
+    CompedNum: number;
+
+    EarliestID: number;
+    EarliestName: string;
+
+    LatestID: number;
+    LatestName: string;
+  };
 
   type CompResp = {
     code: string;
     data: Data;
     msg: string;
-  }
+  };
 }
-
 
 declare namespace CompResultAPI {
   type CompResultResp = {
     code: string;
     data: Result[];
     msg: string;
-  }
+  };
+}
+
+declare namespace CompRecordAPI {
+  type CompRecordResp = {
+    code: string;
+    data: Record[];
+    msg: string;
+  };
 }

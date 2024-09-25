@@ -33,12 +33,3 @@
 .cube_result_player_name_col {
   min-width: 50px;
 }
-
-.cube_result_rank_col {
-  min-width: 10px;
-  max-width: 15px;
-}
-
-.cube_result_results_col {
-  /*background: rgba(225, 236, 251, 0.36);*/
-}

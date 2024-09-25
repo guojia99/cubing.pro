@@ -11,7 +11,6 @@ export function getAPIUrl() {
   }
   // 内网测试
   if (/^192\.168/.test(hostname) || /^10./.test(hostname)) {
-    alert(window.location.protocol + "//" + hostname + ":20000/v3/cube-api")
     return window.location.protocol + "//" + hostname + ":20000/v3/cube-api"
   }
   // 正式网络

@@ -40,7 +40,7 @@ export default [
   {path: '/login', component: "./User/Login"},
 
   // 比赛网页
-  {path: "/competitions", component: "./Competition/Competitions"},
+  {name: "比赛列表",path: "/competitions", component: "./Competition/Competitions"},
   {path: "/competition/:id", component: "./Competition/Competition"},
 
   // 数据

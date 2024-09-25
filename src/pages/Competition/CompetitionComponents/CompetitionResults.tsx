@@ -1,7 +1,9 @@
 import { NavTabs } from '@/components/Tabs/nav_tabs';
 import CompetitionResultsWithEvents from '@/pages/Competition/CompetitionComponents/CompetitionResultsWithEvents';
 import CompetitionResultsWithPlayers from '@/pages/Competition/CompetitionComponents/CompetitionResultsWithPlayers';
+import CompetitionResultsWithRecord from '@/pages/Competition/CompetitionComponents/CompetitionResultsWithRecord';
 import CompetitionResultsWithTop from '@/pages/Competition/CompetitionComponents/CompetitionResultsWithTop';
+import { apiCompRecord } from '@/services/cubing-pro/comps/comp';
 import { apiCompResult } from '@/services/cubing-pro/comps/result';
 import { CompAPI, CompResultAPI } from '@/services/cubing-pro/comps/typings';
 import { apiEvents } from '@/services/cubing-pro/events/events';
@@ -13,6 +15,7 @@ import { Card } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { BsPeople } from 'react-icons/bs';
 import { SiBytedance, SiCodeforces } from 'react-icons/si';
+import {Record} from "@/utils/cube_record/record";
 
 // 定义组件的属性类型
 interface CompetitionResultProps {
@@ -24,6 +27,7 @@ interface CompetitionResultProps {
 const CompetitionResult: React.FC<CompetitionResultProps> = ({ comp }) => {
   const [result, setResult] = useState<CompResultAPI.CompResultResp>();
   const [events, setEvents] = useState<EventsAPI.EventsResponse>();
+  const [records, setRecords] = useState<Record[]>();
   const fetchResult = () => {
     if (comp !== undefined) {
       apiEvents().then((value) => {
@@ -31,6 +35,9 @@ const CompetitionResult: React.FC<CompetitionResultProps> = ({ comp }) => {
       });
       apiCompResult(comp.data.id).then((value) => {
         setResult(value);
+      });
+      apiCompRecord(comp.data.id).then((value) => {
+        setRecords(value.data);
       });
     }
   };
@@ -54,6 +61,7 @@ const CompetitionResult: React.FC<CompetitionResultProps> = ({ comp }) => {
               events={events?.data.Events}
               topRank={1}
               event_divider={false}
+              records={records}
             />
           ),
           icon: <TrophyOutlined />,
@@ -68,6 +76,7 @@ const CompetitionResult: React.FC<CompetitionResultProps> = ({ comp }) => {
               events={events?.data.Events}
               topRank={3}
               event_divider={true}
+              records={records}
             />
           ),
           icon: <SiCodeforces />,
@@ -75,7 +84,13 @@ const CompetitionResult: React.FC<CompetitionResultProps> = ({ comp }) => {
         {
           key: 'record',
           label: '记录',
-          children: <>记录</>,
+          children: (
+            <CompetitionResultsWithRecord
+              comp={comp}
+              events={events?.data.Events}
+              records={records}
+            />
+          ),
           icon: <ProductOutlined />,
         },
       );
@@ -90,6 +105,7 @@ const CompetitionResult: React.FC<CompetitionResultProps> = ({ comp }) => {
             comp={comp}
             results={result.data}
             events={events?.data.Events}
+            records={records}
           />
         ),
         icon: <SiBytedance />,
@@ -102,6 +118,7 @@ const CompetitionResult: React.FC<CompetitionResultProps> = ({ comp }) => {
             comp={comp}
             results={result.data}
             events={events?.data.Events}
+            records={records}
           />
         ),
         icon: <BsPeople />,
