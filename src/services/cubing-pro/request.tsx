@@ -52,7 +52,7 @@ Request.interceptors.response.use(
     if (resp === undefined) {
       return Promise.reject(error);
     }
-
+    console.log(resp)
     const msg = resp.data as ErrorMsg
     if (msg !== undefined) {
       WarnToast(<>错误: {msg.message} ({msg.code}) </>)

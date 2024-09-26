@@ -1,4 +1,4 @@
-import {AuthHeader, saveToken} from "@/services/cubing-pro/auth/token";
+import {AuthHeader, removeToken, saveToken} from "@/services/cubing-pro/auth/token";
 import {Request} from "@/services/cubing-pro/request";
 
 
@@ -10,7 +10,7 @@ export async function captchaCode(): Promise<AuthAPI.captchaCodeResp> {
 
 /** 登录接口 POST /api/login/account */
 export async function login(body: AuthAPI.LoginRequest) {
-  const response = await Request.post<AuthAPI.Token>('/auth/login')
+  const response = await Request.post<AuthAPI.Token>('/auth/login', body)
   // 检查响应并保存token
   if (response && response.data.token) {
     saveToken(response.data);
@@ -23,12 +23,13 @@ export async function getEmailCode(body: AuthAPI.GetEmailCodeRequest) {
 }
 
 export async function refreshToken() {
-  return Request.post<AuthAPI.Token>('/auth/refresh', {headers: AuthHeader()})
+  return await Request.post<AuthAPI.Token>('/auth/refresh', {headers: AuthHeader()});
 }
 
 
 export async function logout() {
-  return Request.post<AuthAPI.Token>('/auth/logout', {headers: AuthHeader()})
+  removeToken()
+  return Request.post<AuthAPI.Token>('/auth/logout', {}, {headers: AuthHeader()})
 }
 
 export async function currentUser() {
