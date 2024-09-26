@@ -61,8 +61,8 @@ const columns: ProColumns<CompsAPI.Comp>[] = [
     dataIndex: 'CompStartTime',
     key: "CompStartTime",
     render: (text: any, result: CompsAPI.Comp) => {
-      const startTime = dayjs(result.CompStartTime);
-      const endTime = dayjs(result.CompEndTime);
+      // const startTime = dayjs(result.CompStartTime);
+      // const endTime = dayjs(result.CompEndTime);
       return (<>{parseDateTime(result.CompStartTime)}</>)
     },
     hideInSearch: true

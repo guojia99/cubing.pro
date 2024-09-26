@@ -1,11 +1,12 @@
-import {Footer, SelectLang, AvatarDropdown, AvatarName} from '@/components';
-import type {RunTimeLayoutConfig} from '@umijs/max';
+import { Footer, AvatarDropdown, AvatarName } from '@/components';
+import type { RunTimeLayoutConfig } from '@umijs/max';
 import React from 'react';
-import {currentUser} from "@/services/cubing-pro/auth/auth";
-import defaultSettings from "../config/defaultSettings";
-import {UserSwitchOutlined} from "@ant-design/icons";
-import {AvatarProps} from "antd";
-import type {Settings as LayoutSettings} from '@ant-design/pro-components';
+import { currentUser } from '@/services/cubing-pro/auth/auth';
+import defaultSettings from '../config/defaultSettings';
+import {UserOutlined, UserSwitchOutlined} from '@ant-design/icons';
+import { AvatarProps } from 'antd';
+import type { Settings as LayoutSettings } from '@ant-design/pro-components';
+import {ExtAppList} from "@/layout_config";
 
 /**
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
@@ -13,18 +14,20 @@ import type {Settings as LayoutSettings} from '@ant-design/pro-components';
 export async function getInitialState(): Promise<{
   settings?: Partial<LayoutSettings>;
   currentUser?: AuthAPI.CurrentUser;
-  fetchUserInfo?: () => Promise<{data: AuthAPI.CurrentUser} | undefined>;
+  fetchUserInfo?: () => Promise<{ data: AuthAPI.CurrentUser } | undefined>;
 }> {
   const fetchUserInfo = async () => {
     let currentUserValue: AuthAPI.CurrentUser;
-    await currentUser().then((value) => {
-      // @ts-ignore
-      currentUserValue = value.data
-    }).catch((e) => {
-      console.log(e)
-    });
+    await currentUser()
+      .then((value) => {
+        // @ts-ignore
+        currentUserValue = value.data;
+      })
+      .catch((e) => {
+        console.log(e);
+      });
     // @ts-ignore
-    return currentUserValue
+    return currentUserValue;
   };
 
   return {
@@ -35,31 +38,38 @@ export async function getInitialState(): Promise<{
   };
 }
 
-
 // startTokenRefresh();
 
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
 // @ts-ignore
-export const layout: RunTimeLayoutConfig = ({initialState, setInitialState}) => {
+export const layout: RunTimeLayoutConfig = ({ initialState }) => {
+
+  let icon: JSX.Element | undefined = <UserSwitchOutlined/>
+  if (initialState?.currentUser?.data.Avatar){
+    icon = undefined
+  } else if (initialState?.currentUser?.data.id){
+    icon = <UserOutlined />
+  }
+
   return {
-    logo: "https://avatars.githubusercontent.com/u/52768576?v=4", // todo logo
-    actionsRender: () => [<SelectLang key="SelectLang"/>],
+    // logo: 'https://avatars.githubusercontent.com/u/52768576?v=4', // todo logo
+    // actionsRender: () => [<SelectLang key="SelectLang"/>],
     avatarProps: {
-      src: initialState?.currentUser?.Avatar,
-      icon: initialState?.currentUser?.Avatar ? undefined : <UserSwitchOutlined/>,
+      src: initialState?.currentUser?.data.Avatar,
+      icon: icon,
       title: <AvatarName/>,
       render: (_: AvatarProps, avatarChildren: React.ReactNode) => {
-        return <AvatarDropdown>{avatarChildren}</AvatarDropdown>;
+        return <AvatarDropdown menu={initialState?.currentUser?.data.id !== 0 }>{avatarChildren}</AvatarDropdown>;
       },
     },
-    // appList: ExtAppList(),
+    appList: ExtAppList(),
     waterMarkProps: {
-      content: initialState?.currentUser?.CubeID,
+      content: initialState?.currentUser?.data.CubeID,
     },
-    footerRender: () => <Footer/>,
+    footerRender: () => <Footer />,
     menuHeaderRender: undefined,
     childrenRender: (children) => {
-      return (<>{children}</>);
+      return <>{children}</>;
     },
     ...initialState?.settings,
   };

@@ -1,21 +1,15 @@
 import { CubesCn } from '@/components/CubeIcon/cube';
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
+import { CompetitionLink, PlayerLink } from '@/components/Link/Links';
 import { Record } from '@/utils/cube_record/record';
-import { RecordMapWithRecordID} from '@/utils/cube_record/record_utils';
+import { RecordTag } from '@/utils/cube_record/record_tag';
 import { eventRouteM } from '@/utils/cube_result/event_route';
 import { resultTimeString } from '@/utils/cube_result/result';
-import { Link } from '@@/exports';
 import { Table } from 'antd';
-import {RecordTag} from "@/utils/cube_record/record_tag";
 
-export const RecordsTableKeys: string[] = ['EventId', 'UserName', 'Best', 'Average', 'CompsName'];
+export const RecordsTableKeys: string[] = ['EventId', 'UserName', 'Best', 'Average'];
 
-export const RecordsTable = (
-  dataSource: Record[],
-  keys: string[],
-  records: Record[] | undefined,
-) => {
-  let recordsMap = RecordMapWithRecordID(records); // map[resultsID]Record
+export const RecordsTable = (dataSource: Record[], keys: string[]) => {
   const columnsMap = new Map([
     [
       'EventId',
@@ -41,13 +35,7 @@ export const RecordsTable = (
         key: 'UserName',
         width: 100,
         render: (value: string, record: Record) => {
-          return (
-            <td>
-              <strong>
-                <Link to={'/player/' + record.UserId}>{value}</Link>
-              </strong>
-            </td>
-          );
+          return <>{PlayerLink(record.UserId, record.UserName, "")}</>;
         },
       },
     ],
@@ -63,16 +51,10 @@ export const RecordsTable = (
           let inter = m.integer ? m.integer : false;
 
           if (record.Best !== null && record.Best !== undefined) {
-            return RecordTag(
-              record,
-              resultTimeString(record.Best, inter),
-            );
+            return RecordTag(record, resultTimeString(record.Best, inter));
           }
           if (m.repeatedly && record.Repeatedly !== null && record.Repeatedly !== undefined) {
-            return RecordTag(
-              record,
-              record.Repeatedly,
-            );
+            return RecordTag(record, record.Repeatedly);
           }
           return <></>;
         },
@@ -87,10 +69,7 @@ export const RecordsTable = (
         width: 150,
         render: (value: number, record: Record) => {
           if (record.Average !== null && record.Average !== undefined) {
-            return RecordTag(
-              record,
-              resultTimeString(record.Average),
-            );
+            return RecordTag(record, resultTimeString(record.Average));
           }
           return <></>;
         },
@@ -104,13 +83,7 @@ export const RecordsTable = (
         key: 'CompsName',
         width: 300,
         render: (value: string, record: Record) => {
-          return (
-            <td>
-              <strong>
-                <Link to={'/competition/' + record.CompsId}>{value}</Link>
-              </strong>
-            </td>
-          );
+          return <>{CompetitionLink(record.CompsId, record.CompsName)}</>;
         },
       },
     ],

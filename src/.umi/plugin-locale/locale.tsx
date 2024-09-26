@@ -5,9 +5,7 @@ import React from 'react';
 import { ConfigProvider } from 'antd';
 
 import moment from '/home/guojia/worker/code/cube/cubing.pro/node_modules/dayjs';
-import '/home/guojia/worker/code/cube/cubing.pro/node_modules/dayjs/locale/en';
 import '/home/guojia/worker/code/cube/cubing.pro/node_modules/dayjs/locale/zh-cn';
-import '/home/guojia/worker/code/cube/cubing.pro/node_modules/dayjs/locale/zh-tw';
 import { RawIntlProvider, getLocale, getDirection , setIntl, getIntl, localeInfo, event, LANG_CHANGE_EVENT } from './localeExports';
 
 

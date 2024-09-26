@@ -11,38 +11,30 @@
  * @doc https://umijs.org/docs/guides/routes
  */
 export default [
-  {
-    path: '/welcome',
-    // name: 'welcome',
-    component: './Welcome',
-  },
-  {
-    path: '/',
-    redirect: '/welcome',
-  },
-  {
-    path: '*',
-    component: './404',
-  },
+  {path: '/welcome',component: './Welcome',},
+  {path: '/', redirect: '/welcome',},
+  {path: '*', component: './404',},
+
+  {path: 'settings', component: './Settings'},
 
   // 标题主页栏
-  {
-    name: '统计',
-    icon: 'dotChart',
-    path: '/static',
-    component: './Static',
-  },
-
-
+  {name: '统计', path: '/static', component: './Static'},
+  {name: "项目", path: "/events", component: "./Events/Events"},
 
   // 用户相关
-  {path: '/user',  component: './User/UserInfo'},
-  {path: '/login', component: "./User/Login"},
+  {path: '/user',  component: './User/UserInfo'}, // 用户个人信息
+  {path: '/login', component: "./User/Login"}, // 登录
+  {path: '/user/profile', component: './User/Profile'}, // 个人中心
+  {path: '/user/settings', component: './User/Settings'}, // 个人设置
+  {path: '/user/messages', component: './User/Messages'}, // 消息中心
+  {path: '/user/like', component: './User/Like'}, // 收藏
+
 
   // 比赛网页
-  {name: "比赛列表",path: "/competitions", component: "./Competition/Competitions"},
+  {name: "比赛",path: "/competitions", component: "./Competition/Competitions"},
   {path: "/competition/:id", component: "./Competition/Competition"},
 
-  // 数据
-  {name: "项目列表", path: "/events", component: "./Events/Events"},
+  // 选手
+  {name:"选手", path: "/players", component: "./Player/Players" },
+  {path: '/player/:id', component: './Player/Player'},
 ];

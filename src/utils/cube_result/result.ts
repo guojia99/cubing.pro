@@ -12,6 +12,7 @@ export type Result = {
   RoundNumber: number;
   PersonName: string;
   UserID: number;
+  CubeID: string;
   Best: number;
   Average: number;
   BestRepeatedlyReduction: number;

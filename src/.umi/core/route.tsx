@@ -4,19 +4,26 @@
 import React from 'react';
 
 export async function getRoutes() {
-  const routes = {"1":{"path":"/welcome","parentId":"ant-design-pro-layout","id":"1"},"2":{"path":"/","redirect":"/welcome","parentId":"ant-design-pro-layout","id":"2"},"3":{"path":"*","parentId":"ant-design-pro-layout","id":"3"},"4":{"name":"统计","icon":"dotChart","path":"/static","parentId":"ant-design-pro-layout","id":"4"},"5":{"path":"/user","parentId":"ant-design-pro-layout","id":"5"},"6":{"path":"/login","parentId":"ant-design-pro-layout","id":"6"},"7":{"name":"比赛列表","path":"/competitions","parentId":"ant-design-pro-layout","id":"7"},"8":{"path":"/competition/:id","parentId":"ant-design-pro-layout","id":"8"},"9":{"name":"项目列表","path":"/events","parentId":"ant-design-pro-layout","id":"9"},"ant-design-pro-layout":{"id":"ant-design-pro-layout","path":"/","isLayout":true},"umi/plugin/openapi":{"path":"/umi/plugin/openapi","id":"umi/plugin/openapi"}} as const;
+  const routes = {"1":{"path":"/welcome","parentId":"ant-design-pro-layout","id":"1"},"2":{"path":"/","redirect":"/welcome","parentId":"ant-design-pro-layout","id":"2"},"3":{"path":"*","parentId":"ant-design-pro-layout","id":"3"},"4":{"path":"settings","parentId":"ant-design-pro-layout","id":"4"},"5":{"name":"统计","path":"/static","parentId":"ant-design-pro-layout","id":"5"},"6":{"name":"项目","path":"/events","parentId":"ant-design-pro-layout","id":"6"},"7":{"path":"/user","parentId":"ant-design-pro-layout","id":"7"},"8":{"path":"/login","parentId":"ant-design-pro-layout","id":"8"},"9":{"path":"/user/profile","parentId":"ant-design-pro-layout","id":"9"},"10":{"path":"/user/settings","parentId":"ant-design-pro-layout","id":"10"},"11":{"path":"/user/messages","parentId":"ant-design-pro-layout","id":"11"},"12":{"path":"/user/like","parentId":"ant-design-pro-layout","id":"12"},"13":{"name":"比赛","path":"/competitions","parentId":"ant-design-pro-layout","id":"13"},"14":{"path":"/competition/:id","parentId":"ant-design-pro-layout","id":"14"},"15":{"name":"选手","path":"/players","parentId":"ant-design-pro-layout","id":"15"},"16":{"path":"/player/:id","parentId":"ant-design-pro-layout","id":"16"},"ant-design-pro-layout":{"id":"ant-design-pro-layout","path":"/","isLayout":true},"umi/plugin/openapi":{"path":"/umi/plugin/openapi","id":"umi/plugin/openapi"}} as const;
   return {
     routes,
     routeComponents: {
 '1': React.lazy(() => import(/* webpackChunkName: "p__Welcome" */'@/pages/Welcome.tsx')),
 '2': React.lazy(() => import('./EmptyRoute')),
 '3': React.lazy(() => import(/* webpackChunkName: "p__404" */'@/pages/404.tsx')),
-'4': React.lazy(() => import(/* webpackChunkName: "p__Static__index" */'@/pages/Static/index.tsx')),
-'5': React.lazy(() => import(/* webpackChunkName: "p__User__UserInfo" */'@/pages/User/UserInfo.tsx')),
-'6': React.lazy(() => import(/* webpackChunkName: "p__User__Login" */'@/pages/User/Login.tsx')),
-'7': React.lazy(() => import(/* webpackChunkName: "p__Competition__Competitions" */'@/pages/Competition/Competitions.tsx')),
-'8': React.lazy(() => import(/* webpackChunkName: "p__Competition__Competition" */'@/pages/Competition/Competition.tsx')),
-'9': React.lazy(() => import(/* webpackChunkName: "p__Events__Events" */'@/pages/Events/Events.tsx')),
+'4': React.lazy(() => import(/* webpackChunkName: "p__Settings" */'@/pages/Settings.tsx')),
+'5': React.lazy(() => import(/* webpackChunkName: "p__Static" */'@/pages/Static.tsx')),
+'6': React.lazy(() => import(/* webpackChunkName: "p__Events__Events" */'@/pages/Events/Events.tsx')),
+'7': React.lazy(() => import(/* webpackChunkName: "p__User__UserInfo" */'@/pages/User/UserInfo.tsx')),
+'8': React.lazy(() => import(/* webpackChunkName: "p__User__Login" */'@/pages/User/Login.tsx')),
+'9': React.lazy(() => import(/* webpackChunkName: "p__User__Profile" */'@/pages/User/Profile.tsx')),
+'10': React.lazy(() => import(/* webpackChunkName: "p__User__Settings" */'@/pages/User/Settings.tsx')),
+'11': React.lazy(() => import(/* webpackChunkName: "p__User__Messages" */'@/pages/User/Messages.tsx')),
+'12': React.lazy(() => import(/* webpackChunkName: "p__User__Like" */'@/pages/User/Like.tsx')),
+'13': React.lazy(() => import(/* webpackChunkName: "p__Competition__Competitions" */'@/pages/Competition/Competitions.tsx')),
+'14': React.lazy(() => import(/* webpackChunkName: "p__Competition__Competition" */'@/pages/Competition/Competition.tsx')),
+'15': React.lazy(() => import(/* webpackChunkName: "p__Player__Players" */'@/pages/Player/Players.tsx')),
+'16': React.lazy(() => import(/* webpackChunkName: "p__Player__Player" */'@/pages/Player/Player.tsx')),
 'ant-design-pro-layout': React.lazy(() => import(/* webpackChunkName: "umi__plugin-layout__Layout" */'/home/guojia/worker/code/cube/cubing.pro/src/.umi/plugin-layout/Layout.tsx')),
 'umi/plugin/openapi': React.lazy(() => import(/* webpackChunkName: "umi__plugin-openapi__openapi" */'/home/guojia/worker/code/cube/cubing.pro/src/.umi/plugin-openapi/openapi.tsx')),
 },

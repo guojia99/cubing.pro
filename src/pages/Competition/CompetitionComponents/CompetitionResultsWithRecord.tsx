@@ -51,7 +51,7 @@ const CompetitionResultsWithRecord: React.FC<CompetitionResultsWithRecordProps> 
     }
   }
 
-  return <>{RecordsTable(sortRecords, RecordsTableKeys, records)}</>;
+  return <>{RecordsTable(sortRecords, RecordsTableKeys)}</>;
 };
 
 export default CompetitionResultsWithRecord;

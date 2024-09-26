@@ -2,9 +2,9 @@ import { CubesCn } from '@/components/CubeIcon/cube';
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import { eventRouteM } from '@/utils/cube_result/event_route';
 import { Result, resultStringPro, resultTimeString } from '@/utils/cube_result/result';
-import { Link } from '@umijs/max';
 import { Table } from 'antd';
 
+import { PlayerLink } from '@/components/Link/Links';
 import { Record } from '@/utils/cube_record/record';
 import { RecordTagWithResult } from '@/utils/cube_record/record_tag';
 import { generateRecordMap } from '@/utils/cube_record/record_utils';
@@ -48,13 +48,7 @@ export const ResultsTable = (
           className: 'custom-cell',
         }),
         render: (value: string, result: Result) => {
-          return (
-            <td className={'cube_result_player_name_col'}>
-              <strong>
-                <Link to={'/player/' + result.UserID}>{value}</Link>
-              </strong>
-            </td>
-          );
+          return <>{PlayerLink(result.CubeID, value, "")}</>;
         },
       },
     ],

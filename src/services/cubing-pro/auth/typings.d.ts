@@ -36,7 +36,7 @@ declare namespace AuthAPI {
     lastSendTime: string;
   }
 
-  type CurrentUser = {
+  type CurrentUserData = {
     id: number;
     createdAt: string; // 可以使用 Date 类型，但需要在处理时进行转换
     updatedAt: string; // 同上
@@ -80,6 +80,10 @@ declare namespace AuthAPI {
     Birthdate: string; // 同上
     Address: string;
     DelegateName: string;
+  }
+
+  type CurrentUser = {
+   data: CurrentUserData
   }
 
   type RegisterRequest = {
