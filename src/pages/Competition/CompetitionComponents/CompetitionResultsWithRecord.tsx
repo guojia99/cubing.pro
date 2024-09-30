@@ -1,9 +1,10 @@
 import { CompAPI } from '@/services/cubing-pro/comps/typings';
 import { EventsAPI } from '@/services/cubing-pro/events/typings';
-import { Record } from '@/utils/cube_record/record';
-import { RecordsTable, RecordsTableKeys } from '@/utils/cube_record/record_tables';
+import { Record } from '@/components/Data/types/record';
+import { RecordsTable, RecordsTableKeys } from '@/components/Data/cube_record/record_tables';
 import { Divider, Skeleton } from 'antd';
 import React from 'react';
+import {MergeRecords} from "@/components/Data/cube_record/record_utils";
 
 interface CompetitionResultsWithRecordProps {
   comp?: CompAPI.CompResp;
@@ -26,6 +27,9 @@ const CompetitionResultsWithRecord: React.FC<CompetitionResultsWithRecordProps> 
       </>
     );
   }
+
+  // eslint-disable-next-line no-param-reassign
+  records = MergeRecords(records)
 
   const recordMap = records.reduce<Map<string, Record[]>>((map, record) => {
     const eventId = record.EventId;

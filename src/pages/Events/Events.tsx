@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {EventsAPI} from "@/services/cubing-pro/events/typings";
 import {apiEvents} from "@/services/cubing-pro/events/events";
 import {Divider, Table} from "antd";
-import {eventRouteM} from "@/utils/cube_result/event_route";
+import {eventRouteM} from "@/components/Data/cube_result/event_route";
 import {CubeIcon} from "@/components/CubeIcon/cube_icon";
 
 const columns = [

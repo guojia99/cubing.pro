@@ -2,13 +2,14 @@ import { CubesCn } from '@/components/CubeIcon/cube';
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import { CompAPI } from '@/services/cubing-pro/comps/typings';
 import { EventsAPI } from '@/services/cubing-pro/events/typings';
-import { Result, sortResults } from '@/utils/cube_result/result';
-import { resultsToMap } from '@/utils/cube_result/result_detail';
-import { ResultsTable } from '@/utils/cube_result/result_tables';
+import { Result, sortResults } from '@/components/Data/types/result';
+import { resultsToMap } from '@/components/Data/cube_result/result_detail';
+import { ResultsTable } from '@/components/Data/cube_result/result_tables';
 import { useNavigate } from '@@/exports';
 import { Card, Divider, Space } from 'antd';
 import React, { useEffect } from 'react';
-import {Record as CubeRecord} from "@/utils/cube_record/record";
+import {Record as CubeRecord} from "@/components/Data/types/record";
+import {RouteMaps} from "@/components/Data/cube_result/event_route";
 
 interface CompetitionResultsWithEventsProps {
   comp?: CompAPI.CompResp;
@@ -78,6 +79,10 @@ const CompetitionResultsWithEvents: React.FC<CompetitionResultsWithEventsProps> 
       data = sortResults(data);
 
       let key: string[] = ['Rank', 'PersonName', 'Best', 'Average', 'Result'];
+      if (RouteMaps.get(data[0].EventRoute)?.repeatedly){
+        key = ['CompetitionName', 'Round', 'Best', "Result_with_repeatedly"]
+      }
+
       tables.push(
         <Card title={data[0].Round} size="small">
           {ResultsTable(data, key, records)}

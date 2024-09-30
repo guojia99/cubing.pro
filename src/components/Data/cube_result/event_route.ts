@@ -1,5 +1,3 @@
-import route from "@umijs/utils/compiled/color/color-convert/route";
-
 export const Not = 0;               // 非比赛项目
 export const OneRound = 1;          // "1_r" 单轮项目
 export const ThreeRoundsBest = 2;   // "3_r_b" 三轮取最佳

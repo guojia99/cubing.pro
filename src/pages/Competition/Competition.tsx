@@ -12,6 +12,7 @@ import { useParams } from '@@/exports';
 import { BuildOutlined, ProductOutlined, ProfileOutlined, TableOutlined } from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import UpdateTitle from "@/components/Title/Title";
 
 const Competition: React.FC = () => {
   const { id } = useParams();
@@ -110,6 +111,7 @@ const Competition: React.FC = () => {
       <ScrollToTopButton />
       {/*</Watermark>*/}
       <h1 style={{ textAlign: 'center' }}>{comp ? comp.data.Name : '比赛加载中'}</h1>
+      {IfLoading(loading, <UpdateTitle title={comp?.data.Name}/>)}
       <NavTabs
         type="line"
         items={items}

@@ -1,13 +1,15 @@
-import { eventRouteM, RouteMaps } from '@/utils/cube_result/event_route';
+import { eventRouteM, RouteMaps } from '@/components/Data/cube_result/event_route';
 
 export const DNF = -10000;
 
 export type Result = {
+  Index: number;
   id: number;
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
   CompetitionID: number;
+  CompetitionName: string;
   Round: string;
   RoundNumber: number;
   PersonName: string;
@@ -161,14 +163,12 @@ export const resultString = (results: number[], eventRoute: number) => {
         resultTimeString(results[2], false, true),
       ].join(' '),
     ];
-    console.log(results);
     return out;
   }
 
   for (let i = 0; i < results.length; i++) {
     out.push(resultTimeString(results[i], inter));
   }
-
   return out;
 };
 

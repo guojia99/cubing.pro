@@ -3,11 +3,11 @@ import { CubesCn } from '@/components/CubeIcon/cube';
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import { CompAPI } from '@/services/cubing-pro/comps/typings';
 import { EventsAPI } from '@/services/cubing-pro/events/typings';
-import { Record } from '@/utils/cube_record/record';
-import { RouteMaps } from '@/utils/cube_result/event_route';
-import { DBest, DNF, Result, resultToBest, sortResults } from '@/utils/cube_result/result';
-import { resultsToMap } from '@/utils/cube_result/result_detail';
-import { ResultsTable } from '@/utils/cube_result/result_tables';
+import { Record } from '@/components/Data/types/record';
+import { RouteMaps } from '@/components/Data/cube_result/event_route';
+import { DBest, DNF, Result, resultToBest, sortResults } from '@/components/Data/types/result';
+import { resultsToMap } from '@/components/Data/cube_result/result_detail';
+import { ResultsTable } from '@/components/Data/cube_result/result_tables';
 import { Divider } from 'antd';
 import React from 'react';
 

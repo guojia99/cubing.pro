@@ -33,6 +33,7 @@ const LoginFormC: React.FC = () => {
       form={form}
       contentStyle={{ minWidth: 280, maxWidth: '70vw' }}
       title="Cubing Pro"
+
       initialValues={{ autoLogin: true }}
       submitter={{ searchConfig: { submitText: submitText(type) } }}
       onFinish={async (values) => {
@@ -62,7 +63,6 @@ const LoginFormC: React.FC = () => {
         <>
           <LoginTab />
           <CaptchaCodeTab form={form} update={updateCode} />
-
         </>
       )}
       {type === 'register' && <RegisterTab form={form} />}
@@ -75,7 +75,7 @@ const Login: React.FC = () => {
     <div
       style={{
         textAlign: 'center',
-        marginBottom: '25vh',
+        // marginBottom: '25vh',
       }}
     >
       <LoginFormC></LoginFormC>

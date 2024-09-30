@@ -1,4 +1,4 @@
-import { Record } from '@/utils/cube_record/record';
+import { Record } from '@/components/Data/types/record';
 import { Tag } from 'antd';
 
 const CR_color = '#f50';
@@ -63,10 +63,11 @@ export const RecordTag = (record: Record, values: string) => {
 
   return (
     <>
-      <strong style={{ color: color }}>{values}</strong>{' '}
       <Tag color={color} style={{ marginLeft: '3px' }}>
         {record.Type}
       </Tag>
+      {' '}
+      <strong style={{ color: color }}>{values}</strong>
     </>
   );
 };

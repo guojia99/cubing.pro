@@ -22,7 +22,7 @@ export declare namespace EventsAPI {
     msg: string
   }
 
-  function ParamsRouteTypeString(input: number): string {
+ export function ParamsRouteTypeString(input: number): string {
     const table = {
       0: "非比赛项目",
       1: "单轮项目",
@@ -35,10 +35,11 @@ export declare namespace EventsAPI {
       8: "两轮多次尝试取最佳",
       9: "三轮多次尝试取最佳"
     }
+    let inp = input
     if (input > 9){
-      input = 0
+      inp = 0
     }
-    return table[input]
+    return table[inp]
   }
 }
 

@@ -1,13 +1,13 @@
 import { CubesCn } from '@/components/CubeIcon/cube';
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
-import { eventRouteM } from '@/utils/cube_result/event_route';
-import { Result, resultStringPro, resultTimeString } from '@/utils/cube_result/result';
+import { eventRouteM } from '@/components/Data/cube_result/event_route';
+import { Result, resultStringPro, resultTimeString } from '@/components/Data/types/result';
 import { Table } from 'antd';
 
-import { PlayerLink } from '@/components/Link/Links';
-import { Record } from '@/utils/cube_record/record';
-import { RecordTagWithResult } from '@/utils/cube_record/record_tag';
-import { generateRecordMap } from '@/utils/cube_record/record_utils';
+import { RecordTagWithResult } from '@/components/Data/cube_record/record_tag';
+import { generateRecordMap } from '@/components/Data/cube_record/record_utils';
+import { Record } from '@/components/Data/types/record';
+import { CompetitionLink, PlayerLink } from '@/components/Link/Links';
 import './result_tables.css';
 
 export const playerResultKeys = ['EventNameOnlyOne', 'Round', 'Best', 'Average', 'Result'];
@@ -21,19 +21,25 @@ export const ResultsTable = (
 
   const columnsMap = new Map([
     [
+      'Index',
+      {
+        title: '序号',
+        dataIndex: 'Index',
+        key: 'Index',
+        width: 100,
+      },
+    ],
+    [
       'Round',
       {
         title: '轮次',
         dataIndex: 'Round',
         key: 'Round',
-        width: 150,
+        width: 80,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         onCell: (result: any, rowIndex: number) => ({
           className: 'custom-cell',
         }),
-        render: (value: string) => {
-          return <td className={'cube_result_round_col'}>{value}</td>;
-        },
       },
     ],
     [
@@ -48,7 +54,7 @@ export const ResultsTable = (
           className: 'custom-cell',
         }),
         render: (value: string, result: Result) => {
-          return <>{PlayerLink(result.CubeID, value, "")}</>;
+          return <>{PlayerLink(result.CubeID, value, '')}</>;
         },
       },
     ],
@@ -146,6 +152,28 @@ export const ResultsTable = (
       },
     ],
     [
+      'Result_with_repeatedly',
+      {
+        title: '成绩',
+        dataIndex: 'Result',
+        key: 'Result',
+        render: (results: number[], result: Result) => {
+          let body: JSX.Element[] = [];
+          // eslint-disable-next-line array-callback-return
+          const data = resultStringPro(results, result.EventRoute);
+          // eslint-disable-next-line array-callback-return
+          data.map((value: string) => {
+            body.push(
+              <td style={{ minWidth: '80px' }}>
+                {RecordTagWithResult(value, result.id + '_repeatedly', true, false, recordsMap)}
+              </td>,
+            );
+          });
+          return <div className={'cube_result_results_col'}>{body}</div>;
+        },
+      },
+    ],
+    [
       'EventName',
       {
         title: '项目',
@@ -205,6 +233,18 @@ export const ResultsTable = (
         },
       },
     ],
+    [
+      'CompetitionName',
+      {
+        title: '比赛',
+        dataIndex: 'CompetitionName',
+        key: 'CompetitionName',
+        render: (value: string, record: Result) => {
+          return <>{CompetitionLink(record.CompetitionID, value)}</>;
+        },
+        width: 260,
+      },
+    ],
   ]);
 
   let columns = [];
@@ -222,6 +262,7 @@ export const ResultsTable = (
       // @ts-ignore
       columns={columns}
       pagination={false}
+      size="small"
       scroll={{ x: 'max-content' }} // 启用横向滚动
     />
   );

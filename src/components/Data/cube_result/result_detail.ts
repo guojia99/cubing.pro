@@ -1,4 +1,4 @@
-import { Result } from '@/utils/cube_result/result';
+import { Result } from '@/components/Data/types/result';
 
 export type resultsToMapOut = {
   withEvent: Map<string, Result[]>;

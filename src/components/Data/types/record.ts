@@ -1,4 +1,5 @@
 export type Record = {
+  Index: number;
   id: number;
   createdAt: string;
   updatedAt: string;

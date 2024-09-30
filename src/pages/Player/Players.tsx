@@ -3,6 +3,8 @@ import { apiPlayers } from '@/services/cubing-pro/players/players';
 import { ProTable } from '@ant-design/pro-table';
 import { ProColumns } from '@ant-design/pro-table/es/typing';
 import React, { useRef, useState } from 'react';
+import {rowClassNameWithStyleLines} from "@/components/Table/table_style";
+import {PlayersAPI} from "@/services/cubing-pro/players/typings";
 
 const columns: ProColumns<PlayersAPI.Player>[] = [
   {
@@ -58,6 +60,7 @@ const Players: React.FC = () => {
         title={() => {
           return <>选手列表</>;
         }}
+        rowClassName={rowClassNameWithStyleLines}
         columns={columns}
         onReset={resetParams}
         params={tableParams}
