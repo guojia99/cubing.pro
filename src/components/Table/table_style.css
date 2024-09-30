@@ -1,0 +1,10 @@
+.lightitem {
+  &>td {
+    background-color: #ffffff;
+  }
+}
+.darkitem {
+  &>td {
+    background-color: rgba(231, 231, 231, 0.5);
+  }
+}

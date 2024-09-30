@@ -1,21 +1,7 @@
-import { Result } from '@/utils/cube_result/result';
+import { Result } from '@/components/Data/types/result';
+import {Comp} from "@/components/Data/types/comps";
 
 declare namespace CompsAPI {
-  type Comp = {
-    id: number;
-    StrId: string;
-    Name: string;
-    country: string;
-    City: string;
-    Genre: number;
-    CompStartTime: string;
-    CompEndTime: string;
-    EventMin: string;
-    Series: string;
-    Status: string;
-    logo: string;
-  };
-
   type CompsReq = {
     page: number;
     size: number;

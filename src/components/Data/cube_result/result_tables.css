@@ -24,12 +24,6 @@
   transform: translateY(-50%); /* 使线垂直居中 */
 }
 
-.cube_result_round_col {
-  min-width: 100px;
-  width: 100px;
-  max-width: 120px;
-}
-
 .cube_result_player_name_col {
   min-width: 50px;
 }

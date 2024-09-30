@@ -3,10 +3,10 @@ import type { RunTimeLayoutConfig } from '@umijs/max';
 import React from 'react';
 import { currentUser } from '@/services/cubing-pro/auth/auth';
 import defaultSettings from '../config/defaultSettings';
-import {UserOutlined, UserSwitchOutlined} from '@ant-design/icons';
-import { AvatarProps } from 'antd';
+import { UserOutlined, UserSwitchOutlined } from '@ant-design/icons';
+import { AvatarProps, Col, Row } from 'antd';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
-import {ExtAppList} from "@/layout_config";
+import { ExtAppList } from '@/layout_config';
 
 /**
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
@@ -43,23 +43,38 @@ export async function getInitialState(): Promise<{
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
 // @ts-ignore
 export const layout: RunTimeLayoutConfig = ({ initialState }) => {
-
-  let icon: JSX.Element | undefined = <UserSwitchOutlined/>
-  if (initialState?.currentUser?.data.Avatar){
-    icon = undefined
-  } else if (initialState?.currentUser?.data.id){
-    icon = <UserOutlined />
+  let icon: JSX.Element | undefined = <UserSwitchOutlined />;
+  if (initialState?.currentUser?.data.Avatar) {
+    icon = undefined;
+  } else if (initialState?.currentUser?.data.id) {
+    icon = <UserOutlined />;
   }
+
+  const hiddenPage = (props: { location: { pathname: any } }) => {
+    const { pathname } = props.location;
+    const noNavbarPaths = ['/login'];
+    return !noNavbarPaths.includes(pathname);
+  };
 
   return {
     // logo: 'https://avatars.githubusercontent.com/u/52768576?v=4', // todo logo
     // actionsRender: () => [<SelectLang key="SelectLang"/>],
+    // headerRender:hiddenPage,
+    // disableContentMargin: true,
+    // menuRender: hiddenPage,
+    // menuHeaderRender: hiddenPage,
+
+
     avatarProps: {
       src: initialState?.currentUser?.data.Avatar,
       icon: icon,
-      title: <AvatarName/>,
+      title: <AvatarName />,
       render: (_: AvatarProps, avatarChildren: React.ReactNode) => {
-        return <AvatarDropdown menu={initialState?.currentUser?.data.id !== 0 }>{avatarChildren}</AvatarDropdown>;
+        return (
+          <AvatarDropdown menu={initialState?.currentUser?.data.id !== 0}>
+            {avatarChildren}
+          </AvatarDropdown>
+        );
       },
     },
     appList: ExtAppList(),
@@ -67,9 +82,16 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
       content: initialState?.currentUser?.data.CubeID,
     },
     footerRender: () => <Footer />,
-    menuHeaderRender: undefined,
     childrenRender: (children) => {
-      return <>{children}</>;
+      return (
+        <Row>
+          <Col xs={0} sm={0} md={0} lg={1} xl={3} xxl={3} />
+          <Col xs={24} sm={24} md={24} lg={22} xl={18} xxl={18}>
+            {children}
+          </Col>
+          <Col xs={0} sm={0} md={0} lg={1} xl={3} xxl={3} />
+        </Row>
+      );
     },
     ...initialState?.settings,
   };

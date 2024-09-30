@@ -1,16 +1,25 @@
 import { CubesCn } from '@/components/CubeIcon/cube';
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import { CompetitionLink, PlayerLink } from '@/components/Link/Links';
-import { Record } from '@/utils/cube_record/record';
-import { RecordTag } from '@/utils/cube_record/record_tag';
-import { eventRouteM } from '@/utils/cube_result/event_route';
-import { resultTimeString } from '@/utils/cube_result/result';
+import { Record } from '@/components/Data/types/record';
+import { RecordTag } from '@/components/Data/cube_record/record_tag';
+import { eventRouteM } from '@/components/Data/cube_result/event_route';
+import { resultTimeString } from '@/components/Data/types/result';
 import { Table } from 'antd';
 
 export const RecordsTableKeys: string[] = ['EventId', 'UserName', 'Best', 'Average'];
 
 export const RecordsTable = (dataSource: Record[], keys: string[]) => {
   const columnsMap = new Map([
+    [
+      "Index",
+      {
+        title: "序号",
+        dataIndex: 'Index',
+        key: 'Index',
+        width: 100,
+      }
+    ],
     [
       'EventId',
       {
@@ -103,6 +112,7 @@ export const RecordsTable = (dataSource: Record[], keys: string[]) => {
       dataSource={dataSource}
       // @ts-ignore
       columns={columns}
+      size="small"
       pagination={false}
       scroll={{ x: 'max-content' }} // 启用横向滚动
     />

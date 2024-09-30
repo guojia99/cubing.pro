@@ -8,14 +8,14 @@ import { apiCompResult } from '@/services/cubing-pro/comps/result';
 import { CompAPI, CompResultAPI } from '@/services/cubing-pro/comps/typings';
 import { apiEvents } from '@/services/cubing-pro/events/events';
 import { EventsAPI } from '@/services/cubing-pro/events/typings';
-import { Result } from '@/utils/cube_result/result';
+import { Result } from '@/components/Data/types/result';
 import { ProductOutlined, TrophyOutlined } from '@ant-design/icons';
 import { ProDescriptions } from '@ant-design/pro-components';
 import { Card } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { BsPeople } from 'react-icons/bs';
 import { SiBytedance, SiCodeforces } from 'react-icons/si';
-import {Record} from "@/utils/cube_record/record";
+import { Record } from '@/components/Data/types/record';
 
 // 定义组件的属性类型
 interface CompetitionResultProps {

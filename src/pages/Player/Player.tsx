@@ -4,6 +4,9 @@ import React, { useEffect, useState } from 'react';
 import {P404} from "@/components/Status/404";
 import PlayerDetail from "@/pages/Player/PlayerComponents/PlayerDetail";
 import {IfLoading} from "@/components/Wait/wait";
+import UpdateTitle from "@/components/Title/Title";
+import PlayerResults from "@/pages/Player/PlayerComponents/PlayerResults";
+import {PlayersAPI} from "@/services/cubing-pro/players/typings";
 
 const Player: React.FC = () => {
   const { id } = useParams();
@@ -33,16 +36,20 @@ const Player: React.FC = () => {
 
   const tabs = (
     <>
-      {IfLoading(loading,<PlayerDetail player={player} key={"player_detail"} />)}
+      <div>
+        {IfLoading(loading, <UpdateTitle title={player?.Name}/>)}
+        {IfLoading(loading, <PlayerDetail player={player} key={'player_detail'} />)}
+        {IfLoading(loading, <PlayerResults player={player} />  )}
+      </div>
     </>
-  )
+  );
 
   return (
     <>
       {is404 && P404('玩家不存在')}
       {!is404 && tabs}
     </>
-  )
+  );
 };
 
 export default Player;

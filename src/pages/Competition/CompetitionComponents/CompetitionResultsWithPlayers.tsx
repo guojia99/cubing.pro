@@ -1,13 +1,13 @@
 // 定义组件的属性类型
 import { CompAPI } from '@/services/cubing-pro/comps/typings';
 import { EventsAPI } from '@/services/cubing-pro/events/typings';
-import { Result } from '@/utils/cube_result/result';
-import { resultsToMap } from '@/utils/cube_result/result_detail';
-import { playerResultKeys, ResultsTable } from '@/utils/cube_result/result_tables';
+import { Result } from '@/components/Data/types/result';
+import { resultsToMap } from '@/components/Data/cube_result/result_detail';
+import { playerResultKeys, ResultsTable } from '@/components/Data/cube_result/result_tables';
 import { useNavigate } from '@@/exports';
 import { Divider } from 'antd';
 import React, { useEffect } from 'react';
-import {Record} from "@/utils/cube_record/record";
+import {Record} from "@/components/Data/types/record";
 
 interface CompetitionResultsWithPlayersProps {
   comp?: CompAPI.CompResp;

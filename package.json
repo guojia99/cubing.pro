@@ -54,6 +54,8 @@
     "bootstrap-icons": "^1.11.3",
     "classnames": "^2.5.1",
     "crypto-js": "^4.2.0",
+    "echarts": "^5.5.1",
+    "echarts-for-react": "^3.0.2",
     "lodash": "^4.17.21",
     "lucide-react": "^0.439.0",
     "moment": "^2.30.1",
