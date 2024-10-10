@@ -22,12 +22,17 @@ export default [
   {name: "项目", path: "/events", component: "./Events/Events"},
 
   // 用户相关
-  {path: '/user',  component: './User/UserInfo'}, // 用户个人信息
+
   {path: '/login', component: "./User/Login", hidden: true}, // 登录
+  {path: '/register', component: "./User/Register", hidden: true}, // 注册
   {path: '/user/profile', component: './User/Profile'}, // 个人中心
-  {path: '/user/settings', component: './User/Settings'}, // 个人设置
-  {path: '/user/messages', component: './User/Messages'}, // 消息中心
-  {path: '/user/like', component: './User/Like'}, // 收藏
+  // {path: '/user',  component: './User/UserInfo'}, // 用户个人信息
+  // {path: '/user/settings', component: './User/Settings'}, // 个人设置
+  // {path: '/user/messages', component: './User/Messages'}, // 消息中心
+  // {path: '/user/like', component: './User/Like'}, // 收藏
+  {path: 'user/organizers', component: "./User/Organizers",},
+  {path: 'user/admins', component: "./User/Admin",},
+
 
 
   // 比赛网页

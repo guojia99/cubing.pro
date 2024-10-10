@@ -1,24 +1,28 @@
 import { CubesCn } from '@/components/CubeIcon/cube';
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
-import { CompetitionLink, PlayerLink } from '@/components/Link/Links';
-import { Record } from '@/components/Data/types/record';
 import { RecordTag } from '@/components/Data/cube_record/record_tag';
 import { eventRouteM } from '@/components/Data/cube_result/event_route';
+import { MRecord, Record } from '@/components/Data/types/record';
 import { resultTimeString } from '@/components/Data/types/result';
+import { CompetitionLink, PlayerLink } from '@/components/Link/Links';
 import { Table } from 'antd';
 
 export const RecordsTableKeys: string[] = ['EventId', 'UserName', 'Best', 'Average'];
 
-export const RecordsTable = (dataSource: Record[], keys: string[]) => {
+export const RecordsTable = (
+  dataSource: Record[] | MRecord[],
+  keys: string[],
+  tag: boolean = true,
+) => {
   const columnsMap = new Map([
     [
-      "Index",
+      'Index',
       {
-        title: "序号",
+        title: '序号',
         dataIndex: 'Index',
         key: 'Index',
         width: 100,
-      }
+      },
     ],
     [
       'EventId',
@@ -44,7 +48,7 @@ export const RecordsTable = (dataSource: Record[], keys: string[]) => {
         key: 'UserName',
         width: 100,
         render: (value: string, record: Record) => {
-          return <>{PlayerLink(record.UserId, record.UserName, "")}</>;
+          return <>{PlayerLink(record.CubeId, record.UserName, '')}</>;
         },
       },
     ],
@@ -60,9 +64,16 @@ export const RecordsTable = (dataSource: Record[], keys: string[]) => {
           let inter = m.integer ? m.integer : false;
 
           if (record.Best !== null && record.Best !== undefined) {
+            if (!tag) {
+              return <strong>{resultTimeString(record.Best, inter)}</strong>;
+            }
+
             return RecordTag(record, resultTimeString(record.Best, inter));
           }
           if (m.repeatedly && record.Repeatedly !== null && record.Repeatedly !== undefined) {
+            if (!tag) {
+              return <strong>{record.Repeatedly}</strong>;
+            }
             return RecordTag(record, record.Repeatedly);
           }
           return <></>;
@@ -78,6 +89,9 @@ export const RecordsTable = (dataSource: Record[], keys: string[]) => {
         width: 150,
         render: (value: number, record: Record) => {
           if (record.Average !== null && record.Average !== undefined) {
+            if (!tag) {
+              return <strong>{resultTimeString(record.Average)}</strong>;
+            }
             return RecordTag(record, resultTimeString(record.Average));
           }
           return <></>;
@@ -93,6 +107,49 @@ export const RecordsTable = (dataSource: Record[], keys: string[]) => {
         width: 300,
         render: (value: string, record: Record) => {
           return <>{CompetitionLink(record.CompsId, record.CompsName)}</>;
+        },
+      },
+    ],
+    [
+      'MEventId',
+      {
+        title: '项目',
+        dataIndex: 'EventId',
+        key: 'EventId',
+        width: 100,
+        render: (value: string, record: MRecord) => {
+          if (record.BestRank !== 1 || record.AvgRank !== 1) {
+            return <></>;
+          }
+          return (
+            <td>
+              {CubeIcon(record?.MEventId, record.id + 'record', {})} {CubesCn(record.MEventId)}
+            </td>
+          );
+        },
+      },
+    ],
+    [
+      'BestUserName',
+      {
+        title: '选手',
+        dataIndex: 'Best',
+        key: 'Best',
+        width: 150,
+        render: (value: string, record: MRecord) => {
+          return <>{PlayerLink(record.BestUserCudaId, record.BestUserName, '')}</>;
+        },
+      },
+    ],
+    [
+      'AvgUserName',
+      {
+        title: '选手',
+        dataIndex: 'Best',
+        key: 'Best',
+        width: 150,
+        render: (value: string, record: MRecord) => {
+          return <>{PlayerLink(record.AvgUserCudaId, record.AvgUserName, '')}</>;
         },
       },
     ],
@@ -115,6 +172,7 @@ export const RecordsTable = (dataSource: Record[], keys: string[]) => {
       size="small"
       pagination={false}
       scroll={{ x: 'max-content' }} // 启用横向滚动
+      sticky
     />
   );
 };

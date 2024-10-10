@@ -7,6 +7,7 @@ export type Record = {
   EventRoute: number;
   ResultId: number;
   UserId: number;
+  CubeId: string;
   UserName: string;
   CompsId: number;
   CompsName: string;
@@ -17,3 +18,15 @@ export type Record = {
   ThisResults: string;
   Type: string;
 };
+
+
+export type MRecord = Record & {
+  MEventId: string;
+  BestUserCudaId: string;
+  BestUserName: string;
+  BestRank: number;
+
+  AvgUserCudaId: string;
+  AvgUserName: string;
+  AvgRank: number;
+}

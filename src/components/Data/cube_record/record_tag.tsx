@@ -63,10 +63,9 @@ export const RecordTag = (record: Record, values: string) => {
 
   return (
     <>
-      <Tag color={color} style={{ marginLeft: '3px' }}>
+      <Tag color={color} style={{ marginLeft: '3px', maxWidth: "30px"}}>
         {record.Type}
       </Tag>
-      {' '}
       <strong style={{ color: color }}>{values}</strong>
     </>
   );

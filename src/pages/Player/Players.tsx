@@ -98,7 +98,9 @@ const Players: React.FC = () => {
           });
         }}
         options={false}
+
         actionRef={actionRef}
+        sticky
       />
     </>
   );

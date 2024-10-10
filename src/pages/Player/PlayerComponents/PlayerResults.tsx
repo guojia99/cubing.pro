@@ -26,6 +26,7 @@ import {Comp} from "@/components/Data/types/comps";
 import PlayerResultsRecord from "@/pages/Player/PlayerComponents/PlayerResultRecord";
 import PlayerResultsNemesis from "@/pages/Player/PlayerComponents/PlayerResultNemesis";
 import PlayerResultsSor from "@/pages/Player/PlayerComponents/PlayerResultSor";
+import {KinChSorResult} from "@/services/cubing-pro/statistics/typings";
 
 interface PlayerResultsProps {
   player?: PlayersAPI.Player;
@@ -37,7 +38,7 @@ const PlayerResults: React.FC<PlayerResultsProps> = ({ player }) => {
   const [nemesis, setNemesis] = useState<PlayersAPI.BestResults[]>([])
   const [records, setRecords] = useState< Record[]>([])
   const [comps, setComps] = useState<Comp[]>([])
-  const [sor, setSor] = useState<PlayersAPI.KinChSorResult>()
+  const [sor, setSor] = useState<KinChSorResult>()
 
 
   const fetchResult = () => {

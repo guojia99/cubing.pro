@@ -37,5 +37,6 @@ export async function currentUser() {
 }
 
 export async function register(req: AuthAPI.RegisterRequest) {
-  return Request.post<any>("/auth/register", req, {headers: AuthHeader()})
+  console.log(req)
+  return Request.post<any>("/auth/register", req)
 }
