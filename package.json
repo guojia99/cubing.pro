@@ -48,6 +48,7 @@
   "dependencies": {
     "@ant-design/icons": "^4.8.1",
     "@ant-design/pro-components": "^2.6.48",
+    "@react-three/fiber": "^8.17.10",
     "@umijs/route-utils": "^2.2.2",
     "antd": "^5.13.2",
     "antd-style": "^3.6.1",
@@ -70,6 +71,7 @@
     "react-markdown": "^9.0.1",
     "react-toastify": "^10.0.5",
     "remark-gfm": "^4.0.0",
+    "three": "^0.169.0",
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {

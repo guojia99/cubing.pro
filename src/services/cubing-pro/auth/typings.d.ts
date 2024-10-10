@@ -97,5 +97,6 @@ declare namespace AuthAPI {
     emailCode: string;
     cubeID: string;
     initPassword: string;
+    QQ: string;
   }
 }

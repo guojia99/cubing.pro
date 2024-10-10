@@ -43,6 +43,10 @@ const Competitions: React.FC = () => {
             name: name,
           });
           const value = await apiComps(tableParams);
+
+          for (let i = 0; i < value.data.items.length; i++) {
+            value.data.items[i].Index = (tableParams.page - 1) * tableParams.size + i + 1;
+          }
           return { data: value.data.items, success: true, total: value.data.total };
         }}
         search={{
@@ -65,6 +69,7 @@ const Competitions: React.FC = () => {
         }}
         options={false}
         actionRef={actionRef}
+        sticky
       />
     </>
   );

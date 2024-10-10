@@ -7,6 +7,7 @@ import { UserOutlined, UserSwitchOutlined } from '@ant-design/icons';
 import { AvatarProps, Col, Row } from 'antd';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { ExtAppList } from '@/layout_config';
+import ParticleBackground from "@/components/background/WaveBackground";
 
 /**
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
@@ -83,13 +84,19 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     },
     footerRender: () => <Footer />,
     childrenRender: (children) => {
+      // return (<>{children}</>)
+
       return (
         <Row>
-          <Col xs={0} sm={0} md={0} lg={1} xl={3} xxl={3} />
-          <Col xs={24} sm={24} md={24} lg={22} xl={18} xxl={18}>
+          {/*<Col xs={24} sm={24} md={24} lg={24} xl={24} xxl={24}>*/}
+          {/*  {children}*/}
+          {/*</Col>*/}
+          <ParticleBackground></ParticleBackground>
+          <Col xs={0} sm={0} md={0} lg={1} xl={2} xxl={2} />
+          <Col xs={24} sm={24} md={24} lg={22} xl={20} xxl={20}>
             {children}
           </Col>
-          <Col xs={0} sm={0} md={0} lg={1} xl={3} xxl={3} />
+          <Col xs={0} sm={0} md={0} lg={1} xl={2} xxl={2} />
         </Row>
       );
     },

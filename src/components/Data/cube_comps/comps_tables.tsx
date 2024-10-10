@@ -6,8 +6,6 @@ import {parseDateTime} from "@/utils/time/data_time";
 import {Link} from "react-router-dom";
 import {CubeIcon} from "@/components/CubeIcon/cube_icon";
 import React from "react";
-import {Result} from "@/components/Data/types/result";
-import {Record} from "@/components/Data/types/record";
 
 function getStatusProp(result: Comp) {
   const now = dayjs();
@@ -47,21 +45,18 @@ export const CompsTableColumns: ProColumns<Comp>[] = [
     title: "序号",
     dataIndex: 'Index',
     key: 'Index',
-  },
-  {
-    title: '',
-    dataIndex: 'status',
-    key: '',
+    hideInSearch: true,
+    width: 50,
     colSize: 1,
-    render: (text: any, result: Comp) => {
+    render: (value: any, result: Comp) => {
       const status = getStatusProp(result);
       return (
         <div style={{ textAlign: 'center' }}>
           <Badge color={status.color} size="default" style={{ marginRight: '10px' }} />
+          {value}
         </div>
       );
-    },
-    hideInSearch: true,
+    }
   },
   {
     title: '日期',
@@ -73,6 +68,7 @@ export const CompsTableColumns: ProColumns<Comp>[] = [
       return <>{parseDateTime(result.CompStartTime)}</>;
     },
     hideInSearch: true,
+    width: 150,
   },
   // {
   //   title: "结束日",
@@ -122,6 +118,7 @@ export const CompsTableColumns: ProColumns<Comp>[] = [
         </>
       );
     },
+    width: 80,
   },
   {
     title: '名称',
@@ -143,6 +140,7 @@ export const CompsTableColumns: ProColumns<Comp>[] = [
         </>
       );
     },
+    width: 350,
   },
   {
     title: '项目',

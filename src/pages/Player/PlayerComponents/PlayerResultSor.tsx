@@ -1,11 +1,11 @@
 import { CubesCn } from '@/components/CubeIcon/cube';
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
-import { PlayersAPI } from '@/services/cubing-pro/players/typings';
-import { Table } from 'antd';
+import {Button, Popover, Table} from 'antd';
 import React from 'react';
+import {KinChSorResult} from "@/services/cubing-pro/statistics/typings";
 
 interface PlayerResultsSorProps {
-  kinchSor?: PlayersAPI.KinChSorResult;
+  kinchSor?: KinChSorResult;
 }
 
 const PlayerResultsSor: React.FC<PlayerResultsSorProps> = ({ kinchSor }) => {
@@ -52,13 +52,26 @@ const PlayerResultsSor: React.FC<PlayerResultsSorProps> = ({ kinchSor }) => {
   let withEvent = [];
   for (let i = 0; i < kinchSor.Results.length; i++) {
     withEvent.push({
-      Event: kinchSor.Results[i].Event.id,
+      Event: kinchSor.Results[i].Event,
       Value: kinchSor.Results[i].Result,
     });
   }
 
+
+  const content = (
+    <div>
+      <p>计时项目: (全网最佳 / 最佳分) × 100 </p>
+      <p>多盲等多次尝试项目: 多盲分+(60-用时)/60</p>
+    </div>
+  );
+
   return (
     <>
+      <Popover content={content} title="KinChSor 算法说明" trigger="hover">
+        <Button style={{fontSize: 10, width: "4em", padding: 0, height: "2.5em", background: "#d8e7e6"}}>说明</Button>
+      </Popover>
+
+
       <h3 style={{ marginTop: '20px', marginBottom: '20px' }}>
         <strong>总分</strong>
       </h3>

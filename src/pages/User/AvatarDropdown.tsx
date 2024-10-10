@@ -1,12 +1,15 @@
+import { Auth, hasAuth } from '@/pages/User/AuthComponents';
 import { logout } from '@/services/cubing-pro/auth/auth';
 import { history, useModel } from '@umijs/max';
 import { stringify } from 'querystring';
 import type { MenuInfo } from 'rc-menu/lib/interface';
 import React, { useCallback } from 'react';
 import { flushSync } from 'react-dom';
-import { BsFillPersonLinesFill } from 'react-icons/bs';
-import { FaHospitalUser } from 'react-icons/fa6';
+import {BsClipboard2Data, BsFillPersonLinesFill} from 'react-icons/bs';
+import {FaCubesStacked, FaHospitalUser} from 'react-icons/fa6';
+import { LuComponent } from 'react-icons/lu';
 import {
+  RiAdminLine,
   RiLoginBoxFill,
   RiLogoutBoxRFill,
   RiMessage3Fill,
@@ -104,7 +107,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
     {
       key: 'login',
       icon: <RiLoginBoxFill />,
-      label: '登录/注册',
+      label: '登录',
     },
   ];
 
@@ -148,26 +151,37 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
       label: '个人中心',
     },
     {
-      key: 'user/messages',
-      icon: <RiMessage3Fill />,
-      label: '消息中心',
-    },
-    {
-      key: 'user/like',
-      icon: <RiUserHeartFill />,
-      label: '我的收藏',
-    },
-    {
-      key: 'user/settings',
-      icon: <RiUserSettingsFill />,
-      label: '个人设置',
+      key: 'user/pre_result',
+      icon: <BsClipboard2Data />,
+      label: '成绩录入',
     },
     {
       type: 'divider' as const,
     },
   ];
 
-  const menuItems = [...(menu ? [...userMenu] : []), ...logoutMenu];
+  const adminsMenu = [];
+  if (hasAuth(user.data.Auth, Auth.AuthOrganizers)) {
+    adminsMenu.push({
+      key: 'user/organizers',
+      icon: <LuComponent />,
+      label: '主办管理',
+    });
+  }
+
+  if (hasAuth(user.data.Auth, Auth.AuthAdmin) || hasAuth(user.data.Auth, Auth.AuthSuperAdmin)) {
+    adminsMenu.push({
+      key: 'user/admins',
+      icon: <RiAdminLine />,
+      label: '后台管理',
+    });
+  }
+
+  if (adminsMenu.length > 0) {
+    adminsMenu.push({ type: 'divider' as const });
+  }
+
+  const menuItems = [...(menu ? [...userMenu, ...adminsMenu] : []), ...logoutMenu];
 
   return (
     <HeaderDropdown

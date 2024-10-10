@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {useLocation} from 'react-router-dom';
 import {Tabs} from "antd";
 import {useNavigate} from "react-router";
@@ -11,6 +11,7 @@ export type NavTabsProps = {
   style?: React.CSSProperties;
   indicator?: any;
   centered?: boolean;
+  tabPosition?: 'left' | 'right' | 'top' | 'bottom';
 }
 
 export const NavTabs = (props: NavTabsProps) => {
@@ -31,6 +32,7 @@ export const NavTabs = (props: NavTabsProps) => {
 
   return (
     <Tabs
+      tabPosition={props.tabPosition}
       centered={props.centered}
       defaultActiveKey={defaultTabKey}
       activeKey={defaultTabKey}

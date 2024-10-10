@@ -1,15 +1,15 @@
 import { CubesCn } from '@/components/CubeIcon/cube';
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
+import { eventRouteM } from '@/components/Data/cube_result/event_route';
+import { Result, resultString, resultTimeString } from '@/components/Data/types/result';
 import { WCALink } from '@/components/Link/Links';
 import { rowClassNameWithStyleLines } from '@/components/Table/table_style';
 import { apiEvents } from '@/services/cubing-pro/events/events';
 import { EventsAPI } from '@/services/cubing-pro/events/typings';
-import { eventRouteM } from '@/components/Data/cube_result/event_route';
-import { Result, resultString, resultTimeString } from '@/components/Data/types/result';
+import { PlayersAPI } from '@/services/cubing-pro/players/typings';
 import { ProColumns } from '@ant-design/pro-table/es/typing';
-import { Avatar, Card, Table } from 'antd';
+import { Avatar, Card, Table, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
-import {PlayersAPI} from '@/services/cubing-pro/players/typings';
 
 interface PlayerDetailProps {
   player?: PlayersAPI.Player;
@@ -60,6 +60,7 @@ const detailCol = [
 
 type BestTableRow = {
   event: string;
+  Route: number;
   bestCRRank: string;
   bestResult: string;
   avgResult: string;
@@ -136,14 +137,23 @@ const PlayerDetail: React.FC<PlayerDetailProps> = ({ player }) => {
   const wcaBestCols: BestTableRow[] = [];
   const bestCols: BestTableRow[] = [];
 
+  const tags = [];
+
+  let wcaEventsLen = 0;
   events?.data.Events.forEach((value: EventsAPI.Event) => {
     if (!value.isComp) {
       return;
     }
-    if (player?.BestResults === null || player?.BestResults === undefined || player?.BestResults.Single === null){
+    if (value.isWCA) {
+      wcaEventsLen += 1;
+    }
+    if (
+      player?.BestResults === null ||
+      player?.BestResults === undefined ||
+      player?.BestResults.Single === null
+    ) {
       return;
     }
-
 
     const best = player?.BestResults.Single[value.id] as Result;
     if (best === undefined) {
@@ -158,6 +168,7 @@ const PlayerDetail: React.FC<PlayerDetailProps> = ({ player }) => {
     }
 
     let row: BestTableRow = {
+      Route: value.base_route_typ,
       event: value.id,
       bestCRRank: best.Rank + '',
       bestResult: bestResult,
@@ -165,10 +176,9 @@ const PlayerDetail: React.FC<PlayerDetailProps> = ({ player }) => {
       avgCRRank: '-',
     };
 
-
     if (player?.BestResults.Avgs !== null) {
       const avg = player?.BestResults.Avgs[value.id] as Result;
-      if (avg !== undefined){
+      if (avg !== undefined) {
         row.avgCRRank = avg.Rank + '';
         row.avgResult = resultTimeString(avg.Average);
       }
@@ -180,15 +190,31 @@ const PlayerDetail: React.FC<PlayerDetailProps> = ({ player }) => {
     }
   });
 
+  if (wcaEventsLen === wcaBestCols.length) {
+    let has = true
+    for (let i = 0; i < wcaBestCols.length; i++) {
+      if (eventRouteM(wcaBestCols[i].Route).repeatedly){
+        continue;
+      }
+      if (wcaBestCols[i].avgResult === "-"){
+        has = false
+      }
+    }
+    if (has){
+      tags.push(<Tag color="red">大满贯</Tag>);
+    }
+  }
 
   return (
     <div className="p-6">
-      <Card style={{marginBottom: '30px'}}>
-        <div style={{textAlign: 'center'}}>
+      <Card style={{ marginBottom: '30px' }}>
+        <div style={{ textAlign: 'center' }}>
           {player?.Avatar && (
-            <Avatar size={100} src={player?.Avatar} style={{marginBottom: '20px'}}/>
+            <Avatar size={100} src={player?.Avatar} style={{ marginBottom: '20px' }} />
           )}
-          <h2 style={{fontWeight: '700'}}>{player?.Name}</h2>
+          <h2 style={{ fontWeight: '700' }}>{player?.Name}</h2>
+          <>{tags}</>
+
           <Table
             // @ts-ignore
             columns={detailCol}
@@ -208,7 +234,7 @@ const PlayerDetail: React.FC<PlayerDetailProps> = ({ player }) => {
         <div>
           {wcaBestCols.length > 0 && (
             <>
-              <h3 style={{fontWeight: '700', textAlign: 'center', marginTop: '30px'}}>
+              <h3 style={{ fontWeight: '700', textAlign: 'center', marginTop: '30px' }}>
                 最佳记录
               </h3>
               <Table
@@ -225,7 +251,7 @@ const PlayerDetail: React.FC<PlayerDetailProps> = ({ player }) => {
           {bestCols.length > 0 && (
             <>
               {' '}
-              <h3 style={{fontWeight: '700', textAlign: 'center', marginTop: '30px'}}>
+              <h3 style={{ fontWeight: '700', textAlign: 'center', marginTop: '30px' }}>
                 趣味项目
               </h3>
               <Table

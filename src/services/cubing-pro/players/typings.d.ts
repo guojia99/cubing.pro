@@ -1,7 +1,7 @@
 import { Record } from '@/components/Data/types/record';
 import { Result } from '@/components/Data/types/result';
 import { CompsAPI } from '@/services/cubing-pro/comps/typings';
-import { EventsAPI } from '@/services/cubing-pro/events/typings';
+import { KinChSorResult } from '@/services/cubing-pro/statistics/typings';
 
 declare namespace PlayersAPI {
   export type Detail = {
@@ -105,22 +105,7 @@ declare namespace PlayersAPI {
     };
   };
 
-  export type KinChSorResultWithEvent = {
-    Event: EventsAPI.Event;
-    Result: number;
-    IsBest: boolean;
-  };
-
-  export type KinChSorResult = {
-    PlayerId: number;
-    CubeId: string;
-    Rank: number;
-    PlayerName: string;
-    Result: number;
-    Results: KinChSorResultWithEvent[];
-  };
-
   export type PlayerSorResp = {
-    data: KinChSorResult
-  }
+    data: KinChSorResult;
+  };
 }
