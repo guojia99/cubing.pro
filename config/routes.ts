@@ -31,7 +31,18 @@ export default [
   // {path: '/user/messages', component: './User/Messages'}, // 消息中心
   // {path: '/user/like', component: './User/Like'}, // 收藏
   {path: 'user/organizers', component: "./User/Organizers",},
-  {path: 'user/admins', component: "./User/Admin",},
+
+
+  // 主办相关
+  {path: 'user/organizers/comps', component: "./User/OrganizersComponent/OrganizersComps",}, // 比赛页面
+  {path: 'user/organizers/comps/create', component: "./User/OrganizersComponent/Comps/CreateComps",}, // 创建比赛页面
+
+  {path: 'user/organizers/details', component: "./User/OrganizersComponent/OrganizersDetails",}, // 详情
+  {path: 'user/organizers/group', component: "./User/OrganizersComponent/OrganizersGroup",}, // 群组
+  {path: 'user/organizers/result', component: "./User/OrganizersComponent/OrganizersResults",}, // 成绩管理
+
+
+  {path: 'user/admins', component: "./User/Admin"},
 
 
 
