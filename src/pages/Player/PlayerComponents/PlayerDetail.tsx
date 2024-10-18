@@ -4,6 +4,7 @@ import { eventRouteM } from '@/components/Data/cube_result/event_route';
 import { Result, resultString, resultTimeString } from '@/components/Data/types/result';
 import { WCALink } from '@/components/Link/Links';
 import { rowClassNameWithStyleLines } from '@/components/Table/table_style';
+import { AvatarURL } from '@/pages/User/AvatarDropdown';
 import { apiEvents } from '@/services/cubing-pro/events/events';
 import { EventsAPI } from '@/services/cubing-pro/events/typings';
 import { PlayersAPI } from '@/services/cubing-pro/players/typings';
@@ -191,16 +192,16 @@ const PlayerDetail: React.FC<PlayerDetailProps> = ({ player }) => {
   });
 
   if (wcaEventsLen === wcaBestCols.length) {
-    let has = true
+    let has = true;
     for (let i = 0; i < wcaBestCols.length; i++) {
-      if (eventRouteM(wcaBestCols[i].Route).repeatedly){
+      if (eventRouteM(wcaBestCols[i].Route).repeatedly) {
         continue;
       }
-      if (wcaBestCols[i].avgResult === "-"){
-        has = false
+      if (wcaBestCols[i].avgResult === '-') {
+        has = false;
       }
     }
-    if (has){
+    if (has) {
       tags.push(<Tag color="red">大满贯</Tag>);
     }
   }
@@ -210,7 +211,7 @@ const PlayerDetail: React.FC<PlayerDetailProps> = ({ player }) => {
       <Card style={{ marginBottom: '30px' }}>
         <div style={{ textAlign: 'center' }}>
           {player?.Avatar && (
-            <Avatar size={100} src={player?.Avatar} style={{ marginBottom: '20px' }} />
+            <Avatar size={100} src={AvatarURL(player?.Avatar)} style={{ marginBottom: '20px' }} />
           )}
           <h2 style={{ fontWeight: '700' }}>{player?.Name}</h2>
           <>{tags}</>

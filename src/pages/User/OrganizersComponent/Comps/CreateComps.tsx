@@ -1,7 +1,7 @@
 import BackButton from '@/components/Buttons/back_button';
 import { Card, DatePicker, Form, Input, InputNumber } from 'antd';
 import React from 'react';
-import EventTableForm from "@/pages/User/OrganizersComponent/Comps/CreateCompsWithEventTables";
+import EventTable from "@/pages/User/OrganizersComponent/Comps/CreateCompsEventTables";
 
 const BaseDataForm = () => {
   return (
@@ -10,6 +10,13 @@ const BaseDataForm = () => {
         name="competitionName"
         label="比赛名称"
         rules={[{ required: true, message: '请输入比赛名称！' }]}
+      >
+        <Input />
+      </Form.Item>
+      <Form.Item
+        name="organizersID"
+        label="所在团队"
+        rules={[{ required: true, message: '选择所在团队名称' }]}
       >
         <Input />
       </Form.Item>
@@ -42,12 +49,15 @@ const BaseDataForm = () => {
 };
 
 const CreateCompsPage: React.FC = () => {
+  // todo 获取一次本人所在团队，判断是否有可操作的权限， 只有leader可以创建比赛
+  // todo 无权限则跳转回去
+
   return (
     <>
       {BackButton('返回上层')}
       <Form layout="vertical">
         <Card>{BaseDataForm()}</Card>
-        <Card style={{marginTop: 20}}><EventTableForm /></Card>
+        <Card style={{marginTop: 20}}><EventTable /></Card>
       </Form>
     </>
   );

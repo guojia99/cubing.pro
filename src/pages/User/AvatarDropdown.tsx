@@ -5,23 +5,29 @@ import { stringify } from 'querystring';
 import type { MenuInfo } from 'rc-menu/lib/interface';
 import React, { useCallback } from 'react';
 import { flushSync } from 'react-dom';
-import {BsClipboard2Data, BsFillPersonLinesFill} from 'react-icons/bs';
-import {FaCubesStacked, FaHospitalUser} from 'react-icons/fa6';
+import { BsClipboard2Data, BsFillPersonLinesFill } from 'react-icons/bs';
+import { FaHospitalUser } from 'react-icons/fa6';
 import { LuComponent } from 'react-icons/lu';
-import {
-  RiAdminLine,
-  RiLoginBoxFill,
-  RiLogoutBoxRFill,
-  RiMessage3Fill,
-  RiSettings5Fill,
-  RiUserHeartFill,
-  RiUserSettingsFill,
-} from 'react-icons/ri';
+import { RiAdminLine, RiLoginBoxFill, RiLogoutBoxRFill, RiSettings5Fill } from 'react-icons/ri';
 import HeaderDropdown from '../../components/HeaderDropdown';
+import {getAPIUrl, isLocal} from "@/services/cubing-pro/request";
 
 export type GlobalHeaderRightProps = {
   menu?: boolean;
   children?: React.ReactNode;
+};
+
+export const AvatarURL = (avatar: string|undefined) => {
+  if (!avatar){
+    return avatar;
+  }
+  let a = avatar;
+
+  if (isLocal() && a.length > 0 && a[0] === "/"){
+    a = getAPIUrl() + a
+  }
+
+  return a
 };
 
 export const AvatarName = () => {

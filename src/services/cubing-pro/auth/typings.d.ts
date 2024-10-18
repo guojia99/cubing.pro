@@ -99,4 +99,10 @@ declare namespace AuthAPI {
     initPassword: string;
     QQ: string;
   }
+
+  type UpdateAvatarRequest = {
+    URL: string;
+    Data: string;
+    ImageName: string;
+  }
 }
