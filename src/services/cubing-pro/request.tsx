@@ -17,7 +17,7 @@ export function getAPIUrl() {
   return window.location.protocol + "//" + hostname + ":" + window.location.port + "/v3/cube-api"
 }
 
-function isLocal() : boolean{
+export function isLocal() : boolean{
   const hostname = window.location.hostname;
   // 本地测试
   if (hostname === "localhost" || hostname === "127.0.0.1" || hostname === '0.0.0.0') {

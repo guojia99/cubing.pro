@@ -8,6 +8,7 @@ import { AvatarProps, Col, Row } from 'antd';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { ExtAppList } from '@/layout_config';
 import ParticleBackground from "@/components/background/WaveBackground";
+import {AvatarURL} from "@/pages/User/AvatarDropdown";
 
 /**
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
@@ -51,11 +52,11 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     icon = <UserOutlined />;
   }
 
-  const hiddenPage = (props: { location: { pathname: any } }) => {
-    const { pathname } = props.location;
-    const noNavbarPaths = ['/login'];
-    return !noNavbarPaths.includes(pathname);
-  };
+  // const hiddenPage = (props: { location: { pathname: any } }) => {
+  //   const { pathname } = props.location;
+  //   const noNavbarPaths = ['/login'];
+  //   return !noNavbarPaths.includes(pathname);
+  // };
 
   return {
     // logo: 'https://avatars.githubusercontent.com/u/52768576?v=4', // todo logo
@@ -67,7 +68,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
 
 
     avatarProps: {
-      src: initialState?.currentUser?.data.Avatar,
+      src: AvatarURL(initialState?.currentUser?.data.Avatar),
       icon: icon,
       title: <AvatarName />,
       render: (_: AvatarProps, avatarChildren: React.ReactNode) => {

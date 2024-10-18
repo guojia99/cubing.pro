@@ -14,6 +14,7 @@ export async function apiEvents(): Promise<EventsAPI.EventsResponse> {
     const currentTime = Date.now();
 
     if (currentTime - cacheTime < CACHE_DURATION) {
+
       return parsedData;
     }
   }

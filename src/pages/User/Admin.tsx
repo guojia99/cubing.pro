@@ -1,36 +1,27 @@
-import { Auth, hasAuth } from '@/pages/User/AuthComponents';
+import { Auth, checkAuth, hasAuth } from '@/pages/User/AuthComponents';
 import { MetaCards } from '@/pages/User/Organizers';
-import { history, useModel } from '@@/exports';
-import { message } from 'antd';
 import React from 'react';
 import {
   FcApprove,
   FcCollaboration,
-  FcComboChart, FcConferenceCall, FcDatabase,
-  FcFlowChart,
-  FcGenealogy, FcList,
-  FcMindMap, FcParallelTasks,
-  FcServices, FcTimeline, FcTodoList,
-  FcVoicePresentation
+  FcComboChart,
+  FcConferenceCall,
+  FcDatabase,
+  FcGenealogy,
+  FcList,
+  FcMindMap,
+  FcParallelTasks,
+  FcServices,
+  FcTimeline,
+  FcTodoList,
+  FcVoicePresentation,
 } from 'react-icons/fc';
 
 const Admin: React.FC = () => {
-  const { initialState, setInitialState } = useModel('@@initialState');
-
-  // @ts-ignore
-  const { currentUser } = initialState;
-
-  if (currentUser === null || currentUser === undefined) {
-    message.warning('请先登陆帐号后访问').then();
-    history.replace({ pathname: '/login' });
-    return;
+  const user = checkAuth([Auth.AuthAdmin, Auth.AuthSuperAdmin]);
+  if (user === null) {
+    return <>无权限</>;
   }
-  // @ts-ignore
-  const user = currentUser as AuthAPI.CurrentUser;
-  if (!(hasAuth(user.data.Auth, Auth.AuthAdmin) || hasAuth(user.data.Auth, Auth.AuthSuperAdmin))) {
-    return <>无权限</>; // todo 未来设计一个页面
-  }
-
   let superGroups = [
     {
       title: '网站管理',
@@ -68,9 +59,9 @@ const Admin: React.FC = () => {
         {
           title: '话题管理',
           description: '添加和修改话题等',
-          to:'/',
+          to: '/',
           avatar: <FcCollaboration style={{ fontSize: 40 }} />,
-        }
+        },
       ],
     },
   ];
@@ -129,6 +120,12 @@ const Admin: React.FC = () => {
         {
           title: '成绩管理',
           description: '管理你的成绩',
+          to: '/',
+          avatar: <FcTodoList style={{ fontSize: 40 }} />,
+        },
+        {
+          title: '相册管理',
+          description: '管理用户上传的图片',
           to: '/',
           avatar: <FcTodoList style={{ fontSize: 40 }} />,
         },
