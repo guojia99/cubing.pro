@@ -1,5 +1,5 @@
+import { Comp } from '@/components/Data/types/comps';
 import { Result } from '@/components/Data/types/result';
-import {Comp} from "@/components/Data/types/comps";
 
 declare namespace CompsAPI {
   type CompsReq = {
@@ -23,26 +23,36 @@ declare namespace CompsAPI {
 
 declare namespace CompAPI {
   type Schedule = {
+    EventName: string;
     Round: string;
+    Stage: string;
     Event: string;
     IsComp: boolean;
-    StartTime: string;
-    EndTime: string;
-    ActualStartTime: string;
-    ActualEndTime: string;
-    NoRestrictions: boolean;
+    StartTime:  string |  Date | null;
+    EndTime: string |  Date | null;
+    ActualStartTime:  string |  Date | null;
+    ActualEndTime:  string |  Date | null;
     RoundNum: number;
+    Format: string;
     IsRunning: boolean;
     FirstRound: boolean;
     FinalRound: boolean;
     AdvancedToNextRound: string | null;
+    Cutoff: number;
+    CutoffNumber: number;
+    Competitors: number;
+    TimeLimit: number;
+    NoRestrictions: boolean;
   };
 
   type Event = {
     EventName: string;
     EventID: string;
     EventRoute: number;
+    SingleQualify: number;
+    AvgQualify: number;
     IsComp: boolean;
+    HasResultsQualify: boolean;
     Schedule: Schedule[];
     Done: boolean;
   };
@@ -76,7 +86,7 @@ declare namespace CompAPI {
     qq_groups: string;
     qq_group_uid: string;
     wechat_groups: string;
-  }
+  };
 
   type Data = {
     id: number;
@@ -124,6 +134,8 @@ declare namespace CompAPI {
     data: Data;
     msg: string;
   };
+
+  type CreateCompReq = Data
 }
 
 declare namespace CompResultAPI {
@@ -141,3 +153,4 @@ declare namespace CompRecordAPI {
     msg: string;
   };
 }
+
