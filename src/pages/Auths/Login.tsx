@@ -1,4 +1,4 @@
-import ParticleBackground from '@/components/background/WaveBackground';
+
 import { captchaCode, login } from '@/services/cubing-pro/auth/auth';
 import { LockOutlined, SafetyOutlined, UserOutlined } from '@ant-design/icons';
 import { LoginForm, ProFormText } from '@ant-design/pro-form';
@@ -6,6 +6,7 @@ import { Link } from '@umijs/max';
 import { Form, message } from 'antd';
 import { FormInstance } from 'antd/es/form/hooks/useForm';
 import React, { useEffect, useState } from 'react';
+import {AuthAPI} from "@/services/cubing-pro/auth/typings";
 
 // import "./Login.css"
 

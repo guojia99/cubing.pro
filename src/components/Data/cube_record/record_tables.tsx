@@ -130,6 +130,21 @@ export const RecordsTable = (
       },
     ],
     [
+      'ResultTime',
+      {
+        title: '时间',
+        dataIndex: 'ResultTime',
+        key: 'ResultTime',
+        width: 200,
+        render: (value: string, record: Record) => {
+          const dateObj = new Date(value);
+          return `${dateObj.getFullYear()}年${(dateObj.getMonth() + 1)
+            .toString()
+            .padStart(2, '0')}月${dateObj.getDate().toString().padStart(2, '0')}日`;
+        },
+      },
+    ],
+    [
       'BestUserName',
       {
         title: '选手',

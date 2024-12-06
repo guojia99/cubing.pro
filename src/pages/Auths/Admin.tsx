@@ -1,5 +1,5 @@
-import { Auth, checkAuth, hasAuth } from '@/pages/User/AuthComponents';
-import { MetaCards } from '@/pages/User/Organizers';
+import { Auth, checkAuth, hasAuth } from '@/pages/Auths/AuthComponents';
+import { MetaCards } from '@/pages/Auths/Organizers';
 import React from 'react';
 import {
   FcApprove,

@@ -1,72 +1,56 @@
-'use client';
+import '@wangeditor/editor/dist/css/style.css'; // 引入 css
 
-import { Card } from 'antd';
-import dynamic from 'next/dynamic';
-import { useEffect, useRef, useState } from 'react';
-import 'react-quill/dist/quill.snow.css';
-import TurndownService from 'turndown';
+import { IDomEditor, IEditorConfig, IToolbarConfig } from '@wangeditor/editor';
+import { Editor, Toolbar } from '@wangeditor/editor-for-react';
+import { useEffect, useState } from 'react';
+import {Input} from "antd";
 
-const ReactQuill = dynamic(() => import('react-quill'), {
-  ssr: false,
-  loading: () => <p>Loading editor...</p>,
-});
+// Boot.registerModule(markdownModule);
+function MarkdownEditor({ value, onChange }: { value?: string; onChange?: (val: string) => void }) {
+  const [editor, setEditor] = useState<IDomEditor | null>(null);
+  const [html, setHtml] = useState(value || '<p></p>');
 
-export interface MarkdownEditorProps {
-  initialValue?: string;
-  title: string;
-  onChange?: (markdown: string) => void;
-}
-
-export default function MarkdownEditor({
-  initialValue = '',
-  title = 'md',
-  onChange,
-}: MarkdownEditorProps) {
-  const [editorContent, setEditorContent] = useState(initialValue);
-  const [markdownOutput, setMarkdownOutput] = useState('');
-  const quillRef = useRef<any>(null);
-
-  const turndownService = new TurndownService();
-
-  useEffect(() => {
-    const initialMarkdown = turndownService.turndown(initialValue);
-    setMarkdownOutput(initialMarkdown);
-    if (onChange) {
-      onChange(initialMarkdown);
-    }
-  }, [initialValue, onChange]);
-
-  const handleEditorChange = (content: string) => {
-    setEditorContent(content);
-    const markdown = turndownService.turndown(content);
-    setMarkdownOutput(markdown);
-    if (onChange) {
-      onChange(markdown);
-    }
+  const toolbarConfig: Partial<IToolbarConfig> = {};
+  const editorConfig: Partial<IEditorConfig> = {
+    placeholder: '请输入内容...',
   };
 
-  // const copyToClipboard = () => {
-  //   navigator.clipboard.writeText(markdownOutput).then(() => {
-  //     message.success('Markdown copied to clipboard')
-  //   }, () => {
-  //     message.error('Failed to copy, please try manually')
-  //   })
-  // }
+  useEffect(() => {
+    return () => {
+      if (editor === null) return;
+      editor.destroy();
+      setEditor(null);
+    };
+  }, [editor]);
+
+  // 当编辑器内容发生变化时，更新本地状态和父组件状态
+  const handleChange = (editor: IDomEditor) => {
+    const newHtml = editor.getHtml();
+    setHtml(newHtml);
+    onChange?.(newHtml); // 通知外部组件更新
+  };
 
   return (
     <>
-      <Card title={title} style={{ marginTop: '20px', marginBottom: '20px' }}>
-        <pre style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>{markdownOutput}</pre>
-      </Card>
-
-      <ReactQuill
-        ref={quillRef}
-        theme="snow"
-        value={editorContent}
-        onChange={handleEditorChange}
-        style={{ height: '300px', marginBottom: '50px' }}
-      />
-
+      <div style={{ border: '1px solid #ccc', zIndex: 100 }}>
+        <Toolbar
+          editor={editor}
+          defaultConfig={toolbarConfig}
+          mode="default"
+          style={{ borderBottom: '1px solid #ccc' }}
+        />
+        <Editor
+          defaultConfig={editorConfig}
+          value={html}
+          onCreated={setEditor}
+          onChange={handleChange}
+          mode="default"
+          style={{ height: '500px', overflowY: 'hidden' }}
+        />
+      </div>
+      <Input value={html} hidden readOnly />
     </>
   );
 }
+
+export default MarkdownEditor;

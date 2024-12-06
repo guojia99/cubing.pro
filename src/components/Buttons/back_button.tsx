@@ -11,9 +11,4 @@ const BackButton: (name: string) => JSX.Element = (name: string) => {
   );
 };
 
-export function c() {
-  const navigate = useNavigate();
-  navigate(-1);
-}
-
 export default BackButton;

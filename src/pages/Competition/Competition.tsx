@@ -108,7 +108,6 @@ const Competition: React.FC = () => {
 
   const tabs = (
     <>
-      <ScrollToTopButton />
       {/*</Watermark>*/}
       <h1 style={{ textAlign: 'center' }}>{comp ? comp.data.Name : '比赛加载中'}</h1>
       {IfLoading(loading, <UpdateTitle title={comp?.data.Name}/>)}

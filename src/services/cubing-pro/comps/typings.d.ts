@@ -59,8 +59,8 @@ declare namespace CompAPI {
 
   type CostDetail = {
     Value: number;
-    StartTime: string;
-    EndTime: string;
+    StartTime: string | null;
+    EndTime: string | null;
   };
 
   type Cost = {
@@ -96,6 +96,7 @@ declare namespace CompAPI {
     Status: string;
     Name: string;
     Illustrate: string;
+    IllustrateHTML: string;
     City: string;
     RuleMD: string;
     comp_json: CompJson;

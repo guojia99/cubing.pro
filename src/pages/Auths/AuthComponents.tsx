@@ -1,5 +1,6 @@
 import { history, useModel } from '@@/exports';
 import {message, Tag} from 'antd';
+import {AuthAPI} from "@/services/cubing-pro/auth/typings";
 
 export enum Auth {
   AuthPlayer = 1 << 0, // 选手

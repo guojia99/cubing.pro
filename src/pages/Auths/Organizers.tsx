@@ -1,4 +1,4 @@
-import { Auth, checkAuth } from '@/pages/User/AuthComponents';
+import { Auth, checkAuth } from '@/pages/Auths/AuthComponents';
 import { Link } from '@umijs/max';
 import { Card, Col, Row } from 'antd';
 import Meta from 'antd/es/card/Meta';
@@ -58,7 +58,7 @@ const Organizers: React.FC = () => {
         {
           title: '主办团队',
           description: '主办列表',
-          to: '/',
+          to: '/user/organizers/list',
           avatar: <FcGenealogy style={{ fontSize: 40 }} />,
         },
         {

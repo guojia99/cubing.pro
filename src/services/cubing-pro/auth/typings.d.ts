@@ -1,19 +1,21 @@
 // @ts-ignore
 /* eslint-disable */
 
+import { Player } from '@/services/cubing-pro/players/typings';
+import {CompAPI} from "@/services/cubing-pro/comps/typings";
 
 declare namespace AuthAPI {
   type captchaCodeResp = {
     id: string;
     image: string;
     ext: string;
-  }
+  };
 
   type Token = {
-    token: string,
-    expire: string,
+    token: string;
+    expire: string;
     status: string;
-  }
+  };
 
   type LoginRequest = {
     loginID: string;
@@ -28,13 +30,13 @@ declare namespace AuthAPI {
   type GetEmailCodeRequest = {
     name: string;
     email: string;
-  }
+  };
 
   type GetEmailCodeResponse = {
     email: string;
     timeout: string;
     lastSendTime: string;
-  }
+  };
 
   type CurrentUserData = {
     id: number;
@@ -80,11 +82,11 @@ declare namespace AuthAPI {
     Birthdate: string; // 同上
     Address: string;
     DelegateName: string;
-  }
+  };
 
   type CurrentUser = {
-   data: CurrentUserData
-  }
+    data: CurrentUserData;
+  };
 
   type RegisterRequest = {
     loginID: string;
@@ -98,11 +100,72 @@ declare namespace AuthAPI {
     cubeID: string;
     initPassword: string;
     QQ: string;
-  }
+  };
 
   type UpdateAvatarRequest = {
     URL: string;
     Data: string;
     ImageName: string;
-  }
+  };
+}
+
+export type OrganizersStatus =
+  | 'NotUse'
+  | 'Expired' // 过期
+  | 'Using' // 使用中
+  | 'Applying' // 申请中
+  | 'RejectApply' // 驳回申请
+  | 'UnderAppeal' // 申诉中
+  | 'RejectAppeal' // 驳回申诉
+  | 'Disable' // 禁用
+  | 'PermanentlyDisabled' // 永久禁用
+  | 'Disband'; // 解散 无法使用
+
+export declare namespace OrganizersAPI {
+  type organizer = {
+    id: number;
+    createdAt: string;
+    updatedAt: string;
+
+    Name: string; // 名
+    Introduction?: string; // 介绍 md
+    Email?: string; // 邮箱
+
+    LeaderId?: string; // 组长 cubeID
+    Users: Player[]; // 成员列表
+    Status: OrganizersStatus; // 状态
+
+    LeaderRemark?: string; // 组长备注
+    AdminMessage?: string; // 管理员留言
+  };
+
+  export type MeOrganizersResp = {
+    data: {
+      items: organizer[];
+      total: number;
+    };
+  };
+
+  export type CreateCompReq = {
+    Name: string;
+    StrId: string;
+
+    Illustrate: string;
+    IllustrateHTML: string;
+    // Location: string;
+    // Country: string;
+    // City: string;
+    RuleMD: string;
+    RuleHTML: string;
+    CompJSON: CompAPI.CompJson; // 需要导入相应类型
+    Genre: number;
+    Count: number;
+    CanPreResult: boolean;
+    CompStartTime: string;
+    CompEndTime: string;
+    GroupID: number;
+    CanStartedAddEvent: boolean;
+
+    Apply: boolean;
+  };
 }

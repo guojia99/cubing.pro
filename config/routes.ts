@@ -7,7 +7,7 @@
  * @param redirect 配置路由跳转
  * @param wrappers 配置路由组件的包装组件，通过包装组件可以为当前的路由组件组合进更多的功能。 比如，可以用于路由级别的权限校验
  * @param name 配置路由的标题，默认读取国际化文件 menu.ts 中 menu.xxxx 的值，如配置 name 为 login，则读取 menu.ts 中 menu.login 的取值作为标题
- * @param icon 配置路由的图标，取值参考 https://ant.design/components/icon-cn， 注意去除风格后缀和大小写，如想要配置图标为 <StepBackwardOutlined /> 则取值应为 stepBackward 或 StepBackward，如想要配置图标为 <UserOutlined /> 则取值应为 user 或者 User
+ * @param icon 配置路由的图标，取值参考 https://ant.design/components/icon-cn， 注意去除风格后缀和大小写，如想要配置图标为 <StepBackwardOutlined /> 则取值应为 stepBackward 或 StepBackward，如想要配置图标为 <UserOutlined /> 则取值应为 user 或者 Auths
  * @doc https://umijs.org/docs/guides/routes
  */
 export default [
@@ -23,26 +23,27 @@ export default [
 
   // 用户相关
 
-  {path: '/login', component: "./User/Login", hidden: true}, // 登录
-  {path: '/register', component: "./User/Register", hidden: true}, // 注册
-  {path: '/user/profile', component: './User/Profile'}, // 个人中心
-  // {path: '/user',  component: './User/UserInfo'}, // 用户个人信息
-  // {path: '/user/settings', component: './User/Settings'}, // 个人设置
-  // {path: '/user/messages', component: './User/Messages'}, // 消息中心
-  // {path: '/user/like', component: './User/Like'}, // 收藏
-  {path: 'user/organizers', component: "./User/Organizers",},
+  {path: '/login', component: "./Auths/Login", hidden: true}, // 登录
+  {path: '/register', component: "./Auths/Register", hidden: true}, // 注册
+  {path: '/user/profile', component: './Auths/Profile'}, // 个人中心
+  // {path: '/user',  component: './Auths/UserInfo'}, // 用户个人信息
+  // {path: '/user/settings', component: './Auths/Settings'}, // 个人设置
+  // {path: '/user/messages', component: './Auths/Messages'}, // 消息中心
+  // {path: '/user/like', component: './Auths/Like'}, // 收藏
+  {path: 'user/organizers', component: "./Auths/Organizers",},
 
 
   // 主办相关
-  {path: 'user/organizers/comps', component: "./User/OrganizersComponent/OrganizersComps",}, // 比赛页面
-  {path: 'user/organizers/comps/create', component: "./User/OrganizersComponent/Comps/CreateComps",}, // 创建比赛页面
+  {path: 'user/organizers/comps', component: "./Auths/OrganizersComponent/OrganizersComps",}, // 比赛页面
+  {path: 'user/organizers/comps/create', component: "./Auths/OrganizersComponent/Comps/CreateComps",}, // 创建比赛页面
 
-  {path: 'user/organizers/details', component: "./User/OrganizersComponent/OrganizersDetails",}, // 详情
-  {path: 'user/organizers/group', component: "./User/OrganizersComponent/OrganizersGroup",}, // 群组
-  {path: 'user/organizers/result', component: "./User/OrganizersComponent/OrganizersResults",}, // 成绩管理
+  {path: 'user/organizers/details', component: "./Auths/OrganizersComponent/OrganizersDetails",}, // 详情
+  {path: 'user/organizers/group', component: "./Auths/OrganizersComponent/OrganizersGroup",}, // 群组
+  {path: 'user/organizers/result', component: "./Auths/OrganizersComponent/OrganizersResults",}, // 成绩管理
+  {path: 'user/organizers/list', component: "./Auths/OrganizersComponent/OrganizersList",}, // 我的主办团队列表
 
 
-  {path: 'user/admins', component: "./User/Admin"},
+  {path: 'user/admins', component: "./Auths/Admin"},
 
 
 
