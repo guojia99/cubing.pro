@@ -1,12 +1,11 @@
+import { P404 } from '@/components/Status/404';
+import UpdateTitle from '@/components/Title/Title';
+import PlayerDetail from '@/pages/Player/PlayerComponents/PlayerDetail';
+import PlayerResults from '@/pages/Player/PlayerComponents/PlayerResults';
 import { apiPlayer } from '@/services/cubing-pro/players/players';
+import { PlayersAPI } from '@/services/cubing-pro/players/typings';
 import { useParams } from '@@/exports';
 import React, { useEffect, useState } from 'react';
-import {P404} from "@/components/Status/404";
-import PlayerDetail from "@/pages/Player/PlayerComponents/PlayerDetail";
-import {IfLoading} from "@/components/Wait/wait";
-import UpdateTitle from "@/components/Title/Title";
-import PlayerResults from "@/pages/Player/PlayerComponents/PlayerResults";
-import {PlayersAPI} from "@/services/cubing-pro/players/typings";
 
 const Player: React.FC = () => {
   const { id } = useParams();
@@ -16,16 +15,18 @@ const Player: React.FC = () => {
 
   const fetchPlayer = () => {
     if (id === undefined) {
+      setLoading(true);
       return;
     }
     apiPlayer(id)
       .then((value) => {
         setPlayer(value.data);
-        setLoading(false)
+        setIs404(false);
+        setLoading(false);
       })
       .catch(() => {
         setIs404(true);
-        setLoading(true)
+        setLoading(true);
       });
   };
 
@@ -33,21 +34,22 @@ const Player: React.FC = () => {
   useEffect(() => {
     fetchPlayer();
   }, [id]);
-
-  const tabs = (
-    <>
-      <div>
-        {IfLoading(loading, <UpdateTitle title={player?.Name}/>)}
-        {IfLoading(loading, <PlayerDetail player={player} key={'player_detail'} />)}
-        {IfLoading(loading, <PlayerResults player={player} />  )}
-      </div>
-    </>
-  );
-
   return (
     <>
       {is404 && P404('玩家不存在')}
-      {!is404 && tabs}
+      {!is404 && (
+        <>
+          {loading ? (
+            <div>加载中...</div>
+          ) : (
+            <div>
+              <UpdateTitle title={player?.Name} />
+              <PlayerDetail player={player} key={'player_detail'} />
+              <PlayerResults player={player} />
+            </div>
+          )}
+        </>
+      )}
     </>
   );
 };

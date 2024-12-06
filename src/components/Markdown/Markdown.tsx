@@ -12,24 +12,18 @@ interface MarkdownProps {
 const Markdown: React.FC<MarkdownProps> = ({md}) => {
 
   return (
-    <Card
-      style={{
-        borderRadius: 8,
-        minWidth: "100%"
+    <ReactMarkdown
+      className={'markdown-body'}
+      remarkPlugins={[[remarkGfm, {singleTilde: false}]]}
+      components={{
+        // img(props) {
+        //   return <img {...props} style={{ maxWidth: 30 }} />;
+        // },
       }}
     >
-      <ReactMarkdown
-        className={'markdown-body'}
-        remarkPlugins={[[remarkGfm, {singleTilde: false}]]}
-        components={{
-          // img(props) {
-          //   return <img {...props} style={{ maxWidth: 30 }} />;
-          // },
-        }}
-      >
-        {md}
-      </ReactMarkdown>
-    </Card>
+      {md}
+    </ReactMarkdown>
+
   )
 };
 

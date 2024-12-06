@@ -1,4 +1,4 @@
-import { Auth, hasAuth } from '@/pages/User/AuthComponents';
+import { Auth, hasAuth } from '@/pages/Auths/AuthComponents';
 import { logout } from '@/services/cubing-pro/auth/auth';
 import { history, useModel } from '@umijs/max';
 import { stringify } from 'querystring';
@@ -11,6 +11,7 @@ import { LuComponent } from 'react-icons/lu';
 import { RiAdminLine, RiLoginBoxFill, RiLogoutBoxRFill, RiSettings5Fill } from 'react-icons/ri';
 import HeaderDropdown from '../../components/HeaderDropdown';
 import {getAPIUrl, isLocal} from "@/services/cubing-pro/request";
+import {AuthAPI} from "@/services/cubing-pro/auth/typings";
 
 export type GlobalHeaderRightProps = {
   menu?: boolean;

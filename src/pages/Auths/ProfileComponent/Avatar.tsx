@@ -1,4 +1,4 @@
-import { AvatarURL } from '@/pages/User/AvatarDropdown';
+import { AvatarURL } from '@/pages/Auths/AvatarDropdown';
 import { updateAvatar } from '@/services/cubing-pro/auth/auth';
 import { UploadOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Button, Card, Input, Modal, Spin, Tabs, TabsProps, Upload, message } from 'antd';

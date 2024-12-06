@@ -1,5 +1,6 @@
 import { AuthHeader, removeToken, saveToken } from '@/services/cubing-pro/auth/token';
 import { Request } from '@/services/cubing-pro/request';
+import {AuthAPI} from "@/services/cubing-pro/auth/typings";
 
 export async function captchaCode(): Promise<AuthAPI.captchaCodeResp> {
   const result = await Request.get('/auth/code');
@@ -42,3 +43,5 @@ export async function register(req: AuthAPI.RegisterRequest) {
 export async function updateAvatar(req: AuthAPI.UpdateAvatarRequest) {
   return Request.post<any>('/auth/user/avatar', req, { headers: AuthHeader() });
 }
+
+

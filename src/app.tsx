@@ -7,8 +7,10 @@ import { UserOutlined, UserSwitchOutlined } from '@ant-design/icons';
 import { AvatarProps, Col, Row } from 'antd';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { ExtAppList } from '@/layout_config';
-import ParticleBackground from "@/components/background/WaveBackground";
-import {AvatarURL} from "@/pages/User/AvatarDropdown";
+import ParticleBackground from '@/components/background/WaveBackground';
+import { AvatarURL } from '@/pages/Auths/AvatarDropdown';
+import { AuthAPI } from '@/services/cubing-pro/auth/typings';
+import ScrollToTopButton from "@/components/Buttons/toTop";
 
 /**
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
@@ -66,7 +68,6 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     // menuRender: hiddenPage,
     // menuHeaderRender: hiddenPage,
 
-
     avatarProps: {
       src: AvatarURL(initialState?.currentUser?.data.Avatar),
       icon: icon,
@@ -88,17 +89,20 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
       // return (<>{children}</>)
 
       return (
-        <Row>
-          {/*<Col xs={24} sm={24} md={24} lg={24} xl={24} xxl={24}>*/}
-          {/*  {children}*/}
-          {/*</Col>*/}
-          <ParticleBackground></ParticleBackground>
-          <Col xs={0} sm={0} md={0} lg={1} xl={2} xxl={2} />
-          <Col xs={24} sm={24} md={24} lg={22} xl={20} xxl={20}>
-            {children}
-          </Col>
-          <Col xs={0} sm={0} md={0} lg={1} xl={2} xxl={2} />
-        </Row>
+        <>
+          <ScrollToTopButton />
+          <Row>
+            {/*<Col xs={24} sm={24} md={24} lg={24} xl={24} xxl={24}>*/}
+            {/*  {children}*/}
+            {/*</Col>*/}
+            <ParticleBackground></ParticleBackground>
+            <Col xs={0} sm={0} md={0} lg={1} xl={2} xxl={2} />
+            <Col xs={24} sm={24} md={24} lg={22} xl={20} xxl={20}>
+              {children}
+            </Col>
+            <Col xs={0} sm={0} md={0} lg={1} xl={2} xxl={2} />
+          </Row>
+        </>
       );
     },
     ...initialState?.settings,

@@ -1,11 +1,14 @@
 import BackButton from '@/components/Buttons/back_button';
-import { Card, DatePicker, Form, Input, InputNumber } from 'antd';
+import { Card, Col, DatePicker, Form, Input, InputNumber, Row } from 'antd';
 import React from 'react';
 
 import { CubesCn } from '@/components/CubeIcon/cube';
 import MarkdownEditor from '@/components/Markdown/editer';
+import { apiCreateComps, apiMeOrganizers } from '@/services/cubing-pro/auth/organizers';
+import { OrganizersAPI } from '@/services/cubing-pro/auth/typings';
 import { CompAPI } from '@/services/cubing-pro/comps/typings';
 import { apiEvents } from '@/services/cubing-pro/events/events';
+import { history } from '@@/exports';
 import {
   DeleteOutlined,
   DownloadOutlined,
@@ -13,19 +16,24 @@ import {
   ScheduleOutlined,
   UploadOutlined,
 } from '@ant-design/icons';
-import { Button, Modal, Select, Switch, Table, Upload, message } from 'antd';
+import { Button, Modal, Select, Table, Upload, message } from 'antd';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 
 const { Option } = Select;
 
-const EventTable: React.FC = () => {
+const EventTable: React.FC<{ onChange?: (val: any) => void }> = ({ onChange }) => {
   const [events, setEvents] = useState<CompAPI.Event[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentEvent, setCurrentEvent] = useState<CompAPI.Event | null>(null);
   const [form] = Form.useForm();
 
   const [eventOptions, setEventOptions] = useState<string[]>([]);
+
+  const updateEvents = (newEvents: CompAPI.Event[]) => {
+    setEvents(newEvents);
+    onChange?.(newEvents);
+  };
 
   useEffect(() => {
     apiEvents().then((value) => {
@@ -67,32 +75,6 @@ const EventTable: React.FC = () => {
             </Option>
           ))}
         </Select>
-      ),
-    },
-    {
-      title: '全局单次资格线',
-      dataIndex: 'SingleQualify',
-      key: 'SingleQualify',
-      width: 150,
-      render: (text: number, record: CompAPI.Event) => (
-        <InputNumber
-          value={text}
-          /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
-          onChange={(value) => handleEventChange(record.EventID, 'SingleQualify', value)}
-        />
-      ),
-    },
-    {
-      title: '全局平均资格线',
-      dataIndex: 'AvgQualify',
-      key: 'AvgQualify',
-      width: 150,
-      render: (text: number, record: CompAPI.Event) => (
-        <InputNumber
-          value={text}
-          /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
-          onChange={(value) => handleEventChange(record.EventID, 'AvgQualify', value)}
-        />
       ),
     },
     {
@@ -144,76 +126,6 @@ const EventTable: React.FC = () => {
         getRoundName(index, form.getFieldValue('Schedule').length),
     },
     {
-      title: '无限制',
-      dataIndex: 'NoRestrictions',
-      key: 'NoRestrictions',
-      width: 100,
-      render: (value: boolean, record: CompAPI.Schedule, index: number) => (
-        <Switch
-          checked={value}
-          /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
-          onChange={(checked) => handleScheduleChange(index, 'NoRestrictions', checked)}
-        />
-      ),
-    },
-    {
-      title: '人数',
-      dataIndex: 'Competitors',
-      key: 'Competitors',
-      width: 100,
-      render: (text: number, record: CompAPI.Schedule, index: number) => (
-        <InputNumber
-          value={text}
-          /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
-          onChange={(value) => handleScheduleChange(index, 'Competitors', value)}
-        />
-      ),
-    },
-    {
-      title: '及格线',
-      dataIndex: 'Cutoff',
-      key: 'Cutoff',
-      width: 100,
-      render: (text: number, record: CompAPI.Schedule, index: number) => (
-        <InputNumber
-          value={text}
-          /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
-          onChange={(value) => handleScheduleChange(index, 'Cutoff', value)}
-          disabled={record.NoRestrictions}
-        />
-      ),
-    },
-    {
-      title: '及格线把数',
-      dataIndex: 'CutoffNumber',
-      key: 'CutoffNumber',
-      width: 100,
-      render: (text: number, record: CompAPI.Schedule, index: number) => (
-        <InputNumber
-          value={text}
-          /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
-          onChange={(value) => handleScheduleChange(index, 'CutoffNumber', value)}
-          disabled={record.NoRestrictions}
-        />
-      ),
-    },
-    {
-      title: '还原时限',
-      dataIndex: 'TimeLimit',
-      key: 'TimeLimit',
-      width: 100,
-      render: (text: number, record: CompAPI.Schedule, index: number) => (
-        <InputNumber
-          value={text}
-          onChange={(value) => {
-            /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
-            handleScheduleChange(index, 'TimeLimit', value);
-          }}
-          disabled={record.NoRestrictions}
-        />
-      ),
-    },
-    {
       title: '操作',
       key: 'action',
       width: 100,
@@ -259,11 +171,9 @@ const EventTable: React.FC = () => {
           ...s,
           /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
           Round: getRoundName(index, values.Schedule.length),
-          // StartTime: s.StartTime ? s.StartTime : null,
-          // EndTime: s.EndTime ? s.EndTime : null,
         })),
       };
-      setEvents(events.map((e) => (e.EventID === updatedEvent.EventID ? updatedEvent : e)));
+      updateEvents(events.map((e) => (e.EventID === updatedEvent.EventID ? updatedEvent : e)));
       setIsModalVisible(false);
     });
   };
@@ -289,11 +199,11 @@ const EventTable: React.FC = () => {
       Schedule: [createDefaultSchedule(newEventName)],
       Done: false,
     };
-    setEvents([...events, newEvent]);
+    updateEvents([...events, newEvent]);
   };
 
   const deleteEvent = (eventId: string) => {
-    setEvents(events.filter((e) => e.EventID !== eventId));
+    updateEvents(events.filter((e) => e.EventID !== eventId));
   };
 
   const getRoundName = (index: number, totalRounds: number) => {
@@ -312,7 +222,7 @@ const EventTable: React.FC = () => {
     reader.onload = (e) => {
       try {
         const importedEvents: CompAPI.Event[] = JSON.parse(e.target?.result as string);
-        setEvents(
+        updateEvents(
           importedEvents.map((event) => ({
             ...event,
             Schedule:
@@ -327,6 +237,7 @@ const EventTable: React.FC = () => {
                   [createDefaultSchedule(event.EventName)],
           })),
         );
+
         message.success('数据导入成功').then();
       } catch (error) {
         message.error('数据导入失败，请检查文件格式').then();
@@ -391,26 +302,10 @@ const EventTable: React.FC = () => {
   };
 
   const handleEventChange = (eventId: string, field: string, value: any) => {
-    setEvents(
+    updateEvents(
       events.map((event) => (event.EventID === eventId ? { ...event, [field]: value } : event)),
     );
   };
-
-  const handleScheduleChange = (index: number, field: string, value: any) => {
-    const schedules = form.getFieldValue('Schedule');
-    const newSchedules = schedules.map((s: CompAPI.Schedule, i: number) =>
-      i === index ? { ...s, [field]: value } : s,
-    );
-    form.setFieldsValue({
-      Schedule: newSchedules.map((s: any, i: number) => ({
-        ...s,
-        Round: getRoundName(i, newSchedules.length),
-        FirstRound: i === 0,
-        FinalRound: i === newSchedules.length - 1,
-      })),
-    });
-  };
-
   const deleteSchedule = (index: number) => {
     const schedules = form.getFieldValue('Schedule');
     if (schedules.length > 1) {
@@ -473,12 +368,6 @@ const EventTable: React.FC = () => {
               ))}
             </Select>
           </Form.Item>
-          <Form.Item name="SingleQualify" label="全局单次资格线">
-            <InputNumber />
-          </Form.Item>
-          <Form.Item name="AvgQualify" label="全局平均资格线">
-            <InputNumber />
-          </Form.Item>
           <Form.List name="Schedule">
             {(fields) => (
               <>
@@ -511,23 +400,42 @@ const EventTable: React.FC = () => {
   );
 };
 
-const BaseDataForm = () => {
+const BaseDataForm = (org: OrganizersAPI.MeOrganizersResp | null) => {
+  if (org === null) {
+    return <></>;
+  }
   return (
     <>
-      <Form.Item
-        name="competitionName"
-        label="比赛名称"
-        rules={[{ required: true, message: '请输入比赛名称！' }]}
-      >
-        <Input />
-      </Form.Item>
-      <Form.Item
-        name="organizersID"
-        label="所在团队"
-        rules={[{ required: true, message: '选择所在团队名称' }]}
-      >
-        <Input />
-      </Form.Item>
+      <Row gutter={16}>
+        <Col span={12}>
+          <Form.Item
+            name="competitionName"
+            label="比赛名称"
+            rules={[{ required: true, message: '请输入比赛名称！' }]}
+          >
+            <Input />
+          </Form.Item>
+        </Col>
+        <Form.Item
+          name="organizersID"
+          label="所在团队"
+          style={{ width: '50%' }}
+          rules={[{ required: true, message: '选择所在团队名称' }]}
+        >
+          <Select placeholder="选择所在团队名称">
+            {org.data.items.map((o) => (
+              <Select.Option key={o.id} value={o.id}>
+                {o.Name}
+              </Select.Option>
+            ))}
+          </Select>
+        </Form.Item>
+        <Col span={12}>
+          <Form.Item name="maxParticipants" label="最大参与人数">
+            <InputNumber min={1} />
+          </Form.Item>
+        </Col>
+      </Row>
     </>
   );
 };
@@ -535,51 +443,133 @@ const BaseDataForm = () => {
 const OtherDataForm = () => {
   return (
     <>
-      <Form.Item
-        name="startDate"
-        label="开始日期"
-        rules={[{ required: true, message: '请选择开始日期！' }]}
-      >
-        <DatePicker />
-      </Form.Item>
-      <Form.Item
-        name="endDate"
-        label="结束日期"
-        rules={[{ required: true, message: '请选择结束日期！' }]}
-      >
-        <DatePicker />
-      </Form.Item>
-      <Form.Item
-        name="maxParticipants"
-        label="最大参与人数"
-        rules={[{ required: true, message: '请输入最大参与人数！' }]}
-      >
-        <InputNumber min={1} defaultValue={1000} />
-      </Form.Item>
+      <Row gutter={16}>
+        <Col span={12}>
+          <Form.Item
+            name="startDate"
+            label="开始日期"
+            rules={[{ required: true, message: '请选择开始日期！' }]}
+          >
+            <DatePicker style={{ width: '100%' }} />
+          </Form.Item>
+        </Col>
+        <Col span={12}>
+          <Form.Item
+            name="endDate"
+            label="结束日期"
+            rules={[{ required: true, message: '请选择结束日期！' }]}
+          >
+            <DatePicker style={{ width: '100%' }} />
+          </Form.Item>
+        </Col>
+      </Row>
     </>
   );
 };
 
 const CreateCompsPage: React.FC = () => {
-  // todo 获取一次本人所在团队，判断是否有可操作的权限， 只有leader可以创建比赛
-  // todo 无权限则跳转回去
+  const [org, setOrg] = useState<OrganizersAPI.MeOrganizersResp | null>(null);
+  const [form] = Form.useForm(); // 使用 Ant Design 的 Form
+  const [events, setEvents] = useState<CompAPI.Event[]>([]);
+  // 获取团队信息
+  useEffect(() => {
+    if (org === null) {
+      apiMeOrganizers().then((value: OrganizersAPI.MeOrganizersResp) => {
+        setOrg(value);
+      });
+    }
+  }, []);
+
+  // 检查用户是否加入了团队
+  useEffect(() => {
+    if (org?.data.items === null || org?.data.items?.length === 0) {
+      message.warning('你还未加入任何团队，请加入后再创建比赛').then();
+      history.replace({ pathname: '/user/organizers' });
+    }
+  }, [org]);
+
+  // 提交表单数据
+  const handleSubmit = () => {
+    form
+      .validateFields()
+      .then((values) => {
+        Modal.confirm({
+          title: '确认提交',
+          content: '你确定要提交比赛信息吗？',
+          onOk: async () => {
+            const compJson: CompAPI.CompJson = {
+              Events: events,
+              Cost: {
+                BaseCost: {
+                  Value: 0,
+                  StartTime: null,
+                  EndTime: null,
+                },
+                Costs: null,
+                EventCost: null,
+              },
+            };
+            const req: OrganizersAPI.CreateCompReq = {
+              Name: values.competitionName,
+              StrId: values.competitionName,
+              Illustrate: '',
+              IllustrateHTML: values.description,
+              RuleMD: '',
+              RuleHTML: '',
+              CompJSON: compJson,
+              Count: values.maxParticipants | 500,
+              CanPreResult: true,
+              Genre: 0,
+              CompStartTime: values.startDate.toISOString(),
+              CompEndTime: values.endDate.toISOString(),
+              GroupID: 0,
+              CanStartedAddEvent: true,
+              Apply: true,
+            };
+            console.log(req);
+            console.log(values)
+            apiCreateComps(values.organizersID, req).then((value) => {
+              console.log(value)
+              message.success("创建成功")
+              // window.location.href = '/user/organizers';
+            }).catch((values) => {
+              message.error("创建失败: " + values)
+            })
+          },
+        });
+      })
+      .catch((errorInfo) => {
+        console.error('验证失败:', errorInfo);
+      });
+  };
 
   return (
     <>
       {BackButton('返回上层')}
-      <Form layout="vertical">
-        <Card>{BaseDataForm()}</Card>
-        <Card style={{ marginTop: 20 }}>{OtherDataForm()}</Card>
-        <Card style={{ marginTop: 20 }}>
-          <EventTable />
+      <Form layout="vertical" form={form}>
+        <Card title={'基础信息'}>{BaseDataForm(org)}</Card>
+        <Card title={'时间配置'} style={{ marginTop: 20 }}>
+          {OtherDataForm()}
         </Card>
-        <Card style={{ marginTop: 20 }}>
-          <Form.Item>
-            <MarkdownEditor title={'比赛描述'} onChange={() => {}} />
+        <Card title={'项目配置'} style={{ marginTop: 20 }}>
+          <Form.Item name="events" valuePropName="value" getValueFromEvent={(e) => e}>
+            <EventTable onChange={(newEvents) => setEvents(newEvents)} />
           </Form.Item>
         </Card>
+        <Card title={'比赛描述'} style={{ marginTop: 20 }}>
+          <Form.Item name="description" valuePropName={'value'} getValueFromEvent={(e) => e}>
+            <MarkdownEditor />
+          </Form.Item>
+        </Card>
+        {/*提交按钮 */}
+        <Form.Item style={{ marginTop: 20 }}>
+          <Button type="primary" onClick={handleSubmit}>
+            提交
+          </Button>
+        </Form.Item>
       </Form>
     </>
   );
 };
+
 export default CreateCompsPage;

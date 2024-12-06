@@ -1,6 +1,6 @@
 import PasswordStrengthMeter from '@/components/Inputs/password';
-import {getEmailCode, register} from '@/services/cubing-pro/auth/auth';
-import {history, Link} from '@@/exports';
+import { getEmailCode, register } from '@/services/cubing-pro/auth/auth';
+import { Link, history } from '@@/exports';
 import {
   LockOutlined,
   MailOutlined,
@@ -14,7 +14,7 @@ import React, { useEffect, useState } from 'react';
 import { FaIdCardAlt, FaRegIdBadge, FaRegUserCircle, FaUserEdit } from 'react-icons/fa';
 import { FaQq } from 'react-icons/fa6';
 import { RiEnglishInput, RiLockPasswordLine } from 'react-icons/ri';
-import {stringify} from "querystring";
+import {AuthAPI} from "@/services/cubing-pro/auth/typings";
 
 interface StepFields {
   [key: number]: string[];
@@ -210,7 +210,7 @@ const Register: React.FC = () => {
                 })
                 .catch((error) => {
                   if (error.response) {
-                    message.error("注册错误: " + error.response.data.error)
+                    message.error('注册错误: ' + error.response.data.error);
                   }
                 });
             }}
@@ -248,29 +248,31 @@ const Register: React.FC = () => {
 
   const onFinish = async (values: any) => {
     try {
-      await form.validateFields(stepFields[currentStep])
+      await form.validateFields(stepFields[currentStep]);
       // setFormData((prevData: any) => ({ ...prevData, ...values }));
-    } catch (error){
-      return
+    } catch (error) {
+      return;
     }
 
-    const req = { ...values, ...formData } as AuthAPI.RegisterRequest
-    req.timestamp = 0
-    console.log("===> req", req)
-    register(req).then((value) => {
-      console.log(value)
-      message.success("注册成功")
-      history.replace({pathname: '/login'});
-    }).catch((error) => {
-      // 检查 error 对象是否包含响应数据
-      if (error.response) {
-        message.error("注册错误: " + error.response.data.error)
-      } else if (error.request) {
-        console.log("Error: No response received", error.request);
-      } else {
-        console.log("Error:", error.message);
-      }
-    })
+    const req = { ...values, ...formData } as AuthAPI.RegisterRequest;
+    req.timestamp = 0;
+    console.log('===> req', req);
+    register(req)
+      .then((value) => {
+        console.log(value);
+        message.success('注册成功');
+        history.replace({ pathname: '/login' });
+      })
+      .catch((error) => {
+        // 检查 error 对象是否包含响应数据
+        if (error.response) {
+          message.error('注册错误: ' + error.response.data.error);
+        } else if (error.request) {
+          console.log('Error: No response received', error.request);
+        } else {
+          console.log('Error:', error.message);
+        }
+      });
   };
 
   return (
@@ -285,8 +287,7 @@ const Register: React.FC = () => {
         style={{ marginBottom: '40px' }}
         // @ts-ignore
         status={status}
-      >
-      </Steps>
+      ></Steps>
 
       <Form form={form} onFinish={onFinish} style={{ minHeight: '60vh' }} {...formItemLayout}>
         {steps[currentStep].content}
@@ -308,6 +309,10 @@ const Register: React.FC = () => {
           )}
         </div>
       </Form>
+
+      <div style={{ textAlign: 'center', color: '#a09d9d' }}>
+        <Link to={'/login'}>登录</Link>
+      </div>
     </>
   );
 };

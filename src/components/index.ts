@@ -6,6 +6,6 @@
  * 布局组件
  */
 import Footer from './Footer';
-import {AvatarDropdown, AvatarName} from '@/pages/User/AvatarDropdown';
+import {AvatarDropdown, AvatarName} from '@/pages/Auths/AvatarDropdown';
 
 export {Footer, AvatarDropdown, AvatarName};

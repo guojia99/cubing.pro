@@ -3,7 +3,7 @@ export type Comp = {
   id: number;
   StrId: string;
   Name: string;
-  country: string;
+  Country: string;
   City: string;
   Genre: number;
   CompStartTime: string;
@@ -12,4 +12,6 @@ export type Comp = {
   Series: string;
   Status: string;
   logo: string;
+  IsDone: boolean;
+  Count: number;
 };

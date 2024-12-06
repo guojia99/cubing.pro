@@ -1,13 +1,13 @@
-import {Comp} from "@/components/Data/types/comps";
-import dayjs from "dayjs";
-import {Badge, Radio, Select, SelectProps, Table, Tag} from "antd";
-import {ProColumns} from "@ant-design/pro-table/es/typing";
-import {parseDateTime} from "@/utils/time/data_time";
-import {Link} from "react-router-dom";
-import {CubeIcon} from "@/components/CubeIcon/cube_icon";
-import React from "react";
+import { CubeIcon } from '@/components/CubeIcon/cube_icon';
+import { Comp } from '@/components/Data/types/comps';
+import { parseDateTime } from '@/utils/time/data_time';
+import { ProColumns } from '@ant-design/pro-table/es/typing';
+import { Badge, Radio, Select, SelectProps, Table, Tag } from 'antd';
+import dayjs from 'dayjs';
+import React from 'react';
+import { Link } from 'react-router-dom';
 
-function getStatusProp(result: Comp) {
+export function getStatusProp(result: Comp) {
   const now = dayjs();
   const startTime = dayjs(result.CompStartTime);
   const endTime = dayjs(result.CompEndTime);
@@ -15,16 +15,37 @@ function getStatusProp(result: Comp) {
   let status = '';
   let color = 'default'; // 默认颜色
 
-  if (now.isBefore(startTime)) {
-    status = '未开始';
-    color = '#9254de';
-  } else if (now.isAfter(startTime) && now.isBefore(endTime)) {
-    status = '进行中';
-    color = '#52c41a';
-  } else {
-    status = '已结束';
-    color = '#8c8c8c';
+  switch (result.Status) {
+    case "Running":
+      if (now.isBefore(startTime)) {
+        status = '未开始';
+        color = '#9254de';
+      } else if (now.isAfter(startTime) && now.isBefore(endTime)) {
+        status = '进行中';
+        color = '#52c41a';
+      } else {
+        status = '已结束';
+        color = '#8c8c8c';
+      }
+      break
+    case "Reviewing":
+      status = "审批中"
+      color = "#F4D95B"
+      break;
+    case "Reject":
+      status= "驳回"
+      color = "#F3456D"
+      break;
+    case "Temporary":
+      status="编辑中"
+      color = "#C4F757"
+      break;
+    case "Ban":
+      status="禁用"
+      color = "#173A4E"
+      break;
   }
+
   return {
     status: status,
     color: color,
@@ -42,11 +63,11 @@ const cubeIconOptions: SelectProps['options'] = [
 //  : TableProps<Comp>['columns']
 export const CompsTableColumns: ProColumns<Comp>[] = [
   {
-    title: "序号",
+    title: '序号',
     dataIndex: 'Index',
     key: 'Index',
     hideInSearch: true,
-    width: 50,
+    width: 65,
     colSize: 1,
     render: (value: any, result: Comp) => {
       const status = getStatusProp(result);
@@ -56,7 +77,7 @@ export const CompsTableColumns: ProColumns<Comp>[] = [
           {value}
         </div>
       );
-    }
+    },
   },
   {
     title: '日期',
@@ -140,7 +161,13 @@ export const CompsTableColumns: ProColumns<Comp>[] = [
         </>
       );
     },
-    width: 350,
+    // width: 350,
+  },
+  {
+    title: "人数",
+    dataIndex: 'Count',
+    key: 'Count',
+    width: 70,
   },
   {
     title: '项目',
@@ -152,18 +179,7 @@ export const CompsTableColumns: ProColumns<Comp>[] = [
       for (let i = 0; i < l.length; i++) {
         body.push(CubeIcon(l[i], 'comp_icon_key' + result.id + '-' + l[i], { marginLeft: '3px' }));
       }
-      const status = getStatusProp(result);
-      return (
-        <>
-          <Badge.Ribbon
-            text={status.status}
-            color={status.color}
-            style={{ fontSize: 'small', marginTop: '-15px', marginLeft: '5px' }}
-            placement="end"
-          ></Badge.Ribbon>
-          {body}
-        </>
-      );
+      return <>{body}</>;
     },
     hideInSearch: true, // todo
     renderFormItem: () => {
@@ -197,19 +213,35 @@ export const CompsTableColumns: ProColumns<Comp>[] = [
       );
     },
   },
+  {
+    title: '状态',
+    dataIndex: 'Status',
+    key: 'Status',
+    width: 100,
+    render: (text: any, result: Comp) => {
+      const status = getStatusProp(result);
+      return (
+        <>
+          <Badge.Ribbon
+            text={status.status}
+            color={status.color}
+            style={{ fontSize: 'small', marginTop: '-15px', marginLeft: '5px' }}
+            placement="end"
+          ></Badge.Ribbon>
+        </>
+      );
+    },
+  },
 ];
-
-
-
 
 export const CompsTable = (dataSource: Comp[], keys: string[]) => {
   let columns = [];
 
-  for (let key of keys){
-    for (let i =0; i < CompsTableColumns.length; i++){
-      if (CompsTableColumns[i].dataIndex === key){
-        columns.push(CompsTableColumns[i])
-        break
+  for (let key of keys) {
+    for (let i = 0; i < CompsTableColumns.length; i++) {
+      if (CompsTableColumns[i].dataIndex === key) {
+        columns.push(CompsTableColumns[i]);
+        break;
       }
     }
   }
@@ -222,5 +254,5 @@ export const CompsTable = (dataSource: Comp[], keys: string[]) => {
       size="small"
       scroll={{ x: 'max-content' }} // 启用横向滚动
     />
-  )
-}
+  );
+};

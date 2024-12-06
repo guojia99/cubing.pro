@@ -101,7 +101,7 @@ const RecordsWithEvents: React.FC = () => {
         onChange={handleMenuClick}
       />
 
-      {RecordsTable(rc, ['Index', 'UserName', 'Best', 'Average', 'CompsName'])}
+      {RecordsTable(rc, ['Index', 'UserName', 'Best', 'Average', 'ResultTime', 'CompsName'])}
     </>
   );
 };

@@ -1,4 +1,4 @@
-import { authTags } from '@/pages/User/AuthComponents';
+import { authTags } from '@/pages/Auths/AuthComponents';
 import { currentUser } from '@/services/cubing-pro/auth/auth';
 import { ProDescriptions } from '@ant-design/pro-components';
 import { Card, Divider } from 'antd';

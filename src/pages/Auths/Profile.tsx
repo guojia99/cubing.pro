@@ -1,6 +1,6 @@
-import { Auth, checkAuth } from '@/pages/User/AuthComponents';
-import AvatarWithUpdate from '@/pages/User/ProfileComponent/Avatar';
-import UserInfo from '@/pages/User/ProfileComponent/UserInfo';
+import { Auth, checkAuth } from '@/pages/Auths/AuthComponents';
+import AvatarWithUpdate from '@/pages/Auths/ProfileComponent/Avatar';
+import UserInfo from '@/pages/Auths/ProfileComponent/UserInfo';
 import React from 'react';
 
 

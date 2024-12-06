@@ -1,11 +1,10 @@
+import { CompsTableColumns } from '@/components/Data/cube_comps/comps_tables';
 import { Comp } from '@/components/Data/types/comps';
 import { rowClassNameWithStyleLines } from '@/components/Table/table_style';
 import { apiComps } from '@/services/cubing-pro/comps/comps';
 import { CompsAPI } from '@/services/cubing-pro/comps/typings';
 import { ProTable } from '@ant-design/pro-table';
 import React, { useRef, useState } from 'react';
-import {CompsTableColumns} from "@/components/Data/cube_comps/comps_tables";
-
 
 const Competitions: React.FC = () => {
   const actionRef = useRef();
@@ -44,10 +43,17 @@ const Competitions: React.FC = () => {
           });
           const value = await apiComps(tableParams);
 
-          for (let i = 0; i < value.data.items.length; i++) {
-            value.data.items[i].Index = (tableParams.page - 1) * tableParams.size + i + 1;
+          let comps = value.data.items;
+
+          comps = comps.sort((a: Comp, b: Comp) => {
+            if (a.IsDone && !b.IsDone) return 1;
+            if (!a.IsDone && b.IsDone) return -1;
+            return 0;
+          });
+          for (let i = 0; i < comps.length; i++) {
+            comps[i].Index = (tableParams.page - 1) * tableParams.size + i + 1;
           }
-          return { data: value.data.items, success: true, total: value.data.total };
+          return { data: comps, success: true, total: value.data.total };
         }}
         search={{
           labelWidth: 'auto',
