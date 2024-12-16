@@ -35,9 +35,15 @@ const Footer: React.FC = () => {
           title: cubingProConfig.Filing,
           href: 'https://beian.miit.gov.cn/',
           blankTarget: true,
-        }
+        },
+        // {
+        //   key: 'copyright',
+        //   title: "Cubing Pro Inc",
+        //   href: 'https://github.com/guojia99/cubing.pro',
+        //   blankTarget: true,
+        // }
       ]}
-      copyright={"Cubing Pro Inc"}
+      copyright={false}
     />
   );
 };

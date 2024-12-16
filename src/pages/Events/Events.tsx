@@ -4,6 +4,7 @@ import {apiEvents} from "@/services/cubing-pro/events/events";
 import {Divider, Table} from "antd";
 import {eventRouteM} from "@/components/Data/cube_result/event_route";
 import {CubeIcon} from "@/components/CubeIcon/cube_icon";
+import {CubesCn} from "@/components/CubeIcon/cube";
 
 const columns = [
   {
@@ -16,8 +17,11 @@ const columns = [
   },
   {
     title: '名',
-    dataIndex: 'name',
-    key: 'name',
+    dataIndex: 'id',
+    key: 'id',
+    render: (value: string, events: EventsAPI.Event) => {
+      return CubesCn(value)
+    }
   },
 
   {
@@ -33,7 +37,7 @@ const columns = [
     title: '别名',
     dataIndex: 'otherNames',
     key: 'otherNames',
-    render: (value: string, result:EventsAPI.Event) => {
+    render: (value: string, events:EventsAPI.Event) => {
       const data = value.split(";")
 
       let body : JSX.Element[] = []

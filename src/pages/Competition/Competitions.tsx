@@ -22,6 +22,10 @@ const Competitions: React.FC = () => {
     });
   };
 
+
+
+
+
   return (
     <>
       <ProTable<Comp, CompsAPI.CompsReq>

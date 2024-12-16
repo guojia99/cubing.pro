@@ -46,35 +46,35 @@ export const MetaCards = (groups: any) => {
 };
 
 const Organizers: React.FC = () => {
-  const user = checkAuth([Auth.AuthAdmin, Auth.AuthSuperAdmin]);
+  const user = checkAuth([Auth.AuthOrganizers]);
   if (user === null) {
     return <>无权限</>;
   }
 
   let groups = [
-    {
-      title: '主办管理',
-      children: [
-        {
-          title: '主办团队',
-          description: '主办列表',
-          to: '/user/organizers/list',
-          avatar: <FcGenealogy style={{ fontSize: 40 }} />,
-        },
-        {
-          title: '群组管理',
-          description: '管理你的群组、QQ群等设置',
-          to: '/',
-          avatar: <FcOrgUnit style={{ fontSize: 40 }} />,
-        },
-        {
-          title: '机器人设置',
-          description: '自定义你的机器人',
-          to: '/',
-          avatar: <FcReddit style={{ fontSize: 40 }} />,
-        },
-      ],
-    },
+    // {
+    //   title: '主办管理',
+    //   children: [
+    //     {
+    //       title: '主办团队',
+    //       description: '主办列表',
+    //       to: '/user/organizers/list',
+    //       avatar: <FcGenealogy style={{ fontSize: 40 }} />,
+    //     },
+    //     {
+    //       title: '群组管理',
+    //       description: '管理你的群组、QQ群等设置',
+    //       to: '/',
+    //       avatar: <FcOrgUnit style={{ fontSize: 40 }} />,
+    //     },
+    //     {
+    //       title: '机器人设置',
+    //       description: '自定义你的机器人',
+    //       to: '/',
+    //       avatar: <FcReddit style={{ fontSize: 40 }} />,
+    //     },
+    //   ],
+    // },
     {
       title: '比赛管理',
       children: [
@@ -90,18 +90,18 @@ const Organizers: React.FC = () => {
           to: '/user/organizers/comps/create',
           avatar: <FcAddDatabase style={{ fontSize: 40 }} />,
         },
-        {
-          title: '成绩录入',
-          description: '录入一个新成绩',
-          to: '/', // todo
-          avatar: <FcLineChart style={{ fontSize: 40 }} />,
-        },
-        {
-          title: '成绩审批',
-          description: '审批你群组的成绩',
-          to: '/', // todo
-          avatar: <FcFinePrint style={{ fontSize: 40 }} />,
-        },
+        // {
+        //   title: '成绩录入',
+        //   description: '录入一个新成绩',
+        //   to: '/', // todo
+        //   avatar: <FcLineChart style={{ fontSize: 40 }} />,
+        // },
+        // {
+        //   title: '成绩审批',
+        //   description: '审批你群组的成绩',
+        //   to: '/', // todo
+        //   avatar: <FcFinePrint style={{ fontSize: 40 }} />,
+        // },
       ],
     },
   ];
