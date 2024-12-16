@@ -1,7 +1,7 @@
 cubes = {}
 cubesMap = {}
 
-with open("../cube/cube_map.ts", "r") as f:
+with open("../cube_map.ts", "r") as f:
     data = f.read().split("\n")
 
     # 解析Cubes

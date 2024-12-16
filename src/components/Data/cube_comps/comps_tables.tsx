@@ -16,7 +16,15 @@ export function getStatusProp(result: Comp) {
   let color = 'default'; // 默认颜色
 
   switch (result.Status) {
-    case "Running":
+    case 'Running':
+
+      if (result.IsDone){
+        status = '已结束';
+        color = '#8c8c8c';
+        break
+      }
+
+
       if (now.isBefore(startTime)) {
         status = '未开始';
         color = '#9254de';
@@ -24,25 +32,25 @@ export function getStatusProp(result: Comp) {
         status = '进行中';
         color = '#52c41a';
       } else {
-        status = '已结束';
-        color = '#8c8c8c';
+        status = '待结束'
+        color = '#755b5b';
       }
-      break
-    case "Reviewing":
-      status = "审批中"
-      color = "#F4D95B"
       break;
-    case "Reject":
-      status= "驳回"
-      color = "#F3456D"
+    case 'Reviewing':
+      status = '审批中';
+      color = '#F4D95B';
       break;
-    case "Temporary":
-      status="编辑中"
-      color = "#C4F757"
+    case 'Reject':
+      status = '驳回';
+      color = '#F3456D';
       break;
-    case "Ban":
-      status="禁用"
-      color = "#173A4E"
+    case 'Temporary':
+      status = '编辑中';
+      color = '#C4F757';
+      break;
+    case 'Ban':
+      status = '禁用';
+      color = '#173A4E';
       break;
   }
 
@@ -84,12 +92,17 @@ export const CompsTableColumns: ProColumns<Comp>[] = [
     dataIndex: 'CompStartTime',
     key: 'CompStartTime',
     render: (text: any, result: Comp) => {
-      // const startTime = dayjs(result.CompStartTime);
-      // const endTime = dayjs(result.CompEndTime);
-      return <>{parseDateTime(result.CompStartTime)}</>;
+      const startTime = dayjs(result.CompStartTime);
+      const endTime = dayjs(result.CompEndTime);
+      const daysDifference = endTime.diff(startTime, 'day'); // 天数差
+
+      if (daysDifference > 1) {
+        return  <>{parseDateTime(result.CompStartTime)}({daysDifference}天)</>;
+      }
+      return <>{parseDateTime(result.CompStartTime)})</>;
     },
     hideInSearch: true,
-    width: 150,
+    width: 130,
   },
   // {
   //   title: "结束日",
@@ -161,23 +174,33 @@ export const CompsTableColumns: ProColumns<Comp>[] = [
         </>
       );
     },
-    // width: 350,
+    width: 200,
   },
   {
-    title: "人数",
+    title: '人数',
     dataIndex: 'Count',
     key: 'Count',
     width: 70,
+    hideInSearch: true,
   },
   {
     title: '项目',
     dataIndex: 'EventMin',
     key: 'EventMin',
+    width: 150,
     render: (text: any, result: Comp) => {
       const l = text.toString().split(';');
+
+      if (text === '') {
+        return <>暂无项目</>;
+      }
       const body = [];
       for (let i = 0; i < l.length; i++) {
         body.push(CubeIcon(l[i], 'comp_icon_key' + result.id + '-' + l[i], { marginLeft: '3px' }));
+        if (i >= 3) {
+          body.push(<> 等共{l.length}个项目</>);
+          break;
+        }
       }
       return <>{body}</>;
     },
@@ -217,17 +240,13 @@ export const CompsTableColumns: ProColumns<Comp>[] = [
     title: '状态',
     dataIndex: 'Status',
     key: 'Status',
-    width: 100,
+    width: 70,
+    hideInSearch: true,
     render: (text: any, result: Comp) => {
       const status = getStatusProp(result);
       return (
         <>
-          <Badge.Ribbon
-            text={status.status}
-            color={status.color}
-            style={{ fontSize: 'small', marginTop: '-15px', marginLeft: '5px' }}
-            placement="end"
-          ></Badge.Ribbon>
+          <Tag color={status.color}>{status.status}</Tag>
         </>
       );
     },

@@ -35,13 +35,13 @@ export default [
 
   // 主办相关
   {path: 'user/organizers/comps', component: "./Auths/OrganizersComponent/OrganizersComps",}, // 比赛页面
-  {path: 'user/organizers/comps/create', component: "./Auths/OrganizersComponent/Comps/CreateComps",}, // 创建比赛页面
+  {path: 'user/organizers/comps/create', component: "./Auths/OrganizersComponent/CreateComps",}, // 创建比赛页面
 
   {path: 'user/organizers/details', component: "./Auths/OrganizersComponent/OrganizersDetails",}, // 详情
   {path: 'user/organizers/group', component: "./Auths/OrganizersComponent/OrganizersGroup",}, // 群组
   {path: 'user/organizers/result', component: "./Auths/OrganizersComponent/OrganizersResults",}, // 成绩管理
   {path: 'user/organizers/list', component: "./Auths/OrganizersComponent/OrganizersList",}, // 我的主办团队列表
-
+  {path: 'user/organizers/:orgId/comp/:compId/result', component: './Auths/OrganizersComponent/OrganizersResults'}, // 录入成绩
 
   {path: 'user/admins', component: "./Auths/Admin"},
 

@@ -46,6 +46,7 @@ declare namespace CompAPI {
   };
 
   type Event = {
+    Key: string;
     EventName: string;
     EventID: string;
     EventRoute: number;

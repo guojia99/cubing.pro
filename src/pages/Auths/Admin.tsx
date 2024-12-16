@@ -16,6 +16,7 @@ import {
   FcTodoList,
   FcVoicePresentation,
 } from 'react-icons/fc';
+import {UnorderedListOutlined} from "@ant-design/icons";
 
 const Admin: React.FC = () => {
   const user = checkAuth([Auth.AuthAdmin, Auth.AuthSuperAdmin]);
@@ -128,6 +129,23 @@ const Admin: React.FC = () => {
           description: '管理用户上传的图片',
           to: '/',
           avatar: <FcTodoList style={{ fontSize: 40 }} />,
+        },
+      ],
+    },
+    {
+      title: '自定义WCA榜单',
+      children: [
+        {
+          title: '榜单管理',
+          description: '榜单管理',
+          to: '/',
+          avatar: <UnorderedListOutlined style={{ fontSize: 40 }} />,
+        },
+        {
+          title: '榜单人员管理',
+          description: '榜单人员管理',
+          to: '/',
+          avatar: <FcConferenceCall style={{ fontSize: 40 }} />,
         },
       ],
     },

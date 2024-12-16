@@ -4,7 +4,11 @@ import React from 'react';
 
 import { CubesCn } from '@/components/CubeIcon/cube';
 import MarkdownEditor from '@/components/Markdown/editer';
-import { apiCreateComps, apiMeOrganizers } from '@/services/cubing-pro/auth/organizers';
+import {
+  apiCreateComps,
+  apiGetGroups,
+  apiMeOrganizers,
+} from '@/services/cubing-pro/auth/organizers';
 import { OrganizersAPI } from '@/services/cubing-pro/auth/typings';
 import { CompAPI } from '@/services/cubing-pro/comps/typings';
 import { apiEvents } from '@/services/cubing-pro/events/events';
@@ -19,6 +23,7 @@ import {
 import { Button, Modal, Select, Table, Upload, message } from 'antd';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 const { Option } = Select;
 
@@ -67,7 +72,7 @@ const EventTable: React.FC<{ onChange?: (val: any) => void }> = ({ onChange }) =
           value={text}
           style={{ width: 120 }}
           /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
-          onChange={(value) => handleEventChange(record.EventID, 'EventName', value)}
+          onChange={(value) => handleEventChangeEventName(record.Key, value)}
         >
           {eventOptions.map((option) => (
             <Option key={option} value={option}>
@@ -105,7 +110,7 @@ const EventTable: React.FC<{ onChange?: (val: any) => void }> = ({ onChange }) =
             icon={<DeleteOutlined />}
             onClick={
               /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
-              () => deleteEvent(record.EventID)
+              () => deleteEvent(record.Key)
             }
           >
             删除
@@ -173,7 +178,7 @@ const EventTable: React.FC<{ onChange?: (val: any) => void }> = ({ onChange }) =
           Round: getRoundName(index, values.Schedule.length),
         })),
       };
-      updateEvents(events.map((e) => (e.EventID === updatedEvent.EventID ? updatedEvent : e)));
+      updateEvents(events.map((e) => (e.Key === updatedEvent.Key ? updatedEvent : e)));
       setIsModalVisible(false);
     });
   };
@@ -186,8 +191,15 @@ const EventTable: React.FC<{ onChange?: (val: any) => void }> = ({ onChange }) =
     const unusedEvents = eventOptions.filter(
       (option) => !events.some((e) => e.EventName === option),
     );
-    const newEventName = unusedEvents.length > 0 ? unusedEvents[0] : eventOptions[0];
+
+    if (unusedEvents.length === 0) {
+      message.warning('所有项目已全部加入，无法继续加载').then();
+      return;
+    }
+
+    const newEventName = unusedEvents[0];
     const newEvent: CompAPI.Event = {
+      Key: uuidv4(),
       EventName: newEventName,
       EventID: newEventName,
       EventRoute: 0,
@@ -202,8 +214,8 @@ const EventTable: React.FC<{ onChange?: (val: any) => void }> = ({ onChange }) =
     updateEvents([...events, newEvent]);
   };
 
-  const deleteEvent = (eventId: string) => {
-    updateEvents(events.filter((e) => e.EventID !== eventId));
+  const deleteEvent = (key: string) => {
+    updateEvents(events.filter((e) => e.Key !== key));
   };
 
   const getRoundName = (index: number, totalRounds: number) => {
@@ -301,9 +313,22 @@ const EventTable: React.FC<{ onChange?: (val: any) => void }> = ({ onChange }) =
     });
   };
 
-  const handleEventChange = (eventId: string, field: string, value: any) => {
+  const handleEventChangeEventName = (key: string, value: string) => {
+    const find = events.filter((e) => {
+      if (e.Key === key) {
+        return false;
+      }
+      return e.EventID === value;
+    });
+    if (find.length !== 0) {
+      message.warning('已存在' + value + '项目, 无法继续添加').then()
+      return;
+    }
+
     updateEvents(
-      events.map((event) => (event.EventID === eventId ? { ...event, [field]: value } : event)),
+      events.map((event) =>
+        event.Key === key ? { ...event, ...{ EventName: value, EventID: value } } : event,
+      ),
     );
   };
   const deleteSchedule = (index: number) => {
@@ -400,46 +425,6 @@ const EventTable: React.FC<{ onChange?: (val: any) => void }> = ({ onChange }) =
   );
 };
 
-const BaseDataForm = (org: OrganizersAPI.MeOrganizersResp | null) => {
-  if (org === null) {
-    return <></>;
-  }
-  return (
-    <>
-      <Row gutter={16}>
-        <Col span={12}>
-          <Form.Item
-            name="competitionName"
-            label="比赛名称"
-            rules={[{ required: true, message: '请输入比赛名称！' }]}
-          >
-            <Input />
-          </Form.Item>
-        </Col>
-        <Form.Item
-          name="organizersID"
-          label="所在团队"
-          style={{ width: '50%' }}
-          rules={[{ required: true, message: '选择所在团队名称' }]}
-        >
-          <Select placeholder="选择所在团队名称">
-            {org.data.items.map((o) => (
-              <Select.Option key={o.id} value={o.id}>
-                {o.Name}
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
-        <Col span={12}>
-          <Form.Item name="maxParticipants" label="最大参与人数">
-            <InputNumber min={1} />
-          </Form.Item>
-        </Col>
-      </Row>
-    </>
-  );
-};
-
 const OtherDataForm = () => {
   return (
     <>
@@ -469,8 +454,12 @@ const OtherDataForm = () => {
 
 const CreateCompsPage: React.FC = () => {
   const [org, setOrg] = useState<OrganizersAPI.MeOrganizersResp | null>(null);
+  const [curOrg, setCurOrg] = useState<number>(0);
+  const [groups, setGroups] = useState<OrganizersAPI.GetGroupsResp | null>(null);
+
   const [form] = Form.useForm(); // 使用 Ant Design 的 Form
   const [events, setEvents] = useState<CompAPI.Event[]>([]);
+
   // 获取团队信息
   useEffect(() => {
     if (org === null) {
@@ -487,6 +476,15 @@ const CreateCompsPage: React.FC = () => {
       history.replace({ pathname: '/user/organizers' });
     }
   }, [org]);
+
+  useEffect(() => {
+    if (curOrg === 0) {
+      return;
+    }
+    apiGetGroups(curOrg).then((value) => {
+      setGroups(value);
+    });
+  }, [curOrg]);
 
   // 提交表单数据
   const handleSubmit = () => {
@@ -527,14 +525,16 @@ const CreateCompsPage: React.FC = () => {
               Apply: true,
             };
             console.log(req);
-            console.log(values)
-            apiCreateComps(values.organizersID, req).then((value) => {
-              console.log(value)
-              message.success("创建成功")
-              // window.location.href = '/user/organizers';
-            }).catch((values) => {
-              message.error("创建失败: " + values)
-            })
+            console.log(values);
+            apiCreateComps(values.organizersID, req)
+              .then((value) => {
+                console.log(value);
+                message.success('创建成功');
+                window.location.href = '/user/organizers';
+              })
+              .catch((values) => {
+                message.error('创建失败: ' + values);
+              });
           },
         });
       })
@@ -547,7 +547,68 @@ const CreateCompsPage: React.FC = () => {
     <>
       {BackButton('返回上层')}
       <Form layout="vertical" form={form}>
-        <Card title={'基础信息'}>{BaseDataForm(org)}</Card>
+        <Card title={'基础信息'}>
+          <>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item
+                  name="competitionName"
+                  label="比赛名称"
+                  rules={[{ required: true, message: '请输入比赛名称！' }]}
+                >
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item name="maxParticipants" label="最大参与人数">
+                  <InputNumber min={1} style={{ width: '100%' }} />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  name="organizersID"
+                  label="所在团队"
+                  // style={{ width: '50%' }}
+                  rules={[{ required: true, message: '选择所在团队名称' }]}
+                >
+                  <Select
+                    placeholder="选择所在团队名称"
+                    onChange={(value) => {
+                      setGroups(null);
+                      setCurOrg(value);
+                      // todo 这里有bug， 多个群组同时存在时，切换主办这里要清空，但是这里清空不了
+                    }}
+                  >
+                    {org?.data.items.map((o) => (
+                      <Select.Option key={o.id} value={o.id}>
+                        {o.Name}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  name="groupsID"
+                  label="群组"
+                  // style={{ width: '50%' }}
+                  rules={[{ required: true, message: '选择群组' }]}
+                >
+                  <Select placeholder="选择群组">
+                    {groups?.data.items.map((o) => (
+                      <Select.Option key={o.id} value={o.id}>
+                        {o.name}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <p>比赛类型: 线上</p>
+              </Col>
+            </Row>
+          </>
+        </Card>
         <Card title={'时间配置'} style={{ marginTop: 20 }}>
           {OtherDataForm()}
         </Card>

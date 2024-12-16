@@ -59,6 +59,15 @@ export const ResultsTable = (
       },
     ],
     [
+      'CubeID',
+      {
+        title: "CubeID",
+        dataIndex: "CubeID",
+        key: "CubeID",
+        width: 100,
+      }
+    ],
+    [
       'Best',
       {
         title: '单次',
@@ -118,11 +127,12 @@ export const ResultsTable = (
             // todo 多轮的
             return <td className={'cube_result_Average_col'}>-</td>;
           }
+
           // todo 需要pb
           return (
             <td className={'cube_result_Average_col'}>
               {RecordTagWithResult(
-                resultTimeString(results),
+                resultTimeString(results, m.integer),
                 result.id + '_average',
                 false,
                 false,

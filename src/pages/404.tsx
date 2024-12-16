@@ -1,4 +1,4 @@
-import { history, useIntl } from '@umijs/max';
+import { history } from '@umijs/max';
 import { Button, Result } from 'antd';
 import React from 'react';
 

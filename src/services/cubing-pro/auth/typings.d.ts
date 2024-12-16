@@ -146,6 +146,10 @@ export declare namespace OrganizersAPI {
     };
   };
 
+  export type OrganizersResp = {
+    data: organizer;
+  }
+
   export type CreateCompReq = {
     Name: string;
     StrId: string;
@@ -168,4 +172,25 @@ export declare namespace OrganizersAPI {
 
     Apply: boolean;
   };
+
+  export type  CompetitionGroup = {
+    id: number;
+    createdAt: string; // 创建时间
+    updatedAt: string; // 更新时间
+    deletedAt?: string | null; // 删除时间，可选
+
+    name: string; // 比赛组名称
+    organizersID?: number; // 主办团队的 ID，可为空
+
+    qqGroups: string; // QQ 群组
+    qqGroupUid: string; // QQ 群组的 UID
+    wechatGroups: string; // 微信群组
+  }
+
+  export type  GetGroupsResp = {
+    data: {
+      items: CompetitionGroup[];
+      total: number;
+    };
+  }
 }

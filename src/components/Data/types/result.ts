@@ -82,7 +82,12 @@ const IsBestAvgResult = (r: Result, other: Result): boolean => {
 };
 
 export const sortResults = (dst: Result[]) => {
-  if (dst.length <= 1) {
+  if (dst.length === 0) {
+    return dst;
+  }
+
+  if (dst.length === 1) {
+    dst[0].Rank = 0;
     return dst;
   }
   const rom = RouteMaps.get(dst[0].EventRoute);
@@ -120,7 +125,11 @@ export const sortResults = (dst: Result[]) => {
   return dst;
 };
 
-export const resultTimeString = (result: number, inter: boolean | undefined = false, omitMilliseconds: boolean = false) => {
+export const resultTimeString = (
+  result: number,
+  inter: boolean | undefined = false,
+  omitMilliseconds: boolean = false,
+) => {
   if (isNaN(result)) {
     return 'DNF';
   }
@@ -142,7 +151,9 @@ export const resultTimeString = (result: number, inter: boolean | undefined = fa
 
   const minutes = Math.floor(result / 60);
   const seconds = omitMilliseconds
-    ? Math.floor(result % 60).toString().padStart(2, '0')
+    ? Math.floor(result % 60)
+        .toString()
+        .padStart(2, '0')
     : (result % 60).toFixed(2).padStart(5, '0');
 
   return `${minutes}:${seconds}`;
@@ -203,21 +214,24 @@ export const resultStringPro = (results: number[], eventRoute: number): string[]
   return outs;
 };
 
-
-
 export const resultToBest = (result: Result): string => {
-  const m = eventRouteM(result.EventRoute)
-  if (m.repeatedly){
-    return result.BestRepeatedlyReduction + "/" + result.BestRepeatedlyTry + "  " + resultTimeString(result.BestRepeatedlyTime, false, true)
+  const m = eventRouteM(result.EventRoute);
+  if (m.repeatedly) {
+    return (
+      result.BestRepeatedlyReduction +
+      '/' +
+      result.BestRepeatedlyTry +
+      '  ' +
+      resultTimeString(result.BestRepeatedlyTime, false, true)
+    );
   }
 
-  if (m.withBest){
-    return resultTimeString(result.Best)
+  if (m.withBest) {
+    return resultTimeString(result.Best);
   }
-  if (DAvg(result)){
-    return resultTimeString(result.Best) + "[单次]"
+  if (DAvg(result)) {
+    return resultTimeString(result.Best) + '[单次]';
   }
 
-
-  return resultTimeString(result.Average)
-}
+  return resultTimeString(result.Average);
+};

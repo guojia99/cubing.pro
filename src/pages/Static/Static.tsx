@@ -2,7 +2,6 @@ import { NavTabs } from '@/components/Tabs/nav_tabs';
 import KinCh from '@/pages/Static/Kinsor';
 import { OrderedListOutlined, TrophyOutlined } from '@ant-design/icons';
 import React from 'react';
-import Best from "@/pages/Static/Best";
 import Records from "@/pages/Static/Record";
 
 const Static: React.FC = () => {
