@@ -1,18 +1,25 @@
 import Pagination from '@/components/Buttons/pagination_button';
-import ScrollToTopButton from '@/components/Buttons/toTop';
 import { P404 } from '@/components/Status/404';
 import { NavTabs } from '@/components/Tabs/nav_tabs';
+import UpdateTitle from '@/components/Title/Title';
 import { IfLoading } from '@/components/Wait/wait';
-import CompetitionDetail from '@/pages/Competition/CompetitionComponents/CompetitionDetail';
-import CompetitionRegulations from '@/pages/Competition/CompetitionComponents/CompetitionRegulations';
-import CompetitionResults from '@/pages/Competition/CompetitionComponents/CompetitionResults';
+
 import { apiComp } from '@/services/cubing-pro/comps/comp';
 import { CompAPI } from '@/services/cubing-pro/comps/typings';
 import { useParams } from '@@/exports';
 import { BuildOutlined, ProductOutlined, ProfileOutlined, TableOutlined } from '@ant-design/icons';
-import React, { useEffect, useState } from 'react';
+import React, { lazy, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import UpdateTitle from "@/components/Title/Title";
+
+const CompetitionDetail = lazy(
+  () => import('@/pages/Competition/CompetitionComponents/CompetitionDetail'),
+);
+const CompetitionRegulations = lazy(
+  () => import('@/pages/Competition/CompetitionComponents/CompetitionRegulations'),
+);
+const CompetitionResults = lazy(
+  () => import('@/pages/Competition/CompetitionComponents/CompetitionResults'),
+);
 
 const Competition: React.FC = () => {
   const { id } = useParams();
@@ -110,7 +117,7 @@ const Competition: React.FC = () => {
     <>
       {/*</Watermark>*/}
       <h1 style={{ textAlign: 'center' }}>{comp ? comp.data.Name : '比赛加载中'}</h1>
-      {IfLoading(loading, <UpdateTitle title={comp?.data.Name}/>)}
+      {IfLoading(loading, <UpdateTitle title={comp?.data.Name} />)}
       <NavTabs
         type="line"
         items={items}

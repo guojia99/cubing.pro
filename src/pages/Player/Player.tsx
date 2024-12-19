@@ -1,11 +1,12 @@
 import { P404 } from '@/components/Status/404';
-import UpdateTitle from '@/components/Title/Title';
-import PlayerDetail from '@/pages/Player/PlayerComponents/PlayerDetail';
-import PlayerResults from '@/pages/Player/PlayerComponents/PlayerResults';
 import { apiPlayer } from '@/services/cubing-pro/players/players';
 import { PlayersAPI } from '@/services/cubing-pro/players/typings';
 import { useParams } from '@@/exports';
-import React, { useEffect, useState } from 'react';
+import React, { lazy, useEffect, useState } from 'react';
+
+const UpdateTitle = lazy(() => import('@/components/Title/Title'));
+const PlayerDetail = lazy(() => import('@/pages/Player/PlayerComponents/PlayerDetail'));
+const PlayerResults = lazy(() => import('@/pages/Player/PlayerComponents/PlayerResults'));
 
 const Player: React.FC = () => {
   const { id } = useParams();
