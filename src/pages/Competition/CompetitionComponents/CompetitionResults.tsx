@@ -1,21 +1,31 @@
 import { NavTabs } from '@/components/Tabs/nav_tabs';
-import CompetitionResultsWithEvents from '@/pages/Competition/CompetitionComponents/CompetitionResultsWithEvents';
-import CompetitionResultsWithPlayers from '@/pages/Competition/CompetitionComponents/CompetitionResultsWithPlayers';
-import CompetitionResultsWithRecord from '@/pages/Competition/CompetitionComponents/CompetitionResultsWithRecord';
-import CompetitionResultsWithTop from '@/pages/Competition/CompetitionComponents/CompetitionResultsWithTop';
+
+import { Record } from '@/components/Data/types/record';
+import { Result } from '@/components/Data/types/result';
 import { apiCompRecord } from '@/services/cubing-pro/comps/comp';
 import { apiCompResult } from '@/services/cubing-pro/comps/result';
 import { CompAPI, CompResultAPI } from '@/services/cubing-pro/comps/typings';
 import { apiEvents } from '@/services/cubing-pro/events/events';
 import { EventsAPI } from '@/services/cubing-pro/events/typings';
-import { Result } from '@/components/Data/types/result';
 import { ProductOutlined, TrophyOutlined } from '@ant-design/icons';
 import { ProDescriptions } from '@ant-design/pro-components';
 import { Card } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { lazy, useEffect, useState } from 'react';
 import { BsPeople } from 'react-icons/bs';
 import { SiBytedance, SiCodeforces } from 'react-icons/si';
-import { Record } from '@/components/Data/types/record';
+
+const CompetitionResultsWithEvents = lazy(
+  () => import('@/pages/Competition/CompetitionComponents/CompetitionResultsWithEvents'),
+);
+const CompetitionResultsWithPlayers = lazy(
+  () => import('@/pages/Competition/CompetitionComponents/CompetitionResultsWithPlayers'),
+);
+const CompetitionResultsWithRecord = lazy(
+  () => import('@/pages/Competition/CompetitionComponents/CompetitionResultsWithRecord'),
+);
+const CompetitionResultsWithTop = lazy(
+  () => import('@/pages/Competition/CompetitionComponents/CompetitionResultsWithTop'),
+);
 
 // 定义组件的属性类型
 interface CompetitionResultProps {
