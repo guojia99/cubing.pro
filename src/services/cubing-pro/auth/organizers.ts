@@ -95,6 +95,18 @@ export async function apiGetCompsResults(
   return response.data;
 }
 
+export async function apiGetCompsResultsWithPlayer(
+  orgId: string | undefined,
+  compId: string | undefined,
+  cubeId: string | undefined,
+): Promise<CompResultAPI.CompResultResp> {
+  const response = await Request.get<CompResultAPI.CompResultResp>(
+    'organizers/' + orgId + '/comp/' + compId + '/result' + '?cube_id=' + cubeId,
+    { headers: AuthHeader() },
+  );
+  return response.data;
+}
+
 export async function apiAddCompResults(
   orgId: string | undefined,
   compId: string | undefined,

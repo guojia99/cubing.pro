@@ -24,6 +24,7 @@ import { Button, Modal, Select, Table, Upload, message } from 'antd';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import {EventsAPI} from "@/services/cubing-pro/events/typings";
 
 const { Option } = Select;
 
@@ -459,6 +460,7 @@ const CreateCompsPage: React.FC = () => {
 
   const [form] = Form.useForm(); // 使用 Ant Design 的 Form
   const [events, setEvents] = useState<CompAPI.Event[]>([]);
+  const [baseEvents, setBaseEvents] = useState<EventsAPI.Event[]>([]);
 
   // 获取团队信息
   useEffect(() => {
@@ -486,6 +488,12 @@ const CreateCompsPage: React.FC = () => {
     });
   }, [curOrg]);
 
+  useEffect(() => {
+    apiEvents().then((value) => {
+      setBaseEvents(value.data.Events)
+    });
+  }, []);
+
   // 提交表单数据
   const handleSubmit = () => {
     form
@@ -495,6 +503,14 @@ const CreateCompsPage: React.FC = () => {
           title: '确认提交',
           content: '你确定要提交比赛信息吗？',
           onOk: async () => {
+            for (let i = 0; i < events.length;i++){
+              const f = baseEvents.find((value) => value.id === events[i].EventID)
+              if (f === undefined){
+                message.warning('项目错误').then()
+                return;
+              }
+              events[i].EventRoute = f.base_route_typ
+            }
             const compJson: CompAPI.CompJson = {
               Events: events,
               Cost: {

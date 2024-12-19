@@ -1,6 +1,7 @@
 // https://umijs.org/config/
 import { defineConfig } from '@umijs/max';
 import { join } from 'path';
+
 import defaultSettings from './defaultSettings';
 import proxy from './proxy';
 import routes from './routes';
@@ -153,4 +154,133 @@ export default defineConfig({
   },
   esbuildMinifyIIFE: true,
   requestRecord: {},
+  // chunks:['antdesigns', 'vendors', 'commons', 'umi'],
+  // // chainWebpack: REACT_APP_ENV === 'local' ? undefined : webpackPlugin,
+  // chainWebpack: webpackPlugin,
+  // chainWebpack: function (config, { webpack }) {
+  //
+  //   config.merge({
+  //     minimize: true,
+  //     optimization: {  //webpack配置
+  //       splitChunks: {
+  //         chunks: 'all',
+  //         minSize: 20000,
+  //         minChunks: 2,
+  //         cacheGroups: {
+  //           vendors: {
+  //             name: 'vendors',
+  //             // @ts-ignore
+  //             test({resource}) {
+  //               return /[\\/]node_modules[\\/]/.test(resource);
+  //             },
+  //             priority: 10,
+  //           },
+  //         },
+  //       },
+  //     },
+  //   })
+  // }
+  chainWebpack(config) {
+    config.merge({
+      optimization: {
+        minimize: true,
+        splitChunks: {
+          chunks: 'async',
+          minSize: 30000,
+          minChunks: 2,
+          automaticNameDelimiter: '.',
+          cacheGroups: {
+            vendor: {
+              name: 'vendors',
+              test: /^.*node_modules[\\/](?!ag-grid-|lodash|wangeditor|react-virtualized|rc-select|rc-drawer|rc-time-picker|rc-tree|rc-table|rc-calendar|antd).*$/,
+              chunks: "all",
+              priority: 10,
+            },
+            virtualized: {
+              name: "virtualized",
+              test: /[\\/]node_modules[\\/]react-virtualized/,
+              chunks: "all",
+              priority: 10
+            },
+            rcselect: {
+              name: "rc-select",
+              test: /[\\/]node_modules[\\/]rc-select/,
+              chunks: "all",
+              priority: 10
+            },
+            rcdrawer: {
+              name: "rcdrawer",
+              test: /[\\/]node_modules[\\/]rc-drawer/,
+              chunks: "all",
+              priority: 10
+            },
+            rctimepicker: {
+              name: "rctimepicker",
+              test: /[\\/]node_modules[\\/]rc-time-picker/,
+              chunks: "all",
+              priority: 10
+            },
+            ag: {
+              name: "ag",
+              test: /[\\/]node_modules[\\/]ag-grid-/,
+              chunks: "all",
+              priority: 10
+            },
+            antd: {
+              name: "antd",
+              test: /[\\/]node_modules[\\/]antd[\\/]/,
+              chunks: "all",
+              priority: 9
+            },
+            rctree: {
+              name: "rctree",
+              test: /[\\/]node_modules[\\/]rc-tree/,
+              chunks: "all",
+              priority: -1
+            },
+            rccalendar: {
+              name: "rccalendar",
+              test: /[\\/]node_modules[\\/]rc-calendar[\\/]/,
+              chunks: "all",
+              priority: -1
+            },
+            rctable: {
+              name: "rctable",
+              test: /[\\/]node_modules[\\/]rc-table[\\/]es[\\/]/,
+              chunks: "all",
+              priority: -1
+            },
+            wang: {
+              name: "wang",
+              test: /[\\/]node_modules[\\/]wangeditor[\\/]/,
+              chunks: "all",
+              priority: -1
+            },
+            lodash: {
+              name: "lodash",
+              test: /[\\/]node_modules[\\/]lodash[\\/]/,
+              chunks: "all",
+              priority: -2
+            },
+            bizcharts: {
+              name: "bizcharts",
+              test: /[\\/]node_modules[\\/]bizcharts[\\/]/,
+              chunks: "all",
+              priority: 10
+            },
+            xlsx: {
+              name: "xlsx",
+              test: /[\\/]node_modules[\\/]xlsx[\\/]/,
+              chunks: "async",
+              priority: 10
+            }
+          }
+        }
+      }
+    });
+    //过滤掉momnet的那些不使用的国际化文件
+    config.plugin("replace").use(require("webpack").ContextReplacementPlugin).tap(() => {
+      return [/moment[/\\]locale$/, /zh-cn/];
+    });
+  }
 });
