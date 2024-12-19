@@ -1,13 +1,14 @@
 import { CubesCn } from '@/components/CubeIcon/cube';
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import { ResultsTable } from '@/components/Data/cube_result/result_tables';
-import { Result } from '@/components/Data/types/result';
+import { Result, resultStringPro } from '@/components/Data/types/result';
 import { NavTabs } from '@/components/Tabs/nav_tabs';
 import { Auth, checkAuth } from '@/pages/Auths/AuthComponents';
 import {
   apiAddCompResults,
   apiGetAllPlayers,
   apiGetCompsResults,
+  apiGetCompsResultsWithPlayer,
   apiGetOrgComp,
   apiOrganizers,
 } from '@/services/cubing-pro/auth/organizers';
@@ -16,9 +17,22 @@ import { CompAPI } from '@/services/cubing-pro/comps/typings';
 import { apiEvents } from '@/services/cubing-pro/events/events';
 import { EventsAPI } from '@/services/cubing-pro/events/typings';
 import { PlayersAPI } from '@/services/cubing-pro/players/typings';
+import { isNumber } from '@/utils/types/numbers';
 import { useParams } from '@@/exports';
 import { CloseCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
-import { Button, Card, Cascader, Form, Input, Select, Space, Tooltip, message } from 'antd';
+import {
+  Alert,
+  Button,
+  Card,
+  Cascader,
+  Form,
+  Input,
+  Select,
+  Space,
+  Table,
+  Tooltip,
+  message,
+} from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import React, { useEffect, useState } from 'react';
 
@@ -26,19 +40,24 @@ const { Option } = Select;
 
 const OrganizersResults: React.FC = () => {
   const { orgId, compId } = useParams();
-
   const [org, setOrg] = useState<OrganizersAPI.OrganizersResp | null>(null);
   const [comp, setComp] = useState<CompAPI.CompResp | null>(null);
+  const [events, setEvents] = useState<EventsAPI.Event[]>([]);
+
   const [players, setPlayers] = useState<PlayersAPI.Player[]>();
+
+  // 单个录入
   const [curPlayer, setCurPlayer] = useState<any>();
   const [curSchedule, setCurSchedule] = useState<CompAPI.Schedule | null>(null);
   const [curEvent, setCurEvent] = useState<CompAPI.Event | null>(null);
-  const [results, setResults] = useState<Result[]>([]);
+  const [oneResults, setOneResults] = useState<Result[]>([]);
   const [scheduleOpt, setScheduleOpt] = useState<[]>();
   const [inputValues, setInputValues] = useState<string[]>(Array(5));
   const [curRound, setCurRound] = useState<any>();
-  const [events, setEvents] = useState<EventsAPI.Event[]>([]);
-  const [multiInput, setMultiInput] = useState<any>('');
+
+  // 多录入
+  const [multiResults, setMultiResults] = useState<Result[]>([]);
+  const [parserResults, setParserResults] = useState<any[]>([]);
 
   const user = checkAuth([Auth.AuthOrganizers]);
   if (user === null) {
@@ -114,6 +133,7 @@ const OrganizersResults: React.FC = () => {
       return;
     }
     setCurEvent(ev);
+
     const schedule = ev.Schedule.find((value) => {
       return value.RoundNum === v[1];
     });
@@ -129,7 +149,7 @@ const OrganizersResults: React.FC = () => {
       for (let i = 0; i < value.data.length; i++) {
         value.data[i].Rank -= 1;
       }
-      setResults(value.data);
+      setOneResults(value.data);
     });
   };
 
@@ -143,9 +163,18 @@ const OrganizersResults: React.FC = () => {
 
   const getEventRoundNum = () => {
     if (!curEvent) {
-      return 1;
+      return 0;
     }
-    switch (curEvent.EventRoute) {
+
+    const event = events.find((value) => {
+      return value.id === curEvent?.EventID;
+    });
+    if (event === undefined) {
+      return 0;
+    }
+    switch (event.base_route_typ) {
+      case 1:
+        return 1;
       case 2:
       case 3:
       case 4:
@@ -154,12 +183,14 @@ const OrganizersResults: React.FC = () => {
       case 6:
       case 7:
         return 5;
+      case 8:
+        return 1;
       case 9:
         return 2;
       case 10:
         return 3;
     }
-    return 1;
+    return 0;
   };
 
   const filedStyle = {
@@ -172,7 +203,7 @@ const OrganizersResults: React.FC = () => {
   };
 
   const parseTimeToSeconds = (time: string) => {
-    if (time === 'DNF') {
+    if (time === 'DNF' || time === 'd' || time === 'D') {
       return -10000;
     }
     if (time === 'DNS') {
@@ -199,7 +230,7 @@ const OrganizersResults: React.FC = () => {
   };
 
   // 更新输出框的成绩，不符合的需要删除或更新
-  const inputResultUpdate = (v: string, index: number) => {
+  const inputOneResultUpdate = (v: string, index: number) => {
     const value = v
       // .replace(/\s+/g, '')
       .replace(/：/g, ':') // 替换所有大写的"："为":"
@@ -249,7 +280,9 @@ const OrganizersResults: React.FC = () => {
       return;
     }
 
-    // 确认是否符合时间格式
+    if (value === 'DNF' || value === 'DNS' || value === 'd' || value === 'D') {
+      return;
+    }
 
     // 确认是否符合时间格式
     // 时分秒 {number} : {number} : {number} . {number}
@@ -258,8 +291,22 @@ const OrganizersResults: React.FC = () => {
     if (reg1.test(value) || reg2.test(value) || reg3.test(value)) {
       return;
     }
-
     message.warning(value + '不符合格式', 2).then();
+  };
+
+  const checkResult = (input: any): boolean => {
+    const reg =
+      /^((([0-1]?\d|2[0-3]):([0-5]?\d|60):([0-5]?\d|60)(\.\d{1,3})?)|(([0-5]?\d|60):([0-5]?\d|60)(\.\d{1,3})?)|([0-5]?\d(\.\d{1,3})?))$/;
+
+    if (isNumber(input)) {
+      return true;
+    }
+
+    if (input === 'DNF' || input === 'DNS' || input === 'D' || input === 'd') {
+      return true;
+    }
+
+    return reg.test(input);
   };
 
   const onOneFinish = () => {
@@ -284,8 +331,6 @@ const OrganizersResults: React.FC = () => {
     let results: number[] = [];
 
     const reg = /^\d+\/\d+$/;
-    const reg2 =
-      /^((([0-1]?\d|2[0-3]):([0-5]?\d|60):([0-5]?\d|60)(\.\d{1,3})?)|(([0-5]?\d|60):([0-5]?\d|60)(\.\d{1,3})?)|([0-5]?\d(\.\d{1,3})?))$/;
 
     for (let i = 0; i < getEventRoundNum(); i++) {
       if (inputValues[i] === null || inputValues[i] === '' || inputValues[i] === undefined) {
@@ -294,7 +339,7 @@ const OrganizersResults: React.FC = () => {
       }
       if ([8, 9, 10].indexOf(event.base_route_typ) !== -1) {
         const sl = inputValues[i].split(' ');
-        if (sl.length < 2 || !reg.test(sl[0]) || !reg2.test(sl[1])) {
+        if (sl.length < 2 || !reg.test(sl[0]) || !checkResult(sl[1])) {
           message.warning(`第${i + 1}个成绩格式不正确, 请按 a/b xx:yy:zz的格式录入`).then();
           return;
         }
@@ -305,15 +350,13 @@ const OrganizersResults: React.FC = () => {
         );
         continue;
       }
-
-      if (!reg2.test(inputValues[i]) && inputValues[i] !== 'DNF' && inputValues[i] !== 'DNS') {
+      if (!checkResult(inputValues[i])) {
         message.warning(`第${i + 1}个成绩格式不正确`).then();
         return;
       }
       results.push(parseTimeToSeconds(inputValues[i]));
     }
 
-    console.log(inputValues, results);
     apiAddCompResults(orgId, compId, curEvent?.EventID, curSchedule?.RoundNum, results, curPlayer)
       .then(() => {
         message.success('成绩录入成功').then();
@@ -321,35 +364,9 @@ const OrganizersResults: React.FC = () => {
         setInputValues([]);
       })
       .catch((value) => {
-        message.error('成绩录入失败' + value).then();
+        message.error('成绩录入失败:' + value.response.data.error).then();
       });
   };
-
-
-  const playerHTML = () => {
-    return (
-      <Form.Item label="选择选手">
-        <Select
-          style={filedStyle}
-          placeholder={'选择选手'}
-          onChange={(value) => {
-            setCurPlayer(value);
-          }}
-          filterOption={filterOption}
-          clearIcon={<CloseCircleOutlined style={{ color: 'red' }} />}
-          showSearch
-          allowClear
-        >
-          {players?.map((player) => (
-            <Option key={player.CubeID} value={player.CubeID}>
-              {player.CubeID} - {player.Name}
-            </Option>
-          ))}
-        </Select>
-      </Form.Item>
-    )
-  }
-
 
   const onInputResult = () => {
     return (
@@ -364,7 +381,25 @@ const OrganizersResults: React.FC = () => {
                 placeholder="选择项目和轮次"
               />
             </Form.Item>
-            {playerHTML()}
+            <Form.Item label="选择选手">
+              <Select
+                style={filedStyle}
+                placeholder={'选择选手'}
+                onChange={(value) => {
+                  setCurPlayer(value);
+                }}
+                filterOption={filterOption}
+                clearIcon={<CloseCircleOutlined style={{ color: 'red' }} />}
+                showSearch
+                allowClear
+              >
+                {players?.map((player) => (
+                  <Option key={player.CubeID} value={player.CubeID}>
+                    {player.CubeID} - {player.Name}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
 
             <Form.Item
               label={
@@ -392,7 +427,7 @@ const OrganizersResults: React.FC = () => {
                     addonBefore={`${index + 1}`}
                     value={inputValues[index]}
                     placeholder="请输入成绩"
-                    onChange={(e) => inputResultUpdate(e.target.value, index)}
+                    onChange={(e) => inputOneResultUpdate(e.target.value, index)}
                   />
                 ))}
               </Space>
@@ -411,7 +446,7 @@ const OrganizersResults: React.FC = () => {
               {CubesCn(curEvent?.EventID)} {curSchedule?.Round}
             </h1>
             {ResultsTable(
-              results,
+              oneResults,
               ['Rank', 'CubeID', 'PersonName', 'Best', 'Average', 'Result'],
               undefined,
             )}
@@ -420,13 +455,192 @@ const OrganizersResults: React.FC = () => {
       </>
     );
   };
-  const onMultiFinish = () => {};
+
+  const updateMultiPlayer = (v: any) => {
+    if (v === undefined || v === '' || v === null) {
+      setMultiResults([]);
+      return;
+    }
+
+    apiGetCompsResultsWithPlayer(orgId, compId, v).then((value) => {
+      if (value === undefined || value.data === undefined) {
+        return;
+      }
+      setMultiResults(value.data);
+    });
+    setCurPlayer(v);
+  };
+
+  const updateMultiInput = (v: string) => {
+    let slice = v.split('\n');
+    slice = slice.filter((value) => {
+      return value !== '';
+    });
+
+    let parserResults = [];
+
+    for (let i = 0; i < slice.length; i++) {
+      let line = slice[i]
+        .replaceAll(',', ' ')
+        .replaceAll('，', ' ')
+        .replaceAll('(', '')
+        .replaceAll(')', '');
+
+      const data = line.split(' ').filter((value) => {
+        return value !== '';
+      });
+
+      if (data.length <= 1) {
+        message.warning(`${slice[i]} 存在格式错误`).then();
+        continue;
+      }
+      let one = data[0];
+
+      let result = {
+        Index: i + 1,
+        EventID: data[0],
+        Round: 1,
+        RoundNum: 1,
+        Result: [],
+        Error: '',
+        EventRoute: 7,
+      };
+
+      if (one.indexOf('[') !== -1) {
+        const match = one.match(/^([a-zA-Z0-9]+)\[(\d+)]$/);
+        if (match) {
+          result.EventID = match[1]; // 前面的数字
+          result.Round = Number(match[2]); // 方括号内的数字
+          result.RoundNum = Number(match[2]);
+        }
+      }
+      const evs = events.find((value) => {
+        return value.id === result.EventID || value.name === result.EventID;
+      });
+      if (evs === undefined) {
+        result.Error = '项目不存在';
+        parserResults.push(result);
+        continue;
+      }
+      result.EventRoute = evs.base_route_typ;
+
+      if ([8, 9, 10].indexOf(evs.base_route_typ) !== -1) {
+        if (data.length < 2) {
+          result.Error = '成绩格式错误';
+        }
+        const reg = /^\d+\/\d+$/;
+        if (!reg.test(data[1]) || !checkResult(data[2])) {
+          result.Error = '成绩格式不正确';
+        }
+        const sl = data[1].split(' ');
+        result.Result.push(
+          // @ts-ignore
+          Number(sl[0].split('/')[0]),
+          Number(sl[0].split('/')[1]),
+          parseTimeToSeconds(data[2]),
+        );
+      } else {
+        for (let j = 1; j < data.length; j++) {
+          if (!checkResult(data[j])) {
+            result.Error = `${data[j]}成绩格式不正确`;
+            break;
+          }
+          // @ts-ignore
+          result.Result.push(parseTimeToSeconds(data[j]));
+        }
+      }
+
+      // 获取项目轮次
+      const compEv = comp.data.comp_json.Events.find((value) => {
+        return value.EventID === result.EventID;
+      });
+      if (compEv === undefined) {
+        result.Error = '本次比赛未开放该项目';
+        parserResults.push(result);
+        continue;
+      }
+      // todo 轮次
+
+      const schedule = compEv.Schedule.find((value) => {
+        return value.RoundNum === result.Round;
+      });
+      if (schedule === undefined) {
+        result.Error = '本次比赛未开放该轮次';
+      } else {
+        // @ts-ignore
+        result.Round = schedule.Round;
+      }
+      parserResults.push(result);
+    }
+    setParserResults(parserResults);
+  };
+
+  const onMultiFinish = async () => {
+    if (parserResults === undefined || parserResults.length === 0) {
+      message.error('无成绩可提交').then();
+      return;
+    }
+
+    if (!curPlayer) {
+      message.error('请选择一个玩家').then();
+      return;
+    }
+
+    for (let i = 0; i < parserResults.length; i++) {
+      if (parserResults[i].Error) {
+        message.error(`第${i + 1}个成绩存在: ${parserResults[i].Error}错误,请删除后再添加`).then();
+        return;
+      }
+    }
+
+    for (let i = 0; i < parserResults.length; i++) {
+      const result = parserResults[i];
+      await apiAddCompResults(
+        orgId,
+        compId,
+        result.EventID,
+        result.RoundNum,
+        result.Result,
+        curPlayer,
+      )
+        .then(() => {
+          message.success(result.EventID + ' ' + result.Round + '成绩录入成功');
+          updateRound(curRound);
+          setInputValues([]);
+        })
+        .catch((value) => {
+          message.error('成绩录入失败:' + value.response.data.error);
+        });
+    }
+
+    setParserResults([]);
+    updateMultiPlayer(curPlayer);
+  };
+
   const multiInputResult = () => {
     return (
       <>
-        <Form onFinish={onMultiFinish} labelCol={{ span: 4 }} wrapperCol={{ span: 14 }}>
+        <Form onFinish={onMultiFinish} labelCol={{ span: 4 }} wrapperCol={{ span: 18 }}>
           <Card style={{ marginTop: 20 }}>
-            {playerHTML()}
+            <Form.Item label="选择选手">
+              <Select
+                style={filedStyle}
+                clearIcon={<CloseCircleOutlined style={{ color: 'red' }} />}
+                placeholder={'选择选手'}
+                onChange={(value) => {
+                  updateMultiPlayer(value);
+                }}
+                filterOption={filterOption}
+                showSearch
+                allowClear
+              >
+                {players?.map((player) => (
+                  <Option key={player.CubeID} value={player.CubeID}>
+                    {player.CubeID} - {player.Name}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
             <Form.Item
               label={
                 <span>
@@ -448,18 +662,86 @@ const OrganizersResults: React.FC = () => {
               }
             >
               <TextArea
+                style={{ minHeight: 200 }}
                 onChange={(e) => {
-                  setMultiInput(e.target.value);
+                  updateMultiInput(e.target.value);
                 }}
               ></TextArea>
             </Form.Item>
 
-            <Form.Item wrapperCol={{ offset: 4, span: 16 }}>
+            <Form.Item label="项目" style={{ width: '100%' }}>
+              <Table
+                dataSource={parserResults}
+                // @ts-ignore
+                columns={[
+                  {
+                    title: '序号',
+                    dataIndex: 'Index',
+                    key: 'Index',
+                    width: 50,
+                  },
+
+                  {
+                    title: '项目',
+                    dataIndex: 'EventID',
+                    key: 'EventID',
+                    width: 100,
+                    render: (value) => {
+                      return (
+                        <>
+                          {CubeIcon(value, value, {})} {CubesCn(value)}
+                        </>
+                      );
+                    },
+                  },
+                  {
+                    title: '轮次',
+                    dataIndex: 'Round',
+                    key: 'Round',
+                    width: 100,
+                  },
+                  {
+                    title: '成绩',
+                    dataIndex: 'Result',
+                    key: 'Result',
+                    render: (results: any[], result: any) => {
+                      let body: JSX.Element[] = [];
+                      // eslint-disable-next-line array-callback-return
+                      const data = resultStringPro(results, result.EventRoute);
+                      // eslint-disable-next-line array-callback-return
+                      data.map((value: string) => {
+                        body.push(<td style={{ minWidth: '80px' }}>{value}</td>);
+                      });
+                      return (
+                        <>
+                          {result.Error && <Alert message={result.Error} type="error" showIcon />}
+                          <div className={'cube_result_results_col'}>{body}</div>
+                        </>
+                      );
+                    },
+                  },
+                ]}
+                pagination={false}
+                size="small"
+                scroll={{ x: 'max-content' }} // 启用横向滚动
+              />
+            </Form.Item>
+
+            <Form.Item wrapperCol={{ offset: 4, span: 16 }} style={{ marginTop: 20 }}>
               <Button htmlType="submit">提交</Button>
             </Form.Item>
           </Card>
         </Form>
-        <Card style={{ marginTop: 20 }}>xxx</Card>
+        {multiResults && (
+          <Card style={{ marginTop: 20 }}>
+            <h2>{curPlayer} 本场比赛成绩</h2>
+            {ResultsTable(
+              multiResults,
+              ['EventName', 'Round', 'Best', 'Average', 'Result'],
+              undefined,
+            )}
+          </Card>
+        )}
       </>
     );
   };

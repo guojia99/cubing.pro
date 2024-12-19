@@ -10,6 +10,31 @@
  * @param icon 配置路由的图标，取值参考 https://ant.design/components/icon-cn， 注意去除风格后缀和大小写，如想要配置图标为 <StepBackwardOutlined /> 则取值应为 stepBackward 或 StepBackward，如想要配置图标为 <UserOutlined /> 则取值应为 user 或者 Auths
  * @doc https://umijs.org/docs/guides/routes
  */
+// import { lazy } from 'react';
+//
+// const Welcome = lazy(() => import('@/pages/Welcome'));
+// const Settings = lazy(() => import('@/pages/Settings'));
+// const Static = lazy(() => import('@/pages/Static'));
+// const Events = lazy(() => import('@/pages/Events/Events'));
+//
+// const Login = lazy(() => import('@/pages/Auths/Login'));
+// const Register = lazy(() => import('@/pages/Auths/Register'));
+// const Profile = lazy(() => import('@/pages/Auths/Profile'));
+// const Organizers = lazy(() => import('@/pages/Auths/Organizers'));
+// const Competitions = lazy(() => import('@/pages/Competition/Competitions'));
+// const Competition = lazy(() => import('@/pages/Competition/Competition'));
+// const Players = lazy(() => import('@/pages/Player/Players'));
+// const Player = lazy(() => import('@/pages/Player/Player'));
+//
+// const OrganizersComps = lazy(() => import('@/pages/Auths/OrganizersComponent/OrganizersComps'));
+// const CreateComps = lazy(() => import('@/pages/Auths/OrganizersComponent/OrganizersDetails'));
+// const OrganizersGroup = lazy(() => import('@/pages/Auths/OrganizersComponent/OrganizersGroup'));
+//
+// const OrganizersResults = lazy(() => import('@/pages/Auths/OrganizersComponent/OrganizersResults'));
+// const OrganizersList = lazy(() => import('@/pages/Auths/OrganizersComponent/OrganizersList'));
+//
+// const Admin = lazy(() => import('@/pages/Auths/Admin'));
+
 export default [
   {path: '/welcome',component: './Welcome',},
   {path: '/', redirect: '/welcome',},
