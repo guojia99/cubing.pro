@@ -20,8 +20,8 @@ const loginOnfinish = async (values: any) => {
       // history.push('/user/profile');
       window.location.href = '/user/profile';
     })
-    .catch((values) => {
-      message.error('登陆失败：' + values);
+    .catch((value) => {
+      message.error('登陆失败：' + value.response.data.message);
     });
 };
 

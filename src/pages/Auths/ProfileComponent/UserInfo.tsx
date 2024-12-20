@@ -1,11 +1,11 @@
 import { authTags } from '@/pages/Auths/AuthComponents';
-import { currentUser } from '@/services/cubing-pro/auth/auth';
+import { currentUser, updateDetail } from '@/services/cubing-pro/auth/auth';
+import { AuthAPI } from '@/services/cubing-pro/auth/typings';
 import { ProDescriptions } from '@ant-design/pro-components';
-import { Card, Divider } from 'antd';
+import { Card, Divider, message } from 'antd';
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import {AuthAPI} from "@/services/cubing-pro/auth/typings";
-
+import { format } from 'date-fns';
 const baseColumns = [
   {
     title: 'ID',
@@ -169,17 +169,11 @@ const editColumns = [
     key: 'Sex',
     dataIndex: 'Sex',
     copyable: false,
-    render: (value: number) => {
-      if (value === 0) {
-        return '机器人';
-      }
-      if (value === 1) {
-        return '男';
-      }
-      if (value === 2) {
-        return '女';
-      }
-      return '神奇的生物';
+    valueType: 'select',
+    valueEnum: {
+      0: { text: '机器人', status: '机器人' },
+      1: { text: '男', status: '男' },
+      2: { text: '女', status: '女' },
     },
   },
   {
@@ -187,7 +181,15 @@ const editColumns = [
     key: 'Birthdate',
     dataIndex: 'Birthdate',
     copyable: false,
+    valueType: 'date',
   },
+  {
+    title: '签名',
+    key: 'Sign',
+    dataIndex: 'Sign',
+    copyable: false,
+  },
+
   {
     title: '操作',
     valueType: 'option',
@@ -214,6 +216,59 @@ export default function UserInfo(user: AuthAPI.CurrentUser) {
       data: currentUserValue.data.data,
     };
   };
+
+  const updateFiled = (
+    key: string,
+    record: AuthAPI.CurrentUserData,
+    originRow: AuthAPI.CurrentUserData,
+  ) => {
+    const canUpdateF = ['Name', 'EnName', 'WcaID', 'QQ', 'Sex', 'Birthdate', 'Sign'];
+    if (
+      !canUpdateF.find((value) => {
+        return value === key;
+      })
+    ) {
+      message.warning('该字段不允许修改').then();
+      return;
+    }
+
+    // @ts-ignore
+    if (record[key] === originRow[key]) {
+      message.warning('该字段未修改').then();
+      return;
+    }
+
+    // @ts-ignore
+    const req = "" + record[key]
+    if (req.length > 32 && key !== "Sign"){
+      message.warning("字段长度太长了").then()
+      return;
+    }
+
+    let birthdate = ""
+    if (record.Birthdate){
+      const date = new Date(record.Birthdate);
+      birthdate = format(date, "yyyy-MM-dd")
+    }
+
+    updateDetail({
+      Name: record.Name,
+      EnName: record.EnName,
+      WcaID: record.WcaID,
+      QQ: record.QQ,
+      Sex: Number(record.Sex),
+      Birthdate: birthdate,
+      Sign: record.Sign,
+    })
+      .then(() => {
+        // @ts-ignore
+        actionRef.current.reload();
+      })
+      .catch((value) => {
+        console.log(value);
+      });
+  };
+
   return (
     <Card>
       <ProDescriptions
@@ -249,24 +304,15 @@ export default function UserInfo(user: AuthAPI.CurrentUser) {
       <Divider />
       <ProDescriptions
         actionRef={actionRef}
-        formProps={{ onValuesChange: (e, f) => console.log(f) }}
         tooltip="可修改的用户数据, 点击某项进行修改,无法修改的内容需要联系管理员进行修正"
         request={getUser}
-        editable={{}}
+        editable={{
+          // @ts-ignore
+          onSave: updateFiled,
+        }}
         // @ts-ignore
         columns={editColumns}
-      >
-        <ProDescriptions.Item
-          span={3}
-          valueType="text"
-          contentStyle={{ maxWidth: '100%' }}
-          copyable={true}
-          ellipsis
-          label="签名"
-        >
-          {user.data.Sign}
-        </ProDescriptions.Item>
-      </ProDescriptions>
+      ></ProDescriptions>
     </Card>
   );
 }
