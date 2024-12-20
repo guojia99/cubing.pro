@@ -1,8 +1,8 @@
 // @ts-ignore
 /* eslint-disable */
 
+import { CompAPI } from '@/services/cubing-pro/comps/typings';
 import { Player } from '@/services/cubing-pro/players/typings';
-import {CompAPI} from "@/services/cubing-pro/comps/typings";
 
 declare namespace AuthAPI {
   type captchaCodeResp = {
@@ -107,6 +107,16 @@ declare namespace AuthAPI {
     Data: string;
     ImageName: string;
   };
+
+  type UpdateDetailRequest = {
+    Name: string;
+    EnName: string;
+    WcaID: string;
+    QQ: string;
+    Sex: number;
+    Birthdate: string;
+    Sign: string;
+  };
 }
 
 export type OrganizersStatus =
@@ -148,7 +158,7 @@ export declare namespace OrganizersAPI {
 
   export type OrganizersResp = {
     data: organizer;
-  }
+  };
 
   export type CreateCompReq = {
     Name: string;
@@ -173,7 +183,7 @@ export declare namespace OrganizersAPI {
     Apply: boolean;
   };
 
-  export type  CompetitionGroup = {
+  export type CompetitionGroup = {
     id: number;
     createdAt: string; // 创建时间
     updatedAt: string; // 更新时间
@@ -185,12 +195,12 @@ export declare namespace OrganizersAPI {
     qqGroups: string; // QQ 群组
     qqGroupUid: string; // QQ 群组的 UID
     wechatGroups: string; // 微信群组
-  }
+  };
 
-  export type  GetGroupsResp = {
+  export type GetGroupsResp = {
     data: {
       items: CompetitionGroup[];
       total: number;
     };
-  }
+  };
 }

@@ -58,6 +58,7 @@
     "classnames": "^2.5.1",
     "compression-webpack-plugin": "^11.1.0",
     "crypto-js": "^4.2.0",
+    "date-fns": "^4.1.0",
     "echarts": "^5.5.1",
     "echarts-for-react": "^3.0.2",
     "lodash": "^4.17.21",

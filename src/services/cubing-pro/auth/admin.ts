@@ -22,7 +22,8 @@ export async function apiAdminPlayers(params: PlayersAPI.PlayersReq): Promise<Pl
     "/admin/users/",
     {
       like: {
-        name: params.name
+        name: params.name,
+        cube_id: params.name,
       },
       page: params.page,
       size: params.size,
