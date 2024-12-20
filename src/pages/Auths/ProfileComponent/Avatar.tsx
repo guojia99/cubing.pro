@@ -6,6 +6,7 @@ import type { RcFile } from 'antd/es/upload/interface';
 import React, { useCallback, useRef, useState } from 'react';
 import ReactCrop, { Crop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
+import {AuthAPI} from "@/services/cubing-pro/auth/typings";
 
 export default function AvatarWithUpdate(user: AuthAPI.CurrentUser) {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -114,16 +115,16 @@ export default function AvatarWithUpdate(user: AuthAPI.CurrentUser) {
   const handleSubmit = useCallback(async () => {
     setUploading(true);
     if (imageUrl && imageUrl !== '') {
-      let check = await checkLink(imageUrl);
-      if (!check) {
-        setUploading(true);
-        return;
-      }
+      // let check = await checkLink(imageUrl);
+      // if (!check) {
+      //   setUploading(true);
+      //   return;
+      // }
     }
 
     let req = {
       URL: imageUrl,
-      ImageName: '',
+      ImageName: 'avatar',
       Data: '',
     };
 

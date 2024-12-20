@@ -66,6 +66,7 @@ declare namespace PlayersAPI {
     DelegateName: string;
     Detail: Detail;
     BestResults: BestResults;
+    Index: number;
   };
 
   type PlayersReq = {

@@ -5,7 +5,7 @@ import React from 'react';
 
 
 const Profile: React.FC = () => {
-  const user = checkAuth([Auth.AuthAdmin, Auth.AuthSuperAdmin]);
+  const user = checkAuth([Auth.AuthPlayer]);
   if (user === null) {
     return <>无权限</>;
   }

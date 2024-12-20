@@ -4,6 +4,7 @@ import { ProDescriptions } from '@ant-design/pro-components';
 import { Card, Divider } from 'antd';
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
+import {AuthAPI} from "@/services/cubing-pro/auth/typings";
 
 const baseColumns = [
   {
