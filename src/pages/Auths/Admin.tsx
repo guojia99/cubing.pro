@@ -91,7 +91,7 @@ const Admin: React.FC = () => {
         {
           title: '用户管理',
           description: '管理用户',
-          to: '/',
+          to: '/user/admin/users',
           avatar: <FcConferenceCall style={{ fontSize: 40 }} />,
         },
         {

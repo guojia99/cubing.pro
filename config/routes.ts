@@ -69,6 +69,7 @@ export default [
   {path: 'user/organizers/:orgId/comp/:compId/result', component: './Auths/OrganizersComponent/OrganizersResults'}, // 录入成绩
 
   {path: 'user/admins', component: "./Auths/Admin"},
+  {path: 'user/admin/users', component: './Auths/AdminComponent/Users'},
 
 
 

@@ -22,10 +22,6 @@ const Competitions: React.FC = () => {
     });
   };
 
-
-
-
-
   return (
     <>
       <ProTable<Comp, CompsAPI.CompsReq>
@@ -38,7 +34,6 @@ const Competitions: React.FC = () => {
         params={tableParams}
         rowClassName={rowClassNameWithStyleLines}
         request={async (params) => {
-          // todo 如果条件查询第一次查，需要把翻页重置，后续不再重置。
           // @ts-ignore
           const name = params.Name;
           setTableParams({
