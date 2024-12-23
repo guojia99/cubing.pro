@@ -472,7 +472,7 @@ const OrganizersResults: React.FC = () => {
   };
 
   const updateMultiInput = (v: string) => {
-    let slice = v.split('\n');
+    let slice = v.replaceAll('【', '[').replaceAll('】', ']').split('\n');
     slice = slice.filter((value) => {
       return value !== '';
     });
@@ -484,7 +484,8 @@ const OrganizersResults: React.FC = () => {
         .replaceAll(',', ' ')
         .replaceAll('，', ' ')
         .replaceAll('(', '')
-        .replaceAll(')', '');
+        .replaceAll(')', '')
+        .replaceAll(' [', '[');
 
       const data = line.split(' ').filter((value) => {
         return value !== '';
@@ -515,7 +516,24 @@ const OrganizersResults: React.FC = () => {
         }
       }
       const evs = events.find((value) => {
-        return value.id === result.EventID || value.name === result.EventID;
+        if (result.EventID === '' || result.EventID === undefined) {
+          return false;
+        }
+        if (
+          value.id === result.EventID ||
+          value.name === result.EventID ||
+          value.cn === result.EventID
+        ) {
+          return true;
+        }
+        // 兼容中文名
+        const otherNames = value.otherNames.split(';');
+        for (let i = 0; i < otherNames.length; i++) {
+          if (result.EventID === otherNames[i]) {
+            return true;
+          }
+        }
+        return false;
       });
       if (evs === undefined) {
         result.Error = '项目不存在';
@@ -523,6 +541,7 @@ const OrganizersResults: React.FC = () => {
         continue;
       }
       result.EventRoute = evs.base_route_typ;
+      result.EventID = evs.id
 
       if ([8, 9, 10].indexOf(evs.base_route_typ) !== -1) {
         if (data.length < 2) {
@@ -549,10 +568,10 @@ const OrganizersResults: React.FC = () => {
           result.Result.push(parseTimeToSeconds(data[j]));
         }
       }
-
+      console.log(result);
       // 获取项目轮次
       const compEv = comp.data.comp_json.Events.find((value) => {
-        return value.EventID === result.EventID;
+        return value.EventID === evs.id;
       });
       if (compEv === undefined) {
         result.Error = '本次比赛未开放该项目';

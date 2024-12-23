@@ -72,6 +72,7 @@ const CompetitionResult: React.FC<CompetitionResultProps> = ({ comp }) => {
               topRank={1}
               event_divider={false}
               records={records}
+              with_best={false}
             />
           ),
           icon: <TrophyOutlined />,
@@ -87,6 +88,7 @@ const CompetitionResult: React.FC<CompetitionResultProps> = ({ comp }) => {
               topRank={3}
               event_divider={true}
               records={records}
+              with_best={false}
             />
           ),
           icon: <SiCodeforces />,
@@ -132,6 +134,22 @@ const CompetitionResult: React.FC<CompetitionResultProps> = ({ comp }) => {
           />
         ),
         icon: <BsPeople />,
+      },
+      {
+        key: 'best_top3',
+        label: '最佳前三',
+        children: (
+          <CompetitionResultsWithTop
+            comp={comp}
+            results={result.data}
+            events={events?.data.Events}
+            topRank={3}
+            event_divider={true}
+            records={records}
+            with_best={true}
+          />
+        ),
+        icon: <SiCodeforces />,
       },
     );
   }

@@ -80,7 +80,7 @@ const CompetitionResultsWithEvents: React.FC<CompetitionResultsWithEventsProps> 
 
       let key: string[] = ['Rank', 'PersonName', 'Best', 'Average', 'Result'];
       if (RouteMaps.get(data[0].EventRoute)?.repeatedly){
-        key = ['CompetitionName', 'Round', 'Best', "Result_with_repeatedly"]
+        key = ['Rank', 'PersonName', 'Best', "Result_with_repeatedly"]
       }
 
       tables.push(

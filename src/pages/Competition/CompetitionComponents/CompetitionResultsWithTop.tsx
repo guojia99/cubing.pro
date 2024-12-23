@@ -1,13 +1,13 @@
 import CopyButton from '@/components/Buttons/copy_btn';
 import { CubesCn } from '@/components/CubeIcon/cube';
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
-import { CompAPI } from '@/services/cubing-pro/comps/typings';
-import { EventsAPI } from '@/services/cubing-pro/events/typings';
-import { Record } from '@/components/Data/types/record';
 import { RouteMaps } from '@/components/Data/cube_result/event_route';
-import { DBest, DNF, Result, resultToBest, sortResults } from '@/components/Data/types/result';
 import { resultsToMap } from '@/components/Data/cube_result/result_detail';
 import { ResultsTable } from '@/components/Data/cube_result/result_tables';
+import { Record } from '@/components/Data/types/record';
+import { DBest, DNF, Result, resultToBest, sortResults } from '@/components/Data/types/result';
+import { CompAPI } from '@/services/cubing-pro/comps/typings';
+import { EventsAPI } from '@/services/cubing-pro/events/typings';
 import { Divider } from 'antd';
 import React from 'react';
 
@@ -18,6 +18,7 @@ interface CompetitionResultsWithTopProps {
   topRank: number;
   event_divider: boolean;
   records?: Record[];
+  with_best: boolean;
 }
 
 const CompetitionResultsWithTop: React.FC<CompetitionResultsWithTopProps> = ({
@@ -28,6 +29,7 @@ const CompetitionResultsWithTop: React.FC<CompetitionResultsWithTopProps> = ({
   topRank,
   event_divider,
   records,
+  with_best,
 }) => {
   if (events === undefined) {
     return <></>;
@@ -45,22 +47,37 @@ const CompetitionResultsWithTop: React.FC<CompetitionResultsWithTopProps> = ({
       // eslint-disable-next-line array-callback-return
       return;
     }
-    let maxRound = undefined;
 
-    for (let i = 0, len = res.length; i < len; ++i) {
-      if (maxRound === undefined) {
-        maxRound = res[i].RoundNumber;
-        continue;
+    if (!with_best) {
+      let maxRound = undefined;
+
+      for (let i = 0, len = res.length; i < len; ++i) {
+        if (maxRound === undefined) {
+          maxRound = res[i].RoundNumber;
+          continue;
+        }
+        if (maxRound < res[i].RoundNumber) {
+          maxRound = res[i].RoundNumber;
+        }
       }
-      if (maxRound < res[i].RoundNumber) {
-        maxRound = res[i].RoundNumber;
-      }
+      res = res.filter((value) => {
+        return value.RoundNumber === maxRound;
+      });
     }
 
-    res = res.filter((value) => {
-      return value.RoundNumber === maxRound;
-    });
     res = sortResults(res);
+
+    if (with_best) {
+      const cubeIDSet = new Set<string>();
+      res = res.filter((value) => {
+        if (cubeIDSet.has(value.CubeID)){
+          return false
+        }
+        cubeIDSet.add(value.CubeID);
+        return true;
+      })
+      res = sortResults(res);
+    }
 
     let best = res[0];
     if (DBest(best)) {

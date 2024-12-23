@@ -129,6 +129,7 @@ export const resultTimeString = (
   result: number,
   inter: boolean | undefined = false,
   omitMilliseconds: boolean = false,
+  float: boolean | undefined= false,
 ) => {
   if (isNaN(result)) {
     return 'DNF';
@@ -143,6 +144,9 @@ export const resultTimeString = (
 
   if (inter) {
     return '' + Math.floor(result);
+  }
+  if (float){
+    return '' + result.toFixed(2);
   }
 
   if (result < 60) {
