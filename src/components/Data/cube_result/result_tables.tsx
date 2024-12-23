@@ -132,7 +132,7 @@ export const ResultsTable = (
           return (
             <td className={'cube_result_Average_col'}>
               {RecordTagWithResult(
-                resultTimeString(results, m.integer),
+                resultTimeString(results, false, false, m.integer),
                 result.id + '_average',
                 false,
                 false,

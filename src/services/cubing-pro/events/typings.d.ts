@@ -4,6 +4,7 @@ export declare namespace EventsAPI {
   type Event = {
     id: string,
     name: string,
+    cn: string,
     otherNames: string,
     class: string,
     isComp: boolean,
