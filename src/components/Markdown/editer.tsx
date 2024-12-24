@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {Input} from "antd";
 
 import '@wangeditor/editor/dist/css/style.css'; // 引入 css
+import './editor_view.css'
 
 import { IDomEditor, IEditorConfig, IToolbarConfig } from '@wangeditor/editor';
 import { Editor, Toolbar } from '@wangeditor/editor-for-react';
@@ -56,3 +57,16 @@ function MarkdownEditor({ value, onChange }: { value?: string; onChange?: (val: 
 }
 
 export default MarkdownEditor;
+
+
+
+export const EditorView = (input: string) => {
+  return (
+    <div
+      className={"editor-content-view"}
+      dangerouslySetInnerHTML={{
+        __html: input,
+      }}
+    />
+  )
+}

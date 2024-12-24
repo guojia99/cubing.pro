@@ -35,6 +35,31 @@
 //
 // const Admin = lazy(() => import('@/pages/Auths/Admin'));
 
+
+
+const reXRoutes = () => {
+  const xRoutes = [
+    // 标题主页栏
+    {name: '统计', path: '/static', component: './Static/Static'},
+    {name: "项目", path: "/events", component: "./Events/Events"},
+    // 比赛网页
+    {name: "比赛",path: "/competitions", component: "./Competition/Competitions"},
+    {path: "/competition/:id", component: "./Competition/Competition"},
+    // 选手
+    {name:"选手", path: "/players", component: "./Player/Players" },
+    {path: '/player/:id', component: './Player/Player'},
+  ]
+
+  const out = []
+  for (let x of xRoutes) {
+    let newC = {...x}
+    newC.path = "/x" + x.path
+    out.push(newC)
+  }
+  return [...xRoutes, ...out]
+}
+
+
 export default [
   {path: '/welcome',component: './Welcome',},
   {path: '/', redirect: '/welcome',},
@@ -42,12 +67,9 @@ export default [
 
   {path: 'settings', component: './Settings'},
 
-  // 标题主页栏
-  {name: '统计', path: '/static', component: './Static/Static'},
-  {name: "项目", path: "/events", component: "./Events/Events"},
+
 
   // 用户相关
-
   {path: '/login', component: "./Auths/Login", hidden: true}, // 登录
   {path: '/register', component: "./Auths/Register", hidden: true}, // 注册
   {path: '/user/profile', component: './Auths/Profile'}, // 个人中心
@@ -71,13 +93,6 @@ export default [
   {path: 'user/admins', component: "./Auths/Admin"},
   {path: 'user/admin/users', component: './Auths/AdminComponent/Users'},
 
-
-
-  // 比赛网页
-  {name: "比赛",path: "/competitions", component: "./Competition/Competitions"},
-  {path: "/competition/:id", component: "./Competition/Competition"},
-
-  // 选手
-  {name:"选手", path: "/players", component: "./Player/Players" },
-  {path: '/player/:id', component: './Player/Player'},
+  ...reXRoutes(),
 ];
+
