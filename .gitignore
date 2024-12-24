@@ -54,3 +54,7 @@ dist
 
 build
 dist.zip
+
+.idea/
+*/.idea*
+.husky

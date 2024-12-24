@@ -3,14 +3,10 @@ all: start
 start:
 	npm run start
 
-build_a:
+build:
 	npm run build
-
-#
-# build_x:
-# 	npm run build
-# 	mkdir -p /data/workspace/mycube-ui
-# 	cp -r build /data/workspace/mycube-ui
+	zip -r -q dist.zip dist/
+	rm -rf dist
 
 run:
 	make build_x
