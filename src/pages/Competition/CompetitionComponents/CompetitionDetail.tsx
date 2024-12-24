@@ -1,10 +1,13 @@
+import { CubesCn } from '@/components/CubeIcon/cube';
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import Markdown from '@/components/Markdown/Markdown';
 import { CompAPI } from '@/services/cubing-pro/comps/typings';
 import { parseDateTime } from '@/utils/time/data_time';
 import { ProDescriptions } from '@ant-design/pro-components';
-import { Card, Tag } from 'antd';
+import { Card, Table, Tag } from 'antd';
 import React from 'react';
+import '@wangeditor/editor/dist/css/style.css';
+import {EditorView} from "@/components/Markdown/editer";
 
 // 定义组件的属性类型
 interface CompetitionDetailProps {
@@ -161,24 +164,82 @@ const CompetitionDetail: React.FC<CompetitionDetailProps> = ({ comp }) => {
   );
 
   // 比赛项目
-  const l = comp?.data.EventMin.toString().split(';');
+  const eventMin = comp?.data.EventMin.toString().split(';');
   const events = [];
-  if (l) {
-    for (let i = 0; i < l.length; i++) {
-      if (l[i] === undefined || l[i] === '') {
+  if (eventMin) {
+    for (let i = 0; i < eventMin.length; i++) {
+      if (eventMin[i] === undefined || eventMin[i] === '') {
         continue;
       }
-      let key = 'comp_icon_key' + '_' + i + '_' + l[i];
-      events.push(CubeIcon(l[i], key, { marginLeft: '5px' }));
+      let key = 'comp_icon_key' + '_' + i + '_' + eventMin[i];
+      events.push(CubeIcon(eventMin[i], key, { marginLeft: '5px' }));
     }
   }
+
+  const eventsTable = [];
+  if (comp !== undefined && comp.data.comp_json.Events !== undefined) {
+    for (let i = 0; i < comp.data.comp_json.Events.length; i++) {
+      const evs = comp.data.comp_json.Events[i];
+
+      const event = {
+        EventID: evs.EventID,
+        Rounds: '-',
+        Cols: '', // todo
+      };
+
+      // events
+      if (evs.Schedule !== undefined) {
+        // todo 暂时只有长度大小
+        event.Rounds = evs.Schedule.length  + "轮"
+      }
+      eventsTable.push(event);
+    }
+  }
+
   bodys.push(
     <div key={'__comps_detail_events_key'}>
       <Card style={{ marginBottom: '20px' }}>
         <ProDescriptions column={1} title="项目" key={'__comps_detail_events_key_ProDescriptions'}>
           <ProDescriptions.Item label="项目列表">{events}</ProDescriptions.Item>
-
-          <ProDescriptions.Item label="报名费用">{/*"todo"*/}</ProDescriptions.Item>
+          <ProDescriptions.Item label="项目简表">
+            <Table
+              dataSource={eventsTable}
+              // @ts-ignore
+              columns={[
+                {
+                  title: '项目',
+                  dataIndex: 'EventID',
+                  key: 'EventID',
+                  width: 135,
+                  render: (value) => {
+                    return (
+                      <>
+                        {CubeIcon(value, value, {})} {CubesCn(value)}
+                      </>
+                    );
+                  },
+                },
+                {
+                  title: '轮次',
+                  dataIndex: 'Rounds',
+                  key: 'Rounds',
+                  width: 100,
+                },
+                {
+                  title: '费用',
+                  dataIndex: 'Cols',
+                  key: 'Cols',
+                  render: () => {
+                    return '0元';
+                  },
+                  width: 100,
+                },
+              ]}
+              pagination={false}
+              size="small"
+              // scroll={{ x: 'max-content' }} // 启用横向滚动
+            />
+          </ProDescriptions.Item>
         </ProDescriptions>
       </Card>
     </div>,
@@ -194,11 +255,7 @@ const CompetitionDetail: React.FC<CompetitionDetailProps> = ({ comp }) => {
       >
         <ProDescriptions column={1} title="其他" tooltip="这里是主办编写的其他补充内容">
           <Markdown md={comp?.data.Illustrate} />
-          <div
-            dangerouslySetInnerHTML={{
-              __html: comp?.data.IllustrateHTML ? comp.data.IllustrateHTML : '',
-            }}
-          />
+          {EditorView(comp?.data.IllustrateHTML ? comp.data.IllustrateHTML : '')}
         </ProDescriptions>
       </Card>
     </div>,

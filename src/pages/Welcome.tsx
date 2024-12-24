@@ -128,7 +128,7 @@ const Welcome: React.FC = () => {
             />
             <InfoCard
               index={2}
-              href="./record"
+              href="./static"
               title="记录列表"
               desc="你可以查看当前记录和往期记录, 尝试参与比赛去挑战他们吧!"
             />
