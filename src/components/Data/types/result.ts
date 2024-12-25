@@ -1,8 +1,11 @@
 import { eventRouteM, RouteMaps } from '@/components/Data/cube_result/event_route';
+import React from "react";
 
 export const DNF = -10000;
 
 export type Result = {
+  key: React.Key;
+
   Index: number;
   id: number;
   createdAt: string;
@@ -29,6 +32,19 @@ export type Result = {
   EventRoute: number;
   Ban: boolean;
   Rank: number;
+};
+
+export type PreResult = Result & {
+  ResultID: number;
+  CompetitionID: number;
+  RoundName: string;
+  Recorder: string; // 记录人
+  Processor: string; // 处理人
+  ProcessorID: number; // 处理人id
+  Finish: boolean; // 处理
+  Detail: string;
+  FinishDetail: string;
+  Source: string; // 来源
 };
 
 export const DBest = (r: Result): boolean => {

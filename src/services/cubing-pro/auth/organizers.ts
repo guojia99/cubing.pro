@@ -127,3 +127,45 @@ export async function apiAddCompResults(
   );
   return response.data;
 }
+
+export async function apiGetCompsPreResult(
+  orgId: string | undefined,
+  compId: string | undefined,
+  finish: boolean | undefined,
+  page: number,
+  size: number,
+): Promise<OrganizersAPI.GetPreResultResp> {
+  let f = '/pre_results?page=' + page + '&size=' + size;
+  if (finish !== undefined) {
+    f += '&finish='
+    f += finish ? '1' : '0';
+  }
+
+  const response = await Request.get<OrganizersAPI.GetPreResultResp>(
+    'organizers/' + orgId + '/comp/' + compId + f,
+    { headers: AuthHeader() },
+  );
+
+  return response.data;
+}
+
+
+export async  function  apiApprovalCompsPreResult(
+  orgId: string | undefined,
+  compId: string | undefined,
+  ok: boolean,
+  result_id: number,
+): Promise<any> {
+
+  const response = await Request.post<any>(
+    'organizers/' + orgId + '/comp/' + compId + "/pre_results/" + result_id + "/approval",
+    {
+      FinishDetail: ok ? 'ok' : 'not',
+    },
+    { headers: AuthHeader() },
+  );
+
+  return response.data;
+}
+
+

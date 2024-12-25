@@ -3,6 +3,7 @@
 
 import { CompAPI } from '@/services/cubing-pro/comps/typings';
 import { Player } from '@/services/cubing-pro/players/typings';
+import {PreResult} from "@/components/Data/types/result";
 
 declare namespace AuthAPI {
   type captchaCodeResp = {
@@ -203,4 +204,12 @@ export declare namespace OrganizersAPI {
       total: number;
     };
   };
+
+
+  export type GetPreResultResp = {
+    data: {
+      items: PreResult[];
+      total: number;
+    }
+  }
 }
