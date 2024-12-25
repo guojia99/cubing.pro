@@ -1,12 +1,22 @@
 import { CubesCn } from '@/components/CubeIcon/cube';
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
+import { eventRouteM } from '@/components/Data/cube_result/event_route';
 import { ResultsTable } from '@/components/Data/cube_result/result_tables';
-import { Result, resultStringPro } from '@/components/Data/types/result';
+import {
+  PreResult,
+  Result,
+  resultStringPro,
+  resultTimeString,
+} from '@/components/Data/types/result';
+import { PlayerLink } from '@/components/Link/Links';
+import { rowClassNameWithStyleLines } from '@/components/Table/table_style';
 import { NavTabs } from '@/components/Tabs/nav_tabs';
 import { Auth, checkAuth } from '@/pages/Auths/AuthComponents';
 import {
   apiAddCompResults,
+  apiApprovalCompsPreResult,
   apiGetAllPlayers,
+  apiGetCompsPreResult,
   apiGetCompsResults,
   apiGetCompsResultsWithPlayer,
   apiGetOrgComp,
@@ -20,6 +30,8 @@ import { PlayersAPI } from '@/services/cubing-pro/players/typings';
 import { isNumber } from '@/utils/types/numbers';
 import { useParams } from '@@/exports';
 import { CloseCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { ProTable } from '@ant-design/pro-table';
+import { sleep } from '@antfu/utils';
 import {
   Alert,
   Button,
@@ -27,19 +39,25 @@ import {
   Cascader,
   Form,
   Input,
+  Modal,
+  Progress,
   Select,
   Space,
   Table,
+  Tag,
   Tooltip,
   message,
 } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
-import React, { useEffect, useState } from 'react';
+import { TableRowSelection } from 'antd/es/table/interface';
+import React, { useEffect, useRef, useState } from 'react';
 
 const { Option } = Select;
 
 const OrganizersResults: React.FC = () => {
   const { orgId, compId } = useParams();
+  const actionRef = useRef();
+
   const [org, setOrg] = useState<OrganizersAPI.OrganizersResp | null>(null);
   const [comp, setComp] = useState<CompAPI.CompResp | null>(null);
   const [events, setEvents] = useState<EventsAPI.Event[]>([]);
@@ -58,6 +76,10 @@ const OrganizersResults: React.FC = () => {
   // 多录入
   const [multiResults, setMultiResults] = useState<Result[]>([]);
   const [parserResults, setParserResults] = useState<any[]>([]);
+
+  // 录入审批
+  const [preResultSelectedRowKeys, setPreResultSelectedRowKeys] = useState<React.Key[]>([]);
+  const [preResults, setPreResults] = useState<PreResult[]>([]);
 
   const user = checkAuth([Auth.AuthOrganizers]);
   if (user === null) {
@@ -541,7 +563,7 @@ const OrganizersResults: React.FC = () => {
         continue;
       }
       result.EventRoute = evs.base_route_typ;
-      result.EventID = evs.id
+      result.EventID = evs.id;
 
       if ([8, 9, 10].indexOf(evs.base_route_typ) !== -1) {
         if (data.length < 2) {
@@ -640,7 +662,7 @@ const OrganizersResults: React.FC = () => {
     return (
       <>
         <Form onFinish={onMultiFinish} labelCol={{ span: 4 }} wrapperCol={{ span: 18 }}>
-          <Card style={{ marginTop: 20 }}>
+          <Card>
             <Form.Item label="选择选手">
               <Select
                 style={filedStyle}
@@ -699,7 +721,6 @@ const OrganizersResults: React.FC = () => {
                     key: 'Index',
                     width: 50,
                   },
-
                   {
                     title: '项目',
                     dataIndex: 'EventID',
@@ -765,6 +786,256 @@ const OrganizersResults: React.FC = () => {
     );
   };
 
+  const onPreResultSelectChange = (newSelectedRowKeys: React.Key[]) => {
+    setPreResultSelectedRowKeys(newSelectedRowKeys);
+  };
+
+  const updatePreResult = async (params: {
+    pageSize?: number | undefined;
+    current?: number | undefined;
+    keyword?: string | undefined;
+  }) => {
+    const value = await apiGetCompsPreResult(
+      orgId,
+      compId,
+      false,
+      params.current ? params.current : 1,
+      params.pageSize ? params.pageSize : 20,
+    );
+
+    for (let i = 0; i < value.data.items.length; i++) {
+      value.data.items[i].key = value.data.items[i].id;
+    }
+
+    setPreResults(value.data.items);
+    setPreResultSelectedRowKeys([]);
+    return {
+      data: value.data.items,
+      success: true,
+      total: value.data.total,
+    };
+  };
+
+  const preResultRowSelection: TableRowSelection<PreResult> = {
+    // @ts-ignore
+    preResultSelectedRowKeys,
+    onChange: onPreResultSelectChange,
+    selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT, Table.SELECTION_NONE],
+  };
+
+  const onPreResultFinish = (ok: boolean) => {
+    return () => {
+      if (preResultSelectedRowKeys.length === 0) {
+        message.warning('你未选择任何成绩').then();
+        return;
+      }
+
+      const color = ok ? '#a0d911' : 'red';
+
+      let progress = 0;
+      let startSend = false;
+
+      Modal.confirm({
+        title: ok ? '是否通过' : '是否驳回',
+        content: (
+          <>
+            <p>{`确认要执行对 ${preResultSelectedRowKeys.length} 个成绩的${
+              ok ? '通过' : '驳回'
+            }操作?`}</p>
+            {startSend && (
+              <Progress percent={progress} status={progress === 100 ? 'success' : 'active'} />
+            )}
+          </>
+        ),
+        okText: ok ? '通过' : '驳回',
+        okButtonProps: {
+          style: { backgroundColor: color, borderColor: color, color: 'white' }, // 自定义样式
+        },
+        async onOk() {
+          startSend = true
+          for (let i = 0; i < preResultSelectedRowKeys.length; i++) {
+            const k = preResultSelectedRowKeys[i];
+            const res = preResults.find((value) => value.key === k);
+            progress = (i * 100) / preResultSelectedRowKeys.length;
+
+            if (res === undefined) {
+              continue;
+            }
+            await apiApprovalCompsPreResult(orgId, compId, ok, res.id).catch((error) => {
+              message.error(`保存审批失败: ${res.EventID} - ${res.Round} / ${error.response.data.error}`).then();
+            });
+          }
+
+          // @ts-ignore
+          actionRef.current.reload();
+        },
+      });
+    };
+  };
+
+  const preResultInputResult = () => {
+    return (
+      <>
+        <Card>
+          <ProTable<PreResult>
+            title={() => {
+              return (
+                <>
+                  <p style={{ display: 'inline', fontWeight: 700, fontSize: 20 }}>录入审批</p>
+                  <Button
+                    danger
+                    onClick={onPreResultFinish(false)}
+                    style={{ float: 'right', marginLeft: 20 }}
+                  >
+                    驳回
+                  </Button>
+                  <Button
+                    type="primary"
+                    color="#a0d911"
+                    onClick={onPreResultFinish(true)}
+                    style={{ float: 'right' }}
+                  >
+                    通过
+                  </Button>
+                </>
+              );
+            }}
+            // dataSource={preResults}
+            request={updatePreResult}
+            rowSelection={preResultRowSelection}
+            size="small"
+            columns={[
+              {
+                title: '项目',
+                dataIndex: 'EventID',
+                key: 'EventID',
+                width: 80,
+                // @ts-ignore
+                render: (value: string, result: Result) => {
+                  return (
+                    <td style={{ minWidth: '80px', width: '80px' }}>
+                      {CubeIcon(result.EventID, result.EventID, {})} {CubesCn(value)}
+                    </td>
+                  );
+                },
+              },
+              {
+                title: '轮次',
+                dataIndex: 'Round',
+                key: 'Round',
+                width: 80,
+              },
+              {
+                title: '玩家名',
+                dataIndex: 'PersonName',
+                key: 'PersonName',
+                width: 100,
+                // @ts-ignore
+                render: (value: string, result: Result) => {
+                  return <>{PlayerLink(result.CubeID, value, '')}</>;
+                },
+              },
+              {
+                title: 'CubeID',
+                dataIndex: 'CubeID',
+                key: 'CubeID',
+                width: 120,
+              },
+              {
+                title: '单次',
+                dataIndex: 'Best',
+                key: 'Best',
+                width: 100,
+                // @ts-ignore
+                render: (results: number, result: Result) => {
+                  const m = eventRouteM(result.EventRoute);
+                  let inter = m.integer ? m.integer : false;
+
+                  if (m.repeatedly) {
+                    return (
+                      <td className={'cube_result_Best_col'}>{resultTimeString(results, true)}</td>
+                    );
+                  }
+                  return (
+                    <td className={'cube_result_Best_col'}>{resultTimeString(results, inter)}</td>
+                  );
+                },
+              },
+              {
+                title: '平均',
+                dataIndex: 'Average',
+                key: 'Average',
+                width: 100,
+                // @ts-ignore
+                render: (results: number, result: Result) => {
+                  const m = eventRouteM(result.EventRoute);
+                  if (m.repeatedly) {
+                    return <td className={'cube_result_Average_col'}>-</td>;
+                  }
+
+                  // todo 需要pb
+                  return (
+                    <td className={'cube_result_Average_col'}>
+                      {resultTimeString(results, false, false, m.integer)}
+                    </td>
+                  );
+                },
+              },
+              {
+                title: '成绩',
+                dataIndex: 'Result',
+                key: 'Result',
+                // @ts-ignore
+                render: (results: number[], result: Result) => {
+                  let body: JSX.Element[] = [];
+                  const data = resultStringPro(results, result.EventRoute);
+                  // eslint-disable-next-line array-callback-return
+                  data.map((value: string) => {
+                    body.push(<td style={{ minWidth: '80px' }}>{value}</td>);
+                  });
+                  return <div className={'cube_result_results_col'}>{body}</div>;
+                },
+              },
+              {
+                title: '来源',
+                dataIndex: 'Source',
+                key: 'Source',
+                width: 120,
+              },
+              {
+                title: '状态',
+                dataIndex: 'Finish',
+                key: 'Finish',
+                width: 100,
+                // @ts-ignore
+                render: (f: boolean) => {
+                  if (f) {
+                    return <Tag color="#52c41a">已审批</Tag>;
+                  }
+                  return <Tag color="#F4D95B">待审批</Tag>;
+                },
+              },
+            ]}
+            onReset={() => {
+              setPreResultSelectedRowKeys([]);
+            }}
+            rowClassName={rowClassNameWithStyleLines}
+            search={false}
+            pagination={{
+              showQuickJumper: true,
+            }}
+            options={false}
+            actionRef={actionRef}
+            sticky
+          />
+          {/*<ProTable<Comp, CompsAPI.CompsReq>*/}
+          {/**/}
+          {/*/>*/}
+        </Card>
+      </>
+    );
+  };
+
   const items = [
     {
       key: 'one',
@@ -775,6 +1046,11 @@ const OrganizersResults: React.FC = () => {
       key: 'multi',
       label: '批量录入',
       children: multiInputResult(),
+    },
+    {
+      key: 'pre_result',
+      label: '录入审批',
+      children: preResultInputResult(),
     },
   ];
 

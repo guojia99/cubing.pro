@@ -536,7 +536,7 @@ const CreateCompsPage: React.FC = () => {
               Genre: 0,
               CompStartTime: values.startDate.toISOString(),
               CompEndTime: values.endDate.toISOString(),
-              GroupID: 0,
+              GroupID: values.groupsID,
               CanStartedAddEvent: true,
               Apply: true,
             };
