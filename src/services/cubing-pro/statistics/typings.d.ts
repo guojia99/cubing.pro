@@ -41,5 +41,18 @@ declare namespace StaticAPI {
     }
   }
 
+  export type DiyRankWCAResult = {
+    BestRank: number,
+    BestStr: string,
+    BestPersonName: string,
+    BestPersonWCAID: string
+    AvgRank: number,
+    AvgStr: string,
+    AvgPersonName: string,
+    AvgPersonWCAID: string,
+  }
 
+  export type DiyRankWCAResultStaticsResponse = {
+    data: any, // map[string]DiyRankWCAResult[]
+  }
 }

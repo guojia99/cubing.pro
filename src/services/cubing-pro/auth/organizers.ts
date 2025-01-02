@@ -137,7 +137,7 @@ export async function apiGetCompsPreResult(
 ): Promise<OrganizersAPI.GetPreResultResp> {
   let f = '/pre_results?page=' + page + '&size=' + size;
   if (finish !== undefined) {
-    f += '&finish='
+    f += '&finish=';
     f += finish ? '1' : '0';
   }
 
@@ -149,16 +149,14 @@ export async function apiGetCompsPreResult(
   return response.data;
 }
 
-
-export async  function  apiApprovalCompsPreResult(
+export async function apiApprovalCompsPreResult(
   orgId: string | undefined,
   compId: string | undefined,
   ok: boolean,
   result_id: number,
 ): Promise<any> {
-
   const response = await Request.post<any>(
-    'organizers/' + orgId + '/comp/' + compId + "/pre_results/" + result_id + "/approval",
+    'organizers/' + orgId + '/comp/' + compId + '/pre_results/' + result_id + '/approval',
     {
       FinishDetail: ok ? 'ok' : 'not',
     },
@@ -168,4 +166,15 @@ export async  function  apiApprovalCompsPreResult(
   return response.data;
 }
 
+export async function apiDeleteCompsResult(
+  orgId: string | undefined,
+  compId: string | undefined,
+  result_id: number,
+): Promise<any> {
+  const response = await Request.delete<any>(
+    'organizers/' + orgId + '/comp/' + compId + '/result/' + result_id,
+    { headers: AuthHeader() },
+  );
 
+  return response.data;
+}
