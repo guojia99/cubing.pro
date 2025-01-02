@@ -3,6 +3,7 @@ import KinCh from '@/pages/Static/Kinsor';
 import { OrderedListOutlined, TrophyOutlined } from '@ant-design/icons';
 import React from 'react';
 import Records from "@/pages/Static/Record";
+import DiyRanks from "@/pages/Static/DiyRanks";
 
 const Static: React.FC = () => {
   const items = [
@@ -24,6 +25,13 @@ const Static: React.FC = () => {
       children: <KinCh />,
       icon: <OrderedListOutlined />,
     },
+    {
+      // todo 做成不同的key
+      key: "diy_rankings_guangdong_gaoxiao",
+      label: '广东高校榜单',
+      children: <DiyRanks/>,
+      icon: <OrderedListOutlined />,
+    }
   ];
 
   return (

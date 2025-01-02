@@ -1,9 +1,7 @@
 import RecordsWithBest from '@/pages/Static/RecordComponents/RecordWithBest';
 import RecordsWithEvents from '@/pages/Static/RecordComponents/RecordWithEvents';
-import { apiEvents } from '@/services/cubing-pro/events/events';
-import { EventsAPI } from '@/services/cubing-pro/events/typings';
 import { Switch } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 const Records: React.FC = () => {
   // const [events, setEvents] = useState<EventsAPI.Event[]>([]);
@@ -25,7 +23,7 @@ const Records: React.FC = () => {
         checkedChildren="总榜"
         unCheckedChildren="历史"
         onChange={() => setBest(!best)}
-        style={{float: "right"}}
+        style={{ float: 'right' }}
         // defaultChecked
       />
       <br />

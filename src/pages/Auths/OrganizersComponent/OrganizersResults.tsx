@@ -15,6 +15,7 @@ import { Auth, checkAuth } from '@/pages/Auths/AuthComponents';
 import {
   apiAddCompResults,
   apiApprovalCompsPreResult,
+  apiDeleteCompsResult,
   apiGetAllPlayers,
   apiGetCompsPreResult,
   apiGetCompsResults,
@@ -31,7 +32,6 @@ import { isNumber } from '@/utils/types/numbers';
 import { useParams } from '@@/exports';
 import { CloseCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-table';
-import { sleep } from '@antfu/utils';
 import {
   Alert,
   Button,
@@ -390,94 +390,6 @@ const OrganizersResults: React.FC = () => {
       });
   };
 
-  const onInputResult = () => {
-    return (
-      <>
-        <Form onFinish={onOneFinish} labelCol={{ span: 4 }} wrapperCol={{ span: 14 }}>
-          <Card>
-            <Form.Item label="选择轮次">
-              <Cascader
-                style={filedStyle}
-                options={scheduleOpt}
-                onChange={updateRound}
-                placeholder="选择项目和轮次"
-              />
-            </Form.Item>
-            <Form.Item label="选择选手">
-              <Select
-                style={filedStyle}
-                placeholder={'选择选手'}
-                onChange={(value) => {
-                  setCurPlayer(value);
-                }}
-                filterOption={filterOption}
-                clearIcon={<CloseCircleOutlined style={{ color: 'red' }} />}
-                showSearch
-                allowClear
-              >
-                {players?.map((player) => (
-                  <Option key={player.CubeID} value={player.CubeID}>
-                    {player.CubeID} - {player.Name}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
-
-            <Form.Item
-              label={
-                <span>
-                  <Tooltip
-                    title={
-                      <>
-                        <p>成绩格式为: xx:yy:zz.www</p>
-                        <p>可以输入DNF、DNS、D等代表成绩无效</p>
-                        <p>多盲等以 a/b xx:yy:zz 格式录入</p>
-                      </>
-                    }
-                  >
-                    <InfoCircleOutlined style={{ marginRight: 5, color: '#d5ad62' }} />
-                  </Tooltip>
-                  录入成绩
-                </span>
-              }
-            >
-              <Space direction="vertical" size={7} style={filedStyle}>
-                {Array.from({ length: getEventRoundNum() }, (_, index) => (
-                  <Input
-                    key={`result${index + 1}`}
-                    name={`result${index + 1}`}
-                    addonBefore={`${index + 1}`}
-                    value={inputValues[index]}
-                    placeholder="请输入成绩"
-                    onChange={(e) => inputOneResultUpdate(e.target.value, index)}
-                  />
-                ))}
-              </Space>
-            </Form.Item>
-
-            <Form.Item wrapperCol={{ offset: 4, span: 16 }}>
-              <Button htmlType="submit">提交</Button>
-            </Form.Item>
-          </Card>
-        </Form>
-
-        {/*成绩列表*/}
-        {curEvent && (
-          <Card style={{ marginTop: 20 }}>
-            <h1>
-              {CubesCn(curEvent?.EventID)} {curSchedule?.Round}
-            </h1>
-            {ResultsTable(
-              oneResults,
-              ['Rank', 'CubeID', 'PersonName', 'Best', 'Average', 'Result'],
-              undefined,
-            )}
-          </Card>
-        )}
-      </>
-    );
-  };
-
   const updateMultiPlayer = (v: any) => {
     if (v === undefined || v === '' || v === null) {
       setMultiResults([]);
@@ -517,7 +429,7 @@ const OrganizersResults: React.FC = () => {
         message.warning(`${slice[i]} 存在格式错误`).then();
         continue;
       }
-      let one = data[0];
+      let oneLineStr = data[0];
 
       let result = {
         Index: i + 1,
@@ -529,8 +441,8 @@ const OrganizersResults: React.FC = () => {
         EventRoute: 7,
       };
 
-      if (one.indexOf('[') !== -1) {
-        const match = one.match(/^([a-zA-Z0-9]+)\[(\d+)]$/);
+      if (oneLineStr.indexOf('[') !== -1) {
+        const match = oneLineStr.match(/^([a-zA-Z0-9]+)\[(\d+)]$/);
         if (match) {
           result.EventID = match[1]; // 前面的数字
           result.Round = Number(match[2]); // 方括号内的数字
@@ -658,6 +570,134 @@ const OrganizersResults: React.FC = () => {
     updateMultiPlayer(curPlayer);
   };
 
+  const deleteResultsColumn = {
+    title: '操作',
+    dataIndex: 'PersonName',
+    key: 'PersonName',
+    width: 100,
+    render: (value: string, result: Result) => {
+      const showConfirm = () => {
+        Modal.warning({
+          title: '是否删除成绩?',
+          content: (
+            <p>
+              确认要执行对{result.PersonName}的{result.EventID}-{result.Round}成绩进行删除
+            </p>
+          ),
+          okText: '删除',
+          okButtonProps: {
+            style: { backgroundColor: 'red', borderColor: 'red', color: 'white' }, // 自定义样式
+          },
+          async onOk() {
+            await apiDeleteCompsResult(orgId, compId, result.id)
+              .then(() => {
+                message.info('成绩删除成功').then();
+              })
+              .catch((value) => {
+                message.error('成绩删除失败:' + value.response.data.error).then();
+              });
+            updateMultiPlayer(curPlayer)
+            updateRound(curRound);
+          },
+        });
+      };
+      return (
+        <Button size={'small'} danger onClick={showConfirm}>
+          删除
+        </Button>
+      );
+    },
+  };
+
+  const onInputResult = () => {
+    return (
+      <>
+        <Form onFinish={onOneFinish} labelCol={{ span: 4 }} wrapperCol={{ span: 14 }}>
+          <Card>
+            <Form.Item label="选择轮次">
+              <Cascader
+                style={filedStyle}
+                options={scheduleOpt}
+                onChange={updateRound}
+                placeholder="选择项目和轮次"
+              />
+            </Form.Item>
+            <Form.Item label="选择选手">
+              <Select
+                style={filedStyle}
+                placeholder={'选择选手'}
+                onChange={(value) => {
+                  setCurPlayer(value);
+                }}
+                filterOption={filterOption}
+                clearIcon={<CloseCircleOutlined style={{ color: 'red' }} />}
+                showSearch
+                allowClear
+              >
+                {players?.map((player) => (
+                  <Option key={player.CubeID} value={player.CubeID}>
+                    {player.CubeID} - {player.Name}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+
+            <Form.Item
+              label={
+                <span>
+                  <Tooltip
+                    title={
+                      <>
+                        <p>成绩格式为: xx:yy:zz.www</p>
+                        <p>可以输入DNF、DNS、D等代表成绩无效</p>
+                        <p>多盲等以 a/b xx:yy:zz 格式录入</p>
+                      </>
+                    }
+                  >
+                    <InfoCircleOutlined style={{ marginRight: 5, color: '#d5ad62' }} />
+                  </Tooltip>
+                  录入成绩
+                </span>
+              }
+            >
+              <Space direction="vertical" size={7} style={filedStyle}>
+                {Array.from({ length: getEventRoundNum() }, (_, index) => (
+                  <Input
+                    key={`result${index + 1}`}
+                    name={`result${index + 1}`}
+                    addonBefore={`${index + 1}`}
+                    value={inputValues[index]}
+                    placeholder="请输入成绩"
+                    onChange={(e) => inputOneResultUpdate(e.target.value, index)}
+                  />
+                ))}
+              </Space>
+            </Form.Item>
+
+            <Form.Item wrapperCol={{ offset: 4, span: 16 }}>
+              <Button htmlType="submit">提交</Button>
+            </Form.Item>
+          </Card>
+        </Form>
+
+        {/*成绩列表*/}
+        {curEvent && (
+          <Card style={{ marginTop: 20 }}>
+            <h1>
+              {CubesCn(curEvent?.EventID)} {curSchedule?.Round}
+            </h1>
+            {ResultsTable(
+              oneResults,
+              ['Rank', 'CubeID', 'PersonName', 'Best', 'Average', 'Result'],
+              undefined,
+              [deleteResultsColumn],
+            )}
+          </Card>
+        )}
+      </>
+    );
+  };
+
   const multiInputResult = () => {
     return (
       <>
@@ -779,6 +819,7 @@ const OrganizersResults: React.FC = () => {
               multiResults,
               ['EventName', 'Round', 'Best', 'Average', 'Result'],
               undefined,
+              [deleteResultsColumn],
             )}
           </Card>
         )}
@@ -852,7 +893,7 @@ const OrganizersResults: React.FC = () => {
           style: { backgroundColor: color, borderColor: color, color: 'white' }, // 自定义样式
         },
         async onOk() {
-          startSend = true
+          startSend = true;
           for (let i = 0; i < preResultSelectedRowKeys.length; i++) {
             const k = preResultSelectedRowKeys[i];
             const res = preResults.find((value) => value.key === k);
@@ -862,7 +903,9 @@ const OrganizersResults: React.FC = () => {
               continue;
             }
             await apiApprovalCompsPreResult(orgId, compId, ok, res.id).catch((error) => {
-              message.error(`保存审批失败: ${res.EventID} - ${res.Round} / ${error.response.data.error}`).then();
+              message
+                .error(`保存审批失败: ${res.EventID} - ${res.Round} / ${error.response.data.error}`)
+                .then();
             });
           }
 

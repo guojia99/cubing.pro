@@ -29,22 +29,26 @@ export const CompetitionLink = (compsId: any, name: string) => {
 };
 
 
-export const WCALink = (wcaId: any) => {
+export const WCALink = (wcaId: any, name: string | null = null) => {
   if (wcaId === null || wcaId ===undefined){
     return <>-</>
   }
 
+  let wca = wcaId.toUpperCase();
+  let dataName = wca
+  if (name !== null){
+    dataName = name
+  }
 
-  let val = wcaId.toUpperCase();
-  if (val !== undefined && val !== '' && val !== "-") {
+  if (wca !== undefined && wca !== '' && wca !== "-") {
     return (
       <strong>
         <a
-          href={'https://www.worldcubeassociation.org/persons/' + val}
+          href={'https://www.worldcubeassociation.org/persons/' + wca}
           target="_blank"
           rel="noopener noreferrer"
         >
-          {val}
+          {dataName}
         </a>
       </strong>
     );

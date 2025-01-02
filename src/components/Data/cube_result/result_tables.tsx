@@ -16,6 +16,7 @@ export const ResultsTable = (
   dataSource: Result[],
   keys: string[],
   records: Record[] | undefined,
+  other_columns: any[] | undefined = undefined,
 ) => {
   let recordsMap = generateRecordMap(records); // map[resultsID]Record
 
@@ -61,11 +62,11 @@ export const ResultsTable = (
     [
       'CubeID',
       {
-        title: "CubeID",
-        dataIndex: "CubeID",
-        key: "CubeID",
+        title: 'CubeID',
+        dataIndex: 'CubeID',
+        key: 'CubeID',
         width: 100,
-      }
+      },
     ],
     [
       'Best',
@@ -258,6 +259,13 @@ export const ResultsTable = (
   ]);
 
   let columns = [];
+
+  if (other_columns) {
+    for (let c of other_columns) {
+      columns.push(c);
+    }
+  }
+
   for (let key of keys) {
     let column = columnsMap.get(key);
     if (column === undefined) {
