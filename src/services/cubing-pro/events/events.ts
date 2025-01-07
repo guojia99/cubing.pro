@@ -3,8 +3,9 @@ import {EventsAPI} from "@/services/cubing-pro/events/typings";
 import {Request} from "@/services/cubing-pro/request";
 
 const CACHE_KEY = 'cachedEvents';
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+// const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 
+const CACHE_DURATION = 1;
 export async function apiEvents(): Promise<EventsAPI.EventsResponse> {
   const cachedData = localStorage.getItem(CACHE_KEY);
 

@@ -12,6 +12,9 @@ export declare namespace EventsAPI {
     iconBase64: string,
     isWCA: boolean,
     base_route_typ: number,
+    scrambleValue: string,
+    autoScrambleKey: string,
+    puzzleId: string; // 使用的魔方
   }
 
   type EventsResponse = {

@@ -43,6 +43,9 @@ declare namespace CompAPI {
     Competitors: number;
     TimeLimit: number;
     NoRestrictions: boolean;
+    ScrambleNums: int;
+    NotScramble: boolean;
+    Scrambles: string[][];
   };
 
   type Event = {
