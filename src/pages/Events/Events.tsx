@@ -47,6 +47,26 @@ const columns = [
       return <>{body}</>
     }
   },
+  {
+    title: "打乱",
+    dataIndex: 'scrambleValue',
+    key: 'scrambleValue',
+    render: (value: string, events: EventsAPI.Event) => {
+      if (!events.scrambleValue && !events.autoScrambleKey) {
+        return events.id
+      }
+
+      if (events.autoScrambleKey) {
+        return events.autoScrambleKey
+      }
+      const data = value.split(",")
+      let body : JSX.Element[] = []
+      data.map((value: string) => {
+        body.push(<div style={{ display: "inline-block", minWidth:"100px", width: "100px"}}>{value}</div>)
+      })
+      return <>{body}</>
+    }
+  }
 ];
 
 const Events: React.FC = () => {

@@ -1,5 +1,5 @@
 import BackButton from '@/components/Buttons/back_button';
-import { Card, Col, DatePicker, Form, Input, InputNumber, Row } from 'antd';
+import {Alert, Card, Col, DatePicker, Form, Input, InputNumber, Row} from 'antd';
 import React from 'react';
 
 import { CubesCn } from '@/components/CubeIcon/cube';
@@ -12,6 +12,7 @@ import {
 import { OrganizersAPI } from '@/services/cubing-pro/auth/typings';
 import { CompAPI } from '@/services/cubing-pro/comps/typings';
 import { apiEvents } from '@/services/cubing-pro/events/events';
+import { EventsAPI } from '@/services/cubing-pro/events/typings';
 import { history } from '@@/exports';
 import {
   DeleteOutlined,
@@ -24,7 +25,6 @@ import { Button, Modal, Select, Table, Upload, message } from 'antd';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import {EventsAPI} from "@/services/cubing-pro/events/typings";
 
 const { Option } = Select;
 
@@ -292,6 +292,9 @@ const EventTable: React.FC<{ onChange?: (val: any) => void }> = ({ onChange }) =
     TimeLimit: 0,
     Competitors: 0,
     NoRestrictions: true,
+    ScrambleNums: 1,
+    Scrambles: [],
+    NotScramble: false,
   });
 
   const addSchedule = () => {
@@ -322,7 +325,7 @@ const EventTable: React.FC<{ onChange?: (val: any) => void }> = ({ onChange }) =
       return e.EventID === value;
     });
     if (find.length !== 0) {
-      message.warning('已存在' + value + '项目, 无法继续添加').then()
+      message.warning('已存在' + value + '项目, 无法继续添加').then();
       return;
     }
 
@@ -490,7 +493,7 @@ const CreateCompsPage: React.FC = () => {
 
   useEffect(() => {
     apiEvents().then((value) => {
-      setBaseEvents(value.data.Events)
+      setBaseEvents(value.data.Events);
     });
   }, []);
 
@@ -501,15 +504,20 @@ const CreateCompsPage: React.FC = () => {
       .then((values) => {
         Modal.confirm({
           title: '确认提交',
-          content: '你确定要提交比赛信息吗？',
+          content: (
+            <>
+              <p>你确定要提交比赛信息吗？</p>
+              <Alert message={"生成打乱可能要等待 2 ~ 20秒"} showIcon={true} type={"warning"}  />
+            </>
+          ),
           onOk: async () => {
-            for (let i = 0; i < events.length;i++){
-              const f = baseEvents.find((value) => value.id === events[i].EventID)
-              if (f === undefined){
-                message.warning('项目错误').then()
+            for (let i = 0; i < events.length; i++) {
+              const f = baseEvents.find((value) => value.id === events[i].EventID);
+              if (f === undefined) {
+                message.warning('项目错误').then();
                 return;
               }
-              events[i].EventRoute = f.base_route_typ
+              events[i].EventRoute = f.base_route_typ;
             }
             const compJson: CompAPI.CompJson = {
               Events: events,
@@ -542,7 +550,7 @@ const CreateCompsPage: React.FC = () => {
             };
             console.log(req);
             console.log(values);
-            apiCreateComps(values.organizersID, req)
+            await apiCreateComps(values.organizersID, req)
               .then((value) => {
                 console.log(value);
                 message.success('创建成功');

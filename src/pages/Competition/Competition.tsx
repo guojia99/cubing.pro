@@ -21,6 +21,10 @@ const CompetitionResults = lazy(
   () => import('@/pages/Competition/CompetitionComponents/CompetitionResults'),
 );
 
+const CompetitionScrambles = lazy(
+  () => import('@/pages/Competition/CompetitionComponents/CompetitionScrambles'),
+)
+
 const Competition: React.FC = () => {
   const { id } = useParams();
 
@@ -68,7 +72,7 @@ const Competition: React.FC = () => {
     {
       key: 'scrambles',
       label: '打乱',
-      children: <>打乱</>,
+      children: IfLoading(loading, <CompetitionScrambles comp={comp} />),
       icon: <BuildOutlined />,
     },
   ];
