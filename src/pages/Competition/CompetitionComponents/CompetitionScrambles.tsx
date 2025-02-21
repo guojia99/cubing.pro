@@ -72,7 +72,7 @@ const ScrambleImage: React.FC<ScrambleImageProps> = ({ sc, ev }) => {
 
   return (
     <div className={'svg-container'}>
-      <img src={pngData} alt={sc} />
+      <img src={pngData} alt={sc}  style={{maxWidth: "100%", height: "auto"}} />
     </div>
   );
 };
@@ -129,88 +129,92 @@ const CompetitionScrambles: React.FC<CompetitionScramblesProps> = ({ comp }) => 
       const sc = ev.Schedule[i];
 
       const data: JSX.Element[] = [];
-      for (let j = 0; j < sc.Scrambles.length; j++) {
-        const ssc = sc.Scrambles[j];
+      if (sc.Scrambles) {
+        for (let j = 0; j < sc.Scrambles.length; j++) {
+          const ssc = sc.Scrambles[j];
 
-        const tb = [];
+          const tb = [];
 
-        // 多盲等
-        if (m.repeatedly) {
-          for (let evIdx = 0; evIdx < ssc.length; evIdx++) {
-            tb.push({
-              Index: '#' + (evIdx + 1),
-              Scramble: scrambleValue(ssc[evIdx]),
-              ScrambleImage: <ScrambleImage sc={ssc[evIdx]} ev={baseEvent?.puzzleId} />,
-            });
-          }
-        }
-
-        // 多个项目的
-        if (baseEvent?.scrambleValue) {
-          const sp = baseEvent.scrambleValue.split(',');
-          if (sp.length >= 2) {
-            if (sp.length !== ssc.length) {
-              continue;
-            }
-            for (let evIdx = 0; evIdx < sp.length; evIdx++) {
+          // 多盲等
+          if (m.repeatedly) {
+            for (let evIdx = 0; evIdx < ssc.length; evIdx++) {
               tb.push({
-                Index: sp[evIdx],
+                Index: '#' + (evIdx + 1),
                 Scramble: scrambleValue(ssc[evIdx]),
-                ScrambleImage:  <ScrambleImage sc={ssc[evIdx]} ev={sp[evIdx]} />,
+                ScrambleImage: <ScrambleImage sc={ssc[evIdx]} ev={baseEvent?.puzzleId} />,
               });
             }
           }
-        }
 
-        // 其他类型
-        if (tb.length === 0) {
-          let extNum = 1;
-          for (let evIdx = 0; evIdx < ssc.length; evIdx++) {
-            let indexStr = '#' + (evIdx + 1);
-            if (evIdx + 1 > m.rounds) {
-              indexStr = 'Ex#' + extNum;
-              extNum += 1;
+          // 多个项目的
+          if (baseEvent?.scrambleValue) {
+            const sp = baseEvent.scrambleValue.split(',');
+            if (sp.length >= 2) {
+              if (sp.length !== ssc.length) {
+                continue;
+              }
+              for (let evIdx = 0; evIdx < sp.length; evIdx++) {
+                tb.push({
+                  Index: sp[evIdx],
+                  Scramble: scrambleValue(ssc[evIdx]),
+                  ScrambleImage:  <ScrambleImage sc={ssc[evIdx]} ev={sp[evIdx]} />,
+                });
+              }
             }
-            tb.push({
-              Index: indexStr,
-              Scramble: scrambleValue(ssc[evIdx]),
-              ScrambleImage:  <ScrambleImage sc={ssc[evIdx]} ev={baseEvent?.puzzleId} />,
-            });
           }
+
+          // 其他类型
+          if (tb.length === 0) {
+            let extNum = 1;
+            for (let evIdx = 0; evIdx < ssc.length; evIdx++) {
+              let indexStr = '#' + (evIdx + 1);
+              if (evIdx + 1 > m.rounds) {
+                indexStr = 'Ex#' + extNum;
+                extNum += 1;
+              }
+              tb.push({
+                Index: indexStr,
+                Scramble: scrambleValue(ssc[evIdx]),
+                ScrambleImage:  <ScrambleImage sc={ssc[evIdx]} ev={baseEvent?.puzzleId} />,
+              });
+            }
+          }
+
+          data.push(
+            <>
+              <strong>{'打乱组' + (j + 1)}</strong>
+              <Table
+                style={{ marginTop: 20, marginBottom: 20 }}
+                dataSource={tb}
+                size={'small'}
+                rowClassName={rowClassName}
+                columns={[
+                  {
+                    title: '序号',
+                    dataIndex: 'Index',
+                    key: 'index',
+                    width: 60,
+                  },
+                  {
+                    title: '打乱',
+                    dataIndex: 'Scramble',
+                    key: 'Scramble',
+                  },
+                  {
+                    title: '打乱图',
+                    width: 400,
+                    dataIndex: 'ScrambleImage',
+                    key: 'ScrambleImage',
+                  },
+                ]}
+                pagination={false}
+              />
+            </>,
+          );
         }
-
-        data.push(
-          <>
-            <strong>{'打乱组' + (j + 1)}</strong>
-            <Table
-              style={{ marginTop: 20, marginBottom: 20 }}
-              dataSource={tb}
-              size={'small'}
-              rowClassName={rowClassName}
-              columns={[
-                {
-                  title: '序号',
-                  dataIndex: 'Index',
-                  key: 'index',
-                  width: 60,
-                },
-                {
-                  title: '打乱',
-                  dataIndex: 'Scramble',
-                  key: 'Scramble',
-                },
-                {
-                  title: '打乱图',
-                  dataIndex: 'ScrambleImage',
-                  key: 'ScrambleImage',
-                },
-              ]}
-              pagination={false}
-            />
-          </>,
-        );
+      } else {
+        data.push(<>暂无打乱</>)
       }
-
       bodys.push(
         <>
           <h3 style={{ marginBottom: '10px' }}>

@@ -7,6 +7,8 @@ import { ProTable } from '@ant-design/pro-table';
 import { ProColumns } from '@ant-design/pro-table/es/typing';
 import { Button, Tooltip, message } from 'antd';
 import React, { useRef, useState } from 'react';
+import {Auth, authTags} from "@/pages/Auths/AuthComponents";
+
 
 const columns: ProColumns<PlayersAPI.Player>[] = [
   {
@@ -27,6 +29,7 @@ const columns: ProColumns<PlayersAPI.Player>[] = [
     },
     hideInSearch: true,
   },
+
   {
     title: '名称',
     dataIndex: 'Name',
@@ -86,15 +89,24 @@ const columns: ProColumns<PlayersAPI.Player>[] = [
     },
   },
   {
-    title: '操作',
-    dataIndex: 'Option',
-    key: 'option',
+    title: '权限',
+    dataIndex: 'Auth',
+    key: 'Auth',
     width: 200,
     hideInSearch: true,
-    render: (value: any, player: PlayersAPI.Player) => {
-      return <>xxx</>;
-    },
+    // @ts-ignore
+    render: (a: Auth ) => {return authTags(a)}
   },
+  // {
+  //   title: '操作',
+  //   dataIndex: 'Option',
+  //   key: 'option',
+  //   width: 200,
+  //   hideInSearch: true,
+  //   render: (value: any, player: PlayersAPI.Player) => {
+  //     return <>xxx</>;
+  //   },
+  // },
 ];
 
 const Users: React.FC = () => {

@@ -8,6 +8,7 @@ import { Result } from '@/components/Data/types/result';
 import { NavTabs } from '@/components/Tabs/nav_tabs';
 import { EventsAPI } from '@/services/cubing-pro/events/typings';
 import React from 'react';
+import {ResultChat} from "@/components/Data/cube_result/result_chat";
 
 interface PlayerResultsListWithEventProps {
   events: EventsAPI.Event[];
@@ -56,13 +57,6 @@ const PlayerResultsListWithEvent: React.FC<PlayerResultsListWithEventProps> = ({
       return a.CompetitionID > b.CompetitionID ? -1 : 1;
     });
 
-    // todo 这里有问题，最好重写
-    // const chat = ResultsChat({
-    //   Event: eventId,
-    //   CompsMap: compsMap,
-    //   result: res,
-    // })
-
     let last_comp_name = '';
     for (let j = 0; j < res.length; j++) {
       if (res[j].CompetitionName !== last_comp_name) {
@@ -82,6 +76,7 @@ const PlayerResultsListWithEvent: React.FC<PlayerResultsListWithEventProps> = ({
             <strong>{CubesCn(eventId)}</strong>
           </h3>
           {/*{chat}*/}
+          {ResultChat(eventId, res, records)}
 
           {m?.repeatedly
             ? ResultsTable(res, ['CompetitionName', 'Round', 'Result_with_repeatedly'], records)

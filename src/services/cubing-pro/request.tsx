@@ -3,7 +3,13 @@ import type {AxiosError, AxiosResponse} from 'axios';
 import {WarnToast} from "@/components/Alert/toast";
 import {message} from "antd";
 
+const dev = true
+
 export function getAPIUrl() {
+  if (dev){
+    return "https://mycube.club/v3/cube-api"
+  }
+
   const hostname = window.location.hostname;
   // 本地测试
   if (hostname === "localhost" || hostname === "127.0.0.1" || hostname === '0.0.0.0') {
@@ -39,9 +45,9 @@ export type  ErrorMsg = {
 
 export const Request = axios.create({
   baseURL: getAPIUrl(),
-  timeout: 30000,
+  timeout: 900000,
 });
-Request.defaults.timeout = 30000;
+Request.defaults.timeout = 900000;
 
 Request.interceptors.response.use(
   (response: AxiosResponse) => {
@@ -59,7 +65,7 @@ Request.interceptors.response.use(
     } else {
       const url = error.config?.url
       if (isLocal()){
-        message.warning("错误: " + url + "| (" + msg + ")")
+        message.warning("错误: " + url + "| (" + msg + ")").then()
         // WarnToast(<>未知错误: {url} ({status})</>)
       }
     }

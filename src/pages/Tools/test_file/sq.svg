@@ -1,0 +1,42 @@
+<svg
+  width="70" height="70" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  viewBox="70,70"
+  xml:space="preserve" overflow="hidden"><g>
+
+  <style>
+    polygon { stroke: black; stroke-width: 0.5px; stroke-linejoin: round;}
+    path { stroke: black; stroke-width: 0.5px; stroke-linejoin: round;}
+  </style>
+
+  <defs>
+<symbol id="corner">
+  <path d="M24.5004 24.5004 19.3511 5.28389 5.28389 5.28389 5.28389 19.3511 24.5004 24.5004Z" fill="#FFFFFF"/>
+  <path d="M5.28389 5.28389 0.480191 0.480191 18.0637 0.480191 19.3511 5.28389 5.28389 5.28389Z" fill="#FFA100"/>
+  <path d="M5.28389 5.28389 0.480191 0.480191 0.480191 18.0637 5.28389 19.3511 5.28389 5.28389Z" fill="#0000F2"/>
+</symbol>
+<symbol id="edge">
+  <path d="M24.5004 24.5004 29.6489 5.28389 19.3511 5.28389 24.5004 24.5004Z" fill="#FFFFFF"/>
+  <path d="M29.6489 5.28389 30.9363 0.480191 18.0637 0.480191 19.3511 5.28389 29.6489 5.28389Z" fill="#FFA100"/>
+</symbol>
+
+  </defs>
+
+<use href="#corner" transform="rotate(0 25 25)"/>
+  <use href="#edge" transform="rotate(0 25 25)"/>
+
+  <!--<path d="M24.5004 24.5004 5.28389 19.3511 5.28389 29.6489 24.5004 24.5004Z" stroke="#000000" stroke-width="0.960383" stroke-linejoin="round" fill="#FFFFFF"/>-->
+  <!--<path d="M5.28389 19.3511 0.480191 18.0637 0.480191 30.9363 5.28389 29.6489 5.28389 19.3511Z" stroke="#000000" stroke-width="0.960383" stroke-linejoin="round" fill="#0000F2"/>-->
+  <!--<path d="M24.5004 24.5004 5.28389 29.6489 5.28389 43.7161 19.3511 43.7161 24.5004 24.5004Z" stroke="#000000" stroke-width="0.960383" stroke-linejoin="round" fill="#FFFFFF"/>-->
+  <!--<path d="M5.28389 43.7161 0.480191 48.5198 0.480191 30.9363 5.28389 29.6489 5.28389 43.7161Z" stroke="#000000" stroke-width="0.960383" stroke-linejoin="round" fill="#0000F2"/>-->
+  <!--<path d="M5.28389 43.7161 0.480191 48.5198 18.0637 48.5198 19.3511 43.7161 5.28389 43.7161Z" stroke="#000000" stroke-width="0.960383" stroke-linejoin="round" fill="#EE0000"/>-->
+  <!--<path d="M24.5004 24.5004 19.3511 43.7161 29.6489 43.7161 24.5004 24.5004Z" stroke="#000000" stroke-width="0.960383" stroke-linejoin="round" fill="#FFFFFF"/>-->
+  <!--<path d="M19.3511 43.7161 18.0637 48.5198 30.9363 48.5198 29.6489 43.7161 19.3511 43.7161Z" stroke="#000000" stroke-width="0.960383" stroke-linejoin="round" fill="#EE0000"/>-->
+  <!--<path d="M24.5004 24.5004 29.6489 43.7161 43.7161 43.7161 43.7161 29.6489 24.5004 24.5004Z" stroke="#000000" stroke-width="0.960383" stroke-linejoin="round" fill="#FFFFFF"/>-->
+  <!--<path d="M43.7161 43.7161 48.5198 48.5198 30.9363 48.5198 29.6489 43.7161 43.7161 43.7161Z" stroke="#000000" stroke-width="0.960383" stroke-linejoin="round" fill="#EE0000"/>-->
+  <!--<path d="M43.7161 43.7161 48.5198 48.5198 48.5198 30.9363 43.7161 29.6489 43.7161 43.7161Z" stroke="#000000" stroke-width="0.960383" stroke-linejoin="round" fill="#00D800"/>-->
+  <!--<path d="M24.5004 24.5004 43.7161 29.6489 43.7161 19.3511 24.5004 24.5004Z" stroke="#000000" stroke-width="0.960383" stroke-linejoin="round" fill="#FFFFFF"/>-->
+  <!--<path d="M43.7161 29.6489 48.5198 30.9363 48.5198 18.0637 43.7161 19.3511 43.7161 29.6489Z" stroke="#000000" stroke-width="0.960383" stroke-linejoin="round" fill="#00D800"/>-->
+  <!--<path d="M24.5004 24.5004 43.7161 19.3511 43.7161 5.28389 29.6489 5.28389 24.5004 24.5004Z" stroke="#000000" stroke-width="0.960383" stroke-linejoin="round" fill="#FFFFFF"/>-->
+  <!--<path d="M43.7161 5.28389 48.5198 0.480191 48.5198 18.0637 43.7161 19.3511 43.7161 5.28389Z" stroke="#000000" stroke-width="0.960383" stroke-linejoin="round" fill="#00D800"/>-->
+  <!--<path d="M43.7161 5.28389 48.5198 0.480191 30.9363 0.480191 29.6489 5.28389 43.7161 5.28389Z" stroke="#000000" stroke-width="0.960383" stroke-linejoin="round" fill="#FFA100"/>-->
+</g></svg>
