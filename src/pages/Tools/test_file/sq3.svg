@@ -1,0 +1,32 @@
+<svg width="70" height="70" xmlns="http://www.w3.org/2000/svg" xml:space="preserve">
+
+ <g>
+  <title>Layer 1</title>
+   <g transform="rotate(0.067269 26.2211 26.08)" id="svg_1">
+
+     <defs>
+        <symbol id="c">
+         <path id="svg_4" fill="#FFF" stroke-linejoin="round" stroke-width="0.96038" stroke="#000000"
+               d="m35.01322,38.09014l-5.1493,-19.21651l-14.06721,0l0,14.06721l19.21651,5.1493z"/>
+          <path id="svg_5" fill="#FFF" stroke-linejoin="round" stroke-width="0.96038" stroke="#000000"
+                d="m15.79671,18.87363l-4.8037,-4.8037l17.58351,0l1.2874,4.8037l-14.06721,0z"/>
+          <path id="svg_6" fill="#FFF" stroke-linejoin="round" stroke-width="0.96038" stroke="#000000"
+                d="m15.79671,18.87363l-4.8037,-4.8037l0,17.58351l4.8037,1.2874l0,-14.06721z"/>
+        </symbol>
+
+       <symbol id="e">
+            <path fill="#FFF" stroke-linejoin="round" stroke-width="0.96038" stroke="#000000"
+                  d="m35.01322,38.09014l5.1485,-19.21651l-10.2978,0l5.1493,19.21651z"/>
+         <path fill="#FFF" stroke-linejoin="round" stroke-width="0.96038" stroke="#000000"
+               d="m40.16172,18.87363l1.2874,-4.8037l-12.8726,0l1.2874,4.8037l10.2978,0z"/>
+       </symbol>
+
+     </defs>
+  </g>
+   <use href="#c" transform="rotate(180 35.01322 38.0901)"/>
+   <use href="#e" transform="rotate(0 35.01322 38.09014)"/>
+
+  <path d="M 42.77779 9.11233 L 27.24865 67.06787" stroke="black" stroke-width="1" fill="none" transform="rotate(0 35.01322 38.09014)"/>
+
+ </g>
+</svg>
