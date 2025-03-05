@@ -1,6 +1,6 @@
 import DrawPalette, { pathSvg } from '@/pages/Tools/DrawPalette';
 import { Button, Form, message, Select, Slider, Space } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
 const cspMap = new Map([
   ['星 Star', 'cccccc'],
@@ -75,6 +75,10 @@ const Sq1Draw: React.FC = () => {
   const [linePoint, setLinePoint] = useState<pathSvg[]>([]);
   const [cubes, setCubes] = useState<string[]>([]);
   const [cpsOpt, setCpsOpt] = useState<any[]>([]);
+  const [defaultVal, setDefaultVal] = useState<any>();
+
+  const defaultValRef = useRef(defaultVal)
+
 
   const addEdge = () => {
     if (reg + 30 > 360) {
@@ -136,6 +140,7 @@ const Sq1Draw: React.FC = () => {
     setCorner(0);
     setSvgPoints([]);
     setCubes([]);
+    setDefaultVal('')
   };
 
   const resetBaseReg = (e: number) => {
@@ -165,6 +170,7 @@ const Sq1Draw: React.FC = () => {
     }
     cubes.splice(-1, 1);
     setCubes([...cubes]);
+    setDefaultVal('')
   };
 
   const resetLineReg = (e: number) => {
@@ -245,12 +251,14 @@ const Sq1Draw: React.FC = () => {
     setCorner(curCorner);
     setCubes(curCubes);
     setNum(curNum)
+    setDefaultVal(e)
   };
 
   useEffect(() => {
     resetLineReg(30);
 
     let opt: any[] = [];
+    opt.push({value: '', label: '-无-'})
     cspMap.forEach((value: string, key: string) => {
       opt.push({
         value: key,
@@ -290,6 +298,7 @@ const Sq1Draw: React.FC = () => {
                       { value: 30, label: '正15度' },
                       { value: -30, label: '负15度' },
                     ]}
+                    style={{width: 100}}
                   />
                 </Form.Item>
 
@@ -297,6 +306,7 @@ const Sq1Draw: React.FC = () => {
                   {/*// @ts-ignore*/}
                   <Select
                     onChange={setDefault}
+                    value={defaultVal}
                     options={cpsOpt}
                     defaultValue={'星 Star'}
                     style={{ width: 150 }}
