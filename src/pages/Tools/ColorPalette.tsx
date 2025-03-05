@@ -54,6 +54,10 @@ const ColorPalette: React.FC<ColorPaletteProps> = ({
       const key = event.srcElement.getAttribute('data-key');
       if (!key) return;
 
+      if (!key.includes(storageKey)) {
+        return;
+      }
+
       if (!selectedColor) {
         message.warning('选择一个颜色').then();
         return;

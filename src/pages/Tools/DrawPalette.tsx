@@ -112,17 +112,18 @@ const DrawPalette: React.FC<DrawPaletteProps> = ({
       if (colors[key] === undefined) {
         // @ts-ignore
         colors[key] = '#777';
-        keys.push(key);
       }
+      keys.push(key);
     }
     setColors(colors);
     setKeys(keys);
+    console.log(keys)
   }, [JSON.stringify(svgPoints)]);
 
   return (
     <div>
       <Row gutter={24} align="middle">
-        <Col xs={24} sm={24} md={16} lg={16} xl={16} style={{ paddingRight: 16 }}>
+        <Col xs={24} sm={24} md={24} lg={16} xl={16} style={{ paddingRight: 16 }}>
           <Card>
             {/*save button*/}
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -205,7 +206,7 @@ const DrawPalette: React.FC<DrawPaletteProps> = ({
             </div>
           </Card>
         </Col>
-        <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+        <Col xs={24} sm={24} md={24} lg={8} xl={8}>
           <div
             style={{
               padding: 20,

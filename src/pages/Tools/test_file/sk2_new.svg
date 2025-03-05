@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<svg width="78" height="82" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"
+     xml:space="preserve">
+ <g class="layer">
+  <title>Layer 1</title>
+   <g id="svg_1">
+
+<!--   <path d="m70.1,40.94l0,17.58l-15.22,8.8l15.22,-26.38z" fill="#404040" id="svg_3"/>-->
+<!--     <path d="m70.1,23.35l0,17.59l-15.22,-8.8l15.22,-8.79z" fill="#404040" id="svg_4"/>-->
+<!--     <path d="m39.66,58.53l15.22,-26.39l15.23,8.79l-15.23,26.38l-15.22,-8.78z" fill="#404040" id="svg_5"/>-->
+<!--     <path d="m70.1,23.35l-15.22,8.79l0,-17.59l1.63,0.94l13.59,7.86z" fill="#404040" id="svg_6"/>-->
+<!--     <path d="m24.44,14.55l30.44,0l0,17.59l-30.44,0l0,-17.59z" fill="#404040" id="svg_7"/>-->
+<!--     <path d="m54.88,32.14l-15.22,26.38l0,-17.58l15.22,-8.8z" fill="#404040" id="svg_8"/>-->
+<!--     <path d="m54.88,14.55l-30.44,0l15.22,-8.8l13.67,7.91l1.55,0.89z" fill="#404040" id="svg_9"/>-->
+<!--     <path d="m54.88,32.14l-15.22,8.8l-15.22,-8.8l30.44,0z" fill="#FF99FF" id="svg_10"/>-->
+<!--     <path d="m54.88,67.32l-15.22,8.8l0,-17.6l15.22,8.8z" fill="#404040" id="svg_11"/>-->
+<!--     <path d="m39.66,58.52l0,17.6l-15.22,-8.8l15.22,-8.8z" fill="#404040" id="svg_12"/>-->
+<!--     <path d="m39.66,40.94l0,17.58l-15.22,-26.38l15.22,8.8z" fill="#404040" id="svg_13"/>-->
+<!--     <path d="m9.21,40.94l15.22,-8.79l15.23,26.39l-15.23,8.78l-15.22,-26.38z" fill="#404040" id="svg_14"/>-->
+<!--     <path d="m24.44,14.55l0,17.59l-15.23,-8.79l15.23,-8.8z" fill="#404040" id="svg_15"/>-->
+<!--     <path d="m9.21,40.94l15.23,26.38l-15.23,-8.8l0,-17.58z" fill="#404040" id="svg_16"/>-->
+<!--     <path d="m24.44,32.14l-15.23,8.8l0,-17.59l15.23,8.79z" fill="#404040" id="svg_17"/>-->
+
+<!--     <path d="m54.88,14.55l-1.55,-0.89l-13.67,-7.91l-15.22,8.8" fill="none" id="svg_19" stroke="#000000"-->
+<!--           stroke-linejoin="round" stroke-width="1.22"/>-->
+<!--     <path d="m70.1,23.35l-13.59,-7.86l-1.63,-0.94" fill="none" id="svg_20" stroke="#000000" stroke-linejoin="round"-->
+<!--           stroke-width="1.22"/>-->
+<!--     <path d="m24.44,14.55l-15.23,8.8" fill="none" id="svg_21" stroke="#000000" stroke-linejoin="round"-->
+<!--           stroke-width="1.22"/>-->
+<!--     <path d="m24.44,14.55l30.44,0l0,17.59l-30.44,0l0,-17.59z" fill="none" id="svg_22" stroke="#000000"-->
+<!--           stroke-linejoin="round" stroke-width="1.22"/>-->
+<!--     <path d="m54.88,32.14l-15.22,8.8" fill="none" id="svg_23" stroke="#000000" stroke-linejoin="round"-->
+<!--           stroke-width="1.22"/>-->
+<!--     <path d="m70.1,40.94l0,-17.59l-15.22,8.79" fill="none" id="svg_24" stroke="#000000" stroke-linejoin="round"-->
+<!--           stroke-width="1.22"/>-->
+<!--     <path d="m39.66,76.12l15.22,-8.8" fill="none" id="svg_25" stroke="#000000" stroke-linejoin="round"-->
+<!--           stroke-width="1.22"/>-->
+<!--     <path d="m54.88,67.32l15.22,-8.8l0,-17.58" fill="none" id="svg_26" stroke="#000000" stroke-linejoin="round"-->
+<!--           stroke-width="1.22"/>-->
+<!--     <path d="m39.66,58.53l15.22,-26.39l15.23,8.79l-15.23,26.38l-15.22,-8.78z" fill="none" id="svg_27" stroke="#000000"-->
+<!--           stroke-linejoin="round" stroke-width="1.22"/>-->
+<!--     <path d="m24.44,32.14l-15.23,-8.79l0,17.59" fill="none" id="svg_28" stroke="#000000" stroke-linejoin="round"-->
+<!--           stroke-width="1.22"/>-->
+<!--     <path d="m39.66,58.52l0,-17.58l-15.22,-8.8" fill="none" id="svg_29" stroke="#000000" stroke-linejoin="round"-->
+<!--           stroke-width="1.22"/>-->
+<!--     <path d="m9.21,40.94l0,17.58l15.23,8.8" fill="none" id="svg_30" stroke="#000000" stroke-linejoin="round"-->
+<!--           stroke-width="1.22"/>-->
+<!--     <path d="m24.44,67.32l15.22,8.8l0,-17.6" fill="none" id="svg_31" stroke="#000000" stroke-linejoin="round"-->
+<!--           stroke-width="1.22"/>-->
+
+
+<!--        <path d="m71.99,43.88c-0.13,-1.55 3.8,-1.55 3.66,0l0,13.01c0.13,1.56 -3.8,1.54 -3.66,0l0,-13.01z" fill="#88DDFF" id="svg_2"/>-->
+     <!--        <path d="m20.02,10.9c1.28,-0.9 3.24,2.51 1.83,3.16l-11.25,6.5c-1.27,0.9 -3.22,-2.52 -1.82,-3.16c0,-0.01 11.24,-6.5 11.24,-6.5z" fill="#FFFF00" id="svg_18"/>-->
+
+     <path d="m21.86,14.06l-11.26,6.5c-1.27,0.9 -3.22,-2.52 -1.82,-3.16c0,0 11.24,-6.5 11.24,-6.5c1.31,-0.9 3.24,2.51 1.84,3.16z" fill="none" id="svg_34" stroke="#000000" stroke-linejoin="round" stroke-width="0.61"/>
+     <path d="m36.48,5.21l-11.26,6.5c-1.27,0.9 -3.22,-2.52 -1.82,-3.16c0,0 11.24,-6.5 11.24,-6.5c1.31,-0.9 3.24,2.51 1.84,3.16z" fill="none" id="svg_35" stroke="#000000" stroke-linejoin="round" stroke-width="0.61"/>
+     <path d="m67.88,28.4l0,13.01c0.14,1.56 -3.79,1.54 -3.65,0l0,-13.01c-0.14,-1.53 3.79,-1.52 3.65,0z" fill="none" id="svg_44" stroke="#000000" stroke-linejoin="round" stroke-width="0.61" transform="rotate(120 65.7926 16.1458)"/>
+     <path d="m67.5,9.63l0,13.01c0.14,1.56 -3.79,1.54 -3.65,0l0,-13.01c-0.14,-1.53 3.79,-1.52 3.65,0z" fill="none" id="svg_43" stroke="#000000" stroke-linejoin="round" stroke-width="0.61" transform="rotate(120 65.5426 16.1458)"/>
+
+     <path d="m75.52,25.11l0,13.01c0.14,1.56 -3.79,1.54 -3.65,0l0,-13.01c-0.14,-1.53 3.79,-1.52 3.65,0z" fill="none" id="svg_38" stroke="#000000" stroke-linejoin="round" stroke-width="0.61"/>
+     <path d="m75.65,43.88l0,13.01c0.14,1.56 -3.79,1.54 -3.65,0l0,-13.01c-0.14,-1.53 3.79,-1.52 3.65,0z" fill="none" id="svg_33" stroke="#000000" stroke-linejoin="round" stroke-width="0.61"/>
+        <path d="m70.54,64.53l-11.26,6.5c-1.27,0.9 -3.22,-2.52 -1.82,-3.16c0,0 11.24,-6.5 11.24,-6.5c1.31,-0.9 3.24,2.51 1.84,3.16z" fill="none" id="svg_36" stroke="#000000" stroke-linejoin="round" stroke-width="0.61"/>
+<path d="m55.92,72.88l-11.26,6.5c-1.27,0.9 -3.22,-2.52 -1.82,-3.16c0,0 11.24,-6.5 11.24,-6.5c1.31,-0.9 3.24,2.51 1.84,3.16z" fill="none" id="svg_37" stroke="#000000" stroke-linejoin="round" stroke-width="0.61"/>
+        <path d="m32.33,86.75l0,13.01c0.14,1.56 -3.79,1.54 -3.65,0l0,-13.01c-0.14,-1.53 3.79,-1.52 3.65,0z" fill="none" id="svg_42" stroke="#000000" stroke-linejoin="round" stroke-width="0.61" transform="rotate(120 30.25 74.4902)"/>
+        <path d="m31.95,67.98l0,13.01c0.14,1.56 -3.79,1.54 -3.65,0l0,-13.01c-0.14,-1.53 3.79,-1.52 3.65,0z" fill="none" id="svg_41" stroke="#000000" stroke-linejoin="round" stroke-width="0.61" transform="rotate(120 30 74.4902)"/>
+     <path d="m7.33,44l0,13.01c0.14,1.56 -3.79,1.54 -3.65,0l0,-13.01c-0.14,-1.53 3.79,-1.52 3.65,0z" fill="none" id="svg_40" stroke="#000000" stroke-linejoin="round" stroke-width="0.61"/>
+     <path d="m7.2,25.23l0,13.01c0.14,1.56 -3.79,1.54 -3.65,0l0,-13.01c-0.14,-1.53 3.79,-1.52 3.65,0z" fill="none" id="svg_39" stroke="#000000" stroke-linejoin="round" stroke-width="0.61"/>
+  </g>
+ </g>
+</svg>

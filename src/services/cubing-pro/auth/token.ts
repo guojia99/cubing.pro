@@ -1,4 +1,5 @@
 import {refreshToken} from "@/services/cubing-pro/auth/auth";
+import {AuthAPI} from "@/services/cubing-pro/auth/typings";
 
 
 const AUTH_TOKEN_KEY = 'authToken_cubing_pro';

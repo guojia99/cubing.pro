@@ -1,5 +1,6 @@
 import { NavTabs } from '@/components/Tabs/nav_tabs';
 import DrawPalette, { pathSvg } from '@/pages/Tools/DrawPalette';
+import { Button, Col, Row } from 'antd';
 import React, { useEffect, useState } from 'react';
 
 const baseSkColor = [
@@ -242,12 +243,204 @@ const SimpleSkDraw = () => {
   );
 };
 
+const SK3DDraw = () => {
+  const baseSvgs = [
+    'm70.1,40.94l0,17.58l-15.22,8.8l15.22,-26.38z',
+    'm70.1,23.35l0,17.59l-15.22,-8.8l15.22,-8.79z',
+    'm39.66,58.53l15.22,-26.39l15.23,8.79l-15.23,26.38l-15.22,-8.78z',
+    'm70.1,23.35l-15.22,8.79l0,-17.59l1.63,0.94l13.59,7.86z',
+    'm24.44,14.55l30.44,0l0,17.59l-30.44,0l0,-17.59z',
+    'm54.88,32.14l-15.22,26.38l0,-17.58l15.22,-8.8z',
+    'm54.88,14.55l-30.44,0l15.22,-8.8l13.67,7.91l1.55,0.89z',
+    'm54.88,32.14l-15.22,8.8l-15.22,-8.8l30.44,0z',
+    'm54.88,67.32l-15.22,8.8l0,-17.6l15.22,8.8z',
+    'm39.66,58.52l0,17.6l-15.22,-8.8l15.22,-8.8z',
+    'm39.66,40.94l0,17.58l-15.22,-26.38l15.22,8.8z',
+    'm9.21,40.94l15.22,-8.79l15.23,26.39l-15.23,8.78l-15.22,-26.38z',
+    'm24.44,14.55l0,17.59l-15.23,-8.79l15.23,-8.8z',
+    'm9.21,40.94l15.23,26.38l-15.23,-8.8l0,-17.58z',
+    'm24.44,32.14l-15.23,8.8l0,-17.59l15.23,8.79z',
+    'm54.88,14.55l-1.55,-0.89l-13.67,-7.91l-15.22,8.8',
+    'm70.1,23.35l-13.59,-7.86l-1.63,-0.94',
+    'm24.44,14.55l-15.23,8.8',
+    'm24.44,14.55l30.44,0l0,17.59l-30.44,0l0,-17.59z',
+    'm54.88,32.14l-15.22,8.8',
+    'm70.1,40.94l0,-17.59l-15.22,8.79',
+    'm39.66,76.12l15.22,-8.8',
+    'm54.88,67.32l15.22,-8.8l0,-17.58',
+    'm39.66,58.53l15.22,-26.39l15.23,8.79l-15.23,26.38l-15.22,-8.78z',
+    'm24.44,32.14l-15.23,-8.79l0,17.59',
+    'm39.66,58.52l0,-17.58l-15.22,-8.8',
+    'm9.21,40.94l0,17.58l15.23,8.8',
+    'm24.44,67.32l15.22,8.8l0,-17.6',
+  ];
+
+  const lineSvgs = [
+    {
+      // 左上角
+      d: 'm21.86,14.06l-11.26,6.5c-1.27,0.9 -3.22,-2.52 -1.82,-3.16c0,0 11.24,-6.5 11.24,-6.5c1.31,-0.9 3.24,2.51 1.84,3.16z',
+      transform: '',
+      name: '左上1',
+      key: 1,
+    },
+    {
+      d: 'm36.48,5.21l-11.26,6.5c-1.27,0.9 -3.22,-2.52 -1.82,-3.16c0,0 11.24,-6.5 11.24,-6.5c1.31,-0.9 3.24,2.51 1.84,3.16z',
+      transform: '',
+      name: '左上2',
+      key: 2,
+    },
+    {
+      d: 'm67.88,28.4l0,13.01c0.14,1.56 -3.79,1.54 -3.65,0l0,-13.01c-0.14,-1.53 3.79,-1.52 3.65,0z',
+      transform: 'rotate(120 65.7926 16.1458)',
+      name: '右上1',
+      key: 3,
+    },
+    {
+      d: 'm67.5,9.63l0,13.01c0.14,1.56 -3.79,1.54 -3.65,0l0,-13.01c-0.14,-1.53 3.79,-1.52 3.65,0z',
+      transform: 'rotate(120 65.5426 16.1458)',
+      name: '右上2',
+      key: 4,
+    },
+    {
+      d: 'm75.52,25.11l0,13.01c0.14,1.56 -3.79,1.54 -3.65,0l0,-13.01c-0.14,-1.53 3.79,-1.52 3.65,0z',
+      transform: '',
+      name: '右1',
+      key: 5,
+    },
+    {
+      d: 'm75.65,43.88l0,13.01c0.14,1.56 -3.79,1.54 -3.65,0l0,-13.01c-0.14,-1.53 3.79,-1.52 3.65,0z',
+      transform: '',
+      name: '右2',
+      key: 6,
+    },
+    {
+      d: 'm70.54,64.53l-11.26,6.5c-1.27,0.9 -3.22,-2.52 -1.82,-3.16c0,0 11.24,-6.5 11.24,-6.5c1.31,-0.9 3.24,2.51 1.84,3.16z',
+      transform: '',
+      name: '右下1',
+      key: 7,
+    },
+    {
+      d: 'm55.92,72.88l-11.26,6.5c-1.27,0.9 -3.22,-2.52 -1.82,-3.16c0,0 11.24,-6.5 11.24,-6.5c1.31,-0.9 3.24,2.51 1.84,3.16z',
+      transform: '',
+      name: '右下2',
+      key: 8,
+    },
+    {
+      d: 'm32.33,86.75l0,13.01c0.14,1.56 -3.79,1.54 -3.65,0l0,-13.01c-0.14,-1.53 3.79,-1.52 3.65,0z',
+      transform: 'rotate(120 30.25 74.4902)',
+      name: '左下1',
+      key: 9,
+    },
+    {
+      d: 'm31.95,67.98l0,13.01c0.14,1.56 -3.79,1.54 -3.65,0l0,-13.01c-0.14,-1.53 3.79,-1.52 3.65,0z',
+      transform: 'rotate(120 30 74.4902)',
+      name: '左下2',
+      key: 10,
+    },
+    {
+      d: 'm7.33,44l0,13.01c0.14,1.56 -3.79,1.54 -3.65,0l0,-13.01c-0.14,-1.53 3.79,-1.52 3.65,0z',
+      transform: '',
+      name: '左2',
+      key: 11,
+    },
+    {
+      d: 'm7.2,25.23l0,13.01c0.14,1.56 -3.79,1.54 -3.65,0l0,-13.01c-0.14,-1.53 3.79,-1.52 3.65,0z',
+      transform: '',
+      name: '左1',
+      key: 12,
+    },
+  ];
+
+  const [skPointsM, setSkPointsM] = useState<pathSvg[]>([]);
+
+  const [lineMap, setLineMap] = useState(new Map<number, (typeof lineSvgs)[0]>()); //
+  const [skLinePointsM, setSkLinePointsM] = useState<pathSvg[]>([]);
+  const [skLineSelectMap, setSkLineSelectMap] = useState(new Map());
+
+  const selectLine = (k: number) => {
+    // 创建一个新的 Map 进行状态更新
+    const newMap = new Map(skLineSelectMap);
+    if (newMap.has(k)) {
+      newMap.delete(k); // 取消选中
+      setSkLinePointsM(
+        skLinePointsM.filter((e) => {
+          return e.key !== 'sk_3d_line' + k;
+        }),
+      );
+    } else {
+      newMap.set(k, k); // 设置为选中
+      const svg = lineMap.get(k);
+      if (!svg) {
+        return;
+      }
+      skLinePointsM.push({
+        d: svg.d,
+        transformStr: svg.transform,
+        key: 'sk_3d_line' + svg.key,
+      });
+      setSkLinePointsM(skLinePointsM);
+    }
+    setSkLineSelectMap(newMap); // 更新状态
+  };
+
+  useEffect(() => {
+    const newMap = new Map(lineSvgs.map((item) => [item.key, item]));
+    setLineMap(newMap);
+
+    const v = [];
+    for (let i = 0; i < baseSvgs.length; i++) {
+      v.push({
+        key: 'sk_3d_2_sk' + i,
+        d: baseSvgs[i],
+      });
+    }
+    setSkPointsM(v);
+  }, []);
+
+  return (
+    <div>
+      <DrawPalette
+        svgPoints={[...skPointsM, ...skLinePointsM]}
+        presetColors={baseSkColor}
+        storageKey={'SK3DDraw'}
+        viewBox={'0 0 78 82'}
+        strokeWidthNum={0.2}
+        buttons={
+          <div style={{ textAlign: 'center' }}>
+            <div>
+              <Row gutter={16}>
+                {lineSvgs.map((btn, index) => (
+                  <Col span={4} key={index} style={{ marginBottom: 10 }}>
+                    <Button
+                      type={skLineSelectMap.get(btn.key) ? 'primary' : undefined}
+                      size={'small'}
+                      onClick={() => selectLine(btn.key)}
+                      block
+                    >
+                      {btn.name}
+                    </Button>
+                  </Col>
+                ))}
+              </Row>
+            </div>
+          </div>
+        }
+      />
+    </div>
+  );
+};
+
 const SKDraw: React.FC = () => {
   const items = [
     {
       key: 'simple_sk',
       label: '展开图',
       children: SimpleSkDraw(),
+    },
+    {
+      key: '3d_2_sk',
+      label: '立体图',
+      children: SK3DDraw(),
     },
   ];
 
