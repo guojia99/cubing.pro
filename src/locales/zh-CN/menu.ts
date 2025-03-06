@@ -7,5 +7,5 @@ export default {
   "menu.工具.SQ1绘图工具": "SQ1绘图工具",
   "menu.工具.Minx绘图工具": "Minx绘图工具",
   "menu.工具.Sk绘图工具": "Sk绘图工具",
-
+  "menu.工具.记忆工具": "记忆工具",
 }

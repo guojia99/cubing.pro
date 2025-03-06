@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_图层_2" data-name="图层 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 308 307">
+  <defs>
+    <style>
+      .cls-1, .cls-2 {
+        fill: #ff0;
+      }
+
+      .cls-1, .cls-3, .cls-4, .cls-5 {
+        stroke: #231815;
+        stroke-linecap: round;
+        stroke-miterlimit: 10;
+      }
+
+      .cls-6 {
+        fill: red;
+        font-family: Verdana-Bold, Verdana;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .cls-7, .cls-8, .cls-2 {
+        stroke-width: 0px;
+      }
+
+      .cls-8, .cls-4 {
+        fill: #29abe2;
+      }
+
+      .cls-3 {
+        fill: #efefef;
+      }
+    </style>
+  </defs>
+  <g id="_图层_1-2" data-name="图层 1">
+    <rect class="cls-3" x="14.5" y=".5" width="293" height="293" rx="80" ry="80" transform="translate(322 294) rotate(-180)"/>
+    <circle class="cls-4" cx="250.37" cy="236.88" r="35.35"/>
+    <circle class="cls-4" cx="159.37" cy="236.88" r="35.35"/>
+    <circle class="cls-4" cx="70.37" cy="236.87" r="35.35"/>
+    <circle class="cls-4" cx="250.38" cy="146.88" r="35.35"/>
+    <circle class="cls-4" cx="160.38" cy="146.88" r="35.35"/>
+    <circle class="cls-4" cx="70.38" cy="146.87" r="35.35"/>
+    <circle class="cls-4" cx="250.38" cy="56.88" r="35.35"/>
+    <circle class="cls-4" cx="160.38" cy="56.88" r="35.35"/>
+    <circle class="cls-4" cx="70.38" cy="56.87" r="35.35"/>
+    <circle class="cls-1" cx="114.81" cy="192" r="9.02"/>
+    <circle class="cls-1" cx="205.81" cy="191" r="9.02"/>
+    <circle class="cls-1" cx="205.81" cy="103" r="9.02"/>
+    <circle class="cls-1" cx="114.81" cy="102" r="9.02"/>
+    <g>
+      <line class="cls-8" x1="250.5" y1="236.5" x2="250.5" y2="201.5"/>
+      <path class="cls-2" d="m245.5,236.5l5-35,5,35c.39,2.76-1.52,5.32-4.29,5.71-3.27.52-6.23-2.45-5.71-5.71h0Z"/>
+    </g>
+    <g>
+      <line class="cls-8" x1="250.5" y1="146.5" x2="250.5" y2="111.5"/>
+      <path class="cls-2" d="m245.5,146.5l5-35,5,35c.39,2.76-1.52,5.32-4.29,5.71-3.27.52-6.23-2.45-5.71-5.71h0Z"/>
+    </g>
+    <g>
+      <line class="cls-8" x1="250.5" y1="56.5" x2="250.5" y2="21.5"/>
+      <path class="cls-2" d="m245.5,56.5l5-35,5,35c.39,2.76-1.52,5.32-4.29,5.71-3.27.52-6.23-2.45-5.71-5.71h0Z"/>
+    </g>
+    <g>
+      <line class="cls-7" x1="160.5" y1="146.5" x2="160.5" y2="111.5"/>
+      <path class="cls-2" d="m155.5,146.5l5-35,5,35c.39,2.76-1.52,5.32-4.29,5.71-3.27.52-6.23-2.45-5.71-5.71h0Z"/>
+    </g>
+    <g>
+      <line class="cls-7" x1="160.5" y1="56.5" x2="160.5" y2="21.5"/>
+      <path class="cls-2" d="m155.5,56.5l5-35,5,35c.39,2.76-1.52,5.32-4.29,5.71-3.27.52-6.23-2.45-5.71-5.71h0Z"/>
+    </g>
+    <g>
+      <line class="cls-7" x1="70.5" y1="236.5" x2="70.5" y2="201.5"/>
+      <path class="cls-2" d="m65.5,236.5l5-35,5,35c.39,2.76-1.52,5.32-4.29,5.71-3.27.52-6.23-2.45-5.71-5.71h0Z"/>
+    </g>
+    <g>
+      <line class="cls-7" x1="70.5" y1="146.5" x2="70.5" y2="111.5"/>
+      <path class="cls-2" d="m65.5,146.5l5-35,5,35c.39,2.76-1.52,5.32-4.29,5.71-3.27.52-6.23-2.45-5.71-5.71h0Z"/>
+    </g>
+    <g>
+      <line class="cls-7" x1="70.5" y1="56.5" x2="70.5" y2="21.5"/>
+      <path class="cls-2" d="m65.5,56.5l5-35,5,35c.39,2.76-1.52,5.32-4.29,5.71-3.27.52-6.23-2.45-5.71-5.71h0Z"/>
+    </g>
+    <g>
+      <line class="cls-8" x1="159.5" y1="236.5" x2="159.5" y2="201.5"/>
+      <path class="cls-2" d="m154.5,236.5l5-35,5,35c.39,2.76-1.52,5.32-4.29,5.71-3.27.52-6.23-2.45-5.71-5.71h0Z"/>
+    </g>
+<!--    <text class="cls-6" transform="translate(242.14 106.7)"><tspan x="0" y="0">12</tspan></text>-->
+<!--    <text class="cls-6" transform="translate(240.14 195.7)"><tspan x="0" y="0">12</tspan></text>-->
+<!--    <text class="cls-6" transform="translate(151.14 195.7)"><tspan x="0" y="0">12</tspan></text>-->
+<!--    <text class="cls-6" transform="translate(151.14 106.7)"><tspan x="0" y="0">12</tspan></text>-->
+<!--    <text class="cls-6" transform="translate(241.14 15.7)"><tspan x="0" y="0">12</tspan></text>-->
+<!--    <text class="cls-6" transform="translate(152.14 16.7)"><tspan x="0" y="0">12</tspan></text>-->
+<!--    <text class="cls-6" transform="translate(62.14 195.7)"><tspan x="0" y="0">12</tspan></text>-->
+<!--    <text class="cls-6" transform="translate(62.14 105.7)"><tspan x="0" y="0">12</tspan></text>-->
+<!--    <text class="cls-6" transform="translate(61.14 16.7)"><tspan x="0" y="0">12</tspan></text>-->
+<!--    <path class="cls-5" d="m80.5,306.5h17s0-13,0-13h-4c-44,0-80-36-80-80v-4s-13,0-13,0v17c0,44,36,80,80,80Z"/>-->
+
+
+
+  </g>
+</svg>
