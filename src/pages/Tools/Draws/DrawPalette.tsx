@@ -1,4 +1,4 @@
-import ColorPalette from '@/pages/Tools/ColorPalette';
+import ColorPalette from '@/pages/Tools/Draws/ColorPalette';
 import { DownloadOutlined, FileImageOutlined, FileJpgOutlined } from '@ant-design/icons';
 import { Card, Col, Divider, Input, Row, Slider } from 'antd';
 import html2canvas from 'html2canvas';
@@ -6,7 +6,12 @@ import React, { useEffect, useRef, useState } from 'react';
 
 export type pathSvg = {
   key: string;
-  d: string;
+
+  d?: string; // path
+  points?: string; // polygon
+
+  type?: string; // path, polygon
+  disableDrawing?: boolean;
 
   baseRotate?: number; // 初始角度
   transform?: number; // 额外添加的角度
@@ -172,7 +177,7 @@ const DrawPalette: React.FC<DrawPaletteProps> = ({
                 ref={svgRef}
               >
                 {svgPoints.map((elem: pathSvg) => {
-                  const key = storageKey + '-' + elem.key;
+                  let key = storageKey + '-' + elem.key;
                   let transform = undefined;
                   if (elem.transformStr) {
                     transform = elem.transformStr;
@@ -182,20 +187,47 @@ const DrawPalette: React.FC<DrawPaletteProps> = ({
                       elem.transformPoint
                     })`;
                   }
-                  return (
-                    <path
-                      // @ts-ignore
-                      fill={colors[key]}
-                      key={key}
-                      data-key={key}
-                      d={elem.d}
-                      stroke={'black'}
-                      strokeWidth={strokeWidth * strokeWidthNum}
-                      strokeLinejoin={'round'}
-                      style={{ cursor: 'pointer' }}
-                      transform={transform}
-                    ></path>
-                  );
+
+                  if (elem.disableDrawing){
+                    key = 'disable'
+                  }
+
+                  if (elem.d){
+                    return (
+                      <path
+                        // @ts-ignore
+                        fill={colors[key]}
+                        key={key}
+                        data-key={key}
+                        d={elem.d}
+                        stroke={'black'}
+                        strokeWidth={strokeWidth * strokeWidthNum}
+                        strokeLinejoin={'round'}
+                        style={{ cursor: 'pointer' }}
+                        transform={transform}
+                      ></path>
+                    );
+                  }
+
+                  if (elem.points){
+                    return (
+                      <polygon
+                        // @ts-ignore
+                        fill={colors[key]}
+                        key={key}
+                        data-key={key}
+                        points={elem.points}
+                        stroke={'black'}
+                        strokeWidth={strokeWidth * strokeWidthNum}
+                        strokeLinejoin={'round'}
+                        style={{ cursor: 'pointer' }}
+                        transform={transform}
+                      >
+                      </polygon>
+                    )
+                  }
+
+                  return (<></>)
                 })}
               </svg>
             </div>

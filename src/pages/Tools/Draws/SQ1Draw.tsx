@@ -1,6 +1,6 @@
-import DrawPalette, { pathSvg } from '@/pages/Tools/DrawPalette';
+import DrawPalette, { pathSvg } from '@/pages/Tools/Draws/DrawPalette';
 import { Button, Form, message, Select, Slider, Space } from 'antd';
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 
 const cspMap = new Map([
   ['星 Star', 'cccccc'],
@@ -77,9 +77,6 @@ const Sq1Draw: React.FC = () => {
   const [cpsOpt, setCpsOpt] = useState<any[]>([]);
   const [defaultVal, setDefaultVal] = useState<any>();
 
-  const defaultValRef = useRef(defaultVal)
-
-
   const addEdge = () => {
     if (reg + 30 > 360) {
       message.warning('可用角度已满').then();
@@ -140,7 +137,7 @@ const Sq1Draw: React.FC = () => {
     setCorner(0);
     setSvgPoints([]);
     setCubes([]);
-    setDefaultVal('')
+    setDefaultVal('');
   };
 
   const resetBaseReg = (e: number) => {
@@ -170,7 +167,7 @@ const Sq1Draw: React.FC = () => {
     }
     cubes.splice(-1, 1);
     setCubes([...cubes]);
-    setDefaultVal('')
+    setDefaultVal('');
   };
 
   const resetLineReg = (e: number) => {
@@ -212,7 +209,7 @@ const Sq1Draw: React.FC = () => {
     let curCorner = 0;
     let curCubes = [];
 
-    let curNum = num
+    let curNum = num;
     for (let i = 0; i < v.length; i++) {
       const d = v[i];
       if (d === 'e') {
@@ -242,23 +239,23 @@ const Sq1Draw: React.FC = () => {
         curCorner += 1;
         curCubes.push('corner');
       }
-      curNum += 1
+      curNum += 1;
     }
 
     setReg(curReg);
-    setSvgPoints(newSvgPoints)
+    setSvgPoints(newSvgPoints);
     setEdge(curEdge);
     setCorner(curCorner);
     setCubes(curCubes);
-    setNum(curNum)
-    setDefaultVal(e)
+    setNum(curNum);
+    setDefaultVal(e);
   };
 
   useEffect(() => {
     resetLineReg(30);
 
     let opt: any[] = [];
-    opt.push({value: '', label: '-无-'})
+    opt.push({ value: '', label: '-无-' });
     cspMap.forEach((value: string, key: string) => {
       opt.push({
         value: key,
@@ -269,7 +266,7 @@ const Sq1Draw: React.FC = () => {
 
     setDefault('星 Star');
 
-    console.log(svgPoints)
+    console.log(svgPoints);
   }, []);
 
   return (
@@ -298,7 +295,7 @@ const Sq1Draw: React.FC = () => {
                       { value: 30, label: '正15度' },
                       { value: -30, label: '负15度' },
                     ]}
-                    style={{width: 100}}
+                    style={{ width: 100 }}
                   />
                 </Form.Item>
 

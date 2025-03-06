@@ -54,6 +54,11 @@ const ColorPalette: React.FC<ColorPaletteProps> = ({
       const key = event.srcElement.getAttribute('data-key');
       if (!key) return;
 
+      if (key === 'disable'){
+        return;
+      }
+
+
       if (!key.includes(storageKey)) {
         return;
       }

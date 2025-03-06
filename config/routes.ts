@@ -96,9 +96,10 @@ export default [
     path: 'tools',
     name: '工具',
     routes: [
-      {path: 'sq1-d', component: './Tools/SQ1Draw', name:'SQ1绘图工具'},
-      {path: 'minx-d', component: './Tools/MinxDraw', name: 'Minx绘图工具'},
-      {path: 'sk-d', component: './Tools/SkDraw', name: 'Sk绘图工具'},
+      {path: 'sq1-d', component: './Tools/Draws/SQ1Draw', name:'SQ1绘图工具'},
+      {path: 'minx-d', component: './Tools/Draws/MinxDraw', name: 'Minx绘图工具'},
+      {path: 'sk-d', component: './Tools/Draws/SkDraw', name: 'Sk绘图工具'},
+      {path: 'bld-d', component: './Tools/Bld/BldMeor', name: "记忆工具"}
     ],
   },
 
