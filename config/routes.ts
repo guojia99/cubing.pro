@@ -99,7 +99,10 @@ export default [
       {path: 'sq1-d', component: './Tools/Draws/SQ1Draw', name:'SQ1绘图工具'},
       {path: 'minx-d', component: './Tools/Draws/MinxDraw', name: 'Minx绘图工具'},
       {path: 'sk-d', component: './Tools/Draws/SkDraw', name: 'Sk绘图工具'},
-      {path: 'bld-d', component: './Tools/Bld/BldMeor', name: "记忆工具"}
+      {path: 'bld-d', component: './Tools/Bld/BldMeor', name: "盲拧公式练习"},
+      {path: 'mbld-d', component: './Tools/Bld/MBld', name: "多盲记忆练习"},
+
+      {path: 'teamMatch', component: './Tools/TeamMatch/TeamMatch', name: "TeamMatch"}
     ],
   },
 
