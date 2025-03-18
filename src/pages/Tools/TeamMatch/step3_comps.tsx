@@ -126,9 +126,6 @@ const distributePlayers = (context: Context) => {
   return curPlayers;
 };
 
-
-
-
 const Step2MatchNow: React.FC<Props> = ({ context, setContext }) => {
   const [players, setPlayers] = useState<(Player | null)[]>([]);
   const [winners, setWinners] = useState<Record<string, Player | null>>({});

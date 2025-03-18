@@ -40,40 +40,53 @@ function MatchBox({
   } ${!isClickable ? 'match-disabled' : ''}`;
 
   // todo 两个都是null的情况下， 则不显示
+
+  if (!players.some((p) => p)) {
+    return (
+      <div className={matchClasses}>
+        <>比赛空缺 | 未开始</>
+      </div>
+    );
+  }
+
   return (
     <div className={matchClasses}>
-      {players.some(p => p) ? (
-        players.map((player, idx) => {
-          const medal = getPlayerMedal(player);
-          const isBye = round === 1 && player && !players[idx === 0 ? 1 : 0];
+      {players.map((player, idx) => {
+        const medal = getPlayerMedal(player);
+        const isBye = round === 1 && player && !players[idx === 0 ? 1 : 0];
 
-          const playerClasses = `player-slot ${idx === 0 ? 'player-top' : 'player-bottom'} ${
-            winner?.id === player?.id ? 'player-winner' : ''
-          } ${!player ? 'player-empty' : ''} ${isBye ? 'player-bye' : ''} ${
-            !isClickable ? 'player-disabled' : ''
-          }`;
+        const playerClasses = `player-slot ${idx === 0 ? 'player-top' : 'player-bottom'} ${
+          winner?.id === player?.id ? 'player-winner' : ''
+        } ${!player ? 'player-empty' : ''} ${isBye ? 'player-bye' : ''} ${
+          !isClickable ? 'player-disabled' : ''
+        }`;
 
-          return (
-            <div
-              key={idx}
-              onClick={() => player && onPlayerClick(round, match, idx as 0 | 1)}
-              className={playerClasses}
-            >
-              <div className="player-info">
-                {player?.seed && <span className="player-seed">{player.seed}</span>}
-                <span className="player-name">{player?.name || '无选手'}</span>
-              </div>
-              <div className="player-status">
-                {medal && getPlayerMedalIcon(medal)}
-                {winner?.id === player?.id && <span className="winner-check">✓</span>}
-                {isBye && <span className="bye-label">轮空</span>}
-              </div>
+        const seedClass = player?.seeded ? 'seedFont' : '';
+
+        return (
+          <div
+            key={idx}
+            onClick={() => player && onPlayerClick(round, match, idx as 0 | 1)}
+            className={playerClasses}
+          >
+            <div className={'player-info'}>
+              {player?.seed && <span className="player-seed">{player.seed}</span>}
+              {!player?.name && <span>无选手</span>}
+              {player?.name && (
+                <span className={'player-name ' + seedClass}>
+                  {/*{player?.groupName && <span className="player-name-group">{player?.groupName}<br/></span>}*/}
+                  {player?.name}
+                </span>
+              )}
             </div>
-          );
-        })
-      ): (
-        <>比赛空缺 | 未开始</>
-      )}
+            <div className={'player-status'}>
+              {medal && getPlayerMedalIcon(medal)}
+              {winner?.id === player?.id && <span className="winner-check">✓</span>}
+              {isBye && <span className="bye-label">轮空</span>}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }

@@ -52,6 +52,7 @@ const GroupPlayerManager: React.FC<Props> = ({ tableData, setTableData }) => {
             name: `队伍 ${newData[groupIndex].players.length + 1}`,
             seeded: false,
             man: [],
+            groupName: tableData[groupIndex].name,
           },
         ], // 新队伍，man为空
       };
@@ -128,6 +129,9 @@ const GroupPlayerManager: React.FC<Props> = ({ tableData, setTableData }) => {
           ...newData[editGroupIndex],
           name: editGroupName,
         };
+        for (let i = 0; i < newData[editGroupIndex].players.length; i++){
+          newData[editGroupIndex].players[i].groupName = editGroupName
+        }
         return newData;
       });
     }
