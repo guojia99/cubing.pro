@@ -42,10 +42,6 @@ const TeamMatch: React.FC = () => {
       title: '赛程',
       content: <Step2MatchNow context={context} setContext={setContext} />,
     },
-    {
-      title: '赛果',
-      content: 'Last-content',
-    },
   ];
 
   const items = steps.map((item) => ({
