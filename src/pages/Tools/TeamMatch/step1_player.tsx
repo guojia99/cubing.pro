@@ -36,8 +36,8 @@ const GroupPlayerManager: React.FC<Props> = ({ tableData, setTableData }) => {
       return;
     }
 
-    if (tableData[groupIndex].players.length >= 4) {
-      message.warning('每个组最多只能有4个队伍').then();
+    if (tableData[groupIndex].players.length >= 8) {
+      message.warning('每个组最多只能有8个队伍').then();
       return;
     }
 

@@ -138,14 +138,8 @@ const Admin: React.FC = () => {
         {
           title: '榜单管理',
           description: '榜单管理',
-          to: '/',
+          to: '/user/admin/diy_ranking',
           avatar: <UnorderedListOutlined style={{ fontSize: 40 }} />,
-        },
-        {
-          title: '榜单人员管理',
-          description: '榜单人员管理',
-          to: '/',
-          avatar: <FcConferenceCall style={{ fontSize: 40 }} />,
         },
       ],
     },

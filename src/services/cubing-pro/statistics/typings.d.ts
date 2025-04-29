@@ -55,4 +55,10 @@ declare namespace StaticAPI {
   export type DiyRankWCAResultStaticsResponse = {
     data: any, // map[string]DiyRankWCAResult[]
   }
+
+  export type DiyRankKeyValue = {
+    id: string,
+    Value: string,
+    Description: string,
+  }
 }

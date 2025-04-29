@@ -4,6 +4,7 @@ import { OrderedListOutlined, TrophyOutlined } from '@ant-design/icons';
 import React from 'react';
 import Records from "@/pages/Static/Record";
 import DiyRanks from "@/pages/Static/DiyRanks";
+import DiyRankView from "@/pages/Static/DiyRanks";
 
 const Static: React.FC = () => {
   const items = [
@@ -27,16 +28,17 @@ const Static: React.FC = () => {
     },
     {
       // todo 做成不同的key
-      key: "diy_rankings_guangdong_gaoxiao",
-      label: '广东高校榜单',
-      children: <DiyRanks/>,
+      key: "wca_view",
+      label: 'WCA成绩榜单',
+      children: <DiyRankView />,
       icon: <OrderedListOutlined />,
-    }
+    },
+
   ];
 
   return (
     <>
-      <h2> 成绩统计 </h2>
+      <h1 style={{textAlign: "center"}}> 成绩统计 </h1>
       <NavTabs
         type="line"
         items={items}

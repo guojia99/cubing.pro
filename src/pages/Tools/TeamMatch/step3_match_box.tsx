@@ -1,6 +1,8 @@
 // Match box component
 import { Player } from '@/pages/Tools/TeamMatch/types';
 import { TrophyFilled } from '@ant-design/icons';
+import {useState} from "react";
+import BattleModal from "@/pages/Tools/TeamMatch/step3_match_modal";
 
 const getPlayerMedalIcon = (medal: 'gold' | 'silver' | 'bronze' | null) => {
   if (!medal) return null;
@@ -35,11 +37,20 @@ function MatchBox({
   isFinal?: boolean;
   isThirdPlace?: boolean;
 }) {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
   const matchClasses = `match-box ${isFinal ? 'match-final' : ''} ${
     isThirdPlace ? 'match-third-place' : ''
   } ${!isClickable ? 'match-disabled' : ''}`;
 
   // todo 两个都是null的情况下， 则不显示
+
+  const openModal = () => {
+    if (!isClickable){
+      return;
+    }
+    setIsModalOpen(true);
+  }
 
   if (!players.some((p) => p)) {
     return (
@@ -50,44 +61,57 @@ function MatchBox({
   }
 
   return (
-    <div className={matchClasses}>
-      {players.map((player, idx) => {
-        const medal = getPlayerMedal(player);
-        const isBye = round === 1 && player && !players[idx === 0 ? 1 : 0];
+    <>
+    <BattleModal
+      teamA={players[0]}
+      teamB={players[1]}
+      onPlayerClick={onPlayerClick}
+      setIsModalOpen={setIsModalOpen}
+      isModalOpen={isModalOpen}
+      round={round}
+      match={match}
+    />
 
-        const playerClasses = `player-slot ${idx === 0 ? 'player-top' : 'player-bottom'} ${
-          winner?.id === player?.id ? 'player-winner' : ''
-        } ${!player ? 'player-empty' : ''} ${isBye ? 'player-bye' : ''} ${
-          !isClickable ? 'player-disabled' : ''
-        }`;
+      <div className={matchClasses}>
+        {players.map((player, idx) => {
+          const medal = getPlayerMedal(player);
+          const isBye = round === 1 && player && !players[idx === 0 ? 1 : 0];
 
-        const seedClass = player?.seeded ? 'seedFont' : '';
+          const playerClasses = `player-slot ${idx === 0 ? 'player-top' : 'player-bottom'} ${
+            winner?.id === player?.id ? 'player-winner' : ''
+          } ${!player ? 'player-empty' : ''} ${isBye ? 'player-bye' : ''} ${
+            !isClickable ? 'player-disabled' : ''
+          }`;
 
-        return (
-          <div
-            key={idx}
-            onClick={() => player && onPlayerClick(round, match, idx as 0 | 1)}
-            className={playerClasses}
-          >
-            <div className={'player-info'}>
-              {player?.seed && <span className="player-seed">{player.seed}</span>}
-              {!player?.name && <span>无选手</span>}
-              {player?.name && (
-                <span className={'player-name ' + seedClass}>
+          const seedClass = player?.seeded ? 'seedFont' : '';
+
+          return (
+            <div
+              key={idx}
+              onClick={() => openModal()}
+              className={playerClasses}
+            >
+              <div className={'player-info-match'}>
+                {player?.seed && <span className="player-seed">{player.seed}</span>}
+                {!player?.name && <span>无选手</span>}
+                {player?.name && (
+                  <span className={'player-name-match-box ' + seedClass}>
                   {/*{player?.groupName && <span className="player-name-group">{player?.groupName}<br/></span>}*/}
-                  {player?.name}
+                    {player?.name}
                 </span>
-              )}
+                )}
+              </div>
+              <div className={'player-status'}>
+                {medal && getPlayerMedalIcon(medal)}
+                {winner?.id === player?.id && <span className="winner-check">✓</span>}
+                {isBye && (<><br/><span className="bye-label">轮空</span></>)}
+              </div>
             </div>
-            <div className={'player-status'}>
-              {medal && getPlayerMedalIcon(medal)}
-              {winner?.id === player?.id && <span className="winner-check">✓</span>}
-              {isBye && <span className="bye-label">轮空</span>}
-            </div>
-          </div>
-        );
-      })}
-    </div>
+          );
+        })}
+      </div>
+
+    </>
   );
 }
 
