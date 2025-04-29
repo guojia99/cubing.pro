@@ -5,7 +5,16 @@ export async function apiDiyRanking(
   key: string,
 ): Promise<StaticAPI.DiyRankWCAResultStaticsResponse> {
   const response = await Request.get<StaticAPI.DiyRankWCAResultStaticsResponse>(
-    'public/statistics/diy_rankings/' + key,
+    'diy_static/diy_rankings/' + key,
+    {},
+  );
+  return response.data;
+}
+
+
+export async function apiGetAllDiyRankingKey(): Promise<{data: StaticAPI.DiyRankKeyValue[]}>{
+  const response = await Request.get<{data: StaticAPI.DiyRankKeyValue[]}>(
+    'diy_static/diy_rankings',
     {},
   );
   return response.data;

@@ -9,7 +9,7 @@ export type Player = {
   // step2使用的
   seed?: number;
 
-  groupName?: string;
+  groupName: string;
 };
 
 export type Group = {

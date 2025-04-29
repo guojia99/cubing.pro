@@ -45,7 +45,7 @@ const CompetitionResultsWithTop: React.FC<CompetitionResultsWithTopProps> = ({
 
     if (res === undefined || res.length === 0) {
       // eslint-disable-next-line array-callback-return
-      return;
+      return
     }
 
     if (!with_best) {
@@ -112,7 +112,9 @@ const CompetitionResultsWithTop: React.FC<CompetitionResultsWithTopProps> = ({
   let last_idx = 0;
   let copyMsg = comp?.data.Name + ' 各项目前三排名: \n';
 
+  // 这里处理的是上一个项目
   const push_body = (idx: number) => {
+    console.log("push_body", idx,  dataSource[last_idx].EventID);
     let key = 'CompetitionResultsWithTop_' + dataSource[last_idx].EventID;
     body.push(
       <div key={key}>
@@ -141,17 +143,13 @@ const CompetitionResultsWithTop: React.FC<CompetitionResultsWithTopProps> = ({
     copyMsg += this_msg + '\n';
   };
 
-  for (let idx = 0; idx < dataSource.length; idx++) {
-    if (dataSource[last_idx].EventID === dataSource[idx].EventID) {
-      if (idx === dataSource.length - 1) {
-        push_body(idx + 1);
-      }
-      continue;
+  for (let idx = 1; idx < dataSource.length; idx++) {
+    if (dataSource[idx].EventID !== dataSource[last_idx].EventID) {
+      push_body(idx);
+      last_idx = idx;
     }
-    // idx += 1
-    push_body(idx);
-    last_idx = idx;
   }
+  push_body(dataSource.length);
 
   return (
     <>

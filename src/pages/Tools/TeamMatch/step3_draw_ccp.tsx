@@ -196,8 +196,6 @@ const TournamentBracket: React.FC<Props> = ({
       : null;
     const thirdPlace = getWinner(5, 1);
 
-    console.log(player, champion, runnerUp, thirdPlace);
-
     if (champion?.id === player.id) return 'gold';
     if (runnerUp?.id === player.id) return 'silver';
     if (thirdPlace?.id === player.id) return 'bronze';
@@ -240,13 +238,13 @@ const TournamentBracket: React.FC<Props> = ({
             <table className="bracket-table">
               <thead>
                 <tr>
-                  <th>16进8</th>
+                  <th>初赛</th>
                   <th>四分之一决赛</th>
                   <th>半决赛</th>
                   <th>决赛</th>
                   <th>半决赛</th>
                   <th>四分之一决赛</th>
-                  <th>16进8</th>
+                  <th>初赛</th>
                 </tr>
               </thead>
               <tbody>

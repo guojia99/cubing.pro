@@ -217,7 +217,7 @@
   background-color: #dbeafe;
 }
 
-.player-info {
+.player-info-match {
   display: flex;
   align-items: center;
 }
@@ -256,7 +256,12 @@
   font-weight: bold;
 }
 
-.player-winner .player-name {
+
+.player-name-match-box{
+  font-size: 20px;
+}
+
+.player-winner .player-name-match-box {
   font-weight: 600;
 }
 
