@@ -2,6 +2,9 @@ import { CheckOutlined } from '@ant-design/icons';
 import { Button, Divider, message, Popover } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { SketchPicker } from 'react-color';
+import {FormattedMessage, getIntl} from "@@/exports";
+
+const intl = getIntl();
 
 export interface ColorPaletteProps {
   onSelectColor: (key: string, color: string) => void;
@@ -64,7 +67,7 @@ const ColorPalette: React.FC<ColorPaletteProps> = ({
       }
 
       if (!selectedColor) {
-        message.warning('选择一个颜色').then();
+        message.warning(intl.formatMessage({ id: 'draws.color.select_color' })).then();
         return;
       }
       if (key && selectedColor) {
@@ -121,7 +124,7 @@ const ColorPalette: React.FC<ColorPaletteProps> = ({
       </div>
 
       <Divider style={{ borderColor: '#7cb305' }} dashed>
-        自定义颜色
+        <FormattedMessage id="draws.color.custom_color" />
       </Divider>
       {/* 历史颜色 */}
       {historyColors.length > 0 && (
@@ -137,12 +140,12 @@ const ColorPalette: React.FC<ColorPaletteProps> = ({
         visible={pickerVisible}
         onVisibleChange={setPickerVisible}
       >
-        <Button>选择自定义颜色</Button>
+        <Button><FormattedMessage id="draws.color.select_custom_color" /></Button>
       </Popover>
 
       <Divider style={{ borderColor: '#7cb305' }} dashed></Divider>
 
-      <Button onClick={resetColors}>重置颜色</Button>
+      <Button onClick={resetColors}><FormattedMessage id="draws.color.reset_color" /></Button>
     </div>
   );
 };

@@ -1,7 +1,8 @@
 import DrawPalette, { pathSvg } from '@/pages/Tools/Draws/DrawPalette';
 import { Button, Form, message, Select, Slider, Space } from 'antd';
 import React, { useEffect, useState } from 'react';
-
+import {FormattedMessage, getIntl} from "@@/exports";
+const intl = getIntl();
 const cspMap = new Map([
   ['星 Star', 'cccccc'],
   ['风筝 Kite', 'ececcece'],
@@ -79,12 +80,12 @@ const Sq1Draw: React.FC = () => {
 
   const addEdge = () => {
     if (reg + 30 > 360) {
-      message.warning('可用角度已满').then();
+      message.warning(intl.formatMessage({ id: 'draws.sq1.error1.Available_full' })).then();
       return;
     }
 
     if (edge >= 8) {
-      message.warning('最多只能有8个棱块').then();
+      message.warning(intl.formatMessage({ id: 'draws.sq1.error2.full_edge' })).then();
       return;
     }
 
@@ -107,12 +108,12 @@ const Sq1Draw: React.FC = () => {
 
   const addCorner = () => {
     if (reg + 60 > 360) {
-      message.warning('可用角度已满').then();
+      message.warning(intl.formatMessage({ id: 'draws.sq1.error1.Available_full' })).then();
       return;
     }
 
     if (corner >= 6) {
-      message.warning('最多只能有6个角块').then();
+      message.warning(intl.formatMessage({ id: 'draws.sq1.error3.full_corner' })).then();
       return;
     }
     for (let i = 0; i < cornerSvgs.length; i++) {
@@ -150,7 +151,7 @@ const Sq1Draw: React.FC = () => {
 
   const removeHandler = () => {
     if (!cubes || cubes.length === 0) {
-      message.warning('无可用删除').then();
+      message.warning(intl.formatMessage({ id: 'draws.sq1.error4.not_available_delete' })).then();
       return;
     }
 
@@ -255,7 +256,7 @@ const Sq1Draw: React.FC = () => {
     resetLineReg(30);
 
     let opt: any[] = [];
-    opt.push({ value: '', label: '-无-' });
+    opt.push({ value: '', label: <>- <FormattedMessage id="draws.sq1.item3" /> -</> });
     cspMap.forEach((value: string, key: string) => {
       opt.push({
         value: key,
@@ -280,26 +281,26 @@ const Sq1Draw: React.FC = () => {
         buttons={
           <div>
             <div style={{ textAlign: 'center', width: '50%', marginLeft: '25%' }}>
-              <Form.Item label="旋转">
+              <Form.Item label={<FormattedMessage id="draws.sq1.Rotate" />} >
                 <Slider defaultValue={0} step={30} min={0} max={180} onChange={resetBaseReg} />
               </Form.Item>
             </div>
             <div style={{ textAlign: 'center', marginBottom: 20 }}>
               <Space>
-                <Form.Item label="中轴线" style={{ marginBottom: 0 }}>
+                <Form.Item label={<FormattedMessage id="draws.sq1.Central_axis" />} style={{ marginBottom: 0 }}>
                   <Select
                     defaultValue={30}
                     onChange={resetLineReg}
                     options={[
-                      { value: 0, label: '无' },
-                      { value: 30, label: '正15度' },
-                      { value: -30, label: '负15度' },
+                      { value: 0, label: <FormattedMessage id="draws.sq1.None" /> },
+                      { value: 30, label: <FormattedMessage id="draws.sq1.Positive_15" /> },
+                      { value: -30, label: <FormattedMessage id="draws.sq1.Negative_15" /> },
                     ]}
                     style={{ width: 100 }}
                   />
                 </Form.Item>
 
-                <Form.Item label="预设值" style={{ marginBottom: 0 }}>
+                <Form.Item label={<FormattedMessage id="draws.sq1.Default" /> } style={{ marginBottom: 0 }}>
                   {/*// @ts-ignore*/}
                   <Select
                     onChange={setDefault}
@@ -320,7 +321,7 @@ const Sq1Draw: React.FC = () => {
                 style={{ marginLeft: 10 }}
                 disabled={!(cubes.length > 0)}
               >
-                重置
+                <FormattedMessage id="draws.reset" />
               </Button>
               <Button
                 onClick={removeHandler}
@@ -328,7 +329,7 @@ const Sq1Draw: React.FC = () => {
                 style={{ marginLeft: 10 }}
                 disabled={!(cubes.length > 0)}
               >
-                删除
+                <FormattedMessage id="draws.delete" />
               </Button>
               <Button
                 onClick={addCorner}
@@ -336,7 +337,7 @@ const Sq1Draw: React.FC = () => {
                 style={{ marginLeft: 10 }}
                 disabled={!(corner < 6 && reg + 60 <= 360)}
               >
-                添加角
+                <FormattedMessage id="draws.sq1.add_corner" />
               </Button>
               <Button
                 onClick={addEdge}
@@ -344,7 +345,7 @@ const Sq1Draw: React.FC = () => {
                 key={'addEdge_button'}
                 disabled={!(edge < 8 && reg + 30 <= 360)}
               >
-                添加棱
+                <FormattedMessage id="draws.sq1.add_edge" />
               </Button>
             </div>
           </div>

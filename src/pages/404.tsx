@@ -1,15 +1,16 @@
 import { history } from '@umijs/max';
 import { Button, Result } from 'antd';
 import React from 'react';
+import {FormattedMessage} from "@@/exports";
 
 const NoFoundPage: React.FC = () => (
   <Result
     status="404"
     title="404"
-    subTitle="找不到页面信息"
+    subTitle={<FormattedMessage id="home.status.404" />}
     extra={
       <Button type="primary" onClick={() => history.push('/')}>
-        回到首页
+        <FormattedMessage id="home.status.back_home" />
       </Button>
     }
   />

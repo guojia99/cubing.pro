@@ -1,11 +1,11 @@
 import { PlayerLink, WCALink } from '@/components/Link/Links';
 import { rowClassNameWithStyleLines } from '@/components/Table/table_style';
-import { apiAdminPlayers } from '@/services/cubing-pro/auth/admin';
+import {apiAdminCreatePlayer, apiAdminPlayers} from '@/services/cubing-pro/auth/admin';
 import { PlayersAPI } from '@/services/cubing-pro/players/typings';
-import { CopyOutlined } from '@ant-design/icons';
+import {CopyOutlined, UserAddOutlined} from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-table';
 import { ProColumns } from '@ant-design/pro-table/es/typing';
-import { Button, Tooltip, message } from 'antd';
+import {Button, Modal, Tooltip, message, Form, Input} from 'antd';
 import React, { useRef, useState } from 'react';
 import {Auth, authTags} from "@/pages/Auths/AuthComponents";
 
@@ -111,6 +111,11 @@ const columns: ProColumns<PlayersAPI.Player>[] = [
 
 const Users: React.FC = () => {
   const actionRef = useRef();
+  const [createUserModalOpen, setCreateUserModalOpen] = useState(false);
+
+  const [form] = Form.useForm();
+  const [confirmLoading, setConfirmLoading] = useState(false);
+
   const [tableParams, setTableParams] = useState<PlayersAPI.PlayersReq>({
     size: 20,
     page: 1,
@@ -123,8 +128,80 @@ const Users: React.FC = () => {
     });
   };
 
+
+  const handleCreateUser = async () => {
+    try {
+      const values = await form.validateFields();
+      setConfirmLoading(true);
+      await apiAdminCreatePlayer(values);
+      message.success('用户创建成功');
+      setCreateUserModalOpen(false);
+      form.resetFields();
+    } catch (err) {
+      if (err instanceof Error) {
+        message.error(err.message);
+      } else {
+        console.error(err);
+      }
+    } finally {
+      resetParams()
+      setConfirmLoading(false);
+
+    }
+  };
+
+
   return (
     <>
+      <Button
+        type="primary"
+        icon={<UserAddOutlined />}
+        size="small"
+        onClick={() => {setCreateUserModalOpen(true);}}
+        style={{ marginBottom: 20, borderRadius: 6, float: 'right' }}
+      >
+        创建用户
+      </Button>
+
+      <Modal
+        title="创建用户"
+        open={createUserModalOpen}
+        onCancel={() => setCreateUserModalOpen(false)}
+        onOk={handleCreateUser}
+        confirmLoading={confirmLoading}
+        okText="提交"
+        cancelText="取消"
+      >
+        <Form form={form} layout="vertical">
+          <Form.Item
+            name="name"
+            label="用户名"
+            rules={[{ required: true, message: '请输入用户名' }]}
+          >
+            <Input placeholder="请输入用户名" />
+          </Form.Item>
+          <Form.Item
+            name="qq"
+            label="QQ"
+          >
+            <Input placeholder="请输入 QQ 号" />
+          </Form.Item>
+          <Form.Item
+            name="actualName"
+            label="真实姓名"
+          >
+            <Input placeholder="请输入真实姓名" />
+          </Form.Item>
+          <Form.Item
+            name="wca_id"
+            label="WCA ID"
+          >
+            <Input placeholder="请输入 WCA ID" />
+          </Form.Item>
+        </Form>
+      </Modal>
+
+
       <ProTable<PlayersAPI.Player, PlayersAPI.PlayersReq>
         title={() => {
           return <h1>后台用户管理列表</h1>;

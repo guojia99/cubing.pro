@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg id="_图层_2" data-name="图层 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 308 307">
+<svg id="_图层_2" data-name="图层 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320">
   <defs>
     <style>
       .cls-1, .cls-2 {
@@ -15,7 +15,7 @@
       .cls-6 {
         fill: red;
         font-family: Verdana-Bold, Verdana;
-        font-size: 12px;
+        font-size: 14px;
         font-weight: 700;
       }
 
@@ -83,16 +83,17 @@
       <line class="cls-8" x1="159.5" y1="236.5" x2="159.5" y2="201.5"/>
       <path class="cls-2" d="m154.5,236.5l5-35,5,35c.39,2.76-1.52,5.32-4.29,5.71-3.27.52-6.23-2.45-5.71-5.71h0Z"/>
     </g>
-<!--    <text class="cls-6" transform="translate(242.14 106.7)"><tspan x="0" y="0">12</tspan></text>-->
-<!--    <text class="cls-6" transform="translate(240.14 195.7)"><tspan x="0" y="0">12</tspan></text>-->
-<!--    <text class="cls-6" transform="translate(151.14 195.7)"><tspan x="0" y="0">12</tspan></text>-->
-<!--    <text class="cls-6" transform="translate(151.14 106.7)"><tspan x="0" y="0">12</tspan></text>-->
-<!--    <text class="cls-6" transform="translate(241.14 15.7)"><tspan x="0" y="0">12</tspan></text>-->
-<!--    <text class="cls-6" transform="translate(152.14 16.7)"><tspan x="0" y="0">12</tspan></text>-->
-<!--    <text class="cls-6" transform="translate(62.14 195.7)"><tspan x="0" y="0">12</tspan></text>-->
-<!--    <text class="cls-6" transform="translate(62.14 105.7)"><tspan x="0" y="0">12</tspan></text>-->
-<!--    <text class="cls-6" transform="translate(61.14 16.7)"><tspan x="0" y="0">12</tspan></text>-->
-<!--    <path class="cls-5" d="m80.5,306.5h17s0-13,0-13h-4c-44,0-80-36-80-80v-4s-13,0-13,0v17c0,44,36,80,80,80Z"/>-->
+
+    <text class="cls-6" transform="translate(242.14 106.7)"><tspan x="0" y="0">12</tspan></text>
+    <text class="cls-6" transform="translate(240.14 195.7)"><tspan x="0" y="0">12</tspan></text>
+    <text class="cls-6" transform="translate(151.14 195.7)"><tspan x="0" y="0">12</tspan></text>
+    <text class="cls-6" transform="translate(151.14 106.7)"><tspan x="0" y="0">12</tspan></text>
+    <text class="cls-6" transform="translate(241.14 15.7)"><tspan x="0" y="0">12</tspan></text>
+    <text class="cls-6" transform="translate(152.14 16.7)"><tspan x="0" y="0">12</tspan></text>
+    <text class="cls-6" transform="translate(62.14 195.7)"><tspan x="0" y="0">12</tspan></text>
+    <text class="cls-6" transform="translate(62.14 105.7)"><tspan x="0" y="0">12</tspan></text>
+    <text class="cls-6" transform="translate(61.14 16.7)"><tspan x="0" y="0">12</tspan></text>
+    <path class="cls-5" d="m80.5,306.5h17s0-13,0-13h-4c-44,0-80-36-80-80v-4s-13,0-13,0v17c0,44,36,80,80,80Z"/>
 
 
 

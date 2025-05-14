@@ -45,8 +45,14 @@ export const event = new EventEmitter();
 
 export const LANG_CHANGE_EVENT = Symbol('LANG_CHANGE');
 
+import enUS0 from 'antd/es/locale/en_US';
+import lang_enUS0 from "/home/guojia/worker/code/cube/cubing.pro/src/locales/en-US.ts";
+import jaJP0 from 'antd/es/locale/ja_JP';
+import lang_jaJP0 from "/home/guojia/worker/code/cube/cubing.pro/src/locales/ja-JP.ts";
 import zhCN0 from 'antd/es/locale/zh_CN';
 import lang_zhCN0 from "/home/guojia/worker/code/cube/cubing.pro/src/locales/zh-CN.ts";
+import zhTW0 from 'antd/es/locale/zh_TW';
+import lang_zhTW0 from "/home/guojia/worker/code/cube/cubing.pro/src/locales/zh-TW.ts";
 
 const flattenMessages=(
   nestedMessages: Record<string, any>,
@@ -68,6 +74,26 @@ const flattenMessages=(
 }
 
 export const localeInfo: {[key: string]: any} = {
+  'en-US': {
+    messages: {
+      ...flattenMessages(lang_enUS0),
+    },
+    locale: 'en-US',
+    antd: {
+      ...enUS0,
+    },
+    momentLocale: 'en',
+  },
+  'ja-JP': {
+    messages: {
+      ...flattenMessages(lang_jaJP0),
+    },
+    locale: 'ja-JP',
+    antd: {
+      ...jaJP0,
+    },
+    momentLocale: 'ja',
+  },
   'zh-CN': {
     messages: {
       ...flattenMessages(lang_zhCN0),
@@ -77,6 +103,16 @@ export const localeInfo: {[key: string]: any} = {
       ...zhCN0,
     },
     momentLocale: 'zh-cn',
+  },
+  'zh-TW': {
+    messages: {
+      ...flattenMessages(lang_zhTW0),
+    },
+    locale: 'zh-TW',
+    antd: {
+      ...zhTW0,
+    },
+    momentLocale: 'zh-tw',
   },
 };
 

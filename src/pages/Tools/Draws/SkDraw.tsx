@@ -1,5 +1,6 @@
 import { NavTabs } from '@/components/Tabs/nav_tabs';
 import DrawPalette, { pathSvg } from '@/pages/Tools/Draws/DrawPalette';
+import { FormattedMessage } from '@@/exports';
 import { Button, Col, Row } from 'antd';
 import React, { useEffect, useState } from 'react';
 
@@ -280,73 +281,77 @@ const SK3DDraw = () => {
       // 左上角
       d: 'm21.86,14.06l-11.26,6.5c-1.27,0.9 -3.22,-2.52 -1.82,-3.16c0,0 11.24,-6.5 11.24,-6.5c1.31,-0.9 3.24,2.51 1.84,3.16z',
       transform: '',
-      name: '左上1',
+      name: (
+        <>
+          <FormattedMessage id="draws.sk.top.left" /> 1
+        </>
+      ),
       key: 1,
     },
     {
       d: 'm36.48,5.21l-11.26,6.5c-1.27,0.9 -3.22,-2.52 -1.82,-3.16c0,0 11.24,-6.5 11.24,-6.5c1.31,-0.9 3.24,2.51 1.84,3.16z',
       transform: '',
-      name: '左上2',
+      name: <><FormattedMessage id="draws.sk.top.left" />) 2</>,
       key: 2,
     },
     {
       d: 'm67.88,28.4l0,13.01c0.14,1.56 -3.79,1.54 -3.65,0l0,-13.01c-0.14,-1.53 3.79,-1.52 3.65,0z',
       transform: 'rotate(120 65.7926 16.1458)',
-      name: '右上1',
+      name: <><FormattedMessage id="draws.sk.top.right" /> 1</>,
       key: 3,
     },
     {
       d: 'm67.5,9.63l0,13.01c0.14,1.56 -3.79,1.54 -3.65,0l0,-13.01c-0.14,-1.53 3.79,-1.52 3.65,0z',
       transform: 'rotate(120 65.5426 16.1458)',
-      name: '右上2',
+      name: <><FormattedMessage id="draws.sk.top.right" /> 2</>,
       key: 4,
     },
     {
       d: 'm75.52,25.11l0,13.01c0.14,1.56 -3.79,1.54 -3.65,0l0,-13.01c-0.14,-1.53 3.79,-1.52 3.65,0z',
       transform: '',
-      name: '右1',
+      name: <><FormattedMessage id="draws.sk.right" /> 1</>,
       key: 5,
     },
     {
       d: 'm75.65,43.88l0,13.01c0.14,1.56 -3.79,1.54 -3.65,0l0,-13.01c-0.14,-1.53 3.79,-1.52 3.65,0z',
       transform: '',
-      name: '右2',
+      name: <><FormattedMessage id="draws.sk.right" /> 2</>,
       key: 6,
     },
     {
       d: 'm70.54,64.53l-11.26,6.5c-1.27,0.9 -3.22,-2.52 -1.82,-3.16c0,0 11.24,-6.5 11.24,-6.5c1.31,-0.9 3.24,2.51 1.84,3.16z',
       transform: '',
-      name: '右下1',
+      name: <><FormattedMessage id="draws.sk.bottom.right" /> 1</>,
       key: 7,
     },
     {
       d: 'm55.92,72.88l-11.26,6.5c-1.27,0.9 -3.22,-2.52 -1.82,-3.16c0,0 11.24,-6.5 11.24,-6.5c1.31,-0.9 3.24,2.51 1.84,3.16z',
       transform: '',
-      name: '右下2',
+      name: <><FormattedMessage id="draws.sk.bottom.right" /> 2</>,
       key: 8,
     },
     {
       d: 'm32.33,86.75l0,13.01c0.14,1.56 -3.79,1.54 -3.65,0l0,-13.01c-0.14,-1.53 3.79,-1.52 3.65,0z',
       transform: 'rotate(120 30.25 74.4902)',
-      name: '左下1',
+      name: <><FormattedMessage id="draws.sk.bottom.left" /> 1</>,
       key: 9,
     },
     {
       d: 'm31.95,67.98l0,13.01c0.14,1.56 -3.79,1.54 -3.65,0l0,-13.01c-0.14,-1.53 3.79,-1.52 3.65,0z',
       transform: 'rotate(120 30 74.4902)',
-      name: '左下2',
+      name: <><FormattedMessage id="draws.sk.bottom.left" /> 2</>,
       key: 10,
     },
     {
       d: 'm7.33,44l0,13.01c0.14,1.56 -3.79,1.54 -3.65,0l0,-13.01c-0.14,-1.53 3.79,-1.52 3.65,0z',
       transform: '',
-      name: '左2',
+      name: <><FormattedMessage id="draws.sk.left" /> 2</>,
       key: 11,
     },
     {
       d: 'm7.2,25.23l0,13.01c0.14,1.56 -3.79,1.54 -3.65,0l0,-13.01c-0.14,-1.53 3.79,-1.52 3.65,0z',
       transform: '',
-      name: '左1',
+      name: <><FormattedMessage id="draws.sk.left" /> 1</>,
       key: 12,
     },
   ];
@@ -407,6 +412,9 @@ const SK3DDraw = () => {
         strokeWidthNum={0.2}
         buttons={
           <div style={{ textAlign: 'center' }}>
+            <h2>
+              <FormattedMessage id="draws.flank" />
+            </h2>
             <div>
               <Row gutter={16}>
                 {lineSvgs.map((btn, index) => (
@@ -434,12 +442,12 @@ const SKDraw: React.FC = () => {
   const items = [
     {
       key: 'simple_sk',
-      label: '展开图',
+      label: <FormattedMessage id="draws.expanded_view" />,
       children: SimpleSkDraw(),
     },
     {
       key: '3d_2_sk',
-      label: '立体图',
+      label: <FormattedMessage id="draws.stereogram" />,
       children: SK3DDraw(),
     },
   ];

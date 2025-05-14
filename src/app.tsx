@@ -11,6 +11,7 @@ import ParticleBackground from '@/components/background/WaveBackground';
 import { AvatarURL } from '@/pages/Auths/AvatarDropdown';
 import { AuthAPI } from '@/services/cubing-pro/auth/typings';
 import ScrollToTopButton from "@/components/Buttons/toTop";
+import LanguageSelect from "@/locales/Language/LanguageSelect";
 
 /**
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
@@ -74,9 +75,12 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
       title: <AvatarName />,
       render: (_: AvatarProps, avatarChildren: React.ReactNode) => {
         return (
-          <AvatarDropdown menu={initialState?.currentUser?.data.id !== 0}>
-            {avatarChildren}
-          </AvatarDropdown>
+         <>
+           <AvatarDropdown menu={initialState?.currentUser?.data.id !== 0}>
+             {avatarChildren}
+           </AvatarDropdown>
+           <LanguageSelect/>
+         </>
         );
       },
     },
