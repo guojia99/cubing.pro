@@ -109,4 +109,16 @@ declare namespace PlayersAPI {
   export type PlayerSorResp = {
     data: KinChSorResult;
   };
+
+  export type CreatePlayerReq = {
+    name: string;
+    qq: string;
+    actualName: string;
+    wca_id: string;
+  }
+
+  export type UpdatePlayerNameReq = {
+    name: string;
+    cube_id: string;
+  }
 }

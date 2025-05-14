@@ -1,9 +1,8 @@
 import axios from "axios";
 import type {AxiosError, AxiosResponse} from 'axios';
 import {WarnToast} from "@/components/Alert/toast";
-import {message} from "antd";
 
-const dev = true
+const dev = false
 
 export function getAPIUrl() {
   if (dev){
@@ -63,9 +62,9 @@ Request.interceptors.response.use(
     if (msg !== undefined) {
       WarnToast(<>错误: {msg.message} ({msg.code}) </>)
     } else {
-      const url = error.config?.url
+      // const url = error.config?.url
       if (isLocal()){
-        message.warning("错误: " + url + "| (" + msg + ")").then()
+        // message.warning("错误: " + url + "| (" + msg + ")").then()
         // WarnToast(<>未知错误: {url} ({status})</>)
       }
     }

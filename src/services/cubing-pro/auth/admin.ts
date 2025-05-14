@@ -1,6 +1,6 @@
 import { AuthHeader } from '@/services/cubing-pro/auth/token';
+import { PlayersAPI } from '@/services/cubing-pro/players/typings';
 import { Request } from '@/services/cubing-pro/request';
-import {PlayersAPI} from "@/services/cubing-pro/players/typings";
 
 export async function apiApprovalComp(compId: number): Promise<any> {
   const response = await Request.post<any>(
@@ -16,10 +16,11 @@ export async function apiApprovalComp(compId: number): Promise<any> {
   return response.data;
 }
 
-
-export async function apiAdminPlayers(params: PlayersAPI.PlayersReq): Promise<PlayersAPI.PlayersResp> {
+export async function apiAdminPlayers(
+  params: PlayersAPI.PlayersReq,
+): Promise<PlayersAPI.PlayersResp> {
   const response = await Request.post<PlayersAPI.PlayersResp>(
-    "/admin/users/",
+    '/admin/users/',
     {
       like: {
         name: params.name,
@@ -30,7 +31,27 @@ export async function apiAdminPlayers(params: PlayersAPI.PlayersReq): Promise<Pl
     },
     {
       headers: AuthHeader(),
-    }
-  )
-  return response.data
+    },
+  );
+  return response.data;
+}
+
+export async function apiAdminCreatePlayer(params: PlayersAPI.CreatePlayerReq): Promise<any> {
+  const response = await Request.post<PlayersAPI.PlayersResp>(
+    '/admin/users/create_user',
+    params,
+    { headers: AuthHeader() },
+  );
+  return response.data;
+}
+
+export async function apiAdminUpdatePlayerName(
+  params: PlayersAPI.UpdatePlayerNameReq,
+): Promise<any> {
+  const response = await Request.post<PlayersAPI.PlayersResp>(
+    '/admin/users/update_user_name',
+    params,
+    { headers: AuthHeader() },
+  );
+  return response.data;
 }

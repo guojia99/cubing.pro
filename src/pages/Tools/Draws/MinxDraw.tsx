@@ -1,6 +1,7 @@
 import DrawPalette, { pathSvg } from '@/pages/Tools/Draws/DrawPalette';
 import React, {useEffect, useState} from 'react';
 import {NavTabs} from "@/components/Tabs/nav_tabs";
+import {FormattedMessage} from "@@/exports";
 
 const baseMinxColor = [
   '#00000000',
@@ -242,12 +243,12 @@ const MinxDraw: React.FC = () => {
  const items = [
    {
      key: 'minx',
-     label: '展开图',
+     label: <FormattedMessage id="draws.top_view" />,
      children: SimpleMinxDraw(),
    },
    {
      key: 'minx_center',
-     label: '展开图(带中心)',
+     label: <FormattedMessage id="draws.expanded_view" />,
      children: MinxHasCenterDraw(),
    },
    // {

@@ -1,21 +1,25 @@
-import {PageContainer} from '@ant-design/pro-components';
-import {Card, theme} from 'antd';
+import { FormattedMessage, getIntl } from '@@/exports';
+import { PageContainer } from '@ant-design/pro-components';
+import { Card, theme } from 'antd';
 import React from 'react';
+
+const intl = getIntl();
+type CardProps = {
+  title: string;
+  index: number;
+  desc: string;
+  href: string;
+};
 
 /**
  * 每个单独的卡片，为了复用样式抽成了组件
  * @param param0
  * @returns
  */
-const InfoCard: React.FC<{
-  title: string;
-  index: number;
-  desc: string;
-  href: string;
-}> = ({title, href, index, desc}) => {
-  const {useToken} = theme;
+const InfoCard: React.FC<CardProps> = ({ title, href, index, desc }) => {
+  const { useToken } = theme;
 
-  const {token} = useToken();
+  const { token } = useToken();
 
   return (
     <div
@@ -32,7 +36,7 @@ const InfoCard: React.FC<{
       }}
     >
       <a href={href} target="_blank" rel="noreferrer">
-        <div style={{display: 'flex', gap: '4px', alignItems: 'center',}}>
+        <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
           <div
             style={{
               width: 48,
@@ -45,10 +49,11 @@ const InfoCard: React.FC<{
               fontWeight: 'bold',
               backgroundImage:
                 "url('https://gw.alipayobjects.com/zos/bmw-prod/daaf8d50-8e6d-4251-905d-676a24ddfa12.svg')",
-            }}>{index}</div>
-          <div style={{fontSize: '16px', color: token.colorText, paddingBottom: 8,}}>
-            {title}
+            }}
+          >
+            {index}
           </div>
+          <div style={{ fontSize: '16px', color: token.colorText, paddingBottom: 8 }}>{title}</div>
         </div>
         <div
           style={{
@@ -57,23 +62,29 @@ const InfoCard: React.FC<{
             textAlign: 'justify',
             lineHeight: '22px',
             marginBottom: 8,
-          }}>
+          }}
+        >
           {desc}
         </div>
-        <a href={href} target="_blank" rel="noreferrer">了解更多 {'>'}
+        <a href={href} target="_blank" rel="noreferrer">
+          <FormattedMessage id="home.learn_more" /> {'>'}
         </a>
       </a>
     </div>
   );
 };
 
-const Welcome: React.FC = () => {
-  const {token} = theme.useToken();
-  // @ts-ignore
-  // const {initialState} = useModel('@@initialState');
+const GroupInfoCards: React.FC<{
+  groupName: string;
+  title: string;
+  desc: string;
+  childrens: CardProps[];
+}> = ({ groupName, title, desc, childrens }) => {
+  const { token } = theme.useToken();
   return (
-    <PageContainer>
+    <>
       <Card
+        key={groupName}
         style={{
           borderRadius: 8,
         }}
@@ -99,7 +110,7 @@ const Welcome: React.FC = () => {
               color: token.colorTextHeading,
             }}
           >
-            欢迎来到 Cubing Pro
+            {title}
           </div>
           <p
             style={{
@@ -111,7 +122,7 @@ const Welcome: React.FC = () => {
               width: '100%',
             }}
           >
-            Cubing Pro 是一个线上赛事系统为主的魔方开源平台, 将支持各位玩家在线上选择赛事进行挑战, 后续将提供多种实用工具。
+            {desc}
           </p>
           <div
             style={{
@@ -120,27 +131,91 @@ const Welcome: React.FC = () => {
               gap: 16,
             }}
           >
-            <InfoCard
-              index={1}
-              href="./competitions"
-              title="赛事列表"
-              desc="你可以查看现在有哪些比赛在进行, 也可查看往期比赛的成绩。"
-            />
-            <InfoCard
-              index={2}
-              href="./static"
-              title="记录列表"
-              desc="你可以查看当前记录和往期记录, 尝试参与比赛去挑战他们吧!"
-            />
-            <InfoCard
-              index={3}
-              title="玩家列表"
-              href="./players"
-              desc="查看有哪些玩家, 查询想了解的ta"
-            />
+            {childrens.map((item, index) => (
+              <InfoCard
+                key={index + title}
+                index={item.index}
+                href={item.href}
+                title={item.title}
+                desc={item.desc}
+              />
+            ))}
           </div>
         </div>
       </Card>
+    </>
+  );
+};
+
+const Welcome: React.FC = () => {
+  // @ts-ignore
+  // const {initialState} = useModel('@@initialState');
+  return (
+    <PageContainer>
+      <GroupInfoCards
+        groupName={'welcome'}
+        title={intl.formatMessage({ id: 'home.welcome.title' })}
+        desc={intl.formatMessage({ id: 'home.welcome.desc' })}
+        childrens={[
+          {
+            index: 1,
+            href: './competitions',
+            title: intl.formatMessage({ id: 'home.welcome.competitions.title' }),
+            desc: intl.formatMessage({ id: 'home.welcome.competitions.desc' }),
+          },
+          {
+            index: 2,
+            href: './static',
+            title: intl.formatMessage({ id: 'home.welcome.static.title' }),
+            desc: intl.formatMessage({ id: 'home.welcome.static.desc' }),
+          },
+          {
+            index: 3,
+            title: intl.formatMessage({ id: 'home.welcome.players.title' }),
+            href: './players',
+            desc: intl.formatMessage({ id: 'home.welcome.players.desc' }),
+          },
+        ]}
+      />
+
+      <div style={{ marginTop: 30 }}></div>
+      <GroupInfoCards
+        groupName={'draw_tool'}
+        title={intl.formatMessage({ id: 'home.welcome.draw.title' })}
+        desc={intl.formatMessage({ id: 'home.welcome.draw.desc' })}
+        childrens={[
+          {
+            index: 0,
+            href: 'https://visualcubeplus.com/',
+            title: intl.formatMessage({ id: 'home.welcome.draw.cube.title' }),
+            desc: intl.formatMessage({ id: 'home.welcome.draw.cube.desc' }),
+          },
+          {
+            index: 1,
+            href: './draw_tools/sq1-d',
+            title: intl.formatMessage({ id: 'home.welcome.draw.sq.title' }),
+            desc: intl.formatMessage({ id: 'home.welcome.draw.sq.desc' }),
+          },
+          {
+            index: 2,
+            href: './draw_tools/minx-d',
+            title: intl.formatMessage({ id: 'home.welcome.draw.minx.title' }),
+            desc: intl.formatMessage({ id: 'home.welcome.draw.minx.desc' }),
+          },
+          {
+            index: 3,
+            href: './draw_tools/sk-d',
+            title: intl.formatMessage({ id: 'home.welcome.draw.sk.title' }),
+            desc: intl.formatMessage({ id: 'home.welcome.draw.sk.desc' }),
+          },
+          {
+            index: 4,
+            href: './draw_tools/py-d',
+            title: intl.formatMessage({ id: 'home.welcome.draw.py.title' }),
+            desc: intl.formatMessage({ id: 'home.welcome.draw.py.desc' }),
+          },
+        ]}
+      />
     </PageContainer>
   );
 };

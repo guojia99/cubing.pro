@@ -1,134 +1,116 @@
-// import {DNF, Result, resultTimeString} from '@/components/Data/types/result';
-// import * as echarts from 'echarts';
-// import ReactEcharts from 'echarts-for-react';
-// import {CubesCn} from "@/components/CubeIcon/cube";
-//
-// // @ts-ignore
-// export type Format = echarts.EChartOption.Tooltip.Format;
-// // @ts-ignore
-// export type EChartsOption = echarts.EChartOption;
-//
-// export type ScoreChatValue = {
-//   Event: string;
-//   CompsMap: Map<number, string>;
-//   result: Result[];
-// };
-//
-// export const ResultsChat = (v: ScoreChatValue) => {
-//   let avg: number[] = [];
-//   let single: number[] = [];
-//
-//   for (let i = 0; i < v.result.length; i++) {
-//     let a = v.result[i].Average;
-//     if (a <= DNF) {
-//       a = NaN;
-//     }
-//     avg.push(a);
-//     let b = v.result[i].Best;
-//     if (b <= DNF) {
-//       b = NaN;
-//     }
-//     single.push(b);
-//   }
-//
-//   const FormatContest = (f: Format): string => {
-//     const idx = f.dataIndex as number;
-//     const r = v.result[idx];
-//     return v.CompsMap.get(r.CompetitionID) || "";
-//   };
-//
-//   const FormatValue = (f: Format, isBest: boolean): string => {
-//     const idx = f.dataIndex as number;
-//     const value = f.value as number;
-//
-//     const r = v.result[idx];
-//     let baseOut = f.marker + ' ' + f.seriesName + ':' + resultTimeString(r.Best, false);
-//
-//     if (idx === 0) {
-//       return baseOut;
-//     }
-//
-//     // 成绩涨幅
-//     let lastValue = v.result[idx - 1].Average;
-//     if (isBest) {
-//       lastValue = v.result[idx - 1].Best;
-//     }
-//
-//     if (lastValue <= -10000 || lastValue === undefined || isNaN(value)) {
-//       return baseOut;
-//     }
-//
-//     const diff = ((value - lastValue) / value) * -100;
-//     if (diff > 0) {
-//       return baseOut + "<i style='color:red'>( +" + diff.toFixed(2) + '% )</i>';
-//     }
-//     return baseOut + "<i style='color:green'>(" + diff.toFixed(2) + '% )</i>';
-//   };
-//
-//   const option: EChartsOption = {
-//     animationDuration: 5000,
-//     title: {
-//       text: CubesCn(v.Event),
-//     },
-//     tooltip: {
-//       trigger: 'axis',
-//       formatter: function (
-//         params: Format | Format[],
-//         // @ts-ignore
-//         ticket: string,
-//         // @ts-ignore
-//         callback: (ticket: string, html: string) => void,
-//       ): string {
-//         const param = params as Format[];
-//         return (
-//           FormatContest(param[0]) +
-//           '<br/>' +
-//           FormatValue(param[0], false) +
-//           '<br/>' +
-//           FormatValue(param[1], true)
-//         );
-//       },
-//     },
-//     legend: {
-//       data: ['平均', '单次'],
-//     },
-//     grid: {
-//       left: '3%',
-//       right: '4%',
-//       bottom: '3%',
-//       containLabel: true,
-//     },
-//     toolbox: {
-//       feature: {
-//         saveAsImage: {},
-//       },
-//     },
-//     backgroundColor: '#ffffff',
-//     xAxis: {
-//       type: 'category',
-//       boundaryGap: false,
-//     },
-//     yAxis: {
-//       type: 'value',
-//       axisLabel: {
-//         formatter: function (value: number, index: number) {
-//           // todo
-//           return resultTimeString(value, false);
-//         },
-//       },
-//     },
-//     series: [
-//       {
-//         name: '平均',
-//         data: avg,
-//         type: 'line',
-//       },
-//       {
-//         name: '单次',
-//         data: single,
-//         type: 'line',
-//       },
-//     ],
-//   };
-//   return <ReactEcharts option={option} />
-// };
+import React from "react";
+import ReactECharts from "echarts-for-react";
+
+type ScoreType = "best" | "average";
+
+interface ScoreData {
+  index: number;
+  value: number | null;
+  type: ScoreType;
+  round: string;
+  valueStr?: string;
+}
+
+interface Props {
+  data: ScoreData[];
+  renderScore?: (value: number) => string;
+}
+
+const ScoreLineChart: React.FC<Props> = ({ data, renderScore }) => {
+  const bestData = data.filter((item) => item.type === "best");
+  const averageData = data.filter((item) => item.type === "average");
+
+  // const rounds = [...new Set(data.map((item) => item.round))];
+
+  // 构建横轴（index）与对应round映射
+  const xAxisData = bestData.map((item) => ({
+    value: item.index,
+    round: item.round,
+  }));
+
+  // 渲染函数：优先用 valueStr，然后 fallback 到 renderScore，再 fallback 到 DNF
+  const getLabel = (val: ScoreData) => {
+    if (val.valueStr) return val.valueStr;
+    if (val.value === null) return "DNF";
+    return renderScore ? renderScore(val.value) : val.value.toString();
+  };
+
+  const getSeries = () => {
+    const formatSeriesData = (arr: ScoreData[]) =>
+      arr.map((item) => ({
+        value: item.value,
+        // 不再显示 label 标签
+        label: { show: false },
+      }));
+
+    const series = [
+      {
+        name: "Best",
+        type: "line",
+        data: formatSeriesData(bestData),
+        itemStyle: { color: "#5470C6" },
+        symbol: "circle",
+        symbolSize: 8,
+      },
+    ];
+
+    if (averageData.length > 0) {
+      series.push({
+        name: "Average",
+        type: "line",
+        data: formatSeriesData(averageData),
+        itemStyle: { color: "#91CC75" },
+        symbol: "triangle",
+        symbolSize: 8,
+      });
+    }
+
+    return series;
+  };
+
+
+  const option = {
+    title: {
+      text: "成绩折线图",
+    },
+    tooltip: {
+      trigger: "axis",
+      formatter: (params: any[]) => {
+        const idx = params[0].dataIndex;
+        const round = bestData[idx]?.round || averageData[idx]?.round;
+
+        const best = bestData[idx];
+        const avg = averageData[idx];
+
+        const lines: string[] = [`场次: ${round}`];
+
+        if (best) {
+          lines.push(`Best: ${getLabel(best)}`);
+        }
+        if (avg) {
+          lines.push(`Average: ${getLabel(avg)}`);
+        }
+
+        return lines.join("<br/>");
+      },
+    },
+
+    legend: {
+      data: ["Best", ...(averageData.length > 0 ? ["Average"] : [])],
+    },
+    xAxis: {
+      type: "category",
+      data: xAxisData.map((x) => `#${x.value}`),
+      name: "Index",
+    },
+    yAxis: {
+      type: "value",
+      name: "成绩",
+    },
+    series: getSeries(),
+  };
+
+  return <ReactECharts option={option} style={{ height: 400 }} />;
+};
+
+export default ScoreLineChart;

@@ -3,7 +3,8 @@ import { DownloadOutlined, FileImageOutlined, FileJpgOutlined } from '@ant-desig
 import { Card, Col, Divider, Input, Row, Slider } from 'antd';
 import html2canvas from 'html2canvas';
 import React, { useEffect, useRef, useState } from 'react';
-
+import {getIntl} from "@@/exports";
+const intl = getIntl();
 export type pathSvg = {
   key: string;
 
@@ -135,7 +136,7 @@ const DrawPalette: React.FC<DrawPaletteProps> = ({
               <Input
                 value={downloadName}
                 onChange={(e) => setDownloadName(e.target.value)}
-                placeholder="输入文件名"
+                placeholder={intl.formatMessage({ id: 'draws.palette.input' })}
                 style={{ width: 175 }}
               />
               <DownloadOutlined
@@ -249,7 +250,7 @@ const DrawPalette: React.FC<DrawPaletteProps> = ({
           >
             <Card style={{ minWidth: 400, width: 400 }}>
               <Divider style={{ borderColor: '#7cb305' }} dashed>
-                粗细设置
+                {intl.formatMessage({ id: 'draws.palette.thickness' })}
               </Divider>
               <Slider
                 defaultValue={1}
@@ -260,7 +261,7 @@ const DrawPalette: React.FC<DrawPaletteProps> = ({
                 }}
               />
               <Divider style={{ borderColor: '#7cb305' }} dashed>
-                颜色设置 & 点击上色
+                {intl.formatMessage({ id: 'draws.palette.color_setting' })}
               </Divider>
               <ColorPalette
                 onSelectColor={handleColrChange}

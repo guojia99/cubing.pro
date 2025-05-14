@@ -88,7 +88,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
         flushSync(() => {
           setInitialState((s: any) => ({ ...s, currentUser: undefined }));
         });
-        loginOut();
+        loginOut().then()
         return;
       }
       history.push(`/${key}`); // 这里是用于跳转到指定key 的路由

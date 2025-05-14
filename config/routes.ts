@@ -38,13 +38,13 @@
 const reXRoutes = () => {
   const xRoutes = [
     // 标题主页栏
-    { name: '统计', path: '/static', component: './Static/Static' },
-    { name: '项目', path: '/events', component: './Events/Events' },
+    { name: 'Static', path: '/static', component: './Static/Static' },
+    { name: 'Project', path: '/events', component: './Events/Events' },
     // 比赛网页
-    { name: '比赛', path: '/competitions', component: './Competition/Competitions' },
+    { name: 'Competitions', path: '/competitions', component: './Competition/Competitions' },
     { path: '/competition/:id', component: './Competition/Competition' },
     // 选手
-    { name: '选手', path: '/players', component: './Player/Players' },
+    { name: 'Player', path: '/players', component: './Player/Players' },
     { path: '/player/:id', component: './Player/Player' },
   ];
 
@@ -94,16 +94,23 @@ export default [
   // 工具
   {
     path: 'tools',
-    name: '工具',
+    name: 'Tools',
     routes: [
-      { path: 'sq1-d', component: './Tools/Draws/SQ1Draw', name: 'SQ1绘图工具' },
-      { path: 'minx-d', component: './Tools/Draws/MinxDraw', name: 'Minx绘图工具' },
-      { path: 'sk-d', component: './Tools/Draws/SkDraw', name: 'Sk绘图工具' },
-      { path: 'bld-d', component: './Tools/Bld/BldMeor', name: '盲拧公式练习' },
-      { path: 'mbld-d', component: './Tools/Bld/MBld', name: '多盲记忆练习' },
-
+      { path: 'bld-d', component: './Tools/Bld/BldMeor', name: 'bld' },
+      { path: 'mbld-d', component: './Tools/Bld/MBld', name: 'mbld' },
       { path: 'teamMatch', component: './Tools/TeamMatch/TeamMatch', name: 'TeamMatch' },
     ],
+  },
+
+  {
+    path: 'draw_tools',
+    name: 'DrawTools',
+    routes: [
+      { path: 'sq1-d', component: './Tools/Draws/SQ1Draw', name: 'sq1' },
+      { path: 'minx-d', component: './Tools/Draws/MinxDraw', name: 'minx' },
+      { path: 'sk-d', component: './Tools/Draws/SkDraw', name: 'sk' },
+      { path: 'py-d', component: './Tools/Draws/PyDraw', name: 'py' },
+    ]
   },
 
   { path: 'test', component: './Tests/Test' },
