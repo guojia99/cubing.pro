@@ -1,13 +1,15 @@
+import { NavTabs } from '@/components/Tabs/nav_tabs';
 import DrawPalette, { pathSvg } from '@/pages/Tools/Draws/DrawPalette';
-import { Button, Form, message, Select, Slider, Space } from 'antd';
+import { FormattedMessage, getIntl } from '@@/exports';
+import { Button, Form, Select, Slider, Space, message } from 'antd';
 import React, { useEffect, useState } from 'react';
-import {FormattedMessage, getIntl} from "@@/exports";
+
 const intl = getIntl();
 const cspMap = new Map([
   ['星 Star', 'cccccc'],
   ['风筝 Kite', 'ececcece'],
   ['方 Square', 'ecececec'],
-  ['贝壳 Scallop', 'eecceecc'],
+  ['贝壳 Scallop', 'eeccccee'],
   ['蘑菇 Mushroom', 'ecceccee'],
   ['右爪 R Paw', 'eecccece'],
   ['左爪 L Paw', 'ececccee'],
@@ -17,7 +19,7 @@ const cspMap = new Map([
   ['桶 Barrel', 'ceecceec'],
   ['对 Twins', 'cceeccc'],
 
-  ['8', 'eeeeceeeec'],
+  ['8', 'eeeecceeee'],
   ['71', 'eeececeeee'],
   ['62', 'eeeceeceee'],
   ['53', 'eeceeeceee'],
@@ -36,37 +38,35 @@ const cspMap = new Map([
   ['I', 'ecceccc'],
 ]);
 
-console.log(cspMap.get('星 Star')); // 输出: 'cccccc'
+const lineSvgs = 'M 44.84834 1.38492 L 25.17810 74.79528';
 
-const Sq1Draw: React.FC = () => {
-  const baseMinxColor = [
-    '#00000000',
-    '#033fff',
-    '#f3ff00',
-    '#d10707',
-    '#206606',
-    '#ff8806',
+const cornerSvgs = [
+  'm35.01322,38.09014l-5.1493,-19.21651l-14.06721,0l0,14.06721l19.21651,5.1493z',
+  'm15.79671,18.87363l-4.8037,-4.8037l17.58351,0l1.2874,4.8037l-14.06721,0z',
+  'm15.79671,18.87363l-4.8037,-4.8037l0,17.58351l4.8037,1.2874l0,-14.06721z',
+];
 
-    '#3d3d3d',
-    '#f5f3db',
-    '#777',
-  ];
+const edgeSvgs = [
+  'm35.01322,38.09014l5.1485,-19.21651l-10.2978,0l5.1493,19.21651z',
+  'm40.16172,18.87363l1.2874,-4.8037l-12.8726,0l1.2874,4.8037l10.2978,0z',
+];
 
-  const lineSvgs = 'M 44.84834 1.38492 L 25.17810 74.79528';
+const rotatePoint = '35.01322 38.0901';
 
-  const cornerSvgs = [
-    'm35.01322,38.09014l-5.1493,-19.21651l-14.06721,0l0,14.06721l19.21651,5.1493z',
-    'm15.79671,18.87363l-4.8037,-4.8037l17.58351,0l1.2874,4.8037l-14.06721,0z',
-    'm15.79671,18.87363l-4.8037,-4.8037l0,17.58351l4.8037,1.2874l0,-14.06721z',
-  ];
+const baseMinxColor = [
+  '#00000000',
+  '#033fff',
+  '#f3ff00',
+  '#d10707',
+  '#206606',
+  '#ff8806',
 
-  const edgeSvgs = [
-    'm35.01322,38.09014l5.1485,-19.21651l-10.2978,0l5.1493,19.21651z',
-    'm40.16172,18.87363l1.2874,-4.8037l-12.8726,0l1.2874,4.8037l10.2978,0z',
-  ];
+  '#3d3d3d',
+  '#f5f3db',
+  '#777',
+];
 
-  const rotatePoint = '35.01322 38.0901';
-
+const SimpleSq1Draw = () => {
   const [num, setNum] = useState(0);
   const [corner, setCorner] = useState(0);
   const [edge, setEdge] = useState(0);
@@ -94,8 +94,8 @@ const Sq1Draw: React.FC = () => {
         key: 'edge' + num + '_' + i,
         d: edgeSvgs[i],
         baseRotate: reg + 30,
-        transform: baseReg,
-        transformPoint: rotatePoint,
+        rotate: baseReg,
+        rotatePoint: rotatePoint,
       });
     }
 
@@ -121,8 +121,8 @@ const Sq1Draw: React.FC = () => {
         key: 'corner' + num + '_' + i,
         d: cornerSvgs[i],
         baseRotate: reg + 90,
-        transform: baseReg,
-        transformPoint: rotatePoint,
+        rotate: baseReg,
+        rotatePoint: rotatePoint,
       });
     }
     setNum(num + 1);
@@ -144,7 +144,7 @@ const Sq1Draw: React.FC = () => {
   const resetBaseReg = (e: number) => {
     setBaseReg(e);
     for (let i = 0; i < svgPoints.length; i++) {
-      svgPoints[i].transform = e;
+      svgPoints[i].rotate = e;
     }
     setSvgPoints(svgPoints);
   };
@@ -186,8 +186,8 @@ const Sq1Draw: React.FC = () => {
           {
             key: 'sq1_line',
             d: lineSvgs,
-            transformPoint: rotatePoint,
-            transform: 0,
+            rotatePoint: rotatePoint,
+            rotate: 0,
             baseRotate: -30,
           },
         ]);
@@ -219,8 +219,8 @@ const Sq1Draw: React.FC = () => {
             key: 'edge' + curNum + '_' + i,
             d: edgeSvgs[i],
             baseRotate: curReg + 30,
-            transform: baseReg,
-            transformPoint: rotatePoint,
+            rotate: baseReg,
+            rotatePoint: rotatePoint,
           });
         }
         curReg += 30;
@@ -232,8 +232,8 @@ const Sq1Draw: React.FC = () => {
             key: 'corner' + curNum + '_' + i,
             d: cornerSvgs[i],
             baseRotate: curReg + 90,
-            transform: baseReg,
-            transformPoint: rotatePoint,
+            rotate: baseReg,
+            rotatePoint: rotatePoint,
           });
         }
         curReg += 60;
@@ -256,7 +256,7 @@ const Sq1Draw: React.FC = () => {
     resetLineReg(30);
 
     let opt: any[] = [];
-    opt.push({ value: '', label: <>- <FormattedMessage id="draws.sq1.item3" /> -</> });
+    opt.push({ value: '', label: `- ${intl.formatMessage({ id: 'draws.sq1.None' })} -` });
     cspMap.forEach((value: string, key: string) => {
       opt.push({
         value: key,
@@ -281,13 +281,16 @@ const Sq1Draw: React.FC = () => {
         buttons={
           <div>
             <div style={{ textAlign: 'center', width: '50%', marginLeft: '25%' }}>
-              <Form.Item label={<FormattedMessage id="draws.sq1.Rotate" />} >
+              <Form.Item label={<FormattedMessage id="draws.sq1.Rotate" />}>
                 <Slider defaultValue={0} step={30} min={0} max={180} onChange={resetBaseReg} />
               </Form.Item>
             </div>
             <div style={{ textAlign: 'center', marginBottom: 20 }}>
               <Space>
-                <Form.Item label={<FormattedMessage id="draws.sq1.Central_axis" />} style={{ marginBottom: 0 }}>
+                <Form.Item
+                  label={<FormattedMessage id="draws.sq1.Central_axis" />}
+                  style={{ marginBottom: 0 }}
+                >
                   <Select
                     defaultValue={30}
                     onChange={resetLineReg}
@@ -300,7 +303,10 @@ const Sq1Draw: React.FC = () => {
                   />
                 </Form.Item>
 
-                <Form.Item label={<FormattedMessage id="draws.sq1.Default" /> } style={{ marginBottom: 0 }}>
+                <Form.Item
+                  label={<FormattedMessage id="draws.sq1.Default" />}
+                  style={{ marginBottom: 0 }}
+                >
                   {/*// @ts-ignore*/}
                   <Select
                     onChange={setDefault}
@@ -352,6 +358,301 @@ const Sq1Draw: React.FC = () => {
         }
       />
     </div>
+  );
+};
+
+const DoubleSq1Draw = () => {
+  const [topReg, setTopReg] = useState(0);
+  const [svgPointsTop, setSvgPointsTop] = useState<pathSvg[]>([]);
+  const [linePointTop, setLinePointTop] = useState<pathSvg[]>([]);
+  const [topCspOption, setTopCspOptions] = useState<any[]>([]);
+
+  const [downReg, setDownReg] = useState(0);
+  const [downDefaultVal, setDownDefaultVal] = useState<any>();
+  const [svgPointsDown, setSvgPointsDown] = useState<pathSvg[]>([]);
+  const [linePointDown, setLinePointDown] = useState<pathSvg[]>([]);
+  const [downCspOption, setDownCspOptions] = useState<any[]>([]);
+
+  const setDraws = (e: string, topDown: string) => {
+    const v = cspMap.get(e);
+    if (!v) {
+      return;
+    }
+    let newSvgPoints = [];
+    let curEdge = 0,
+      curCorner = 0;
+    const timestamp = Date.now();
+    const baseReg = topDown === 'top' ? topReg : downReg;
+    let translate = undefined;
+    if (topDown !== 'top') {
+      translate = [0, 75];
+    }
+
+    let curReg = 0;
+    for (let i = 0; i < v.length; i++) {
+      const d = v[i];
+      switch (d) {
+        case 'e':
+          for (let j = 0; j < edgeSvgs.length; j++) {
+            newSvgPoints.push({
+              key: timestamp + '_edge_' + topDown + '_' + i + '_' + j + '_' + curReg,
+              d: edgeSvgs[j],
+              baseRotate: curReg + 30,
+              rotate: baseReg,
+              rotatePoint: rotatePoint,
+              translate: translate,
+            });
+          }
+          curReg += 30;
+          curEdge += 1;
+          break;
+        case 'c':
+          for (let j = 0; j < cornerSvgs.length; j++) {
+            newSvgPoints.push({
+              key: timestamp + '_corner_' + topDown + '_' + i + '_' + j + '_' + curReg,
+              d: cornerSvgs[j],
+              baseRotate: curReg + 90,
+              rotate: baseReg,
+              rotatePoint: rotatePoint,
+              translate: translate,
+            });
+          }
+          curReg += 60;
+          curCorner += 1;
+          break;
+      }
+    }
+
+    console.log(newSvgPoints);
+
+    if (topDown === 'top') {
+      setSvgPointsTop(newSvgPoints);
+      return [curEdge, curCorner];
+    } else {
+      setSvgPointsDown(newSvgPoints);
+    }
+  };
+
+  const resetLineReg = (e: number, top: boolean) => {
+    let line: pathSvg = {
+      key: 'sq1_line_top',
+    };
+    switch (e) {
+      case 30:
+        line = {
+          key: 'sq1_line_top',
+          d: lineSvgs,
+        };
+        break;
+      case -30:
+        line = {
+          key: 'sq1_line_top',
+          d: lineSvgs,
+          rotatePoint: rotatePoint,
+          rotate: 0,
+          baseRotate: -30,
+        };
+        break;
+      default:
+        if (top) {
+          setLinePointTop([]);
+        } else {
+          setLinePointDown([]);
+        }
+        return;
+    }
+
+    if (!top) {
+      line.key = 'sq1_line_down';
+      line.translate = [0, 75];
+      setLinePointDown([line]);
+      return;
+    }
+    setLinePointTop([line]);
+  };
+
+  const handleUpdateTopOpt = (e: string) => {
+    const result = setDraws(e, 'top');
+    if (!result) {
+      return;
+    }
+    const [curE, curC] = result;
+    let wantE = 8 - curE;
+    let wantC = 8 - curC;
+    let opt: any = [];
+    cspMap.forEach((value: string, key: string) => {
+      const eCount = value.split('e').length - 1;
+      const cCount = value.split('c').length - 1;
+      if (eCount === wantE && cCount === wantC) {
+        opt.push({
+          value: key,
+          label: key,
+        });
+      }
+    });
+    setDownCspOptions(opt);
+    setSvgPointsDown([]);
+    setDownDefaultVal('');
+  };
+
+  const handleUpdateDownOpt = (e: string) => {
+    setDraws(e, 'down');
+    setDownDefaultVal(e)
+  };
+
+  useEffect(() => {
+    // 初始化中轴线
+    resetLineReg(30, true);
+    resetLineReg(-30, false);
+
+    // 初始化top配置
+    let opt: any[] = [];
+    cspMap.forEach((value: string, key: string) => {
+      opt.push({ value: key, label: key });
+    });
+    setTopCspOptions(opt);
+  }, []);
+
+  const resetBaseReg = (e: number, topDown: string) => {
+    switch (topDown) {
+      case 'top':
+        for (let i = 0; i < svgPointsTop.length; i++) {
+          svgPointsTop[i].rotate = e;
+        }
+        setTopReg(e);
+        setSvgPointsTop(svgPointsTop);
+        break;
+      case 'down':
+        for (let i = 0; i < svgPointsDown.length; i++) {
+          svgPointsDown[i].rotate = e;
+        }
+        setDownReg(e);
+        setSvgPointsDown(svgPointsDown);
+        break;
+    }
+  };
+
+  return (
+    <div>
+      <DrawPalette
+        width={300}
+        height={600}
+        svgPoints={[...linePointTop, ...linePointDown, ...svgPointsTop, ...svgPointsDown]}
+        presetColors={baseMinxColor}
+        storageKey={'sq1DrawDouble'}
+        viewBox={'0 0 75 150'}
+        strokeWidthNum={0.2}
+        buttons={
+          <>
+            <div style={{ display: 'flex', gap: 16 }}>
+              <Form.Item label={<strong>顶层</strong>} style={{ marginBottom: 0 }}>
+                {/* @ts-ignore */}
+                <Select
+                  onChange={handleUpdateTopOpt}
+                  options={topCspOption}
+                  style={{ width: 150 }}
+                />
+              </Form.Item>
+
+              <Form.Item label={'中轴线'} style={{ marginBottom: 0 }}>
+                <Select
+                  defaultValue={30}
+                  onChange={(e) => {
+                    resetLineReg(e, true);
+                  }}
+                  options={[
+                    { value: 0, label: <FormattedMessage id="draws.sq1.None" /> },
+                    { value: 30, label: <FormattedMessage id="draws.sq1.Positive_15" /> },
+                    { value: -30, label: <FormattedMessage id="draws.sq1.Negative_15" /> },
+                  ]}
+                  style={{ width: 100 }}
+                />
+              </Form.Item>
+              <div style={{ textAlign: 'center', width: '50%' }}>
+                <Form.Item label={<FormattedMessage id="draws.sq1.Rotate" />}>
+                  <Slider
+                    defaultValue={0}
+                    step={30}
+                    min={0}
+                    max={180}
+                    onChange={(e) => {
+                      resetBaseReg(e, 'top');
+                    }}
+                  />
+                </Form.Item>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: 16, marginTop: 15 }}>
+              <Form.Item label={<strong>底层</strong>} style={{ marginBottom: 0 }}>
+                {/* @ts-ignore */}
+                <Select
+                  onChange={handleUpdateDownOpt}
+                  options={downCspOption}
+                  value={downDefaultVal}
+                  style={{ width: 150 }}
+                />
+              </Form.Item>
+
+              <Form.Item label={'中轴线'} style={{ marginBottom: 0 }}>
+                <Select
+                  defaultValue={-30}
+                  onChange={(e) => {
+                    resetLineReg(e, false);
+                  }}
+                  options={[
+                    { value: 0, label: <FormattedMessage id="draws.sq1.None" /> },
+                    { value: 30, label: <FormattedMessage id="draws.sq1.Positive_15" /> },
+                    { value: -30, label: <FormattedMessage id="draws.sq1.Negative_15" /> },
+                  ]}
+                  style={{ width: 100 }}
+                />
+              </Form.Item>
+
+              <div style={{ textAlign: 'center', width: '50%' }}>
+                <Form.Item label={<FormattedMessage id="draws.sq1.Rotate" />}>
+                  <Slider
+                    defaultValue={0}
+                    step={30}
+                    min={0}
+                    max={180}
+                    onChange={(e) => {
+                      resetBaseReg(e, 'down');
+                    }}
+                  />
+                </Form.Item>
+              </div>
+            </div>
+          </>
+        }
+      />
+    </div>
+  );
+};
+
+const Sq1Draw: React.FC = () => {
+  const items = [
+    {
+      key: 'simple_sq',
+      label: <FormattedMessage id="draws.top_view" />,
+      children: SimpleSq1Draw(),
+    },
+    {
+      key: 'double_sq',
+      label: <FormattedMessage id="draws.double_view" />,
+      children: DoubleSq1Draw(),
+    },
+  ];
+
+  return (
+    <>
+      <NavTabs
+        type="line"
+        items={items}
+        tabsKey="sq1_draw_tabs"
+        indicator={{ size: (origin: number) => origin - 20, align: 'center' }}
+      />
+    </>
   );
 };
 

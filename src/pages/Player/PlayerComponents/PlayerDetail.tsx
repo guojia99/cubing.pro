@@ -4,7 +4,7 @@ import { eventRouteM } from '@/components/Data/cube_result/event_route';
 import { Result, resultString, resultTimeString } from '@/components/Data/types/result';
 import { WCALink } from '@/components/Link/Links';
 import { rowClassNameWithStyleLines } from '@/components/Table/table_style';
-import { AvatarURL } from '@/pages/Auths/AvatarDropdown';
+import { AvatarURL } from '@/pages/Admin/AvatarDropdown';
 import { apiEvents } from '@/services/cubing-pro/events/events';
 import { EventsAPI } from '@/services/cubing-pro/events/typings';
 import { PlayersAPI } from '@/services/cubing-pro/players/typings';

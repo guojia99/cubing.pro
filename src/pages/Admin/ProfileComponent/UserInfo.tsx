@@ -1,4 +1,4 @@
-import { authTags } from '@/pages/Auths/AuthComponents';
+import { authTags } from '@/pages/Admin/AuthComponents/AuthComponents';
 import { currentUser, updateDetail } from '@/services/cubing-pro/auth/auth';
 import { AuthAPI } from '@/services/cubing-pro/auth/typings';
 import { ProDescriptions } from '@ant-design/pro-components';

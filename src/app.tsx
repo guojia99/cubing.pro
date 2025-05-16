@@ -8,7 +8,7 @@ import { AvatarProps, Col, Row } from 'antd';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { ExtAppList } from '@/layout_config';
 import ParticleBackground from '@/components/background/WaveBackground';
-import { AvatarURL } from '@/pages/Auths/AvatarDropdown';
+import { AvatarURL } from '@/pages/Admin/AvatarDropdown';
 import { AuthAPI } from '@/services/cubing-pro/auth/typings';
 import ScrollToTopButton from "@/components/Buttons/toTop";
 import LanguageSelect from "@/locales/Language/LanguageSelect";

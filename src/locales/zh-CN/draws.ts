@@ -7,6 +7,9 @@ export default {
   "draws.flank": "侧面",
   "draws.reset": "重置",
   "draws.delete": "删除",
+
+  "draws.double_view": "双层图",
+
   // 框架
   "draws.palette.input": "输入文件名",
   "draws.palette.thickness": "粗细设置",

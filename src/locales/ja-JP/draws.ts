@@ -7,6 +7,8 @@ export default {
   "draws.flank": "側面図",
   "draws.reset": "リセット",
   "draws.delete": "削除",
+
+  "draws.double_view": "双层图",
   // パレット
   "draws.palette.input": "ファイル名を入力",
   "draws.palette.thickness": "太さの設定",

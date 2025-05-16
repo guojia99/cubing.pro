@@ -1,4 +1,4 @@
-import { Auth, hasAuth } from '@/pages/Auths/AuthComponents';
+import { Auth, hasAuth } from '@/pages/Admin/AuthComponents/AuthComponents';
 import { logout } from '@/services/cubing-pro/auth/auth';
 import { history, useModel } from '@umijs/max';
 import { stringify } from 'querystring';
@@ -170,7 +170,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
   const adminsMenu = [];
   if (hasAuth(user.data.Auth, Auth.AuthOrganizers)) {
     adminsMenu.push({
-      key: 'user/organizers',
+      key: 'admin/organizers',
       icon: <LuComponent />,
       label: '主办管理',
     });
@@ -178,7 +178,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
 
   if (hasAuth(user.data.Auth, Auth.AuthAdmin) || hasAuth(user.data.Auth, Auth.AuthSuperAdmin)) {
     adminsMenu.push({
-      key: 'user/admins',
+      key: 'admin/admins',
       icon: <RiAdminLine />,
       label: '后台管理',
     });

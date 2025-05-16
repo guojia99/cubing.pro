@@ -7,7 +7,7 @@
  * @param redirect 配置路由跳转
  * @param wrappers 配置路由组件的包装组件，通过包装组件可以为当前的路由组件组合进更多的功能。 比如，可以用于路由级别的权限校验
  * @param name 配置路由的标题，默认读取国际化文件 menu.ts 中 menu.xxxx 的值，如配置 name 为 login，则读取 menu.ts 中 menu.login 的取值作为标题
- * @param icon 配置路由的图标，取值参考 https://ant.design/components/icon-cn， 注意去除风格后缀和大小写，如想要配置图标为 <StepBackwardOutlined /> 则取值应为 stepBackward 或 StepBackward，如想要配置图标为 <UserOutlined /> 则取值应为 user 或者 Auths
+ * @param icon 配置路由的图标，取值参考 https://ant.design/components/icon-cn， 注意去除风格后缀和大小写，如想要配置图标为 <StepBackwardOutlined /> 则取值应为 stepBackward 或 StepBackward，如想要配置图标为 <UserOutlined /> 则取值应为 user 或者 Admin
  * @doc https://umijs.org/docs/guides/routes
  */
 // import { lazy } from 'react';
@@ -17,40 +17,40 @@
 // const Static = lazy(() => import('@/pages/Static'));
 // const Events = lazy(() => import('@/pages/Events/Events'));
 //
-// const Login = lazy(() => import('@/pages/Auths/Login'));
-// const Register = lazy(() => import('@/pages/Auths/Register'));
-// const Profile = lazy(() => import('@/pages/Auths/Profile'));
-// const Organizers = lazy(() => import('@/pages/Auths/Organizers'));
+// const Login = lazy(() => import('@/pages/Admin/Login'));
+// const Register = lazy(() => import('@/pages/Admin/Register'));
+// const Profile = lazy(() => import('@/pages/Admin/Profile'));
+// const Organizers = lazy(() => import('@/pages/Admin/Organizers'));
 // const Competitions = lazy(() => import('@/pages/Competition/Competitions'));
 // const Competition = lazy(() => import('@/pages/Competition/Competition'));
 // const Players = lazy(() => import('@/pages/Player/Players'));
 // const Player = lazy(() => import('@/pages/Player/Player'));
 //
-// const OrganizersComps = lazy(() => import('@/pages/Auths/OrganizersComponent/OrganizersComps'));
-// const CreateComps = lazy(() => import('@/pages/Auths/OrganizersComponent/OrganizersDetails'));
-// const OrganizersGroup = lazy(() => import('@/pages/Auths/OrganizersComponent/OrganizersGroup'));
+// const OrganizersComps = lazy(() => import('@/pages/Admin/OrganizersComponent/OrganizersComps'));
+// const CreateComps = lazy(() => import('@/pages/Admin/OrganizersComponent/OrganizersDetails'));
+// const OrganizersGroup = lazy(() => import('@/pages/Admin/OrganizersComponent/OrganizersGroup'));
 //
-// const OrganizersResults = lazy(() => import('@/pages/Auths/OrganizersComponent/OrganizersResults'));
-// const OrganizersList = lazy(() => import('@/pages/Auths/OrganizersComponent/OrganizersList'));
+// const OrganizersResults = lazy(() => import('@/pages/Admin/OrganizersComponent/OrganizersResults'));
+// const OrganizersList = lazy(() => import('@/pages/Admin/OrganizersComponent/OrganizersList'));
 //
-// const Admin = lazy(() => import('@/pages/Auths/Admin'));
+// const Admin = lazy(() => import('@/pages/Admin/Admin'));
 
 const reXRoutes = () => {
   const xRoutes = [
     // 标题主页栏
-    { name: 'Static', path: '/static', component: './Static/Static' },
-    { name: 'Project', path: '/events', component: './Events/Events' },
+    {name: 'Static', path: '/static', component: './Static/Static'},
+    {name: 'Project', path: '/events', component: './Events/Events'},
     // 比赛网页
-    { name: 'Competitions', path: '/competitions', component: './Competition/Competitions' },
-    { path: '/competition/:id', component: './Competition/Competition' },
+    {name: 'Competitions', path: '/competitions', component: './Competition/Competitions'},
+    {path: '/competition/:id', component: './Competition/Competition'},
     // 选手
-    { name: 'Player', path: '/players', component: './Player/Players' },
-    { path: '/player/:id', component: './Player/Player' },
+    {name: 'Player', path: '/players', component: './Player/Players'},
+    {path: '/player/:id', component: './Player/Player'},
   ];
 
   const out = [];
   for (let x of xRoutes) {
-    let newC = { ...x };
+    let newC = {...x};
     newC.path = '/x' + x.path;
     newC.name = '';
     out.push(newC);
@@ -59,46 +59,52 @@ const reXRoutes = () => {
 };
 
 export default [
-  { path: '/welcome', component: './Welcome' },
-  { path: '/', redirect: '/welcome' },
-  { path: '*', component: './404' },
+  {path: '/welcome', component: './Welcome'},
+  {path: '/', redirect: '/welcome'},
+  {path: '*', component: './404'},
 
-  { path: 'settings', component: './Settings' },
+  {path: 'settings', component: './Settings'},
 
   // 用户相关
-  { path: '/login', component: './Auths/Login', hidden: true }, // 登录
-  { path: '/register', component: './Auths/Register', hidden: true }, // 注册
-  { path: '/user/profile', component: './Auths/Profile' }, // 个人中心
-  // {path: '/user',  component: './Auths/UserInfo'}, // 用户个人信息
-  // {path: '/user/settings', component: './Auths/Settings'}, // 个人设置
-  // {path: '/user/messages', component: './Auths/Messages'}, // 消息中心
-  // {path: '/user/like', component: './Auths/Like'}, // 收藏
-  { path: 'user/organizers', component: './Auths/Organizers' },
+  {path: '/login', component: './Admin/Login', hidden: true}, // 登录
+  {path: '/register', component: './Admin/Register', hidden: true}, // 注册
+  {path: '/user/profile', component: './Admin/Profile'}, // 个人中心
+  // {path: '/user',  component: './Admin/UserInfo'}, // 用户个人信息
+  // {path: '/user/settings', component: './Admin/Settings'}, // 个人设置
+  // {path: '/user/messages', component: './Admin/Messages'}, // 消息中心
+  // {path: '/user/like', component: './Admin/Like'}, // 收藏
 
   // 主办相关
-  { path: 'user/organizers/comps', component: './Auths/OrganizersComponent/OrganizersComps' }, // 比赛页面
-  { path: 'user/organizers/comps/create', component: './Auths/OrganizersComponent/CreateComps' }, // 创建比赛页面
+  {path: 'admin/organizers', component: './Admin/Organizers'},
+  {path: 'admin/organizers/comps', component: './Admin/OrganizersComponent/OrganizersComps'}, // 比赛页面
+  {path: 'admin/organizers/comps/create', component: './Admin/OrganizersComponent/CreateComps'}, // 创建比赛页面
 
-  { path: 'user/organizers/details', component: './Auths/OrganizersComponent/OrganizersDetails' }, // 详情
-  { path: 'user/organizers/group', component: './Auths/OrganizersComponent/OrganizersGroup' }, // 群组
-  { path: 'user/organizers/result', component: './Auths/OrganizersComponent/OrganizersResults' }, // 成绩管理
-  { path: 'user/organizers/list', component: './Auths/OrganizersComponent/OrganizersList' }, // 我的主办团队列表
+  {path: 'admin/organizers/details', component: './Admin/OrganizersComponent/OrganizersDetails'}, // 详情
+  {path: 'admin/organizers/group', component: './Admin/OrganizersComponent/OrganizersGroup'}, // 群组
+  {path: 'admin/organizers/result', component: './Admin/OrganizersComponent/OrganizersResults'}, // 成绩管理
+  {path: 'admin/organizers/list', component: './Admin/OrganizersComponent/OrganizersList'}, // 我的主办团队列表
   {
-    path: 'user/organizers/:orgId/comp/:compId/result',
-    component: './Auths/OrganizersComponent/OrganizersResults',
+    path: 'admin/organizers/:orgId/comp/:compId/result',
+    component: './Admin/OrganizersComponent/OrganizersResults',
   }, // 录入成绩
 
-  { path: 'user/admins', component: './Auths/Admin' },
-  { path: 'user/admin/users', component: './Auths/AdminComponent/Users' },
-  { path: 'user/admin/diy_ranking', component: './Auths/AdminComponent/DiyRanking' },
+  {path: 'admin/admins', component: './Admin/Admin'},
+  {path: 'admin/users', component: './Admin/AdminComponent/Users'},
+  {path: 'admin/diy_ranking', component: './Admin/AdminComponent/DiyRanking'},
+
+  // 管理
+  {path: 'admin/sports', component: "./Admin/SportsComponents/Sports"},
+  {path: 'admin/sports/events', component: "./Admin/SportsComponents/Events"},
+
+
   // 工具
   {
     path: 'tools',
     name: 'Tools',
     routes: [
-      { path: 'bld-d', component: './Tools/Bld/BldMeor', name: 'bld' },
-      { path: 'mbld-d', component: './Tools/Bld/MBld', name: 'mbld' },
-      { path: 'teamMatch', component: './Tools/TeamMatch/TeamMatch', name: 'TeamMatch' },
+      {path: 'bld-d', component: './Tools/Bld/BldMeor', name: 'bld'},
+      {path: 'mbld-d', component: './Tools/Bld/MBld', name: 'mbld'},
+      {path: 'teamMatch', component: './Tools/TeamMatch/TeamMatch', name: 'TeamMatch'},
     ],
   },
 
@@ -106,14 +112,14 @@ export default [
     path: 'draw_tools',
     name: 'DrawTools',
     routes: [
-      { path: 'sq1-d', component: './Tools/Draws/SQ1Draw', name: 'sq1' },
-      { path: 'minx-d', component: './Tools/Draws/MinxDraw', name: 'minx' },
-      { path: 'sk-d', component: './Tools/Draws/SkDraw', name: 'sk' },
-      { path: 'py-d', component: './Tools/Draws/PyDraw', name: 'py' },
+      {path: 'sq1-d', component: './Tools/Draws/SQ1Draw', name: 'sq1'},
+      {path: 'minx-d', component: './Tools/Draws/MinxDraw', name: 'minx'},
+      {path: 'sk-d', component: './Tools/Draws/SkDraw', name: 'sk'},
+      {path: 'py-d', component: './Tools/Draws/PyDraw', name: 'py'},
     ]
   },
 
-  { path: 'test', component: './Tests/Test' },
+  {path: 'test', component: './Tests/Test'},
 
   ...reXRoutes(),
 ];

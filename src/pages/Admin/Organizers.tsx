@@ -1,17 +1,9 @@
-import { Auth, checkAuth } from '@/pages/Auths/AuthComponents';
+import { Auth, checkAuth } from '@/pages/Admin/AuthComponents/AuthComponents';
 import { Link } from '@umijs/max';
 import { Card, Col, Row } from 'antd';
 import Meta from 'antd/es/card/Meta';
 import React from 'react';
-import {
-  FcAddDatabase,
-  FcFinePrint,
-  FcGenealogy,
-  FcLineChart,
-  FcList,
-  FcOrgUnit,
-  FcReddit,
-} from 'react-icons/fc';
+import { FcAddDatabase, FcList } from 'react-icons/fc';
 
 export const MetaCards = (groups: any) => {
   let bodys: JSX.Element[] = [];
@@ -81,13 +73,13 @@ const Organizers: React.FC = () => {
         {
           title: '比赛列表',
           description: '展示你的比赛列表，进行操作等',
-          to: '/user/organizers/comps',
+          to: '/admin/organizers/comps',
           avatar: <FcList style={{ fontSize: 40 }} />,
         },
         {
           title: '创建比赛',
           description: '新建一个比赛',
-          to: '/user/organizers/comps/create',
+          to: '/admin/organizers/comps/create',
           avatar: <FcAddDatabase style={{ fontSize: 40 }} />,
         },
         // {

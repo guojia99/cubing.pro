@@ -1,4 +1,4 @@
-<svg width="70" height="70" xmlns="http://www.w3.org/2000/svg" xml:space="preserve">
+<svg width="70" height="140" xmlns="http://www.w3.org/2000/svg" xml:space="preserve">
 
  <g>
   <title>Layer 1</title>
@@ -23,10 +23,18 @@
 
      </defs>
   </g>
+
+
    <use href="#c" transform="rotate(180 35.01322 38.0901)"/>
    <use href="#e" transform="rotate(0 35.01322 38.09014)"/>
 
-  <path d="M 42.77779 9.11233 L 27.24865 67.06787" stroke="black" stroke-width="1" fill="none" transform="rotate(0 35.01322 38.09014)"/>
+   <use href="#c" transform="translate(0 70) rotate(180 35.01322 38.0901)"/>
+
+
+   <path d="M 42.77779 9.11233 L 27.24865 67.06787" stroke="black" stroke-width="1" fill="none" transform="rotate(0 35.01322 38.09014)"/>
+
+
+
 
  </g>
 </svg>
