@@ -1,14 +1,16 @@
 import { CubesCn } from '@/components/CubeIcon/cube';
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import { RouteMaps } from '@/components/Data/cube_result/event_route';
+import { ResultGraphChart } from '@/components/Data/cube_result/result_chat';
 import { ResultsTable } from '@/components/Data/cube_result/result_tables';
 import { Comp } from '@/components/Data/types/comps';
 import { Record } from '@/components/Data/types/record';
 import { Result } from '@/components/Data/types/result';
 import { NavTabs } from '@/components/Tabs/nav_tabs';
+import BOGroup from '@/pages/Player/PlayerComponents/BestBoGroup';
 import { EventsAPI } from '@/services/cubing-pro/events/typings';
 import React from 'react';
-import {ResultChart} from "@/components/Data/cube_result/result_chat";
+import SuccessRateBox from "@/pages/Player/PlayerComponents/SuccessRateBox";
 
 interface PlayerResultsListWithEventProps {
   events: EventsAPI.Event[];
@@ -45,6 +47,7 @@ const PlayerResultsListWithEvent: React.FC<PlayerResultsListWithEventProps> = ({
 
   for (let i = 0; i < events.length; i++) {
     const eventId = events[i].id;
+    const resultNums: number[] = [];
 
     let res = resultMap.get(eventId);
     if (res === undefined) {
@@ -59,6 +62,10 @@ const PlayerResultsListWithEvent: React.FC<PlayerResultsListWithEventProps> = ({
 
     let last_comp_name = '';
     for (let j = 0; j < res.length; j++) {
+      for (let k = 0; k < res[j].Result.length; k++) {
+        resultNums.push(res[j].Result[k]);
+      }
+
       if (res[j].CompetitionName !== last_comp_name) {
         last_comp_name = res[j].CompetitionName;
         continue;
@@ -75,8 +82,15 @@ const PlayerResultsListWithEvent: React.FC<PlayerResultsListWithEventProps> = ({
           <h3 style={{ textAlign: 'center', marginBottom: '10px' }}>
             <strong>{CubesCn(eventId)}</strong>
           </h3>
+
+          {!m?.repeatedly && (
+            <>
+              <SuccessRateBox data={resultNums} />
+              <BOGroup data={resultNums} />
+            </>
+          )}
           {/*{chat}*/}
-          {ResultChart(eventId, res, records)}
+          {ResultGraphChart(eventId, res, records)}
 
           {m?.repeatedly
             ? ResultsTable(res, ['CompetitionName', 'Round', 'Result_with_repeatedly'], records)

@@ -71,7 +71,7 @@ const ScoreLineChart: React.FC<Props> = ({ data, renderScore }) => {
 
   const option = {
     title: {
-      text: "成绩折线图",
+      text: "成绩轨迹",
     },
     tooltip: {
       trigger: "axis",

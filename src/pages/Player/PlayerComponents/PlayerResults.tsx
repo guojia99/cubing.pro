@@ -83,7 +83,7 @@ const PlayerResults: React.FC<PlayerResultsProps> = ({ player }) => {
       key: 'result',
       label: '成绩',
       children: (
-        <PlayerResultsList events={events} results={results} records={records} comps={comps} />
+        <PlayerResultsList events={events} results={results} records={records} comps={comps} player={player} />
       ),
       icon: <ProjectOutlined />,
     },
