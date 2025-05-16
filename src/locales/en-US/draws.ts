@@ -9,6 +9,8 @@ export default {
   "draws.reset": "Reset",
   "draws.delete": "Delete",
 
+  "draws.double_view": "Double View",
+
   // Palette
   "draws.palette.input": "Enter file name",
   "draws.palette.thickness": "Thickness Setting",

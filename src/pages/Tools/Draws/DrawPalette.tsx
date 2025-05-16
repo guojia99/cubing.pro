@@ -1,9 +1,10 @@
 import ColorPalette from '@/pages/Tools/Draws/ColorPalette';
+import { getIntl } from '@@/exports';
 import { DownloadOutlined, FileImageOutlined, FileJpgOutlined } from '@ant-design/icons';
 import { Card, Col, Divider, Input, Row, Slider } from 'antd';
 import html2canvas from 'html2canvas';
 import React, { useEffect, useRef, useState } from 'react';
-import {getIntl} from "@@/exports";
+
 const intl = getIntl();
 export type pathSvg = {
   key: string;
@@ -15,10 +16,11 @@ export type pathSvg = {
   disableDrawing?: boolean;
 
   baseRotate?: number; // 初始角度
-  transform?: number; // 额外添加的角度
-  transformPoint?: string; // 角度旋转矛点
+  rotate?: number; // 额外添加的角度
+  rotatePoint?: string; // 角度旋转矛点
+  translate?: number[]; // 平移
 
-  transformStr?: string; // 强制使用旋转， 上面的无效
+  transformStr?: string; // 强制使用字符串，以上均无效
 };
 
 interface DrawPaletteProps {
@@ -29,6 +31,9 @@ interface DrawPaletteProps {
   strokeWidthNum: number;
 
   buttons?: JSX.Element;
+
+  width?: number;
+  height?: number;
 }
 
 const getFormattedDate = (): string => {
@@ -51,6 +56,8 @@ const DrawPalette: React.FC<DrawPaletteProps> = ({
   viewBox,
   strokeWidthNum = 1,
   buttons = [],
+  width = 400,
+  height = 400,
 }) => {
   const [colors, setColors] = useState({});
   const [keys, setKeys] = useState<string[]>([]);
@@ -123,7 +130,7 @@ const DrawPalette: React.FC<DrawPaletteProps> = ({
     }
     setColors(colors);
     setKeys(keys);
-    console.log(keys)
+    console.log(keys);
   }, [JSON.stringify(svgPoints)]);
 
   return (
@@ -172,28 +179,33 @@ const DrawPalette: React.FC<DrawPaletteProps> = ({
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width={400}
-                height={400}
+                width={width}
+                height={height}
                 viewBox={viewBox}
                 ref={svgRef}
+                // style={{border: 'red 1px solid'}}
               >
                 {svgPoints.map((elem: pathSvg) => {
                   let key = storageKey + '-' + elem.key;
                   let transform = undefined;
                   if (elem.transformStr) {
                     transform = elem.transformStr;
-                  } else if (elem.transformPoint) {
-                    // @ts-ignore
-                    transform = `rotate(${elem.baseRotate + elem.transform} ${
-                      elem.transformPoint
-                    })`;
+                  } else {
+                    transform = ""
+                    if (elem.translate){
+                      transform += `translate(${elem.translate.join(' ')}) `;
+                    }
+                    if (elem.rotatePoint) {
+                      // @ts-ignore
+                      transform += `rotate(${elem.baseRotate + elem.rotate} ${elem.rotatePoint})`;
+                    }
                   }
 
-                  if (elem.disableDrawing){
-                    key = 'disable'
+                  if (elem.disableDrawing) {
+                    key = 'disable';
                   }
 
-                  if (elem.d){
+                  if (elem.d) {
                     return (
                       <path
                         // @ts-ignore
@@ -210,7 +222,7 @@ const DrawPalette: React.FC<DrawPaletteProps> = ({
                     );
                   }
 
-                  if (elem.points){
+                  if (elem.points) {
                     return (
                       <polygon
                         // @ts-ignore
@@ -223,12 +235,11 @@ const DrawPalette: React.FC<DrawPaletteProps> = ({
                         strokeLinejoin={'round'}
                         style={{ cursor: 'pointer' }}
                         transform={transform}
-                      >
-                      </polygon>
-                    )
+                      ></polygon>
+                    );
                   }
 
-                  return (<></>)
+                  return <></>;
                 })}
               </svg>
             </div>

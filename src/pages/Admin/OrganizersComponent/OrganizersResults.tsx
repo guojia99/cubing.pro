@@ -11,7 +11,7 @@ import {
 import { PlayerLink } from '@/components/Link/Links';
 import { rowClassNameWithStyleLines } from '@/components/Table/table_style';
 import { NavTabs } from '@/components/Tabs/nav_tabs';
-import { Auth, checkAuth } from '@/pages/Auths/AuthComponents';
+import { Auth, checkAuth } from '@/pages/Admin/AuthComponents/AuthComponents';
 import {
   apiAddCompResults,
   apiApprovalCompsPreResult,

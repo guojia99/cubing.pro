@@ -67,7 +67,7 @@ const ColorPalette: React.FC<ColorPaletteProps> = ({
       }
 
       if (!selectedColor) {
-        message.warning(intl.formatMessage({ id: 'draws.color.select_color' })).then();
+        // message.warning(intl.formatMessage({ id: 'draws.color.select_color' })).then();
         return;
       }
       if (key && selectedColor) {

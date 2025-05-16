@@ -2,7 +2,7 @@ import BackButton from '@/components/Buttons/back_button';
 import { CompsTableColumns } from '@/components/Data/cube_comps/comps_tables';
 import { Comp } from '@/components/Data/types/comps';
 import { rowClassNameWithStyleLines } from '@/components/Table/table_style';
-import { Auth, checkAuth } from '@/pages/Auths/AuthComponents';
+import { Auth, checkAuth } from '@/pages/Admin/AuthComponents/AuthComponents';
 import { apiApprovalComp } from '@/services/cubing-pro/auth/admin';
 import {apiEndComp, apiGetComps, apiMeOrganizers} from '@/services/cubing-pro/auth/organizers';
 import { OrganizersAPI } from '@/services/cubing-pro/auth/typings';
@@ -65,7 +65,7 @@ const OrganizersComps: React.FC = () => {
               size={'small'}
               autoInsertSpace={false}
               onClick={() => {
-                history.replace({ pathname: '/user/organizers/' + curOrg?.id + '/comp/' + result.id + '/result' });
+                history.replace({ pathname: '/admin/organizers/' + curOrg?.id + '/comp/' + result.id + '/result' });
               }}
             >
               录入
@@ -167,7 +167,7 @@ const OrganizersComps: React.FC = () => {
     <>
       <div style={{ marginBottom: 30 }}>
         {BackButton('返回上层')}
-        <Link to={'/user/organizers/comps/create'} style={{ marginRight: 20, marginLeft: 20 }}>
+        <Link to={'/admin/organizers/comps/create'} style={{ marginRight: 20, marginLeft: 20 }}>
           <Button type="default" className="create-comp-btn">
             创建比赛
           </Button>

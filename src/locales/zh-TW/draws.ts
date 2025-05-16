@@ -9,6 +9,8 @@ export default {
   "draws.reset": "重置",
   "draws.delete": "刪除",
 
+  "draws.double_view": "双层图",
+
   // 框架
   "draws.palette.input": "輸入檔案名稱",
   "draws.palette.thickness": "粗細設定",

@@ -7,7 +7,7 @@ import { ProTable } from '@ant-design/pro-table';
 import { ProColumns } from '@ant-design/pro-table/es/typing';
 import {Button, Modal, Tooltip, message, Form, Input} from 'antd';
 import React, { useRef, useState } from 'react';
-import {Auth, authTags} from "@/pages/Auths/AuthComponents";
+import {Auth, authTags} from "@/pages/Admin/AuthComponents/AuthComponents";
 
 
 const columns: ProColumns<PlayersAPI.Player>[] = [

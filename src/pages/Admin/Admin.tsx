@@ -1,5 +1,6 @@
-import { Auth, checkAuth, hasAuth } from '@/pages/Auths/AuthComponents';
-import { MetaCards } from '@/pages/Auths/Organizers';
+import { Auth, checkAuth, hasAuth } from '@/pages/Admin/AuthComponents/AuthComponents';
+import { MetaCards } from '@/pages/Admin/Organizers';
+import { UnorderedListOutlined } from '@ant-design/icons';
 import React from 'react';
 import {
   FcApprove,
@@ -12,11 +13,12 @@ import {
   FcMindMap,
   FcParallelTasks,
   FcServices,
+  FcSportsMode,
   FcTimeline,
   FcTodoList,
   FcVoicePresentation,
 } from 'react-icons/fc';
-import {UnorderedListOutlined} from "@ant-design/icons";
+import { RiTimerFlashFill } from 'react-icons/ri';
 
 const Admin: React.FC = () => {
   const user = checkAuth([Auth.AuthAdmin, Auth.AuthSuperAdmin]);
@@ -86,12 +88,29 @@ const Admin: React.FC = () => {
       ],
     },
     {
+      title: '运动专区',
+      children: [
+        {
+          title: '运动成绩录入',
+          description: '录入运动的成绩',
+          to: '/admin/sports',
+          avatar: <RiTimerFlashFill style={{ fontSize: 40 }} />,
+        },
+        {
+          title: '运动项目管理',
+          description: '管理运动相关项目',
+          to: '/admin/sports/events',
+          avatar: <FcSportsMode style={{ fontSize: 40 }} />,
+        },
+      ],
+    },
+    {
       title: '资源管理',
       children: [
         {
           title: '用户管理',
           description: '管理用户',
-          to: '/user/admin/users',
+          to: '/admin/users',
           avatar: <FcConferenceCall style={{ fontSize: 40 }} />,
         },
         {
@@ -138,7 +157,7 @@ const Admin: React.FC = () => {
         {
           title: '榜单管理',
           description: '榜单管理',
-          to: '/user/admin/diy_ranking',
+          to: '/admin/diy_ranking',
           avatar: <UnorderedListOutlined style={{ fontSize: 40 }} />,
         },
       ],
