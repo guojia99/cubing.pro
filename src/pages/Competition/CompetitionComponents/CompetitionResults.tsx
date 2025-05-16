@@ -123,6 +123,22 @@ const CompetitionResult: React.FC<CompetitionResultProps> = ({ comp }) => {
         icon: <SiBytedance />,
       },
       {
+        key: 'best_events',
+        label: '最佳各项',
+        children: (
+          <CompetitionResultsWithTop
+            comp={comp}
+            results={result.data}
+            events={events?.data.Events}
+            topRank={999}
+            event_divider={true}
+            records={records}
+            with_best={true}
+          />
+        ),
+        icon: <SiBytedance />,
+      },
+      {
         key: 'players',
         label: '玩家',
         children: (

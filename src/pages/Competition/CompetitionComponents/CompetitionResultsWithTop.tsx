@@ -110,7 +110,7 @@ const CompetitionResultsWithTop: React.FC<CompetitionResultsWithTopProps> = ({
 
   let body: JSX.Element[] = [];
   let last_idx = 0;
-  let copyMsg = comp?.data.Name + ' 各项目前三排名: \n';
+  let copyMsg = comp?.data.Name + ' 各项目排名: \n';
 
   // 这里处理的是上一个项目
   const push_body = (idx: number) => {

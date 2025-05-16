@@ -1,12 +1,10 @@
 import { Record } from '@/components/Data/types/record';
-import { DAvg, DBest, Result } from '@/components/Data/types/result';
+import {DAvg, DBest, Result, resultTimeString} from '@/components/Data/types/result';
 
-import {eventRouteM} from "@/components/Data/cube_result/event_route";
-import {generateRecordMap} from "@/components/Data/cube_record/record_utils";
-import ScoreLineChart from "@/components/Data/cube_result/result_echarts";
+import { eventRouteM } from '@/components/Data/cube_result/event_route';
+import ScoreLineChart from '@/components/Data/cube_result/result_echarts';
 
-
-export const ResultChart = (
+export const ResultGraphChart = (
   eventID: string,
   dataSource: Result[],
   records: Record[] | undefined,
@@ -55,7 +53,7 @@ export const ResultChart = (
       <div style={{ marginBottom: 20 }}>
         <ScoreLineChart
           data={data}
-          renderScore={(v) => `${(v).toFixed(2)}s`} // 这里你可以改成自己的格式
+          renderScore={(v) => resultTimeString(v)} // 这里你可以改成自己的格式
         />
       </div>
     </>
