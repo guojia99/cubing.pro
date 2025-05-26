@@ -197,8 +197,11 @@ export const CompsTableColumns: ProColumns<Comp>[] = [
       const body = [];
       for (let i = 0; i < l.length; i++) {
         body.push(CubeIcon(l[i], 'comp_icon_key' + result.id + '-' + l[i], { marginLeft: '3px' }));
-        if (i >= 3) {
-          body.push(<> 等共{l.length}个项目</>);
+        if (l[i] === ''){
+          break
+        }
+        if (i >= 4) {
+          body.push(<> 等共{l.length-1}个项目</>);
           break;
         }
       }

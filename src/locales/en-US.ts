@@ -2,6 +2,7 @@
 import menu from './en-US/menu';
 import draws from "@/locales/en-US/draws";
 import home from "@/locales/en-US/home";
+import layout from "@/locales/en-US/layout";
 
 
 export default {
@@ -12,4 +13,5 @@ export default {
   ...menu,
   ...draws,
   ...home,
+  ...layout
 };

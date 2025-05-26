@@ -1,6 +1,7 @@
 import menu from "@/locales/zh-TW/menu";
 import draws from "@/locales/zh-TW/draws";
 import home from "@/locales/zh-TW/home";
+import layout from "@/locales/zh-TW/layout";
 
 export default {
   'navBar.lang': '語言',
@@ -11,4 +12,5 @@ export default {
   ...menu,
   ...draws,
   ...home,
+  ...layout
 };

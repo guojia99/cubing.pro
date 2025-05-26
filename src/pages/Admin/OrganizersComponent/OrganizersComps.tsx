@@ -4,14 +4,14 @@ import { Comp } from '@/components/Data/types/comps';
 import { rowClassNameWithStyleLines } from '@/components/Table/table_style';
 import { Auth, checkAuth } from '@/pages/Admin/AuthComponents/AuthComponents';
 import { apiApprovalComp } from '@/services/cubing-pro/auth/admin';
-import {apiEndComp, apiGetComps, apiMeOrganizers} from '@/services/cubing-pro/auth/organizers';
+import {apiEndComp, apiGetComps, apiMeOrganizers, apiUpdateCompName} from '@/services/cubing-pro/auth/organizers';
 import { OrganizersAPI } from '@/services/cubing-pro/auth/typings';
 import { CompsAPI } from '@/services/cubing-pro/comps/typings';
 import { history } from '@@/core/history';
 import { ProTable } from '@ant-design/pro-table';
 import { ProColumns } from '@ant-design/pro-table/es/typing';
 import { Link } from '@umijs/max';
-import { Button, Modal, Select, message } from 'antd';
+import {Button, Modal, Select, message, Input} from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 
 const OrganizersComps: React.FC = () => {
@@ -49,6 +49,52 @@ const OrganizersComps: React.FC = () => {
       render: (value: any, result: Comp) => {
         let buttons: JSX.Element[] = [];
 
+
+
+        const showUpdateNameModal = () => {
+          let newName = result.Name;
+
+          Modal.confirm({
+            title: '修改比赛名称',
+            content: (
+              <Input
+                defaultValue={result.Name}
+                onChange={(e) => {
+                  newName = e.target.value;
+                }}
+                placeholder="请输入新的比赛名称"
+              />
+            ),
+            okText: '确认修改',
+            cancelText: '取消',
+            onOk: async () => {
+              if (!curOrg) return;
+
+              try {
+                await apiUpdateCompName(curOrg.id, result.id, newName);
+                // @ts-ignore
+                actionRef.current?.reload();
+                message.success('名称已更新');
+              } catch (e) {
+                message.error('更新失败: ' + e);
+              }
+            },
+          });
+        };
+
+        buttons.push(
+          <Button
+            style={{ backgroundColor: '#13c2c2', fontWeight: 700, color: '#fff', border: 'none' }}
+            size={'small'}
+            autoInsertSpace={false}
+            onClick={showUpdateNameModal}
+          >
+            改名
+          </Button>,
+        );
+
+
+
         if (!result.IsDone && result.Status === 'Running') {
           // buttons.push(
           //   <Button
@@ -84,7 +130,6 @@ const OrganizersComps: React.FC = () => {
               message.error(e)
             })
           }
-
 
           const showEnd = () => {
             Modal.warning({
