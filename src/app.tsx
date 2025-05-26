@@ -6,12 +6,15 @@ import defaultSettings from '../config/defaultSettings';
 import { UserOutlined, UserSwitchOutlined } from '@ant-design/icons';
 import { AvatarProps, Col, Row } from 'antd';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
-import { ExtAppList } from '@/layout_config';
 import ParticleBackground from '@/components/background/WaveBackground';
 import { AvatarURL } from '@/pages/Admin/AvatarDropdown';
 import { AuthAPI } from '@/services/cubing-pro/auth/typings';
 import ScrollToTopButton from "@/components/Buttons/toTop";
 import LanguageSelect from "@/locales/Language/LanguageSelect";
+import {ExtAppList} from "@/services/layout_config";
+
+
+
 
 /**
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
@@ -54,21 +57,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
   } else if (initialState?.currentUser?.data.id) {
     icon = <UserOutlined />;
   }
-
-  // const hiddenPage = (props: { location: { pathname: any } }) => {
-  //   const { pathname } = props.location;
-  //   const noNavbarPaths = ['/login'];
-  //   return !noNavbarPaths.includes(pathname);
-  // };
-
   return {
-    // logo: 'https://avatars.githubusercontent.com/u/52768576?v=4', // todo logo
-    // actionsRender: () => [<SelectLang key="SelectLang"/>],
-    // headerRender:hiddenPage,
-    // disableContentMargin: true,
-    // menuRender: hiddenPage,
-    // menuHeaderRender: hiddenPage,
-
     avatarProps: {
       src: AvatarURL(initialState?.currentUser?.data.Avatar),
       icon: icon,
@@ -96,9 +85,6 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
         <>
           <ScrollToTopButton />
           <Row>
-            {/*<Col xs={24} sm={24} md={24} lg={24} xl={24} xxl={24}>*/}
-            {/*  {children}*/}
-            {/*</Col>*/}
             <ParticleBackground></ParticleBackground>
             <Col xs={0} sm={0} md={0} lg={1} xl={2} xxl={2} />
             <Col xs={24} sm={24} md={24} lg={22} xl={20} xxl={20}>

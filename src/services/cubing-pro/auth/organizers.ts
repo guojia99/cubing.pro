@@ -178,3 +178,18 @@ export async function apiDeleteCompsResult(
 
   return response.data;
 }
+
+export async function apiUpdateCompName(
+  orgId: number | undefined,
+  compId: number | undefined,
+  newName: string,
+): Promise<any> {
+  const response = await Request.post<any>(
+    'organizers/' + orgId + '/comp/' + compId + '/update_name',
+    {
+      newName: newName,
+    },
+    {headers: AuthHeader() },
+  )
+  return response.data;
+}
