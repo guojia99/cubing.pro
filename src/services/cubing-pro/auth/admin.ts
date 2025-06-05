@@ -48,7 +48,7 @@ export async function apiAdminCreatePlayer(params: PlayersAPI.CreatePlayerReq): 
 export async function apiAdminUpdatePlayerName(
   params: PlayersAPI.UpdatePlayerNameReq,
 ): Promise<any> {
-  const response = await Request.post<PlayersAPI.PlayersResp>(
+  const response = await Request.put<PlayersAPI.PlayersResp>(
     '/admin/users/update_user_name',
     params,
     { headers: AuthHeader() },
