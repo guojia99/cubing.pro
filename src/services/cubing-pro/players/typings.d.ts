@@ -118,7 +118,7 @@ declare namespace PlayersAPI {
   }
 
   export type UpdatePlayerNameReq = {
-    name: string;
+    new_name: string;
     cube_id: string;
   }
 }
