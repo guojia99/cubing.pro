@@ -27,26 +27,38 @@ export const defaultConfig: PinyinConfig = {
     Z: "z",
   },
   secondLetters: {
-    A: "ī",
-    B: "ūn",
+
     C: "ā",
     D: "à",
+
     E: "ō",
     F: "ò",
+
     G: "ē",
     H: "è",
+
+    A: "ī",
     J: "ì",
+
+
     K: "ū",
-    L: "ū",
+    L: "ù",
+
     M: "āo",
-    N: "āo",
-    P: "ūn",
+    N: "ào",
+
+    B: "ūn",
+    P: "ùn",
+
     Q: "āng",
     R: "àng",
+
     S: "ēng",
     T: "èng",
+
     W: "īng",
     X: "ìng",
+
     Y: "ōng",
     Z: "òng",
   },

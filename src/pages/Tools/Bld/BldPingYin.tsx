@@ -153,7 +153,7 @@ export default function BldPingYin() {
       }
 
       if (e.key === "Enter") {
-        checkAnswer()
+        // checkAnswer()
       } else if (e.key === "Escape") {
         generateNewCombination()
       } else if (mode === "letterToPinyin") {
@@ -254,12 +254,14 @@ export default function BldPingYin() {
             />
 
             {mode === "letterToPinyin" && (
-              <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: "8px" }}>
-                <Button onClick={() => applyToneToInput(0)}>无声调</Button>
-                <Button onClick={() => applyToneToInput(1)}>第一声 (ˉ)</Button>
-                <Button onClick={() => applyToneToInput(2)}>第二声 (ˊ)</Button>
-                <Button onClick={() => applyToneToInput(3)}>第三声 (ˇ)</Button>
-                <Button onClick={() => applyToneToInput(4)}>第四声 (ˋ)</Button>
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: "8px" }}>
+                  <Button onClick={() => applyToneToInput(1)}>第一声 (ˉ)</Button>
+                  <Button onClick={() => applyToneToInput(2)}>第二声 (ˊ)</Button>
+                  <Button onClick={() => applyToneToInput(3)}>第三声 (ˇ)</Button>
+                  <Button onClick={() => applyToneToInput(4)}>第四声 (ˋ)</Button>
+                  <Button onClick={() => applyToneToInput(0)}>无声调</Button>
+                </div>
               </div>
             )}
 
