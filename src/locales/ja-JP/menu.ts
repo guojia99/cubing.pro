@@ -12,6 +12,8 @@ export default {
 
   "menu.Tools": "ツール",
   "menu.Tools.bld": "目隠し公式練習",
+  'menu.Tools.bld_pingyin': '盲拧读音练习',
+  "menu.Tools.associative-words": "目隠し公式練習v2",
   "menu.Tools.mbld": "多目隠し記憶練習",
   "menu.Tools.TeamMatch": "チーム対戦結果ツール"
 };

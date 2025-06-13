@@ -1,7 +1,5 @@
 import { Card } from 'antd';
-import React, {useEffect} from 'react';
-import AnalyseAlg from "./bld_helper";
-
+import React, { useEffect } from 'react';
 
 const MBldPracticeTools: React.FC = () => {
   const [data, setData] = React.useState();
@@ -14,8 +12,6 @@ const MBldPracticeTools: React.FC = () => {
     <div style={{ margin: 'auto', textAlign: 'center', padding: '20px' }}>
       <Card title={'多盲记忆练习工具'} style={{ marginBottom: 20 }}>
         {data}
-
-
       </Card>
     </div>
   );

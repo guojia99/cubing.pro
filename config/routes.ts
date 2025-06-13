@@ -103,6 +103,8 @@ export default [
     name: 'Tools',
     routes: [
       {path: 'bld-d', component: './Tools/Bld/BldMeor', name: 'bld'},
+      {path: 'bld_pingyin', component: './Tools/Bld/BldPingYin', name: 'bld_pingyin'},
+      {path: 'associative-words',component: './Tools/Bld/Bld_Associative_Words', name: 'associative-words'},
       {path: 'mbld-d', component: './Tools/Bld/MBld', name: 'mbld'},
       {path: 'teamMatch', component: './Tools/TeamMatch/TeamMatch', name: 'TeamMatch'},
     ],

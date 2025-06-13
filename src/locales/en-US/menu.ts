@@ -13,6 +13,8 @@ export default {
 
   "menu.Tools": "Tools",
   "menu.Tools.bld": "Bld",
+  'menu.Tools.bld_pingyin': '盲拧读音练习',
+  "menu.Tools.associative-words": "Bld v2",
   "menu.Tools.mbld": "Many Bld",
   "menu.Tools.TeamMatch": "TeamMatch"
 }
