@@ -76,8 +76,8 @@ export default [
 
   // 主办相关
   {path: 'admin/organizers', component: './Admin/Organizers'},
-  {path: 'admin/organizers/comps', component: './Admin/OrganizersComponent/OrganizersComps'}, // 比赛页面
-  {path: 'admin/organizers/comps/create', component: './Admin/OrganizersComponent/CreateComps'}, // 创建比赛页面
+  {path: 'admin/organizers/Comps', component: './Admin/OrganizersComponent/OrganizersComps'}, // 比赛页面
+  {path: 'admin/organizers/Comps/create', component: './Admin/OrganizersComponent/CreateComps'}, // 创建比赛页面
 
   {path: 'admin/organizers/details', component: './Admin/OrganizersComponent/OrganizersDetails'}, // 详情
   {path: 'admin/organizers/group', component: './Admin/OrganizersComponent/OrganizersGroup'}, // 群组
@@ -122,6 +122,8 @@ export default [
   },
 
   {path: 'test', component: './Tests/Test'},
+
+  {path: 'wca_comps', component: './Tools/Comps/WCAComps', name:'wca_comps'},
 
   ...reXRoutes(),
 ];

@@ -212,7 +212,7 @@ const OrganizersComps: React.FC = () => {
     <>
       <div style={{ marginBottom: 30 }}>
         {BackButton('返回上层')}
-        <Link to={'/admin/organizers/comps/create'} style={{ marginRight: 20, marginLeft: 20 }}>
+        <Link to={'/admin/organizers/Comps/create'} style={{ marginRight: 20, marginLeft: 20 }}>
           <Button type="default" className="create-comp-btn">
             创建比赛
           </Button>

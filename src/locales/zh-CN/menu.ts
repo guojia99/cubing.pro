@@ -16,4 +16,6 @@ export default {
   "menu.Tools.associative-words": "盲拧联想词练习v2",
   'menu.Tools.mbld': '多盲记忆练习',
   'menu.Tools.TeamMatch': '组队赛对战赛果工具',
+
+  'menu.wca_comps': '附近比赛',
 };

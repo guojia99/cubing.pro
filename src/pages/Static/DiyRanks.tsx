@@ -7,8 +7,8 @@ import {
   apiGetAllDiyRankingKey,
 } from '@/services/cubing-pro/statistics/diy_ranking';
 import { StaticAPI } from '@/services/cubing-pro/statistics/typings';
-import { OrderedListOutlined } from '@ant-design/icons';
-import { Table } from 'antd';
+import { OrderedListOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { Table, Tooltip } from 'antd';
 import React, { useEffect, useState } from 'react';
 //
 // const eventList = [
@@ -95,7 +95,7 @@ const DiyRanks: React.FC<DiyRanksProps> = ({ keys }) => {
         title: '单次',
         dataIndex: 'BestStr',
         key: 'BestStr',
-        width: 200,
+        width: 100,
       },
     ];
 
@@ -120,7 +120,7 @@ const DiyRanks: React.FC<DiyRanksProps> = ({ keys }) => {
           title: '排名',
           dataIndex: 'AvgRank',
           key: 'AvgRank',
-          width: 200,
+          width: 100,
         },
       );
     }
@@ -177,7 +177,12 @@ const DiyRankView: React.FC = () => {
 
   return (
     <>
-      <h2 style={{ textAlign: 'center' }}> WCA成绩统计排行 </h2>
+      <h2 style={{ textAlign: 'center' }}>
+        WCA成绩统计排行&nbsp;
+        <Tooltip title="该榜单基于WCA官方比赛成绩进行统计排名，包含各项目选手的最新纪录。如果你没有在榜单上，需要记录到榜单当中，请联系管理员。">
+          <QuestionCircleOutlined style={{fontSize: 14}} />
+        </Tooltip>
+      </h2>
       {items && items.length > 0 && (
         <NavTabs
           type="line"
