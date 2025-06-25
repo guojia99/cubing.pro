@@ -1,5 +1,6 @@
 import { Request } from '@/services/cubing-pro/request';
 import { StaticAPI } from '@/services/cubing-pro/statistics/typings';
+import { AuthHeader } from '@/services/cubing-pro/auth/token';
 
 export async function apiDiyRanking(
   key: string,
@@ -18,4 +19,30 @@ export async function apiGetAllDiyRankingKey(): Promise<{data: StaticAPI.DiyRank
     {},
   );
   return response.data;
+}
+
+
+export async function apiUpdateRankingWithKey(key: string, description: string, persons: string[] ) :Promise<any>{
+  const response = await Request.post(
+    `diy_static/diy_rankings/${key}`,
+    {
+      description: description,
+      persons: persons,
+    },
+    { headers: AuthHeader() },
+  )
+  return response.data
+}
+
+
+export async function apiCreateRanking(key:string, description:string) :Promise<any>{
+  const response = await Request.post(
+    `diy_static/diy_rankings`,
+    {
+      description: description,
+      key: key,
+    },
+    { headers: AuthHeader() },
+  )
+  return response.data
 }

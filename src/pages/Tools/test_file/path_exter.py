@@ -23,7 +23,7 @@ def extract_paths_from_svg(svg_file):
   return paths
 
 if __name__ == "__main__":
-  svg_file = "minx_2.svg"  # 替换为你的 SVG 文件路径
+  svg_file = "金字塔-双色图.svg"  # 替换为你的 SVG 文件路径
   extracted_paths = extract_paths_from_svg(svg_file)
 
   # 打印输出结果

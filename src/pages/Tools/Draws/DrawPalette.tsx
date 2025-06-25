@@ -11,6 +11,14 @@ export type pathSvg = {
 
   d?: string; // path
   points?: string; // polygon
+  line?: {
+    x1?: number;
+    y1?: number;
+    x2?: number;
+    y2?: number;
+  }
+
+  disableStrokeWidth?: boolean;
 
   type?: string; // path, polygon
   disableDrawing?: boolean;
@@ -205,6 +213,11 @@ const DrawPalette: React.FC<DrawPaletteProps> = ({
                     key = 'disable';
                   }
 
+                  let curStrokeWidth =strokeWidth * strokeWidthNum
+                  if (elem.disableStrokeWidth){
+                    curStrokeWidth = 0
+                  }
+
                   if (elem.d) {
                     return (
                       <path
@@ -214,7 +227,7 @@ const DrawPalette: React.FC<DrawPaletteProps> = ({
                         data-key={key}
                         d={elem.d}
                         stroke={'black'}
-                        strokeWidth={strokeWidth * strokeWidthNum}
+                        strokeWidth={curStrokeWidth}
                         strokeLinejoin={'round'}
                         style={{ cursor: 'pointer' }}
                         transform={transform}
@@ -231,12 +244,35 @@ const DrawPalette: React.FC<DrawPaletteProps> = ({
                         data-key={key}
                         points={elem.points}
                         stroke={'black'}
-                        strokeWidth={strokeWidth * strokeWidthNum}
+                        strokeWidth={curStrokeWidth}
                         strokeLinejoin={'round'}
                         style={{ cursor: 'pointer' }}
                         transform={transform}
                       ></polygon>
                     );
+                  }
+
+
+                  if (elem.line){
+                    return (
+                      <line
+                        // @ts-ignore
+                        // fill={colors[key]}
+
+                        x1={elem.line.x1}
+                        x2={elem.line.x2}
+                        y1={elem.line.y1}
+                        y2={elem.line.y2}
+                        key={key}
+                        data-key={key}
+                        stroke={'black'}
+                        strokeWidth={curStrokeWidth}
+                        strokeLinejoin={'round'}
+                        style={{ cursor: 'pointer' }}
+                        transform={transform}
+                      >
+                      </line>
+                    )
                   }
 
                   return <></>;

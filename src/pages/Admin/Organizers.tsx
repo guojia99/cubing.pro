@@ -73,13 +73,13 @@ const Organizers: React.FC = () => {
         {
           title: '比赛列表',
           description: '展示你的比赛列表，进行操作等',
-          to: '/admin/organizers/comps',
+          to: '/admin/organizers/Comps',
           avatar: <FcList style={{ fontSize: 40 }} />,
         },
         {
           title: '创建比赛',
           description: '新建一个比赛',
-          to: '/admin/organizers/comps/create',
+          to: '/admin/organizers/Comps/create',
           avatar: <FcAddDatabase style={{ fontSize: 40 }} />,
         },
         // {

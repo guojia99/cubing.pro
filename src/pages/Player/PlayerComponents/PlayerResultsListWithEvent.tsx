@@ -7,10 +7,129 @@ import { Comp } from '@/components/Data/types/comps';
 import { Record } from '@/components/Data/types/record';
 import { Result } from '@/components/Data/types/result';
 import { NavTabs } from '@/components/Tabs/nav_tabs';
-import BOGroup from '@/pages/Player/PlayerComponents/BestBoGroup';
+import { BOBestGroup, BORecentGroup } from '@/pages/Player/PlayerComponents/BestBoGroup';
+import RollingQuantileChart from '@/pages/Player/PlayerComponents/Echarts/RollingQuantileChart';
+import ScoreRangeChart from '@/pages/Player/PlayerComponents/Echarts/ScoreRangeChart';
+import SuccessRateBox from '@/pages/Player/PlayerComponents/SuccessRateBox';
 import { EventsAPI } from '@/services/cubing-pro/events/typings';
+import { Tabs } from 'antd';
 import React from 'react';
-import SuccessRateBox from "@/pages/Player/PlayerComponents/SuccessRateBox";
+
+interface PlayerEventResultPanelProps {
+  event: EventsAPI.Event;
+  results: Result[];
+  records: Record[];
+}
+
+export const PlayerEventResultPanel: React.FC<PlayerEventResultPanelProps> = ({
+  event,
+  results,
+  records,
+}) => {
+  const eventId = event.id;
+  const resultNums: number[] = [];
+  const m = RouteMaps.get(event.base_route_typ);
+  const res = [...results]; // 避免修改原数组
+  res.sort((a, b) => {
+    if (a.CompetitionID === b.CompetitionID) {
+      return a.RoundNumber > b.RoundNumber ? -1 : 1;
+    }
+    return a.CompetitionID > b.CompetitionID ? -1 : 1;
+  });
+
+  const avgResultNums: number[] = []
+
+  let last_comp_name = '';
+  for (let j = 0; j < res.length; j++) {
+    for (let k = 0; k < res[j].Result.length; k++) {
+      resultNums.push(res[j].Result[k]);
+    }
+    avgResultNums.push(res[j].Average)
+    if (res[j].CompetitionName !== last_comp_name) {
+      last_comp_name = res[j].CompetitionName;
+    } else {
+      res[j].CompetitionName = '';
+    }
+  }
+
+  return (
+    <>
+      <h3 style={{ textAlign: 'center', marginBottom: '10px' }}>
+        <strong>{CubesCn(eventId)}</strong>
+      </h3>
+
+      {ResultGraphChart(eventId, res, records)}
+
+
+
+      {!m?.repeatedly && (
+        <div style={{ marginBottom: 24, marginTop: 16 }}>
+          <h2>
+            <strong>统计</strong>
+          </h2>
+          <Tabs
+            defaultActiveKey="success"
+            items={[
+              {
+                key: 'success',
+                label: '成功率',
+                children: (
+                  <div style={{ padding: 16 }}>
+                    <SuccessRateBox data={resultNums} />
+                  </div>
+                )
+              },
+              {
+                key: 'recent_chart',
+                label: '成绩分位(单次)',
+                children: (
+                  <div style={{ padding: 16 }}>
+                    <RollingQuantileChart inputData={resultNums} baseWindowSize={50} />
+                  </div>
+                ),
+              },
+              {
+                key: 'recent_chart_avg',
+                label: '成绩分位(平均)',
+                children: (
+                  <div style={{ padding: 16 }}>
+                    <RollingQuantileChart inputData={avgResultNums} baseWindowSize={12} />
+                  </div>
+                ),
+              },
+              {
+                key: 'result_ton',
+                label: '成绩分布',
+                children: (
+                  <div style={{ padding: 16 }}>
+                    <ScoreRangeChart inputData={resultNums} />
+                  </div>
+                ),
+              },
+              {
+                key: 'recent',
+                label: '平均成绩',
+                children: (
+                  <div style={{ padding: 16 }}>
+                    <BORecentGroup data={resultNums} />
+                    <BOBestGroup data={resultNums} />
+                  </div>
+                ),
+              },
+            ]}
+            tabBarStyle={{
+              margin: 0,
+            }}
+            type="line"
+          />
+        </div>
+      )}
+      {m?.repeatedly
+        ? ResultsTable(res, ['CompetitionName', 'Round', 'Result_with_repeatedly'], records)
+        : ResultsTable(res, ['CompetitionName', 'Round', 'Best', 'Average', 'Result'], records)}
+    </>
+  );
+};
 
 interface PlayerResultsListWithEventProps {
   events: EventsAPI.Event[];
@@ -47,56 +166,12 @@ const PlayerResultsListWithEvent: React.FC<PlayerResultsListWithEventProps> = ({
 
   for (let i = 0; i < events.length; i++) {
     const eventId = events[i].id;
-    const resultNums: number[] = [];
-
-    let res = resultMap.get(eventId);
-    if (res === undefined) {
-      continue;
-    }
-    res.sort((a: Result, b: Result) => {
-      if (a.CompetitionID === b.CompetitionID) {
-        return a.RoundNumber > b.RoundNumber ? -1 : 1;
-      }
-      return a.CompetitionID > b.CompetitionID ? -1 : 1;
-    });
-
-    let last_comp_name = '';
-    for (let j = 0; j < res.length; j++) {
-      for (let k = 0; k < res[j].Result.length; k++) {
-        resultNums.push(res[j].Result[k]);
-      }
-
-      if (res[j].CompetitionName !== last_comp_name) {
-        last_comp_name = res[j].CompetitionName;
-        continue;
-      }
-      res[j].CompetitionName = '';
-    }
-
-    const m = RouteMaps.get(events[i].base_route_typ);
+    const res = resultMap.get(eventId);
+    if (!res) continue;
 
     items.push({
       key: eventId,
-      children: (
-        <>
-          <h3 style={{ textAlign: 'center', marginBottom: '10px' }}>
-            <strong>{CubesCn(eventId)}</strong>
-          </h3>
-
-          {!m?.repeatedly && (
-            <>
-              <SuccessRateBox data={resultNums} />
-              <BOGroup data={resultNums} />
-            </>
-          )}
-          {/*{chat}*/}
-          {ResultGraphChart(eventId, res, records)}
-
-          {m?.repeatedly
-            ? ResultsTable(res, ['CompetitionName', 'Round', 'Result_with_repeatedly'], records)
-            : ResultsTable(res, ['CompetitionName', 'Round', 'Best', 'Average', 'Result'], records)}
-        </>
-      ),
+      children: <PlayerEventResultPanel event={events[i]} results={res} records={records} />,
       icon: <>{CubeIcon(eventId, eventId, {})}</>,
     });
   }

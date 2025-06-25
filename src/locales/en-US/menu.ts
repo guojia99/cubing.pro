@@ -16,5 +16,7 @@ export default {
   'menu.Tools.bld_pingyin': '盲拧读音练习',
   "menu.Tools.associative-words": "Bld v2",
   "menu.Tools.mbld": "Many Bld",
-  "menu.Tools.TeamMatch": "TeamMatch"
+  "menu.Tools.TeamMatch": "TeamMatch",
+
+  'menu.wca_comps': '附近比赛',
 }

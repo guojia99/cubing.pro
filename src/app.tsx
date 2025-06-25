@@ -85,7 +85,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
         <>
           <ScrollToTopButton />
           <Row>
-            <ParticleBackground></ParticleBackground>
+            {/*<ParticleBackground></ParticleBackground>*/}
             <Col xs={0} sm={0} md={0} lg={1} xl={2} xxl={2} />
             <Col xs={24} sm={24} md={24} lg={22} xl={20} xxl={20}>
               {children}
