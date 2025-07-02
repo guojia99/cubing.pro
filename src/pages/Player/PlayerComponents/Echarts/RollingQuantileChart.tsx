@@ -1,4 +1,4 @@
-import { Select } from 'antd';
+import { Card, Select } from 'antd';
 import ReactECharts from 'echarts-for-react';
 import React, { useMemo, useState } from 'react';
 import { resultTimeString } from '@/components/Data/types/result';
@@ -172,6 +172,37 @@ const RollingQuantileChart: React.FC<RollingQuantileChartProps> = ({ inputData, 
           ))}
         </Select>
       </div>
+
+      {(() => {
+        const latestIndex = q25.length - 1;
+        const latestQ25 = q25[latestIndex];
+        const latestQ50 = q50[latestIndex];
+        const latestQ75 = q75[latestIndex];
+
+        if (latestQ25 === null || latestQ50 === null || latestQ75 === null) {
+          return null;
+        }
+
+        return (
+          <Card title="最新百分位成绩" style={{ marginTop: 16, background: '#f9f9f9', marginBottom: 16 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-around', fontSize: 16 }}>
+              <div>
+                <strong style={{ color: '#111dff' }}>25%</strong><br />
+                {resultTimeString(latestQ25)}
+              </div>
+              <div>
+                <strong style={{ color: '#f89600' }}>50%</strong><br />
+                {resultTimeString(latestQ50)}
+              </div>
+              <div>
+                <strong style={{ color: '#EE6666' }}>75%</strong><br />
+                {resultTimeString(latestQ75)}
+              </div>
+            </div>
+          </Card>
+        );
+      })()}
+
       <ReactECharts option={option} style={{ height: 400 }} />
     </div>
   );

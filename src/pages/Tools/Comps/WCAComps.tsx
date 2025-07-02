@@ -1,5 +1,5 @@
 import { FlagOutlined } from '@ant-design/icons';
-import { Avatar, Button, Card, Empty, List, Progress, Tabs, Tag, Typography } from 'antd';
+import { Avatar, Button, Card, Empty, List, message, Progress, Tabs, Tag, Typography } from 'antd';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 
@@ -160,16 +160,11 @@ const WcaCompetitionList: React.FC = () => {
   const [data, setData] = useState<{ [key: string]: WcaCompetition[] }>({});
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [allFetched, setAllFetched] = useState(false);
 
-  const fetchData = async () => {
-    setLoading(true);
-    setProgress(0);
-    const newData: typeof data = {};
-    const countries = Object.keys(COUNTRY_MAP);
-    const total = countries.length;
 
-    for (let i = 0; i < total; i++) {
-      const key = countries[i];
+  const fetchSingleCountry = async (key: string) => {
+    if (!data[key]) { // 如果数据不存在，则请求
       try {
         const params = new URLSearchParams({
           country_iso2: key,
@@ -180,37 +175,40 @@ const WcaCompetitionList: React.FC = () => {
         const res = await axios.get(
           `https://www.worldcubeassociation.org/api/v0/competition_index?${params}`,
         );
-        newData[key] = res.data || [];
+        setData((prevData) => ({ ...prevData, [key]: res.data || [] }));
       } catch (e) {
-        newData[key] = [];
+        setData((prevData) => ({ ...prevData, [key]: [] }));
       }
-      setProgress(Math.round(((i + 1) / total) * 100));
     }
-
-    setData(newData);
-    setLoading(false);
   };
 
-  const fetchSingleCountry = async (key: string) => {
-    try {
-      const params = new URLSearchParams({
-        country_iso2: key,
-        include_cancelled: 'false',
-        ongoing_and_future: new Date(Date.now() - 86400000).toISOString().split('T')[0],
-        page: '1',
-      });
-      const res = await axios.get(
-        `https://www.worldcubeassociation.org/api/v0/competition_index?${params}`,
+  const fetchDataForAllCountries = async () => {
+    if (!allFetched) { // 如果还没有获取过所有国家的数据，则发起请求
+      if (allFetched) return; // 已经加载过就不再重复请求
+
+      const countries = Object.keys(COUNTRY_MAP);
+      const notLoadedCountries = countries.filter(key => !(key in data));
+
+      if (notLoadedCountries.length === 0) return;
+
+      setLoading(true);
+      setProgress(0);
+
+      await Promise.all(
+        notLoadedCountries.map(async (key, index) => {
+          await fetchSingleCountry(key); // 复用 fetchSingleCountry 的逻辑
+          setProgress(Math.round(((index + 1) / notLoadedCountries.length) * 100));
+        })
       );
-      setData((prev) => ({ ...prev, [key]: res.data || [] }));
-    } catch (e) {
-      // 失败仍设为空
-      setData((prev) => ({ ...prev, [key]: [] }));
+
+      setLoading(false);
+      setAllFetched(true);
     }
   };
+
 
   useEffect(() => {
-    fetchData();
+    fetchSingleCountry('CN');
   }, []);
 
   const renderItem = (item: WcaCompetition) => {
@@ -302,7 +300,11 @@ const WcaCompetitionList: React.FC = () => {
               <Button
                 type="primary"
                 style={{ marginTop: 16 }}
-                onClick={() => fetchSingleCountry(key)}
+                onClick={() => {
+                  fetchSingleCountry(key).then(() => {
+                    message.success("刷新成功").then()
+                  })
+                }}
               >
                 刷新
               </Button>
@@ -314,6 +316,15 @@ const WcaCompetitionList: React.FC = () => {
   };
 
   const tabItems = [
+    ...Object.entries(COUNTRY_MAP).map(([key, { label, icon }]) => ({
+      key,
+      label: (
+        <span>
+          {icon} {label}
+        </span>
+      ),
+      children: renderList(data[key], key),
+    })),
     {
       key: 'ALL',
       label: (
@@ -337,18 +348,22 @@ const WcaCompetitionList: React.FC = () => {
         ))
       ),
     },
-    ...Object.entries(COUNTRY_MAP).map(([key, { label, icon }]) => ({
-      key,
-      label: (
-        <span>
-          {icon} {label}
-        </span>
-      ),
-      children: renderList(data[key], key) ,
-    })),
   ];
 
-  return <Tabs items={tabItems} defaultActiveKey="ALL" destroyInactiveTabPane />;
+  return (
+    <Tabs
+      items={tabItems}
+      defaultActiveKey="CN"
+      destroyInactiveTabPane
+      onChange={(activeKey) => {
+        if (activeKey === 'ALL') {
+          fetchDataForAllCountries().then()
+        } else {
+          fetchSingleCountry(activeKey).then()
+        }
+      }}
+    />
+  );
 };
 
 export default WcaCompetitionList;
