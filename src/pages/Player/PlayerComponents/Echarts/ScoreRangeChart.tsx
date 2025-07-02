@@ -1,67 +1,49 @@
 import { resultTimeString } from '@/components/Data/types/result';
-import { getQuantile } from '@/pages/Player/PlayerComponents/Echarts/RollingQuantileChart';
 import ReactECharts from 'echarts-for-react';
-import React from 'react';
+import React, { useState } from 'react';
+import { Select } from 'antd';
 
 interface ScoreRangeChartProps {
   inputData: number[];
 }
 
-const getQuartiles = (sorted: number[]) => {
-  return {
-    Q1: getQuantile(sorted, 0.25),
-    Q2: getQuantile(sorted, 0.5),
-    Q3: getQuantile(sorted, 0.75),
-  };
-};
-
-const alignDown5 = (n: number) => Math.floor(n / 5) * 5;
-const alignUp5 = (n: number) => Math.ceil(n / 5) * 5;
-
-const generateRanges = (data: number[]): [number, number][] => {
-  if (data.length === 0) return [];
-
-  const intData = data.map((n) => Math.floor(n)); // 取整
-  const sorted = [...intData].sort((a, b) => a - b);
-  const { Q1, Q3 } = getQuartiles(sorted);
-  const min = alignDown5(sorted[0]);
-  const max = alignUp5(sorted[sorted.length - 1]);
-
-  const ranges: [number, number][] = [];
-
-  // 上段（好）：min ~ Q1，步长5
-  for (let start = min; start < Q1; start += 5) {
-    ranges.push([start, start + 5]);
-  }
-
-  // 中段：Q1 ~ Q3，步长10
-  const midStart = alignDown5(Q1);
-  for (let start = midStart; start < Q3; start += 10) {
-    ranges.push([start, start + 10]);
-  }
-
-  // 下段（差）：Q3 ~ max，步长15
-  const lowStart = alignDown5(Q3);
-  for (let start = lowStart; start < max; start += 15) {
-    ranges.push([start, start + 15]);
-  }
-
-  return ranges;
-};
-
 const ScoreRangeChart: React.FC<ScoreRangeChartProps> = ({ inputData }) => {
+  // 过滤掉负数
   const data = inputData.filter((n) => n >= 0);
 
-  const intData = data.map((n) => Math.floor(n));
-  const ranges = generateRanges(intData);
+  // 时间间隔选项
+  const intervalOptions = [0.5, 1, 2, 3, 4, 5, 10];
 
-  const rangeCounts = ranges.map(
-    ([min, max]) => intData.filter((score) => score >= min && score < max).length,
+  // 当前选择的时间间隔
+  const [selectedInterval, setSelectedInterval] = useState<number>(5);
+
+  // 动态生成区间范围
+  const generateRanges = (data: number[], interval: number) => {
+    const ranges = [];
+    const min = Math.floor(Math.min(...data) / interval) * interval;
+    const max = Math.ceil(Math.max(...data) / interval) * interval;
+
+    for (let i = min; i < max; i += interval) {
+      ranges.push([i, i + interval]);
+    }
+    return ranges;
+  };
+
+  const ranges = generateRanges(data, selectedInterval);
+  const rangeCounts = ranges.map(([min, max]) =>
+    data.filter((score) => score >= min && score < max).length,
   );
+
+  // 找到成绩次数最多的三个柱的索引
+  const topThreeIndices = rangeCounts
+    .map((count, index) => ({ count, index }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 3)
+    .map(({ index }) => index);
 
   const option = {
     title: {
-      text: '成绩分布图',
+      text: `成绩分布图（每 ${selectedInterval} 秒）`,
       left: 'center',
     },
     tooltip: {
@@ -78,16 +60,35 @@ const ScoreRangeChart: React.FC<ScoreRangeChartProps> = ({ inputData }) => {
     },
     series: [
       {
-        data: rangeCounts,
+        name: '人数',
+        data: rangeCounts.map((count, idx) => ({
+          value: count,
+          itemStyle: topThreeIndices.includes(idx) ? { color: '#f47885' } : { color: '#4CAF50' },
+        })),
         type: 'bar',
-        itemStyle: {
-          color: '#4CAF50',
-        },
       },
     ],
   };
 
-  return <ReactECharts option={option} style={{ height: 400 }} />;
+  return (
+    <div>
+      <label htmlFor="interval-select">选择时间间隔：</label>
+      <Select
+        id="interval-select"
+        value={selectedInterval}
+        onChange={(e) => setSelectedInterval(Number(e))}
+        style={{minWidth: 120}}
+      >
+        {intervalOptions.map((option) => (
+          <Select.Option key={option} value={option}>
+            {option} 秒
+          </Select.Option>
+        ))}
+      </Select>
+
+      <ReactECharts option={option} style={{ height: 400 }} />
+    </div>
+  );
 };
 
 export default ScoreRangeChart;

@@ -7,8 +7,10 @@ import { EventsAPI } from '@/services/cubing-pro/events/typings';
 import { PlayersAPI } from '@/services/cubing-pro/players/typings';
 import React, {Suspense, useEffect, useState} from 'react';
 
-const PlayerResultsListWithEvent = React.lazy(() => import('./PlayerResultsListWithEvent'));
-const PlayerResultsListWithComps = React.lazy(() => import('./PlayerResultsListWithComps'));
+const PlayerResultsListWithEvent = React.lazy(
+  () => import('./PlayerResultsListWithEvent'));
+const PlayerResultsListWithComps = React.lazy(
+  () => import('./PlayerResultsListWithComps'));
 
 interface PlayerResultsListProps {
   events: EventsAPI.Event[];
