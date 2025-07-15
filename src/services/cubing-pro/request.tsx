@@ -2,11 +2,11 @@ import axios from "axios";
 import type {AxiosError, AxiosResponse} from 'axios';
 import {WarnToast} from "@/components/Alert/toast";
 
-const dev = true
+const dev = false
 
 export function getAPIUrl() {
   if (dev){
-    return "https://mycube.club/v3/cube-api"
+    return "http://106.53.77.214/v3/cube-api"
   }
 
   const hostname = window.location.hostname;
@@ -14,10 +14,10 @@ export function getAPIUrl() {
   if (hostname === "localhost" || hostname === "127.0.0.1" || hostname === '0.0.0.0') {
     return "http://127.0.0.1:20000/v3/cube-api"
   }
-  // 内网测试
-  if (/^192\.168/.test(hostname) || /^10./.test(hostname)) {
-    return window.location.protocol + "//" + hostname + ":20000/v3/cube-api"
-  }
+  // // 内网测试
+  // if (/^192\.168/.test(hostname) || /^10./.test(hostname)) {
+  //   return window.location.protocol + "//" + hostname + ":20000/v3/cube-api"
+  // }
   // 正式网络
   return window.location.protocol + "//" + hostname + ":" + window.location.port + "/v3/cube-api"
 }

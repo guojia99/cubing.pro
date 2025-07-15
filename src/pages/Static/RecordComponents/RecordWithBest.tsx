@@ -4,23 +4,65 @@ import { apiEvents } from '@/services/cubing-pro/events/events';
 import { EventsAPI } from '@/services/cubing-pro/events/typings';
 import { apiRecords } from '@/services/cubing-pro/statistics/records';
 import React, { useEffect, useState } from 'react';
+import { Select } from 'antd';
+import { apiPublicOrganizers } from '@/services/cubing-pro/public/orgs';
 
 const RecordsWithBest: React.FC = () => {
   const [events, setEvents] = useState<EventsAPI.Event[]>([]);
   const [bestRecords, setBestRecords] = useState<any>();
   const [avgRecords, setAvgRecords] = useState<any>();
 
+  const [groupId, setGroupId] = useState<number>(0);
+  const [orgItems, setOrgItems] = useState<any[]>([]);
+
+
+  const fetchRecords = () => {
+    apiRecords({
+      GroupId: groupId === 0 ? '' : String(groupId),
+      EventId: '',
+    }).then((value) => {
+      setAvgRecords(value.data.Average);
+      setBestRecords(value.data.Best);
+    });
+  }
+
   useEffect(() => {
     apiEvents().then((value) => {
       setEvents(value.data.Events);
     });
 
-    apiRecords().then((value) => {
-      console.log(value);
-      setAvgRecords(value.data.Average);
-      setBestRecords(value.data.Best);
-    });
+
+
+    apiPublicOrganizers().then(value => {
+      const ite = [
+        {
+          label: 'CubingPro',
+          key: 'CubingPro',
+          value: 0,
+        },
+      ]
+
+      if (value.data && value.data.items){
+        for (let i = 0; i < value.data.items.length; i++){
+          ite.push({
+            label: value.data.items[i].Name,
+            key: value.data.items[i].Name,
+            value: value.data.items[i].id,
+          })
+        }
+      }
+      setOrgItems(ite)
+    })
+
+
+    fetchRecords()
   }, []);
+
+
+  useEffect(() => {
+    fetchRecords()
+  }, [groupId]);
+
 
   let records: MRecord[] = [];
 
@@ -74,6 +116,15 @@ const RecordsWithBest: React.FC = () => {
       <h3 style={{ textAlign: 'center', marginBottom: '20px' }}>
         <strong>最佳记录</strong>
       </h3>
+
+      <Select
+        defaultValue={0}
+        style={{ marginBottom: '20px', width: '150px' }}
+        options={orgItems}
+        onChange={(value) => {
+          setGroupId(value);
+        }}
+      ></Select>
 
       {RecordsTable(records, ['MEventId', 'BestUserName', 'Best', 'Average', 'AvgUserName'], false)}
     </>

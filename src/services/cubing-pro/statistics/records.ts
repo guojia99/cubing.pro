@@ -7,3 +7,4 @@ export async function apiRecords(req?: StaticAPI.RecordsReq): Promise<StaticAPI.
   });
   return response.data;
 }
+

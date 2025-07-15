@@ -1,22 +1,29 @@
 import { CubesCn } from '@/components/CubeIcon/cube';
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import { RecordsTable } from '@/components/Data/cube_record/record_tables';
-import { MergeRecords } from '@/components/Data/cube_record/record_utils';
 import { Record } from '@/components/Data/types/record';
 import { apiEvents } from '@/services/cubing-pro/events/events';
 import { EventsAPI } from '@/services/cubing-pro/events/typings';
 import { apiRecords } from '@/services/cubing-pro/statistics/records';
 import { Select } from 'antd';
 import React, { useEffect, useState } from 'react';
+import { apiPublicOrganizers } from '@/services/cubing-pro/public/orgs';
+
+
 
 const RecordsWithEvents: React.FC = () => {
   const [events, setEvents] = useState<EventsAPI.Event[]>([]);
+  const [groupId, setGroupId] = useState<number>(0);
+  const [event, setEvent] = useState<string>('333');
+
+  const [orgItems, setOrgItems] = useState<any[]>([]);
+
   const [loading, setLoading] = useState<boolean>(false);
   const [records, setRecords] = useState<Record[]>([]);
-  const fetchRecords = (event: string) => {
+  const fetchRecords = () => {
     setLoading(true);
     apiRecords({
-      GroupId: '',
+      GroupId: groupId === 0 ? '' : String(groupId),
       EventId: event || '333',
     })
       .then((value) => {
@@ -33,9 +40,31 @@ const RecordsWithEvents: React.FC = () => {
     apiEvents().then((value) => {
       setEvents(value.data.Events);
       if (value.data.Events.length > 0) {
-        fetchRecords(value.data.Events[0].id);
+        setEvent(value.data.Events[0].id);
+        fetchRecords();
       }
     });
+
+    apiPublicOrganizers().then(value => {
+      const ite = [
+        {
+          label: 'CubingPro',
+          key: 'CubingPro',
+          value: 0,
+        },
+      ]
+
+      if (value.data && value.data.items){
+        for (let i = 0; i < value.data.items.length; i++){
+          ite.push({
+            label: value.data.items[i].Name,
+            key: value.data.items[i].Name,
+            value: value.data.items[i].id,
+          })
+        }
+      }
+      setOrgItems(ite)
+    })
   }, []);
 
   const GroupChildren = (list: EventsAPI.Event[]) => {
@@ -57,9 +86,9 @@ const RecordsWithEvents: React.FC = () => {
     return out;
   };
 
-  const handleMenuClick = (value: string) => {
-    fetchRecords(value);
-  };
+  useEffect(() => {
+    fetchRecords();
+  }, [event, groupId]);
 
   const items = [
     {
@@ -82,7 +111,11 @@ const RecordsWithEvents: React.FC = () => {
     },
   ];
 
-  let rc = MergeRecords(records).reverse();
+  // api接口
+
+
+  // let rc = MergeRecords(records).reverse();
+  let rc = records;
   for (let i = 0; i < rc.length; i++) {
     rc[i].Index = rc.length - i;
   }
@@ -95,11 +128,23 @@ const RecordsWithEvents: React.FC = () => {
 
       <Select
         defaultValue="333"
-        style={{ marginBottom: '20px', width: '200px' }}
+        style={{ marginBottom: '20px', width: '150px' }}
         loading={loading}
         options={items}
-        onChange={handleMenuClick}
+        onChange={(value) => {
+          setEvent(value);
+        }}
       />
+
+      <Select
+        defaultValue={0}
+        style={{ marginBottom: '20px', marginLeft: '20px', width: '150px' }}
+        loading={loading}
+        options={orgItems}
+        onChange={(value) => {
+          setGroupId(value);
+        }}
+      ></Select>
 
       {RecordsTable(rc, ['Index', 'UserName', 'Best', 'Average', 'ResultTime', 'CompsName'])}
     </>
