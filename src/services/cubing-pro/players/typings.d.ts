@@ -117,8 +117,11 @@ declare namespace PlayersAPI {
     wca_id: string;
   }
 
-  export type UpdatePlayerNameReq = {
+  export type UpdatePlayerNameWCAIDReq = {
     new_name: string;
     cube_id: string;
+    wca_id: string;
   }
+
+
 }

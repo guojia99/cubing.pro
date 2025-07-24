@@ -1,27 +1,32 @@
-import {PlayerLink, WCALink} from '@/components/Link/Links';
-import {rowClassNameWithStyleLines} from '@/components/Table/table_style';
-import {apiAdminCreatePlayer, apiAdminPlayers, apiAdminUpdatePlayerName} from '@/services/cubing-pro/auth/admin';
-import {PlayersAPI} from '@/services/cubing-pro/players/typings';
-import {CopyOutlined, UserAddOutlined} from '@ant-design/icons';
-import {ProTable} from '@ant-design/pro-table';
-import {ProColumns} from '@ant-design/pro-table/es/typing';
-import {Button, Modal, Tooltip, message, Form, Input} from 'antd';
-import React, {useEffect, useRef, useState} from 'react';
-import {Auth, authTags} from "@/pages/Admin/AuthComponents/AuthComponents";
-
+import { PlayerLink, WCALink } from '@/components/Link/Links';
+import { rowClassNameWithStyleLines } from '@/components/Table/table_style';
+import { Auth, authTags } from '@/pages/Admin/AuthComponents/AuthComponents';
+import {
+  apiAdminCreatePlayer,
+  apiAdminPlayers,
+  apiAdminUpdatePlayerName, apiAdminUpdatePlayerWCAID,
+} from '@/services/cubing-pro/auth/admin';
+import { PlayersAPI } from '@/services/cubing-pro/players/typings';
+import { CopyOutlined, UserAddOutlined } from '@ant-design/icons';
+import { ProTable } from '@ant-design/pro-table';
+import { ProColumns } from '@ant-design/pro-table/es/typing';
+import { Button, Form, Input, Modal, Tooltip, message } from 'antd';
+import React, { useRef, useState } from 'react';
 
 const Users: React.FC = () => {
   const actionRef = useRef();
   const [createUserModalOpen, setCreateUserModalOpen] = useState(false);
 
-
   const [confirmLoading, setConfirmLoading] = useState(false);
 
-  const [createForm] = Form.useForm()
+  const [createForm] = Form.useForm();
 
   const [updateNameForm] = Form.useForm();
   const [curUpdatePlayer, setCurUpdatePlayer] = useState<PlayersAPI.Player>();
   const [updatePlayerNameModal, setUpdatePlayerNameModal] = useState<boolean>(false);
+
+  const [updateWCAForm] = Form.useForm();
+  const [updatePlayerWcaModal, setUpdatePlayerWcaModal] = useState<boolean>(false);
 
   const [tableParams, setTableParams] = useState<PlayersAPI.PlayersReq>({
     size: 20,
@@ -34,7 +39,6 @@ const Users: React.FC = () => {
       name: '',
     });
   };
-
 
   const handleCreateUser = async () => {
     try {
@@ -51,11 +55,10 @@ const Users: React.FC = () => {
         console.error(err);
       }
     } finally {
-      resetParams()
+      resetParams();
       setConfirmLoading(false);
     }
   };
-
 
   const handleUpdateName = async () => {
     try {
@@ -65,10 +68,37 @@ const Users: React.FC = () => {
       await apiAdminUpdatePlayerName({
         cube_id: curUpdatePlayer?.CubeID || '',
         new_name: values.name,
-      })
+        wca_id: '',
+      });
       message.success('用户更名成功');
       setUpdatePlayerNameModal(false);
       updateNameForm.resetFields();
+    } catch (err) {
+      if (err instanceof Error) {
+        message.error(err.message);
+      } else {
+        console.error(err);
+      }
+    } finally {
+      resetParams();
+      setConfirmLoading(false);
+    }
+  };
+
+  const handleUpdateWCA = async () => {
+    try {
+      const values = await updateWCAForm.validateFields();
+      setConfirmLoading(true);
+
+      await apiAdminUpdatePlayerWCAID({
+        cube_id: curUpdatePlayer?.CubeID || '',
+        new_name: '',
+        wca_id: values.wca_id,
+      });
+      message.success('用户更改WCAID成功');
+      setUpdatePlayerWcaModal(false);
+      updateWCAForm.resetFields();
+
     } catch (err){
       if (err instanceof Error) {
         message.error(err.message);
@@ -76,11 +106,10 @@ const Users: React.FC = () => {
         console.error(err);
       }
     } finally {
-      resetParams()
+      resetParams();
       setConfirmLoading(false);
     }
-  }
-
+  };
 
   const columns: ProColumns<PlayersAPI.Player>[] = [
     {
@@ -146,14 +175,14 @@ const Users: React.FC = () => {
         };
 
         return (
-          <div style={{display: 'flex', alignItems: 'center'}}>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
             <Tooltip title={value}>
-              <span style={{marginRight: 8}}>{truncateText(value, 6, 4)}</span>
+              <span style={{ marginRight: 8 }}>{truncateText(value, 6, 4)}</span>
             </Tooltip>
             <Button
               size="small"
-              style={{color: 'blueviolet'}}
-              icon={<CopyOutlined/>}
+              style={{ color: 'blueviolet' }}
+              icon={<CopyOutlined />}
               onClick={handleCopy}
             ></Button>
           </div>
@@ -168,8 +197,8 @@ const Users: React.FC = () => {
       hideInSearch: true,
       // @ts-ignore
       render: (a: Auth) => {
-        return authTags(a)
-      }
+        return authTags(a);
+      },
     },
     {
       title: '操作',
@@ -177,28 +206,43 @@ const Users: React.FC = () => {
       key: 'option',
       hideInSearch: true,
       render: (value: any, player: PlayersAPI.Player) => {
-        return <>
-          <Button size={"small"} onClick={() => {
-            setCurUpdatePlayer(player)
-            setUpdatePlayerNameModal(true)
-          }}>修改名称</Button>
-        </>;
+        return (
+          <>
+            <Button
+              size={'small'}
+              onClick={() => {
+                setCurUpdatePlayer(player);
+                setUpdatePlayerNameModal(true);
+              }}
+            >
+              修改名称
+            </Button>
+            <Button
+              size={'small'}
+              style={{marginLeft: 8}}
+              onClick={() => {
+                setCurUpdatePlayer(player);
+                setUpdatePlayerWcaModal(true);
+              }}
+            >
+              修改WCA ID
+            </Button>
+          </>
+        );
       },
-    }
+    },
   ];
-
-
 
   return (
     <>
       <Button
         type="primary"
-        icon={<UserAddOutlined/>}
+        icon={<UserAddOutlined />}
         size="small"
         onClick={() => {
           setCreateUserModalOpen(true);
         }}
-        style={{marginBottom: 20, borderRadius: 6, float: 'right'}}
+        style={{ marginBottom: 20, borderRadius: 6, float: 'right' }}
       >
         创建用户
       </Button>
@@ -216,38 +260,28 @@ const Users: React.FC = () => {
           <Form.Item
             name="name"
             label="用户名"
-            rules={[{required: true, message: '请输入用户名'}]}
+            rules={[{ required: true, message: '请输入用户名' }]}
           >
-            <Input placeholder="请输入用户名"/>
+            <Input placeholder="请输入用户名" />
           </Form.Item>
-          <Form.Item
-            name="qq"
-            label="QQ"
-          >
-            <Input placeholder="请输入 QQ 号"/>
+          <Form.Item name="qq" label="QQ">
+            <Input placeholder="请输入 QQ 号" />
           </Form.Item>
-          <Form.Item
-            name="actualName"
-            label="真实姓名"
-          >
-            <Input placeholder="请输入真实姓名"/>
+          <Form.Item name="actualName" label="真实姓名">
+            <Input placeholder="请输入真实姓名" />
           </Form.Item>
-          <Form.Item
-            name="wca_id"
-            label="WCA ID"
-          >
-            <Input placeholder="请输入 WCA ID"/>
+          <Form.Item name="wca_id" label="WCA ID">
+            <Input placeholder="请输入 WCA ID" />
           </Form.Item>
         </Form>
       </Modal>
-
 
       <ProTable<PlayersAPI.Player, PlayersAPI.PlayersReq>
         title={() => {
           return <h1>后台用户管理列表</h1>;
         }}
-        size={"small"}
-        scroll={{x: 'max-content'}}
+        size={'small'}
+        scroll={{ x: 'max-content' }}
         rowClassName={rowClassNameWithStyleLines}
         columns={columns}
         onReset={resetParams}
@@ -278,7 +312,7 @@ const Users: React.FC = () => {
           labelWidth: 'auto',
           defaultColsNumber: 1,
           defaultCollapsed: false,
-          span: {xs: 24, sm: 24, md: 24, lg: 18, xl: 18, xxl: 12},
+          span: { xs: 24, sm: 24, md: 24, lg: 18, xl: 18, xxl: 12 },
         }}
         pagination={{
           showQuickJumper: true,
@@ -297,13 +331,14 @@ const Users: React.FC = () => {
         sticky
       />
 
-
       <Modal
         title="修改用户名称"
         open={updatePlayerNameModal}
         onOk={handleUpdateName}
         confirmLoading={confirmLoading}
-        onCancel={() => {setUpdatePlayerNameModal(false)}}
+        onCancel={() => {
+          setUpdatePlayerNameModal(false);
+        }}
         destroyOnClose
       >
         <Form form={updateNameForm} layout="vertical" preserve={false}>
@@ -313,6 +348,27 @@ const Users: React.FC = () => {
             rules={[{ required: true, message: '请输入新名称' }]}
           >
             <Input placeholder="请输入新名称" defaultValue={curUpdatePlayer?.Name} />
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      <Modal
+        title={`修改用户${curUpdatePlayer?.Name} WCAID`}
+        open={updatePlayerWcaModal}
+        onOk={handleUpdateWCA}
+        confirmLoading={confirmLoading}
+        onCancel={() => {
+          setUpdatePlayerWcaModal(false);
+        }}
+        destroyOnClose
+      >
+        <Form form={updateWCAForm} layout="vertical" preserve={false}>
+          <Form.Item
+            label="WCAID"
+            name="wca_id"
+            rules={[{ required: true, message: '请输入wcaID'}, {message: '长度必须为10', len: 10 }]}
+          >
+            <Input placeholder="请输入WCAID" defaultValue={curUpdatePlayer?.WcaID} />
           </Form.Item>
         </Form>
       </Modal>
