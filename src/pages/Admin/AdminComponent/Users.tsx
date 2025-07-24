@@ -4,7 +4,9 @@ import { Auth, authTags } from '@/pages/Admin/AuthComponents/AuthComponents';
 import {
   apiAdminCreatePlayer,
   apiAdminPlayers,
-  apiAdminUpdatePlayerName, apiAdminUpdatePlayerWCAID,
+  apiAdminUpdatePlayerName,
+  apiAdminUpdatePlayerWCAID,
+  apiMergePlayers,
 } from '@/services/cubing-pro/auth/admin';
 import { PlayersAPI } from '@/services/cubing-pro/players/typings';
 import { CopyOutlined, UserAddOutlined } from '@ant-design/icons';
@@ -27,6 +29,12 @@ const Users: React.FC = () => {
 
   const [updateWCAForm] = Form.useForm();
   const [updatePlayerWcaModal, setUpdatePlayerWcaModal] = useState<boolean>(false);
+
+  const [mergePlayerForm] = Form.useForm();
+  const [mergePlayerWcaModal, setMergePlayerWcaModal] = useState<boolean>(false);
+
+  // const [setAuth]
+
 
   const [tableParams, setTableParams] = useState<PlayersAPI.PlayersReq>({
     size: 20,
@@ -98,8 +106,30 @@ const Users: React.FC = () => {
       message.success('用户更改WCAID成功');
       setUpdatePlayerWcaModal(false);
       updateWCAForm.resetFields();
+    } catch (err) {
+      if (err instanceof Error) {
+        message.error(err.message);
+      } else {
+        console.error(err);
+      }
+    } finally {
+      resetParams();
+      setConfirmLoading(false);
+    }
+  };
 
-    } catch (err){
+  const handleMergePlayer = async () => {
+    try {
+      const values = await mergePlayerForm.validateFields();
+      setConfirmLoading(true);
+      await apiMergePlayers({
+        base_user_cube_id: curUpdatePlayer?.CubeID || '',
+        merged_user_cube_id: values.other_cube_id,
+      });
+      message.success('用户合并成功');
+      setMergePlayerWcaModal(false);
+      mergePlayerForm.resetFields();
+    } catch (err) {
       if (err instanceof Error) {
         message.error(err.message);
       } else {
@@ -209,6 +239,7 @@ const Users: React.FC = () => {
         return (
           <>
             <Button
+              type="primary"
               size={'small'}
               onClick={() => {
                 setCurUpdatePlayer(player);
@@ -218,14 +249,38 @@ const Users: React.FC = () => {
               修改名称
             </Button>
             <Button
+              type="default"
               size={'small'}
-              style={{marginLeft: 8}}
+              style={{ marginLeft: 8 }}
               onClick={() => {
                 setCurUpdatePlayer(player);
                 setUpdatePlayerWcaModal(true);
               }}
             >
               修改WCA ID
+            </Button>
+            <Button
+              type="default"
+              size={'small'}
+              danger={true}
+              style={{ marginLeft: 8 }}
+              onClick={() => {
+                setCurUpdatePlayer(player);
+                setMergePlayerWcaModal(true);
+              }}
+            >
+              合并用户
+            </Button>
+            <Button
+              type="default"
+              danger={true}
+              size={'small'}
+              style={{ marginLeft: 8 }}
+              onClick={() => {
+                setCurUpdatePlayer(player);
+              }}
+            >
+              修改权限
             </Button>
           </>
         );
@@ -366,9 +421,36 @@ const Users: React.FC = () => {
           <Form.Item
             label="WCAID"
             name="wca_id"
-            rules={[{ required: true, message: '请输入wcaID'}, {message: '长度必须为10', len: 10 }]}
+            rules={[
+              { required: true, message: '请输入wcaID' },
+              { message: '长度必须为10', len: 10 },
+            ]}
           >
             <Input placeholder="请输入WCAID" defaultValue={curUpdatePlayer?.WcaID} />
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      <Modal
+        title={`合并用户 ${curUpdatePlayer?.Name}`}
+        open={mergePlayerWcaModal}
+        onOk={handleMergePlayer}
+        confirmLoading={confirmLoading}
+        onCancel={() => {
+          setMergePlayerWcaModal(false);
+        }}
+        destroyOnClose
+      >
+        <Form form={mergePlayerForm} layout="vertical" preserve={false}>
+          <Form.Item
+            label="需要合并对象CubeID"
+            name="other_cube_id"
+            rules={[
+              { required: true, message: '必填选项' },
+              { message: '长度必须为10', len: 10 },
+            ]}
+          >
+            <Input placeholder="请输入CubeID" />
           </Form.Item>
         </Form>
       </Modal>

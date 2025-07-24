@@ -62,3 +62,17 @@ export async function apiAdminUpdatePlayerWCAID(
   });
   return response.data;
 }
+
+export async function apiUpdatePlayerAuth(params: PlayersAPI.UpdatePlayerAuthReq): Promise<any> {
+  const response = await Request.post<any>('/admin/users/update_auth', params, {
+    headers: AuthHeader(),
+  });
+  return response.data;
+}
+
+export async function apiMergePlayers(params: PlayersAPI.MergePlayerReq): Promise<any> {
+  const response = await Request.post<any>('/admin/users/merge_user', params, {
+    headers: AuthHeader(),
+  });
+  return response.data;
+}
