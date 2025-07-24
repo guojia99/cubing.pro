@@ -123,5 +123,14 @@ declare namespace PlayersAPI {
     wca_id: string;
   }
 
+  export type UpdatePlayerAuthReq = {
+    cube_id: string;
+    set: boolean;
+    auth: number;
+  }
 
+  export type MergePlayerReq = {
+    base_user_cube_id: string;
+    merged_user_cube_id: string;
+  }
 }
