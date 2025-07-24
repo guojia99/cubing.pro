@@ -37,21 +37,28 @@ export async function apiAdminPlayers(
 }
 
 export async function apiAdminCreatePlayer(params: PlayersAPI.CreatePlayerReq): Promise<any> {
-  const response = await Request.post<PlayersAPI.PlayersResp>(
-    '/admin/users/create_user',
-    params,
-    { headers: AuthHeader() },
-  );
+  const response = await Request.post<PlayersAPI.PlayersResp>('/admin/users/create_user', params, {
+    headers: AuthHeader(),
+  });
   return response.data;
 }
 
 export async function apiAdminUpdatePlayerName(
-  params: PlayersAPI.UpdatePlayerNameReq,
+  params: PlayersAPI.UpdatePlayerNameWCAIDReq,
 ): Promise<any> {
   const response = await Request.put<PlayersAPI.PlayersResp>(
     '/admin/users/update_user_name',
     params,
     { headers: AuthHeader() },
   );
+  return response.data;
+}
+
+export async function apiAdminUpdatePlayerWCAID(
+  params: PlayersAPI.UpdatePlayerNameWCAIDReq,
+): Promise<any> {
+  const response = await Request.put<PlayersAPI.PlayersResp>('/admin/users/update_wca_id', params, {
+    headers: AuthHeader(),
+  });
   return response.data;
 }
