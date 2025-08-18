@@ -1,7 +1,7 @@
 import { NavTabs } from '@/components/Tabs/nav_tabs';
 import DrawPalette, { pathSvg } from '@/pages/Tools/Draws/DrawPalette';
 import { FormattedMessage, getIntl } from '@@/exports';
-import { Button, Form, Select, Slider, Space, message } from 'antd';
+import { Button, Col, Form, Input, Row, Select, Slider, Space, Switch, message } from 'antd';
 import React, { useEffect, useState } from 'react';
 
 const intl = getIntl();
@@ -45,6 +45,9 @@ const cornerSvgs = [
   'm15.79671,18.87363l-4.8037,-4.8037l17.58351,0l1.2874,4.8037l-14.06721,0z',
   'm15.79671,18.87363l-4.8037,-4.8037l0,17.58351l4.8037,1.2874l0,-14.06721z',
 ];
+
+const cornerFontPoint = [21.94057, 27.84965];
+const edgeFontPoint = [33.4, 27.84965];
 
 const edgeSvgs = [
   'm35.01322,38.09014l5.1485,-19.21651l-10.2978,0l5.1493,19.21651z',
@@ -373,6 +376,69 @@ const DoubleSq1Draw = () => {
   const [linePointDown, setLinePointDown] = useState<pathSvg[]>([]);
   const [downCspOption, setDownCspOptions] = useState<any[]>([]);
 
+  // 输入文字
+  const [useFont, setUseFont] = useState<boolean>();
+  const [fontsTop, setFontsTop] = useState<string[]>([]);
+  const [fontsDown, setFontsDown] = useState<string[]>([]);
+
+  const handleSetFontSwitch = (showFont: boolean) => {
+    console.log(showFont);
+    setUseFont(showFont);
+
+    svgPointsTop.map((v) => {
+      if (v.key.includes('fonts_')) {
+        v.disShow = !showFont;
+      }
+      return v;
+    });
+    setSvgPointsTop(svgPointsTop);
+
+    svgPointsDown.map((v) => {
+      if (v.key.includes('fonts_')) {
+        v.disShow = !showFont;
+      }
+      return v;
+    });
+    setSvgPointsDown(svgPointsDown);
+  };
+
+  const handleTopFontChange = (index: number, value: string) => {
+    const newFonts = [...fontsTop];
+    newFonts[index] = value;
+    setFontsTop(newFonts);
+
+    svgPointsTop.map((v) => {
+      if (!v.key.includes('fonts_')) {
+        return v;
+      }
+      const key = '_' + 'top' + '_' + index + '_disable';
+      if (v.key.includes(key)) {
+        v.text = value;
+      }
+      return v;
+    });
+    setSvgPointsTop(svgPointsTop);
+  };
+
+  // 更新 fontsDown 中指定索引的字体
+  const handleDownFontChange = (index: number, value: string) => {
+    const newFonts = [...fontsDown];
+    newFonts[index] = value;
+    setFontsDown(newFonts);
+
+    svgPointsDown.map((v) => {
+      if (!v.key.includes('fonts_')) {
+        return v;
+      }
+      const key = '_' + 'down' + '_' + index + '_disable';
+      if (v.key.includes(key)) {
+        v.text = value;
+      }
+      return v;
+    });
+    setSvgPointsDown(svgPointsDown);
+  };
+
   const setDraws = (e: string, topDown: string) => {
     const v = cspMap.get(e);
     if (!v) {
@@ -389,13 +455,20 @@ const DoubleSq1Draw = () => {
     }
 
     let curReg = 0;
+    let fonts = [];
     for (let i = 0; i < v.length; i++) {
       const d = v[i];
+      const font = `${i}`.toUpperCase();
+      const textSize = 6;
+
+      fonts.push(font);
+      const fontKey = 'fonts_' + timestamp + '_' + topDown + '_' + i + '_disable';
       switch (d) {
         case 'e':
           for (let j = 0; j < edgeSvgs.length; j++) {
             newSvgPoints.push({
               key: timestamp + '_edge_' + topDown + '_' + i + '_' + j + '_' + curReg,
+              unColorBindKey: j === 0 ? 'sq1DrawDouble-' + fontKey : undefined,
               d: edgeSvgs[j],
               baseRotate: curReg + 30,
               rotate: baseReg,
@@ -403,6 +476,19 @@ const DoubleSq1Draw = () => {
               translate: translate,
             });
           }
+          newSvgPoints.push({
+            disShow: !useFont,
+            key: fontKey,
+            baseRotate: curReg + 30,
+            rotate: baseReg,
+            rotatePoint: rotatePoint,
+            translate: translate,
+            text: font,
+            textPoint: edgeFontPoint,
+            textSize: textSize,
+            textRouteResetPoint: [1.7, -2.5],
+          });
+
           curReg += 30;
           curEdge += 1;
           break;
@@ -410,6 +496,7 @@ const DoubleSq1Draw = () => {
           for (let j = 0; j < cornerSvgs.length; j++) {
             newSvgPoints.push({
               key: timestamp + '_corner_' + topDown + '_' + i + '_' + j + '_' + curReg,
+              unColorBindKey: j === 0 ? 'sq1DrawDouble-' + fontKey : undefined,
               d: cornerSvgs[j],
               baseRotate: curReg + 90,
               rotate: baseReg,
@@ -417,19 +504,32 @@ const DoubleSq1Draw = () => {
               translate: translate,
             });
           }
+          newSvgPoints.push({
+            disShow: !useFont,
+            key: fontKey,
+            baseRotate: curReg + 90,
+            rotate: baseReg,
+            rotatePoint: rotatePoint,
+            translate: translate,
+            text: font,
+            textPoint: cornerFontPoint,
+            textSize: textSize,
+            textRouteResetPoint: [1.7, -2.5],
+          });
+
           curReg += 60;
           curCorner += 1;
           break;
       }
     }
 
-    console.log(newSvgPoints);
-
     if (topDown === 'top') {
       setSvgPointsTop(newSvgPoints);
+      setFontsTop(fonts);
       return [curEdge, curCorner];
     } else {
       setSvgPointsDown(newSvgPoints);
+      setFontsDown(fonts);
     }
   };
 
@@ -492,12 +592,13 @@ const DoubleSq1Draw = () => {
     });
     setDownCspOptions(opt);
     setSvgPointsDown([]);
-    setDownDefaultVal('');
+    setDownDefaultVal(opt[0].value);
+    setDraws(opt[0].value, 'down');
   };
 
   const handleUpdateDownOpt = (e: string) => {
     setDraws(e, 'down');
-    setDownDefaultVal(e)
+    setDownDefaultVal(e);
   };
 
   useEffect(() => {
@@ -511,6 +612,10 @@ const DoubleSq1Draw = () => {
       opt.push({ value: key, label: key });
     });
     setTopCspOptions(opt);
+    setDownDefaultVal('8');
+
+    setDraws('星 Star', 'top');
+    setDraws('8', 'down');
   }, []);
 
   const resetBaseReg = (e: number, topDown: string) => {
@@ -545,11 +650,19 @@ const DoubleSq1Draw = () => {
         buttons={
           <>
             <div style={{ display: 'flex', gap: 16 }}>
+              <Form.Item label={<strong>文字</strong>}>
+                <Switch onChange={handleSetFontSwitch} />
+              </Form.Item>
+            </div>
+
+            {/*顶层*/}
+            <div style={{ display: 'flex', gap: 16 }}>
               <Form.Item label={<strong>顶层</strong>} style={{ marginBottom: 0 }}>
                 {/* @ts-ignore */}
                 <Select
                   onChange={handleUpdateTopOpt}
                   options={topCspOption}
+                  defaultValue={'星 Star'}
                   style={{ width: 150 }}
                 />
               </Form.Item>
@@ -583,6 +696,26 @@ const DoubleSq1Draw = () => {
               </div>
             </div>
 
+            {useFont && fontsTop && fontsTop.length > 0 && (
+              <>
+                <Form.Item label={<strong>顶层文字</strong>} style={{ marginBottom: 0 }}>
+                  <Row gutter={[8, 8]}>
+                    {fontsTop.map((font, index) => (
+                      <Col span={8} key={`top-font-${index}`}>
+                        <Input
+                          value={font}
+                          maxLength={1}
+                          onChange={(e) => handleTopFontChange(index, e.target.value)}
+                          placeholder="Enter Value"
+                        />
+                      </Col>
+                    ))}
+                  </Row>
+                </Form.Item>
+              </>
+            )}
+
+            {/*底层*/}
             <div style={{ display: 'flex', gap: 16, marginTop: 15 }}>
               <Form.Item label={<strong>底层</strong>} style={{ marginBottom: 0 }}>
                 {/* @ts-ignore */}
@@ -623,6 +756,25 @@ const DoubleSq1Draw = () => {
                 </Form.Item>
               </div>
             </div>
+
+            {useFont && fontsDown && fontsDown.length > 0 && (
+              <>
+                <Form.Item label={<strong>底层文字</strong>} style={{ marginBottom: 0 }}>
+                  <Row gutter={[8, 8]}>
+                    {fontsDown.map((font, index) => (
+                      <Col span={8} key={`down-font-${index}`}>
+                        <Input
+                          value={font}
+                          maxLength={1}
+                          onChange={(e) => handleDownFontChange(index, e.target.value)}
+                          placeholder="Enter Value"
+                        />
+                      </Col>
+                    ))}
+                  </Row>
+                </Form.Item>
+              </>
+            )}
           </>
         }
       />

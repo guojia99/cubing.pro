@@ -16,7 +16,7 @@ export type pathSvg = {
     y1?: number;
     x2?: number;
     y2?: number;
-  }
+  };
 
   disableStrokeWidth?: boolean;
 
@@ -29,6 +29,17 @@ export type pathSvg = {
   translate?: number[]; // 平移
 
   transformStr?: string; // 强制使用字符串，以上均无效
+
+  // 绑定的反色文字
+  unColorBindKey?: string; // 使用该key，可以让绑定该key内容反色
+
+  // 文字
+  text?: string;
+  textSize?: number;
+  textPoint?: number[];
+  textRouteResetPoint?: number[];
+
+  disShow?: boolean; // 隐藏
 };
 
 interface DrawPaletteProps {
@@ -73,11 +84,16 @@ const DrawPalette: React.FC<DrawPaletteProps> = ({
   const [downloadName, setDownloadName] = useState<string>();
   const [strokeWidth, setStrokeWidth] = useState(1);
   const handleColrChange = (key: string, color: string) => {
+    console.log(key, color);
     setColors((prevColors) => ({
       ...prevColors,
       [key]: color,
     }));
   };
+
+  useEffect(() => {
+    console.log('colors', colors);
+  }, [colors]);
 
   const handleSvgDownload = () => {
     const svg = svgRef.current;
@@ -129,10 +145,14 @@ const DrawPalette: React.FC<DrawPaletteProps> = ({
     const keys: string[] = [];
     for (let i = 0; i < svgPoints.length; i++) {
       const key = storageKey + '-' + svgPoints[i].key;
+      let cs = '#777';
       // @ts-ignore
       if (colors[key] === undefined) {
+        if (key.includes('fonts')) {
+          cs = '#000';
+        }
         // @ts-ignore
-        colors[key] = '#777';
+        colors[key] = cs;
       }
       keys.push(key);
     }
@@ -140,6 +160,17 @@ const DrawPalette: React.FC<DrawPaletteProps> = ({
     setKeys(keys);
     console.log(keys);
   }, [JSON.stringify(svgPoints)]);
+
+  const buildTransform = (elem: pathSvg) => {
+    if (elem.transformStr) return elem.transformStr;
+    const parts: string[] = [];
+    if (elem.translate?.length) parts.push(`translate(${elem.translate.join(' ')})`);
+    if (elem.rotatePoint) {
+      const angle = (elem.baseRotate ?? 0) + (elem.rotate ?? 0);
+      parts.push(`rotate(${angle} ${elem.rotatePoint})`);
+    }
+    return parts.join(' ');
+  };
 
   return (
     <div>
@@ -195,27 +226,48 @@ const DrawPalette: React.FC<DrawPaletteProps> = ({
               >
                 {svgPoints.map((elem: pathSvg) => {
                   let key = storageKey + '-' + elem.key;
-                  let transform = undefined;
-                  if (elem.transformStr) {
-                    transform = elem.transformStr;
-                  } else {
-                    transform = ""
-                    if (elem.translate){
-                      transform += `translate(${elem.translate.join(' ')}) `;
-                    }
-                    if (elem.rotatePoint) {
-                      // @ts-ignore
-                      transform += `rotate(${elem.baseRotate + elem.rotate} ${elem.rotatePoint})`;
-                    }
-                  }
+                  const transform = buildTransform(elem);
 
                   if (elem.disableDrawing) {
-                    key = 'disable';
+                    key += '_disable';
                   }
 
-                  let curStrokeWidth =strokeWidth * strokeWidthNum
-                  if (elem.disableStrokeWidth){
-                    curStrokeWidth = 0
+                  let curStrokeWidth = strokeWidth * strokeWidthNum;
+                  if (elem.disableStrokeWidth) {
+                    curStrokeWidth = 0;
+                  }
+
+                  if (elem.text) {
+                    const angle = (elem.baseRotate ?? 0) + (elem.rotate ?? 0);
+                    const baseTransform = buildTransform(elem);
+
+                    // 只对 text 特殊：加一个反向旋转
+                    // @ts-ignore
+                    const textTransform = `${baseTransform} rotate(${-angle} ${
+                      // @ts-ignore
+                      elem.textPoint?.[0] + elem.textRouteResetPoint?.[0]
+                      // @ts-ignore
+                    } ${elem.textPoint?.[1] + elem.textRouteResetPoint?.[1]})`;
+
+                    return (
+                      <text
+                        // @ts-ignore
+                        fill={colors[key]}
+                        key={key}
+                        data-key={key}
+                        textAnchor="start"
+                        fontFamily={'Noto Sans JP'}
+                        fontSize={elem.textSize}
+                        // @ts-ignore
+                        x={elem.textPoint[0]}
+                        // @ts-ignore
+                        y={elem.textPoint[1]}
+                        transform={textTransform}
+                        opacity={elem.disShow ? 0 : 1}
+                      >
+                        {elem.text}
+                      </text>
+                    );
                   }
 
                   if (elem.d) {
@@ -225,6 +277,8 @@ const DrawPalette: React.FC<DrawPaletteProps> = ({
                         fill={colors[key]}
                         key={key}
                         data-key={key}
+                        /* eslint-disable-next-line react/no-unknown-property */
+                        uncolor-data-key={elem.unColorBindKey}
                         d={elem.d}
                         stroke={'black'}
                         strokeWidth={curStrokeWidth}
@@ -252,8 +306,7 @@ const DrawPalette: React.FC<DrawPaletteProps> = ({
                     );
                   }
 
-
-                  if (elem.line){
+                  if (elem.line) {
                     return (
                       <line
                         // @ts-ignore
@@ -270,9 +323,8 @@ const DrawPalette: React.FC<DrawPaletteProps> = ({
                         strokeLinejoin={'round'}
                         style={{ cursor: 'pointer' }}
                         transform={transform}
-                      >
-                      </line>
-                    )
+                      ></line>
+                    );
                   }
 
                   return <></>;
