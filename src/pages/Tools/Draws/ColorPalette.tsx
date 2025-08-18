@@ -1,16 +1,37 @@
 import { CheckOutlined } from '@ant-design/icons';
-import { Button, Divider, message, Popover } from 'antd';
+import { Button, Divider, Popover } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { SketchPicker } from 'react-color';
-import {FormattedMessage, getIntl} from "@@/exports";
+import {FormattedMessage} from "@@/exports";
 
-const intl = getIntl();
 
 export interface ColorPaletteProps {
   onSelectColor: (key: string, color: string) => void;
   presetColors?: string[];
   storageKey?: string;
   allKeys?: string[];
+}
+
+function getInvertedColor(hexColor: string): string {
+  let hex = hexColor.replace(/^#/, '');
+
+  // 支持 3 位颜色：#abc → #aabbcc
+  if (hex.length === 3) {
+    hex = hex
+      .split('')
+      .map((char) => char + char)
+      .join('');
+  }
+
+  const r = parseInt(hex.slice(0, 2), 16);
+  const g = parseInt(hex.slice(2, 4), 16);
+  const b = parseInt(hex.slice(4, 6), 16);
+
+  const ir = (255 - r).toString(16).padStart(2, '0');
+  const ig = (255 - g).toString(16).padStart(2, '0');
+  const ib = (255 - b).toString(16).padStart(2, '0');
+
+  return `#${ir}${ig}${ib}`;
 }
 
 const ColorPalette: React.FC<ColorPaletteProps> = ({
@@ -41,7 +62,11 @@ const ColorPalette: React.FC<ColorPaletteProps> = ({
 
   const resetColors = () => {
     for (let i = 0; i < allKeys.length; i++) {
-      onSelectColor(allKeys[i], '#777');
+      if (allKeys[i].includes("fonts")){
+        onSelectColor(allKeys[i], '#000');
+      } else {
+        onSelectColor(allKeys[i], '#777');
+      }
     }
   };
 
@@ -57,10 +82,9 @@ const ColorPalette: React.FC<ColorPaletteProps> = ({
       const key = event.srcElement.getAttribute('data-key');
       if (!key) return;
 
-      if (key === 'disable'){
+      if (key.includes("disable")){
         return;
       }
-
 
       if (!key.includes(storageKey)) {
         return;
@@ -70,9 +94,16 @@ const ColorPalette: React.FC<ColorPaletteProps> = ({
         // message.warning(intl.formatMessage({ id: 'draws.color.select_color' })).then();
         return;
       }
-      if (key && selectedColor) {
+      if (key) {
         onSelectColor(key, selectedColor);
       }
+
+      const unbindKey = event.srcElement.getAttribute('uncolor-data-key');
+      if (unbindKey){
+        console.log("unbindKey", unbindKey, getInvertedColor(selectedColor), selectedColor)
+        onSelectColor(unbindKey, getInvertedColor(selectedColor))
+      }
+
     };
 
     document.addEventListener('click', handleSvgClick);
