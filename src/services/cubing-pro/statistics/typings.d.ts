@@ -4,12 +4,15 @@ export type KinChSorResultWithEvent = {
   Event: string;
   Result: number;
   IsBest: boolean;
+  ResultString: string;
 };
 
 export type KinChSorResult = {
   PlayerId: number;
   CubeId: string;
   Rank: number;
+  wca_id: string;
+  WcaName: string;
   PlayerName: string;
   Result: number;
   Results: KinChSorResultWithEvent[];
@@ -19,6 +22,7 @@ declare namespace StaticAPI {
   type KinchReq = {
     page: number;
     size: number;
+    age: number;
     events: string[];
   };
   type KinchResp = {

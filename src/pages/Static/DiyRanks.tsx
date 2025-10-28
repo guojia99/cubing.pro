@@ -1,6 +1,6 @@
 import { CubesCn } from '@/components/CubeIcon/cube';
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
-import { WCALink } from '@/components/Link/Links';
+import { WCALink, WCALinkWithCnName } from '@/components/Link/Links';
 import { NavTabs } from '@/components/Tabs/nav_tabs';
 import {
   apiDiyRanking,
@@ -88,7 +88,7 @@ const DiyRanks: React.FC<DiyRanksProps> = ({ keys }) => {
         dataIndex: 'BestPersonName',
         key: 'BestPersonName',
         render: (value: string, record: StaticAPI.DiyRankWCAResult) => {
-          return <>{WCALink(record.BestPersonWCAID, record.BestPersonName)}</>;
+          return <>{WCALinkWithCnName(record.BestPersonWCAID, record.BestPersonName)}</>;
         },
       },
       {
@@ -113,7 +113,7 @@ const DiyRanks: React.FC<DiyRanksProps> = ({ keys }) => {
           dataIndex: 'BestPersonName',
           key: 'BestPersonName',
           render: (value: string, record: StaticAPI.DiyRankWCAResult) => {
-            return <>{WCALink(record.AvgPersonWCAID, record.AvgPersonName)}</>;
+            return <>{WCALinkWithCnName(record.AvgPersonWCAID, record.AvgPersonName)}</>;
           },
         },
         {

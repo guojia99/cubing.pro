@@ -1,6 +1,6 @@
 // src/components/TopologyGraph.tsx
 import React, { useEffect, useRef } from 'react';
-import { Network } from 'vis-network/standalone/esm/vis-network';
+import { Network } from 'vis-network';  // ✅ 修改这里
 import { nodes } from '@/pages/Tools/fmc/htr/nodes';
 import { edges } from '@/pages/Tools/fmc/htr/edges';
 
@@ -40,13 +40,14 @@ const TopologyGraph = () => {
     };
 
     if (containerRef.current) {
+      // @ts-ignore
       new Network(containerRef.current, data, options);
     }
   }, []);
 
   return (
     <div>
-      <h2>HTR迷宫图 拓扑可视化</h2>
+      <h2>HTR迷宫图</h2>
       <div ref={containerRef} style={{ height: '900px', border: '1px solid #ccc' }} />
     </div>
   );

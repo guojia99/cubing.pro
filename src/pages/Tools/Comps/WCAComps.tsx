@@ -2,117 +2,101 @@ import { FlagOutlined } from '@ant-design/icons';
 import { Avatar, Button, Card, Empty, List, message, Progress, Tabs, Tag, Typography } from 'antd';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import { WcaCompetition } from '@/pages/Tools/Comps/api';
 
 const { Title, Text, Link } = Typography;
 
-interface WcaCompetition {
-  id: string;
-  name: string;
-  venue: string;
-  registration_open: string;
-  registration_close: string;
-  start_date: string;
-  end_date: string;
-  short_display_name: string;
-  city: string;
-  country_iso2: string;
-  event_ids: string[];
-  latitude_degrees: number;
-  longitude_degrees: number;
-  announced_at: string;
-  class: string;
-}
 
 const COUNTRY_MAP: { [key: string]: { label: string; code: string; icon: React.ReactNode } } = {
   CN: {
     label: '中国',
     code: 'CN',
     icon: (
-      <Avatar style={{ width: 32 }} src="https://flagcdn.com/cn.svg" size="small" shape="square" />
+      <Avatar style={{ width: 16 }} src="https://flagcdn.com/cn.svg" size="small" shape="square" />
     ),
   },
   HK: {
     label: '中国香港',
     code: 'HK',
     icon: (
-      <Avatar style={{ width: 32 }} src="https://flagcdn.com/hk.svg" size="small" shape="square" />
+      <Avatar style={{ width: 16 }} src="https://flagcdn.com/hk.svg" size="small" shape="square" />
     ),
   },
   TW: {
     label: '中国台湾',
     code: 'TW',
     icon: (
-      <Avatar style={{ width: 32 }} src="https://flagcdn.com/cn.svg" size="small" shape="square" />
+      <Avatar style={{ width: 16 }} src="https://flagcdn.com/cn.svg" size="small" shape="square" />
     ),
   },
   KR: {
     label: '韩国',
     code: 'KR',
     icon: (
-      <Avatar style={{ width: 32 }} src="https://flagcdn.com/kr.svg" size="small" shape="square" />
+      <Avatar style={{ width: 16 }} src="https://flagcdn.com/kr.svg" size="small" shape="square" />
     ),
   },
   MY: {
     label: '马来西亚',
     code: 'MY',
     icon: (
-      <Avatar style={{ width: 32 }} src="https://flagcdn.com/my.svg" size="small" shape="square" />
+      <Avatar style={{ width: 16 }} src="https://flagcdn.com/my.svg" size="small" shape="square" />
     ),
   },
   SG: {
     label: '新加坡',
     code: 'SG',
     icon: (
-      <Avatar style={{ width: 32 }} src="https://flagcdn.com/sg.svg" size="small" shape="square" />
+      <Avatar style={{ width: 16 }} src="https://flagcdn.com/sg.svg" size="small" shape="square" />
     ),
   },
   VN: {
     label: '越南',
     code: 'VN',
     icon: (
-      <Avatar style={{ width: 32 }} src="https://flagcdn.com/vn.svg" size="small" shape="square" />
+      <Avatar style={{ width: 16 }} src="https://flagcdn.com/vn.svg" size="small" shape="square" />
     ),
   },
   TH: {
     label: '泰国',
     code: 'TH',
     icon: (
-      <Avatar style={{ width: 32 }} src="https://flagcdn.com/th.svg" size="small" shape="square" />
+      <Avatar style={{ width: 16 }} src="https://flagcdn.com/th.svg" size="small" shape="square" />
     ),
   },
   JP: {
     label: '日本',
     code: 'JP',
     icon: (
-      <Avatar style={{ width: 32 }} src="https://flagcdn.com/jp.svg" size="small" shape="square" />
+      <Avatar style={{ width: 16 }} src="https://flagcdn.com/jp.svg" size="small" shape="square" />
     ),
   },
   ID: {
     label: '印尼',
     code: 'ID',
     icon: (
-      <Avatar style={{ width: 32 }} src="https://flagcdn.com/id.svg" size="small" shape="square" />
+      <Avatar style={{ width: 16 }} src="https://flagcdn.com/id.svg" size="small" shape="square" />
     ),
   },
   PH: {
     label: '菲律宾',
     code: 'PH',
     icon: (
-      <Avatar style={{ width: 32 }} src="https://flagcdn.com/ph.svg" size="small" shape="square" />
+      <Avatar style={{ width: 16 }} src="https://flagcdn.com/ph.svg" size="small" shape="square" />
     ),
   },
   NP: {
     label: '尼泊尔',
     code: 'NP',
     icon: (
-      <Avatar style={{ width: 32 }} src="https://flagcdn.com/np.svg" size="small" shape="square" />
+      <Avatar style={{ width: 16 }} src="https://flagcdn.com/np.svg" size="small" shape="square" />
     ),
   },
   AU: {
     label: '澳大利亚',
     code: 'AU',
     icon: (
-      <Avatar style={{ width: 32 }} src="https://flagcdn.com/au.svg" size="small" shape="square" />
+      <Avatar style={{ width: 16 }} src="https://flagcdn.com/au.svg" size="small" shape="square" />
     )
   }
 };
