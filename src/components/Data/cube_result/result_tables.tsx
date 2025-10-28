@@ -88,7 +88,7 @@ export const ResultsTable = (
             return (
               <td className={'cube_result_Best_col'}>
                 {RecordTagWithResult(
-                  resultTimeString(results, inter),
+                  resultTimeString(results !== undefined ? results: 0, inter),
                   result.id + '_repeatedly',
                   true,
                   false,

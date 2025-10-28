@@ -1,0 +1,47 @@
+.wca-player-container {
+  min-width: 800px;
+  margin-bottom: 16px;
+  /*margin: 0 auto;*/
+  /*padding: 8px;*/
+}
+
+.wca-player-container .header-section {
+  text-align: center;
+  padding: 8px 0;
+}
+
+.wca-player-container .ant-table {
+  font-size: 16px;
+}
+
+.wca-player-container .ant-table-cell {
+  padding: 16px 12px;
+}
+
+.wca-player-container .ant-badge {
+  margin-right: 4px;
+}
+
+/* 横向表格样式优化 */
+.wca-player-container .ant-table-row > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 响应式适配 */
+@media (max-width: 600px) {
+  .wca-player-container {
+    padding: 10px;
+  }
+  .wca-player-container .ant-card {
+    border-radius: 12px;
+  }
+  .wca-player-container .ant-table-cell {
+    padding: 12px 8px;
+  }
+  .wca-player-container .ant-table {
+    font-size: 14px;
+  }
+}

@@ -6,7 +6,7 @@ const dev = false
 
 export function getAPIUrl() {
   if (dev){
-    return "http://106.53.77.214/v3/cube-api"
+    return "https://cubing.pro/v3/cube-api"
   }
 
   const hostname = window.location.hostname;

@@ -107,6 +107,7 @@ export default [
       {path: 'associative-words',component: './Tools/Bld/Bld_Associative_Words', name: 'associative-words'},
       {path: 'mbld-d', component: './Tools/Bld/MBld', name: 'mbld'},
       {path: 'teamMatch', component: './Tools/TeamMatch/TeamMatch', name: 'TeamMatch'},
+      {path: 'htr-diagram', component: './Tools/fmc/TopologyGraph', name: 'htr路线图'},
     ],
   },
 
@@ -124,6 +125,15 @@ export default [
   {path: 'test', component: './Tests/Test'},
 
   {path: 'wca_comps', component: './Tools/Comps/WCAComps', name:'wca_comps'},
+
+
+  {
+    path: 'wca',
+    // name: 'WCA',
+    routes: [
+      {path: 'player/:wcaId', component: './WCA/Player'},
+    ]
+  },
 
   ...reXRoutes(),
 ];
