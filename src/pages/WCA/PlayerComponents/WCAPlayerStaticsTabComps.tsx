@@ -1,17 +1,14 @@
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
-import { WCACompetition } from '@/services/wca/player';
-import { WCAResult } from '@/services/wca/playerResults';
+import { getCompsEvents } from '@/pages/WCA/utils/events';
+import { WCACompetition, WCAResult } from '@/services/wca/types';
 import { Button, Space, Table } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import React, { useEffect, useState } from 'react';
-import { getCompsEvents } from '@/pages/WCA/utils/events';
 
 interface WCACompetitionTableProps {
   competitions: WCACompetition[];
   wcaResults: WCAResult[];
 }
-
-
 
 // 赛事列表表格组件
 const CompetitionTable: React.FC<WCACompetitionTableProps> = ({ competitions, wcaResults }) => {
@@ -20,13 +17,13 @@ const CompetitionTable: React.FC<WCACompetitionTableProps> = ({ competitions, wc
     return new Date(b.start_date).getTime() - new Date(a.start_date).getTime();
   });
 
-
-  const [competitionEventMap, setCompetitionEventMap] = useState<Map<string, string[]>>(new Map<string, string[]>);
+  const [competitionEventMap, setCompetitionEventMap] = useState<Map<string, string[]>>(
+    new Map<string, string[]>(),
+  );
 
   useEffect(() => {
-    setCompetitionEventMap(getCompsEvents(wcaResults))
-
-  }, [wcaResults])
+    setCompetitionEventMap(getCompsEvents(wcaResults));
+  }, [wcaResults]);
 
   // 定义表格列
   const columns: ColumnsType<WCACompetition> = [
@@ -99,9 +96,9 @@ const CompetitionTable: React.FC<WCACompetitionTableProps> = ({ competitions, wc
           const eventId = ids[i];
 
           if (playerIds.includes(eventId)) {
-            body.push( CubeIcon(eventId, eventId, { color: '#000000' }))
+            body.push(CubeIcon(eventId, eventId, { color: '#000000' }));
           } else {
-            body.push( CubeIcon(eventId, eventId, { color: '#a9a5a5' }))
+            body.push(CubeIcon(eventId, eventId, { color: '#a9a5a5' }));
           }
         }
         return <Space>{body}</Space>;

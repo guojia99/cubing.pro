@@ -1,9 +1,9 @@
-import { WcaProfile } from '@/services/wca/player';
-import { WCAResult } from '@/services/wca/playerResults';
+
 import { Avatar, Badge, Card, Divider, Image, Space, Table, Typography } from 'antd';
 import 'flag-icons/css/flag-icons.min.css';
 import React from 'react';
 import './PlayerDetails.css';
+import { WcaProfile, WCAResult } from '@/services/wca/types';
 
 interface WCAPlayerDetailsProps {
   wcaProfile: WcaProfile;

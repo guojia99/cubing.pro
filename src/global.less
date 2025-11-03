@@ -58,3 +58,25 @@ ol {
     }
   }
 }
+
+
+// 强制全局宽度为 PC 模式
+html, body, #root {
+  min-width: 1200px !important;
+  overflow-x: auto;
+}
+
+// 禁止 ProLayout 的响应式折叠
+.ant-pro-sider {
+  transform: none !important;
+  width: 256px !important;
+}
+
+@media (max-width: 768px) {
+  .ant-pro-sider {
+    position: relative !important;
+  }
+  .ant-pro-layout-content {
+    padding: 24px !important;
+  }
+}

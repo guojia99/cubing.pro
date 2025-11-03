@@ -1,5 +1,4 @@
-import { WCACompetition, WcaProfile } from '@/services/wca/player';
-import { WCAResult } from '@/services/wca/playerResults';
+import { WCACompetition, WcaProfile, WCAResult } from '@/services/wca/types';
 import React from 'react';
 import { Card, Tabs } from 'antd';
 import WCAPlayerStaticsTabResults from '@/pages/WCA/PlayerComponents/WCAPlayerStaticsTabResults';

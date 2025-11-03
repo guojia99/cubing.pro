@@ -1,9 +1,8 @@
+import WCAPlayerStaticsTabResultsWithComp from '@/pages/WCA/PlayerComponents/WCAPlayerStaticsTabResultsWithComps';
 import WCAPlayerStaticsTabResultsWithEvent from '@/pages/WCA/PlayerComponents/WCAPlayerStaticsTabResultsWithEvent';
-import { WCACompetition } from '@/services/wca/player';
-import { WCAResult } from '@/services/wca/playerResults';
+import { WCACompetition, WCAResult } from '@/services/wca/types';
 import { Tabs } from 'antd';
 import React from 'react';
-import WCAPlayerStaticsTabResultsWithComp from '@/pages/WCA/PlayerComponents/WCAPlayerStaticsTabResultsWithComps';
 
 const { TabPane } = Tabs;
 

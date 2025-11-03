@@ -1,5 +1,3 @@
-import { WCAResult } from '@/services/wca/playerResults';
-
 /**
  * 格式化秒数为 HH:MM:SS.ss 或 MM:SS.ss 或 S.ss
  * @param seconds - 时间（秒）
@@ -24,7 +22,9 @@ export function secondTimeFormat(seconds: number, mbf: boolean): string {
   } else if (duration < 3600) {
     return `${minutes}:${secs.toString().padStart(2, '0')}${mmSecondsStr}`;
   } else {
-    return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}${mmSecondsStr}`;
+    return `${hours}:${minutes.toString().padStart(2, '0')}:${secs
+      .toString()
+      .padStart(2, '0')}${mmSecondsStr}`;
   }
 }
 
@@ -41,9 +41,9 @@ export function get333MBFResult(inValue: number): {
   formattedTime: string;
 } {
   const str = inValue.toString().padStart(7, '0'); // 确保至少7位
-  const diff = parseInt(str.substring(0, 2), 10);     // DD
-  const timePart = str.substring(2, 7);              // TTTTT
-  const missed = parseInt(str.substring(7), 10);     // MM
+  const diff = parseInt(str.substring(0, 2), 10); // DD
+  const timePart = str.substring(2, 7); // TTTTT
+  const missed = parseInt(str.substring(7), 10); // MM
 
   let seconds: number;
   if (timePart === '99999') {
@@ -63,10 +63,11 @@ export function get333MBFResult(inValue: number): {
  * 格式化 WCA 比赛成绩
  * @param value - 原始成绩（单位：百分之一秒）
  * @param event - 项目 ID（如 '333', '333fm', '333mbf'）
+ * @param isAvg
  * @returns 格式化后的字符串
  */
 export function resultsTimeFormat(value: number, event: string, isAvg: boolean): string {
-  if (value === 0){
+  if (value === 0) {
     return '';
   }
   // 特殊值处理
@@ -75,11 +76,11 @@ export function resultsTimeFormat(value: number, event: string, isAvg: boolean):
 
   switch (event) {
     case '333fm':
-      if (isAvg){
+      if (isAvg) {
         return (value / 100).toFixed(2);
       }
       // FMC：单位为 0.01 步 → 转为 x.xx 步
-      return `${value}`
+      return `${value}`;
 
     case '333mbf':
       // 多盲：解析 DD TTTTT MM
@@ -95,11 +96,50 @@ export function resultsTimeFormat(value: number, event: string, isAvg: boolean):
   }
 }
 
+// 格式化 attempts 显示（高亮最佳与最差）
+export const formatAttempts = (
+  attempts: number[],
+  eventId: string,
+  best_index: number,
+  worst_index: number,
+): JSX.Element => {
+  const cellWidth = 85; // 每个成绩单元格固定宽度
 
-// 格式化 attempts 显示
-export const formatAttempts = (attempts: number[], eventId: string): string => {
-  return attempts
-    .filter((time) => time !== 0)
-    .map((time) => resultsTimeFormat(time, eventId, false))
-    .join('\t');
+  const len = attempts.filter((v) => v !== 0).length
+
+  const items = attempts.map((time, i) => {
+    if (time === 0) {
+      return (
+        <span key={i}></span>
+      );
+    }
+
+    const formatted = resultsTimeFormat(time, eventId, false);
+
+    let displayText = formatted;
+
+    // 仅在 attempts.length === 5 时，对最佳和最差加括号
+    if (len === 5) {
+      if (i === best_index) displayText = `(${formatted})`;
+      else if (i === worst_index) displayText = `(${formatted})`;
+    }
+
+    return (
+      <span
+        key={i}
+        style={{
+          display: 'inline-block',
+          width: cellWidth,
+          textAlign: 'left',
+          fontWeight:
+            len === 5 && (i === best_index || i === worst_index) ? 800 : 500,
+          fontFamily: 'monospace',
+        }}
+      >
+        {displayText}
+      </span>
+    );
+  });
+
+  return <div style={{ display: 'flex', gap: 1 }}>{items}</div>;
 };
