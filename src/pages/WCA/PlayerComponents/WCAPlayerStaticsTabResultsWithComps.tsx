@@ -1,12 +1,12 @@
-import { WCAResult } from '@/services/wca/playerResults';
+
 import React from 'react';
 import { Tag, Space, Card, Typography, Table } from 'antd';
-import { WCACompetition } from '@/services/wca/player';
 import { roundNameMap, roundSortOrder } from '@/pages/WCA/utils/events';
 import { ColumnsType } from 'antd/es/table';
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import { CubesCn } from '@/components/CubeIcon/cube';
 import { formatAttempts, resultsTimeFormat } from '@/pages/WCA/utils/wca_results';
+import { WCACompetition, WCAResult } from '@/services/wca/types';
 
 const { Title } = Typography
 
@@ -100,7 +100,7 @@ const WCAPlayerStaticsTabResultsWithComp: React.FC<WCAPlayerStaticsTabResultsWit
     {
       title: '项目',
       key: 'event',
-      width: 120,
+      width: 200,
       render: (_, record) => {
         if (record.showEvent) {
           const eventId = record.eventId || record.event_id;
@@ -191,10 +191,10 @@ const WCAPlayerStaticsTabResultsWithComp: React.FC<WCAPlayerStaticsTabResultsWit
     {
       title: '详细成绩',
       key: 'attempts',
-      width: 300,
+      width: 360,
       render: (_, record) => (
         <span style={{ fontFamily: 'monospace', fontSize: '12px', whiteSpace: 'pre-wrap' }}>
-          {formatAttempts(record.attempts, record.event_id)}
+          {formatAttempts(record.attempts, record.event_id, record.best_index, record.worst_index)}
         </span>
       ),
     },

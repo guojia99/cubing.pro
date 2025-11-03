@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from '@@/exports';
-import { getWCAPersonCompetitions, getWCAPersonProfile, WCACompetition, WcaProfile } from '@/services/wca/player';
+import { getWCAPersonCompetitions, getWCAPersonProfile, getWCAPersonResults } from '@/services/wca/player';
 import { Spin } from 'antd';
 import WCAPlayerDetails from '@/pages/WCA/PlayerComponents/PlayerDetails';
-import { getWCAPersonResults, WCAResult } from '@/services/wca/playerResults';
 import WCAPlayerResultTable from '@/pages/WCA/PlayerComponents/PlayerResultTable';
 import WCAPlayerStaticsTab from '@/pages/WCA/PlayerComponents/WCAPlayerStaticsTab';
+import { WCACompetition, WcaProfile, WCAResult } from '@/services/wca/types';
 
 const WCAPlayer: React.FC = () => {
   const { wcaId } = useParams();
@@ -14,8 +14,6 @@ const WCAPlayer: React.FC = () => {
   const [wcaProfile, setWcaProfile] = useState<WcaProfile>();
   const [wcaResults, setWcaResults] = useState<WCAResult[]>([])
   const [comps, setComps] = useState<WCACompetition[]>([]);
-
-
 
   const fetchPlayer = async () => {
     if (!wcaId) {

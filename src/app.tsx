@@ -6,12 +6,12 @@ import defaultSettings from '../config/defaultSettings';
 import { UserOutlined, UserSwitchOutlined } from '@ant-design/icons';
 import { AvatarProps, Col, Row } from 'antd';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
-import ParticleBackground from '@/components/background/WaveBackground';
 import { AvatarURL } from '@/pages/Admin/AvatarDropdown';
 import { AuthAPI } from '@/services/cubing-pro/auth/typings';
 import ScrollToTopButton from "@/components/Buttons/toTop";
 import LanguageSelect from "@/locales/Language/LanguageSelect";
 import {ExtAppList} from "@/services/layout_config";
+import { Helmet } from '@@/exports';
 
 
 
@@ -58,6 +58,13 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     icon = <UserOutlined />;
   }
   return {
+    // 禁止手机端渲染
+    // fixSiderbar: true,
+    // siderMenuType: 'sub',
+    // disableMobile: true,
+    // contentWidth: 'Fixed', // 可改为 'Fixed'
+
+    // 标准配置
     avatarProps: {
       src: AvatarURL(initialState?.currentUser?.data.Avatar),
       icon: icon,
@@ -80,9 +87,13 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     footerRender: () => <Footer />,
     childrenRender: (children) => {
       // return (<>{children}</>)
-
       return (
         <>
+          <Helmet>
+            {window.innerWidth <= 768 && (
+              <meta name="viewport" content="width=1080, initial-scale=1" />
+            )}
+          </Helmet>
           <ScrollToTopButton />
           <Row>
             {/*<ParticleBackground></ParticleBackground>*/}

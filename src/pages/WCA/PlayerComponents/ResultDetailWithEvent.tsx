@@ -1,16 +1,18 @@
 import { getRecordColor, roundColorMap, roundNameMap, roundSortOrder } from '@/pages/WCA/utils/events';
 import { formatAttempts, resultsTimeFormat } from '@/pages/WCA/utils/wca_results';
-import { WCACompetition } from '@/services/wca/player';
-import { WCAResult } from '@/services/wca/playerResults';
 import { Space, Table, Tag } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import React from 'react';
+import WCAResultChart from '@/pages/WCA/PlayerComponents/WCAResultChart';
+import { WCACompetition, WCAResult } from '@/services/wca/types';
 
 interface ResultDetailWithEventProps {
   eventID: string;
   wcaResults: WCAResult[];
   comps: WCACompetition[];
 }
+
+
 
 
 // 解析日期范围
@@ -74,6 +76,15 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
     });
   });
 
+  // 判断当前成绩是否为进步成绩
+  const isProgress = (record: typeof dataSource[0], index: number, type: 'best' | 'average') => {
+    const resultsForEvent = dataSource.filter(r => r.event_id === record.event_id);
+    // 当前成绩之后的成绩是历史成绩
+    const historical = resultsForEvent.slice(index + 1);
+    const prevBest = Math.min(...historical.map(r => r[type]).filter(v => v > 0), Infinity);
+    return record[type] > 0 && record[type] < prevBest;
+  };
+
   // 表格列定义
   const columns: ColumnsType<(typeof dataSource)[0]> = [
     {
@@ -114,12 +125,12 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
       title: '排名',
       dataIndex: 'pos',
       key: 'pos',
-      width: 80,
+      width: 100,
       render: (pos: number) => (
         <span
           style={{
-            fontWeight: pos === 1 ? 'bold' : 'normal',
-            color: pos === 1 ? '#cf1322' : 'inherit', // 红色：Ant Design 的 error 主色
+            fontWeight: pos === 0 ? 'bold' : 'normal',
+            color: pos === 0 ? '#cf1322' : 'inherit', // 红色：Ant Design 的 error 主色
           }}
         >
           {pos}
@@ -130,29 +141,20 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
       title: '单次',
       dataIndex: 'best',
       key: 'best',
-      width: 120,
-      render: (best, record) => {
-        return (
-          <Space
-            direction="horizontal"
-            size={4}
-            style={{
-              display: 'flex',
-              whiteSpace: 'nowrap'
-            }}
-          >
+      width: 80,
+      align: 'left',
+      render: (best, record, index) => {
+        const progress = isProgress(record, index, 'best');
 
-            <span>{resultsTimeFormat(best, record.event_id, false)}</span>
+        return (
+          <Space direction="horizontal" size={4} style={{ display: 'flex', whiteSpace: 'nowrap' }}>
+        <span style={{ color: progress ? 'red' : 'inherit', fontWeight: progress ? 600 : 400 }}>
+          {resultsTimeFormat(best, record.event_id, false)}
+        </span>
             {record.regional_single_record && (
               <Tag
                 color={getRecordColor(record.regional_single_record)}
-                style={{
-                  margin: 0,
-                  fontSize: '10px',
-                  padding: '0 6px',
-                  height: '18px',
-                  lineHeight: '18px'
-                }}
+                style={{ margin: 0, fontSize: '10px', padding: '0 6px', height: '18px', lineHeight: '18px' }}
               >
                 {record.regional_single_record}
               </Tag>
@@ -165,20 +167,31 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
       title: '平均',
       dataIndex: 'average',
       key: 'average',
-      width: 120,
-      render: (avg, record) => {
+      width: 80,
+      align: 'left',
+      render: (avg, record, index) => {
         if (avg === 0) return '';
+
+        // 判断是否为进步成绩（比更旧成绩更好）
+        const resultsForEvent = dataSource.filter(r => r.event_id === record.event_id);
+        const historical = resultsForEvent.slice(index + 1); // 更旧成绩
+        const prevBestAvg = Math.min(...historical.map(r => r.average).filter(v => v > 0), Infinity);
+        const isProgress = avg > 0 && avg < prevBestAvg;
 
         return (
           <Space
             direction="horizontal"
             size={4}
-            style={{
-              display: 'flex',
-              whiteSpace: 'nowrap'
-            }}
+            style={{ display: 'flex', whiteSpace: 'nowrap' }}
           >
-            <span>{resultsTimeFormat(avg, record.event_id, true)}</span>
+        <span
+          style={{
+            color: isProgress ? 'red' : 'inherit',
+            fontWeight: isProgress ? 600 : 400,
+          }}
+        >
+          {resultsTimeFormat(avg, record.event_id, true)}
+        </span>
             {record.regional_average_record && (
               <Tag
                 color={getRecordColor(record.regional_average_record)}
@@ -187,7 +200,7 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
                   fontSize: '10px',
                   padding: '0 6px',
                   height: '18px',
-                  lineHeight: '18px'
+                  lineHeight: '18px',
                 }}
               >
                 {record.regional_average_record}
@@ -203,7 +216,7 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
       width: 300,
       render: (_, record) => (
         <span style={{ fontFamily: 'monospace', fontSize: '12px', whiteSpace: 'pre-wrap' }}>
-          {formatAttempts(record.attempts, record.event_id)}
+          {formatAttempts(record.attempts, record.event_id, record.best_index, record.worst_index)}
         </span>
       ),
     },
@@ -214,16 +227,19 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
   }
 
   return (
-    <Table
-      columns={columns}
-      dataSource={dataSource}
-      rowKey={(record) => `${record.competition_id}-${record.round_id}`}
-      pagination={false}
-      scroll={{ x: 'max-content' }}
-      size="middle"
-      bordered={false}
-      style={{ marginTop: 8 }}
-    />
+    <>
+      <WCAResultChart data={wcaResults} eventId={eventID} comps={comps}/>
+      <Table
+        columns={columns}
+        dataSource={dataSource}
+        rowKey={(record) => `${record.competition_id}-${record.round_id}`}
+        pagination={false}
+        size="small"
+        bordered={false}
+        style={{ marginTop: 8 }}
+      />
+    </>
+
   );
 };
 
