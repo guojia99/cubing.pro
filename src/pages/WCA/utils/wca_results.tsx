@@ -76,11 +76,16 @@ export function resultsTimeFormat(value: number, event: string, isAvg: boolean):
 
   switch (event) {
     case '333fm':
+      // eslint-disable-next-line no-case-declarations
+      let dd: number = value;
+      if (dd >= 1000) {
+        dd /= 100;
+      }
       if (isAvg) {
-        return (value / 100).toFixed(2);
+        return (dd).toFixed(2);
       }
       // FMC：单位为 0.01 步 → 转为 x.xx 步
-      return `${value}`;
+      return `${dd}`;
 
     case '333mbf':
       // 多盲：解析 DD TTTTT MM
@@ -105,13 +110,11 @@ export const formatAttempts = (
 ): JSX.Element => {
   const cellWidth = 85; // 每个成绩单元格固定宽度
 
-  const len = attempts.filter((v) => v !== 0).length
+  const len = attempts.filter((v) => v !== 0).length;
 
   const items = attempts.map((time, i) => {
     if (time === 0) {
-      return (
-        <span key={i}></span>
-      );
+      return <span key={i}></span>;
     }
 
     const formatted = resultsTimeFormat(time, eventId, false);
@@ -131,8 +134,7 @@ export const formatAttempts = (
           display: 'inline-block',
           width: cellWidth,
           textAlign: 'left',
-          fontWeight:
-            len === 5 && (i === best_index || i === worst_index) ? 800 : 500,
+          fontWeight: len === 5 && (i === best_index || i === worst_index) ? 800 : 500,
           fontFamily: 'monospace',
         }}
       >

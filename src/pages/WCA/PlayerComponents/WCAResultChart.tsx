@@ -1,9 +1,14 @@
-import { get333MBFResult, resultsTimeFormat, secondTimeFormat } from '@/pages/WCA/utils/wca_results';
-import { Card, Select, Tabs } from 'antd';
+import { roundNameMap } from '@/pages/WCA/utils/events';
+import {
+  get333MBFResult,
+  resultsTimeFormat,
+  secondTimeFormat,
+} from '@/pages/WCA/utils/wca_results';
+import { WCACompetition, WCAResult } from '@/services/wca/types';
+import { Card, Checkbox, Select, Slider, Space, Tabs, Tooltip } from 'antd';
 import ReactECharts from 'echarts-for-react';
 import React, { useMemo, useState } from 'react';
-import { roundNameMap } from '@/pages/WCA/utils/events';
-import { WCACompetition, WCAResult } from '@/services/wca/types';
+
 interface WCAResultChartProps {
   eventId: string;
   data: WCAResult[];
@@ -11,24 +16,68 @@ interface WCAResultChartProps {
 }
 
 // ===== 工具函数 =====
-function getQuantile(arr: number[], q: number): number {
+function getQuantile(arr: number[], q: number, TrimHeadAndTail: number = 0): number {
   if (arr.length === 0) return 0;
+
+  // 对数组进行排序
   const sorted = [...arr].sort((a, b) => a - b);
-  const pos = (sorted.length - 1) * q;
+
+  // 计算需要去除的元素数量
+  const trimPercentage = TrimHeadAndTail / 100; // 转换为小数
+  const trimCount = Math.floor(sorted.length * trimPercentage);
+
+  // 如果去除的数量超过了数组长度的一半，则不进行去除
+  if (trimCount * 2 >= sorted.length) {
+    // 如果去除的数量过大，返回原数组的分位数
+    const pos = (sorted.length - 1) * q;
+    const base = Math.floor(pos);
+    const rest = pos - base;
+    return sorted[base + 1] !== undefined
+      ? sorted[base] + rest * (sorted[base + 1] - sorted[base])
+      : sorted[base];
+  }
+
+  // 去除头尾数据
+  const trimmedArray = sorted.slice(trimCount, sorted.length - trimCount);
+
+  // 如果去头尾后数组为空，则返回原数组的分位数
+  if (trimmedArray.length === 0) {
+    const pos = (sorted.length - 1) * q;
+    const base = Math.floor(pos);
+    const rest = pos - base;
+    return sorted[base + 1] !== undefined
+      ? sorted[base] + rest * (sorted[base + 1] - sorted[base])
+      : sorted[base];
+  }
+
+  // 在去头尾后的数组上计算分位数
+  const pos = (trimmedArray.length - 1) * q;
   const base = Math.floor(pos);
   const rest = pos - base;
-  return sorted[base + 1] !== undefined
-    ? sorted[base] + rest * (sorted[base + 1] - sorted[base])
-    : sorted[base];
+  return trimmedArray[base + 1] !== undefined
+    ? trimmedArray[base] + rest * (trimmedArray[base + 1] - trimmedArray[base])
+    : trimmedArray[base];
 }
 
 export const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps }) => {
   const [recentCount, setRecentCount] = useState<number>(20);
+  const [recentHeadNum, setRecentHeadNum] = useState<number>(0);
+  const [recentMin, setRecentMin] = useState<number>(0);
+  const [recentMax, setRecentMax] = useState<number>(15);
 
   // ===== 数据预处理 =====
+  const seriesName = (() => {
+    if (eventId === '333mbf'){
+      return '得分';
+    }
+    if (eventId === '333fm'){
+      return '步数';
+    }
+    return '时间';
+  })();
   const reversedData = useMemo(() => [...data].reverse(), [data]);
 
- // 获取比赛信息
+  // 获取比赛信息
   const getCompInfo = (id: string) => {
     const comp = comps.find((c) => c.id === id);
     if (!comp) return null;
@@ -41,8 +90,10 @@ export const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, c
     const singles: number[] = [];
     const averages: number[] = [];
     const compWithNameRound: string[] = [];
+    const allAttempts: { data: number; comp: string }[] = [];
 
     for (const r of reversedData) {
+      // 单次平均
       const single = r.best;
       const average = r.average;
       if (eventId === '333mbf') {
@@ -60,18 +111,37 @@ export const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, c
         averages.push(average);
       }
 
-
+      // 比赛名
       let compsAndRound = '';
-      const comp = getCompInfo(r.competition_id)
-      if (comp){
-        compsAndRound += comp.name
+      const comp = getCompInfo(r.competition_id);
+      if (comp) {
+        compsAndRound += comp.name;
       }
-      compsAndRound += " | "
-      compsAndRound += roundNameMap[r.round_type_id]
+      compsAndRound += ' | ';
+      compsAndRound += roundNameMap[r.round_type_id];
       compWithNameRound.push(compsAndRound);
+
+      // 所有单次
+      for (let i = 0; i < r.attempts.length; ++i) {
+        if (r.attempts[i] === undefined || r.attempts[i] === null) {
+          continue;
+        }
+        if (r.attempts[i] <= 0) {
+          continue;
+        }
+
+        let dd = r.attempts[i]
+        if (eventId === '333fm'){
+          dd = dd * 100
+        }
+        allAttempts.push({
+          data: dd,
+          comp: `${compsAndRound}-第${i + 1}把`,
+        });
+      }
     }
 
-    return { singles, averages, compWithNameRound };
+    return { singles, averages, compWithNameRound, allAttempts };
   }, [reversedData, eventId]);
 
   const combinedOption = useMemo(() => {
@@ -88,8 +158,7 @@ export const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, c
 
         const isPR =
           score > bestScore ||
-          (score === bestScore &&
-            (!bestTimeForScore[score] || seconds < bestTimeForScore[score]));
+          (score === bestScore && (!bestTimeForScore[score] || seconds < bestTimeForScore[score]));
 
         if (score > bestScore) {
           bestScore = score;
@@ -101,11 +170,7 @@ export const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, c
         return {
           value: [i, score],
           itemStyle: isPR ? { color: 'red' } : undefined,
-          prType: isPR
-            ? score > bestScore - 1
-              ? 'score'
-              : 'time'
-            : null,
+          prType: isPR ? (score > bestScore - 1 ? 'score' : 'time') : null,
           extra: { solved, attempted, seconds, compName },
         };
       });
@@ -122,7 +187,9 @@ export const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, c
             const score = solved - (attempted - solved);
             const timeStr = secondTimeFormat(seconds, true);
             const prStr = prType
-              ? `（<strong style="color:red;">新纪录${prType === 'time' ? '(同分更快)' : ''}</strong>）`
+              ? `（<strong style="color:red;">新纪录${
+                  prType === 'time' ? '(同分更快)' : ''
+                }</strong>）`
               : '';
 
             return `
@@ -165,7 +232,7 @@ export const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, c
       let progress: number | null = null;
       if (v <= 0) return { value: [i, null], extra: { compName } };
       if (v < bestSingle) {
-        progress = ((bestSingle - v) / bestSingle);
+        progress = (bestSingle - v) / bestSingle;
         bestSingle = v;
       }
       return {
@@ -181,7 +248,7 @@ export const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, c
       let progress: number | null = null;
       if (v <= 0) return { value: [i, null], extra: { compName } };
       if (v < bestAvg) {
-        progress = ((bestAvg - v) / bestAvg);
+        progress = ((bestAvg - v) / bestAvg) * 100;
         bestAvg = v;
       }
       return {
@@ -220,16 +287,23 @@ export const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, c
       grid: { left: 60, right: 40, bottom: 50, top: 40 },
       xAxis: {
         type: 'category',
-        name: '次数',
-        data: Array.from(
-          { length: Math.max(singlePoints.length, avgPoints.length) },
-          (_, i) => i
-        ),
+        name: '还原',
+        data: Array.from({ length: Math.max(singlePoints.length, avgPoints.length) }, (_, i) => i),
       },
       yAxis: {
         type: 'value',
         min: 0,
-        name: '时间（秒）',
+        name: seriesName,
+        axisLabel: {
+          formatter: (value: number) => {
+            if (eventId === '333mbf') {
+              // mbf 得分不需要格式化为时间
+              return String(value);
+            }
+            // 其他项目使用 resultsTimeFormat 格式化为时间字符串
+            return resultsTimeFormat(value, eventId, false);
+          },
+        },
       },
       series: [
         {
@@ -245,81 +319,300 @@ export const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, c
           data: avgPoints,
         },
       ],
+      dataZoom: [
+        {
+          type: 'slider', // 使用滑动条进行缩放
+          xAxisIndex: 0, // 应用于第一个x轴
+          start: 0, // 数据窗口范围的起始百分比
+          end: 100, // 数据窗口范围的结束百分比
+        },
+        {
+          type: 'inside', // 支持鼠标滚轮和拖拽进行缩放和平移
+          xAxisIndex: 0,
+          start: 0,
+          end: 100,
+        },
+      ],
     };
   }, [chartData, eventId, reversedData]);
 
+  // 生成标记点，只显示头尾和当前选中值
+  const generateMarks = () => {
+    const marks = {
+      [recentMin]: `${recentMin}%`,
+      [recentMax]: `${recentMax}%`,
+    };
+
+    // 如果当前值不是头尾，则添加当前选中值的标记
+    if (recentHeadNum !== recentMin && recentHeadNum !== recentMax) {
+      // @ts-ignore
+      marks[recentHeadNum] = {
+        style: { color: '#ff4d4f', fontWeight: 'bold' },
+        label: `${recentHeadNum}%`,
+      };
+    } else {
+      // 如果当前值是头尾，也需要特殊样式
+      if (recentHeadNum === recentMin) {
+        // @ts-ignore
+        marks[recentMin] = {
+          style: { color: '#ff4d4f', fontWeight: 'bold' },
+          label: `${recentMin}%`,
+        };
+      }
+      if (recentHeadNum === recentMax) {
+        // @ts-ignore
+        marks[recentMax] = {
+          style: { color: '#ff4d4f', fontWeight: 'bold' },
+          label: `${recentMax}%`,
+        };
+      }
+    }
+
+    return marks;
+  };
 
   // ===== 单次分布图 =====
   const distributionOption = useMemo(() => {
-    const singles = chartData.singles.filter((v) => v > 0);
+    const singles = chartData.allAttempts;
     if (singles.length === 0) return {};
 
+    // === 四分位数 ===
     const q25: number[] = [];
     const q50: number[] = [];
     const q75: number[] = [];
 
+    // === 移动平均 & 标准差 ===
+    const maWindow = 12; // 可配置
+    const ma: number[] = [];
+    const stdUpper: number[] = [];
+    const stdLower: number[] = [];
+
     for (let i = 0; i < singles.length; i++) {
-      const start = Math.max(0, i - recentCount);
-      const slice = singles.slice(start, i + 1);
-      q25.push(getQuantile(slice, 0.25));
-      q50.push(getQuantile(slice, 0.5));
-      q75.push(getQuantile(slice, 0.75));
+      // --- 四分位 ---
+      const startQ = Math.max(0, i - recentCount);
+      const sliceQ = singles.slice(startQ, i + 1).map((item) => item.data);
+      q25.push(getQuantile(sliceQ, 0.25, recentHeadNum));
+      q50.push(getQuantile(sliceQ, 0.5, recentHeadNum));
+      q75.push(getQuantile(sliceQ, 0.75, recentHeadNum));
+
+      // --- 移动平均 & 标准差 ---
+      const startMA = Math.max(0, i - maWindow + 1);
+      const sliceMA = singles.slice(startMA, i + 1).map((item) => item.data);
+      const mean = sliceMA.reduce((a, b) => a + b, 0) / sliceMA.length;
+      ma.push(mean);
+
+      // 标准差
+      const variance = sliceMA.reduce((sum, x) => sum + Math.pow(x - mean, 2), 0) / sliceMA.length;
+      const std = Math.sqrt(variance);
+      stdUpper.push(mean + std);
+      stdLower.push(mean - std);
     }
 
     return {
+      legend: {
+        show: true,
+        top: 10,
+        type: 'scroll', // 支持滚动，防止图例过多溢出
+      },
       tooltip: {
         trigger: 'axis',
         formatter: (params: any[]) => {
-          const lines = params.map((p) => {
-            const rawHundredths = Array.isArray(p.value) ? p.value[1] : p.value;
-            return `${p.marker}${p.seriesName}: ${resultsTimeFormat(
-              rawHundredths,
-              eventId,
-              false,
-            )}`;
-          });
+          const lines = params
+            .filter(p => {
+              // 排除显式关闭 tooltip 的系列
+              if (p.series?.tooltip?.show === false) return false;
+              // 或者也可以根据数据结构判断：只有 length >= 3 的才处理为区间
+              return true;
+            })
+            .map(p => {
+              if (p.seriesName === '成绩') {
+                const attemptIndex = p.dataIndex;
+                const originalData = singles[attemptIndex];
+                const rawHundredths = Array.isArray(p.value) ? p.value[1] : p.value;
+                return `
+               ${originalData ? `比赛: ${originalData.comp}` : ''} <br/>
+                ${p.marker}${p.seriesName}: ${resultsTimeFormat(
+                  rawHundredths,
+                  eventId,
+                  false
+                )}`;
+              }
+              else if (p.seriesName === '标准差' || p.seriesName === '四分线区间') {
+                // 检查是否包含 [x, lower, upper]
+                if (Array.isArray(p.value) && p.value.length >= 3) {
+                  const lower = p.value[1];
+                  const upper = p.value[2];
+                  return `${p.marker}${p.seriesName}: ${resultsTimeFormat(lower, eventId, true)} ~ ${resultsTimeFormat(upper, eventId, true)}`;
+                } else {
+                  // 安全兜底：如果误入，显示原始值（但理论上不会）
+                  const val = Array.isArray(p.value) ? p.value[1] : p.value;
+                  return `${p.marker}${p.seriesName}: ${resultsTimeFormat(val, eventId, true)}`;
+                }
+              }
+              else {
+                // 其他普通线（如中位数、移动平均等）
+                const rawHundredths = Array.isArray(p.value) ? p.value[1] : p.value;
+                return `${p.marker}${p.seriesName}: ${resultsTimeFormat(
+                  rawHundredths,
+                  eventId,
+                  true
+                )}`;
+              }
+            });
           return lines.join('<br/>');
-        },
+        }
       },
       grid: { left: 60, right: 40, bottom: 50, top: 40 },
       xAxis: {
         type: 'category',
-        name: '次数',
+        name: '还原',
         data: singles.map((_, i) => i),
       },
       yAxis: {
         type: 'value',
         min: 0,
-        name: eventId === '333mbf' ? '得分' : '时间（秒）',
+        name: seriesName,
+        axisLabel: {
+          formatter: (value: number) => {
+            if (eventId === '333mbf') return String(value);
+            return resultsTimeFormat(value, eventId, false);
+          },
+        },
       },
       series: [
         {
           name: '成绩',
           type: 'line',
           showSymbol: false,
-          data: singles.map((v, i) => [i, v]),
+          data: singles.map((v, i) => [i, v.data]),
         },
+        // --- 四分位线 ---
         {
           name: '25%',
           type: 'line',
           data: q25.map((v, i) => [i, v]),
-          lineStyle: { type: 'dashed' },
+          lineStyle: { type: 'dashed', opacity: 0.7 },
         },
         {
           name: '50%',
           type: 'line',
           data: q50.map((v, i) => [i, v]),
-          lineStyle: { type: 'dashed' },
+          lineStyle: { type: 'dashed', opacity: 0.7 },
         },
         {
           name: '75%',
           type: 'line',
           data: q75.map((v, i) => [i, v]),
-          lineStyle: { type: 'dashed' },
+          lineStyle: { type: 'dashed', opacity: 0.7 },
+        },
+        // --- 四分线 区间（填充）---
+        // 第一个 series：下界（基底）
+        {
+          name: '四分线区间',
+          type: 'line',
+          // data 格式: [x, lower, upper] —— 第三个值用于 tooltip
+          data: q25.map((lower, i) => [i, lower, q75[i]]),
+          lineStyle: { opacity: 0 },
+          areaStyle: { opacity: 0 },
+          stack: '四分线',
+          showInLegend: false,
+          z: -1,
+          // 关键：只让这个 series 显示 tooltip
+        },
+        {
+          name: '四分线区间',
+          type: 'line',
+          // 注意：这里 data 是差值，但 tooltip 不显示
+          data: q25.map((_, i) => [i, q75[i] - q25[i]]),
+          lineStyle: { opacity: 0 },
+          areaStyle: { color: 'rgba(100, 100, 255, 0.15)' },
+          stack: '四分线',
+          z: -1,
+          // 👇 关键：禁止 tooltip
+          tooltip: { show: false },
+        },
+        // --- 移动平均线 ---
+        {
+          name: `${maWindow}次平均`,
+          type: 'line',
+          data: ma.map((v, i) => [i, v]),
+          smooth: true,
+          lineStyle: { width: 2, color: '#FF7F0E' },
+          showSymbol: false,
+        },
+        // --- 标准差 边界线 ---
+        // --- 标准差 上边界线 ---
+        {
+          name: '标准差',
+          type: 'line',
+          data: stdUpper.map((v, i) => [i, v]),
+          lineStyle: { type: 'dotted', color: '#2CA02C', width: 1 },
+          showSymbol: false,
+          tooltip: { show: false }, // 👈 不参与 tooltip
+        },
+// --- 标准差 下边界线 ---
+        {
+          name: '标准差',
+          type: 'line',
+          data: stdLower.map((v, i) => [i, v]),
+          lineStyle: { type: 'dotted', color: '#2CA02C', width: 1 },
+          showSymbol: false,
+          showInLegend: false,
+          tooltip: { show: false }, // 👈 不参与 tooltip
+        },
+// --- 填充：基底（携带完整数据）---
+        {
+          name: '标准差',
+          type: 'line',
+          data: stdLower.map((lower, i) => [i, lower, stdUpper[i]]), // [x, lower, upper]
+          lineStyle: { opacity: 0 },
+          areaStyle: { opacity: 0 },
+          stack: 'std',
+          showInLegend: false,
+          z: -2,
+          // ✅ 这个 series 负责 tooltip，所以不要关闭
+        },
+// --- 填充：增量（仅用于渲染高度）---
+        {
+          name: '标准差',
+          type: 'line',
+          data: stdLower.map((_, i) => [i, stdUpper[i] - stdLower[i]]),
+          lineStyle: { opacity: 0 },
+          areaStyle: { color: 'rgba(44, 160, 44, 0.1)' },
+          stack: 'std',
+          z: -2,
+          tooltip: { show: false }, // 👈 隐藏
         },
       ],
+      dataZoom: [
+        { type: 'slider', xAxisIndex: 0, start: 0, end: 100 },
+        { type: 'inside', xAxisIndex: 0, start: 0, end: 100 },
+      ],
     };
-  }, [chartData, recentCount, eventId]);
+  }, [
+    chartData,
+    recentCount,
+    eventId,
+    recentHeadNum,
+  ]);
+
+  const getTrimMax = (count: number) => {
+    if (count <= 20) return 10; // 最多去除25% (5/20)
+    if (count <= 50) return 12; // 最多去除20% (10/50)
+    if (count <= 100) return 15; // 最多去除15% (15/100)
+    return 20; // 最多去除10% (20/200及更多)
+  };
+  // 更新recentMax当recentCount变化时
+  const handleRecentCountChange = (value: number) => {
+    setRecentMin(0);
+    setRecentCount(value);
+    const newMax = getTrimMax(value);
+    setRecentMax(newMax);
+    // 重置recentHeadNum如果超出了新范围
+    if (recentHeadNum > newMax) {
+      setRecentHeadNum(newMax);
+    }
+  };
 
   // ===== Tabs 渲染 =====
   const tabs = [
@@ -336,17 +629,69 @@ export const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, c
       label: '单次成绩分布',
       children: (
         <>
-          <div style={{ marginBottom: 8 }}>
-            <Select
-              value={recentCount}
-              onChange={setRecentCount}
-              style={{ width: 120 }}
-              options={[
-                { label: '最近 20 次', value: 20 },
-                { label: '最近 50 次', value: 50 },
-                { label: '最近 100 次', value: 100 },
-              ]}
-            />
+          <div
+            style={{
+              marginBottom: 8,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 16,
+            }}
+          >
+            {/* 四分线数选择器 */}
+            <Tooltip
+              title={
+                <div style={{ maxWidth: 500, lineHeight: 1.6 }}>
+                  <p>
+                    <b>25%（Q1）</b>：25% 的成绩比它快，代表较好成绩边界。
+                  </p>
+                  <p>
+                    <b>50%（中位数）</b>：一半成绩比它快，反映典型水平。
+                  </p>
+                  <p>
+                    <b>75%（Q3）</b>：75% 的成绩比它快，代表较差成绩边界。
+                  </p>
+                  <p style={{ fontSize: 12, color: '#999' }}>
+                    用于评估魔方成绩的稳定性与分布趋势。
+                  </p>
+                </div>
+              }
+            >
+              <Space style={{ display: 'flex', alignItems: 'center' }}>
+                <label htmlFor="recentCountSelect" style={{ marginRight: 8 }}>
+                  四分线数:
+                </label>
+                <Select
+                  id="recentCountSelect"
+                  value={recentCount}
+                  onChange={handleRecentCountChange}
+                  style={{ width: 120 }}
+                  options={[
+                    { label: '最近 20 次', value: 20 },
+                    { label: '最近 50 次', value: 50 },
+                    { label: '最近 100 次', value: 100 },
+                    { label: '最近 200 次', value: 200 },
+                  ]}
+                />
+              </Space>
+            </Tooltip>
+
+            {/* 去头尾比例滑块 */}
+            <Space style={{ display: 'flex', alignItems: 'center' }}>
+              <label htmlFor="recentHeadSlider" style={{ marginRight: 8 }}>
+                去头尾比例:
+              </label>
+              <Slider
+                id="recentHeadSlider"
+                min={recentMin}
+                max={recentMax}
+                step={1}
+                value={recentHeadNum}
+                onChange={setRecentHeadNum}
+                tooltip={{ formatter: (value) => `${value}%` }}
+                marks={generateMarks()}
+                style={{ flex: 1, minWidth: 200 }}
+              />
+            </Space>
           </div>
           <ReactECharts option={distributionOption} style={{ height: 400 }} />
         </>
