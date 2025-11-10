@@ -1,15 +1,16 @@
 import { CubesCn } from '@/components/CubeIcon/cube';
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
-import { WCALink, WCALinkWithCnName } from '@/components/Link/Links';
+import { WCALinkWithCnName } from '@/components/Link/Links';
 import { NavTabs } from '@/components/Tabs/nav_tabs';
 import {
-  apiDiyRanking,
+  apiDiyRanking, apiDiyRankingKinch,
   apiGetAllDiyRankingKey,
 } from '@/services/cubing-pro/statistics/diy_ranking';
 import { StaticAPI } from '@/services/cubing-pro/statistics/typings';
 import { OrderedListOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { Table, Tooltip } from 'antd';
 import React, { useEffect, useState } from 'react';
+import KinCh from '@/pages/Static/Kinsor';
 //
 // const eventList = [
 //   ['3x3x3Cube', '333'],
@@ -54,7 +55,7 @@ interface DiyRanksProps {
   keys: string;
 }
 
-const DiyRanks: React.FC<DiyRanksProps> = ({ keys }) => {
+const DiyRanksWithEvent: React.FC<DiyRanksProps> = ({ keys }) => {
   // const actionRef = useRef();
   const [diyRankResp, setDiyRankResp] = useState<StaticAPI.DiyRankWCAResultStaticsResponse>();
   // const keys = 'diy_rankings_guangdong_gaoxiao';
@@ -144,6 +145,43 @@ const DiyRanks: React.FC<DiyRanksProps> = ({ keys }) => {
       <NavTabs
         type="line"
         items={eventItems}
+        tabsKey={keys + "_event"}
+        indicator={{ size: (origin: number) => origin - 20, align: 'center' }}
+      />
+    </>
+  );
+};
+
+
+const DiyRanksWithKinch: React.FC<DiyRanksProps> =  ({ keys }) => {
+  const fetch = async (req: StaticAPI.KinchReq): Promise<StaticAPI.KinchResp> => {
+    return apiDiyRankingKinch(keys, req)
+  }
+
+  return <>
+    <KinCh isSenior={false} otherDataFn={fetch} />
+  </>
+}
+
+
+const DiyRanks: React.FC<DiyRanksProps> = ({ keys }) => {
+  const items = [
+    {
+      key: 'event',
+      label: <>WCA排名</>,
+      children: <DiyRanksWithEvent keys={keys} />,
+    },
+    {
+      key: 'kinch',
+      label: <>Kinch排名</>,
+      children: <DiyRanksWithKinch keys={keys} />,
+    }
+  ];
+  return (
+    <>
+      <NavTabs
+        type="line"
+        items={items}
         tabsKey={keys}
         indicator={{ size: (origin: number) => origin - 20, align: 'center' }}
       />
@@ -169,10 +207,9 @@ const DiyRankView: React.FC = () => {
         });
       }
       // @ts-ignore
-      setItems(it)
-      console.log(it)
+      setItems(it);
+      console.log(it);
     });
-
   }, []);
 
   return (
@@ -180,7 +217,7 @@ const DiyRankView: React.FC = () => {
       <h2 style={{ textAlign: 'center' }}>
         WCA成绩统计排行&nbsp;
         <Tooltip title="该榜单基于WCA官方比赛成绩进行统计排名，包含各项目选手的最新纪录。如果你没有在榜单上，需要记录到榜单当中，请联系管理员。">
-          <QuestionCircleOutlined style={{fontSize: 14}} />
+          <QuestionCircleOutlined style={{ fontSize: 14 }} />
         </Tooltip>
       </h2>
       {items && items.length > 0 && (

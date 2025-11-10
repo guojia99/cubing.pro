@@ -12,11 +12,14 @@ import { ProTable } from '@ant-design/pro-table';
 import { Button, Card, Checkbox, Slider, Space, Tag, message, Tooltip } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 
+
 export type KinChProps = {
   isSenior: boolean;
+
+  otherDataFn: ((req: StaticAPI.KinchReq) => Promise<StaticAPI.KinchResp>) | undefined;
 };
 
-const KinCh: React.FC<KinChProps> = ({ isSenior }) => {
+const KinCh: React.FC<KinChProps> = ({ isSenior, otherDataFn }) => {
   const actionRef = useRef();
   const [selectedEvents, setSelectedEvents] = useState<string[]>([]);
   const [selectingEvents, setSelectingEvents] = useState<string[]>([]);
@@ -50,7 +53,7 @@ const KinCh: React.FC<KinChProps> = ({ isSenior }) => {
       dataIndex: 'Name',
       key: 'Name',
       render: (value: string, sor: KinChSorResult) => {
-        if (isSenior) {
+        if (isSenior || otherDataFn !== undefined) {
           return <>{WCALinkWithCnName(sor.wca_id, sor.WcaName)}</>;
         }
         return <>{PlayerLink(sor.CubeId, sor.PlayerName, 'rgb(29,177,236)')}</>;
@@ -298,11 +301,16 @@ const KinCh: React.FC<KinChProps> = ({ isSenior }) => {
         params={tableParams}
         request={async () => {
           let value = undefined;
-          if (isSenior) {
+
+          if (otherDataFn !== undefined){
+            value = await otherDataFn(tableParams)
+          } else if (isSenior) {
             value = await apiSeniorKinch(tableParams);
           } else {
             value = await apiKinch(tableParams);
           }
+
+
           return {
             data: value.data.items,
             success: true,
