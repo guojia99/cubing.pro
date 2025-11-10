@@ -7,22 +7,132 @@ import WCAPlayerResultTable from '@/pages/WCA/PlayerComponents/PlayerResultTable
 import WCAPlayerStaticsTab from '@/pages/WCA/PlayerComponents/WCAPlayerStaticsTab';
 import { WCACompetition, WcaProfile, WCAResult } from '@/services/wca/types';
 
+interface CachedData {
+  wcaProfile: WcaProfile;
+  wcaResults: WCAResult[];
+  comps: WCACompetition[];
+  timestamp: number;
+}
+
+const CACHE_DURATION = 6 * 60 * 60 * 1000; // 6小时 (毫秒)
+
 const WCAPlayer: React.FC = () => {
   const { wcaId } = useParams();
   const [is404, setIs404] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [wcaProfile, setWcaProfile] = useState<WcaProfile>();
-  const [wcaResults, setWcaResults] = useState<WCAResult[]>([])
+  const [wcaResults, setWcaResults] = useState<WCAResult[]>([]);
   const [comps, setComps] = useState<WCACompetition[]>([]);
+
+  // 自动清理过期缓存的函数
+  const cleanupExpiredCache = () => {
+    if (typeof window === 'undefined') return;
+
+    const now = Date.now();
+    const keysToRemove: string[] = [];
+
+    // 遍历所有localStorage项，查找WCA相关的缓存
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('wca_player_data_')) {
+        try {
+          const item = localStorage.getItem(key);
+          if (item) {
+            const parsed = JSON.parse(item) as CachedData;
+            // 检查是否过期
+            if (now - parsed.timestamp > CACHE_DURATION) {
+              keysToRemove.push(key);
+            }
+          }
+        } catch (error) {
+          // 如果解析失败，也删除该项
+          keysToRemove.push(key);
+        }
+      }
+    }
+
+    // 删除过期的缓存项
+    keysToRemove.forEach(key => {
+      localStorage.removeItem(key);
+      console.log(`Removed expired cache: ${key}`);
+    });
+
+    if (keysToRemove.length > 0) {
+      console.log(`Cleaned up ${keysToRemove.length} expired cache entries`);
+    }
+  };
+
+  const getCacheKey = (id: string) => `wca_player_data_${id}`;
+
+  const getFromCache = (id: string): CachedData | null => {
+    if (typeof window === 'undefined') return null;
+
+    const cacheKey = getCacheKey(id);
+    const cachedData = localStorage.getItem(cacheKey);
+
+    if (!cachedData) return null;
+
+    try {
+      const parsed = JSON.parse(cachedData) as CachedData;
+      const now = Date.now();
+
+      // 检查缓存是否过期
+      if (now - parsed.timestamp > CACHE_DURATION) {
+        localStorage.removeItem(cacheKey);
+        return null;
+      }
+
+      return parsed;
+    } catch (error) {
+      console.error('Error parsing cached data:', error);
+      localStorage.removeItem(getCacheKey(id));
+      return null;
+    }
+  };
+
+  const setToCache = (id: string, data: CachedData) => {
+    if (typeof window === 'undefined') return;
+
+    const cacheKey = getCacheKey(id);
+    const cacheData: CachedData = {
+      ...data,
+      timestamp: Date.now()
+    };
+
+    try {
+      localStorage.setItem(cacheKey, JSON.stringify(cacheData));
+    } catch (error) {
+      console.error('Error setting cache:', error);
+      // 如果存储失败，尝试清理一些旧缓存再试
+      try {
+        // 清理一些过期数据后再尝试存储
+        cleanupExpiredCache();
+        localStorage.setItem(cacheKey, JSON.stringify(cacheData));
+      } catch (e) {
+        console.error('Failed to set cache after cleanup:', e);
+      }
+    }
+  };
 
   const fetchPlayer = async () => {
     if (!wcaId) {
       setIs404(true);
-      return; // 提前返回，不再继续
+      return;
+    }
+
+    // 尝试从缓存获取数据
+    const cachedData = getFromCache(wcaId);
+    if (cachedData) {
+      setWcaProfile(cachedData.wcaProfile);
+      setWcaResults(cachedData.wcaResults);
+      setComps(cachedData.comps);
+      setIs404(false);
+      setLoading(false);
+      return;
     }
 
     try {
-      // 并行发起三个请求（效率更高），并等待全部完成
+      // 并行发起三个请求
       const [profileRes, compsRes, resultsRes] = await Promise.all([
         getWCAPersonProfile(wcaId),
         getWCAPersonCompetitions(wcaId),
@@ -35,6 +145,14 @@ const WCAPlayer: React.FC = () => {
       setWcaResults(resultsRes);
       setIs404(false);
 
+      // 存储到缓存
+      setToCache(wcaId, {
+        wcaProfile: profileRes,
+        wcaResults: resultsRes,
+        comps: compsRes,
+        timestamp: Date.now()
+      });
+
     } catch (error) {
       // 任何一个请求失败，都视为 404
       console.error('Failed to fetch player data:', error);
@@ -46,53 +164,44 @@ const WCAPlayer: React.FC = () => {
   };
 
   useEffect(() => {
+    // 进入页面时自动清理过期缓存
+    cleanupExpiredCache();
+
     setLoading(true);
     fetchPlayer().finally(() => {
-      setLoading(false); // 无论成功或失败，都结束 loading
+      setLoading(false);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wcaId]);
-
 
   if (loading || (!wcaProfile)) {
     return (
       <div style={{ textAlign: 'center', marginTop: 100 }}>
         <Spin size="large" tip="加载中..." />
       </div>
-    )
+    );
   }
 
-  if (is404){
+  if (is404) {
     return (
       <div style={{ textAlign: 'center', color: '#999', marginTop: 50 }}>未找到该选手信息</div>
-    )
+    );
   }
 
-  if (wcaResults){
-    document.title = `${wcaProfile.person.name} 的WCA成绩页`
+  if (wcaResults) {
+    document.title = `${wcaProfile.person.name} 的WCA成绩页`;
   }
-
 
   return (
     <div>
       <WCAPlayerDetails wcaProfile={wcaProfile} wcaResults={wcaResults} />
       <WCAPlayerResultTable wcaProfile={wcaProfile} wcaResults={wcaResults} />
-      <WCAPlayerStaticsTab wcaProfile={wcaProfile} wcaResults={wcaResults} comps={comps}/>
+      <WCAPlayerStaticsTab wcaProfile={wcaProfile} wcaResults={wcaResults} comps={comps} />
     </div>
   );
 };
 
 export default WCAPlayer;
-// 个人详情数据
-//   头像、国家地区
-// 个人最佳成绩
-// 奖牌统计
-// 记录统计
-// 排名总和
-// 领奖台
-// 1.个人比赛数据统计页
-//    1.1按比赛
-//    1.2按项目
-// 2.个人成长路线统计页
-// 3.年度统计
-// 4. 赛事列表
+
+
+

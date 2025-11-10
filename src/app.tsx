@@ -89,11 +89,11 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
       // return (<>{children}</>)
       return (
         <>
-          <Helmet>
-            {window.innerWidth <= 768 && (
-              <meta name="viewport" content="width=1080, initial-scale=1" />
-            )}
-          </Helmet>
+          {/*<Helmet>*/}
+          {/*  {window.innerWidth <= 768 && (*/}
+          {/*    <meta name="viewport" content="width=1080, initial-scale=1" />*/}
+          {/*  )}*/}
+          {/*</Helmet>*/}
           <ScrollToTopButton />
           <Row>
             {/*<ParticleBackground></ParticleBackground>*/}

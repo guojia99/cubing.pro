@@ -5,11 +5,11 @@ import {
   secondTimeFormat,
 } from '@/pages/WCA/utils/wca_results';
 import { WCACompetition, WCAResult } from '@/services/wca/types';
-import { Card, Checkbox, Select, Slider, Space, Tabs, Tooltip } from 'antd';
+import { Card, Select, Slider, Space, Tabs, Tooltip } from 'antd';
 import ReactECharts from 'echarts-for-react';
 import React, { useMemo, useState } from 'react';
 
-interface WCAResultChartProps {
+export interface WCAResultChartProps {
   eventId: string;
   data: WCAResult[];
   comps: WCACompetition[];
@@ -59,7 +59,7 @@ function getQuantile(arr: number[], q: number, TrimHeadAndTail: number = 0): num
     : trimmedArray[base];
 }
 
-export const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps }) => {
+const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps }) => {
   const [recentCount, setRecentCount] = useState<number>(20);
   const [recentHeadNum, setRecentHeadNum] = useState<number>(0);
   const [recentMin, setRecentMin] = useState<number>(0);
@@ -67,10 +67,10 @@ export const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, c
 
   // ===== 数据预处理 =====
   const seriesName = (() => {
-    if (eventId === '333mbf'){
+    if (eventId === '333mbf') {
       return '得分';
     }
-    if (eventId === '333fm'){
+    if (eventId === '333fm') {
       return '步数';
     }
     return '时间';
@@ -106,6 +106,10 @@ export const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, c
         if (score > 0 && parsed.seconds > 0) {
           singles.push(score);
         }
+      }
+      if (eventId === '333fm') {
+        singles.push(single);
+        averages.push(average / 100.0);
       } else {
         singles.push(single);
         averages.push(average);
@@ -130,9 +134,9 @@ export const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, c
           continue;
         }
 
-        let dd = r.attempts[i]
-        if (eventId === '333fm'){
-          dd = dd * 100
+        let dd = r.attempts[i];
+        if (eventId === '333fm') {
+          dd = dd * 100;
         }
         allAttempts.push({
           data: dd,
@@ -418,49 +422,47 @@ export const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, c
         trigger: 'axis',
         formatter: (params: any[]) => {
           const lines = params
-            .filter(p => {
+            .filter((p) => {
               // 排除显式关闭 tooltip 的系列
               if (p.series?.tooltip?.show === false) return false;
               // 或者也可以根据数据结构判断：只有 length >= 3 的才处理为区间
               return true;
             })
-            .map(p => {
+            .map((p) => {
               if (p.seriesName === '成绩') {
                 const attemptIndex = p.dataIndex;
                 const originalData = singles[attemptIndex];
                 const rawHundredths = Array.isArray(p.value) ? p.value[1] : p.value;
                 return `
                ${originalData ? `比赛: ${originalData.comp}` : ''} <br/>
-                ${p.marker}${p.seriesName}: ${resultsTimeFormat(
-                  rawHundredths,
-                  eventId,
-                  false
-                )}`;
-              }
-              else if (p.seriesName === '标准差' || p.seriesName === '四分线区间') {
+                ${p.marker}${p.seriesName}: ${resultsTimeFormat(rawHundredths, eventId, false)}`;
+              } else if (p.seriesName === '标准差' || p.seriesName === '四分线区间') {
                 // 检查是否包含 [x, lower, upper]
                 if (Array.isArray(p.value) && p.value.length >= 3) {
                   const lower = p.value[1];
                   const upper = p.value[2];
-                  return `${p.marker}${p.seriesName}: ${resultsTimeFormat(lower, eventId, true)} ~ ${resultsTimeFormat(upper, eventId, true)}`;
+                  return `${p.marker}${p.seriesName}: ${resultsTimeFormat(
+                    lower,
+                    eventId,
+                    true,
+                  )} ~ ${resultsTimeFormat(upper, eventId, true)}`;
                 } else {
                   // 安全兜底：如果误入，显示原始值（但理论上不会）
                   const val = Array.isArray(p.value) ? p.value[1] : p.value;
                   return `${p.marker}${p.seriesName}: ${resultsTimeFormat(val, eventId, true)}`;
                 }
-              }
-              else {
+              } else {
                 // 其他普通线（如中位数、移动平均等）
                 const rawHundredths = Array.isArray(p.value) ? p.value[1] : p.value;
                 return `${p.marker}${p.seriesName}: ${resultsTimeFormat(
                   rawHundredths,
                   eventId,
-                  true
+                  true,
                 )}`;
               }
             });
           return lines.join('<br/>');
-        }
+        },
       },
       grid: { left: 60, right: 40, bottom: 50, top: 40 },
       xAxis: {
@@ -550,7 +552,7 @@ export const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, c
           showSymbol: false,
           tooltip: { show: false }, // 👈 不参与 tooltip
         },
-// --- 标准差 下边界线 ---
+        // --- 标准差 下边界线 ---
         {
           name: '标准差',
           type: 'line',
@@ -560,7 +562,7 @@ export const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, c
           showInLegend: false,
           tooltip: { show: false }, // 👈 不参与 tooltip
         },
-// --- 填充：基底（携带完整数据）---
+        // --- 填充：基底（携带完整数据）---
         {
           name: '标准差',
           type: 'line',
@@ -572,7 +574,7 @@ export const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, c
           z: -2,
           // ✅ 这个 series 负责 tooltip，所以不要关闭
         },
-// --- 填充：增量（仅用于渲染高度）---
+        // --- 填充：增量（仅用于渲染高度）---
         {
           name: '标准差',
           type: 'line',
@@ -589,12 +591,7 @@ export const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, c
         { type: 'inside', xAxisIndex: 0, start: 0, end: 100 },
       ],
     };
-  }, [
-    chartData,
-    recentCount,
-    eventId,
-    recentHeadNum,
-  ]);
+  }, [chartData, recentCount, eventId, recentHeadNum]);
 
   const getTrimMax = (count: number) => {
     if (count <= 20) return 10; // 最多去除25% (5/20)

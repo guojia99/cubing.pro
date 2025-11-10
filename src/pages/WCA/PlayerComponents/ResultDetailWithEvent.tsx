@@ -1,19 +1,21 @@
-import { getRecordColor, roundColorMap, roundNameMap, roundSortOrder } from '@/pages/WCA/utils/events';
+import WCAResultChart from '@/pages/WCA/PlayerComponents/WCAResultChart';
+import {
+  getRecordColor,
+  roundColorMap,
+  roundNameMap,
+  roundSortOrder,
+} from '@/pages/WCA/utils/events';
 import { formatAttempts, resultsTimeFormat } from '@/pages/WCA/utils/wca_results';
+import { WCACompetition, WCAResult } from '@/services/wca/types';
 import { Space, Table, Tag } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import React from 'react';
-import WCAResultChart from '@/pages/WCA/PlayerComponents/WCAResultChart';
-import { WCACompetition, WCAResult } from '@/services/wca/types';
 
 interface ResultDetailWithEventProps {
   eventID: string;
   wcaResults: WCAResult[];
   comps: WCACompetition[];
 }
-
-
-
 
 // 解析日期范围
 const formatDateRange = (start: string, end: string): string => {
@@ -77,11 +79,11 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
   });
 
   // 判断当前成绩是否为进步成绩
-  const isProgress = (record: typeof dataSource[0], index: number, type: 'best' | 'average') => {
-    const resultsForEvent = dataSource.filter(r => r.event_id === record.event_id);
+  const isProgress = (record: (typeof dataSource)[0], index: number, type: 'best' | 'average') => {
+    const resultsForEvent = dataSource.filter((r) => r.event_id === record.event_id);
     // 当前成绩之后的成绩是历史成绩
     const historical = resultsForEvent.slice(index + 1);
-    const prevBest = Math.min(...historical.map(r => r[type]).filter(v => v > 0), Infinity);
+    const prevBest = Math.min(...historical.map((r) => r[type]).filter((v) => v > 0), Infinity);
     return record[type] > 0 && record[type] < prevBest;
   };
 
@@ -148,13 +150,19 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
 
         return (
           <Space direction="horizontal" size={4} style={{ display: 'flex', whiteSpace: 'nowrap' }}>
-        <span style={{ color: progress ? 'red' : 'inherit', fontWeight: progress ? 600 : 400 }}>
-          {resultsTimeFormat(best, record.event_id, false)}
-        </span>
+            <span style={{ color: progress ? 'red' : 'inherit', fontWeight: progress ? 600 : 400 }}>
+              {resultsTimeFormat(best, record.event_id, false)}
+            </span>
             {record.regional_single_record && (
               <Tag
                 color={getRecordColor(record.regional_single_record)}
-                style={{ margin: 0, fontSize: '10px', padding: '0 6px', height: '18px', lineHeight: '18px' }}
+                style={{
+                  margin: 0,
+                  fontSize: '10px',
+                  padding: '0 6px',
+                  height: '18px',
+                  lineHeight: '18px',
+                }}
               >
                 {record.regional_single_record}
               </Tag>
@@ -173,25 +181,24 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
         if (avg === 0) return '';
 
         // 判断是否为进步成绩（比更旧成绩更好）
-        const resultsForEvent = dataSource.filter(r => r.event_id === record.event_id);
+        const resultsForEvent = dataSource.filter((r) => r.event_id === record.event_id);
         const historical = resultsForEvent.slice(index + 1); // 更旧成绩
-        const prevBestAvg = Math.min(...historical.map(r => r.average).filter(v => v > 0), Infinity);
+        const prevBestAvg = Math.min(
+          ...historical.map((r) => r.average).filter((v) => v > 0),
+          Infinity,
+        );
         const isProgress = avg > 0 && avg < prevBestAvg;
 
         return (
-          <Space
-            direction="horizontal"
-            size={4}
-            style={{ display: 'flex', whiteSpace: 'nowrap' }}
-          >
-        <span
-          style={{
-            color: isProgress ? 'red' : 'inherit',
-            fontWeight: isProgress ? 600 : 400,
-          }}
-        >
-          {resultsTimeFormat(avg, record.event_id, true)}
-        </span>
+          <Space direction="horizontal" size={4} style={{ display: 'flex', whiteSpace: 'nowrap' }}>
+            <span
+              style={{
+                color: isProgress ? 'red' : 'inherit',
+                fontWeight: isProgress ? 600 : 400,
+              }}
+            >
+              {resultsTimeFormat(avg, record.event_id, true)}
+            </span>
             {record.regional_average_record && (
               <Tag
                 color={getRecordColor(record.regional_average_record)}
@@ -215,9 +222,36 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
       key: 'attempts',
       width: 300,
       render: (_, record) => (
-        <span style={{ fontFamily: 'monospace', fontSize: '12px', whiteSpace: 'pre-wrap' }}>
-          {formatAttempts(record.attempts, record.event_id, record.best_index, record.worst_index)}
-        </span>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '100%',
+            padding: '8px 0',
+          }}
+        >
+          <span
+            style={{
+              fontFamily: 'monospace',
+              fontSize: '12px',
+              whiteSpace: 'pre-wrap',
+              backgroundColor: 'rgba(178,239,217,0.18)',
+              padding: '4px 8px',
+              borderRadius: '4px',
+              textAlign: 'center',
+              maxWidth: '100%',
+              wordBreak: 'break-word',
+            }}
+          >
+            {formatAttempts(
+              record.attempts,
+              record.event_id,
+              record.best_index,
+              record.worst_index,
+            )}
+          </span>
+        </div>
       ),
     },
   ];
@@ -228,7 +262,7 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
 
   return (
     <>
-      <WCAResultChart data={wcaResults} eventId={eventID} comps={comps}/>
+      <WCAResultChart data={wcaResults} eventId={eventID} comps={comps} />
       <Table
         columns={columns}
         dataSource={dataSource}
@@ -239,7 +273,6 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
         style={{ marginTop: 8 }}
       />
     </>
-
   );
 };
 
