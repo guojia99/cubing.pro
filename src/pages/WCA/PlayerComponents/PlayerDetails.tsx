@@ -4,6 +4,7 @@ import 'flag-icons/css/flag-icons.min.css';
 import React from 'react';
 import './PlayerDetails.css';
 import { WcaProfile, WCAResult } from '@/services/wca/types';
+import { getCountryNameByIso2 } from '@/pages/WCA/PlayerComponents/region/all_contiry';
 
 interface WCAPlayerDetailsProps {
   wcaProfile: WcaProfile;
@@ -59,7 +60,7 @@ const WCAPlayerDetails: React.FC<WCAPlayerDetailsProps> = ({ wcaProfile, wcaResu
               style={{ marginRight: 8, minWidth: 20 }}
               title={country.name}
             />
-            {country.name}
+            {getCountryNameByIso2(country.iso2)}
           </Space>
         );
       },

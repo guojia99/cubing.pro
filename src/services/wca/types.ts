@@ -241,6 +241,9 @@ export interface WCACompetition {
    * 对象类型标识
    */
   class: string;
+
+
+  indexNum: number;
 }
 
 /**
