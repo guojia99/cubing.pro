@@ -4,6 +4,8 @@ import { WCACompetition, WCAResult } from '@/services/wca/types';
 import { Button, Space, Table } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import React, { useEffect, useState } from 'react';
+import { getCountryNameByIso2 } from '@/pages/WCA/PlayerComponents/region/all_contiry';
+import { getLocationByPinyin } from '@/pages/WCA/PlayerComponents/region/china_citys';
 
 interface WCACompetitionTableProps {
   competitions: WCACompetition[];
@@ -15,7 +17,10 @@ const CompetitionTable: React.FC<WCACompetitionTableProps> = ({ competitions, wc
   // 倒序排列（按开始日期倒序）
   const sortedCompetitions = [...competitions].sort((a, b) => {
     return new Date(b.start_date).getTime() - new Date(a.start_date).getTime();
-  });
+  }).map((r, i) => {
+    r.indexNum = competitions.length - i
+    return r;
+  })
 
   const [competitionEventMap, setCompetitionEventMap] = useState<Map<string, string[]>>(
     new Map<string, string[]>(),
@@ -29,10 +34,10 @@ const CompetitionTable: React.FC<WCACompetitionTableProps> = ({ competitions, wc
   const columns: ColumnsType<WCACompetition> = [
     {
       title: '序号',
-      key: 'index',
+      dataIndex: 'indexNum',
+      key: 'indexNum',
       width: 60,
       align: 'center',
-      render: (_, __, index) => index + 1, // 行号从 1 开始
     },
     {
       title: '时间',
@@ -111,6 +116,29 @@ const CompetitionTable: React.FC<WCACompetitionTableProps> = ({ competitions, wc
       key: 'city',
       width: 150,
       ellipsis: true,
+      render: (city: string, record: WCACompetition) => {
+        // 如果是来自中国的比赛，则进行中文城市名转换
+        let cityNames = city.replace('Province', '').split(',').map(name => name.trim()).reverse()
+        if (record.country_iso2 === 'CN' || record.country_iso2 === 'TW' || record.country_iso2 === 'HK') {
+          // 转换城市名和省份名为中文
+          const convertedCityNames = cityNames.map(cityName => {
+            // 如果城市名在映射表中存在，则转换为中文，否则保持原样
+            return getLocationByPinyin(cityName) || cityName;
+          });
+
+          // 假设最后一个元素是省份名，转换省份名
+          if (convertedCityNames.length > 1) {
+            const provinceIndex = convertedCityNames.length - 1;
+            convertedCityNames[provinceIndex] = getLocationByPinyin(convertedCityNames[provinceIndex]) || convertedCityNames[provinceIndex];
+          }
+
+          // 用逗号连接并返回
+          return `${getCountryNameByIso2(record.country_iso2)} ${convertedCityNames.join(' ')}`;
+        }
+
+        // 非中国比赛保持原有逻辑
+        return `${getCountryNameByIso2(record.country_iso2)} ${cityNames.join(' ')}`;
+      }
     },
   ];
 
