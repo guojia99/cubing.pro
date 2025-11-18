@@ -75,9 +75,14 @@ export const ResultsTable = (
         dataIndex: 'Best',
         key: 'Best',
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        onCell: (result: any, rowIndex: number) => ({
-          className: 'custom-cell',
-        }),
+        onCell: (result: any, rowIndex: number) => {
+          const m = eventRouteM(result.EventRoute);
+          const isRepeatedly = m.repeatedly;
+          return {
+            className: 'cube_result_Best_col',
+            colSpan: isRepeatedly ? 2 : 1, // 如果是 repeated 模式，占两列
+          };
+        },
         width: 135,
         render: (results: number, result: Result) => {
           const m = eventRouteM(result.EventRoute);
@@ -86,15 +91,16 @@ export const ResultsTable = (
           if (m.repeatedly) {
             inter = true;
             return (
-              <td className={'cube_result_Best_col'}>
+              <>
                 {RecordTagWithResult(
-                  resultTimeString(results !== undefined ? results: 0, inter),
+                  // resultTimeString(results !== undefined ? results: 0, inter),
+                  [result.BestRepeatedlyReduction, '/', result.BestRepeatedlyTry, ' ', resultTimeString(result.BestRepeatedlyTime, false)].join(''),
                   result.id + '_repeatedly',
                   true,
                   false,
                   recordsMap,
                 )}
-              </td>
+              </>
             );
           }
           return (
@@ -119,14 +125,19 @@ export const ResultsTable = (
         key: 'Average',
         width: 135,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        onCell: (result: any, rowIndex: number) => ({
-          className: 'custom-cell',
-        }),
+        onCell: (result: any, rowIndex: number) => {
+          const m = eventRouteM(result.EventRoute);
+          // 当是 repeatedly 模式时，该列不占格子
+          return {
+            className: 'cube_result_Average_col',
+            colSpan: m.repeatedly ? 0 : 1,
+          };
+        },
         render: (results: number, result: Result) => {
           const m = eventRouteM(result.EventRoute);
           if (m.repeatedly) {
             // todo 多轮的
-            return <td className={'cube_result_Average_col'}>-</td>;
+            return <></>;
           }
 
           // todo 需要pb
