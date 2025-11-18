@@ -8,13 +8,9 @@ import { AvatarProps, Col, Row } from 'antd';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { AvatarURL } from '@/pages/Admin/AvatarDropdown';
 import { AuthAPI } from '@/services/cubing-pro/auth/typings';
-import ScrollToTopButton from "@/components/Buttons/toTop";
-import LanguageSelect from "@/locales/Language/LanguageSelect";
-import {ExtAppList} from "@/services/layout_config";
-import { Helmet } from '@@/exports';
-
-
-
+import ScrollToTopButton from '@/components/Buttons/toTop';
+import LanguageSelect from '@/locales/Language/LanguageSelect';
+import { ExtAppList } from '@/services/layout_config';
 
 /**
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
@@ -71,12 +67,12 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
       title: <AvatarName />,
       render: (_: AvatarProps, avatarChildren: React.ReactNode) => {
         return (
-         <>
-           <AvatarDropdown menu={initialState?.currentUser?.data.id !== 0}>
-             {avatarChildren}
-           </AvatarDropdown>
-           <LanguageSelect/>
-         </>
+          <>
+            <AvatarDropdown menu={initialState?.currentUser?.data.id !== 0}>
+              {avatarChildren}
+            </AvatarDropdown>
+            <LanguageSelect />
+          </>
         );
       },
     },

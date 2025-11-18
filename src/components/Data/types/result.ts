@@ -191,6 +191,7 @@ export const resultString = (results: number[], eventRoute: number) => {
         resultTimeString(results[0], true),
         '/',
         resultTimeString(results[1], true),
+        ' ',
         resultTimeString(results[2], false, true),
       ].join(' '),
     ];

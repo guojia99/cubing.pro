@@ -9,9 +9,8 @@ import {
 } from '@/services/cubing-pro/statistics/typings';
 import { BorderOutlined, CheckSquareOutlined } from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-table';
-import { Button, Card, Checkbox, Slider, Space, Tag, message, Tooltip } from 'antd';
+import { Button, Card, Checkbox, message, Slider, Space, Tag, Tooltip } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
-
 
 export type KinChProps = {
   isSenior: boolean;
@@ -40,7 +39,7 @@ const KinCh: React.FC<KinChProps> = ({ isSenior, otherDataFn }) => {
     });
   };
 
-  const baseColumns = [
+  let columns: any[] = [
     {
       title: '排名',
       dataIndex: 'Rank',
@@ -72,8 +71,6 @@ const KinCh: React.FC<KinChProps> = ({ isSenior, otherDataFn }) => {
       width: 75,
     },
   ];
-
-  let columns: any[] = baseColumns;
   for (let i = 0; i < selectedEvents.length; i++) {
     const ev = selectedEvents[i];
     columns.push({
@@ -83,24 +80,64 @@ const KinCh: React.FC<KinChProps> = ({ isSenior, otherDataFn }) => {
       width: 60,
       hideInSearch: true,
       render: (value: number, sor: KinChSorResult) => {
-        const filter = sor.Results.filter((value: KinChSorResultWithEvent) => {
-          return value.Event === ev;
+        const filter = sor.Results.filter((item: KinChSorResultWithEvent) => {
+          return item.Event === ev;
         });
+
         if (filter.length > 0) {
           const find = filter[0];
-          if (find.Result === 0) {
-            return <>-</>;
-          }
-          if (find.Result === 100) {
-            return <Tooltip title={find.ResultString}>
-              <strong style={{ color: '#f23f3f' }}>100.0</strong>
+
+          // 判断是否有有效成绩：Result 存在且不为 0（根据你的业务逻辑）
+          const hasValidResult = find.Result !== undefined && find.Result !== 0;
+
+          // 根据 UseSingle 决定标签文本
+          const tagLabel = find.UseSingle ? '单次' : '平均';
+          const tagColor = find.UseSingle ? 'green' : 'blue';
+
+          // Tooltip 内容：原始结果字符串 + 类型标签
+          const tooltipContent = (
+            <>
+              {find.ResultString}
+              <Tag color={tagColor} style={{ marginLeft: 4 }}>
+                {tagLabel}
+              </Tag>
+            </>
+          );
+
+          // 文字样式：无成绩时置灰
+          const textStyle: React.CSSProperties = hasValidResult
+            ? {}
+            : { color: '#ccc', fontStyle: 'italic' };
+
+          // 显示内容
+          let displayText: React.ReactNode = '-';
+          if (!hasValidResult && find.ResultString){
+            return  <Tooltip title={tooltipContent}>
+              <span style={{ color: '#ccc' }}>0.0</span>
             </Tooltip>
           }
-          return <Tooltip title={find.ResultString}>{find.Result.toFixed(2)}</Tooltip>;
+
+          if (!hasValidResult) {
+            return <span style={{ color: '#ccc' }}>-</span>;
+          }
+
+          const formattedResult = find.Result.toFixed(2);
+          displayText = find.IsBest ? (
+            <strong style={{ color: '#f23f3f' }}>{formattedResult}</strong>
+          ) : (
+            formattedResult
+          );
+
+          return (
+            <Tooltip title={tooltipContent}>
+              <span style={textStyle}>{displayText}</span>
+            </Tooltip>
+          );
         }
-        return <>-</>;
+
+        // 完全没有该 event 的结果数据
+        return <span style={{ color: '#ccc' }}>-</span>;
       },
-      // width: 75,
     });
   }
 
@@ -164,8 +201,8 @@ const KinCh: React.FC<KinChProps> = ({ isSenior, otherDataFn }) => {
 
   const handleSetWithPresets = (name: string) => {
     const ps = presets.get(name) as string[];
-    setSelectingEvents([...ps])
-  }
+    setSelectingEvents([...ps]);
+  };
 
   return (
     <>
@@ -209,7 +246,6 @@ const KinCh: React.FC<KinChProps> = ({ isSenior, otherDataFn }) => {
                 </Button>
               ))}
             </Space>
-
 
             {/* 显示选中项目数量 */}
             <div style={{ fontSize: '14px' }}>
@@ -255,7 +291,7 @@ const KinCh: React.FC<KinChProps> = ({ isSenior, otherDataFn }) => {
           </div>
 
           {isSenior && (
-            <div style={{ marginBottom: '20px'}}>
+            <div style={{ marginBottom: '20px' }}>
               <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>年龄: {age}岁</div>
               <Slider
                 min={40}
@@ -302,14 +338,13 @@ const KinCh: React.FC<KinChProps> = ({ isSenior, otherDataFn }) => {
         request={async () => {
           let value = undefined;
 
-          if (otherDataFn !== undefined){
-            value = await otherDataFn(tableParams)
+          if (otherDataFn !== undefined) {
+            value = await otherDataFn(tableParams);
           } else if (isSenior) {
             value = await apiSeniorKinch(tableParams);
           } else {
             value = await apiKinch(tableParams);
           }
-
 
           return {
             data: value.data.items,

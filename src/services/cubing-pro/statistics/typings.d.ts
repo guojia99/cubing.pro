@@ -4,6 +4,7 @@ export type KinChSorResultWithEvent = {
   Event: string;
   Result: number;
   IsBest: boolean;
+  UseSingle: boolean;
   ResultString: string;
 };
 

@@ -44,7 +44,8 @@ export const WCALink = (wcaId: any, name: string | null = null) => {
     return (
       <strong>
         <a
-          href={'https://www.worldcubeassociation.org/persons/' + wca}
+          href={'https://www.cubing.pro/wca/player/' + wca}
+          // href={'https://www.worldcubeassociation.org/persons/' + wca}
           target="_blank"
           rel="noopener noreferrer"
         >
