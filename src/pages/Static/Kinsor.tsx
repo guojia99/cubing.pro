@@ -1,5 +1,6 @@
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import { PlayerLink, WCALinkWithCnName } from '@/components/Link/Links';
+import KinchPlayerDetailModal, { getScoreColor } from '@/pages/Static/KinsorPlayerDetail';
 import { apiEvents } from '@/services/cubing-pro/events/events';
 import { apiKinch, apiSeniorKinch } from '@/services/cubing-pro/statistics/sor';
 import {
@@ -9,8 +10,21 @@ import {
 } from '@/services/cubing-pro/statistics/typings';
 import { BorderOutlined, CheckSquareOutlined } from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-table';
-import { Button, Card, Checkbox, message, Slider, Space, Tag, Tooltip } from 'antd';
+import {
+  Button,
+  Card,
+  Checkbox,
+  Slider,
+  Space,
+  Switch,
+  Tag,
+  Tooltip,
+  Typography,
+  message,
+} from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
+
+const { Text } = Typography;
 
 export type KinChProps = {
   isSenior: boolean;
@@ -30,6 +44,7 @@ const KinCh: React.FC<KinChProps> = ({ isSenior, otherDataFn }) => {
     age: 40,
     events: [],
   });
+  const [useColor, setUseColor] = useState<boolean>(false);
 
   const resetParams = () => {
     setTableParams({
@@ -37,6 +52,16 @@ const KinCh: React.FC<KinChProps> = ({ isSenior, otherDataFn }) => {
       events: [],
       age: 40,
     });
+  };
+
+  // 弹窗
+  const [detailModalVisible, setDetailModalVisible] = useState(false);
+  const [selectedPlayer, setSelectedPlayer] = useState<KinChSorResult | null>(null);
+
+  // 打开玩家详情弹窗
+  const openPlayerDetail = (player: KinChSorResult) => {
+    setSelectedPlayer(player);
+    setDetailModalVisible(true);
   };
 
   let columns: any[] = [
@@ -65,8 +90,17 @@ const KinCh: React.FC<KinChProps> = ({ isSenior, otherDataFn }) => {
       dataIndex: 'Result',
       key: 'Result',
       hideInSearch: true,
-      render: (value: number) => {
-        return <>{value.toFixed(3)}</>;
+      render: (score: number) => {
+        if (useColor) {
+          return (
+            <Text
+              style={{ color: getScoreColor(score), fontWeight: score > 0 ? 'bold' : 'normal' }}
+            >
+              {score > 0 ? score.toFixed(3) : '-'}
+            </Text>
+          );
+        }
+        return <>{score.toFixed(3)}</>;
       },
       width: 75,
     },
@@ -111,22 +145,33 @@ const KinCh: React.FC<KinChProps> = ({ isSenior, otherDataFn }) => {
 
           // 显示内容
           let displayText: React.ReactNode = '-';
-          if (!hasValidResult && find.ResultString){
-            return  <Tooltip title={tooltipContent}>
-              <span style={{ color: '#ccc' }}>0.0</span>
-            </Tooltip>
+          if (!hasValidResult && find.ResultString) {
+            return (
+              <Tooltip title={tooltipContent}>
+                <span style={{ color: '#ccc' }}>0.0</span>
+              </Tooltip>
+            );
           }
 
           if (!hasValidResult) {
             return <span style={{ color: '#ccc' }}>-</span>;
           }
 
+          // 不同颜色
           const formattedResult = find.Result.toFixed(2);
-          displayText = find.IsBest ? (
-            <strong style={{ color: '#f23f3f' }}>{formattedResult}</strong>
-          ) : (
-            formattedResult
-          );
+          if (useColor) {
+            displayText = find.IsBest ? (
+              <strong style={{ color: getScoreColor(find.Result) }}>{formattedResult}</strong>
+            ) : (
+              <Text style={{ color: getScoreColor(find.Result) }}>{formattedResult}</Text>
+            );
+          } else {
+            displayText = find.IsBest ? (
+              <strong style={{ color: '#b40000' }}>{formattedResult}</strong>
+            ) : (
+              formattedResult
+            );
+          }
 
           return (
             <Tooltip title={tooltipContent}>
@@ -140,6 +185,21 @@ const KinCh: React.FC<KinChProps> = ({ isSenior, otherDataFn }) => {
       },
     });
   }
+
+  // 行点击事件
+  const handleRowClick = (record: KinChSorResult) => {
+    return {
+      onClick: (e: React.MouseEvent) => {
+        // 如果点击的是选手列，不触发详情弹窗
+        if ((e.target as HTMLElement).closest('td')?.className?.includes('ant-table-column-name')) {
+          return;
+        }
+
+        // 否则打开详情弹窗
+        openPlayerDetail(record);
+      },
+    };
+  };
 
   // 动态加载数据
   useEffect(() => {
@@ -325,6 +385,16 @@ const KinCh: React.FC<KinChProps> = ({ isSenior, otherDataFn }) => {
             提交
           </Button>
         </Card>
+        <Card style={{ marginBottom: '20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <Switch
+              checkedChildren="开启颜色"
+              unCheckedChildren="关闭颜色"
+              value={useColor}
+              onChange={(e) => setUseColor(e)}
+            />
+          </div>
+        </Card>
       </>
 
       <ProTable<KinChSorResult, StaticAPI.KinchReq>
@@ -371,8 +441,19 @@ const KinCh: React.FC<KinChProps> = ({ isSenior, otherDataFn }) => {
         size={'small'}
         style={{ fontSize: '14px' }}
         sticky
-        scroll={{ x: 'max-content' }} // 添加这行
+        scroll={{ x: 'max-content' }}
+        onRow={handleRowClick}
       />
+
+      {/* 玩家详细成绩弹窗 */}
+      {selectedPlayer && (
+        <KinchPlayerDetailModal
+          visible={detailModalVisible}
+          onCancel={() => setDetailModalVisible(false)}
+          player={selectedPlayer}
+          isSenior={isSenior}
+        />
+      )}
     </>
   );
 };
