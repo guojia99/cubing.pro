@@ -45,12 +45,12 @@ const WCAPlayerDetails: React.FC<WCAPlayerDetailsProps> = ({ wcaProfile, wcaResu
   const columns = [
     {
       title: '国家 / 地区',
-      dataIndex: 'country',
-      key: 'country',
+      dataIndex: 'country_iso2',
+      key: 'country_iso2',
       align: 'center' as const,
-      render: (country: { iso2: string; name: string }) => {
-        let ct = `fi-${country.iso2.toLowerCase()}`;
-        if (country.iso2 === 'TW') {
+      render: (country_iso2:string) => {
+        let ct = `fi-${country_iso2.toLowerCase()}`;
+        if (country_iso2 === 'TW') {
           ct = `fi-cn`;
         }
         return (
@@ -58,9 +58,9 @@ const WCAPlayerDetails: React.FC<WCAPlayerDetailsProps> = ({ wcaProfile, wcaResu
             <span
               className={`fi ${ct} fi-3x`}
               style={{ marginRight: 8, minWidth: 20 }}
-              title={country.name}
+              title={getCountryNameByIso2(country_iso2)}
             />
-            {getCountryNameByIso2(country.iso2)}
+            {getCountryNameByIso2(country_iso2)}
           </Space>
         );
       },
@@ -130,7 +130,7 @@ const WCAPlayerDetails: React.FC<WCAPlayerDetailsProps> = ({ wcaProfile, wcaResu
 
   // 根据国家代码决定显示的名字
   const displayName = (() => {
-    const iso2 = person.country.iso2?.toUpperCase() || '';
+    const iso2 = person.country_iso2?.toUpperCase() || '';
     if (['CN', 'HK', 'TW'].includes(iso2)) {
       // 提取中文字符部分（含“·”）
       return person.name.match(/[\u4e00-\u9fa5·]+/g)?.join('') || person.name;
@@ -144,7 +144,7 @@ const WCAPlayerDetails: React.FC<WCAPlayerDetailsProps> = ({ wcaProfile, wcaResu
       key: '1',
       name: displayName,
       gender: person.gender,
-      country: person.country,
+      country_iso2: person.country_iso2,
       competition: competition_count,
       totalSolves: totalSolves,
       totalAttempts: totalAttempts,
