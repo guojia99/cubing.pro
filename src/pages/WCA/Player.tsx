@@ -14,6 +14,8 @@ interface CachedData {
   timestamp: number;
 }
 
+
+const NOT_CACHE =  true
 const CACHE_DURATION = 6 * 60 * 60 * 1000; // 6小时 (毫秒)
 
 const WCAPlayer: React.FC = () => {
@@ -121,15 +123,18 @@ const WCAPlayer: React.FC = () => {
     }
 
     // 尝试从缓存获取数据
-    const cachedData = getFromCache(wcaId);
-    if (cachedData) {
-      setWcaProfile(cachedData.wcaProfile);
-      setWcaResults(cachedData.wcaResults);
-      setComps(cachedData.comps);
-      setIs404(false);
-      setLoading(false);
-      return;
+    if (!NOT_CACHE){
+      const cachedData = getFromCache(wcaId);
+      if (cachedData) {
+        setWcaProfile(cachedData.wcaProfile);
+        setWcaResults(cachedData.wcaResults);
+        setComps(cachedData.comps);
+        setIs404(false);
+        setLoading(false);
+        return;
+      }
     }
+
 
     try {
       // 并行发起三个请求

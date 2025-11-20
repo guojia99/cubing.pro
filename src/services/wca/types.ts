@@ -352,7 +352,7 @@ interface Person {
   name: string;
   gender: string;
   url: string;
-  country: Country;
+  country: Country | undefined;
   location: string;
   region_id: number;
   delegate_status: string;
