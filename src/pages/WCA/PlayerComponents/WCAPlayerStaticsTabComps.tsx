@@ -6,6 +6,7 @@ import { ColumnsType } from 'antd/es/table';
 import React, { useEffect, useState } from 'react';
 import { getCountryNameByIso2 } from '@/pages/WCA/PlayerComponents/region/all_contiry';
 import { getLocationByPinyin } from '@/pages/WCA/PlayerComponents/region/china_citys';
+import { findCubingCompetitionByIdentifier } from '@/services/cubing-pro/cubing_china/cubing';
 
 interface WCACompetitionTableProps {
   competitions: WCACompetition[];
@@ -76,19 +77,25 @@ const CompetitionTable: React.FC<WCACompetitionTableProps> = ({ competitions, wc
       key: 'name',
       width: 250,
       ellipsis: true,
-      render: (name, record) => (
-        <Button
+      render: (name, record) => {
+        let cpName = record.name
+        // 比赛id
+        const findName = findCubingCompetitionByIdentifier(record.id)
+        if (findName){
+          cpName = findName.name
+        }
+        return <Button
           type="link"
           size="small"
           href={record.website}
           target="_blank"
           style={{ padding: 0, height: 'auto', lineHeight: 'inherit' }}
         >
-          {name}
+          {cpName}
         </Button>
-      ),
-    },
 
+      }
+    },
     {
       title: '项目',
       dataIndex: 'event_ids',

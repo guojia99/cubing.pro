@@ -1,4 +1,5 @@
 import {Record} from "@/components/Data/types/record";
+import { apiDiyRankingSor } from '@/services/cubing-pro/statistics/diy_ranking';
 
 export type KinChSorResultWithEvent = {
   Event: string;
@@ -66,4 +67,33 @@ declare namespace StaticAPI {
     Value: string,
     Description: string,
   }
+
+
+  interface Player {
+    wca_id: string;
+    WcaName: string;
+    PlayerId: number;     // Go 中的 uint 在 JSON 中通常为 number
+    CubeId: string;
+    PlayerName: string;
+  }
+
+  interface SorResultWithEvent {
+    Event: string;
+    IsBest: boolean;
+    ResultString: string;
+    Rank: number;
+  }
+
+  interface SorResult extends Player {
+    Rank: number;
+    Sor: number;
+    Results: SorResultWithEvent[];
+  }
+
+  interface apiDiyRankingSorRequest extends KinchReq{
+    withSingle: boolean;
+    withAvg: boolean;
+  }
 }
+
+

@@ -2,15 +2,17 @@ import { CubesCn } from '@/components/CubeIcon/cube';
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import { WCALinkWithCnName } from '@/components/Link/Links';
 import { NavTabs } from '@/components/Tabs/nav_tabs';
+import KinCh from '@/pages/Static/Kinsor';
+import DiyRankingSor from '@/pages/Static/Sor';
 import {
-  apiDiyRanking, apiDiyRankingKinch,
+  apiDiyRanking,
+  apiDiyRankingKinch,
   apiGetAllDiyRankingKey,
 } from '@/services/cubing-pro/statistics/diy_ranking';
 import { StaticAPI } from '@/services/cubing-pro/statistics/typings';
 import { OrderedListOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { Table, Tooltip } from 'antd';
 import React, { useEffect, useState } from 'react';
-import KinCh from '@/pages/Static/Kinsor';
 //
 // const eventList = [
 //   ['3x3x3Cube', '333'],
@@ -145,24 +147,24 @@ const DiyRanksWithEvent: React.FC<DiyRanksProps> = ({ keys }) => {
       <NavTabs
         type="line"
         items={eventItems}
-        tabsKey={keys + "_event"}
+        tabsKey={keys + '_event'}
         indicator={{ size: (origin: number) => origin - 20, align: 'center' }}
       />
     </>
   );
 };
 
-
-const DiyRanksWithKinch: React.FC<DiyRanksProps> =  ({ keys }) => {
+const DiyRanksWithKinch: React.FC<DiyRanksProps> = ({ keys }) => {
   const fetch = async (req: StaticAPI.KinchReq): Promise<StaticAPI.KinchResp> => {
-    return apiDiyRankingKinch(keys, req)
-  }
+    return apiDiyRankingKinch(keys, req);
+  };
 
-  return <>
-    <KinCh isSenior={false} otherDataFn={fetch} />
-  </>
-}
-
+  return (
+    <>
+      <KinCh isSenior={false} otherDataFn={fetch} />
+    </>
+  );
+};
 
 const DiyRanks: React.FC<DiyRanksProps> = ({ keys }) => {
   const items = [
@@ -172,10 +174,15 @@ const DiyRanks: React.FC<DiyRanksProps> = ({ keys }) => {
       children: <DiyRanksWithEvent keys={keys} />,
     },
     {
+      key: 'sor',
+      label: <>Sor排名</>,
+      children: <DiyRankingSor keys={keys} />,
+    },
+    {
       key: 'kinch',
       label: <>Kinch排名</>,
       children: <DiyRanksWithKinch keys={keys} />,
-    }
+    },
   ];
   return (
     <>
