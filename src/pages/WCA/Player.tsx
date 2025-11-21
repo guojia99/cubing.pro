@@ -6,6 +6,7 @@ import WCAPlayerDetails from '@/pages/WCA/PlayerComponents/PlayerDetails';
 import WCAPlayerResultTable from '@/pages/WCA/PlayerComponents/PlayerResultTable';
 import WCAPlayerStaticsTab from '@/pages/WCA/PlayerComponents/WCAPlayerStaticsTab';
 import { WCACompetition, WcaProfile, WCAResult } from '@/services/wca/types';
+import { getCubingChinaComps } from '@/services/cubing-pro/cubing_china/cubing';
 
 interface CachedData {
   wcaProfile: WcaProfile;
@@ -16,7 +17,7 @@ interface CachedData {
 
 
 const NOT_CACHE =  true
-const CACHE_DURATION = 6 * 60 * 60 * 1000; // 6小时 (毫秒)
+const CACHE_DURATION = 12 * 60 * 60 * 1000; // 12小时 (毫秒)
 
 const WCAPlayer: React.FC = () => {
   const { wcaId } = useParams();
@@ -142,6 +143,7 @@ const WCAPlayer: React.FC = () => {
         getWCAPersonProfile(wcaId),
         getWCAPersonCompetitions(wcaId),
         getWCAPersonResults(wcaId),
+        getCubingChinaComps(),
       ]);
 
       // 所有请求成功

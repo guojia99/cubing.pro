@@ -10,6 +10,7 @@ import { WCACompetition, WCAResult } from '@/services/wca/types';
 import { Space, Table, Tag } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import React from 'react';
+import { findCubingCompetitionByIdentifier } from '@/services/cubing-pro/cubing_china/cubing';
 
 interface ResultDetailWithEventProps {
   eventID: string;
@@ -95,10 +96,17 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
       width: 200,
       render: (_, record) => {
         if (record.showCompName) {
+
+          let cpName = record.compName
+          // 比赛id
+          const findName = findCubingCompetitionByIdentifier(record.competition_id)
+          if (findName){
+            cpName = findName.name
+          }
           return (
             <div>
               <div>
-                <strong>{record.compName}</strong>
+                <strong>{cpName}</strong>
               </div>
               <div style={{ fontSize: '12px', color: '#666' }}>{record.compDate}</div>
             </div>

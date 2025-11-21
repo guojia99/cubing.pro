@@ -7,6 +7,7 @@ import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import { CubesCn } from '@/components/CubeIcon/cube';
 import { formatAttempts, resultsTimeFormat } from '@/pages/WCA/utils/wca_results';
 import { WCACompetition, WCAResult } from '@/services/wca/types';
+import { findCubingCompetitionByIdentifier } from '@/services/cubing-pro/cubing_china/cubing';
 
 const { Title } = Typography
 
@@ -73,6 +74,7 @@ const WCAPlayerStaticsTabResultsWithComp: React.FC<WCAPlayerStaticsTabResultsWit
 
       return {
         compId,
+        compID: compId,
         name: compInfo.name,
         startDate: compInfo.start_date,
         endDate: compInfo.end_date,
@@ -87,6 +89,7 @@ const WCAPlayerStaticsTabResultsWithComp: React.FC<WCAPlayerStaticsTabResultsWit
       return b.startDate.localeCompare(a.startDate);
     }) as Array<{
     compId: string;
+    compID: string;
     name: string;
     startDate: string;
     endDate: string;
@@ -200,6 +203,26 @@ const WCAPlayerStaticsTabResultsWithComp: React.FC<WCAPlayerStaticsTabResultsWit
     },
   ];
 
+  const getCompTitle = (comp: any) => {
+
+    let cpName = comp.name
+    let city = comp.city
+    // 比赛id
+    const findName = findCubingCompetitionByIdentifier(comp.compID)
+    if (findName){
+      cpName = findName.name
+      city = findName.city
+    }
+    return <>
+      <div>
+        <Title level={4} style={{ margin: 0 }}>{cpName}</Title>
+        <div style={{ fontSize: '14px', color: '#666' }}>
+          {formatDate(comp.startDate)} ~ {formatDate(comp.endDate)} | {city}
+        </div>
+      </div>
+    </>
+
+  }
   return (
     <div style={{ marginTop: 16 }}>
       {sortedComps.length === 0 ? (
@@ -211,14 +234,7 @@ const WCAPlayerStaticsTabResultsWithComp: React.FC<WCAPlayerStaticsTabResultsWit
             bordered={false}
             style={{ marginBottom: 24, backgroundColor: '#fafafa' }}
             headStyle={{ backgroundColor: '#e6f7ff', borderBottom: '1px solid #91d5ff' }}
-            title={
-              <div>
-                <Title level={4} style={{ margin: 0 }}>{comp.name}</Title>
-                <div style={{ fontSize: '14px', color: '#666' }}>
-                  {formatDate(comp.startDate)} ~ {formatDate(comp.endDate)} | {comp.city}, {comp.country}
-                </div>
-              </div>
-            }
+            title={getCompTitle(comp)}
           >
             <Table
               columns={columns}

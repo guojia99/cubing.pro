@@ -15,3 +15,5 @@ export async function apiSeniorKinch(req: StaticAPI.KinchReq): Promise<StaticAPI
   });
   return response.data;
 }
+
+
