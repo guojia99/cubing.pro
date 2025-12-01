@@ -161,7 +161,7 @@ const DiyRanksWithKinch: React.FC<DiyRanksProps> = ({ keys }) => {
 
   return (
     <>
-      <KinCh isSenior={false} otherDataFn={fetch} />
+      <KinCh isSenior={false} otherDataFn={fetch} isCountry={false} />
     </>
   );
 };

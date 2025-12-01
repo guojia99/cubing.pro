@@ -16,6 +16,7 @@ export type KinChSorResult = {
   wca_id: string;
   WcaName: string;
   PlayerName: string;
+  CountryIso2: string;
   Result: number;
   Results: KinChSorResultWithEvent[];
 };
@@ -26,6 +27,7 @@ declare namespace StaticAPI {
     size: number;
     age: number;
     events: string[];
+    country: string[];
   };
   type KinchResp = {
     data: {

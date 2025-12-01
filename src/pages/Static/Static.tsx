@@ -23,13 +23,13 @@ const Static: React.FC = () => {
     {
       key: 'kinch_sor',
       label: 'KinCh',
-      children: <KinCh isSenior={false} otherDataFn={undefined} />,
+      children: <KinCh isSenior={false} otherDataFn={undefined}  isCountry={false}/>,
       icon: <OrderedListOutlined />,
     },
     {
       key: 'kinch_senior_sor',
       label: 'WCA大龄KinCh',
-      children: <KinCh isSenior={true} otherDataFn={undefined}/>,
+      children: <KinCh isSenior={true} otherDataFn={undefined} isCountry={true}/>,
       icon: <OrderedListOutlined />,
     },
     {

@@ -108,30 +108,31 @@ export function findCubingCompetitionByIdentifier(identifier: string): CubingCom
   comp = useData.find(c => c.enName === identifier);
   if (comp) return comp;
 
-  // 4. 模糊匹配 enName（年份必须一致）
-  const inputYear = extractYear(identifier);
-  if (!inputYear) return null;
+  // // 4. 模糊匹配 enName（年份必须一致）
+  // const inputYear = extractYear(identifier);
+  // if (!inputYear) return null;
+  //
+  // const normalizedInput = normalizeForFuzzy(identifier);
+  // const inputWords = normalizedInput.split(' ').filter(Boolean);
+  //
+  // const candidates = useData.filter(c => extractYear(c.enName) === inputYear);
+  // if (candidates.length === 0) return null;
+  //
+  // let bestMatch: CubingCompetition | null = null;
+  // let maxMatchCount = -1;
+  //
+  // for (const c of candidates) {
+  //   const normEnName = normalizeForFuzzy(c.enName);
+  //   const enWords = normEnName.split(' ').filter(Boolean);
+  //   const matchCount = inputWords.filter(word => enWords.includes(word)).length;
+  //
+  //   if (matchCount > maxMatchCount) {
+  //     maxMatchCount = matchCount;
+  //     bestMatch = c;
+  //   }
+  // }
 
-  const normalizedInput = normalizeForFuzzy(identifier);
-  const inputWords = normalizedInput.split(' ').filter(Boolean);
-
-  const candidates = useData.filter(c => extractYear(c.enName) === inputYear);
-  if (candidates.length === 0) return null;
-
-  let bestMatch: CubingCompetition | null = null;
-  let maxMatchCount = -1;
-
-  for (const c of candidates) {
-    const normEnName = normalizeForFuzzy(c.enName);
-    const enWords = normEnName.split(' ').filter(Boolean);
-    const matchCount = inputWords.filter(word => enWords.includes(word)).length;
-
-    if (matchCount > maxMatchCount) {
-      maxMatchCount = matchCount;
-      bestMatch = c;
-    }
-  }
-
-  return maxMatchCount > 0 ? bestMatch : null;
+  // return maxMatchCount > 0 ? bestMatch : null;
+  return null;
 }
 

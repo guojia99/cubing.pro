@@ -1,8 +1,15 @@
+import { Avatar } from 'antd';
+
 interface CountryMap {
   [key: string]: string;
 }
 
-const countryIso2ToChinese: CountryMap = {
+export const countryIso2ToChinese: CountryMap = {
+  CN: '中国',
+  TW: '中国台湾',
+  HK: '中国香港',
+  MO: '中国澳门',
+
   AF: '阿富汗',
   AX: '奥兰群岛',
   AL: '阿尔巴尼亚',
@@ -48,7 +55,7 @@ const countryIso2ToChinese: CountryMap = {
   CF: '中非共和国',
   TD: '乍得',
   CL: '智利',
-  CN: '中国',
+
   CX: '圣诞岛',
   CC: '科科斯（基林）群岛',
   CO: '哥伦比亚',
@@ -102,7 +109,7 @@ const countryIso2ToChinese: CountryMap = {
   HM: '赫德岛和麦克唐纳群岛',
   VA: '梵蒂冈',
   HN: '洪都拉斯',
-  HK: '中国香港',
+
   HU: '匈牙利',
   IS: '冰岛',
   IN: '印度',
@@ -133,7 +140,7 @@ const countryIso2ToChinese: CountryMap = {
   LI: '列支敦士登',
   LT: '立陶宛',
   LU: '卢森堡',
-  MO: '中国澳门',
+
   MK: '北马其顿',
   MG: '马达加斯加',
   MW: '马拉维',
@@ -220,7 +227,7 @@ const countryIso2ToChinese: CountryMap = {
   SE: '瑞典',
   CH: '瑞士',
   SY: '叙利亚',
-  TW: '中国台湾',
+
   TJ: '塔吉克斯坦',
   TZ: '坦桑尼亚',
   TH: '泰国',
@@ -265,4 +272,23 @@ export function getCountryNameByIso2(iso2Code: string): string {
     return find;
   }
   return '';
+}
+
+export function CountryAvatar(code: string) {
+  let key = code.toLowerCase();
+  if (key === "tw"){
+    key = "cn"
+  }
+
+
+  return (
+    <>
+      <Avatar
+        style={{ width: 16, height: 16, marginRight: 8 }}
+        src={`https://flagcdn.com/${key}.svg`}
+        size="small"
+        shape="square"
+      />
+    </>
+  );
 }
