@@ -1,32 +1,26 @@
-import './cube_icon.css'
-import {SelectProps} from "antd";
+import './cube_icon.css';
 
 export const CubeIcon = (c: string, key: string, styles: any) => {
-
-  if (c === "" || c === undefined) {
-    return <></>
+  if (c === '' || c === undefined) {
+    return <></>;
   }
 
-  c = c.replace(" ", "_")
-  c = c.toLowerCase()
+  let cc = c.replace(' ', '_');
+  cc = cc.toLowerCase();
 
-  let name = "cubing-icon-" + c
+  let name = 'cubing-icon-' + cc;
   return (
     <i
       key={key}
-      className={"cubing-icon " + name}
+      className={'cubing-icon ' + name}
       data-toggle="tooltip"
       data-placement="top"
-      title={c}
+      title={cc}
       style={{
         ...styles,
         display: 'inline-block',
         verticalAlign: 'middle',
       }}
     ></i>
-  )
-}
-
-
-
-
+  );
+};

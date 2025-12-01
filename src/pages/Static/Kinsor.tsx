@@ -11,26 +11,31 @@ import {
 import { ProTable } from '@ant-design/pro-table';
 import { Card, Switch, Tag, Tooltip, Typography, message } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
+import { CountryAvatar, getCountryNameByIso2 } from '@/pages/WCA/PlayerComponents/region/all_contiry';
 
 const { Text } = Typography;
 
 export type KinChProps = {
   isSenior: boolean;
+  isCountry: boolean;
 
   otherDataFn: ((req: StaticAPI.KinchReq) => Promise<StaticAPI.KinchResp>) | undefined;
 };
 
-const KinCh: React.FC<KinChProps> = ({ isSenior, otherDataFn }) => {
+const KinCh: React.FC<KinChProps> = ({ isSenior, isCountry, otherDataFn }) => {
   const actionRef = useRef();
   const [tableParams, setTableParams] = useState<StaticAPI.KinchReq>({
     size: 100,
     page: 1,
     age: 40,
     events: [],
+    country: [],
   });
   const [age, setAge] = useState<number>(40);
   const [selectedEvents, setSelectedEvents] = useState<string[]>([]);
   const [useColor, setUseColor] = useState<boolean>(false);
+
+  const [hasEvents, setHasEvents] = useState<string[]>([]);
 
   const resetParams = () => {
     setTableParams({
@@ -58,6 +63,23 @@ const KinCh: React.FC<KinChProps> = ({ isSenior, otherDataFn }) => {
       width: 40,
       hideInSearch: true,
     },
+  ];
+
+  if (isCountry){
+    columns.push({
+      title: '地区',
+      dataIndex: 'CountryIso2',
+      key: "CountryIso2",
+      width: 100,
+      render: (text: string) => {
+        return (<>
+          {CountryAvatar(text)} {getCountryNameByIso2(text)}
+        </>)
+      }
+    })
+  }
+
+  columns.push(
     {
       title: '选手',
       dataIndex: 'Name',
@@ -90,9 +112,9 @@ const KinCh: React.FC<KinChProps> = ({ isSenior, otherDataFn }) => {
       },
       width: 75,
     },
-  ];
-  for (let i = 0; i < selectedEvents.length; i++) {
-    const ev = selectedEvents[i];
+  );
+  for (let i = 0; i < hasEvents.length; i++) {
+    const ev = hasEvents[i];
     columns.push({
       title: <>{CubeIcon(ev, ev + '__col', {})}</>,
       dataIndex: ev,
@@ -193,23 +215,23 @@ const KinCh: React.FC<KinChProps> = ({ isSenior, otherDataFn }) => {
       ...tableParams,
       events: allEvents,
     });
-    setSelectedEvents(allEvents)
+    setSelectedEvents(allEvents);
   }, []);
 
-
   // 变化时
-  const handleUpdateTable = (selectEvents: string[], age?: number) => {
+  const handleUpdateTable = (selectEvents: string[], age?: number, country?: string[]) => {
     if (selectEvents.length === 0) {
       message.warning('请选择至少一个项目！').then();
       return;
     }
     setTableParams({
       ...tableParams,
-      age: age ? age : 40 ,
+      age: age ? age : 40,
+      country: country ? country : [],
       events: selectEvents,
     });
-    setAge(age ? age : 40 )
-    setSelectedEvents(selectEvents)
+    setAge(age ? age : 40);
+    setSelectedEvents(selectEvents);
     // @ts-ignore
     actionRef.current?.reload();
   };
@@ -217,7 +239,12 @@ const KinCh: React.FC<KinChProps> = ({ isSenior, otherDataFn }) => {
   return (
     <>
       <>
-        <EventSelector events={allEvents} isSenior={isSenior} onConfirm={handleUpdateTable} />
+        <EventSelector
+          events={allEvents}
+          isSenior={isSenior}
+          onConfirm={handleUpdateTable}
+          isCountry={isCountry}
+        />
         <Card style={{ marginBottom: '20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <Switch
@@ -249,6 +276,22 @@ const KinCh: React.FC<KinChProps> = ({ isSenior, otherDataFn }) => {
             value = await apiKinch(tableParams);
           }
 
+          if (value && value.data.items){
+            const events: string[] = [];
+            for (let i = 0; i < value.data.items.length; i++) {
+              const item = value.data.items[i]
+
+              for (let j = 0; j < item.Results.length; j++){
+                events.push(item.Results[j].Event)
+              }
+            }
+            console.log(events)
+            const uniqueEvents: string[] = [...new Set(events)];
+            console.log(uniqueEvents)
+            setHasEvents(uniqueEvents)
+          }
+
+
           return {
             data: value.data.items,
             success: true,
@@ -263,6 +306,7 @@ const KinCh: React.FC<KinChProps> = ({ isSenior, otherDataFn }) => {
         }}
         onChange={(pagination) => {
           setTableParams({
+            ...tableParams,
             events: selectedEvents,
             age: age,
             page: pagination.current ? pagination.current : 1,

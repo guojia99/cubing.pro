@@ -1,7 +1,10 @@
 import { BorderOutlined, CheckSquareOutlined } from '@ant-design/icons';
-import { Button, Card, Checkbox, Slider, Space, Tag } from 'antd';
+import { Avatar, Button, Card, Checkbox, Select, Slider, Space, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
+import type { SelectProps } from 'antd';
+import { CountryAvatar, countryIso2ToChinese } from '@/pages/WCA/PlayerComponents/region/all_contiry';
+
 
 export const allEvents = [
   '333', '222', '444', '555', '666', '777',
@@ -15,17 +18,19 @@ export const allEvents = [
 interface EventSelectorProps {
   events: string[]; // 所有可选项
   isSenior?: boolean; // 是否显示年龄滑块
-  onConfirm: (selectedEvents: string[], age?: number) => void; // 提交回调
+  isCountry?: boolean; // 显示国家地区选择块
+  onConfirm: (selectedEvents: string[], age?: number, country?: string[]) => void; // 提交回调
 }
 
 const EventSelector: React.FC<EventSelectorProps> = ({
   events = [],
   isSenior = false,
+  isCountry= false,
   onConfirm,
 }) => {
   const [selectingEvents, setSelectingEvents] = useState<string[]>([]);
   const [age, setAge] = useState<number>(40);
-
+  const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
 
   useEffect(() => {
     setSelectingEvents(events)
@@ -63,8 +68,25 @@ const EventSelector: React.FC<EventSelectorProps> = ({
 
   // 提交
   const handleUpdateTable = () => {
-    onConfirm(selectingEvents, age);
+    onConfirm(selectingEvents, age, selectedCountries);
   };
+
+
+  const placeholderCountryText = selectedCountries.length === 0
+    ? '全部国家或地区'
+    : `${selectedCountries.length} 个国家已选择`;
+
+
+  const countryOptions: SelectProps['options'] = Object.entries(countryIso2ToChinese).map(([code, name]) => ({
+    value: code,
+    label: (
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        {CountryAvatar(code)}
+        {name} ({code})
+      </div>
+    ),
+  }));
+
 
   return (
     <>
@@ -174,6 +196,22 @@ const EventSelector: React.FC<EventSelectorProps> = ({
               <span>40岁</span>
               <span>100岁</span>
             </div>
+          </div>
+        )}
+
+        {isCountry && (
+          <div style={{marginBottom: '20px'}}>
+            <Select
+              mode="multiple"
+              style={{ width: '50%', marginBottom: '10px' }}
+              placeholder={placeholderCountryText}
+              value={selectedCountries}
+              onChange={(e) => {
+                setSelectedCountries(e)
+              }}
+              options={countryOptions}
+              maxTagCount="responsive"
+            />
           </div>
         )}
 
