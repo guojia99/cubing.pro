@@ -1,20 +1,31 @@
 import { CubesCn } from '@/components/CubeIcon/cube';
-import { findCubingCompetitionByIdentifier } from '@/services/cubing-pro/cubing_china/cubing';
-import { WCACompetition, WcaProfile, WCAResult } from '@/services/wca/types';
 import { eventOrder } from '@/pages/WCA/utils/events';
 import { resultsTimeFormat } from '@/pages/WCA/utils/wca_results';
+import { findCubingCompetitionByIdentifier } from '@/services/cubing-pro/cubing_china/cubing';
+import { WCACompetition, WcaProfile, WCAResult } from '@/services/wca/types';
 
-const improvementPercentNumber = 33
 
 export type MilestoneType =
   | 'first_competition'
-  | 'significant_improvement'
-  | 'grand_slam'
   | 'comeback'
-  | 'first_blindfolded_success'
-  | 'first_podium'
+  | 'nth_competition'
+  | 'grand_slam'
   | 'record_breaker'
-  | 'nth_competition';
+  | 'first_podium'
+  | 'first_blindfolded_success'
+  | 'significant_improvement'
+
+
+export  const MILESTONE_TYPE_PRIORITY: Record<MilestoneType, number> = {
+  first_competition: 0,
+  comeback: 1,
+  nth_competition: 2,
+  grand_slam: 3,
+  record_breaker: 4,
+  first_podium: 5,
+  first_blindfolded_success: 6,
+  significant_improvement: 7,
+};
 
 export interface Milestone {
   type: MilestoneType;
@@ -67,7 +78,7 @@ export function sortResultsByCompDate(
 }
 
 /**
- * 从比赛映射和成绩记录中安全获取比赛开始日期。
+ * 从比赛映射和成绩记录中安全获取比赛开始日期
  *
  * @param compMap - 比赛 ID 到 WCACompetition 的映射
  * @param result - WCA 比赛成绩记录
@@ -106,6 +117,7 @@ export function createFirstCompetitionMilestone(firstComp: WCACompetition): Mile
 export function createSignificantImprovementMilestones(
   wcaResultMap: Record<string, WCAResult[]>,
   compMap: Map<string, WCACompetition>,
+  improvementNumber: number = 33,
 ): Milestone[] {
   const milestones: Milestone[] = [];
 
@@ -125,12 +137,13 @@ export function createSignificantImprovementMilestones(
 
       if (entry.best > 0 && entry.best < currentBestSingle) {
         const improvementPercent = ((currentBestSingle - entry.best) / currentBestSingle) * 100;
-        if (improvementPercent >= improvementPercentNumber) {
+        if (improvementPercent >= improvementNumber) {
           milestones.push({
             type: 'significant_improvement',
             description: `${CubesCn(eventId)} 项目大幅刷新(${improvementPercent.toFixed(
               2,
             )}%)了自己的最佳历史成绩`,
+            competition_id: entry.competition_id,
             event_id: eventId,
             old_best_time: currentBestSingle,
             new_best_time: entry.best,
@@ -143,14 +156,15 @@ export function createSignificantImprovementMilestones(
 
       if (entry.average > 0 && entry.average < currentBestAvg) {
         const improvementPercent = ((currentBestAvg - entry.average) / currentBestAvg) * 100;
-        if (improvementPercent >= improvementPercentNumber) {
+        if (improvementPercent >= improvementNumber) {
           milestones.push({
             type: 'significant_improvement',
             description: `${CubesCn(eventId)} 项目大幅刷新(${improvementPercent.toFixed(
               2,
             )}%)了自己的平均历史成绩`,
             event_id: eventId,
-            old_best_time: currentBestSingle,
+            competition_id: entry.competition_id,
+            old_best_time: currentBestAvg,
             new_best_time: entry.average,
             best_is_average: true,
             percentage_improved: improvementPercent,
@@ -229,7 +243,7 @@ export function createGrandSlamMilestone(
   }
 
   // 检查是否全部达成
-  const allCompleted = eventOrder.every(eventId => {
+  const allCompleted = eventOrder.every((eventId) => {
     const rec = firstAchieved[eventId];
     if (eventId === '333mbf') return !!rec.single;
     return !!rec.single && !!rec.average;
@@ -276,7 +290,7 @@ const BLIND_EVENTS = new Set(['333bf', '444bf', '555bf', '333mbf']);
 
 export function createFirstBlindfoldedSuccessMilestones(
   results: WCAResult[],
-  compMap: Map<string, WCACompetition>
+  compMap: Map<string, WCACompetition>,
 ): Milestone[] {
   // 记录每个 event 的首次 single/average 信息
   const firstRecords: Record<
@@ -338,7 +352,11 @@ export function createFirstBlindfoldedSuccessMilestones(
     if (single && (!average || single.compId !== average.compId)) {
       milestones.push({
         type: 'first_blindfolded_success',
-        description: ` ${CubesCn(eventId)} 首次获得有效单次成绩 ${resultsTimeFormat(single.result, eventId, false)}`,
+        description: ` ${CubesCn(eventId)} 首次获得有效单次成绩 ${resultsTimeFormat(
+          single.result,
+          eventId,
+          false,
+        )}`,
         event_id: eventId,
         result: single.result,
         date_achieved: single.date,
@@ -351,7 +369,11 @@ export function createFirstBlindfoldedSuccessMilestones(
     if (average && (!single || single.compId !== average.compId)) {
       milestones.push({
         type: 'first_blindfolded_success',
-        description: ` ${CubesCn(eventId)} 首次获得有效平均成绩 ${resultsTimeFormat(average.result, eventId, true)}`,
+        description: ` ${CubesCn(eventId)} 首次获得有效平均成绩 ${resultsTimeFormat(
+          average.result,
+          eventId,
+          true,
+        )}`,
         event_id: eventId,
         result: average.result,
         best_is_average: true,
@@ -365,7 +387,11 @@ export function createFirstBlindfoldedSuccessMilestones(
     if (single && average && single.compId === average.compId) {
       milestones.push({
         type: 'first_blindfolded_success',
-        description: ` ${CubesCn(eventId)} 首次同时获得有效单次和平均成绩 ${resultsTimeFormat(single.result, eventId, false)} / ${resultsTimeFormat(average.result, eventId, true)}`,
+        description: ` ${CubesCn(eventId)} 首次同时获得有效单次和平均成绩 ${resultsTimeFormat(
+          single.result,
+          eventId,
+          false,
+        )} / ${resultsTimeFormat(average.result, eventId, true)}`,
         event_id: eventId,
         result: single.result,
         // average_result: average.result,
@@ -379,8 +405,8 @@ export function createFirstBlindfoldedSuccessMilestones(
 
   return milestones;
 }
-// createFirstPodiumMilestones
 
+// createFirstPodiumMilestones
 
 export function createComebackMilestone(sortedComps: WCACompetition[]): Milestone[] {
   if (sortedComps.length < 2) return [];
@@ -390,29 +416,36 @@ export function createComebackMilestone(sortedComps: WCACompetition[]): Mileston
     const curr = new Date(sortedComps[i].start_date);
     const gapYears = (curr.getTime() - prev.getTime()) / (1000 * 60 * 60 * 24 * 365.25);
     if (gapYears >= 3) {
-      return [{
-        type: 'comeback',
-        description: `在时隔${gapYears.toFixed(0)}年重新复出比赛。`,
-        competition_id: sortedComps[i].id,
-        last_competition_date: sortedComps[i - 1].start_date,
-        new_competition_date: sortedComps[i].start_date,
-      }]
+      return [
+        {
+          type: 'comeback',
+          description: `在时隔${gapYears.toFixed(0)}年重新复出比赛`,
+          competition_id: sortedComps[i].id,
+          last_competition_date: sortedComps[i - 1].start_date,
+          new_competition_date: sortedComps[i].start_date,
+        },
+      ];
     }
   }
   return [];
 }
 
-
 export function createFirstPodiumMilestones(
   results: WCAResult[],
-  compMap: Map<string, WCACompetition>
+  compMap: Map<string, WCACompetition>,
 ): Milestone[] {
   const milestones: Milestone[] = [];
   const firstPodiumAchieved = new Set<string>(); // 首次领奖台成就
-  const firstGoldAchieved = new Set<string>();   // 首次金牌成就
+  const firstGoldAchieved = new Set<string>(); // 首次金牌成就
 
   for (const res of results) {
-    if (res.round_type_id !== 'f') continue; // 只考虑决赛轮次
+    if (res.round_type_id !== 'f' && res.round_type_id !== 'c' && res.round_type_id !== 'b')
+      continue; // 只考虑决赛轮次
+
+    if (res.best <= 0){ // DNF
+      continue
+    }
+
     if (res.pos < 1 || res.pos > 3) continue; // 只考虑前三名
 
     const comp = compMap.get(res.competition_id);
@@ -421,12 +454,20 @@ export function createFirstPodiumMilestones(
     const eventId = res.event_id;
     const isGold = res.pos === 1;
 
+    let resultStr = `${resultsTimeFormat(res.best, res.event_id, false)}`
+    if (res.average > 0){
+      resultStr += ` / ${resultsTimeFormat(res.average, res.event_id, true)}`;
+    }
+
+
+
+
     // 如果是首次获得金牌
     if (isGold && !firstGoldAchieved.has(eventId)) {
       firstGoldAchieved.add(eventId);
       milestones.push({
         type: 'first_podium',
-        description: `首次在 ${CubesCn(eventId)} 项目获得金牌。`,
+        description: `首次以成绩 (${resultStr}) 在 ${CubesCn(eventId)} 项目获得金牌`,
         event_id: eventId,
         competition_id: res.competition_id,
         round_type_id: res.round_type_id,
@@ -440,7 +481,7 @@ export function createFirstPodiumMilestones(
       firstPodiumAchieved.add(eventId);
       milestones.push({
         type: 'first_podium',
-        description: `首次在 ${CubesCn(eventId)} 项目获得领奖台。`,
+        description: `首次以成绩 (${resultStr}) 在  ${CubesCn(eventId)} 项目获得领奖台`,
         event_id: eventId,
         competition_id: res.competition_id,
         round_type_id: res.round_type_id,
@@ -455,7 +496,7 @@ export function createFirstPodiumMilestones(
 
 export function createRecordBreakerMilestones(
   results: WCAResult[],
-  compMap: Map<string, WCACompetition>
+  compMap: Map<string, WCACompetition>,
 ): Milestone[] {
   const milestones: Milestone[] = [];
 
@@ -466,8 +507,13 @@ export function createRecordBreakerMilestones(
     if (res.regional_single_record) {
       milestones.push({
         type: 'record_breaker',
-        description: `${res.event_id} 以单次成绩${resultsTimeFormat(res.best, res.event_id, false)}打破 ${res.regional_single_record} 记录。`,
+        description: `${CubesCn(res.event_id)} 以单次成绩${resultsTimeFormat(
+          res.best,
+          res.event_id,
+          false,
+        )}打破 ${res.regional_single_record} 记录`,
         event_id: res.event_id,
+        competition_id: res.competition_id,
         record_type: res.regional_single_record,
         record_value: res.best,
         date: comp.start_date,
@@ -476,9 +522,14 @@ export function createRecordBreakerMilestones(
     if (res.regional_average_record) {
       milestones.push({
         type: 'record_breaker',
-        description: `${res.event_id}以平均成绩${resultsTimeFormat(res.best, res.event_id, false)}打破 ${res.regional_average_record} 记录。`,
+        description: `${CubesCn(res.event_id)} 以平均成绩${resultsTimeFormat(
+          res.best,
+          res.event_id,
+          false,
+        )}打破 ${res.regional_average_record} 记录`,
         event_id: res.event_id,
         record_type: res.regional_average_record,
+        competition_id: res.competition_id,
         record_value: res.average,
         date: comp.start_date,
       });
@@ -488,13 +539,11 @@ export function createRecordBreakerMilestones(
   return milestones;
 }
 
-
-
-
 export function GetMilestones(
   wcaProfile: WcaProfile,
   wcaResults: WCAResult[],
   comps: WCACompetition[],
+  improvementNumber: number = 33
 ): Milestone[] {
   if (comps.length === 0) return [];
 
@@ -523,21 +572,19 @@ export function GetMilestones(
   milestones.push(...createNthCompetitionMilestones(sortedComps));
 
   // 3. 成绩突破
-  milestones.push(...createSignificantImprovementMilestones(wcaResultMap, compMap));
-
+  milestones.push(...createSignificantImprovementMilestones(wcaResultMap, compMap, improvementNumber));
 
   // 4. 大满贯
-  milestones.push(...createGrandSlamMilestone(wcaResults, compMap))
+  milestones.push(...createGrandSlamMilestone(wcaResults, compMap));
 
   // 5. 盲拧有效成绩
   milestones.push(...createFirstBlindfoldedSuccessMilestones(wcaResults, compMap));
 
   // 6. 回归
-  milestones.push(...createComebackMilestone(sortedComps))
+  milestones.push(...createComebackMilestone(sortedComps));
 
   // 7. 首次领奖台
   milestones.push(...createFirstPodiumMilestones(sortedResults, compMap));
-
 
   // 8. 记录
   milestones.push(...createRecordBreakerMilestones(sortedResults, compMap));
