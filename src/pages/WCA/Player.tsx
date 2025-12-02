@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from '@@/exports';
 import { getWCAPersonCompetitions, getWCAPersonProfile, getWCAPersonResults } from '@/services/wca/player';
-import { Spin } from 'antd';
+import { Col, Row, Spin } from 'antd';
 import WCAPlayerDetails from '@/pages/WCA/PlayerComponents/PlayerDetails';
 import WCAPlayerResultTable from '@/pages/WCA/PlayerComponents/PlayerResultTable';
 import WCAPlayerStaticsTab from '@/pages/WCA/PlayerComponents/WCAPlayerStaticsTab';
@@ -200,10 +200,23 @@ const WCAPlayer: React.FC = () => {
   }
 
   return (
-    <div>
-      <WCAPlayerDetails wcaProfile={wcaProfile} wcaResults={wcaResults} />
-      <WCAPlayerResultTable wcaProfile={wcaProfile} wcaResults={wcaResults} />
-      <WCAPlayerStaticsTab wcaProfile={wcaProfile} wcaResults={wcaResults} comps={comps} />
+    <div style={{ width: '100%' }}>
+      <Row gutter={[0, 24]} style={{ padding: '0 16px' }}>
+        {/* WCAPlayerDetails */}
+        <Col span={24}>
+          <WCAPlayerDetails wcaProfile={wcaProfile} wcaResults={wcaResults} />
+        </Col>
+
+        {/* WCAPlayerResultTable */}
+        <Col span={24}>
+          <WCAPlayerResultTable wcaProfile={wcaProfile} wcaResults={wcaResults} />
+        </Col>
+
+        {/* WCAPlayerStaticsTab */}
+        <Col span={24}>
+          <WCAPlayerStaticsTab wcaProfile={wcaProfile} wcaResults={wcaResults} comps={comps} />
+        </Col>
+      </Row>
     </div>
   );
 };

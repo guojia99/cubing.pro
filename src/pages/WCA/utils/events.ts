@@ -1,4 +1,5 @@
-import { WCAResult } from '@/services/wca/playerResults';
+import { WCAResult } from '@/services/wca/types';
+
 
 export const eventOrder = [
   '333',
