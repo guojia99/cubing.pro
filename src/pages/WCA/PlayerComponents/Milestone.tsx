@@ -1,26 +1,40 @@
-
 import { WCACompetition, WCAResult, WcaProfile } from '@/services/wca/types';
-import { SelectProps, Typography } from 'antd';
-import { Badge, Button, Card, Select, Space, Tag, Timeline } from 'antd';
+import {
+  Badge,
+  Button,
+  Card,
+  Form, InputNumber,
+  Select,
+  SelectProps,
+  Slider,
+  Space,
+  Tag,
+  Timeline,
+  Typography,
+} from 'antd';
 import React, { useEffect, useState } from 'react';
+
+import 'antd/dist/reset.css'; // 如果你使用的是 antd v5，请用这个引入样式
+
+import MilestoneItemContent, {
+  MILESTONE_COLOR_MAP,
+  defaultMilestoneTypeOptions,
+} from '@/pages/WCA/PlayerComponents/MilestoneContent';
 import {
   GetMilestones,
   MILESTONE_TYPE_PRIORITY,
   Milestone,
   MilestoneType,
 } from './player_milestone';
-import MilestoneItemContent, {
-  defaultMilestoneTypeOptions,
-  MILESTONE_COLOR_MAP,
-} from '@/pages/WCA/PlayerComponents/MilestoneContent';
+
 const { Text } = Typography;
 type TagRender = SelectProps['tagRender'];
 
-// 获取显示用的年月（YYYY-MM）
-const getYearMonth = (dateStr?: string): string | null => {
+// 获取显示用的年月（YYYY-MM-DD）
+const getYearMonthDay = (dateStr?: string): string | null => {
   if (!dateStr) return null;
   // 支持 YYYY-MM-DD 或 ISO 8601
-  const match = dateStr.match(/^(\d{4}-\d{2})/);
+  const match = dateStr.match(/^(\d{4}-\d{2}-\d{2})/);
   return match ? match[1] : null;
 };
 
@@ -75,22 +89,27 @@ const MilestoneTimelines: React.FC<MilestoneTimelineProps> = ({
   comps,
 }) => {
   const [ascending, setAscending] = useState<boolean>(false);
-
-  const milestones = GetMilestones(wcaProfile, wcaResults, comps);
-
   const [excludedTypes, setExcludedTypes] = useState<MilestoneType[]>([]);
+  const [allMilestones, setAllMilestones] = useState<Milestone[]>([]);
   const [filteredMilestones, setFilteredMilestones] = useState<Milestone[]>([]);
+  const [milestoneTypeOptions, setMilestoneTypeOptions] = useState<
+    { label: string; value: MilestoneType }[]
+  >([]);
+  const [improvementNumber, setImprovementNumber] = useState(33);
 
   useEffect(() => {
+    const milestones = GetMilestones(wcaProfile, wcaResults, comps, improvementNumber);
+    setAllMilestones(milestones);
     const sortedMilestones = sortMilestones(milestones, ascending);
     const fs = sortedMilestones.filter((m) => !excludedTypes.includes(m.type));
     setFilteredMilestones(fs);
-  }, [excludedTypes, milestones, ascending]);
 
-  const milestoneTypesPresent = new Set(milestones.map((m) => m.type));
-  const milestoneTypeOptions = defaultMilestoneTypeOptions
-    .filter((opt) => milestoneTypesPresent.has(opt.value))
-    .sort((a, b) => MILESTONE_TYPE_PRIORITY[a.value] - MILESTONE_TYPE_PRIORITY[b.value]);
+    const milestoneTypesPresent = new Set(milestones.map((m) => m.type));
+    const mOpt = defaultMilestoneTypeOptions
+      .filter((opt) => milestoneTypesPresent.has(opt.value))
+      .sort((a, b) => MILESTONE_TYPE_PRIORITY[a.value] - MILESTONE_TYPE_PRIORITY[b.value]);
+    setMilestoneTypeOptions(mOpt);
+  }, [excludedTypes, ascending, improvementNumber]);
 
   const tagRender: TagRender = (props) => {
     const { label, value, closable, onClose } = props;
@@ -113,6 +132,7 @@ const MilestoneTimelines: React.FC<MilestoneTimelineProps> = ({
     );
   };
 
+
   return (
     <Card
       title={
@@ -127,41 +147,68 @@ const MilestoneTimelines: React.FC<MilestoneTimelineProps> = ({
           </Button>
 
           <div style={{ marginTop: 16 }}>
-            <Text type="secondary" style={{ marginRight: 8 }}>
-              不看里程碑{' '}
-            </Text>
-            <Select
-              mode="multiple"
-              allowClear
-              placeholder="选择要排除的里程碑类型"
-              value={excludedTypes}
-              onChange={(value) => setExcludedTypes(value as MilestoneType[])}
-              style={{ width: '100%', maxWidth: 200 }}
-              options={milestoneTypeOptions}
-              tagRender={tagRender}
-              optionRender={(option) => {
-                return (
-                  <>
-                    <Tag color={MILESTONE_COLOR_MAP[option.data.value as MilestoneType]}>
-                      {option.data.label}(
-                      {milestones.filter((r) => r.type === option.data.value).length})
-                    </Tag>
-                  </>
-                );
-              }}
-            ></Select>
+            <Form.Item label="不看里程碑">
+              <Select
+                mode="multiple"
+                allowClear
+                placeholder="选择要排除的里程碑类型"
+                value={excludedTypes}
+                onChange={(value) => setExcludedTypes(value as MilestoneType[])}
+                style={{ width: '100%', maxWidth: 200 }}
+                options={milestoneTypeOptions}
+                tagRender={tagRender}
+                optionRender={(option) => {
+                  return (
+                    <>
+                      <Tag color={MILESTONE_COLOR_MAP[option.data.value as MilestoneType]}>
+                        {option.data.label}(
+                        {allMilestones.filter((r) => r.type === option.data.value).length})
+                      </Tag>
+                    </>
+                  );
+                }}
+              ></Select>
+            </Form.Item>
+          </div>
+          <div style={{ marginTop: 16, minWidth: '200px', width: '33%' }}>
+            <Form.Item label="进步阈值">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <Slider
+                  min={10}
+                  max={100}
+                  value={improvementNumber}
+                  onChange={setImprovementNumber}
+                  tooltip={{ formatter: (value) => `${value}%` }}
+                  style={{ flex: 1 }}
+                />
+                <InputNumber
+                  min={10}
+                  max={100}
+                  value={improvementNumber}
+                  onChange={(value) => {
+                    if (value !== null) {
+                      setImprovementNumber(value);
+                    }
+                  }}
+                  formatter={(value) => `${value}%`}
+                  // @ts-ignore
+                  parser={(displayValue) => (displayValue || '')?.replace('%', '') || ''}
+                  style={{ width: '90px' }}
+                />
+              </div>
+            </Form.Item>
           </div>
         </div>
       }
     >
       <Timeline mode="alternate">
         {filteredMilestones.map((m, index) => {
-          const yearMonth = getYearMonth(
+          const yearMonthDay = getYearMonthDay(
             m.date ||
-            m.achieved_on ||
-            m.new_competition_date ||
-            m.last_competition_date ||
-            m.date_achieved
+              m.achieved_on ||
+              m.new_competition_date ||
+              m.last_competition_date ||
+              m.date_achieved,
           );
 
           const isLeft = index % 2 === 1;
@@ -172,10 +219,10 @@ const MilestoneTimelines: React.FC<MilestoneTimelineProps> = ({
               dot={
                 <Badge
                   color={MILESTONE_COLOR_MAP[m.type as MilestoneType]}
-                  style={{ boxShadow: '0 0 0 2px #fff', width: 16, height: 16 }}
+                  style={{ boxShadow: '0 0 0 2px #fff', marginTop: 8, width: 16, height: 16 }}
                 />
               }
-              label={yearMonth ? <Text type="secondary">{yearMonth}</Text> : null}
+              label={yearMonthDay ? <Text type="secondary" style={{position: 'relative', top: 3}}>{yearMonthDay}</Text> : null}
             >
               <MilestoneItemContent milestone={m} isLeft={isLeft} />
             </Timeline.Item>

@@ -104,13 +104,20 @@ const CompetitionTable: React.FC<WCACompetitionTableProps> = ({ competitions, wc
       render: (ids: string[], record: WCACompetition) => {
         const body: React.ReactElement[] = [];
         const playerIds = competitionEventMap.get(record.id) || [];
-        for (let i = 0; i < ids.length; i++) {
-          const eventId = ids[i];
+        if (ids){
+          for (let i = 0; i < ids.length; i++) {
+            const eventId = ids[i];
 
-          if (playerIds.includes(eventId)) {
+            if (playerIds.includes(eventId)) {
+              body.push(CubeIcon(eventId, eventId, { color: '#000000' }));
+            } else {
+              body.push(CubeIcon(eventId, eventId, { color: '#a9a5a5' }));
+            }
+          }
+        } else {
+          for (let i = 0; i < playerIds.length; i++) {
+            const eventId = playerIds[i];
             body.push(CubeIcon(eventId, eventId, { color: '#000000' }));
-          } else {
-            body.push(CubeIcon(eventId, eventId, { color: '#a9a5a5' }));
           }
         }
         return <Space>{body}</Space>;

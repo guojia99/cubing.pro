@@ -11,6 +11,7 @@ import { AuthAPI } from '@/services/cubing-pro/auth/typings';
 import ScrollToTopButton from '@/components/Buttons/toTop';
 import LanguageSelect from '@/locales/Language/LanguageSelect';
 import { ExtAppList } from '@/services/layout_config';
+import { Helmet } from '@@/exports';
 
 /**
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
@@ -55,10 +56,14 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
   }
   return {
     // 禁止手机端渲染
-    // fixSiderbar: true,
-    // siderMenuType: 'sub',
-    // disableMobile: true,
-    // contentWidth: 'Fixed', // 可改为 'Fixed'
+    fixSiderbar: true,
+    siderMenuType: 'sub',
+    disableMobile: true,
+    contentWidth: 'Fluid', // 必须设为 Fluid 才能自定义宽度
+    contentStyle: {
+      margin: '0 auto',   // 居中
+      padding: '16px 16px',  // 可选：增加内边距防止贴边
+    },
 
     // 标准配置
     avatarProps: {
@@ -82,24 +87,40 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     },
     footerRender: () => <Footer />,
     childrenRender: (children) => {
-      // return (<>{children}</>)
+      // 判断是否为移动端（例如屏幕宽度 <= 768px）
+      // const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+      // const scale = isMobile ? 0.7 : 1; // 手机端 70%，桌面端 100%
+      // const containerWidth = scale === 1 ? '100%' : `${100 / scale}%`; // 补偿缩放后留白
+
       return (
-        <>
-          {/*<Helmet>*/}
-          {/*  {window.innerWidth <= 768 && (*/}
-          {/*    <meta name="viewport" content="width=1080, initial-scale=1" />*/}
-          {/*  )}*/}
-          {/*</Helmet>*/}
-          <ScrollToTopButton />
-          <Row>
-            {/*<ParticleBackground></ParticleBackground>*/}
-            <Col xs={0} sm={0} md={0} lg={1} xl={2} xxl={2} />
-            <Col xs={24} sm={24} md={24} lg={22} xl={20} xxl={20}>
-              {children}
-            </Col>
-            <Col xs={0} sm={0} md={0} lg={1} xl={2} xxl={2} />
-          </Row>
-        </>
+        <div
+          style={{
+            position: 'relative',
+            width: '100vw',
+            overflow: 'auto',
+            minHeight: '100vh',
+          }}
+        >
+          <div
+            // style={{
+            //   transform: `scale(${scale})`,
+            //   transformOrigin: 'top left',
+            //   width: containerWidth,
+            //   height: 'auto', // 避免高度塌陷
+            //   overflow: 'hidden',
+            //   position: 'relative',
+            // }}
+          >
+            <ScrollToTopButton />
+            <Row>
+              <Col xs={0} sm={0} md={0} lg={1} xl={2} xxl={2} />
+              <Col xs={24} sm={24} md={24} lg={22} xl={20} xxl={20}>
+                {children}
+              </Col>
+              <Col xs={0} sm={0} md={0} lg={1} xl={2} xxl={2} />
+            </Row>
+          </div>
+        </div>
       );
     },
     ...initialState?.settings,

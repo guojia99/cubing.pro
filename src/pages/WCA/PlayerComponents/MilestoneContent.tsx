@@ -1,9 +1,8 @@
+import { resultsTimeFormat } from '@/pages/WCA/utils/wca_results';
 import { Tag, Typography } from 'antd';
 import React from 'react';
 import { Milestone, MilestoneType, getCompName } from './player_milestone';
-import { resultsTimeFormat } from '@/pages/WCA/utils/wca_results';
 
-const { Paragraph } = Typography;
 const { Text } = Typography;
 
 export const defaultMilestoneTypeOptions: { label: string; value: MilestoneType }[] = [
@@ -74,7 +73,7 @@ const MilestoneItemContent: React.FC<MilestoneItemContentProps> = ({ milestone, 
       <div
         style={{
           position: 'absolute',
-          top: '4px',
+          top: '8px',
           [isLeft ? 'right' : 'left']: '-8px',
           width: 0,
           height: 0,
@@ -84,7 +83,7 @@ const MilestoneItemContent: React.FC<MilestoneItemContentProps> = ({ milestone, 
         }}
       />
 
-      <Text style={{ color: bubbleStyle.text, fontWeight: 800, marginBottom: '6px'}}>
+      <Text style={{ color: bubbleStyle.text, fontWeight: 800, marginBottom: '6px' }}>
         {milestone.description}
       </Text>
 
@@ -110,8 +109,8 @@ const MilestoneItemContent: React.FC<MilestoneItemContentProps> = ({ milestone, 
                 milestone.position === 1
                   ? '#ffd700'
                   : milestone.position === 2
-                    ? '#c0c0c0'
-                    : '#cd7f32'
+                  ? '#c0c0c0'
+                  : '#cd7f32'
               }
               style={{
                 color: milestone.position === 1 ? '#000' : '#fff',
@@ -121,8 +120,8 @@ const MilestoneItemContent: React.FC<MilestoneItemContentProps> = ({ milestone, 
               {milestone.position === 1
                 ? '🥇 金牌'
                 : milestone.position === 2
-                  ? '🥈 银牌'
-                  : '🥉 铜牌'}
+                ? '🥈 银牌'
+                : '🥉 铜牌'}
             </Tag>
           )}
 
@@ -134,36 +133,50 @@ const MilestoneItemContent: React.FC<MilestoneItemContentProps> = ({ milestone, 
 
         {(milestone.old_best_time !== undefined || milestone.new_best_time !== undefined) && (
           <>
-            {milestone.best_is_average ? (
-              <Tag color="red">平均</Tag>
-            ) : (
-              <Tag color="blue">单次</Tag>
-            )}
-
-            <Paragraph
-              type="secondary"
-              style={{
-                fontSize: 14,
-                margin: 0,
-                maxWidth: '100%',
-                overflowWrap: 'break-word',
-              }}
-              strong={false}
-            >
-              {milestone.old_best_time && milestone.new_best_time
-                ? `从 ${resultsTimeFormat(
-                  milestone.old_best_time,
-                  milestone.event_id || '333',
-                  true,
-                )} → ${resultsTimeFormat(
-                  milestone.new_best_time,
-                  milestone.event_id || '333',
-                  true,
-                )}`
-                : milestone.result !== undefined
-                  ? `成绩: ${resultsTimeFormat(milestone.result, milestone.event_id || '333', true)}`
+            {milestone.best_is_single && (
+              <Tag color="red">
+                单次{' '}
+                {milestone.old_best_time && milestone.new_best_time
+                  ? `${resultsTimeFormat(
+                      milestone.old_best_time,
+                      milestone.event_id || '333',
+                      true,
+                    )} → ${resultsTimeFormat(
+                      milestone.new_best_time,
+                      milestone.event_id || '333',
+                      true,
+                    )}`
+                  : milestone.result !== undefined
+                  ? `成绩: ${resultsTimeFormat(
+                      milestone.result,
+                      milestone.event_id || '333',
+                      true,
+                    )}`
                   : ''}
-            </Paragraph>
+              </Tag>
+            )}
+            {milestone.best_is_average && (
+              <Tag color="blue">
+                平均{' '}
+                {milestone.old_best_avg_time && milestone.new_best_avg_time
+                  ? `${resultsTimeFormat(
+                      milestone.old_best_avg_time,
+                      milestone.event_id || '333',
+                      true,
+                    )} → ${resultsTimeFormat(
+                      milestone.new_best_avg_time,
+                      milestone.event_id || '333',
+                      true,
+                    )}`
+                  : milestone.result !== undefined
+                  ? `成绩: ${resultsTimeFormat(
+                      milestone.result,
+                      milestone.event_id || '333',
+                      true,
+                    )}`
+                  : ''}
+              </Tag>
+            )}
           </>
         )}
       </div>

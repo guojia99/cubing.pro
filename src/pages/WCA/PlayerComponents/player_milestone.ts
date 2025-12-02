@@ -37,7 +37,10 @@ export interface Milestone {
   competition_name?: string;
   old_best_time?: number;
   new_best_time?: number;
+  old_best_avg_time?: number;
+  new_best_avg_time?: number;
   best_is_average?: boolean;
+  best_is_single?: boolean;
 
   percentage_improved?: number;
   achieved_on?: string;
@@ -119,61 +122,145 @@ export function createSignificantImprovementMilestones(
   compMap: Map<string, WCACompetition>,
   improvementNumber: number = 33,
 ): Milestone[] {
-  const milestones: Milestone[] = [];
+  // 临时存储：key = `${competition_id}-${event_id}`
+  const tempMap = new Map<string, {
+    eventId: string;
+    competitionId: string;
+    date: string | undefined;
+    single: { old: number; new: number; percent: number } | null;
+    average: { old: number; new: number; percent: number } | null;
+  }>();
 
-  for (const [eventId, history] of Object.entries(wcaResultMap)) {
-    if (history.length < 2) {
+  for (const [eventId, results] of Object.entries(wcaResultMap)) {
+    if (results.length < 2 || eventId === '333mbf') {
       continue;
     }
+    const history = results.reverse()
+
 
     let currentBestSingle = history[0].best;
     let currentBestAvg = history[0].average;
 
+
+
     for (let i = 1; i < history.length; i++) {
       const entry = history[i];
-      if (eventId === '333mbf') {
-        continue;
+      const compId = entry.competition_id;
+      const key = `${compId}-${eventId}`;
+      const date = getCompetitionDateFromResult(compMap, entry);
+
+      let record = tempMap.get(key);
+      if (!record) {
+        record = {
+          eventId,
+          competitionId: compId,
+          date,
+          single: null,
+          average: null,
+        };
       }
 
+      // Check single
       if (entry.best > 0 && entry.best < currentBestSingle) {
+        if (entry.event_id === '222'){
+          console.log(entry.best, currentBestSingle);
+        }
+
         const improvementPercent = ((currentBestSingle - entry.best) / currentBestSingle) * 100;
         if (improvementPercent >= improvementNumber) {
-          milestones.push({
-            type: 'significant_improvement',
-            description: `${CubesCn(eventId)} 项目大幅刷新(${improvementPercent.toFixed(
-              2,
-            )}%)了自己的最佳历史成绩`,
-            competition_id: entry.competition_id,
-            event_id: eventId,
-            old_best_time: currentBestSingle,
-            new_best_time: entry.best,
-            percentage_improved: improvementPercent,
-            date: getCompetitionDateFromResult(compMap, entry),
-          });
+          record.single = {
+            old: currentBestSingle,
+            new: entry.best,
+            percent: improvementPercent,
+          };
         }
-        currentBestSingle = entry.best;
+        currentBestSingle = entry.best; // update best even if not milestone
       }
 
+      // Check average
       if (entry.average > 0 && entry.average < currentBestAvg) {
         const improvementPercent = ((currentBestAvg - entry.average) / currentBestAvg) * 100;
         if (improvementPercent >= improvementNumber) {
-          milestones.push({
-            type: 'significant_improvement',
-            description: `${CubesCn(eventId)} 项目大幅刷新(${improvementPercent.toFixed(
-              2,
-            )}%)了自己的平均历史成绩`,
-            event_id: eventId,
-            competition_id: entry.competition_id,
-            old_best_time: currentBestAvg,
-            new_best_time: entry.average,
-            best_is_average: true,
-            percentage_improved: improvementPercent,
-            date: getCompetitionDateFromResult(compMap, entry),
-          });
+          record.average = {
+            old: currentBestAvg,
+            new: entry.average,
+            percent: improvementPercent,
+          };
         }
+        currentBestAvg = entry.average; // update best even if not milestone
       }
-      currentBestAvg = entry.average;
+
+      // Only store if at least one qualifies
+      if (record.single || record.average) {
+        tempMap.set(key, record);
+      }
     }
+  }
+
+  // Now convert tempMap to final Milestone[]
+  const milestones: Milestone[] = [];
+  for (const record of tempMap.values()) {
+    const { eventId, competitionId, date, single, average } = record;
+
+    let description = '';
+    let best_is_average: boolean | undefined = undefined;
+    let best_is_single: boolean | undefined = undefined;
+    let old_best_time: number | undefined = undefined;
+    let new_best_time: number | undefined = undefined;
+
+    let old_best_avg_time : number | undefined = undefined;
+    let new_best_avg_time: number | undefined = undefined;
+
+
+    let percentage_improved: number | undefined = undefined;
+
+    if (single && average) {
+      // 双刷：合并描述
+      description = `${CubesCn(eventId)} 同时刷新了单次(${single.percent.toFixed(2)}%)和平均(${average.percent.toFixed(2)}%)历史最佳成绩`;
+      // 注意：此时无法用单一 old/new time 表示，但根据原结构可能仍需保留字段
+      // 可选：扩展 Milestone 类型支持 dual improvement，但若不能改类型，可优先展示单次或设为 null
+      // 这里按你的原始结构，我们保留单次为主（或根据需求调整）
+      old_best_time = single.old;
+      new_best_time = single.new;
+      old_best_avg_time = average.old;
+      new_best_avg_time = average.new;
+      percentage_improved = single.percent;
+      best_is_average = true
+      best_is_single = true
+    } else if (single) {
+      description = `${CubesCn(eventId)} 刷新(${single.percent.toFixed(2)}%)了自己的历史单次`;
+      old_best_time = single.old;
+      new_best_time = single.new;
+      percentage_improved = single.percent;
+      best_is_average = false;
+      best_is_single = true
+    } else if (average) {
+      description = `${CubesCn(eventId)} 刷新(${average.percent.toFixed(2)}%)了自己的历史平均`;
+      old_best_time = average.old;
+      new_best_time = average.new;
+      old_best_avg_time = average.old;
+      new_best_avg_time = average.new;
+      percentage_improved = average.percent;
+      best_is_average = true;
+      best_is_single = false
+    } else {
+      continue; // should not happen
+    }
+
+    milestones.push({
+      type: 'significant_improvement',
+      description,
+      competition_id: competitionId,
+      event_id: eventId,
+      old_best_time,
+      new_best_time,
+      old_best_avg_time,
+      new_best_avg_time,
+      best_is_average,
+      best_is_single,
+      percentage_improved,
+      date,
+    });
   }
 
   return milestones;

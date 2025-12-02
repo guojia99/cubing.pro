@@ -236,7 +236,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
       let progress: number | null = null;
       if (v <= 0) return { value: [i, null], extra: { compName } };
       if (v < bestSingle) {
-        progress = (bestSingle - v) / bestSingle;
+        progress = ((bestSingle - v) / bestSingle) * 100;
         bestSingle = v;
       }
       return {
