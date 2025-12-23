@@ -135,7 +135,7 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
       title: '排名',
       dataIndex: 'pos',
       key: 'pos',
-      width: 100,
+      width: 50,
       render: (pos: number) => (
         <span
           style={{
@@ -179,26 +179,29 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
         );
       },
     },
-    {
-      title: '平均',
-      dataIndex: 'average',
-      key: 'average',
-      width: 80,
-      align: 'left',
-      render: (avg, record, index) => {
-        if (avg === 0) return '';
+  ];
 
-        // 判断是否为进步成绩（比更旧成绩更好）
-        const resultsForEvent = dataSource.filter((r) => r.event_id === record.event_id);
-        const historical = resultsForEvent.slice(index + 1); // 更旧成绩
-        const prevBestAvg = Math.min(
-          ...historical.map((r) => r.average).filter((v) => v > 0),
-          Infinity,
-        );
-        const isProgress = avg > 0 && avg < prevBestAvg;
+  if (eventID !== '333mbf'){
+    columns.push( {
+        title: '平均',
+        dataIndex: 'average',
+        key: 'average',
+        width: 80,
+        align: 'left',
+        render: (avg, record, index) => {
+          if (avg === 0) return '';
 
-        return (
-          <Space direction="horizontal" size={4} style={{ display: 'flex', whiteSpace: 'nowrap' }}>
+          // 判断是否为进步成绩（比更旧成绩更好）
+          const resultsForEvent = dataSource.filter((r) => r.event_id === record.event_id);
+          const historical = resultsForEvent.slice(index + 1); // 更旧成绩
+          const prevBestAvg = Math.min(
+            ...historical.map((r) => r.average).filter((v) => v > 0),
+            Infinity,
+          );
+          const isProgress = avg > 0 && avg < prevBestAvg;
+
+          return (
+            <Space direction="horizontal" size={4} style={{ display: 'flex', whiteSpace: 'nowrap' }}>
             <span
               style={{
                 color: isProgress ? 'red' : 'inherit',
@@ -207,24 +210,26 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
             >
               {resultsTimeFormat(avg, record.event_id, true)}
             </span>
-            {record.regional_average_record && (
-              <Tag
-                color={getRecordColor(record.regional_average_record)}
-                style={{
-                  margin: 0,
-                  fontSize: '10px',
-                  padding: '0 6px',
-                  height: '18px',
-                  lineHeight: '18px',
-                }}
-              >
-                {record.regional_average_record}
-              </Tag>
-            )}
-          </Space>
-        );
-      },
-    },
+              {record.regional_average_record && (
+                <Tag
+                  color={getRecordColor(record.regional_average_record)}
+                  style={{
+                    margin: 0,
+                    fontSize: '10px',
+                    padding: '0 6px',
+                    height: '18px',
+                    lineHeight: '18px',
+                  }}
+                >
+                  {record.regional_average_record}
+                </Tag>
+              )}
+            </Space>
+          );
+        },
+      })
+  }
+  columns.push(
     {
       title: '详细成绩',
       key: 'attempts',
@@ -234,7 +239,7 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
           style={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
+            // justifyContent: 'center',
             height: '100%',
             padding: '8px 0',
           }}
@@ -244,7 +249,6 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
               fontFamily: 'monospace',
               fontSize: '12px',
               whiteSpace: 'pre-wrap',
-              backgroundColor: 'rgba(178,239,217,0.18)',
               padding: '4px 8px',
               borderRadius: '4px',
               textAlign: 'center',
@@ -261,8 +265,10 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
           </span>
         </div>
       ),
-    },
-  ];
+    }
+  )
+
+
 
   if (dataSource.length === 0) {
     return <div style={{ color: '#999', fontStyle: 'italic' }}>暂无 {eventID} 项目成绩</div>;
