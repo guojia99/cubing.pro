@@ -8,6 +8,7 @@ import { WCACompetition, WCAResult } from '@/services/wca/types';
 import { Card, Select, Slider, Space, Tabs, Tooltip } from 'antd';
 import ReactECharts from 'echarts-for-react';
 import React, { useMemo, useState } from 'react';
+import { undefined } from '@umijs/utils/compiled/zod';
 
 export interface WCAResultChartProps {
   eventId: string;
@@ -32,6 +33,7 @@ function getQuantile(arr: number[], q: number, TrimHeadAndTail: number = 0): num
     const pos = (sorted.length - 1) * q;
     const base = Math.floor(pos);
     const rest = pos - base;
+    // @ts-ignore
     return sorted[base + 1] !== undefined
       ? sorted[base] + rest * (sorted[base + 1] - sorted[base])
       : sorted[base];
@@ -45,6 +47,7 @@ function getQuantile(arr: number[], q: number, TrimHeadAndTail: number = 0): num
     const pos = (sorted.length - 1) * q;
     const base = Math.floor(pos);
     const rest = pos - base;
+    // @ts-ignore
     return sorted[base + 1] !== undefined
       ? sorted[base] + rest * (sorted[base + 1] - sorted[base])
       : sorted[base];
@@ -54,6 +57,7 @@ function getQuantile(arr: number[], q: number, TrimHeadAndTail: number = 0): num
   const pos = (trimmedArray.length - 1) * q;
   const base = Math.floor(pos);
   const rest = pos - base;
+  // @ts-ignore
   return trimmedArray[base + 1] !== undefined
     ? trimmedArray[base] + rest * (trimmedArray[base + 1] - trimmedArray[base])
     : trimmedArray[base];
@@ -127,7 +131,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
 
       // 所有单次
       for (let i = 0; i < r.attempts.length; ++i) {
-        if (r.attempts[i] === undefined || r.attempts[i] === null) {
+        if ((!r.attempts[i]) || r.attempts[i] === null) {
           continue;
         }
         if (r.attempts[i] <= 0) {
@@ -154,16 +158,22 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
       let bestScore = -Infinity;
       let bestTimeForScore: Record<number, number> = {};
 
-      const singlePoints = chartData.singles.map((score, i) => {
-        const rawResult = reversedData[i];
-        const parsed = get333MBFResult(rawResult.best);
+      console.log(chartData, reversedData)
+
+      const singlePoints = chartData.allAttempts.map((result, i) => {
+        const parsed = get333MBFResult(result.data);
         const { solved, attempted, seconds } = parsed;
-        const compName = chartData.compWithNameRound[i]; // ✅ 比赛名
+        const compName = result.comp
+
+        // 当前得分
+        const score = (solved - (attempted - solved))
 
         const isPR =
           score > bestScore ||
           (score === bestScore && (!bestTimeForScore[score] || seconds < bestTimeForScore[score]));
 
+
+        const  prType =  isPR ? (score > bestScore? 'score' : 'time') : null
         if (score > bestScore) {
           bestScore = score;
           bestTimeForScore[score] = seconds;
@@ -171,11 +181,13 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
           bestTimeForScore[score] = seconds;
         }
 
+
+
         return {
           value: [i, score],
           itemStyle: isPR ? { color: 'red' } : undefined,
-          prType: isPR ? (score > bestScore - 1 ? 'score' : 'time') : null,
-          extra: { solved, attempted, seconds, compName },
+          prType,
+          extra: { solved, attempted, seconds, compName, prType },
         };
       });
 
@@ -191,8 +203,8 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
             const score = solved - (attempted - solved);
             const timeStr = secondTimeFormat(seconds, true);
             const prStr = prType
-              ? `（<strong style="color:red;">新纪录${
-                  prType === 'time' ? '(同分更快)' : ''
+              ? `（<strong style="color:red;">新最佳${
+                  prType === 'time' ? ',同分更快' : ''
                 }</strong>）`
               : '';
 

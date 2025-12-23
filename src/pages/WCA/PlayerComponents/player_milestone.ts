@@ -610,7 +610,7 @@ export function createRecordBreakerMilestones(
       milestones.push({
         type: 'record_breaker',
         description: `${CubesCn(res.event_id)} 以平均成绩${resultsTimeFormat(
-          res.best,
+          res.average,
           res.event_id,
           false,
         )}打破 ${res.regional_average_record} 记录`,

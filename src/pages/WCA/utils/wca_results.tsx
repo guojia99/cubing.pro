@@ -4,27 +4,36 @@
  * @param mbf - 是否为多盲模式（多盲时整数秒不显示小数）
  */
 export function secondTimeFormat(seconds: number, mbf: boolean): string {
-  const intSeconds = Math.floor(seconds);
-  const decimalSeconds = Math.floor(seconds * 100) % 100;
-  const duration = intSeconds;
-
-  const hours = Math.floor(duration / 3600);
-  const minutes = Math.floor((duration % 3600) / 60);
-  const secs = duration % 60;
-
-  let mmSecondsStr = `.${decimalSeconds.toString().padStart(2, '0')}`;
-  if (decimalSeconds === 0 && (duration >= 3600 || mbf)) {
-    mmSecondsStr = ''; // 整数秒且满足条件时，不显示 .00
+  // 处理负数？根据需求决定是否需要
+  if (seconds < 0) {
+    // 可选：抛出错误或处理负数逻辑
+    // 这里假设 seconds >= 0
   }
 
-  if (duration < 60) {
+  // 使用 toFixed(2) 避免浮点误差，再转回数字确保格式统一
+  const fixedStr = seconds.toFixed(2); // 保证有两位小数，如 "9.62"
+  const [intPart, decPart] = fixedStr.split('.');
+
+  const intSeconds = parseInt(intPart, 10);
+  const decimalSeconds = parseInt(decPart, 10); // 0~99
+
+  const hours = Math.floor(intSeconds / 3600);
+  const minutes = Math.floor((intSeconds % 3600) / 60);
+  const secs = intSeconds % 60;
+
+  let mmSecondsStr = `.${decPart}`; // decPart 已经是 '00'-'99'
+
+  // 整数秒且满足条件时，不显示 .00
+  if (decimalSeconds === 0 && (intSeconds >= 3600 || mbf)) {
+    mmSecondsStr = '';
+  }
+
+  if (intSeconds < 60) {
     return `${secs}${mmSecondsStr}`;
-  } else if (duration < 3600) {
+  } else if (intSeconds < 3600) {
     return `${minutes}:${secs.toString().padStart(2, '0')}${mmSecondsStr}`;
   } else {
-    return `${hours}:${minutes.toString().padStart(2, '0')}:${secs
-      .toString()
-      .padStart(2, '0')}${mmSecondsStr}`;
+    return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}${mmSecondsStr}`;
   }
 }
 
@@ -108,7 +117,7 @@ export const formatAttempts = (
   best_index: number,
   worst_index: number,
 ): JSX.Element => {
-  const cellWidth = 85; // 每个成绩单元格固定宽度
+  let cellWidth = 75; // 每个成绩单元格固定宽度
 
   const len = attempts.filter((v) => v !== 0).length;
 
@@ -125,6 +134,13 @@ export const formatAttempts = (
     if (len === 5) {
       if (i === best_index) displayText = `(${formatted})`;
       else if (i === worst_index) displayText = `(${formatted})`;
+    }
+
+    if (len === 3){
+      cellWidth = 100
+    }
+    if (eventId === '333mbf'){
+      cellWidth = 120
     }
 
     return (

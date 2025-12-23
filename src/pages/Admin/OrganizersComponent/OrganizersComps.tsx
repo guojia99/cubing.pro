@@ -38,7 +38,7 @@ const OrganizersComps: React.FC = () => {
   useEffect(() => {
     if (org?.data.items === null || org?.data.items?.length === 0) {
       message.warning('你还未加入任何团队，请加入后再创建比赛').then();
-      history.replace({ pathname: '/user/organizers' });
+      history.replace({ pathname: '/admin/organizers' });
     }
   }, [org]);
 

@@ -177,7 +177,7 @@ export const CubesAttributesList: CubesAttributes[] = [
     Cubes: Cubes.Cube333BF,
     Cn: '三盲',
     DrawSize: 3,
-    SeqNumber: 3,
+    SeqNumber: 5,
     SpareSeqNumber: 2,
     DrawSeq: true,
     Icon: 'ea0b',

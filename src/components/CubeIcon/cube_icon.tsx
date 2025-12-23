@@ -8,6 +8,11 @@ export const CubeIcon = (c: string, key: string, styles: any) => {
   let cc = c.replace(' ', '_');
   cc = cc.toLowerCase();
 
+  if (cc === 'o333bf'){
+    cc = '333bf'
+  }
+
+
   let name = 'cubing-icon-' + cc;
   return (
     <i

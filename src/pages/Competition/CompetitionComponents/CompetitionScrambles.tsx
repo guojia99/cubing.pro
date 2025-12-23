@@ -114,8 +114,7 @@ const CompetitionScrambles: React.FC<CompetitionScramblesProps> = ({ comp }) => 
     if (!baseEvent) {
       return <></>;
     }
-
-    const m = eventRouteM(baseEvent.base_route_typ);
+    const m = eventRouteM(ev.EventRoute);
 
     const rowClassName = (data: { Index: string }) => {
       if (data.Index.indexOf('Ex') !== -1) {
@@ -145,6 +144,7 @@ const CompetitionScrambles: React.FC<CompetitionScramblesProps> = ({ comp }) => 
               });
             }
           }
+
 
           // 多个项目的
           if (baseEvent?.scrambleValue) {

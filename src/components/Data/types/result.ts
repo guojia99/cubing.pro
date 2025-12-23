@@ -85,12 +85,14 @@ const IsBestAvgResult = (r: Result, other: Result): boolean => {
   if (RouteMaps.get(r.EventRoute)?.repeatedly) {
     return true;
   }
-  if (DAvg(r) || DAvg(other)) {
-    return !DAvg(r);
-  }
   if (DAvg(r) && DAvg(other)) {
     return IsBestResult(r, other);
   }
+
+  if (DAvg(r) || DAvg(other)) {
+    return !DAvg(r);
+  }
+
   if (r.Average === other.Average) {
     return IsBestResult(r, other);
   }
