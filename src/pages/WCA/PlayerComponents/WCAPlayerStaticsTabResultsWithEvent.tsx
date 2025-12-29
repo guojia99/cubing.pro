@@ -1,20 +1,22 @@
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import { eventOrder } from '@/pages/WCA/utils/events';
-import { WCACompetition, WCAResult } from '@/services/wca/types';
 import { Tabs } from 'antd';
 import React from 'react';
-import ResultDetailWithEvent from './ResultDetailWithEvent'; // 确保路径正确
+import ResultDetailWithEvent from './ResultDetailWithEvent';
+import { StaticWithTimerRank, WCACompetition, WCAResult } from '@/services/cubing-pro/wca/types';
 
 const { TabPane } = Tabs;
 
 interface WCAPlayerStaticsTabResultsWithEventProps {
   wcaResults: WCAResult[];
   comps: WCACompetition[];
+  wcaRankTimer: StaticWithTimerRank[]
 }
 
 const WCAPlayerStaticsTabResultsWithEvent: React.FC<WCAPlayerStaticsTabResultsWithEventProps> = ({
   wcaResults,
   comps,
+                                                                                                   wcaRankTimer
 }) => {
   // 按 event_id 分组成绩
   const resultsByEvent = new Map<string, WCAResult[]>();
@@ -44,6 +46,7 @@ const WCAPlayerStaticsTabResultsWithEvent: React.FC<WCAPlayerStaticsTabResultsWi
             eventID={eventId}
             wcaResults={resultsByEvent.get(eventId)!}
             comps={comps}
+            wcaRankTimer={wcaRankTimer}
           />
         </TabPane>
       ))}

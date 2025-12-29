@@ -4,11 +4,11 @@ import {
   resultsTimeFormat,
   secondTimeFormat,
 } from '@/pages/WCA/utils/wca_results';
-import { WCACompetition, WCAResult } from '@/services/wca/types';
 import { Card, Select, Slider, Space, Tabs, Tooltip } from 'antd';
 import ReactECharts from 'echarts-for-react';
 import React, { useMemo, useState } from 'react';
 import { undefined } from '@umijs/utils/compiled/zod';
+import { WCACompetition, WCAResult } from '@/services/cubing-pro/wca/types';
 
 export interface WCAResultChartProps {
   eventId: string;
@@ -709,7 +709,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
   }
 
   return (
-    <Card bordered={false} style={{ marginBottom: 16 }}>
+    <Card bordered={false} style={{ marginBottom: 32 }}>
       <Tabs items={tabs} />
     </Card>
   );

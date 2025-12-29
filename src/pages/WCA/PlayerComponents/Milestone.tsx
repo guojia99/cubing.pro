@@ -1,4 +1,3 @@
-import { WCACompetition, WCAResult, WcaProfile } from '@/services/wca/types';
 import {
   Badge,
   Button,
@@ -26,6 +25,7 @@ import {
   Milestone,
   MilestoneType,
 } from './player_milestone';
+import { WCACompetition, WcaProfile, WCAResult } from '@/services/cubing-pro/wca/types';
 
 const { Text } = Typography;
 type TagRender = SelectProps['tagRender'];

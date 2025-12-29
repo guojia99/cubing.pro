@@ -1,23 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from '@@/exports';
-import { getWCAPersonCompetitions, getWCAPersonProfile, getWCAPersonResults } from '@/services/wca/player';
 import { Col, Row, Spin } from 'antd';
 import WCAPlayerDetails from '@/pages/WCA/PlayerComponents/PlayerDetails';
 import WCAPlayerResultTable from '@/pages/WCA/PlayerComponents/PlayerResultTable';
 import WCAPlayerStaticsTab from '@/pages/WCA/PlayerComponents/WCAPlayerStaticsTab';
-import { WCACompetition, WcaProfile, WCAResult } from '@/services/wca/types';
-import { getCubingChinaComps } from '@/services/cubing-pro/cubing_china/cubing';
+import {
+  GetPlayerRankTimers,
+  getWCAPersonCompetitions,
+  getWCAPersonProfile,
+  getWCAPersonResults,
+} from '@/services/cubing-pro/wca/player';
+import { StaticWithTimerRank, WCACompetition, WcaProfile, WCAResult } from '@/services/cubing-pro/wca/types';
 
-interface CachedData {
-  wcaProfile: WcaProfile;
-  wcaResults: WCAResult[];
-  comps: WCACompetition[];
-  timestamp: number;
-}
-
-
-const NOT_CACHE =  true
-const CACHE_DURATION = 12 * 60 * 60 * 1000; // 12小时 (毫秒)
+const notAvatarUrl = "https://assets.worldcubeassociation.org/assets/062b138/assets/missing_avatar_thumb-d77f478a307a91a9d4a083ad197012a391d5410f6dd26cb0b0e3118a5de71438.png";
+const banAvatarKey = ["2016XUWE02"];
 
 const WCAPlayer: React.FC = () => {
   const { wcaId } = useParams();
@@ -26,162 +22,68 @@ const WCAPlayer: React.FC = () => {
   const [wcaProfile, setWcaProfile] = useState<WcaProfile>();
   const [wcaResults, setWcaResults] = useState<WCAResult[]>([]);
   const [comps, setComps] = useState<WCACompetition[]>([]);
+  const [wcaRankTimer, setWcaRankTimer] = useState<StaticWithTimerRank[]>([]);
 
-  // 自动清理过期缓存的函数
-  const cleanupExpiredCache = () => {
-    if (typeof window === 'undefined') return;
-
-    const now = Date.now();
-    const keysToRemove: string[] = [];
-
-    // 遍历所有localStorage项，查找WCA相关的缓存
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('wca_player_data_')) {
-        try {
-          const item = localStorage.getItem(key);
-          if (item) {
-            const parsed = JSON.parse(item) as CachedData;
-            // 检查是否过期
-            if (now - parsed.timestamp > CACHE_DURATION) {
-              keysToRemove.push(key);
-            }
-          }
-        } catch (error) {
-          // 如果解析失败，也删除该项
-          keysToRemove.push(key);
-        }
-      }
+  // ✅ 设置页面标题的 useEffect —— 必须放在 return 之前，且无条件调用
+  useEffect(() => {
+    if (!loading && wcaProfile?.name) {
+      document.title = `${wcaProfile.name} 的WCA成绩页`;
     }
-
-    // 删除过期的缓存项
-    keysToRemove.forEach(key => {
-      localStorage.removeItem(key);
-      console.log(`Removed expired cache: ${key}`);
-    });
-
-    if (keysToRemove.length > 0) {
-      console.log(`Cleaned up ${keysToRemove.length} expired cache entries`);
-    }
-  };
-
-  const getCacheKey = (id: string) => `wca_player_data_${id}`;
-
-  const getFromCache = (id: string): CachedData | null => {
-    if (typeof window === 'undefined') return null;
-
-    const cacheKey = getCacheKey(id);
-    const cachedData = localStorage.getItem(cacheKey);
-
-    if (!cachedData) return null;
-
-    try {
-      const parsed = JSON.parse(cachedData) as CachedData;
-      const now = Date.now();
-
-      // 检查缓存是否过期
-      if (now - parsed.timestamp > CACHE_DURATION) {
-        localStorage.removeItem(cacheKey);
-        return null;
-      }
-
-      return parsed;
-    } catch (error) {
-      console.error('Error parsing cached data:', error);
-      localStorage.removeItem(getCacheKey(id));
-      return null;
-    }
-  };
-
-  const setToCache = (id: string, data: CachedData) => {
-    if (typeof window === 'undefined') return;
-
-    const cacheKey = getCacheKey(id);
-    const cacheData: CachedData = {
-      ...data,
-      timestamp: Date.now()
-    };
-
-    try {
-      localStorage.setItem(cacheKey, JSON.stringify(cacheData));
-    } catch (error) {
-      console.error('Error setting cache:', error);
-      // 如果存储失败，尝试清理一些旧缓存再试
-      try {
-        // 清理一些过期数据后再尝试存储
-        cleanupExpiredCache();
-        localStorage.setItem(cacheKey, JSON.stringify(cacheData));
-      } catch (e) {
-        console.error('Failed to set cache after cleanup:', e);
-      }
-    }
-  };
+  }, [loading, wcaProfile?.name]); // 依赖项确保只在必要时更新
 
   const fetchPlayer = async () => {
     if (!wcaId) {
+      setLoading(false);
       setIs404(true);
       return;
     }
 
-    // 尝试从缓存获取数据
-    if (!NOT_CACHE){
-      const cachedData = getFromCache(wcaId);
-      if (cachedData) {
-        setWcaProfile(cachedData.wcaProfile);
-        setWcaResults(cachedData.wcaResults);
-        setComps(cachedData.comps);
-        setIs404(false);
-        setLoading(false);
-        return;
-      }
-    }
-
-
     try {
-      // 并行发起三个请求
-      const [profileRes, compsRes, resultsRes] = await Promise.all([
+      const [profileRes, compsRes, resultsRes, rankTimers] = await Promise.all([
         getWCAPersonProfile(wcaId),
         getWCAPersonCompetitions(wcaId),
         getWCAPersonResults(wcaId),
-        getCubingChinaComps(),
+        GetPlayerRankTimers(wcaId),
       ]);
 
-      // 所有请求成功
+      if (banAvatarKey.includes(wcaId)) {
+        profileRes.thumb_url = notAvatarUrl;
+      }
+      // ⚠️ 注意：下面这行会覆盖所有头像！确认是否需要
+      // profileRes.thumb_url = notAvatarUrl;
+
       setWcaProfile(profileRes);
       setComps(compsRes);
       setWcaResults(resultsRes);
+      setWcaRankTimer(rankTimers);
       setIs404(false);
-
-      // 存储到缓存
-      setToCache(wcaId, {
-        wcaProfile: profileRes,
-        wcaResults: resultsRes,
-        comps: compsRes,
-        timestamp: Date.now()
-      });
-
     } catch (error) {
-      // 任何一个请求失败，都视为 404
       console.error('Failed to fetch player data:', error);
       setIs404(true);
       setWcaProfile(undefined);
       setComps([]);
       setWcaResults([]);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    // 进入页面时自动清理过期缓存
-    cleanupExpiredCache();
-
     setLoading(true);
-    fetchPlayer().finally(() => {
-      setLoading(false);
-    });
+    fetchPlayer();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wcaId]);
 
-  if (loading || (!wcaProfile)) {
+  // ❌ 所有 return 必须在所有 hooks 之后
+  if (is404) {
+    return (
+      <div style={{ textAlign: 'center', color: '#999', marginTop: 50 }}>
+        未找到该选手信息
+      </div>
+    );
+  }
+
+  if (loading || !wcaProfile) {
     return (
       <div style={{ textAlign: 'center', marginTop: 100 }}>
         <Spin size="large" tip="加载中..." />
@@ -189,39 +91,26 @@ const WCAPlayer: React.FC = () => {
     );
   }
 
-  if (is404) {
-    return (
-      <div style={{ textAlign: 'center', color: '#999', marginTop: 50 }}>未找到该选手信息</div>
-    );
-  }
-
-  if (wcaResults) {
-    document.title = `${wcaProfile.person.name} 的WCA成绩页`;
-  }
-
+  // ✅ 正常渲染
   return (
     <div style={{ width: '100%' }}>
       <Row gutter={[0, 24]} style={{ padding: '0 16px' }}>
-        {/* WCAPlayerDetails */}
         <Col span={24}>
           <WCAPlayerDetails wcaProfile={wcaProfile} wcaResults={wcaResults} />
         </Col>
-
-        {/* WCAPlayerResultTable */}
         <Col span={24}>
           <WCAPlayerResultTable wcaProfile={wcaProfile} wcaResults={wcaResults} />
         </Col>
-
-        {/* WCAPlayerStaticsTab */}
         <Col span={24}>
-          <WCAPlayerStaticsTab wcaProfile={wcaProfile} wcaResults={wcaResults} comps={comps} />
+          <WCAPlayerStaticsTab
+            wcaProfile={wcaProfile}
+            wcaResults={wcaResults}
+            comps={comps}
+            wcaRankTimer={wcaRankTimer}
+          />
         </Col>
       </Row>
     </div>
   );
 };
-
 export default WCAPlayer;
-
-
-

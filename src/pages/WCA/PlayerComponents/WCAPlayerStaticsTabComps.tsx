@@ -1,12 +1,12 @@
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import { getCompsEvents } from '@/pages/WCA/utils/events';
-import { WCACompetition, WCAResult } from '@/services/wca/types';
 import { Button, Space, Table } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import React, { useEffect, useState } from 'react';
 import { getCountryNameByIso2 } from '@/pages/WCA/PlayerComponents/region/all_contiry';
 import { getLocationByPinyin } from '@/pages/WCA/PlayerComponents/region/china_citys';
 import { findCubingCompetitionByIdentifier } from '@/services/cubing-pro/cubing_china/cubing';
+import { WCACompetition, WCAResult } from '@/services/cubing-pro/wca/types';
 
 interface WCACompetitionTableProps {
   competitions: WCACompetition[];

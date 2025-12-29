@@ -3,8 +3,8 @@ import { Avatar, Badge, Card, Divider, Image, Space, Table, Typography } from 'a
 import 'flag-icons/css/flag-icons.min.css';
 import React from 'react';
 import './PlayerDetails.css';
-import { WcaProfile, WCAResult } from '@/services/wca/types';
 import { getCountryNameByIso2 } from '@/pages/WCA/PlayerComponents/region/all_contiry';
+import { WcaProfile, WCAResult } from '@/services/cubing-pro/wca/types';
 
 interface WCAPlayerDetailsProps {
   wcaProfile: WcaProfile;
@@ -14,7 +14,6 @@ interface WCAPlayerDetailsProps {
 const { Title, Text } = Typography;
 
 const WCAPlayerDetails: React.FC<WCAPlayerDetailsProps> = ({ wcaProfile, wcaResults }) => {
-  const { person, competition_count } = wcaProfile;
 
   // 计算总复原次数（有 single 或 average 都计数一次）
   let totalSolves = 0;
@@ -79,7 +78,7 @@ const WCAPlayerDetails: React.FC<WCAPlayerDetailsProps> = ({ wcaProfile, wcaResu
       align: 'center' as const,
       render: (id: string) => (
         <Space>
-          <a href={person.url} target="_blank" rel="noopener noreferrer">
+          <a href={wcaProfile.thumb_url} target="_blank" rel="noopener noreferrer">
             <Image
               src="https://cubing.com/f/images/wca.png"
               alt="WCA Logo"
@@ -88,7 +87,7 @@ const WCAPlayerDetails: React.FC<WCAPlayerDetailsProps> = ({ wcaProfile, wcaResu
               preview={false}
             />
           </a>
-          <a href={`https://cubing.com/results/person/${person.wca_id}`} target="_blank" rel="noopener noreferrer">
+          <a href={`https://cubing.com/results/person/${wcaProfile.wcaId}`} target="_blank" rel="noopener noreferrer">
             <Image
               src=" https://cubing.com/f/images/icon196.png"
               alt="Cubing China Logo"
@@ -130,12 +129,12 @@ const WCAPlayerDetails: React.FC<WCAPlayerDetailsProps> = ({ wcaProfile, wcaResu
 
   // 根据国家代码决定显示的名字
   const displayName = (() => {
-    const iso2 = person.country_iso2?.toUpperCase() || '';
+    const iso2 = wcaProfile.country_iso2?.toUpperCase() || '';
     if (['CN', 'HK', 'TW'].includes(iso2)) {
       // 提取中文字符部分（含“·”）
-      return person.name.match(/[\u4e00-\u9fa5·]+/g)?.join('') || person.name;
+      return wcaProfile.name.match(/[\u4e00-\u9fa5·]+/g)?.join('') || wcaProfile.name;
     }
-    return person.name;
+    return wcaProfile.name;
   })();
 
   // 表格数据（只有一行）
@@ -143,12 +142,12 @@ const WCAPlayerDetails: React.FC<WCAPlayerDetailsProps> = ({ wcaProfile, wcaResu
     {
       key: '1',
       name: displayName,
-      gender: person.gender,
-      country_iso2: person.country_iso2,
-      competition: competition_count,
+      gender: wcaProfile.gender,
+      country_iso2: wcaProfile.country_iso2,
+      competition: wcaProfile.competition_count,
       totalSolves: totalSolves,
       totalAttempts: totalAttempts,
-      wcaId: person.wca_id,
+      wcaId: wcaProfile.wcaId,
       career: "",
     },
   ];
@@ -162,7 +161,7 @@ const WCAPlayerDetails: React.FC<WCAPlayerDetailsProps> = ({ wcaProfile, wcaResu
       >
         {/* 头像与姓名 */}
         <div className="header-section">
-          <Avatar src={person.avatar.thumb_url} alt={`${person.name} 的头像`} size={100} />
+          <Avatar src={wcaProfile.thumb_url} alt={`${wcaProfile.name} 的头像`} size={100} />
           <Title level={3} style={{ margin: '8px 0 8px 0' }}>
             {displayName}
           </Title>

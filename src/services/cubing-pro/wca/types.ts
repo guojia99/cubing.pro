@@ -419,7 +419,14 @@ interface Records {
 }
 
 export interface WcaProfile {
-  person: Person;
+  // person: Person;
+  name: string;
+  wcaId : string;
+  countryId : string;
+  gender: string;
+  thumb_url: string;
+  country_iso2: string;
+
   competition_count: number;
   personal_records: PersonalRecords;
   medals: Medals;
@@ -428,3 +435,18 @@ export interface WcaProfile {
 
 
 
+export interface StaticWithTimerRank {
+  wcaId: string;
+  eventId: string;
+  year: number;
+  month: number;
+  week: number;
+  single: number;
+  average: number;
+  singleCountryRank: number;
+  singleWorldRank: number;
+  singleContinentRank: number;
+  avgCountryRank: number;
+  avgWorldRank: number;
+  avgContinentRank: number;
+}
