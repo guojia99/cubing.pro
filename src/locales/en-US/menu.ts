@@ -1,22 +1,24 @@
 export default {
-  "menu.Static": "Static",
+  "menu.Static": "Statistics",
   "menu.Project": "Project",
   "menu.Competitions": "Competitions",
-  "menu.Player": "Player",
+  "menu.Player": "Person",
 
-
-  "menu.DrawTools": "DrawTools",
-  "menu.DrawTools.sq1": "SQ1 Draw",
-  "menu.DrawTools.minx": "Minx Draw",
-  "menu.DrawTools.sk": "Skewb Draw",
-  "menu.DrawTools.py": "Pyram Draw",
+  "menu.DrawTools": "Drawing Tools",
+  "menu.DrawTools.sq1": "SQ1 Drawing Tool",
+  "menu.DrawTools.minx": "Minx Drawing Tool",
+  "menu.DrawTools.sk": "Skewb Drawing Tool",
+  "menu.DrawTools.py": "Pyraminx Drawing Tool",
 
   "menu.Tools": "Tools",
-  "menu.Tools.bld": "Bld",
-  'menu.Tools.bld_pingyin': '盲拧读音练习',
-  "menu.Tools.associative-words": "Bld v2",
-  "menu.Tools.mbld": "Many Bld",
-  "menu.Tools.TeamMatch": "TeamMatch",
+  "menu.Tools.bld": "BLD Association Word Practice v1",
+  "menu.Tools.bld_pingyin": "BLD Pronunciation Practice",
+  "menu.Tools.associative-words": "BLD Association Word Practice v2",
+  "menu.Tools.mbld": "Multi-BLD Memory Practice",
+  "menu.Tools.TeamMatch": "Team Match Results Tool",
 
-  'menu.wca_comps': '附近比赛',
+  "menu.wca_comps": "Nearby Competitions",
+
+  "menu.WCA": "WCA Lookup",
+  "menu.WCA.Players": "Persons"
 }

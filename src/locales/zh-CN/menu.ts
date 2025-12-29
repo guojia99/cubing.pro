@@ -18,4 +18,7 @@ export default {
   'menu.Tools.TeamMatch': '组队赛对战赛果工具',
 
   'menu.wca_comps': '附近比赛',
+
+  'menu.WCA': "WCA查询",
+  'menu.WCA.Players': "选手"
 };
