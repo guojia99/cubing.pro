@@ -1,6 +1,3 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from '@@/exports';
-import { Col, Row, Spin } from 'antd';
 import WCAPlayerDetails from '@/pages/WCA/PlayerComponents/PlayerDetails';
 import WCAPlayerResultTable from '@/pages/WCA/PlayerComponents/PlayerResultTable';
 import WCAPlayerStaticsTab from '@/pages/WCA/PlayerComponents/WCAPlayerStaticsTab';
@@ -10,10 +7,20 @@ import {
   getWCAPersonProfile,
   getWCAPersonResults,
 } from '@/services/cubing-pro/wca/player';
-import { StaticWithTimerRank, WCACompetition, WcaProfile, WCAResult } from '@/services/cubing-pro/wca/types';
+import {
+  StaticWithTimerRank,
+  WCACompetition,
+  WCAResult,
+  WcaProfile,
+} from '@/services/cubing-pro/wca/types';
+import { apiGetWCAPersonProfile } from '@/services/cubing-pro/wca/wca_api';
+import { useParams } from '@@/exports';
+import { Col, Row, Spin } from 'antd';
+import React, { useEffect, useState } from 'react';
 
-const notAvatarUrl = "https://assets.worldcubeassociation.org/assets/062b138/assets/missing_avatar_thumb-d77f478a307a91a9d4a083ad197012a391d5410f6dd26cb0b0e3118a5de71438.png";
-const banAvatarKey = ["2016XUWE02"];
+const notAvatarUrl =
+  'https://assets.worldcubeassociation.org/assets/062b138/assets/missing_avatar_thumb-d77f478a307a91a9d4a083ad197012a391d5410f6dd26cb0b0e3118a5de71438.png';
+const banAvatarKey = ['2016XUWE02'];
 
 const WCAPlayer: React.FC = () => {
   const { wcaId } = useParams();
@@ -46,17 +53,35 @@ const WCAPlayer: React.FC = () => {
         GetPlayerRankTimers(wcaId),
       ]);
 
+      // 处理 banAvatarKey
       if (banAvatarKey.includes(wcaId)) {
         profileRes.thumb_url = notAvatarUrl;
       }
-      // ⚠️ 注意：下面这行会覆盖所有头像！确认是否需要
-      // profileRes.thumb_url = notAvatarUrl;
 
+      // 先设置基础 profile
       setWcaProfile(profileRes);
       setComps(compsRes);
       setWcaResults(resultsRes);
       setWcaRankTimer(rankTimers);
       setIs404(false);
+
+      // ✅ 异步获取更准确的头像 URL（不阻塞主流程）
+      apiGetWCAPersonProfile(wcaId)
+        .then(res => {
+          // 安全更新：基于当前状态创建新对象
+          setWcaProfile(prev => {
+            if (!prev) return prev;
+            return {
+              ...prev,
+              thumb_url: res.person.avatar.thumb_url || prev.thumb_url, // fallback to existing
+            };
+          });
+        })
+        .catch(err => {
+          console.warn('Failed to fetch updated avatar from WCA API:', err);
+          // 可选：保留原头像，或设为默认
+        });
+
     } catch (error) {
       console.error('Failed to fetch player data:', error);
       setIs404(true);
@@ -70,16 +95,13 @@ const WCAPlayer: React.FC = () => {
 
   useEffect(() => {
     setLoading(true);
-    fetchPlayer();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    fetchPlayer().then()
   }, [wcaId]);
 
   // ❌ 所有 return 必须在所有 hooks 之后
   if (is404) {
     return (
-      <div style={{ textAlign: 'center', color: '#999', marginTop: 50 }}>
-        未找到该选手信息
-      </div>
+      <div style={{ textAlign: 'center', color: '#999', marginTop: 50 }}>未找到该选手信息</div>
     );
   }
 

@@ -19,6 +19,7 @@ export const eventOrder = [
   '444bf',
   '555bf',
   '333mbf',
+  '333ft',
 ];
 
 export function getCompsEvents(wcaResults: WCAResult[]): Map<string, string[]> {

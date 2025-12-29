@@ -418,8 +418,12 @@ interface Records {
   total: number;
 }
 
+export interface WcaProfilePerson {
+  person: Person;
+}
+
 export interface WcaProfile {
-  // person: Person;
+
   name: string;
   wcaId : string;
   countryId : string;
