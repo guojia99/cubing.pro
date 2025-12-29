@@ -1,4 +1,4 @@
-import { WCAResult } from '@/services/wca/types';
+import { WCAResult } from '@/services/cubing-pro/wca/types';
 
 
 export const eventOrder = [

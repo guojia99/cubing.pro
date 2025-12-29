@@ -2,7 +2,7 @@ import { CubesCn } from '@/components/CubeIcon/cube';
 import { eventOrder } from '@/pages/WCA/utils/events';
 import { resultsTimeFormat } from '@/pages/WCA/utils/wca_results';
 import { findCubingCompetitionByIdentifier } from '@/services/cubing-pro/cubing_china/cubing';
-import { WCACompetition, WcaProfile, WCAResult } from '@/services/wca/types';
+import { WCACompetition, WcaProfile, WCAResult } from '@/services/cubing-pro/wca/types';
 
 
 export type MilestoneType =

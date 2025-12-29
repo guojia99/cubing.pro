@@ -1,17 +1,18 @@
-import { WCACompetition, WcaProfile, WCAResult } from '@/services/wca/types';
 import React from 'react';
 import { Card, Tabs } from 'antd';
 import WCAPlayerStaticsTabResults from '@/pages/WCA/PlayerComponents/WCAPlayerStaticsTabResults';
 import CompetitionTable from '@/pages/WCA/PlayerComponents/WCAPlayerStaticsTabComps';
 import MilestoneTimelines from '@/pages/WCA/PlayerComponents/Milestone';
+import { StaticWithTimerRank, WCACompetition, WcaProfile, WCAResult } from '@/services/cubing-pro/wca/types';
 const { TabPane } = Tabs;
 interface WCAPlayerStaticsTabProps {
   wcaProfile: WcaProfile;
   wcaResults: WCAResult[];
-  comps: WCACompetition[]
+  comps: WCACompetition[];
+  wcaRankTimer: StaticWithTimerRank[]
 }
 
-const WCAPlayerStaticsTab: React.FC<WCAPlayerStaticsTabProps> = ({ wcaProfile, wcaResults, comps }) => {
+const WCAPlayerStaticsTab: React.FC<WCAPlayerStaticsTabProps> = ({ wcaProfile, wcaResults, comps,wcaRankTimer }) => {
 
   const wcaResultsRes = wcaResults.reverse()
 
@@ -29,7 +30,7 @@ const WCAPlayerStaticsTab: React.FC<WCAPlayerStaticsTabProps> = ({ wcaProfile, w
       >
         {/* 成绩 Tab */}
         <TabPane tab="成绩" key="results">
-          <WCAPlayerStaticsTabResults wcaResults={wcaResultsRes} comps={comps}/>
+          <WCAPlayerStaticsTabResults wcaResults={wcaResultsRes} comps={comps} wcaRankTimer={wcaRankTimer} />
         </TabPane>
 
         {/* 赛事 Tab */}

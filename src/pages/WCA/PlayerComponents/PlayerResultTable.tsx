@@ -1,5 +1,4 @@
 import { resultsTimeFormat } from '@/pages/WCA/utils/wca_results';
-import { WcaProfile, WCAResult } from '@/services/wca/types';
 import { Button, Card, Checkbox, message, Table, Tag, Tooltip } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import React from 'react';
@@ -9,6 +8,7 @@ import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import { CopyOutlined } from '@ant-design/icons';
 import { eventOrder, roundSortOrder } from '../utils/events';
 import './WCAPlayerResultTable.less';
+import { WcaProfile, WCAResult } from '@/services/cubing-pro/wca/types';
 
 interface WCAPlayerResultTableProps {
   wcaProfile: WcaProfile;
@@ -161,8 +161,8 @@ const WCAPlayerResultTable: React.FC<WCAPlayerResultTableProps> = ({ wcaProfile,
 
   // 构建表格数据
   const tableData: TableData[] = [];
-  let copyResult = `${wcaProfile.person.name}
-${wcaProfile.person.wca_id}
+  let copyResult = `${wcaProfile.name}
+${wcaProfile.wcaId}
 参赛次数: ${wcaProfile.competition_count}
 ================
 `;

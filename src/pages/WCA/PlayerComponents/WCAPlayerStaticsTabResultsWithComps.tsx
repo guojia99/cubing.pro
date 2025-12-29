@@ -6,8 +6,8 @@ import { ColumnsType } from 'antd/es/table';
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import { CubesCn } from '@/components/CubeIcon/cube';
 import { formatAttempts, resultsTimeFormat } from '@/pages/WCA/utils/wca_results';
-import { WCACompetition, WCAResult } from '@/services/wca/types';
 import { findCubingCompetitionByIdentifier } from '@/services/cubing-pro/cubing_china/cubing';
+import { WCACompetition, WCAResult } from '@/services/cubing-pro/wca/types';
 
 const { Title } = Typography
 

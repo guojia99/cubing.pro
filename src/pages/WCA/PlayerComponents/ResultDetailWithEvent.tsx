@@ -6,11 +6,13 @@ import {
   roundSortOrder,
 } from '@/pages/WCA/utils/events';
 import { formatAttempts, resultsTimeFormat } from '@/pages/WCA/utils/wca_results';
-import { WCACompetition, WCAResult } from '@/services/wca/types';
 import { Space, Table, Tag } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import React from 'react';
 import { findCubingCompetitionByIdentifier } from '@/services/cubing-pro/cubing_china/cubing';
+
+import ResultDetailWithRankingTimers from '@/pages/WCA/PlayerComponents/ResultWIthEventRankingTimers';
+import { StaticWithTimerRank, WCACompetition, WCAResult } from '@/services/cubing-pro/wca/types';
 
 interface ResultDetailWithEventProps {
   eventID: string;
@@ -27,12 +29,16 @@ interface ResultDetailWithEventProps {
   eventID: string;
   wcaResults: WCAResult[];
   comps: WCACompetition[];
+  wcaRankTimer: StaticWithTimerRank[]
 }
+
+
 
 const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
   eventID,
   wcaResults,
   comps,
+                                                                       wcaRankTimer,
 }) => {
   // 按 competition_id 分组
   const resultsByComp = new Map<string, WCAResult[]>();
@@ -277,6 +283,7 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
   return (
     <>
       <WCAResultChart data={wcaResults} eventId={eventID} comps={comps} />
+      <ResultDetailWithRankingTimers eventID={eventID} wcaRankTimer={wcaRankTimer} />
       <Table
         columns={columns}
         dataSource={dataSource}
