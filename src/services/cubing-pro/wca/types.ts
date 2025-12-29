@@ -21,6 +21,14 @@ export interface WCAResult {
   regional_average_record: 'NR' | 'AsR' | 'WR' | 'CR' | null; // 区域平均记录标记， 可能值：null, "NR", "AsR", "WR" 等
 }
 
+export interface WCAPerson {
+  wca_id: string;
+  sub_id: number;
+  name: string;
+  country_id: string;
+  gender: string;
+}
+
 // 定义API响应数据的TypeScript接口
 interface RoleWCAUser {
   id: number;

@@ -27,11 +27,12 @@ const WCAPlayerStaticsTabResultsWithEvent: React.FC<WCAPlayerStaticsTabResultsWi
     }
     resultsByEvent.get(result.event_id)!.push(result);
   });
+  console.log(resultsByEvent)
 
   // 获取选手实际参加过的项目，并按 eventOrder 排序
   const userEvents = Array.from(resultsByEvent.keys())
     .filter((event) => eventOrder.includes(event))
-    .sort((a, b) => eventOrder.indexOf(a) - eventOrder.indexOf(b));
+    .sort((a, b) => eventOrder.indexOf(a) - eventOrder.indexOf(b))
 
   if (userEvents.length === 0) {
     return <div>暂无历史成绩</div>;

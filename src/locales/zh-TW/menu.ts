@@ -4,18 +4,21 @@ export default {
   "menu.Competitions": "比賽",
   "menu.Player": "選手",
 
-  "menu.DrawTools": "扭技骰繪圖工具",
-  "menu.DrawTools.sq1": "SQ1繪圖工具",
-  "menu.DrawTools.minx": "Minx繪圖工具",
-  "menu.DrawTools.sk": "Sk繪圖工具",
-  "menu.DrawTools.py": "Py繪圖工具",
+  "menu.DrawTools": "繪圖工具",
+  "menu.DrawTools.sq1": "SQ1 繪圖工具",
+  "menu.DrawTools.minx": "Minx 繪圖工具",
+  "menu.DrawTools.sk": "Skewb 繪圖工具",
+  "menu.DrawTools.py": "Pyraminx 繪圖工具",
 
   "menu.Tools": "工具",
-  "menu.Tools.bld": "盲解公式練習",
-  'menu.Tools.bld_pingyin': '盲拧读音练习',
-  "menu.Tools.associative-words": "盲解公式練習 v2",
-  "menu.Tools.mbld": "多盲解記憶練習",
-  "menu.Tools.TeamMatch": "組隊賽對戰結果工具",
+  "menu.Tools.bld": "盲解聯想詞練習 v1",
+  "menu.Tools.bld_pingyin": "盲解讀音練習",
+  "menu.Tools.associative-words": "盲解聯想詞練習 v2",
+  "menu.Tools.mbld": "多盲記憶練習",
+  "menu.Tools.TeamMatch": "組隊賽對戰賽果工具",
 
-  'menu.wca_comps': '附近比赛',
-};
+  "menu.wca_comps": "附近比賽",
+
+  "menu.WCA": "WCA 查詢",
+  "menu.WCA.Players": "選手"
+}

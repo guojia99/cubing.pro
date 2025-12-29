@@ -5,17 +5,20 @@ export default {
   "menu.Player": "選手",
 
   "menu.DrawTools": "描画ツール",
-  "menu.DrawTools.sq1": "SQ1描画ツール",
-  "menu.DrawTools.minx": "Minx描画ツール",
-  "menu.DrawTools.sk": "Sk描画ツール",
-  "menu.DrawTools.py": "Py描画ツール",
+  "menu.DrawTools.sq1": "SQ1 描画ツール",
+  "menu.DrawTools.minx": "Minx 描画ツール",
+  "menu.DrawTools.sk": "Skewb 描画ツール",
+  "menu.DrawTools.py": "Pyraminx 描画ツール",
 
   "menu.Tools": "ツール",
-  "menu.Tools.bld": "目隠し公式練習",
-  'menu.Tools.bld_pingyin': '盲拧读音练习',
-  "menu.Tools.associative-words": "目隠し公式練習v2",
-  "menu.Tools.mbld": "多目隠し記憶練習",
+  "menu.Tools.bld": "BLD 連想語練習 v1",
+  "menu.Tools.bld_pingyin": "BLD 発音練習",
+  "menu.Tools.associative-words": "BLD 連想語練習 v2",
+  "menu.Tools.mbld": "マルチBLD 記憶練習",
   "menu.Tools.TeamMatch": "チーム対戦結果ツール",
 
-  'menu.wca_comps': '附近WCA大会',
-};
+  "menu.wca_comps": "近くの大会",
+
+  "menu.WCA": "WCA検索",
+  "menu.WCA.Players": "選手"
+}
