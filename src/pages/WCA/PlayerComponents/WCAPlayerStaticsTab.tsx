@@ -14,7 +14,7 @@ interface WCAPlayerStaticsTabProps {
 
 const WCAPlayerStaticsTab: React.FC<WCAPlayerStaticsTabProps> = ({ wcaProfile, wcaResults, comps,wcaRankTimer }) => {
 
-  const wcaResultsRes = wcaResults.reverse()
+  const wcaResultsRes = wcaResults.sort((a, b) => b.id - a.id);
 
   return (
     <Card
