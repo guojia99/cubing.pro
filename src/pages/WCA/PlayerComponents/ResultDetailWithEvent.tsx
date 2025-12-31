@@ -50,11 +50,6 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
     resultsByComp.get(result.competition_id)!.push(result);
   });
 
-  console.log(wcaResults)
-  console.log(resultsByComp)
-
-
-
   // 获取比赛信息
   const getCompInfo = (id: string) => {
     const comp = comps.find((c) => c.id === id);
@@ -89,7 +84,6 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
       });
     });
   });
-  console.log(dataSource)
 
   // 判断当前成绩是否为进步成绩
   const isProgress = (record: (typeof dataSource)[0], index: number, type: 'best' | 'average') => {
