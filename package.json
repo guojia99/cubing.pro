@@ -63,6 +63,7 @@
     "flag-icons": "^7.5.0",
     "html2canvas": "^1.4.1",
     "js-cookie": "^3.0.5",
+    "jspdf": "^4.1.0",
     "lucide-react": "^0.479.0",
     "rc-menu": "^9.12.4",
     "react": "^18.2.0",

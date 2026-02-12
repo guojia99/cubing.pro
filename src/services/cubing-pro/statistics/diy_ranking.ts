@@ -1,6 +1,7 @@
 import { AuthHeader } from '@/services/cubing-pro/auth/token';
 import { Request } from '@/services/cubing-pro/request';
 import { StaticAPI } from '@/services/cubing-pro/statistics/typings';
+import { WCAPerson } from '@/services/cubing-pro/wca/types';
 
 export async function apiDiyRanking(
   key: string,
@@ -71,5 +72,12 @@ export async function apiDiyRankingSor(
   };
 }> {
   const response = await Request.post(`diy_static/diy_rankings/${key}/sor`, req, {});
+  return response.data;
+}
+
+
+
+export async function apiDiyRankingPersons(key: string): Promise<{data: WCAPerson[]}>{
+  const response = await Request.get(`diy_static/diy_rankings/${key}/person_list`, {});
   return response.data;
 }

@@ -1,9 +1,11 @@
 export default {
-  "menu.Static": "統計",
-  "menu.Project": "プロジェクト",
-  "menu.Competitions": "大会",
-  "menu.Player": "選手",
-
+  "menu.groupCompetitions": "群の大会",
+  "menu.groupCompetitions.Static": "統計",
+  "menu.groupCompetitions.Project": "プロジェクト",
+  "menu.groupCompetitions.Competitions": "大会",
+  "menu.groupCompetitions.Player": "選手",
+  "menu.groupCompetitions.PKTimer": "PKTimer",
+  "menu.AlgsDetail": "公式",
   "menu.DrawTools": "描画ツール",
   "menu.DrawTools.sq1": "SQ1 描画ツール",
   "menu.DrawTools.minx": "Minx 描画ツール",
@@ -17,8 +19,10 @@ export default {
   "menu.Tools.mbld": "マルチBLD 記憶練習",
   "menu.Tools.TeamMatch": "チーム対戦結果ツール",
 
-  "menu.wca_comps": "近くの大会",
+  "menu.WCA.wca_comps": "近くの大会",
 
   "menu.WCA": "WCA検索",
-  "menu.WCA.Players": "選手"
+  "menu.WCA.Players": "選手",
+
+  'menu.Algs': "公式库",
 }

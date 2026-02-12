@@ -2,6 +2,10 @@ import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import { PlayerLink, WCALinkWithCnName } from '@/components/Link/Links';
 import EventSelector, { allEvents } from '@/pages/Static/EventSelector';
 import KinchPlayerDetailModal, { getScoreColor } from '@/pages/Static/KinsorPlayerDetail';
+import {
+  CountryAvatar,
+  getCountryNameByIso2,
+} from '@/pages/WCA/PlayerComponents/region/all_contiry';
 import { apiKinch, apiSeniorKinch } from '@/services/cubing-pro/statistics/sor';
 import {
   KinChSorResult,
@@ -11,7 +15,6 @@ import {
 import { ProTable } from '@ant-design/pro-table';
 import { Card, Switch, Tag, Tooltip, Typography, message } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
-import { CountryAvatar, getCountryNameByIso2 } from '@/pages/WCA/PlayerComponents/region/all_contiry';
 
 const { Text } = Typography;
 
@@ -19,10 +22,11 @@ export type KinChProps = {
   isSenior: boolean;
   isCountry: boolean;
 
+  pages?: boolean;
   otherDataFn: ((req: StaticAPI.KinchReq) => Promise<StaticAPI.KinchResp>) | undefined;
 };
 
-const KinCh: React.FC<KinChProps> = ({ isSenior, isCountry, otherDataFn }) => {
+const KinCh: React.FC<KinChProps> = ({ isSenior, isCountry, otherDataFn, pages = true }) => {
   const actionRef = useRef();
   const [tableParams, setTableParams] = useState<StaticAPI.KinchReq>({
     size: 100,
@@ -65,18 +69,20 @@ const KinCh: React.FC<KinChProps> = ({ isSenior, isCountry, otherDataFn }) => {
     },
   ];
 
-  if (isCountry){
+  if (isCountry) {
     columns.push({
       title: '地区',
       dataIndex: 'CountryIso2',
-      key: "CountryIso2",
+      key: 'CountryIso2',
       width: 100,
       render: (text: string) => {
-        return (<>
-          {CountryAvatar(text)} {getCountryNameByIso2(text)}
-        </>)
-      }
-    })
+        return (
+          <>
+            {CountryAvatar(text)} {getCountryNameByIso2(text)}
+          </>
+        );
+      },
+    });
   }
 
   columns.push(
@@ -276,21 +282,20 @@ const KinCh: React.FC<KinChProps> = ({ isSenior, isCountry, otherDataFn }) => {
             value = await apiKinch(tableParams);
           }
 
-          if (value && value.data.items){
+          if (value && value.data.items) {
             const events: string[] = [];
             for (let i = 0; i < value.data.items.length; i++) {
-              const item = value.data.items[i]
+              const item = value.data.items[i];
 
-              for (let j = 0; j < item.Results.length; j++){
-                events.push(item.Results[j].Event)
+              for (let j = 0; j < item.Results.length; j++) {
+                events.push(item.Results[j].Event);
               }
             }
-            console.log(events)
+            console.log(events);
             const uniqueEvents: string[] = [...new Set(events)];
-            console.log(uniqueEvents)
-            setHasEvents(uniqueEvents)
+            console.log(uniqueEvents);
+            setHasEvents(uniqueEvents);
           }
-
 
           return {
             data: value.data.items,
@@ -299,11 +304,15 @@ const KinCh: React.FC<KinChProps> = ({ isSenior, isCountry, otherDataFn }) => {
           };
         }}
         search={false}
-        pagination={{
-          showQuickJumper: true,
-          current: tableParams.page,
-          pageSize: tableParams.size,
-        }}
+        pagination={
+          pages
+            ? {
+                showQuickJumper: true,
+                current: tableParams.page,
+                pageSize: tableParams.size,
+              }
+            : false
+        }
         onChange={(pagination) => {
           setTableParams({
             ...tableParams,

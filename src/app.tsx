@@ -11,7 +11,6 @@ import { AuthAPI } from '@/services/cubing-pro/auth/typings';
 import ScrollToTopButton from '@/components/Buttons/toTop';
 import LanguageSelect from '@/locales/Language/LanguageSelect';
 import { ExtAppList } from '@/services/layout_config';
-import { Helmet } from '@@/exports';
 
 /**
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state

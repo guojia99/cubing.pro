@@ -1,0 +1,119 @@
+@keyframes algsFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+/* PDF 导出进度条：平滑过渡 + 动效 */
+.algs-export-progress {
+  .ant-progress-bg {
+    transition: width 0.35s ease-out;
+  }
+}
+
+@media (max-width: 576px) {
+  .ant-card-body {
+    padding: 12px !important;
+  }
+}
+
+.algs-stat-modal {
+  padding: 4px 0;
+
+  .algs-stat-total {
+    text-align: center;
+    margin-bottom: 20px;
+    padding: 12px 0;
+    background: rgba(100, 149, 237, 0.06);
+    border-radius: 8px;
+
+    .ant-statistic-title {
+      font-size: 12px;
+      color: rgba(0, 0, 0, 0.5);
+    }
+    .ant-statistic-content {
+      font-size: 28px;
+      font-weight: 600;
+      color: rgba(100, 149, 237, 0.9);
+    }
+    .ant-statistic-content-suffix {
+      font-size: 13px;
+      font-weight: 400;
+      color: rgba(0, 0, 0, 0.5);
+      margin-left: 4px;
+    }
+  }
+
+  .algs-stat-sets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+
+    .algs-stat-set-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      font-size: 12px;
+      border-radius: 6px;
+      border: 1px solid;
+      background: rgba(0, 0, 0, 0.02);
+
+      em {
+        font-style: normal;
+        font-weight: 600;
+        color: rgba(0, 0, 0, 0.75);
+      }
+    }
+  }
+
+  .algs-stat-groups {
+    max-height: 180px;
+    overflow-y: auto;
+    padding-right: 4px;
+
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.15);
+      border-radius: 2px;
+    }
+  }
+
+  .algs-stat-group-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    font-size: 12px;
+    border-bottom: 1px dashed rgba(0, 0, 0, 0.06);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .algs-stat-group-name {
+      color: rgba(0, 0, 0, 0.7);
+    }
+    .algs-stat-group-count {
+      font-weight: 500;
+      color: rgba(0, 0, 0, 0.85);
+    }
+  }
+
+  .ant-collapse {
+    .ant-collapse-header {
+      padding: 6px 0 !important;
+      font-size: 13px;
+    }
+    .ant-collapse-content-box {
+      padding: 4px 0 8px 16px !important;
+    }
+  }
+}
