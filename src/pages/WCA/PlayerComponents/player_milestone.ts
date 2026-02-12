@@ -162,10 +162,6 @@ export function createSignificantImprovementMilestones(
 
       // Check single
       if (entry.best > 0 && entry.best < currentBestSingle) {
-        if (entry.event_id === '222'){
-          console.log(entry.best, currentBestSingle);
-        }
-
         const improvementPercent = ((currentBestSingle - entry.best) / currentBestSingle) * 100;
         if (improvementPercent >= improvementNumber) {
           record.single = {
@@ -287,23 +283,19 @@ export function createNthCompetitionMilestones(sortedComps: WCACompetition[]): M
 
   return milestones;
 }
-
 export function createGrandSlamMilestone(
   results: WCAResult[],
   compMap: Map<string, WCACompetition>,
 ): Milestone[] {
-  // 记录每个 event 的 single/average 首次达成信息
   const firstAchieved: Record<
     string,
     { single?: { date: string; compId: string }; average?: { date: string; compId: string } }
   > = {};
 
-  // 初始化
   for (const eventId of eventOrder) {
     firstAchieved[eventId] = {};
   }
 
-  // 按时间顺序处理成绩（确保“首次”正确）
   const sortedResults = [...results].sort((a, b) => {
     const compA = compMap.get(a.competition_id);
     const compB = compMap.get(b.competition_id);
@@ -311,34 +303,44 @@ export function createGrandSlamMilestone(
     return compA.start_date.localeCompare(compB.start_date);
   });
 
+  let earliestDate: string | null = null;
+
   for (const res of sortedResults) {
     if (!eventOrder.includes(res.event_id)) continue;
     const comp = compMap.get(res.competition_id);
     if (!comp) continue;
 
+    // 更新最早有效成绩日期（只要 best > 0 或 average > 0）
+    if ((res.best > 0 || (res.average > 0 && res.event_id !== '333mbf'))) {
+      if (!earliestDate || comp.start_date < earliestDate) {
+        earliestDate = comp.start_date;
+      }
+    }
+
     const record = firstAchieved[res.event_id];
 
-    // 记录首次有效 single
     if (res.best > 0 && !record.single) {
       record.single = { date: comp.start_date, compId: comp.id };
     }
 
-    // 记录首次有效 average（333mbf 无 average）
     if (res.average > 0 && !record.average && res.event_id !== '333mbf') {
       record.average = { date: comp.start_date, compId: comp.id };
     }
   }
 
-  // 检查是否全部达成
   const allCompleted = eventOrder.every((eventId) => {
+    if (eventId === '333ft'){
+      return true;
+    }
     const rec = firstAchieved[eventId];
     if (eventId === '333mbf') return !!rec.single;
     return !!rec.single && !!rec.average;
   });
 
-  if (!allCompleted) return [];
+  console.log(allCompleted, earliestDate, firstAchieved)
 
-  // 收集所有“首次达成”的时间点
+  if (!allCompleted || !earliestDate) return [];
+
   const achievePoints: { date: string; compId: string }[] = [];
   for (const eventId of eventOrder) {
     const rec = firstAchieved[eventId];
@@ -350,7 +352,6 @@ export function createGrandSlamMilestone(
     }
   }
 
-  // 找出最晚的那个（即真正完成大满贯的时刻）
   let latestPoint = achievePoints[0];
   for (const point of achievePoints) {
     if (point.date > latestPoint.date) {
@@ -359,20 +360,23 @@ export function createGrandSlamMilestone(
   }
 
   const finalComp = compMap.get(latestPoint.compId);
-  if (!finalComp) return []; // 安全兜底
+  // === 计算天数 ===
+  const start = new Date(earliestDate);
+  const end = new Date(latestPoint.date);
+  const timeDiff = end.getTime() - start.getTime();
+  const daysUsed = Math.floor(timeDiff / (1000 * 60 * 60 * 24)) + 1; // 包含首尾日
 
   return [
     {
       type: 'grand_slam',
-      description: '达成了大满贯！',
+      description: `达成了大满贯！耗时  ${daysUsed} 天`,
       achieved_on: latestPoint.date,
       competition_id: latestPoint.compId,
-      competition_name: finalComp.name,
+      competition_name: finalComp?.name,
       date: latestPoint.date,
     },
   ];
 }
-
 const BLIND_EVENTS = new Set(['333bf', '444bf', '555bf', '333mbf']);
 
 export function createFirstBlindfoldedSuccessMilestones(

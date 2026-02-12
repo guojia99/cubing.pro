@@ -1,17 +1,5 @@
 import { Request } from '@/services/cubing-pro/request';
-// === 辅助函数 ===
-function extractYear(str: string): string | null {
-  const match = str.match(/\b(19|20)\d{2}\b/);
-  return match ? match[0] : null;
-}
 
-function normalizeForFuzzy(str: string): string {
-  return str
-    .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
 export interface CubingCompetition {
   id: string;
   wcaid: string;

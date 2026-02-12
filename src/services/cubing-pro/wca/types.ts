@@ -23,6 +23,7 @@ export interface WCAResult {
 
 export interface WCAPerson {
   wca_id: string;
+  wcaId: string;
   sub_id: number;
   name: string;
   country_id: string;

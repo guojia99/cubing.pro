@@ -10,11 +10,14 @@ import React, { useEffect, useRef, useState } from 'react';
 const { Option } = Select;
 export type DiyRankingSorProps = {
   keys: string;
+
+  pages: boolean
 };
 
-const DiyRankingSor: React.FC<DiyRankingSorProps> = ({ keys }) => {
+const DiyRankingSor: React.FC<DiyRankingSorProps> = ({ keys , pages}) => {
   const actionRef = useRef();
   const [selectedEvents, setSelectedEvents] = useState<string[]>([]);
+  // @ts-ignore
   const [tableParams, setTableParams] = useState<StaticAPI.apiDiyRankingSorRequest>({
     size: 100,
     page: 1,
@@ -243,11 +246,11 @@ const DiyRankingSor: React.FC<DiyRankingSorProps> = ({ keys }) => {
           };
         }}
         search={false}
-        pagination={{
+        pagination={pages ? {
           showQuickJumper: true,
           current: tableParams.page,
           pageSize: tableParams.size,
-        }}
+        }: false}
         onChange={(pagination) => {
           setTableParams({
             ...tableParams,

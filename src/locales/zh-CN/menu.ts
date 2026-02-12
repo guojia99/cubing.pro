@@ -1,9 +1,11 @@
 export default {
-  'menu.Static': '统计',
-  'menu.Project': '项目',
-  'menu.Competitions': '比赛',
-  'menu.Player': '选手',
-
+  "menu.groupCompetitions": "群赛",
+  "menu.groupCompetitions.Static": "统计",
+  "menu.groupCompetitions.Project": "项目",
+  "menu.groupCompetitions.Competitions": "比赛",
+  "menu.groupCompetitions.Player": "选手",
+  "menu.groupCompetitions.PKTimer": "PKTimer",
+  "menu.AlgsDetail": "公式",
   'menu.DrawTools': '绘图工具',
   'menu.DrawTools.sq1': 'SQ1绘图工具',
   'menu.DrawTools.minx': 'Minx绘图工具',
@@ -17,8 +19,10 @@ export default {
   'menu.Tools.mbld': '多盲记忆练习',
   'menu.Tools.TeamMatch': '组队赛对战赛果工具',
 
-  'menu.wca_comps': '附近比赛',
+  'menu.WCA.wca_comps': '附近比赛',
 
   'menu.WCA': "WCA查询",
-  'menu.WCA.Players': "选手"
+  'menu.WCA.Players': "选手",
+
+  'menu.Algs': "公式库",
 };

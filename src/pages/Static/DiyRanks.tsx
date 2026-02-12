@@ -6,12 +6,13 @@ import KinCh from '@/pages/Static/Kinsor';
 import DiyRankingSor from '@/pages/Static/Sor';
 import {
   apiDiyRanking,
-  apiDiyRankingKinch,
+  apiDiyRankingKinch, apiDiyRankingPersons,
   apiGetAllDiyRankingKey,
 } from '@/services/cubing-pro/statistics/diy_ranking';
 import { StaticAPI } from '@/services/cubing-pro/statistics/typings';
+import { WCAPerson } from '@/services/cubing-pro/wca/types';
 import { OrderedListOutlined, QuestionCircleOutlined } from '@ant-design/icons';
-import { Table, Tooltip } from 'antd';
+import { Spin, Table, TableColumnsType, Tooltip } from 'antd';
 import React, { useEffect, useState } from 'react';
 //
 // const eventList = [
@@ -161,13 +162,82 @@ const DiyRanksWithKinch: React.FC<DiyRanksProps> = ({ keys }) => {
 
   return (
     <>
-      <KinCh isSenior={false} otherDataFn={fetch} isCountry={false} />
+      <KinCh isSenior={false} otherDataFn={fetch} isCountry={false} pages={false} />
     </>
+  );
+};
+const DiyRankPersons: React.FC<DiyRanksProps> = ({ keys }) => {
+  const [persons, setPersons] = useState<WCAPerson[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    setPersons([]);
+    apiDiyRankingPersons(keys)
+      .then((res) => {
+        setPersons(res.data || []);
+      })
+      .catch((err) => {
+        console.error('Failed to fetch persons:', err);
+        setPersons([]);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [keys]);
+
+  // 表格列定义
+  const columns: TableColumnsType<WCAPerson> = [
+    {
+      title: '#',
+      key: 'index',
+      width: 60,
+      render: (_text, _record, index) => index + 1,
+      align: 'center',
+    },
+    {
+      title: 'WCA ID',
+      dataIndex: 'wcaId',
+      key: 'wcaId',
+      width: 120,
+    },
+    {
+      title: '性别',
+      dataIndex: 'gender',
+      key: 'gender',
+      width: 80,
+      render: (gender: string) => {
+        if (gender === 'm') return '男';
+        if (gender === 'f') return '女';
+        return '未知';
+      },
+    },
+    {
+      title: '姓名',
+      dataIndex: 'name',
+      key: 'name',
+      ellipsis: true,
+    },
+
+  ];
+
+  return (
+    <Spin spinning={loading}>
+      <Table
+        dataSource={persons}
+        columns={columns}
+        rowKey={(record: WCAPerson) => ` ${record.wca_id}- ${record.sub_id}`}
+        pagination={false}
+        size="middle"
+        scroll={{ x: 600 }}
+      />
+    </Spin>
   );
 };
 
 const DiyRanks: React.FC<DiyRanksProps> = ({ keys }) => {
   const items = [
+
     {
       key: 'event',
       label: <>WCA排名</>,
@@ -176,12 +246,17 @@ const DiyRanks: React.FC<DiyRanksProps> = ({ keys }) => {
     {
       key: 'sor',
       label: <>Sor排名</>,
-      children: <DiyRankingSor keys={keys} />,
+      children: <DiyRankingSor keys={keys} pages={false}/>,
     },
     {
       key: 'kinch',
       label: <>Kinch排名</>,
       children: <DiyRanksWithKinch keys={keys} />,
+    },
+    {
+      key: 'persons',
+      label: <>名单</>,
+      children: <DiyRankPersons keys={keys}/>
     },
   ];
   return (
