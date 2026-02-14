@@ -1,0 +1,70 @@
+@import './RandomPickModal.less';
+
+.formula-random-pick-modal {
+  &.formula-random-history-modal {
+    .formula-random-history-list {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .formula-random-history-empty {
+      text-align: center;
+      color: rgba(0, 0, 0, 0.45);
+      padding: 24px;
+    }
+
+    .formula-random-history-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        background: rgba(100, 149, 237, 0.1);
+      }
+    }
+
+    .formula-random-history-item-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .formula-random-history-item-name {
+      font-weight: 600;
+      color: rgba(0, 0, 0, 0.85);
+      font-size: 14px;
+    }
+
+    .formula-random-history-item-meta {
+      font-size: 12px;
+      color: rgba(0, 0, 0, 0.5);
+      margin-top: 2px;
+    }
+  }
+}
+
+.formula-random-result-card.formula-random-option-card {
+  margin: 0 auto 12px;
+  cursor: pointer;
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(230, 240, 255, 0.55);
+  border: 2px solid rgba(100, 149, 237, 0.35);
+  transition: all 0.25s ease;
+
+  &:hover {
+    border-color: rgba(100, 149, 237, 0.7);
+    background: rgba(230, 240, 255, 0.85);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(100, 149, 237, 0.2);
+  }
+}
+
+.formula-random-option-meta {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.5);
+  margin-top: 4px;
+}

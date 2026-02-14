@@ -10,6 +10,12 @@ import AlgsModal from './components/AlgsModal';
 import AlgsFormulaCard from './components/AlgsFormulaCard';
 import AlgsFilterPanel from './components/AlgsFilterPanel';
 import AlgsFloatButtons from './components/AlgsFloatButtons';
+import FormulaRandomPickModal from './components/FormulaRandomPickModal';
+import FormulaRandomPickCard from './components/FormulaRandomPickCard';
+import FormulaProficiencyCard from './components/FormulaProficiencyCard';
+import PracticeHistoryStatsCard from './components/PracticeHistoryStatsCard';
+import UsageInstructionsModal from './components/UsageInstructionsModal';
+import FormulaPracticeModal from './components/FormulaPracticeModal';
 import { getFormulaFontSize, setFormulaFontSize } from './utils/storage';
 import { SET_CARD_COLORS } from './constants';
 import './index.less';
@@ -37,6 +43,12 @@ const AlgsDetail: React.FC = () => {
   } | null>(null);
   const [exporting, setExporting] = useState(false);
   const [exportProgress, setExportProgress] = useState(0);
+  const [formulaRandomModalOpen, setFormulaRandomModalOpen] = useState(false);
+  const [formulaRandomModalMode, setFormulaRandomModalMode] = useState<'random' | 'history'>('random');
+  const [formulaRandomRefreshKey, setFormulaRandomRefreshKey] = useState(0);
+  const [unskilledRefreshKey, setUnskilledRefreshKey] = useState(0);
+  const [usageInstructionsOpen, setUsageInstructionsOpen] = useState(false);
+  const [formulaPracticeOpen, setFormulaPracticeOpen] = useState(false);
 
   useEffect(() => {
     if (!cube || !classId) return;
@@ -279,6 +291,77 @@ const AlgsDetail: React.FC = () => {
         <AlgsFilterPanel {...filterPanelProps} />
       </div>
 
+      <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
+        {flatAlgs.length >= 8 && (
+          <Col xs={24} sm={12} md={8} lg={6}>
+            <FormulaRandomPickCard
+              key={formulaRandomRefreshKey}
+              cube={dcube}
+              classId={dclassId}
+              flatAlgs={flatAlgs}
+              onOpenRandom={() => {
+                setFormulaRandomModalMode('random');
+                setFormulaRandomModalOpen(true);
+              }}
+              onOpenHistory={() => {
+                setFormulaRandomModalMode('history');
+                setFormulaRandomModalOpen(true);
+              }}
+              onPickFormula={openModal}
+            />
+          </Col>
+        )}
+        {flatAlgs.length > 0 && (
+          <Col xs={24} sm={12} md={8} lg={6}>
+            <FormulaProficiencyCard
+              key={unskilledRefreshKey}
+              cube={dcube}
+              classId={dclassId}
+              flatAlgs={flatAlgs}
+              onOpenFormulaPractice={() => setFormulaPracticeOpen(true)}
+              refreshKey={unskilledRefreshKey}
+            />
+          </Col>
+        )}
+        {flatAlgs.length > 0 && (
+          <Col xs={24} sm={12} md={8} lg={6}>
+            <PracticeHistoryStatsCard
+              key={unskilledRefreshKey}
+              cube={dcube}
+              classId={dclassId}
+              refreshKey={unskilledRefreshKey}
+            />
+          </Col>
+        )}
+      </Row>
+
+      <FormulaRandomPickModal
+        open={formulaRandomModalOpen}
+        onClose={() => setFormulaRandomModalOpen(false)}
+        mode={formulaRandomModalMode}
+        cube={dcube}
+        classId={dclassId}
+        flatAlgs={flatAlgs}
+        onPickFormula={openModal}
+        onPickSuccess={() => setFormulaRandomRefreshKey((k) => k + 1)}
+      />
+
+      <UsageInstructionsModal
+        open={usageInstructionsOpen}
+        onClose={() => setUsageInstructionsOpen(false)}
+      />
+
+      <FormulaPracticeModal
+        open={formulaPracticeOpen}
+        onClose={() => {
+          setFormulaPracticeOpen(false);
+          setUnskilledRefreshKey((k) => k + 1);
+        }}
+        cube={dcube}
+        classId={dclassId}
+        flatAlgs={flatAlgs}
+      />
+
       <Drawer
         title={intl.formatMessage({ id: 'algs.detail.filterDrawer' })}
         placement="right"
@@ -317,7 +400,12 @@ const AlgsDetail: React.FC = () => {
         ))}
       </div>
 
-      <AlgsFloatButtons onScrollTop={handleScrollTop} onOpenFilter={() => setFilterDrawerOpen(true)} />
+      <AlgsFloatButtons
+        onScrollTop={handleScrollTop}
+        onOpenFilter={() => setFilterDrawerOpen(true)}
+        onOpenUsageInstructions={() => setUsageInstructionsOpen(true)}
+        onOpenFormulaPractice={flatAlgs.length > 0 ? () => setFormulaPracticeOpen(true) : undefined}
+      />
 
       {modalState && (
         <AlgsModal
