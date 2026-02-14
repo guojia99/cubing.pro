@@ -157,4 +157,8 @@ export default defineConfig({
   codeSplitting: {
     jsStrategy: 'granularChunks',
   },
+  define: {
+    'process.env.CHOKIDAR_USEPOLLING': 'true',
+    'process.env.CHOKIDAR_INTERVAL': '1000',
+  },
 });

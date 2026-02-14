@@ -159,20 +159,20 @@ const Welcome: React.FC = () => {
         childrens={[
           {
             index: 1,
-            href: './competitions',
+            href: './groupCompetitions/competitions',
             title: intl.formatMessage({ id: 'home.welcome.competitions.title' }),
             desc: intl.formatMessage({ id: 'home.welcome.competitions.desc' }),
           },
           {
             index: 2,
-            href: './static',
+            href: './groupCompetitions/static',
             title: intl.formatMessage({ id: 'home.welcome.static.title' }),
             desc: intl.formatMessage({ id: 'home.welcome.static.desc' }),
           },
           {
             index: 3,
             title: intl.formatMessage({ id: 'home.welcome.players.title' }),
-            href: './players',
+            href: './groupCompetitions/players',
             desc: intl.formatMessage({ id: 'home.welcome.players.desc' }),
           },
         ]}

@@ -1,10 +1,17 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Button, Modal, Space } from 'antd';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import { useIntl } from '@@/plugin-locale';
 import type { Algorithm } from '@/services/cubing-pro/algs/typings';
 import { getAlgsSelection, setAlgsSelection, buildAlgsKey } from '../utils/storage';
+import {
+  getFormulaProficiency,
+  setFormulaProficiency,
+  type ProficiencyLevel,
+} from '@/services/cubing-pro/algs/formulaPracticeProficiency';
+import { buildFormulaKey } from '@/services/cubing-pro/algs/formulaPracticeSelection';
 import SvgRenderer from './SvgRenderer';
+import ProficiencySelect from './ProficiencySelect';
 
 export interface AlgsModalItem {
   alg: Algorithm;
@@ -33,6 +40,27 @@ const AlgsModal: React.FC<AlgsModalProps> = ({
 }) => {
   const intl = useIntl();
   const item = items[currentIndex];
+  const formulaKey = item ? buildFormulaKey(item.setName, item.groupName, item.alg.name) : '';
+  const [proficiency, setProficiency] = useState<ProficiencyLevel>(() =>
+    item ? (getFormulaProficiency(cube, classId)[formulaKey] ?? 'average') : 'average',
+  );
+
+  useEffect(() => {
+    if (item) {
+      const key = buildFormulaKey(item.setName, item.groupName, item.alg.name);
+      setProficiency(getFormulaProficiency(cube, classId)[key] ?? 'average');
+    }
+  }, [open, cube, classId, currentIndex]);
+
+  const handleProficiencyChange = useCallback(
+    (level: ProficiencyLevel) => {
+      if (!formulaKey) return;
+      setFormulaProficiency(cube, classId, formulaKey, level);
+      setProficiency(level);
+    },
+    [cube, classId, formulaKey],
+  );
+
   if (!item) return null;
   const { alg, setName, groupName } = item;
 
@@ -129,6 +157,13 @@ const AlgsModal: React.FC<AlgsModalProps> = ({
               </div>
             ))}
           </div>
+        </div>
+
+        <div style={{ marginTop: 16, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 12, color: 'rgba(0,0,0,0.6)' }}>
+            {intl.formatMessage({ id: 'algs.proficiencyCard.title' })}:
+          </span>
+          <ProficiencySelect value={proficiency} onChange={handleProficiencyChange} size="small" />
         </div>
 
         <Space style={{ marginTop: 20, width: '100%', justifyContent: 'space-between' }}>

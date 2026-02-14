@@ -58,3 +58,5 @@ dist.zip
 .idea/
 */.idea*
 .husky
+
+node_modules
