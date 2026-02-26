@@ -14,6 +14,15 @@ export default {
   "home.welcome.players.title": "玩家列表",
   "home.welcome.players.desc": "查看有哪些玩家，查詢你想了解的他們",
 
+  "home.welcome.algs.title": "公式庫",
+  "home.welcome.algs.desc": "公式庫包含了大量不同的公式、公式練習等，助力提升你的還原速度。",
+  "home.welcome.algs.list.title": "公式庫",
+  "home.welcome.algs.list.desc": "瀏覽各類扭技骰公式，支援練習與記憶",
+  "home.welcome.algs.eg.title": "EG",
+  "home.welcome.algs.eg.desc": "二階進階公式",
+  "home.welcome.algs.pll.title": "PLL",
+  "home.welcome.algs.pll.desc": "三階頂層進階公式",
+
   "home.welcome.draw.title": "扭技骰繪圖工具",
   "home.welcome.draw.desc": "各類扭技骰繪圖工具，支援 SVG、PNG 圖片匯出，自訂顏色、旋轉，打造你的扭技骰公式配圖",
 
@@ -31,4 +40,15 @@ export default {
 
   "home.welcome.draw.py.title": "Pyraminx 繪圖工具",
   "home.welcome.draw.py.desc": "繪製金字塔扭技骰",
+
+  "home.buyCoffee.title": "請作者喝咖啡",
+  "home.buyCoffee.subTitle": "感謝您的支持",
+  "home.buyCoffee.desc": "如果 Cubing Pro 對您有幫助，歡迎請作者喝杯咖啡～",
+  "home.buyCoffee.cardDesc": "掃碼支持作者，感謝您的慷慨",
+  "home.buyCoffee.wechat": "微信",
+  "home.buyCoffee.wechat.desc": "微信掃碼打賞",
+  "home.buyCoffee.alipay": "支付寶",
+  "home.buyCoffee.alipay.desc": "支付寶掃碼打賞",
+  "home.buyCoffee.contact": "聯繫方式：",
+  "home.buyCoffee.feedback": "如有建議或意見，歡迎透過郵箱聯繫～",
 }

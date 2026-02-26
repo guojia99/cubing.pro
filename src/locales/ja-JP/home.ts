@@ -15,6 +15,15 @@ export default {
   "home.welcome.players.title": "プレイヤー一覧",
   "home.welcome.players.desc": "どんなプレイヤーがいるのかを確認し、気になる人を検索できます。",
 
+  "home.welcome.algs.title": "公式ライブラリ",
+  "home.welcome.algs.desc": "公式ライブラリには様々な公式や練習問題が豊富に収録されており、タイム短縮に役立ちます。",
+  "home.welcome.algs.list.title": "公式ライブラリ",
+  "home.welcome.algs.list.desc": "各種キューブ公式を閲覧、練習・暗記をサポート",
+  "home.welcome.algs.eg.title": "EG",
+  "home.welcome.algs.eg.desc": "2x2 上級公式",
+  "home.welcome.algs.pll.title": "PLL",
+  "home.welcome.algs.pll.desc": "3x3 上面上級公式",
+
   "home.welcome.draw.title": "描画ツール",
   "home.welcome.draw.desc": "さまざまなキューブ描画ツール。SVG、PNG出力に対応。" +
     "色や回転もカスタマイズ可能。あなたのキューブ公式図を作ろう。",
@@ -33,4 +42,15 @@ export default {
 
   "home.welcome.draw.py.title": "ピラミンクス描画ツール",
   "home.welcome.draw.py.desc": "Pyraminx（ピラミッド型）キューブを描画",
+
+  "home.buyCoffee.title": "作者にコーヒーをおごる",
+  "home.buyCoffee.subTitle": "ご支援ありがとうございます",
+  "home.buyCoffee.desc": "Cubing Pro がお役に立てたなら、作者にコーヒーをおごってください～",
+  "home.buyCoffee.cardDesc": "スキャンして作者を応援、ご厚意に感謝します",
+  "home.buyCoffee.wechat": "WeChat",
+  "home.buyCoffee.wechat.desc": "WeChatでスキャンしてチップ",
+  "home.buyCoffee.alipay": "Alipay",
+  "home.buyCoffee.alipay.desc": "Alipayでスキャンしてチップ",
+  "home.buyCoffee.contact": "連絡先：",
+  "home.buyCoffee.feedback": "ご意見やご要望がございましたら、メールでお気軽にご連絡ください。",
 }

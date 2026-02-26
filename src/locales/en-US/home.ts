@@ -14,6 +14,15 @@ export default {
   "home.welcome.players.title": "Player List",
   "home.welcome.players.desc": "Browse through players and find the ones you're interested in.",
 
+  "home.welcome.algs.title": "Alg Library",
+  "home.welcome.algs.desc": "The alg library contains a large collection of formulas, alg practice, and more to help improve your solve speed.",
+  "home.welcome.algs.list.title": "Alg Library",
+  "home.welcome.algs.list.desc": "Browse various cube algs with practice and memorization support",
+  "home.welcome.algs.eg.title": "EG",
+  "home.welcome.algs.eg.desc": "2x2 advanced formulas",
+  "home.welcome.algs.pll.title": "PLL",
+  "home.welcome.algs.pll.desc": "3x3 top layer advanced formulas",
+
   "home.welcome.draw.title": "Drawing Tools",
   "home.welcome.draw.desc": "Various cube drawing tools supporting SVG and PNG output, custom colors, rotation — perfect for creating cube formula illustrations.",
 
@@ -31,4 +40,15 @@ export default {
 
   "home.welcome.draw.py.title": "Pyraminx Drawing Tool",
   "home.welcome.draw.py.desc": "Draw Pyraminx Cube",
+
+  "home.buyCoffee.title": "Buy Me a Coffee",
+  "home.buyCoffee.subTitle": "Thank you for your support",
+  "home.buyCoffee.desc": "If Cubing Pro has been helpful to you, consider buying the author a coffee~",
+  "home.buyCoffee.cardDesc": "Scan to support the author, thank you for your generosity",
+  "home.buyCoffee.wechat": "WeChat",
+  "home.buyCoffee.wechat.desc": "Scan with WeChat to tip",
+  "home.buyCoffee.alipay": "Alipay",
+  "home.buyCoffee.alipay.desc": "Scan with Alipay to tip",
+  "home.buyCoffee.contact": "Contact:",
+  "home.buyCoffee.feedback": "For suggestions or feedback, feel free to reach out via email.",
 }

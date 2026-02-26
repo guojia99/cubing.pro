@@ -60,23 +60,33 @@ ol {
 }
 
 
-// 强制全局宽度为 PC 模式
-html, body, #root {
-  min-width: 1200px !important;
-  overflow-x: auto;
-}
-
-// 禁止 ProLayout 的响应式折叠
-.ant-pro-sider {
-  transform: none !important;
-  width: 256px !important;
+// PC 端保持最小宽度，手机端自适应无留白
+@media (min-width: 769px) {
+  html, body, #root {
+    min-width: 1200px !important;
+    overflow-x: auto;
+  }
 }
 
 @media (max-width: 768px) {
+  html, body, #root {
+    min-width: unset !important;
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+  }
   .ant-pro-sider {
     position: relative !important;
   }
   .ant-pro-layout-content {
-    padding: 24px !important;
+    padding: 12px 8px !important;
+  }
+}
+
+// 禁止 ProLayout 的响应式折叠（仅 PC）
+@media (min-width: 769px) {
+  .ant-pro-sider {
+    transform: none !important;
+    width: 256px !important;
   }
 }

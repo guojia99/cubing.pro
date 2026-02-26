@@ -1,3 +1,11 @@
+/* Algs 页面容器：防止横向溢出、无留白 */
+.algs-page-container {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
 @keyframes algsFloat {
   0%,
   100% {
@@ -15,9 +23,20 @@
   }
 }
 
-@media (max-width: 576px) {
+/* 手机端布局优化：防止溢出、无左右留白 */
+@media (max-width: 768px) {
   .ant-card-body {
     padding: 12px !important;
+  }
+  /* 公式卡片在窄屏下保持可读 */
+  [data-algs-group-card] .ant-col {
+    min-width: 0; /* 允许 flex 子项收缩 */
+  }
+}
+
+@media (max-width: 576px) {
+  .ant-card-body {
+    padding: 10px !important;
   }
 }
 
