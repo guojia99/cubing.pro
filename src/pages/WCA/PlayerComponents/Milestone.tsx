@@ -28,6 +28,7 @@ import {
   MilestoneType,
 } from './player_milestone';
 import { WCACompetition, WcaProfile, WCAResult } from '@/services/cubing-pro/wca/types';
+import './Milestone.less';
 
 const { Text } = Typography;
 type TagRender = SelectProps['tagRender'];
@@ -168,6 +169,7 @@ const MilestoneTimelines: React.FC<MilestoneTimelineProps> = ({
               <Select
                 mode="multiple"
                 allowClear
+                maxTagCount="responsive"
                 placeholder={intl.formatMessage({ id: 'wca.milestone.excludePlaceholder' })}
                 value={excludedTypes}
                 onChange={(value) => setExcludedTypes(value as MilestoneType[])}
@@ -187,7 +189,7 @@ const MilestoneTimelines: React.FC<MilestoneTimelineProps> = ({
               ></Select>
             </Form.Item>
           </div>
-          <div style={{ marginTop: 16, minWidth: '200px', width: '33%' }}>
+          <div style={{ marginTop: 16, minWidth: 0, width: '100%', maxWidth: 400 }}>
             <Form.Item label={intl.formatMessage({ id: 'wca.milestone.improvementThreshold' })}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <Slider
@@ -218,6 +220,7 @@ const MilestoneTimelines: React.FC<MilestoneTimelineProps> = ({
         </div>
       }
     >
+      <div className="milestone-timeline-wrapper">
       <Timeline mode="alternate">
         {filteredMilestones.map((m, index) => {
           const yearMonthDay = getYearMonthDay(
@@ -246,6 +249,7 @@ const MilestoneTimelines: React.FC<MilestoneTimelineProps> = ({
           );
         })}
       </Timeline>
+      </div>
     </Card>
   );
 };

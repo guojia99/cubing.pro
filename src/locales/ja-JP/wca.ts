@@ -77,6 +77,18 @@ export default {
   'wca.results.detailAttempts': '試技詳細',
   'wca.results.competition': '大会',
 
+  // PR Streak
+  'wca.results.prStreakTitle': 'PR Streak（連続PB）',
+  'wca.results.prStreakCurrent': '現在のstreak',
+  'wca.results.prStreakLongest': '最長streak',
+  'wca.results.prStreakNone': '0（なし）',
+  'wca.results.prStreakCount': '{count}大会',
+  'wca.results.prStreakBreaks': 'Streak中断記録',
+  'wca.results.prStreakBreakAt': '中断大会',
+  'wca.results.prStreakBreakAtSuffix': '',
+  'wca.results.prStreakBreakPrev': '前回の連続',
+  'wca.results.prStreakBreakPrevSuffix': '',
+
   // Milestone
   'wca.milestone.title': '選手マイルストーン',
   'wca.milestone.count': '{count} 件のマイルストーン',
@@ -163,4 +175,12 @@ export default {
   'wca.chart.stdDev': '標準偏差',
   'wca.chart.compLabel': '大会',
   'wca.chart.maN': '{n}試技平均',
+
+  // HistoricalRank 歴史ランキング
+  'wca.historicalRank.title': '歴史ランキング',
+  'wca.historicalRank.year': '年',
+  'wca.historicalRank.country': '国',
+  'wca.historicalRank.type': 'タイプ',
+  'wca.historicalRank.rank': '順位',
+  'wca.historicalRank.worldwide': '全世界',
 };

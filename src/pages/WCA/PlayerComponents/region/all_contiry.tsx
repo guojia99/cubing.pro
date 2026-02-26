@@ -267,6 +267,7 @@ export const countryIso2ToChinese: CountryMap = {
  * @returns 对应的中文名称，如果不存在则返回undefined
  */
 export function getCountryNameByIso2(iso2Code: string): string {
+  if (!iso2Code || typeof iso2Code !== 'string') return '';
   const find = countryIso2ToChinese[iso2Code.toUpperCase()];
   if (find) {
     return find;

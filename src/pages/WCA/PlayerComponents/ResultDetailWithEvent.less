@@ -1,0 +1,28 @@
+/* 图表容器：外层限制宽度并启用横向滚动 */
+.wca-chart-container {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 0;
+
+  /* 显示滚动条，便于用户发现可滑动 */
+  scrollbar-width: thin;
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 4px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.4);
+  }
+}
+
+/* 内层：PC 端 100% 铺满，窄屏时最小 500px 保证可读并触发横向滚动 */
+.wca-chart-inner {
+  width: 100%;
+  min-width: 500px;
+}

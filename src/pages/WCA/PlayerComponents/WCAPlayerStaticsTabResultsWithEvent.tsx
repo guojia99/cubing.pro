@@ -2,6 +2,7 @@ import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import { eventOrder } from '@/pages/WCA/utils/events';
 import { Tabs } from 'antd';
 import React from 'react';
+import './WCAPlayerStaticsTabResultsWithEvent.less';
 import { useIntl } from '@@/plugin-locale';
 import ResultDetailWithEvent from './ResultDetailWithEvent';
 import { StaticWithTimerRank, WCACompetition, WCAResult } from '@/services/cubing-pro/wca/types';
@@ -43,7 +44,13 @@ const WCAPlayerStaticsTabResultsWithEvent: React.FC<WCAPlayerStaticsTabResultsWi
   }
 
   return (
-    <Tabs defaultActiveKey={userEvents[0]} size="large" tabPosition="top" centered={true}>
+    <Tabs
+      className="wca-event-tabs"
+      defaultActiveKey={userEvents[0]}
+      size="large"
+      tabPosition="top"
+      centered={true}
+    >
       {userEvents.map((eventId) => (
         <TabPane tab={<strong>{CubeIcon(eventId, eventId, {})}</strong>} key={eventId}>
           {/* 将分类好的数据传递给展示组件 */}

@@ -117,17 +117,25 @@ const WCAPlayer: React.FC = () => {
     );
   }
 
-  // ✅ 正常渲染
+  // ✅ 正常渲染 - 响应式布局：PC 居中限宽，手机端全宽
   return (
-    <div style={{ width: '100%' }}>
-      <Row gutter={[0, 24]} style={{ padding: '0 16px' }}>
-        <Col span={24}>
+    <div
+      style={{
+        width: '100%',
+        maxWidth: 1000,
+        margin: '0 auto',
+        padding: '0 16px',
+        boxSizing: 'border-box',
+      }}
+    >
+      <Row gutter={[0, 24]}>
+        <Col xs={24} sm={24} md={24} lg={24}>
           <WCAPlayerDetails wcaProfile={wcaProfile} wcaResults={wcaResults} />
         </Col>
-        <Col span={24}>
+        <Col xs={24} sm={24} md={24} lg={24}>
           <WCAPlayerResultTable wcaProfile={wcaProfile} wcaResults={wcaResults} />
         </Col>
-        <Col span={24}>
+        <Col xs={24} sm={24} md={24} lg={24}>
           <WCAPlayerStaticsTab
             wcaProfile={wcaProfile}
             wcaResults={wcaResults}

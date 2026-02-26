@@ -374,7 +374,7 @@ interface Person {
   id: string;
 }
 
-interface Country {
+export interface Country {
   id: string;
   name: string;
   continent_id: string;
@@ -450,12 +450,14 @@ export interface WcaProfile {
 
 export interface StaticWithTimerRank {
   wcaId: string;
+  wcaName: string;
   eventId: string;
   year: number;
   month: number;
   week: number;
   single: number;
   average: number;
+  country: string;
   singleCountryRank: number;
   singleWorldRank: number;
   singleContinentRank: number;

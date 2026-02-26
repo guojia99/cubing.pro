@@ -1,0 +1,105 @@
+.historical-rank {
+  padding: 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+  box-sizing: border-box;
+
+  .page-title {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 24px;
+
+    .filter-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .filter-label {
+        white-space: nowrap;
+      }
+
+      .filter-select.ant-select {
+        min-width: 120px;
+      }
+    }
+  }
+
+  .table-wrapper {
+    /* Table scroll.x 已处理横向滚动，此处不再加 overflow 以免分页被推出视口 */
+  }
+}
+
+@media (max-width: 768px) {
+  .historical-rank {
+    padding: 12px 8px;
+    overflow: visible;
+
+    .page-title {
+      margin-bottom: 16px;
+      font-size: 18px !important;
+    }
+
+    .filter-row {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+      margin-bottom: 16px;
+
+      .filter-item {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+
+        .filter-label {
+          flex-shrink: 0;
+          min-width: 70px;
+        }
+
+        .filter-select.ant-select {
+          flex: 1;
+          min-width: 0;
+        }
+      }
+    }
+
+    .table-wrapper {
+      width: 100%;
+      /* 不在此处加 overflow-x，Table 的 scroll.x 会单独滚动表格区域，分页保持可见 */
+    }
+
+    .ant-table {
+      font-size: 13px;
+    }
+
+    .ant-table-cell {
+      padding: 8px 6px !important;
+    }
+
+    .ant-pagination {
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 12px 0;
+      overflow: visible !important;
+
+      .ant-pagination-options {
+        margin-left: 0;
+        margin-top: 8px;
+      }
+
+      .ant-pagination-item,
+      .ant-pagination-prev,
+      .ant-pagination-next {
+        min-width: 32px;
+      }
+    }
+  }
+}

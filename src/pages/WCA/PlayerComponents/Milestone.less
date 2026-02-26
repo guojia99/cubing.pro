@@ -1,0 +1,17 @@
+/* 里程碑 Timeline 手机端防止溢出 */
+.milestone-timeline-wrapper {
+  width: 100%;
+  overflow: hidden;
+
+  .ant-timeline-item-content {
+    min-width: 0;
+    max-width: 100%;
+  }
+}
+
+/* 里程碑筛选区域 - 手机端适配 */
+@media (max-width: 768px) {
+  .ant-card .ant-form-item-control-input .ant-select {
+    max-width: 100% !important;
+  }
+}
