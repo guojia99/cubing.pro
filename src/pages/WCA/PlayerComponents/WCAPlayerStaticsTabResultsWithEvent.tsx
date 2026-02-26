@@ -2,6 +2,7 @@ import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import { eventOrder } from '@/pages/WCA/utils/events';
 import { Tabs } from 'antd';
 import React from 'react';
+import { useIntl } from '@@/plugin-locale';
 import ResultDetailWithEvent from './ResultDetailWithEvent';
 import { StaticWithTimerRank, WCACompetition, WCAResult } from '@/services/cubing-pro/wca/types';
 
@@ -16,8 +17,9 @@ interface WCAPlayerStaticsTabResultsWithEventProps {
 const WCAPlayerStaticsTabResultsWithEvent: React.FC<WCAPlayerStaticsTabResultsWithEventProps> = ({
   wcaResults,
   comps,
-                                                                                                   wcaRankTimer
+  wcaRankTimer,
 }) => {
+  const intl = useIntl();
   // 按 event_id 分组成绩
   const resultsByEvent = new Map<string, WCAResult[]>();
 
@@ -37,7 +39,7 @@ const WCAPlayerStaticsTabResultsWithEvent: React.FC<WCAPlayerStaticsTabResultsWi
     .sort((a, b) => eventOrder.indexOf(a) - eventOrder.indexOf(b))
 
   if (userEvents.length === 0) {
-    return <div>暂无历史成绩</div>;
+    return <div>{intl.formatMessage({ id: 'wca.results.noHistory' })}</div>;
   }
 
   return (

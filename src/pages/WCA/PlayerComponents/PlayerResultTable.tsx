@@ -2,8 +2,9 @@ import { resultsTimeFormat } from '@/pages/WCA/utils/wca_results';
 import { Button, Card, Checkbox, message, Table, Tag, Tooltip } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import React from 'react';
+import { useIntl } from '@@/plugin-locale';
 
-import { CubesCn } from '@/components/CubeIcon/cube'; // 我们将样式抽离到 less 文件中更好控制
+import { CubesCn } from '@/components/CubeIcon/cube';
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import { CopyOutlined } from '@ant-design/icons';
 import { eventOrder, roundSortOrder } from '../utils/events';
@@ -75,6 +76,7 @@ const renderRank = (rank: number | string) => {
 };
 
 const WCAPlayerResultTable: React.FC<WCAPlayerResultTableProps> = ({ wcaProfile, wcaResults }) => {
+  const intl = useIntl();
   const [showRank, setShowRank] = React.useState(true);
   const [showPodium, setShowPodium] = React.useState(true);
 
@@ -163,7 +165,7 @@ const WCAPlayerResultTable: React.FC<WCAPlayerResultTableProps> = ({ wcaProfile,
   const tableData: TableData[] = [];
   let copyResult = `${wcaProfile.name}
 ${wcaProfile.wcaId}
-参赛次数: ${wcaProfile.competition_count}
+${intl.formatMessage({ id: 'wca.resultTable.competitionCount' })}: ${wcaProfile.competition_count}
 ================
 `;
 
@@ -201,7 +203,7 @@ ${wcaProfile.wcaId}
   // 平铺列定义（无嵌套）
   const columns: ColumnsType<TableData> = [
     {
-      title: '项目',
+      title: intl.formatMessage({ id: 'wca.resultTable.event' }),
       dataIndex: 'eventId',
       key: 'eventId',
       width: 80,
@@ -218,31 +220,31 @@ ${wcaProfile.wcaId}
 
   if (showRank) {
     columns.push({
-      title: '单次',
+      title: intl.formatMessage({ id: 'wca.resultTable.single' }),
       children: [
         {
-          title: '地区',
+          title: intl.formatMessage({ id: 'wca.resultTable.region' }),
           dataIndex: 'countryRankSingle',
           key: 'countryRankSingle',
           width: 70,
           render: (rank: number) => renderRank(rank),
         },
         {
-          title: '洲际',
+          title: intl.formatMessage({ id: 'wca.resultTable.continent' }),
           dataIndex: 'continentRankSingle',
           key: 'continentRankSingle',
           width: 70,
           render: (rank: number) => renderRank(rank),
         },
         {
-          title: '世界',
+          title: intl.formatMessage({ id: 'wca.resultTable.world' }),
           dataIndex: 'worldRankSingle',
           key: 'worldRankSingle',
           width: 70,
           render: (rank: number) => renderRank(rank), // 单次世界排名，第一名标红
         },
         {
-          title: '成绩',
+          title: intl.formatMessage({ id: 'wca.resultTable.result' }),
           dataIndex: 'single',
           key: 'single',
           width: 100,
@@ -252,10 +254,10 @@ ${wcaProfile.wcaId}
       ],
     });
     columns.push({
-      title: '平均',
+      title: intl.formatMessage({ id: 'wca.resultTable.average' }),
       children: [
         {
-          title: '成绩',
+          title: intl.formatMessage({ id: 'wca.resultTable.result' }),
           dataIndex: 'average',
           key: 'average',
           width: 100,
@@ -263,21 +265,21 @@ ${wcaProfile.wcaId}
           render: (text) => <strong>{text}</strong>,
         },
         {
-          title: '世界',
+          title: intl.formatMessage({ id: 'wca.resultTable.world' }),
           dataIndex: 'worldRankAverage',
           key: 'worldRankAverage',
           width: 70,
           render: (rank) => renderRank(rank), // 平均世界排名第一标红
         },
         {
-          title: '洲际',
+          title: intl.formatMessage({ id: 'wca.resultTable.continent' }),
           dataIndex: 'continentRankAverage',
           key: 'continentRankAverage',
           width: 70,
           render: (rank) => renderRank(rank),
         },
         {
-          title: '地区',
+          title: intl.formatMessage({ id: 'wca.resultTable.region' }),
           dataIndex: 'countryRankAverage',
           key: 'countryRankAverage',
           width: 70,
@@ -287,7 +289,7 @@ ${wcaProfile.wcaId}
     });
   } else {
     columns.push({
-      title: '单次',
+      title: intl.formatMessage({ id: 'wca.resultTable.single' }),
       dataIndex: 'single',
       key: 'single',
       width: 100,
@@ -295,7 +297,7 @@ ${wcaProfile.wcaId}
     });
 
     columns.push({
-      title: '平均',
+      title: intl.formatMessage({ id: 'wca.resultTable.average' }),
       dataIndex: 'average',
       key: 'average',
       width: 100,
@@ -307,7 +309,7 @@ ${wcaProfile.wcaId}
   for (let i = 0; i < tableData.length; i++) {
     if (tableData[i].podiumCount && showPodium) {
       columns.push({
-        title: '领奖台',
+        title: intl.formatMessage({ id: 'wca.resultTable.podium' }),
         dataIndex: 'podiumCount',
         key: 'podiumCount',
         width: 90,
@@ -318,7 +320,7 @@ ${wcaProfile.wcaId}
 
   // 添加还原列
   columns.push({
-    title: '复原/尝试',
+    title: intl.formatMessage({ id: 'wca.resultTable.solvesAttempts' }),
     dataIndex: 'solvesAttempted',
     key: 'solvesAttempted',
     width: 90,
@@ -327,17 +329,17 @@ ${wcaProfile.wcaId}
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(copyResult);
-      message.success('✅ 成绩已复制到剪贴板！');
+      message.success(intl.formatMessage({ id: 'wca.resultTable.copySuccess' }));
     } catch (err) {
       console.error('复制失败:', err);
-      message.error('❌ 复制失败，请手动选择复制');
+      message.error(intl.formatMessage({ id: 'wca.resultTable.copyFailed' }));
     }
   };
 
   return (
     <Card hoverable style={{ minWidth: 900, margin: '0 auto', borderRadius: 16 }} bordered={false}>
       <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 10 }}>
-        <Tooltip title="复制成绩到剪贴板">
+        <Tooltip title={intl.formatMessage({ id: 'wca.resultTable.copyTooltip' })}>
           <Button type="default" icon={<CopyOutlined />} size="small" onClick={handleCopy} />
         </Tooltip>
       </div>
@@ -354,10 +356,10 @@ ${wcaProfile.wcaId}
 
       <div style={{ marginTop: 12, display: 'flex', gap: 8, float: 'right' }}>
         <Checkbox checked={showRank} onChange={(e) => setShowRank(e.target.checked)}>
-          显示排名
+          {intl.formatMessage({ id: 'wca.resultTable.showRank' })}
         </Checkbox>
         <Checkbox checked={showPodium} onChange={(e) => setShowPodium(e.target.checked)}>
-          显示领奖台
+          {intl.formatMessage({ id: 'wca.resultTable.showPodium' })}
         </Checkbox>
       </div>
     </Card>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card, Tabs } from 'antd';
+import { useIntl } from '@@/plugin-locale';
 import WCAPlayerStaticsTabResults from '@/pages/WCA/PlayerComponents/WCAPlayerStaticsTabResults';
 import CompetitionTable from '@/pages/WCA/PlayerComponents/WCAPlayerStaticsTabComps';
 import MilestoneTimelines from '@/pages/WCA/PlayerComponents/Milestone';
@@ -12,8 +13,8 @@ interface WCAPlayerStaticsTabProps {
   wcaRankTimer: StaticWithTimerRank[]
 }
 
-const WCAPlayerStaticsTab: React.FC<WCAPlayerStaticsTabProps> = ({ wcaProfile, wcaResults, comps,wcaRankTimer }) => {
-
+const WCAPlayerStaticsTab: React.FC<WCAPlayerStaticsTabProps> = ({ wcaProfile, wcaResults, comps, wcaRankTimer }) => {
+  const intl = useIntl();
   const wcaResultsRes = wcaResults.sort((a, b) => b.id - a.id);
 
   return (
@@ -29,16 +30,16 @@ const WCAPlayerStaticsTab: React.FC<WCAPlayerStaticsTabProps> = ({ wcaProfile, w
         animated
       >
         {/* 成绩 Tab */}
-        <TabPane tab="成绩" key="results">
+        <TabPane tab={intl.formatMessage({ id: 'wca.tabs.results' })} key="results">
           <WCAPlayerStaticsTabResults wcaResults={wcaResultsRes} comps={comps} wcaRankTimer={wcaRankTimer} />
         </TabPane>
 
         {/* 赛事 Tab */}
-        <TabPane tab="赛事" key="competitions">
+        <TabPane tab={intl.formatMessage({ id: 'wca.tabs.competitions' })} key="competitions">
           <CompetitionTable competitions={comps} wcaResults={wcaResultsRes} />
         </TabPane>
 
-        <TabPane tab="里程碑" key="milestones">
+        <TabPane tab={intl.formatMessage({ id: 'wca.tabs.milestones' })} key="milestones">
           <MilestoneTimelines comps={comps} wcaResults={wcaResultsRes} wcaProfile={wcaProfile} />
         </TabPane>
 

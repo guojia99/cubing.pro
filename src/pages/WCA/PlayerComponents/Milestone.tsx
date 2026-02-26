@@ -2,7 +2,8 @@ import {
   Badge,
   Button,
   Card,
-  Form, InputNumber,
+  Form,
+  InputNumber,
   Select,
   SelectProps,
   Slider,
@@ -12,8 +13,9 @@ import {
   Typography,
 } from 'antd';
 import React, { useEffect, useState } from 'react';
+import { useIntl } from '@@/plugin-locale';
 
-import 'antd/dist/reset.css'; // 如果你使用的是 antd v5，请用这个引入样式
+import 'antd/dist/reset.css';
 
 import MilestoneItemContent, {
   MILESTONE_COLOR_MAP,
@@ -88,6 +90,7 @@ const MilestoneTimelines: React.FC<MilestoneTimelineProps> = ({
   wcaResults,
   comps,
 }) => {
+  const intl = useIntl();
   const [ascending, setAscending] = useState<boolean>(false);
   const [excludedTypes, setExcludedTypes] = useState<MilestoneType[]>([]);
   const [allMilestones, setAllMilestones] = useState<Milestone[]>([]);
@@ -98,7 +101,13 @@ const MilestoneTimelines: React.FC<MilestoneTimelineProps> = ({
   const [improvementNumber, setImprovementNumber] = useState(33);
 
   useEffect(() => {
-    const milestones = GetMilestones(wcaProfile, wcaResults, comps, improvementNumber);
+    const milestones = GetMilestones(
+      wcaProfile,
+      wcaResults,
+      comps,
+      improvementNumber,
+      (descriptor, values) => intl.formatMessage(descriptor, values),
+    );
     setAllMilestones(milestones);
     const sortedMilestones = sortMilestones(milestones, ascending);
     const fs = sortedMilestones.filter((m) => !excludedTypes.includes(m.type));
@@ -107,9 +116,13 @@ const MilestoneTimelines: React.FC<MilestoneTimelineProps> = ({
     const milestoneTypesPresent = new Set(milestones.map((m) => m.type));
     const mOpt = defaultMilestoneTypeOptions
       .filter((opt) => milestoneTypesPresent.has(opt.value))
-      .sort((a, b) => MILESTONE_TYPE_PRIORITY[a.value] - MILESTONE_TYPE_PRIORITY[b.value]);
+      .sort((a, b) => MILESTONE_TYPE_PRIORITY[a.value] - MILESTONE_TYPE_PRIORITY[b.value])
+      .map((opt) => ({
+        ...opt,
+        label: intl.formatMessage({ id: `wca.milestone.type.${opt.value}` }),
+      }));
     setMilestoneTypeOptions(mOpt);
-  }, [excludedTypes, ascending, improvementNumber]);
+  }, [excludedTypes, ascending, improvementNumber, intl, wcaProfile, wcaResults, comps]);
 
   const tagRender: TagRender = (props) => {
     const { label, value, closable, onClose } = props;
@@ -138,20 +151,24 @@ const MilestoneTimelines: React.FC<MilestoneTimelineProps> = ({
       title={
         <div style={{ paddingTop: 16, paddingBottom: 16 }}>
           <Space>
-            <Text strong>选手里程碑</Text>
-            <Text type="secondary">共有 {filteredMilestones.length} 条里程碑</Text>
+            <Text strong>{intl.formatMessage({ id: 'wca.milestone.title' })}</Text>
+            <Text type="secondary">
+              {intl.formatMessage({ id: 'wca.milestone.count' }, { count: filteredMilestones.length })}
+            </Text>
           </Space>
 
           <Button size="small" onClick={() => setAscending(!ascending)} style={{ float: 'right' }}>
-            {ascending ? '倒序' : '正序'}
+            {ascending
+              ? intl.formatMessage({ id: 'wca.milestone.descOrder' })
+              : intl.formatMessage({ id: 'wca.milestone.ascOrder' })}
           </Button>
 
           <div style={{ marginTop: 16 }}>
-            <Form.Item label="不看里程碑">
+            <Form.Item label={intl.formatMessage({ id: 'wca.milestone.excludeLabel' })}>
               <Select
                 mode="multiple"
                 allowClear
-                placeholder="选择要排除的里程碑类型"
+                placeholder={intl.formatMessage({ id: 'wca.milestone.excludePlaceholder' })}
                 value={excludedTypes}
                 onChange={(value) => setExcludedTypes(value as MilestoneType[])}
                 style={{ width: '100%', maxWidth: 200 }}
@@ -171,7 +188,7 @@ const MilestoneTimelines: React.FC<MilestoneTimelineProps> = ({
             </Form.Item>
           </div>
           <div style={{ marginTop: 16, minWidth: '200px', width: '33%' }}>
-            <Form.Item label="进步阈值">
+            <Form.Item label={intl.formatMessage({ id: 'wca.milestone.improvementThreshold' })}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <Slider
                   min={10}

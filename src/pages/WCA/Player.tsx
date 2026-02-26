@@ -15,6 +15,7 @@ import {
 } from '@/services/cubing-pro/wca/types';
 import { apiGetWCAPersonProfile } from '@/services/cubing-pro/wca/wca_api';
 import { useParams } from '@@/exports';
+import { useIntl } from '@@/plugin-locale';
 import { Col, Row, Spin } from 'antd';
 import React, { useEffect, useState } from 'react';
 
@@ -24,6 +25,7 @@ const banAvatarKey = ['2016XUWE02'];
 
 const WCAPlayer: React.FC = () => {
   const { wcaId } = useParams();
+  const intl = useIntl();
   const [is404, setIs404] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [wcaProfile, setWcaProfile] = useState<WcaProfile>();
@@ -34,9 +36,9 @@ const WCAPlayer: React.FC = () => {
   // ✅ 设置页面标题的 useEffect —— 必须放在 return 之前，且无条件调用
   useEffect(() => {
     if (!loading && wcaProfile?.name) {
-      document.title = `${wcaProfile.name} 的WCA成绩页`;
+      document.title = intl.formatMessage({ id: 'wca.player.pageTitle' }, { name: wcaProfile.name });
     }
-  }, [loading, wcaProfile?.name]); // 依赖项确保只在必要时更新
+  }, [loading, wcaProfile?.name, intl]);
 
   const fetchPlayer = async () => {
     if (!wcaId) {
@@ -101,14 +103,16 @@ const WCAPlayer: React.FC = () => {
   // ❌ 所有 return 必须在所有 hooks 之后
   if (is404) {
     return (
-      <div style={{ textAlign: 'center', color: '#999', marginTop: 50 }}>未找到该选手信息</div>
+      <div style={{ textAlign: 'center', color: '#999', marginTop: 50 }}>
+        {intl.formatMessage({ id: 'wca.player.notFound' })}
+      </div>
     );
   }
 
   if (loading || !wcaProfile) {
     return (
       <div style={{ textAlign: 'center', marginTop: 100 }}>
-        <Spin size="large" tip="加载中..." />
+        <Spin size="large" tip={intl.formatMessage({ id: 'wca.player.loading' })} />
       </div>
     );
   }

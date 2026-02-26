@@ -3,6 +3,7 @@ import { getCompsEvents } from '@/pages/WCA/utils/events';
 import { Button, Space, Table } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import React, { useEffect, useState } from 'react';
+import { useIntl } from '@@/plugin-locale';
 import { getCountryNameByIso2 } from '@/pages/WCA/PlayerComponents/region/all_contiry';
 import { getLocationByPinyin } from '@/pages/WCA/PlayerComponents/region/china_citys';
 import { findCubingCompetitionByIdentifier } from '@/services/cubing-pro/cubing_china/cubing';
@@ -15,6 +16,7 @@ interface WCACompetitionTableProps {
 
 // 赛事列表表格组件
 const CompetitionTable: React.FC<WCACompetitionTableProps> = ({ competitions, wcaResults }) => {
+  const intl = useIntl();
   // 倒序排列（按开始日期倒序）
   const sortedCompetitions = [...competitions].sort((a, b) => {
     return new Date(b.start_date).getTime() - new Date(a.start_date).getTime();
@@ -34,14 +36,14 @@ const CompetitionTable: React.FC<WCACompetitionTableProps> = ({ competitions, wc
   // 定义表格列
   const columns: ColumnsType<WCACompetition> = [
     {
-      title: '序号',
+      title: intl.formatMessage({ id: 'wca.competition.index' }),
       dataIndex: 'indexNum',
       key: 'indexNum',
       width: 60,
       align: 'center',
     },
     {
-      title: '时间',
+      title: intl.formatMessage({ id: 'wca.competition.time' }),
       key: 'date_range', // 使用 date_range 作为唯一 key
       width: 180,
       sorter: (a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime(),
@@ -72,7 +74,7 @@ const CompetitionTable: React.FC<WCACompetitionTableProps> = ({ competitions, wc
       },
     },
     {
-      title: '比赛名称',
+      title: intl.formatMessage({ id: 'wca.competition.name' }),
       dataIndex: 'name',
       key: 'name',
       width: 250,
@@ -97,7 +99,7 @@ const CompetitionTable: React.FC<WCACompetitionTableProps> = ({ competitions, wc
       }
     },
     {
-      title: '项目',
+      title: intl.formatMessage({ id: 'wca.competition.events' }),
       dataIndex: 'event_ids',
       key: 'events',
       width: 200,
@@ -125,7 +127,7 @@ const CompetitionTable: React.FC<WCACompetitionTableProps> = ({ competitions, wc
     },
 
     {
-      title: '城市',
+      title: intl.formatMessage({ id: 'wca.competition.city' }),
       dataIndex: 'city',
       key: 'city',
       width: 150,

@@ -1,6 +1,6 @@
-
 import React from 'react';
 import { Tag, Space, Card, Typography, Table } from 'antd';
+import { useIntl } from '@@/plugin-locale';
 import { roundNameMap, roundSortOrder } from '@/pages/WCA/utils/events';
 import { ColumnsType } from 'antd/es/table';
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
@@ -23,8 +23,13 @@ const formatDate = (date: string): string => {
 };
 
 const WCAPlayerStaticsTabResultsWithComp: React.FC<WCAPlayerStaticsTabResultsWithCompProps> = ({ wcaResults, comps }) => {
+  const intl = useIntl();
   if (!wcaResults || wcaResults.length === 0) {
-    return <div style={{ color: '#999', textAlign: 'center', padding: '16px' }}>暂无比赛成绩</div>;
+    return (
+      <div style={{ color: '#999', textAlign: 'center', padding: '16px' }}>
+        {intl.formatMessage({ id: 'wca.results.noCompetitionResults' })}
+      </div>
+    );
   }
 
   // 按比赛分组
@@ -101,7 +106,7 @@ const WCAPlayerStaticsTabResultsWithComp: React.FC<WCAPlayerStaticsTabResultsWit
   // 表格列定义
   const columns: ColumnsType<WCAResult & { showEvent?: boolean; eventId?: string }> = [
     {
-      title: '项目',
+      title: intl.formatMessage({ id: 'wca.results.event' }),
       key: 'event',
       width: 200,
       render: (_, record) => {
@@ -119,7 +124,7 @@ const WCAPlayerStaticsTabResultsWithComp: React.FC<WCAPlayerStaticsTabResultsWit
       },
     },
     {
-      title: '轮次',
+      title: intl.formatMessage({ id: 'wca.results.round' }),
       dataIndex: 'round_type_id',
       key: 'round',
       width: 100,
@@ -130,7 +135,7 @@ const WCAPlayerStaticsTabResultsWithComp: React.FC<WCAPlayerStaticsTabResultsWit
       },
     },
     {
-      title: '排名',
+      title: intl.formatMessage({ id: 'wca.results.rank' }),
       dataIndex: 'pos',
       key: 'pos',
       width: 80,
@@ -143,7 +148,7 @@ const WCAPlayerStaticsTabResultsWithComp: React.FC<WCAPlayerStaticsTabResultsWit
       ),
     },
     {
-      title: '单次',
+      title: intl.formatMessage({ id: 'wca.results.single' }),
       dataIndex: 'best',
       key: 'best',
       width: 120,
@@ -166,7 +171,7 @@ const WCAPlayerStaticsTabResultsWithComp: React.FC<WCAPlayerStaticsTabResultsWit
       ),
     },
     {
-      title: '平均',
+      title: intl.formatMessage({ id: 'wca.results.average' }),
       dataIndex: 'average',
       key: 'average',
       width: 120,
@@ -192,7 +197,7 @@ const WCAPlayerStaticsTabResultsWithComp: React.FC<WCAPlayerStaticsTabResultsWit
       },
     },
     {
-      title: '详细成绩',
+      title: intl.formatMessage({ id: 'wca.results.detailAttempts' }),
       key: 'attempts',
       width: 360,
       render: (_, record) => (
@@ -226,7 +231,7 @@ const WCAPlayerStaticsTabResultsWithComp: React.FC<WCAPlayerStaticsTabResultsWit
   return (
     <div style={{ marginTop: 16 }}>
       {sortedComps.length === 0 ? (
-        <div>暂无有效比赛数据</div>
+        <div>{intl.formatMessage({ id: 'wca.results.noValidData' })}</div>
       ) : (
         sortedComps.map((comp) => (
           <Card

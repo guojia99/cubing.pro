@@ -3,6 +3,7 @@ import { StaticWithTimerRank } from '@/services/cubing-pro/wca/types';
 import { Card } from 'antd';
 import ReactECharts from 'echarts-for-react';
 import React from 'react';
+import { useIntl } from '@@/plugin-locale';
 
 interface ResultDetailWithRankingTimersProps {
   eventID: string;
@@ -34,12 +35,17 @@ const ResultDetailWithRankingTimers: React.FC<ResultDetailWithRankingTimersProps
   eventID,
   wcaRankTimer,
 }) => {
+  const intl = useIntl();
   const rawData = getEventWcaRankTimer(eventID, wcaRankTimer);
 
   if (rawData.length === 0) {
     return (
-      <Card title="成绩排名曲线" bordered={false} style={{ marginBottom: 32 }}>
-        暂无 {eventID} 项目的排名数据
+      <Card
+        title={intl.formatMessage({ id: 'wca.chart.rankCurve' })}
+        bordered={false}
+        style={{ marginBottom: 32 }}
+      >
+        {intl.formatMessage({ id: 'wca.chart.noRankData' }, { event: eventID })}
       </Card>
     );
   }
@@ -66,7 +72,7 @@ const ResultDetailWithRankingTimers: React.FC<ResultDetailWithRankingTimersProps
         let tip = `${params[0].name}<br/>`;
 
         // 成绩显示
-        tip += `成绩: ${resultsTimeFormat(rawData[dataIndex].single, eventID, false)}`;
+        tip += `${intl.formatMessage({ id: 'wca.chart.result' })}: ${resultsTimeFormat(rawData[dataIndex].single, eventID, false)}`;
         if (rawData[dataIndex].average !== -1) {
           tip += ` / ${resultsTimeFormat(rawData[dataIndex].average, eventID, true)}`;
         }
@@ -85,12 +91,12 @@ const ResultDetailWithRankingTimers: React.FC<ResultDetailWithRankingTimersProps
 
         // 遍历每个系列，计算变化
         const rankKeys: { key: keyof StaticWithTimerRank; label: string }[] = [
-          { key: 'singleCountryRank', label: '单次-NR' },
-          { key: 'singleContinentRank', label: '单次-CR' },
-          { key: 'singleWorldRank', label: '单次-WR' },
-          { key: 'avgCountryRank', label: '平均-NR' },
-          { key: 'avgContinentRank', label: '平均-CR' },
-          { key: 'avgWorldRank', label: '平均-WR' },
+          { key: 'singleCountryRank', label: intl.formatMessage({ id: 'wca.chart.singleNR' }) },
+          { key: 'singleContinentRank', label: intl.formatMessage({ id: 'wca.chart.singleCR' }) },
+          { key: 'singleWorldRank', label: intl.formatMessage({ id: 'wca.chart.singleWR' }) },
+          { key: 'avgCountryRank', label: intl.formatMessage({ id: 'wca.chart.avgNR' }) },
+          { key: 'avgContinentRank', label: intl.formatMessage({ id: 'wca.chart.avgCR' }) },
+          { key: 'avgWorldRank', label: intl.formatMessage({ id: 'wca.chart.avgWR' }) },
         ];
 
         rankKeys.forEach(({ key, label }) => {
@@ -116,7 +122,14 @@ const ResultDetailWithRankingTimers: React.FC<ResultDetailWithRankingTimersProps
       },
     },
     legend: {
-      data: ['单次-NR', '单次-CR', '单次-WR', '平均-NR', '平均-CR', '平均-WR'],
+      data: [
+        intl.formatMessage({ id: 'wca.chart.singleNR' }),
+        intl.formatMessage({ id: 'wca.chart.singleCR' }),
+        intl.formatMessage({ id: 'wca.chart.singleWR' }),
+        intl.formatMessage({ id: 'wca.chart.avgNR' }),
+        intl.formatMessage({ id: 'wca.chart.avgCR' }),
+        intl.formatMessage({ id: 'wca.chart.avgWR' }),
+      ],
       bottom: 10,
       show: true,
       top: 10,
@@ -139,7 +152,7 @@ const ResultDetailWithRankingTimers: React.FC<ResultDetailWithRankingTimersProps
     },
     yAxis: {
       type: 'value',
-      name: '排名',
+      name: intl.formatMessage({ id: 'wca.chart.rank' }),
       inverse: false, // 👈 关键：不倒置！0 在底部，大数在顶部
       min: 0, // 从 0 开始
       // 可选：设置最大值为略大于最大排名
@@ -168,7 +181,7 @@ const ResultDetailWithRankingTimers: React.FC<ResultDetailWithRankingTimersProps
     ],
     series: [
       {
-        name: '单次-NR',
+        name: intl.formatMessage({ id: 'wca.chart.singleNR' }),
         type: 'line',
         smooth: true,
         symbol: 'circle',
@@ -176,7 +189,7 @@ const ResultDetailWithRankingTimers: React.FC<ResultDetailWithRankingTimersProps
         data: seriesData('singleCountryRank'),
       },
       {
-        name: '单次-CR',
+        name: intl.formatMessage({ id: 'wca.chart.singleCR' }),
         type: 'line',
         smooth: true,
         symbol: 'circle',
@@ -184,7 +197,7 @@ const ResultDetailWithRankingTimers: React.FC<ResultDetailWithRankingTimersProps
         data: seriesData('singleContinentRank'),
       },
       {
-        name: '单次-WR',
+        name: intl.formatMessage({ id: 'wca.chart.singleWR' }),
         type: 'line',
         smooth: true,
         symbol: 'circle',
@@ -192,7 +205,7 @@ const ResultDetailWithRankingTimers: React.FC<ResultDetailWithRankingTimersProps
         data: seriesData('singleWorldRank'),
       },
       {
-        name: '平均-NR',
+        name: intl.formatMessage({ id: 'wca.chart.avgNR' }),
         type: 'line',
         smooth: true,
         symbol: 'circle',
@@ -200,7 +213,7 @@ const ResultDetailWithRankingTimers: React.FC<ResultDetailWithRankingTimersProps
         data: seriesData('avgCountryRank'),
       },
       {
-        name: '平均-CR',
+        name: intl.formatMessage({ id: 'wca.chart.avgCR' }),
         type: 'line',
         smooth: true,
         symbol: 'circle',
@@ -208,7 +221,7 @@ const ResultDetailWithRankingTimers: React.FC<ResultDetailWithRankingTimersProps
         data: seriesData('avgContinentRank'),
       },
       {
-        name: '平均-WR',
+        name: intl.formatMessage({ id: 'wca.chart.avgWR' }),
         type: 'line',
         smooth: true,
         symbol: 'circle',
@@ -218,7 +231,11 @@ const ResultDetailWithRankingTimers: React.FC<ResultDetailWithRankingTimersProps
     ],
   };
   return (
-    <Card title="历史成绩排名曲线" bordered={false} style={{ marginBottom: 32 }}>
+    <Card
+      title={intl.formatMessage({ id: 'wca.chart.historyRankCurve' })}
+      bordered={false}
+      style={{ marginBottom: 32 }}
+    >
       <div style={{ height: 400 }}>
         <ReactECharts
           option={option}

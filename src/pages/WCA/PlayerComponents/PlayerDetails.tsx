@@ -1,7 +1,7 @@
-
 import { Avatar, Badge, Card, Divider, Image, Space, Table, Typography } from 'antd';
 import 'flag-icons/css/flag-icons.min.css';
 import React from 'react';
+import { useIntl } from '@@/plugin-locale';
 import './PlayerDetails.css';
 import { getCountryNameByIso2 } from '@/pages/WCA/PlayerComponents/region/all_contiry';
 import { WcaProfile, WCAResult } from '@/services/cubing-pro/wca/types';
@@ -14,6 +14,7 @@ interface WCAPlayerDetailsProps {
 const { Title, Text } = Typography;
 
 const WCAPlayerDetails: React.FC<WCAPlayerDetailsProps> = ({ wcaProfile, wcaResults }) => {
+  const intl = useIntl();
 
   // 计算总复原次数（有 single 或 average 都计数一次）
   let totalSolves = 0;
@@ -43,7 +44,7 @@ const WCAPlayerDetails: React.FC<WCAPlayerDetailsProps> = ({ wcaProfile, wcaResu
   // 表格列定义
   const columns = [
     {
-      title: '国家 / 地区',
+      title: intl.formatMessage({ id: 'wca.playerDetails.country' }),
       dataIndex: 'country_iso2',
       key: 'country_iso2',
       align: 'center' as const,
@@ -65,14 +66,19 @@ const WCAPlayerDetails: React.FC<WCAPlayerDetailsProps> = ({ wcaProfile, wcaResu
       },
     },
     {
-      title: '性别',
+      title: intl.formatMessage({ id: 'wca.playerDetails.gender' }),
       dataIndex: 'gender',
       key: 'gender',
       align: 'center' as const,
-      render: (g: string) => (g === 'm' ? '男' : g === 'f' ? '女' : '其他'),
+      render: (g: string) =>
+        g === 'm'
+          ? intl.formatMessage({ id: 'wca.playerDetails.genderMale' })
+          : g === 'f'
+          ? intl.formatMessage({ id: 'wca.playerDetails.genderFemale' })
+          : intl.formatMessage({ id: 'wca.playerDetails.genderOther' }),
     },
     {
-      title: 'WCA ID',
+      title: intl.formatMessage({ id: 'wca.playerDetails.wcaId' }),
       dataIndex: 'wcaId',
       key: 'wcaId',
       align: 'center' as const,
@@ -104,7 +110,7 @@ const WCAPlayerDetails: React.FC<WCAPlayerDetailsProps> = ({ wcaProfile, wcaResu
     },
 
     {
-      title: '比赛次数',
+      title: intl.formatMessage({ id: 'wca.playerDetails.competitionCount' }),
       dataIndex: 'competition',
       key: 'competition',
       align: 'center' as const,
@@ -113,7 +119,7 @@ const WCAPlayerDetails: React.FC<WCAPlayerDetailsProps> = ({ wcaProfile, wcaResu
       ),
     },
     {
-      title: '复原次数 / 尝试次数',
+      title: intl.formatMessage({ id: 'wca.playerDetails.solvesAttempts' }),
       dataIndex: 'solves',
       key: 'solves',
       align: 'center' as const,
@@ -161,7 +167,11 @@ const WCAPlayerDetails: React.FC<WCAPlayerDetailsProps> = ({ wcaProfile, wcaResu
       >
         {/* 头像与姓名 */}
         <div className="header-section">
-          <Avatar src={wcaProfile.thumb_url} alt={`${wcaProfile.name} 的头像`} size={100} />
+          <Avatar
+            src={wcaProfile.thumb_url}
+            alt={intl.formatMessage({ id: 'wca.playerDetails.avatarAlt' }, { name: wcaProfile.name })}
+            size={100}
+          />
           <Title level={3} style={{ margin: '8px 0 8px 0' }}>
             {displayName}
           </Title>

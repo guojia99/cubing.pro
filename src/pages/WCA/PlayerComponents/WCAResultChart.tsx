@@ -7,7 +7,7 @@ import {
 import { Card, Select, Slider, Space, Tabs, Tooltip } from 'antd';
 import ReactECharts from 'echarts-for-react';
 import React, { useMemo, useState } from 'react';
-import { undefined } from '@umijs/utils/compiled/zod';
+import { useIntl } from '@@/plugin-locale';
 import { WCACompetition, WCAResult } from '@/services/cubing-pro/wca/types';
 
 export interface WCAResultChartProps {
@@ -64,6 +64,7 @@ function getQuantile(arr: number[], q: number, TrimHeadAndTail: number = 0): num
 }
 
 const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps }) => {
+  const intl = useIntl();
   const [recentCount, setRecentCount] = useState<number>(20);
   const [recentHeadNum, setRecentHeadNum] = useState<number>(0);
   const [recentMin, setRecentMin] = useState<number>(0);
@@ -72,12 +73,12 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
   // ===== 数据预处理 =====
   const seriesName = (() => {
     if (eventId === '333mbf') {
-      return '得分';
+      return intl.formatMessage({ id: 'wca.chart.score' });
     }
     if (eventId === '333fm') {
-      return '步数';
+      return intl.formatMessage({ id: 'wca.chart.moves' });
     }
-    return '时间';
+    return intl.formatMessage({ id: 'wca.chart.time' });
   })();
   const reversedData = useMemo(() => [...data].reverse(), [data]);
 
@@ -144,13 +145,13 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
         }
         allAttempts.push({
           data: dd,
-          comp: `${compsAndRound}-第${i + 1}把`,
+          comp: `${compsAndRound}-${intl.formatMessage({ id: 'wca.chart.attemptN' }, { n: i + 1 })}`,
         });
       }
     }
 
     return { singles, averages, compWithNameRound, allAttempts };
-  }, [reversedData, eventId]);
+  }, [reversedData, eventId, intl]);
 
   const combinedOption = useMemo(() => {
     // ===== 多盲专用逻辑 =====
@@ -191,28 +192,33 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
         };
       });
 
+      const singleLabel = intl.formatMessage({ id: 'wca.chart.singleLabel' });
+      const unknownComp = intl.formatMessage({ id: 'wca.chart.unknownComp' });
+      const solvedAttempted = intl.formatMessage({ id: 'wca.chart.solvedAttempted' });
+      const timeUsed = intl.formatMessage({ id: 'wca.chart.timeUsed' });
+      const newBest = intl.formatMessage({ id: 'wca.chart.newBest' });
+      const sameScoreFaster = intl.formatMessage({ id: 'wca.chart.sameScoreFaster' });
+
       return {
         tooltip: {
           trigger: 'axis',
           formatter: (params: any[]) => {
             const p = params[0];
             const data = p.data;
-            if (!data || !data.extra) return `${p.marker}单次: DNF`;
+            if (!data || !data.extra) return `${p.marker}${singleLabel}: DNF`;
 
             const { solved, attempted, seconds, compName, prType } = data.extra;
             const score = solved - (attempted - solved);
             const timeStr = secondTimeFormat(seconds, true);
             const prStr = prType
-              ? `（<strong style="color:red;">新最佳${
-                  prType === 'time' ? ',同分更快' : ''
-                }</strong>）`
+              ? `（<strong style="color:red;">${newBest}${prType === 'time' ? `,${sameScoreFaster}` : ''}</strong>）`
               : '';
 
             return `
-            <strong>${compName || '未知比赛'}</strong><br/>
-            ${p.marker}单次: ${score}<br/>
-            成功/尝试: ${solved}/${attempted}<br/>
-            用时: ${timeStr}<br/>
+            <strong>${compName || unknownComp}</strong><br/>
+            ${p.marker}${singleLabel}: ${score}<br/>
+            ${solvedAttempted}: ${solved}/${attempted}<br/>
+            ${timeUsed}: ${timeStr}<br/>
             ${prStr}
           `.replace(/\n/g, '');
           },
@@ -220,17 +226,17 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
         grid: { left: 60, right: 40, bottom: 50, top: 40 },
         xAxis: {
           type: 'category',
-          name: '比赛成绩',
+          name: intl.formatMessage({ id: 'wca.chart.compResult' }),
           data: singlePoints.map((_, i) => i),
         },
         yAxis: {
           type: 'value',
           min: 0,
-          name: '多盲得分',
+          name: intl.formatMessage({ id: 'wca.chart.mbfScore' }),
         },
         series: [
           {
-            name: '单次得分',
+            name: intl.formatMessage({ id: 'wca.chart.singleScore' }),
             type: 'line',
             showSymbol: true,
             data: singlePoints,
@@ -275,13 +281,17 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
       };
     });
 
+    const singleLabel = intl.formatMessage({ id: 'wca.chart.single' });
+    const avgLabel = intl.formatMessage({ id: 'wca.chart.avg' });
+    const unknownComp = intl.formatMessage({ id: 'wca.chart.unknownComp' });
+    const progressLabel = intl.formatMessage({ id: 'wca.chart.progress' });
+
     return {
       tooltip: {
         trigger: 'axis',
         formatter: (params: any[]) => {
           if (!params.length) return '';
-          // ✅ 所有点的 i 一致，所以取第一个即可
-          const compName = params[0]?.data?.extra?.compName || '未知比赛';
+          const compName = params[0]?.data?.extra?.compName || unknownComp;
 
           const lines = params.map((p) => {
             const data = p.data;
@@ -289,8 +299,8 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
               return `${p.marker}${p.seriesName}: DNF`;
             }
             const rawHundredths = data.value[1];
-            const formatted = resultsTimeFormat(rawHundredths, eventId, p.seriesName === '平均');
-            const extra = data.progress ? `（进步 ${data.progress.toFixed(3)}%）` : '';
+            const formatted = resultsTimeFormat(rawHundredths, eventId, p.seriesName === avgLabel);
+            const extra = data.progress ? `（${progressLabel} ${data.progress.toFixed(3)}%）` : '';
             return `${p.marker}${p.seriesName}: ${formatted}${extra}`;
           });
 
@@ -303,7 +313,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
       grid: { left: 60, right: 40, bottom: 50, top: 40 },
       xAxis: {
         type: 'category',
-        name: '还原',
+        name: intl.formatMessage({ id: 'wca.chart.solves' }),
         data: Array.from({ length: Math.max(singlePoints.length, avgPoints.length) }, (_, i) => i),
       },
       yAxis: {
@@ -323,13 +333,13 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
       },
       series: [
         {
-          name: '单次',
+          name: singleLabel,
           type: 'line',
           showSymbol: true,
           data: singlePoints,
         },
         {
-          name: '平均',
+          name: avgLabel,
           type: 'line',
           showSymbol: true,
           data: avgPoints,
@@ -350,7 +360,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
         },
       ],
     };
-  }, [chartData, eventId, reversedData]);
+  }, [chartData, eventId, reversedData, intl]);
 
   // 生成标记点，只显示头尾和当前选中值
   const generateMarks = () => {
@@ -388,6 +398,13 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
   };
 
   // ===== 单次分布图 =====
+  const maWindow = 12;
+  const resultSeriesName = intl.formatMessage({ id: 'wca.chart.resultSeries' });
+  const quartileRangeName = intl.formatMessage({ id: 'wca.chart.quartileRange' });
+  const stdDevName = intl.formatMessage({ id: 'wca.chart.stdDev' });
+  const compLabel = intl.formatMessage({ id: 'wca.chart.compLabel' });
+  const maName = intl.formatMessage({ id: 'wca.chart.maN' }, { n: maWindow });
+
   const distributionOption = useMemo(() => {
     const singles = chartData.allAttempts;
     if (singles.length === 0) return {};
@@ -398,7 +415,6 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
     const q75: number[] = [];
 
     // === 移动平均 & 标准差 ===
-    const maWindow = 12; // 可配置
     const ma: number[] = [];
     const stdUpper: number[] = [];
     const stdLower: number[] = [];
@@ -441,14 +457,14 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
               return true;
             })
             .map((p) => {
-              if (p.seriesName === '成绩') {
+              if (p.seriesName === resultSeriesName) {
                 const attemptIndex = p.dataIndex;
                 const originalData = singles[attemptIndex];
                 const rawHundredths = Array.isArray(p.value) ? p.value[1] : p.value;
                 return `
-               ${originalData ? `比赛: ${originalData.comp}` : ''} <br/>
+               ${originalData ? `${compLabel}: ${originalData.comp}` : ''} <br/>
                 ${p.marker}${p.seriesName}: ${resultsTimeFormat(rawHundredths, eventId, false)}`;
-              } else if (p.seriesName === '标准差' || p.seriesName === '四分线区间') {
+              } else if (p.seriesName === stdDevName || p.seriesName === quartileRangeName) {
                 // 检查是否包含 [x, lower, upper]
                 if (Array.isArray(p.value) && p.value.length >= 3) {
                   const lower = p.value[1];
@@ -479,7 +495,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
       grid: { left: 60, right: 40, bottom: 50, top: 40 },
       xAxis: {
         type: 'category',
-        name: '还原',
+        name: intl.formatMessage({ id: 'wca.chart.solves' }),
         data: singles.map((_, i) => i),
       },
       yAxis: {
@@ -495,7 +511,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
       },
       series: [
         {
-          name: '成绩',
+          name: resultSeriesName,
           type: 'line',
           showSymbol: false,
           data: singles.map((v, i) => [i, v.data]),
@@ -522,7 +538,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
         // --- 四分线 区间（填充）---
         // 第一个 series：下界（基底）
         {
-          name: '四分线区间',
+          name: quartileRangeName,
           type: 'line',
           // data 格式: [x, lower, upper] —— 第三个值用于 tooltip
           data: q25.map((lower, i) => [i, lower, q75[i]]),
@@ -534,7 +550,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
           // 关键：只让这个 series 显示 tooltip
         },
         {
-          name: '四分线区间',
+          name: quartileRangeName,
           type: 'line',
           // 注意：这里 data 是差值，但 tooltip 不显示
           data: q25.map((_, i) => [i, q75[i] - q25[i]]),
@@ -547,7 +563,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
         },
         // --- 移动平均线 ---
         {
-          name: `${maWindow}次平均`,
+          name: maName,
           type: 'line',
           data: ma.map((v, i) => [i, v]),
           smooth: true,
@@ -557,7 +573,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
         // --- 标准差 边界线 ---
         // --- 标准差 上边界线 ---
         {
-          name: '标准差',
+          name: stdDevName,
           type: 'line',
           data: stdUpper.map((v, i) => [i, v]),
           lineStyle: { type: 'dotted', color: '#2CA02C', width: 1 },
@@ -566,7 +582,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
         },
         // --- 标准差 下边界线 ---
         {
-          name: '标准差',
+          name: stdDevName,
           type: 'line',
           data: stdLower.map((v, i) => [i, v]),
           lineStyle: { type: 'dotted', color: '#2CA02C', width: 1 },
@@ -576,7 +592,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
         },
         // --- 填充：基底（携带完整数据）---
         {
-          name: '标准差',
+          name: stdDevName,
           type: 'line',
           data: stdLower.map((lower, i) => [i, lower, stdUpper[i]]), // [x, lower, upper]
           lineStyle: { opacity: 0 },
@@ -588,7 +604,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
         },
         // --- 填充：增量（仅用于渲染高度）---
         {
-          name: '标准差',
+          name: stdDevName,
           type: 'line',
           data: stdLower.map((_, i) => [i, stdUpper[i] - stdLower[i]]),
           lineStyle: { opacity: 0 },
@@ -603,7 +619,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
         { type: 'inside', xAxisIndex: 0, start: 0, end: 100 },
       ],
     };
-  }, [chartData, recentCount, eventId, recentHeadNum]);
+  }, [chartData, recentCount, eventId, recentHeadNum, intl, resultSeriesName, quartileRangeName, stdDevName, compLabel, maName]);
 
   const getTrimMax = (count: number) => {
     if (count <= 20) return 10; // 最多去除25% (5/20)
@@ -627,7 +643,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
   const tabs = [
     {
       key: '1',
-      label: '最佳成绩',
+      label: intl.formatMessage({ id: 'wca.chart.bestResult' }),
       children: <ReactECharts option={combinedOption} style={{ height: 400 }} />,
     },
   ];
@@ -635,7 +651,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
   if (eventId !== '333mbf') {
     tabs.push({
       key: '2',
-      label: '单次成绩分布',
+      label: intl.formatMessage({ id: 'wca.chart.singleDistribution' }),
       children: (
         <>
           <div
@@ -667,7 +683,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
             >
               <Space style={{ display: 'flex', alignItems: 'center' }}>
                 <label htmlFor="recentCountSelect" style={{ marginRight: 8 }}>
-                  四分线数:
+                  {intl.formatMessage({ id: 'wca.chart.quartileCount' })}:
                 </label>
                 <Select
                   id="recentCountSelect"
@@ -675,10 +691,10 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
                   onChange={handleRecentCountChange}
                   style={{ width: 120 }}
                   options={[
-                    { label: '最近 20 次', value: 20 },
-                    { label: '最近 50 次', value: 50 },
-                    { label: '最近 100 次', value: 100 },
-                    { label: '最近 200 次', value: 200 },
+                    { label: intl.formatMessage({ id: 'wca.chart.recent20' }), value: 20 },
+                    { label: intl.formatMessage({ id: 'wca.chart.recent50' }), value: 50 },
+                    { label: intl.formatMessage({ id: 'wca.chart.recent100' }), value: 100 },
+                    { label: intl.formatMessage({ id: 'wca.chart.recent200' }), value: 200 },
                   ]}
                 />
               </Space>
@@ -687,7 +703,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
             {/* 去头尾比例滑块 */}
             <Space style={{ display: 'flex', alignItems: 'center' }}>
               <label htmlFor="recentHeadSlider" style={{ marginRight: 8 }}>
-                去头尾比例:
+                {intl.formatMessage({ id: 'wca.chart.trimRatio' })}:
               </label>
               <Slider
                 id="recentHeadSlider"
