@@ -1,6 +1,7 @@
 import { resultsTimeFormat } from '@/pages/WCA/utils/wca_results';
 import { Tag, Typography } from 'antd';
 import React from 'react';
+import { useIntl } from '@@/plugin-locale';
 import { Milestone, MilestoneType, getCompName } from './player_milestone';
 
 const { Text } = Typography;
@@ -47,6 +48,7 @@ interface MilestoneItemContentProps {
 }
 
 const MilestoneItemContent: React.FC<MilestoneItemContentProps> = ({ milestone, isLeft }) => {
+  const intl = useIntl();
   const bubbleStyle = BUBBLE_COLOR_MAP[milestone.type] || {
     bg: '#f5f5f5',
     border: '#d9d9d9',
@@ -97,7 +99,9 @@ const MilestoneItemContent: React.FC<MilestoneItemContentProps> = ({ milestone, 
         }}
       >
         {milestone.record_type && (
-          <Tag color={MILESTONE_COLOR_MAP[milestone.type]}>{milestone.record_type} 记录</Tag>
+          <Tag color={MILESTONE_COLOR_MAP[milestone.type]}>
+            {milestone.record_type} {intl.formatMessage({ id: 'wca.milestone.record' })}
+          </Tag>
         )}
 
         {milestone.position &&
@@ -118,10 +122,10 @@ const MilestoneItemContent: React.FC<MilestoneItemContentProps> = ({ milestone, 
               }}
             >
               {milestone.position === 1
-                ? '🥇 金牌'
+                ? intl.formatMessage({ id: 'wca.milestone.gold' })
                 : milestone.position === 2
-                ? '🥈 银牌'
-                : '🥉 铜牌'}
+                ? intl.formatMessage({ id: 'wca.milestone.silver' })
+                : intl.formatMessage({ id: 'wca.milestone.bronze' })}
             </Tag>
           )}
 
@@ -135,7 +139,7 @@ const MilestoneItemContent: React.FC<MilestoneItemContentProps> = ({ milestone, 
           <>
             {milestone.best_is_single && (
               <Tag color="red">
-                单次{' '}
+                {intl.formatMessage({ id: 'wca.milestone.single' })}{' '}
                 {milestone.old_best_time && milestone.new_best_time
                   ? `${resultsTimeFormat(
                       milestone.old_best_time,
@@ -147,7 +151,7 @@ const MilestoneItemContent: React.FC<MilestoneItemContentProps> = ({ milestone, 
                       true,
                     )}`
                   : milestone.result !== undefined
-                  ? `成绩: ${resultsTimeFormat(
+                  ? `${intl.formatMessage({ id: 'wca.milestone.result' })}: ${resultsTimeFormat(
                       milestone.result,
                       milestone.event_id || '333',
                       true,
@@ -157,7 +161,7 @@ const MilestoneItemContent: React.FC<MilestoneItemContentProps> = ({ milestone, 
             )}
             {milestone.best_is_average && (
               <Tag color="blue">
-                平均{' '}
+                {intl.formatMessage({ id: 'wca.milestone.average' })}{' '}
                 {milestone.old_best_avg_time && milestone.new_best_avg_time
                   ? `${resultsTimeFormat(
                       milestone.old_best_avg_time,
@@ -169,7 +173,7 @@ const MilestoneItemContent: React.FC<MilestoneItemContentProps> = ({ milestone, 
                       true,
                     )}`
                   : milestone.result !== undefined
-                  ? `成绩: ${resultsTimeFormat(
+                  ? `${intl.formatMessage({ id: 'wca.milestone.result' })}: ${resultsTimeFormat(
                       milestone.result,
                       milestone.event_id || '333',
                       true,

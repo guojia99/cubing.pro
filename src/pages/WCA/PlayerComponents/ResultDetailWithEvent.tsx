@@ -9,6 +9,7 @@ import { formatAttempts, resultsTimeFormat } from '@/pages/WCA/utils/wca_results
 import { Space, Table, Tag } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import React from 'react';
+import { useIntl } from '@@/plugin-locale';
 import { findCubingCompetitionByIdentifier } from '@/services/cubing-pro/cubing_china/cubing';
 
 import ResultDetailWithRankingTimers from '@/pages/WCA/PlayerComponents/ResultWIthEventRankingTimers';
@@ -18,6 +19,7 @@ interface ResultDetailWithEventProps {
   eventID: string;
   wcaResults: WCAResult[];
   comps: WCACompetition[];
+  wcaRankTimer: StaticWithTimerRank[];
 }
 
 // 解析日期范围
@@ -25,21 +27,15 @@ const formatDateRange = (start: string, end: string): string => {
   return start === end ? start : `${start} ~ ${end}`;
 };
 
-interface ResultDetailWithEventProps {
-  eventID: string;
-  wcaResults: WCAResult[];
-  comps: WCACompetition[];
-  wcaRankTimer: StaticWithTimerRank[]
-}
-
 
 
 const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
   eventID,
   wcaResults,
   comps,
-                                                                       wcaRankTimer,
+  wcaRankTimer,
 }) => {
+  const intl = useIntl();
   // 按 competition_id 分组
   const resultsByComp = new Map<string, WCAResult[]>();
 
@@ -96,13 +92,8 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
 
   // 表格列定义
   const columns: ColumnsType<(typeof dataSource)[0]> = [
-    // {
-    //   title:'ID',
-    //   key: 'id',
-    //   dataIndex: 'id',
-    // },
     {
-      title: '比赛',
+      title: intl.formatMessage({ id: 'wca.results.competition' }),
       key: 'competition',
       width: 200,
       render: (_, record) => {
@@ -128,7 +119,7 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
       },
     },
     {
-      title: '轮次',
+      title: intl.formatMessage({ id: 'wca.results.round' }),
       dataIndex: 'round_type_id',
       key: 'round',
       width: 80,
@@ -143,7 +134,7 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
       },
     },
     {
-      title: '排名',
+      title: intl.formatMessage({ id: 'wca.results.rank' }),
       dataIndex: 'pos',
       key: 'pos',
       width: 50,
@@ -159,7 +150,7 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
       ),
     },
     {
-      title: '单次',
+      title: intl.formatMessage({ id: 'wca.results.single' }),
       dataIndex: 'best',
       key: 'best',
       width: 80,
@@ -193,8 +184,8 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
   ];
 
   if (eventID !== '333mbf'){
-    columns.push( {
-        title: '平均',
+    columns.push({
+        title: intl.formatMessage({ id: 'wca.results.average' }),
         dataIndex: 'average',
         key: 'average',
         width: 80,
@@ -242,7 +233,7 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
   }
   columns.push(
     {
-      title: '详细成绩',
+      title: intl.formatMessage({ id: 'wca.results.detailAttempts' }),
       key: 'attempts',
       width: 300,
       render: (_, record) => (
@@ -282,7 +273,11 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
 
 
   if (dataSource.length === 0) {
-    return <div style={{ color: '#999', fontStyle: 'italic' }}>暂无 {eventID} 项目成绩</div>;
+    return (
+      <div style={{ color: '#999', fontStyle: 'italic' }}>
+        {intl.formatMessage({ id: 'wca.results.noEventResults' }, { event: eventID })}
+      </div>
+    );
   }
 
   return (

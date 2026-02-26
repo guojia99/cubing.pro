@@ -3,6 +3,7 @@ import draws from "@/locales/zh-CN/draws";
 import home from "@/locales/zh-CN/home";
 import layout from "@/locales/zh-CN/layout";
 import algs from "@/locales/zh-CN/algs";
+import wca from "@/locales/zh-CN/wca";
 
 export default {
   'navBar.lang': '语言',
@@ -14,5 +15,6 @@ export default {
   ...draws,
   ...home,
   ...layout,
-  ...algs
+  ...algs,
+  ...wca
 };

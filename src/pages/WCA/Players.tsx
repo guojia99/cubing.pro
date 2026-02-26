@@ -3,6 +3,7 @@ import { getWCAPersons } from '@/services/cubing-pro/wca/player';
 import { WCAPerson } from '@/services/cubing-pro/wca/types';
 import React, { useState, useEffect, useRef } from 'react';
 import { Input, Table, Typography, Alert, Spin } from 'antd';
+import { useIntl } from '@@/plugin-locale';
 import { getCountryNameByIso2 } from '@/pages/WCA/PlayerComponents/region/all_contiry';
 
 const { Title } = Typography;
@@ -31,6 +32,7 @@ const inputStyle: React.CSSProperties = {
 };
 
 const WCAPlayerSearchPage: React.FC = () => {
+  const intl = useIntl();
   const [query, setQuery] = useState<string>('');
   const [results, setResults] = useState<WCAPerson[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -48,7 +50,7 @@ const WCAPlayerSearchPage: React.FC = () => {
     }
 
     if (trimmed.length > 32) {
-      setError('输入内容不能超过32个字符');
+      setError(intl.formatMessage({ id: 'wca.players.errorMaxLength' }));
       setResults([]);
       return;
     }
@@ -69,11 +71,11 @@ const WCAPlayerSearchPage: React.FC = () => {
           // API 返回了非预期结构（如 null, {}, {error: ...} 等）
           console.error('Unexpected API response:', data);
           setResults([]);
-          setError('查询结果格式异常，请稍后再试');
+          setError(intl.formatMessage({ id: 'wca.players.errorFormat' }));
         }
       } catch (err: any) {
         console.error('Search request failed:', err);
-        setError(err.message || '网络请求失败，请检查网络后重试');
+        setError(err.message || intl.formatMessage({ id: 'wca.players.errorNetwork' }));
         setResults([]);
       } finally {
         setLoading(false);
@@ -89,14 +91,14 @@ const WCAPlayerSearchPage: React.FC = () => {
 
   const columns = [
     {
-      title: 'WCA ID',
+      title: intl.formatMessage({ id: 'wca.players.wcaId' }),
       dataIndex: 'wca_id',
       key: 'wca_id',
       width: 150,
       render: (text: string) => WCALink(text, text),
     },
     {
-      title: '国家/地区',
+      title: intl.formatMessage({ id: 'wca.players.country' }),
       dataIndex: 'iso2',
       key: 'iso2',
       width: 120,
@@ -105,7 +107,7 @@ const WCAPlayerSearchPage: React.FC = () => {
       }
     },
     {
-      title: '名字',
+      title: intl.formatMessage({ id: 'wca.players.name' }),
       dataIndex: 'name',
       key: 'name',
       ellipsis: true,
@@ -113,14 +115,14 @@ const WCAPlayerSearchPage: React.FC = () => {
         WCALinkWithCnName(record.wca_id, record.name),
     },
     {
-      title: 'Gender',
+      title: intl.formatMessage({ id: 'wca.players.gender' }),
       dataIndex: 'gender',
       key: 'gender',
       width: 120,
       render: (gender: string) => {
-        if (gender === 'm') return '男';
-        if (gender === 'f') return '女';
-        return '外星人';
+        if (gender === 'm') return intl.formatMessage({ id: 'wca.players.genderMale' });
+        if (gender === 'f') return intl.formatMessage({ id: 'wca.players.genderFemale' });
+        return intl.formatMessage({ id: 'wca.players.genderOther' });
       },
     },
   ];
@@ -142,13 +144,13 @@ const WCAPlayerSearchPage: React.FC = () => {
       }}
     >
       <Title level={2} style={{ textAlign: 'center', marginBottom: 24 }}>
-        WCA 选手查询
+        {intl.formatMessage({ id: 'wca.players.title' })}
       </Title>
 
       <Input
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        placeholder="输入WCAID或名字"
+        placeholder={intl.formatMessage({ id: 'wca.players.placeholder' })}
         allowClear
         size="large"
         style={inputStyle}
@@ -157,7 +159,7 @@ const WCAPlayerSearchPage: React.FC = () => {
       {error && (
         <div style={{ marginTop: 16, width: '100%', maxWidth: 600 }}>
           <Alert
-            message="查询提示"
+            message={intl.formatMessage({ id: 'wca.players.queryTip' })}
             description={error}
             type="error"
             showIcon
@@ -169,7 +171,7 @@ const WCAPlayerSearchPage: React.FC = () => {
 
       {loading && results.length === 0 && (
         <div style={{ marginTop: 24 }}>
-          <Spin tip="搜索中..." />
+          <Spin tip={intl.formatMessage({ id: 'wca.players.searching' })} />
         </div>
       )}
 

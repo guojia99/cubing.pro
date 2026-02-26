@@ -3,6 +3,7 @@ import draws from "@/locales/ja-JP/draws";
 import home from "@/locales/ja-JP/home";
 import layout from "@/locales/ja-JP/layout";
 import algs from "@/locales/ja-JP/algs";
+import wca from "@/locales/ja-JP/wca";
 
 export default {
   'navBar.lang': '言語',
@@ -14,5 +15,6 @@ export default {
   ...draws,
   ...home,
   ...layout,
-  ...algs
+  ...algs,
+  ...wca
 };

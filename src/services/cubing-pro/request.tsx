@@ -2,7 +2,8 @@ import axios from "axios";
 import type {AxiosError, AxiosResponse} from 'axios';
 import {WarnToast} from "@/components/Alert/toast";
 
-const dev = false
+const dev = true
+
 
 export function getAPIUrl() {
   if (dev){
