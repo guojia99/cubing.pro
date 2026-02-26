@@ -25,4 +25,5 @@ export default {
   "menu.WCA.Players": "Persons",
 
   'menu.Algs': "Algs",
+  'menu.buyCoffee': "Buy Me a Coffee",
 }

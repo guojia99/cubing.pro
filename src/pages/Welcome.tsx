@@ -1,6 +1,6 @@
 import { FormattedMessage, getIntl } from '@@/exports';
 import { PageContainer } from '@ant-design/pro-components';
-import { Card, theme } from 'antd';
+import { Card, Image, theme } from 'antd';
 import React from 'react';
 
 const intl = getIntl();
@@ -71,6 +71,50 @@ const InfoCard: React.FC<CardProps> = ({ title, href, index, desc }) => {
         </a>
       </a>
     </div>
+  );
+};
+
+/**
+ * 请作者喝咖啡 - 主页快捷跳转组件（图片可点击放大）
+ */
+const BuyCoffeeQuickJump: React.FC = () => {
+  const { token } = theme.useToken();
+  return (
+    <Card
+      style={{
+        borderRadius: 8,
+        background: `linear-gradient(135deg, ${token.colorBgContainer} 0%, ${token.colorFillQuaternary} 100%)`,
+      }}
+    >
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24, alignItems: 'center' }}>
+        <Image
+          src="/coffee-icon.svg"
+          alt="请作者喝咖啡"
+          width={120}
+          height={120}
+          preview={{ mask: '点击放大' }}
+          style={{ cursor: 'pointer', borderRadius: 12 }}
+        />
+        <div style={{ flex: 1, minWidth: 200 }}>
+          <div style={{ fontSize: '20px', color: token.colorTextHeading, marginBottom: 8 }}>
+            ☕ {intl.formatMessage({ id: 'home.buyCoffee.title' })}
+          </div>
+          <p
+            style={{
+              fontSize: '14px',
+              color: token.colorTextSecondary,
+              lineHeight: '22px',
+              marginBottom: 16,
+            }}
+          >
+            {intl.formatMessage({ id: 'home.buyCoffee.cardDesc' })}
+          </p>
+          <a href="./buy-coffee" style={{ color: token.colorPrimary, fontWeight: 500 }}>
+            <FormattedMessage id="home.learn_more" /> {'>'}
+          </a>
+        </div>
+      </div>
+    </Card>
   );
 };
 
@@ -178,7 +222,34 @@ const Welcome: React.FC = () => {
         ]}
       />
 
-      <div style={{ marginTop: 30 }}></div>
+      <div style={{ marginTop: 30 }} />
+      <GroupInfoCards
+        groupName={'algs'}
+        title={intl.formatMessage({ id: 'home.welcome.algs.title' })}
+        desc={intl.formatMessage({ id: 'home.welcome.algs.desc' })}
+        childrens={[
+          {
+            index: 1,
+            href: './algs',
+            title: intl.formatMessage({ id: 'home.welcome.algs.list.title' }),
+            desc: intl.formatMessage({ id: 'home.welcome.algs.list.desc' }),
+          },
+          {
+            index: 2,
+            href: './algs/222/EG',
+            title: intl.formatMessage({ id: 'home.welcome.algs.eg.title' }),
+            desc: intl.formatMessage({ id: 'home.welcome.algs.eg.desc' }),
+          },
+          {
+            index: 3,
+            href: './algs/333/PLL',
+            title: intl.formatMessage({ id: 'home.welcome.algs.pll.title' }),
+            desc: intl.formatMessage({ id: 'home.welcome.algs.pll.desc' }),
+          },
+        ]}
+      />
+
+      <div style={{ marginTop: 30 }} />
       <GroupInfoCards
         groupName={'draw_tool'}
         title={intl.formatMessage({ id: 'home.welcome.draw.title' })}
@@ -216,6 +287,9 @@ const Welcome: React.FC = () => {
           },
         ]}
       />
+
+      <div style={{ marginTop: 30 }} />
+      <BuyCoffeeQuickJump />
     </PageContainer>
   );
 };

@@ -1,8 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { Card, Col, Divider, Empty, Row, Select, Spin } from 'antd';
+import React, { useEffect, useRef, useState } from 'react';
+import { Button, Card, Col, Divider, Empty, Row, Select, Spin, message } from 'antd';
+import { DownloadOutlined, UploadOutlined } from '@ant-design/icons';
 import { useIntl } from '@@/plugin-locale';
 import { useNavigate } from '@@/exports';
 import { getAlgCubeMap } from '@/services/cubing-pro/algs/algs';
+import {
+  exportPracticeConfig,
+  importPracticeConfig,
+} from '@/services/cubing-pro/algs/practiceConfigExport';
 import type { AlgorithmGroupsResponse, OutputClass } from '@/services/cubing-pro/algs/typings';
 import SvgRenderer from './components/SvgRenderer';
 import RandomPickModal from './components/RandomPickModal';
@@ -23,10 +28,51 @@ const RANDOM_PICK_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0
 const AlgsList: React.FC = () => {
   const intl = useIntl();
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [data, setData] = useState<AlgorithmGroupsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [filterCube, setFilterCube] = useState<string>('');
   const [randomPickModalOpen, setRandomPickModalOpen] = useState(false);
+
+  const handleExport = () => {
+    const config = exportPracticeConfig();
+    const blob = new Blob([JSON.stringify(config, null, 2)], {
+      type: 'application/json',
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `practice-config-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    message.success(intl.formatMessage({ id: 'algs.practiceConfig.exportSuccess' }));
+  };
+
+  const handleImport = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const text = reader.result as string;
+      const result = importPracticeConfig(text);
+      if (result.success) {
+        message.success(intl.formatMessage({ id: 'algs.practiceConfig.importSuccess' }));
+      } else {
+        message.error(
+          intl.formatMessage(
+            { id: 'algs.practiceConfig.importFailed' },
+            { msg: result.message ?? '' },
+          ),
+        );
+      }
+    };
+    reader.readAsText(file, 'UTF-8');
+    e.target.value = '';
+  };
 
   useEffect(() => {
     getAlgCubeMap()
@@ -52,11 +98,11 @@ const AlgsList: React.FC = () => {
   }
 
   return (
-    <div style={{ padding: '16px 0' }}>
+    <div className="algs-page-container" style={{ padding: '16px 0' }}>
       <h2 style={{ marginBottom: 16, color: 'rgba(0,0,0,0.85)' }}>
         {intl.formatMessage({ id: 'algs.title' })}
       </h2>
-      <div style={{ marginBottom: 16 }}>
+      <div style={{ marginBottom: 16, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12 }}>
         <Select
           placeholder={intl.formatMessage({ id: 'algs.filter.placeholder' })}
           allowClear
@@ -67,6 +113,27 @@ const AlgsList: React.FC = () => {
             { value: '', label: intl.formatMessage({ id: 'algs.filter.all' }) },
             ...cubeKeys.map((c) => ({ value: c, label: c })),
           ]}
+        />
+        <Button
+          icon={<DownloadOutlined />}
+          onClick={handleExport}
+          size="small"
+        >
+          {intl.formatMessage({ id: 'algs.practiceConfig.export' })}
+        </Button>
+        <Button
+          icon={<UploadOutlined />}
+          onClick={handleImport}
+          size="small"
+        >
+          {intl.formatMessage({ id: 'algs.practiceConfig.import' })}
+        </Button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".json,application/json"
+          style={{ display: 'none' }}
+          onChange={handleFileChange}
         />
       </div>
 

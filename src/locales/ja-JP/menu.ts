@@ -25,4 +25,5 @@ export default {
   "menu.WCA.Players": "選手",
 
   'menu.Algs': "公式库",
+  'menu.buyCoffee': "作者にコーヒーをおごる",
 }

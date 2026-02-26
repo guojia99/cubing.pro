@@ -1,9 +1,31 @@
 import React, { useMemo, useState } from 'react';
-import { Card, Modal, Table } from 'antd';
-import { BarChartOutlined } from '@ant-design/icons';
+import { Button, Card, Modal, Popconfirm, Table, message } from 'antd';
+import {
+  BarChartOutlined,
+  CheckCircleOutlined,
+  ThunderboltOutlined,
+  MinusCircleOutlined,
+  ExclamationCircleOutlined,
+  CloseCircleOutlined,
+} from '@ant-design/icons';
 import { useIntl } from '@@/plugin-locale';
-import { getFormulaPracticeHistory } from '@/services/cubing-pro/algs/formulaPracticeHistory';
+import {
+  getFormulaPracticeHistory,
+  clearFormulaPracticeHistory,
+} from '@/services/cubing-pro/algs/formulaPracticeHistory';
+import {
+  getFormulaProficiency,
+  type ProficiencyLevel,
+} from '@/services/cubing-pro/algs/formulaPracticeProficiency';
 import { ALGS_COLORS } from '../constants';
+
+const PROFICIENCY_DISPLAY: { value: ProficiencyLevel; icon: React.ReactNode; color: string }[] = [
+  { value: 'mastered', icon: <CheckCircleOutlined />, color: '#52c41a' },
+  { value: 'skilled', icon: <ThunderboltOutlined />, color: '#1890ff' },
+  { value: 'average', icon: <MinusCircleOutlined />, color: 'rgba(0,0,0,0.65)' },
+  { value: 'unskilled', icon: <ExclamationCircleOutlined />, color: '#faad14' },
+  { value: 'unknown', icon: <CloseCircleOutlined />, color: '#ff4d4f' },
+];
 
 interface PracticeHistoryStatsCardProps {
   cube: string;
@@ -27,6 +49,12 @@ const PracticeHistoryStatsCard: React.FC<PracticeHistoryStatsCardProps> = ({
 }) => {
   const intl = useIntl();
   const [modalOpen, setModalOpen] = useState(false);
+  const [clearTrigger, setClearTrigger] = useState(0);
+
+  const proficiencyMap = useMemo(
+    () => getFormulaProficiency(cube, classId),
+    [cube, classId, refreshKey],
+  );
 
   const stats = useMemo(() => {
     const records = getFormulaPracticeHistory(cube, classId);
@@ -61,7 +89,13 @@ const PracticeHistoryStatsCard: React.FC<PracticeHistoryStatsCardProps> = ({
     });
     items.sort((a, b) => b.count - a.count);
     return { items, total };
-  }, [cube, classId, refreshKey]);
+  }, [cube, classId, refreshKey, clearTrigger]);
+
+  const handleClearHistory = () => {
+    clearFormulaPracticeHistory(cube, classId);
+    setClearTrigger((n) => n + 1);
+    message.success(intl.formatMessage({ id: 'algs.practiceHistoryStats.clearSuccess' }));
+  };
 
   const columns = [
     {
@@ -84,6 +118,22 @@ const PracticeHistoryStatsCard: React.FC<PracticeHistoryStatsCardProps> = ({
       render: (_: unknown, row: FormulaStatsItem) => (
         <span style={{ fontWeight: 500 }}>{row.formulaName}</span>
       ),
+    },
+    {
+      title: intl.formatMessage({ id: 'algs.practiceHistoryStats.proficiency' }),
+      dataIndex: 'proficiency',
+      key: 'proficiency',
+      width: 120,
+      render: (_: unknown, row: FormulaStatsItem) => {
+        const level = proficiencyMap[row.formulaKey] ?? 'average';
+        const config = PROFICIENCY_DISPLAY.find((c) => c.value === level);
+        return config ? (
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ color: config.color }}>{config.icon}</span>
+            {intl.formatMessage({ id: `algs.formulaPractice.proficiency.${level}` })}
+          </span>
+        ) : null;
+      },
     },
     {
       title: intl.formatMessage({ id: 'algs.practiceHistoryStats.count' }),
@@ -144,7 +194,20 @@ const PracticeHistoryStatsCard: React.FC<PracticeHistoryStatsCardProps> = ({
         open={modalOpen}
         onCancel={() => setModalOpen(false)}
         title={intl.formatMessage({ id: 'algs.practiceHistoryStats.modalTitle' })}
-        footer={null}
+        footer={
+          stats.total > 0 ? (
+            <Popconfirm
+              title={intl.formatMessage({ id: 'algs.practiceHistoryStats.clearConfirm' })}
+              onConfirm={handleClearHistory}
+              okText={intl.formatMessage({ id: 'algs.practiceHistoryStats.clearConfirmOk' })}
+              cancelText={intl.formatMessage({ id: 'algs.practiceHistoryStats.clearConfirmCancel' })}
+            >
+              <Button danger size="small">
+                {intl.formatMessage({ id: 'algs.practiceHistoryStats.clearHistory' })}
+              </Button>
+            </Popconfirm>
+          ) : null
+        }
         width={880}
         styles={{ body: { maxHeight: 640, overflowY: 'auto' } }}
       >

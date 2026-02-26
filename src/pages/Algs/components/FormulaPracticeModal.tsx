@@ -108,7 +108,7 @@ const FormulaPracticeModal: React.FC<FormulaPracticeModalProps> = ({
 }) => {
   const intl = useIntl();
   const [phase, setPhase] = useState<'config' | 'practice'>('practice');
-  const [mode, setMode] = useState<FormulaPracticeMode>('sequential');
+  const [mode, setMode] = useState<FormulaPracticeMode>('weightedRandom');
   const [selectedFormulaKeys, setSelectedFormulaKeys] = useState<Set<string>>(new Set());
   const [scrambleSlots, setScrambleSlots] = useState<Array<{ algIdx: number; scrambleIdx: number }>>([]);
   const [currentSlotIndex, setCurrentSlotIndex] = useState(0);
@@ -813,7 +813,7 @@ const FormulaPracticeModal: React.FC<FormulaPracticeModalProps> = ({
               }}
               style={{ padding: 0 }}
             >
-              {intl.formatMessage({ id: 'algs.formulaPractice.viewAllHistory' })}
+              {intl.formatMessage({ id: 'algs.formulaPractice.viewAllHistory' })} ({history.length})
             </Button>
           </div>
           {history.length > 0 && (() => {

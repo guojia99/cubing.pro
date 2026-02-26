@@ -46,9 +46,9 @@ const AlgsFormulaCard: React.FC<AlgsFormulaCardProps> = ({
         animation: 'algsFloat 10s ease-in-out infinite',
         minHeight: CARD_MIN_HEIGHT,
       }}
-      bodyStyle={{ padding: 16, display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}
+      bodyStyle={{ padding: 16, display: 'flex', flexDirection: 'column', boxSizing: 'border-box', minWidth: 0, overflow: 'hidden' }}
     >
-      <div style={{ textAlign: 'center', flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ textAlign: 'center', flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
         <SvgRenderer
           svg={alg.image}
           maxWidth={180}

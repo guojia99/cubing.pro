@@ -54,14 +54,13 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     icon = <UserOutlined />;
   }
   return {
-    // 禁止手机端渲染
     fixSiderbar: true,
     siderMenuType: 'sub',
-    disableMobile: true,
-    contentWidth: 'Fluid', // 必须设为 Fluid 才能自定义宽度
+    disableMobile: false, // 支持手机端
+    contentWidth: 'Fluid',
     contentStyle: {
-      margin: '0 auto',   // 居中
-      padding: '16px 16px',  // 可选：增加内边距防止贴边
+      margin: '0 auto',
+      padding: '16px',
     },
 
     // 标准配置
@@ -95,30 +94,21 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
         <div
           style={{
             position: 'relative',
-            width: '100vw',
-            overflow: 'auto',
+            width: '100%',
+            maxWidth: '100%',
+            overflowX: 'hidden',
+            overflowY: 'auto',
             minHeight: '100vh',
           }}
         >
-          <div
-            // style={{
-            //   transform: `scale(${scale})`,
-            //   transformOrigin: 'top left',
-            //   width: containerWidth,
-            //   height: 'auto', // 避免高度塌陷
-            //   overflow: 'hidden',
-            //   position: 'relative',
-            // }}
-          >
-            <ScrollToTopButton />
-            <Row>
-              <Col xs={0} sm={0} md={0} lg={1} xl={2} xxl={2} />
-              <Col xs={24} sm={24} md={24} lg={22} xl={20} xxl={20}>
-                {children}
-              </Col>
-              <Col xs={0} sm={0} md={0} lg={1} xl={2} xxl={2} />
-            </Row>
-          </div>
+          <ScrollToTopButton />
+          <Row gutter={0}>
+            <Col xs={0} sm={0} md={0} lg={1} xl={2} xxl={2} />
+            <Col xs={24} sm={24} md={24} lg={22} xl={20} xxl={20} style={{ maxWidth: '100%' }}>
+              {children}
+            </Col>
+            <Col xs={0} sm={0} md={0} lg={1} xl={2} xxl={2} />
+          </Row>
         </div>
       );
     },

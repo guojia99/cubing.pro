@@ -67,7 +67,8 @@ const SvgRenderer: React.FC<SvgRendererProps> = ({
   return (
     <div
       style={{
-        width: maxWidth,
+        width: '100%',
+        maxWidth: maxWidth,
         aspectRatio: processed.ratio,
         maxHeight: maxHeight,
         margin: '0 auto',

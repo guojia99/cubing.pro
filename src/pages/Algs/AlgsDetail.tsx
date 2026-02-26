@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, Card, Col, Collapse, Drawer, Modal, Progress, Row, Slider, Spin, Statistic } from 'antd';
-import { ArrowLeftOutlined, BarChartOutlined, FilePdfOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, BarChartOutlined, FilePdfOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import { useIntl } from '@@/plugin-locale';
 import { useNavigate, useParams } from '@@/exports';
 import { getAlgCubeClass } from '@/services/cubing-pro/algs/algs';
@@ -172,7 +172,7 @@ const AlgsDetail: React.FC = () => {
   };
 
   return (
-    <div ref={topRef} style={{ padding: '16px 0', minHeight: '100vh' }}>
+    <div ref={topRef} className="algs-page-container" style={{ padding: '16px 0', minHeight: '100vh' }}>
       <div style={{ marginBottom: 20, textAlign: 'center' }}>
         <h2 style={{ margin: 0, fontSize: 22, fontWeight: 600 }}>
           {dcube} - {dclassId}
@@ -309,6 +309,38 @@ const AlgsDetail: React.FC = () => {
               }}
               onPickFormula={openModal}
             />
+          </Col>
+        )}
+        {flatAlgs.length > 0 && (
+          <Col xs={24} sm={12} md={8} lg={6}>
+            <Card
+              size="small"
+              style={{
+                borderRadius: 12,
+                backgroundColor: 'rgba(0, 185, 204, 0.25)',
+                borderColor: 'rgba(0, 185, 204, 0.5)',
+                cursor: 'pointer',
+              }}
+              bodyStyle={{ padding: 16 }}
+              onClick={() => setFormulaPracticeOpen(true)}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  color: 'rgba(0,0,0,0.85)',
+                }}
+              >
+                <PlayCircleOutlined style={{ color: 'rgba(0, 150, 170, 0.9)', fontSize: 18 }} />
+                <span style={{ fontWeight: 500 }}>
+                  {intl.formatMessage({ id: 'algs.formulaPractice.start' })}
+                </span>
+              </div>
+              <div style={{ marginTop: 8, fontSize: 12, color: 'rgba(0,0,0,0.5)' }}>
+                {intl.formatMessage({ id: 'algs.formulaPractice.title' })}
+              </div>
+            </Card>
           </Col>
         )}
         {flatAlgs.length > 0 && (
