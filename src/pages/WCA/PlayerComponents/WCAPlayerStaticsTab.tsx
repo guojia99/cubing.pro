@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card, Tabs } from 'antd';
+import './WCAPlayerStaticsTab.less';
 import { useIntl } from '@@/plugin-locale';
 import WCAPlayerStaticsTabResults from '@/pages/WCA/PlayerComponents/WCAPlayerStaticsTabResults';
 import CompetitionTable from '@/pages/WCA/PlayerComponents/WCAPlayerStaticsTabComps';
@@ -20,10 +21,11 @@ const WCAPlayerStaticsTab: React.FC<WCAPlayerStaticsTabProps> = ({ wcaProfile, w
   return (
     <Card
       hoverable
-      style={{ minWidth: 900, margin: '0 auto', borderRadius: 16, marginTop: 16 }}
+      style={{ width: '100%', margin: '0 auto', borderRadius: 16, marginTop: 16 }}
       bordered={false}
     >
       <Tabs
+        className="wca-player-statics-tab"
         defaultActiveKey="results"
         size="large"
         tabBarStyle={{ fontSize: 16, fontWeight: 'bold', paddingLeft: 16 }}

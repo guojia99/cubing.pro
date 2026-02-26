@@ -1,10 +1,11 @@
 import { NavTabs } from '@/components/Tabs/nav_tabs';
 import KinCh from '@/pages/Static/Kinsor';
-import { OrderedListOutlined, TrophyOutlined } from '@ant-design/icons';
+import { HistoryOutlined, OrderedListOutlined, TrophyOutlined } from '@ant-design/icons';
 import React from 'react';
 import Records from "@/pages/Static/Record";
 import DiyRanks from "@/pages/Static/DiyRanks";
 import DiyRankView from "@/pages/Static/DiyRanks";
+import HistoricalRank from '@/pages/WCA/HistoricalRank';
 
 const Static: React.FC = () => {
   const items = [
@@ -38,6 +39,12 @@ const Static: React.FC = () => {
       label: 'WCA成绩榜单',
       children: <DiyRankView />,
       icon: <OrderedListOutlined />,
+    },
+    {
+      key: 'historical_rank',
+      label: '历史排名',
+      children: <HistoricalRank />,
+      icon: <HistoryOutlined />,
     },
 
   ];

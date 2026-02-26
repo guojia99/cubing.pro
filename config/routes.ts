@@ -139,6 +139,7 @@ export default [
       { path: 'wca_comps', component: './Tools/Comps/WCAComps', name: 'wca_comps' },
       { path: 'player/:wcaId', component: './WCA/Player' },
       { path: 'players', component: './WCA/Players', name: 'Players' },
+      { path: 'historical-rank', component: './WCA/HistoricalRank', name: 'historicalRank' },
     ],
   },
 

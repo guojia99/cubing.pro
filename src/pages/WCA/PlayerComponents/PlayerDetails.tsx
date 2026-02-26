@@ -162,7 +162,7 @@ const WCAPlayerDetails: React.FC<WCAPlayerDetailsProps> = ({ wcaProfile, wcaResu
     <div className="wca-player-container">
       <Card
         hoverable
-        style={{ minWidth: 900, margin: '0 auto', borderRadius: 16 }}
+        style={{ width: '100%', margin: '0 auto', borderRadius: 16 }}
         bordered={false}
       >
         {/* 头像与姓名 */}
@@ -179,19 +179,23 @@ const WCAPlayerDetails: React.FC<WCAPlayerDetailsProps> = ({ wcaProfile, wcaResu
 
         <Divider style={{ margin: '16px 0' }} />
 
-        {/* 横向信息表格 */}
-        <Table
-          columns={columns}
-          dataSource={data}
-          pagination={false}
-          bordered
-          size="middle"
-          style={{
-            borderRadius: 8,
-            background: '#fff',
-            textAlign: 'center',
-          }}
-        />
+        {/* 横向信息表格 - 手机端可横向滚动 */}
+        <div style={{ overflowX: 'auto', margin: '0 -1px' }}>
+          <Table
+            columns={columns}
+            dataSource={data}
+            pagination={false}
+            bordered
+            size="middle"
+            scroll={{ x: 'max-content' }}
+            style={{
+              borderRadius: 8,
+              background: '#fff',
+              textAlign: 'center',
+              minWidth: 500,
+            }}
+          />
+        </div>
       </Card>
     </div>
   );

@@ -77,6 +77,18 @@ export default {
   'wca.results.detailAttempts': 'Attempts',
   'wca.results.competition': 'Competition',
 
+  // PR Streak
+  'wca.results.prStreakTitle': 'PR Streak (Consecutive PB)',
+  'wca.results.prStreakCurrent': 'Current streak',
+  'wca.results.prStreakLongest': 'Longest streak',
+  'wca.results.prStreakNone': '0 (none)',
+  'wca.results.prStreakCount': '{count} comps',
+  'wca.results.prStreakBreaks': 'Streak breaks',
+  'wca.results.prStreakBreakAt': 'Broken at',
+  'wca.results.prStreakBreakAtSuffix': '',
+  'wca.results.prStreakBreakPrev': 'Previous streak',
+  'wca.results.prStreakBreakPrevSuffix': '',
+
   // Milestone
   'wca.milestone.title': 'Player Milestones',
   'wca.milestone.count': '{count} milestones',
@@ -163,4 +175,12 @@ export default {
   'wca.chart.stdDev': 'Std dev',
   'wca.chart.compLabel': 'Competition',
   'wca.chart.maN': '{n}-attempt avg',
+
+  // HistoricalRank
+  'wca.historicalRank.title': 'Historical Ranks',
+  'wca.historicalRank.year': 'Year',
+  'wca.historicalRank.country': 'Country',
+  'wca.historicalRank.type': 'Type',
+  'wca.historicalRank.rank': 'Rank',
+  'wca.historicalRank.worldwide': 'Worldwide',
 };

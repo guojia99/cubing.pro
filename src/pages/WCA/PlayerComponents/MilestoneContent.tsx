@@ -1,6 +1,7 @@
 import { resultsTimeFormat } from '@/pages/WCA/utils/wca_results';
 import { Tag, Typography } from 'antd';
 import React from 'react';
+import './MilestoneContent.less';
 import { useIntl } from '@@/plugin-locale';
 import { Milestone, MilestoneType, getCompName } from './player_milestone';
 
@@ -64,11 +65,14 @@ const MilestoneItemContent: React.FC<MilestoneItemContentProps> = ({ milestone, 
         padding: '12px 16px',
         position: 'relative',
         wordBreak: 'break-word',
-        minWidth: '150px', // 设置最小宽度
+        width: '100%',
         maxWidth: '100%',
-        display: 'inline-flex',
+        minWidth: 0,
+        display: 'flex',
         flexDirection: 'column',
-        alignItems: isLeft ? 'flex-end' : 'flex-start', // 根据箭头方向调整对齐
+        alignItems: isLeft ? 'flex-end' : 'flex-start',
+        overflow: 'hidden',
+        boxSizing: 'border-box',
       }}
     >
       {/* 三角形箭头 */}
@@ -89,13 +93,16 @@ const MilestoneItemContent: React.FC<MilestoneItemContentProps> = ({ milestone, 
         {milestone.description}
       </Text>
 
-      {/* 使用 flex-wrap 容器让 Tag 自动换行 */}
+      {/* 使用 flex-wrap 容器让 Tag 自动换行，手机端防止溢出 */}
       <div
+        className="milestone-tag-container"
         style={{
-          display: 'inline-flex',
+          display: 'flex',
           flexWrap: 'wrap',
-          gap: '2px',
-          justifyContent: isLeft ? 'flex-end' : 'flex-start', // 根据箭头方向调整标签对齐
+          gap: '6px',
+          justifyContent: isLeft ? 'flex-end' : 'flex-start',
+          width: '100%',
+          minWidth: 0,
         }}
       >
         {milestone.record_type && (

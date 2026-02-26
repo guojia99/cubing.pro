@@ -1,8 +1,7 @@
 .wca-player-container {
-  min-width: 800px;
+  width: 100%;
   margin-bottom: 16px;
-  /*margin: 0 auto;*/
-  /*padding: 8px;*/
+  box-sizing: border-box;
 }
 
 .wca-player-container .header-section {
@@ -30,18 +29,26 @@
   align-items: center;
 }
 
-/* 响应式适配 */
-@media (max-width: 600px) {
+/* 响应式适配 - 手机端 */
+@media (max-width: 768px) {
   .wca-player-container {
-    padding: 10px;
+    padding: 0 4px;
   }
   .wca-player-container .ant-card {
     border-radius: 12px;
   }
   .wca-player-container .ant-table-cell {
-    padding: 12px 8px;
+    padding: 10px 6px;
   }
   .wca-player-container .ant-table {
-    font-size: 14px;
+    font-size: 13px;
+  }
+  .wca-player-container .header-section .ant-avatar {
+    width: 72px !important;
+    height: 72px !important;
+    line-height: 72px !important;
+  }
+  .wca-player-container .header-section .ant-typography {
+    font-size: 18px !important;
   }
 }

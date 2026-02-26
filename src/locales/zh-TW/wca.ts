@@ -77,6 +77,18 @@ export default {
   'wca.results.detailAttempts': '詳細成績',
   'wca.results.competition': '比賽',
 
+  // PR Streak
+  'wca.results.prStreakTitle': '持續刷 PB (PR Streak)',
+  'wca.results.prStreakCurrent': '當前 streak',
+  'wca.results.prStreakLongest': '歷史最長 streak',
+  'wca.results.prStreakNone': '0（暫無）',
+  'wca.results.prStreakCount': '{count} 場',
+  'wca.results.prStreakBreaks': 'Streak 中斷記錄',
+  'wca.results.prStreakBreakAt': '在',
+  'wca.results.prStreakBreakAtSuffix': '中斷',
+  'wca.results.prStreakBreakPrev': '此前連續',
+  'wca.results.prStreakBreakPrevSuffix': '刷 PB',
+
   // Milestone
   'wca.milestone.title': '選手里程碑',
   'wca.milestone.count': '共有 {count} 條里程碑',
@@ -163,4 +175,12 @@ export default {
   'wca.chart.stdDev': '標準差',
   'wca.chart.compLabel': '比賽',
   'wca.chart.maN': '{n}次平均',
+
+  // HistoricalRank 歷史排名
+  'wca.historicalRank.title': '歷史排名',
+  'wca.historicalRank.year': '年份',
+  'wca.historicalRank.country': '國家',
+  'wca.historicalRank.type': '類型',
+  'wca.historicalRank.rank': '排名',
+  'wca.historicalRank.worldwide': '全世界',
 };

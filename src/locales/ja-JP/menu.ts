@@ -23,6 +23,7 @@ export default {
 
   "menu.WCA": "WCA検索",
   "menu.WCA.Players": "選手",
+  'menu.WCA.historicalRank': "歴代ランキング",
 
   'menu.Algs': "公式库",
   'menu.buyCoffee': "作者にコーヒーをおごる",

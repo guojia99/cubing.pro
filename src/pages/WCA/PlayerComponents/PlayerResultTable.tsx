@@ -337,7 +337,7 @@ ${intl.formatMessage({ id: 'wca.resultTable.competitionCount' })}: ${wcaProfile.
   };
 
   return (
-    <Card hoverable style={{ minWidth: 900, margin: '0 auto', borderRadius: 16 }} bordered={false}>
+    <Card hoverable style={{ width: '100%', margin: '0 auto', borderRadius: 16 }} bordered={false}>
       <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 10 }}>
         <Tooltip title={intl.formatMessage({ id: 'wca.resultTable.copyTooltip' })}>
           <Button type="default" icon={<CopyOutlined />} size="small" onClick={handleCopy} />
@@ -354,7 +354,16 @@ ${intl.formatMessage({ id: 'wca.resultTable.competitionCount' })}: ${wcaProfile.
         />
       </div>
 
-      <div style={{ marginTop: 12, display: 'flex', gap: 8, float: 'right' }}>
+      <div
+        style={{
+          marginTop: 12,
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 8,
+          justifyContent: 'flex-end',
+          clear: 'both',
+        }}
+      >
         <Checkbox checked={showRank} onChange={(e) => setShowRank(e.target.checked)}>
           {intl.formatMessage({ id: 'wca.resultTable.showRank' })}
         </Checkbox>

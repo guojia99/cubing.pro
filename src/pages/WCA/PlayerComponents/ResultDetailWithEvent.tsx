@@ -1,4 +1,5 @@
 import WCAResultChart from '@/pages/WCA/PlayerComponents/WCAResultChart';
+import './ResultDetailWithEvent.less';
 import {
   getRecordColor,
   roundColorMap,
@@ -282,8 +283,12 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
 
   return (
     <>
-      <WCAResultChart data={wcaResults} eventId={eventID} comps={comps} />
-      <ResultDetailWithRankingTimers eventID={eventID} wcaRankTimer={wcaRankTimer} />
+      <div className="wca-chart-container">
+        <div className="wca-chart-inner">
+          <WCAResultChart data={wcaResults} eventId={eventID} comps={comps} />
+          <ResultDetailWithRankingTimers eventID={eventID} wcaRankTimer={wcaRankTimer} />
+        </div>
+      </div>
       <Table
         columns={columns}
         dataSource={dataSource}
