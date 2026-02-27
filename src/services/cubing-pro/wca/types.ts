@@ -14,6 +14,8 @@ export interface WCAResult {
   round_type_id: string; // 轮次类型 ID（如 1, 2, 3, f 等）
   format_id: string; // 比赛形式 ID（如 m=平均, a=单次, 3=三轮制等）
   wca_id: string; // WCA 唯一 ID
+  competition_name: string; // 比赛名称
+  competition_time?: string; // 比赛日期，如 "2025-6-22"
   attempts: number[]; // 五次尝试的成绩数组， 0 通常表示未完成（DNF）或未使用， -1,-2 代表DNF或DNS
   best_index: number; // 最佳成绩在 attempts 中的索引（从 0 开始）
   worst_index: number; // 最差成绩在 attempts 中的索引（从 0 开始）

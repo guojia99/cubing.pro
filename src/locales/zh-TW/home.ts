@@ -14,6 +14,15 @@ export default {
   "home.welcome.players.title": "玩家列表",
   "home.welcome.players.desc": "查看有哪些玩家，查詢你想了解的他們",
 
+  "home.welcome.wca.title": "WCA數據",
+  "home.welcome.wca.desc": "WCA 選手、排名、比賽等數據查詢與統計",
+  "home.welcome.wca.statistics.title": "WCA數據",
+  "home.welcome.wca.statistics.desc": "歷史排名、全部成績排行等統計資訊",
+  "home.welcome.wca.players.title": "WCA 選手",
+  "home.welcome.wca.players.desc": "查詢 WCA 選手資訊與成績",
+  "home.welcome.wca.comps.title": "附近比賽",
+  "home.welcome.wca.comps.desc": "查看附近的 WCA 比賽",
+
   "home.welcome.algs.title": "公式庫",
   "home.welcome.algs.desc": "公式庫包含了大量不同的公式、公式練習等，助力提升你的還原速度。",
   "home.welcome.algs.list.title": "公式庫",
@@ -49,6 +58,13 @@ export default {
   "home.buyCoffee.wechat.desc": "微信掃碼打賞",
   "home.buyCoffee.alipay": "支付寶",
   "home.buyCoffee.alipay.desc": "支付寶掃碼打賞",
+  "home.buyCoffee.remarkTip": "支付時請備註 WCA ID 或名稱，以便加入致謝名單",
   "home.buyCoffee.contact": "聯繫方式：",
   "home.buyCoffee.feedback": "如有建議或意見，歡迎透過郵箱聯繫～",
+
+  "home.thanks.title": "致謝",
+  "home.thanks.anonymous": "匿名",
+  "home.thanks.sponsorNote": "所收到的贊助將全部用於購買及維護伺服器",
+  "home.thanks.expand": "展開剩餘 {count} 人",
+  "home.thanks.collapse": "收起",
 }

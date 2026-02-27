@@ -2,6 +2,7 @@ import { FormattedMessage } from '@@/exports';
 import { PageContainer } from '@ant-design/pro-components';
 import { Card, Divider, Image, Space, Typography } from 'antd';
 import React, { useState } from 'react';
+import ThanksSection from '@/pages/Welcome/ThanksSection';
 
 const { Title, Paragraph } = Typography;
 
@@ -18,7 +19,16 @@ const QRImage: React.FC<{
       width={200}
       height={200}
       style={{ objectFit: 'contain' }}
-      preview={{ mask: '点击放大' }}
+      preview={{
+        mask: (
+          <div style={{ textAlign: 'center' }}>
+            <div>点击放大</div>
+            <div style={{ fontSize: 12, marginTop: 4, opacity: 0.9 }}>
+              <FormattedMessage id="home.buyCoffee.remarkTip" />
+            </div>
+          </div>
+        ),
+      }}
       onError={() => {
         if (nextIdxRef.current < sources.length) {
           const next = sources[nextIdxRef.current++];
@@ -60,12 +70,23 @@ const BuyCoffee: React.FC = () => {
         <Paragraph
           style={{
             fontSize: 16,
-            marginBottom: 32,
+            marginBottom: 16,
             textAlign: 'center',
             color: 'rgba(0,0,0,0.65)',
           }}
         >
           ✨ <FormattedMessage id="home.buyCoffee.desc" /> 💝
+        </Paragraph>
+        <Paragraph
+          style={{
+            fontSize: 14,
+            marginBottom: 32,
+            textAlign: 'center',
+            color: 'rgba(0,0,0,0.85)',
+            fontWeight: 500,
+          }}
+        >
+          📝 <FormattedMessage id="home.buyCoffee.remarkTip" />
         </Paragraph>
         <Space size="large" wrap style={{ justifyContent: 'center', width: '100%' }}>
           <Card
@@ -151,6 +172,8 @@ const BuyCoffee: React.FC = () => {
           <FormattedMessage id="home.buyCoffee.feedback" />
         </Paragraph>
       </Card>
+      <div style={{ marginTop: 30 }} />
+      <ThanksSection />
     </PageContainer>
   );
 };

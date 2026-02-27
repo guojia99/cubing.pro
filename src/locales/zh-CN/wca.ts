@@ -183,4 +183,11 @@ export default {
   'wca.historicalRank.type': '类型',
   'wca.historicalRank.rank': '排名',
   'wca.historicalRank.worldwide': '全世界',
+
+  // Stats 统计模块
+  'wca.stats.title': 'WCA数据',
+  'wca.stats.historicalRank': '历史排名',
+  'wca.stats.historicalRankDesc': '按年份查看历史排名',
+  'wca.stats.fullRank': '全部成绩排行',
+  'wca.stats.fullRankDesc': '查看所有成绩的完整排行',
 };

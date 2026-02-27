@@ -15,6 +15,15 @@ export default {
   "home.welcome.players.title": "プレイヤー一覧",
   "home.welcome.players.desc": "どんなプレイヤーがいるのかを確認し、気になる人を検索できます。",
 
+  "home.welcome.wca.title": "WCAデータ",
+  "home.welcome.wca.desc": "WCA選手、ランキング、大会などのデータ検索・統計",
+  "home.welcome.wca.statistics.title": "WCAデータ",
+  "home.welcome.wca.statistics.desc": "歴史ランキング、全成績ランキングなどの統計情報",
+  "home.welcome.wca.players.title": "WCA 選手",
+  "home.welcome.wca.players.desc": "WCA選手の情報と成績を検索",
+  "home.welcome.wca.comps.title": "近くの大会",
+  "home.welcome.wca.comps.desc": "近くのWCA大会を表示",
+
   "home.welcome.algs.title": "公式ライブラリ",
   "home.welcome.algs.desc": "公式ライブラリには様々な公式や練習問題が豊富に収録されており、タイム短縮に役立ちます。",
   "home.welcome.algs.list.title": "公式ライブラリ",
@@ -51,6 +60,13 @@ export default {
   "home.buyCoffee.wechat.desc": "WeChatでスキャンしてチップ",
   "home.buyCoffee.alipay": "Alipay",
   "home.buyCoffee.alipay.desc": "Alipayでスキャンしてチップ",
+  "home.buyCoffee.remarkTip": "お支払い時にWCA IDまたは名前を備考欄にご記入いただくと、謝辞リストに追加されます",
   "home.buyCoffee.contact": "連絡先：",
   "home.buyCoffee.feedback": "ご意見やご要望がございましたら、メールでお気軽にご連絡ください。",
+
+  "home.thanks.title": "謝辞",
+  "home.thanks.anonymous": "匿名",
+  "home.thanks.sponsorNote": "いただいたご支援はすべてサーバーの購入・維持に使用されます",
+  "home.thanks.expand": "残り {count} 人を表示",
+  "home.thanks.collapse": "折りたたむ",
 }

@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "致谢人数据结构",
+  "description": "致谢栏数据格式，方便后续添加新的致谢人",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["wcaID", "nickname", "amount"],
+    "properties": {
+      "wcaID": {
+        "type": "string",
+        "description": "WCA 选手 ID，如 2016XUWE02"
+      },
+      "nickname": {
+        "type": "string",
+        "description": "昵称或显示名称"
+      },
+      "amount": {
+        "type": "number",
+        "description": "赞助金额（人民币）"
+      },
+      "avatar": {
+        "type": "string",
+        "description": "头像 URL，留空则使用默认头像"
+      }
+    }
+  }
+}

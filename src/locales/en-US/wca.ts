@@ -183,4 +183,11 @@ export default {
   'wca.historicalRank.type': 'Type',
   'wca.historicalRank.rank': 'Rank',
   'wca.historicalRank.worldwide': 'Worldwide',
+
+  // Stats
+  'wca.stats.title': 'WCA Data',
+  'wca.stats.historicalRank': 'Historical Ranks',
+  'wca.stats.historicalRankDesc': 'View historical ranks by year',
+  'wca.stats.fullRank': 'Full Results Rank',
+  'wca.stats.fullRankDesc': 'View complete ranking of all results',
 };

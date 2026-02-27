@@ -1,0 +1,145 @@
+.full-rank {
+  padding: 16px;
+  max-width: 1000px;
+  margin: 0 auto;
+  box-sizing: border-box;
+
+  .filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 16px;
+
+    .filter-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      .filter-label {
+        white-space: nowrap;
+        font-size: 12px;
+      }
+
+      .filter-select.ant-select {
+        min-width: 100px;
+      }
+    }
+  }
+
+  .table-wrapper {
+    font-size: 12px;
+    width: 100%;
+  }
+
+  .competition-tag {
+    font-size: 12px;
+    line-height: 18px;
+    padding: 0 6px;
+    margin: 0;
+  }
+
+  // 详细成绩列：限制内容不溢出到相邻列
+  .ant-table-cell.attempts-col {
+    overflow: hidden;
+  }
+
+  .attempts-cell {
+    display: flex;
+    align-items: flex-start;
+    gap: 4px;
+    line-height: 1.4;
+    max-width: 100%;
+    overflow: hidden;
+
+    .attempts-toggle {
+      flex-shrink: 0;
+      cursor: pointer;
+      color: rgba(0, 0, 0, 0.45);
+      font-size: 10px;
+      padding: 2px 0;
+
+      &:hover {
+        color: rgba(0, 0, 0, 0.85);
+      }
+    }
+
+    .attempts-single-line {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
+    }
+
+    .attempts-detail {
+      flex: 1;
+      min-width: 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+      max-width: 100%;
+      // 横向滚动条，避免溢出
+      &::-webkit-scrollbar {
+        height: 4px;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .full-rank {
+    padding: 12px 8px;
+
+    .filter-row {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+      margin-bottom: 12px;
+
+      .filter-item {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 6px;
+        width: 100%;
+
+        .filter-label {
+          flex-shrink: 0;
+          min-width: 60px;
+          font-size: 12px;
+        }
+
+        .filter-select.ant-select {
+          flex: 1;
+          min-width: 0;
+        }
+      }
+    }
+
+    .table-wrapper {
+      width: 100%;
+      font-size: 11px;
+    }
+
+    .ant-table-cell {
+      padding: 6px 4px !important;
+    }
+
+    .ant-pagination {
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 8px 0;
+
+      .ant-pagination-options {
+        margin-left: 0;
+        margin-top: 6px;
+      }
+
+      .ant-pagination-item,
+      .ant-pagination-prev,
+      .ant-pagination-next {
+        min-width: 28px;
+      }
+    }
+  }
+}

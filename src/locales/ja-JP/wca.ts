@@ -183,4 +183,11 @@ export default {
   'wca.historicalRank.type': 'タイプ',
   'wca.historicalRank.rank': '順位',
   'wca.historicalRank.worldwide': '全世界',
+
+  // Stats 統計モジュール
+  'wca.stats.title': 'WCAデータ',
+  'wca.stats.historicalRank': '歴史ランキング',
+  'wca.stats.historicalRankDesc': '年別で歴史ランキングを表示',
+  'wca.stats.fullRank': '全成績ランキング',
+  'wca.stats.fullRankDesc': '全成績の完全ランキングを表示',
 };
