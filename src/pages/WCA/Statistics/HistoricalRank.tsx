@@ -100,6 +100,7 @@ const HistoricalRank: React.FC = () => {
       title: intl.formatMessage({ id: 'wca.players.name' }),
       dataIndex: 'wcaName',
       key: 'wcaName',
+      width: 200,
       ellipsis: true,
       render: (_: string, record: StaticWithTimerRank) =>
         WCALinkWithCnName(record.wcaId, record.wcaName),
@@ -153,6 +154,7 @@ const HistoricalRank: React.FC = () => {
         <div className="filter-item">
           <span className="filter-label">{intl.formatMessage({ id: 'wca.historicalRank.year' })}:</span>
           <Select
+            size="small"
             value={year}
             onChange={setYear}
             options={years.map((y) => ({ value: y, label: String(y) }))}
@@ -162,6 +164,7 @@ const HistoricalRank: React.FC = () => {
         <div className="filter-item">
           <span className="filter-label">{intl.formatMessage({ id: 'wca.players.country' })}:</span>
           <Select
+            size="small"
             value={country}
             onChange={(v) => {
               setCountry(v);
@@ -179,6 +182,7 @@ const HistoricalRank: React.FC = () => {
         <div className="filter-item">
           <span className="filter-label">{intl.formatMessage({ id: 'wca.resultTable.event' })}:</span>
           <Select
+            size="small"
             value={eventId}
             onChange={(v) => {
               setEventId(v);
@@ -198,6 +202,7 @@ const HistoricalRank: React.FC = () => {
           <div className="filter-item">
             <span className="filter-label">{intl.formatMessage({ id: 'wca.historicalRank.type' })}:</span>
             <Select
+              size="small"
               value={isAvg}
               onChange={(v) => {
                 setIsAvg(v);

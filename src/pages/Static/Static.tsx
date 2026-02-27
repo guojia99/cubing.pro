@@ -1,11 +1,11 @@
 import { NavTabs } from '@/components/Tabs/nav_tabs';
 import KinCh from '@/pages/Static/Kinsor';
-import { HistoryOutlined, OrderedListOutlined, TrophyOutlined } from '@ant-design/icons';
+import { BarChartOutlined, OrderedListOutlined, TrophyOutlined } from '@ant-design/icons';
 import React from 'react';
 import Records from "@/pages/Static/Record";
 import DiyRanks from "@/pages/Static/DiyRanks";
 import DiyRankView from "@/pages/Static/DiyRanks";
-import HistoricalRank from '@/pages/WCA/HistoricalRank';
+import Statistics from '@/pages/WCA/Statistics';
 
 const Static: React.FC = () => {
   const items = [
@@ -41,10 +41,10 @@ const Static: React.FC = () => {
       icon: <OrderedListOutlined />,
     },
     {
-      key: 'historical_rank',
-      label: '历史排名',
-      children: <HistoricalRank />,
-      icon: <HistoryOutlined />,
+      key: 'stats',
+      label: '统计',
+      children: <Statistics />,
+      icon: <BarChartOutlined />,
     },
 
   ];

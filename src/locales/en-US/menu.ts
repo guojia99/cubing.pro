@@ -23,7 +23,7 @@ export default {
 
   "menu.WCA": "WCA Lookup",
   "menu.WCA.Players": "Persons",
-  'menu.WCA.historicalRank': "Historical Ranking",
+  'menu.WCA.statistics': "Data",
 
   'menu.Algs': "Algs",
   'menu.buyCoffee': "Buy Me a Coffee",

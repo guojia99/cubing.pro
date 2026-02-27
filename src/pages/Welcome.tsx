@@ -1,14 +1,17 @@
-import { FormattedMessage, getIntl } from '@@/exports';
+import { FormattedMessage, getIntl, Link } from '@@/exports';
 import { PageContainer } from '@ant-design/pro-components';
 import { Card, Image, theme } from 'antd';
 import React from 'react';
+import ThanksSection from './Welcome/ThanksSection';
 
 const intl = getIntl();
+
 type CardProps = {
   title: string;
   index: number;
   desc: string;
   href: string;
+  internal?: boolean;
 };
 
 /**
@@ -16,10 +19,48 @@ type CardProps = {
  * @param param0
  * @returns
  */
-const InfoCard: React.FC<CardProps> = ({ title, href, index, desc }) => {
+const InfoCard: React.FC<CardProps> = ({ title, href, index, desc, internal }) => {
   const { useToken } = theme;
 
   const { token } = useToken();
+
+  const content = (
+    <>
+      <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+        <div
+          style={{
+            width: 48,
+            height: 48,
+            lineHeight: '22px',
+            backgroundSize: '100%',
+            textAlign: 'center',
+            padding: '8px 16px 16px 12px',
+            color: '#FFF',
+            fontWeight: 'bold',
+            backgroundImage:
+              "url('https://gw.alipayobjects.com/zos/bmw-prod/daaf8d50-8e6d-4251-905d-676a24ddfa12.svg')",
+          }}
+        >
+          {index}
+        </div>
+        <div style={{ fontSize: '16px', color: token.colorText, paddingBottom: 8 }}>{title}</div>
+      </div>
+      <div
+        style={{
+          fontSize: '14px',
+          color: token.colorTextSecondary,
+          textAlign: 'justify',
+          lineHeight: '22px',
+          marginBottom: 8,
+        }}
+      >
+        {desc}
+      </div>
+      <span>
+        <FormattedMessage id="home.learn_more" /> {'>'}
+      </span>
+    </>
+  );
 
   return (
     <div
@@ -35,41 +76,15 @@ const InfoCard: React.FC<CardProps> = ({ title, href, index, desc }) => {
         flex: 1,
       }}
     >
-      <a href={href} target="_blank" rel="noreferrer">
-        <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
-          <div
-            style={{
-              width: 48,
-              height: 48,
-              lineHeight: '22px',
-              backgroundSize: '100%',
-              textAlign: 'center',
-              padding: '8px 16px 16px 12px',
-              color: '#FFF',
-              fontWeight: 'bold',
-              backgroundImage:
-                "url('https://gw.alipayobjects.com/zos/bmw-prod/daaf8d50-8e6d-4251-905d-676a24ddfa12.svg')",
-            }}
-          >
-            {index}
-          </div>
-          <div style={{ fontSize: '16px', color: token.colorText, paddingBottom: 8 }}>{title}</div>
-        </div>
-        <div
-          style={{
-            fontSize: '14px',
-            color: token.colorTextSecondary,
-            textAlign: 'justify',
-            lineHeight: '22px',
-            marginBottom: 8,
-          }}
-        >
-          {desc}
-        </div>
+      {internal ? (
+        <Link to={href} style={{ color: 'inherit', textDecoration: 'none' }}>
+          {content}
+        </Link>
+      ) : (
         <a href={href} target="_blank" rel="noreferrer">
-          <FormattedMessage id="home.learn_more" /> {'>'}
+          {content}
         </a>
-      </a>
+      )}
     </div>
   );
 };
@@ -92,7 +107,16 @@ const BuyCoffeeQuickJump: React.FC = () => {
           alt="请作者喝咖啡"
           width={120}
           height={120}
-          preview={{ mask: '点击放大' }}
+          preview={{
+            mask: (
+              <div style={{ textAlign: 'center' }}>
+                <div>点击放大</div>
+                <div style={{ fontSize: 12, marginTop: 4, opacity: 0.9 }}>
+                  {intl.formatMessage({ id: 'home.buyCoffee.remarkTip' })}
+                </div>
+              </div>
+            ),
+          }}
           style={{ cursor: 'pointer', borderRadius: 12 }}
         />
         <div style={{ flex: 1, minWidth: 200 }}>
@@ -182,6 +206,7 @@ const GroupInfoCards: React.FC<{
                 href={item.href}
                 title={item.title}
                 desc={item.desc}
+                internal={item.internal}
               />
             ))}
           </div>
@@ -196,6 +221,7 @@ const Welcome: React.FC = () => {
   // const {initialState} = useModel('@@initialState');
   return (
     <PageContainer>
+      <ThanksSection />
       <GroupInfoCards
         groupName={'welcome'}
         title={intl.formatMessage({ id: 'home.welcome.title' })}
@@ -218,6 +244,36 @@ const Welcome: React.FC = () => {
             title: intl.formatMessage({ id: 'home.welcome.players.title' }),
             href: './groupCompetitions/players',
             desc: intl.formatMessage({ id: 'home.welcome.players.desc' }),
+          },
+        ]}
+      />
+
+      <div style={{ marginTop: 30 }} />
+      <GroupInfoCards
+        groupName={'wca'}
+        title={intl.formatMessage({ id: 'home.welcome.wca.title' })}
+        desc={intl.formatMessage({ id: 'home.welcome.wca.desc' })}
+        childrens={[
+          {
+            index: 1,
+            href: '/wca/statistics',
+            title: intl.formatMessage({ id: 'home.welcome.wca.statistics.title' }),
+            desc: intl.formatMessage({ id: 'home.welcome.wca.statistics.desc' }),
+            internal: true,
+          },
+          {
+            index: 2,
+            href: '/wca/players',
+            title: intl.formatMessage({ id: 'home.welcome.wca.players.title' }),
+            desc: intl.formatMessage({ id: 'home.welcome.wca.players.desc' }),
+            internal: true,
+          },
+          {
+            index: 3,
+            href: '/wca/wca_comps',
+            title: intl.formatMessage({ id: 'home.welcome.wca.comps.title' }),
+            desc: intl.formatMessage({ id: 'home.welcome.wca.comps.desc' }),
+            internal: true,
           },
         ]}
       />

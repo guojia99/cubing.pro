@@ -69,6 +69,34 @@ export function get333MBFResult(inValue: number): {
 }
 
 /**
+ * 解析 333mbo 成绩（与 333mbf 同格式，但 99999 表示未知时间，用于排序比较）
+ */
+export function get333MBOResult(inValue: number): {
+  solved: number;
+  attempted: number;
+  seconds: number;
+  formattedTime: string;
+} {
+  const str = inValue.toString().padStart(7, '0');
+  const diff = parseInt(str.substring(0, 2), 10);
+  const timePart = str.substring(2, 7);
+  const missed = parseInt(str.substring(7) || '0', 10);
+
+  let seconds: number;
+  if (timePart === '99999') {
+    seconds = 99999; // 333mbo 中 99999 表示未知时间
+  } else {
+    seconds = parseInt(timePart, 10);
+  }
+
+  const solved = 99 - diff + missed;
+  const attempted = solved + missed;
+  const formattedTime = seconds === 99999 ? '?' : secondTimeFormat(seconds, true);
+
+  return { solved, attempted, seconds, formattedTime };
+}
+
+/**
  * 格式化 WCA 比赛成绩
  * @param value - 原始成绩（单位：百分之一秒）
  * @param event - 项目 ID（如 '333', '333fm', '333mbf'）
@@ -109,7 +137,6 @@ export function resultsTimeFormat(value: number, event: string, isAvg: boolean):
       return secondTimeFormat(seconds, false);
   }
 }
-
 // 格式化 attempts 显示（高亮最佳与最差）
 export const formatAttempts = (
   attempts: number[],
@@ -117,30 +144,32 @@ export const formatAttempts = (
   best_index: number,
   worst_index: number,
 ): JSX.Element => {
-  let cellWidth = 75; // 每个成绩单元格固定宽度
+  let cellWidth = 75; // 默认单元格宽度
 
-  const len = attempts.filter((v) => v !== 0).length;
+  const validAttempts = attempts.filter((v) => v !== 0);
+  const len = validAttempts.length;
 
-  const items = attempts.map((time, i) => {
+  if (len === 3) {
+    cellWidth = 100;
+  }
+  if (eventId === '333mbf') {
+    cellWidth = 120;
+  }
+
+  // 构建所有非零 attempt 的 JSX 元素（带索引信息）
+  const itemElements = attempts.map((time, i) => {
     if (time === 0) {
-      return <span key={i}></span>;
+      return null; // 不渲染占位，或可返回 <span key={i} style={{ width: cellWidth }}></span>
     }
 
     const formatted = resultsTimeFormat(time, eventId, false);
-
     let displayText = formatted;
 
-    // 仅在 attempts.length === 5 时，对最佳和最差加括号
+    // 仅在有效尝试数为5时，给 best/worst 加括号
     if (len === 5) {
-      if (i === best_index) displayText = `(${formatted})`;
-      else if (i === worst_index) displayText = `(${formatted})`;
-    }
-
-    if (len === 3){
-      cellWidth = 100
-    }
-    if (eventId === '333mbf'){
-      cellWidth = 120
+      if (i === best_index || i === worst_index) {
+        displayText = `(${formatted})`;
+      }
     }
 
     return (
@@ -157,7 +186,18 @@ export const formatAttempts = (
         {displayText}
       </span>
     );
-  });
+  }).filter(Boolean); // 移除 null（即 time === 0 的项）
 
-  return <div style={{ display: 'flex', gap: 1 }}>{items}</div>;
+  // 将 itemElements 每5个分一组
+  const rows: JSX.Element[] = [];
+  for (let i = 0; i < itemElements.length; i += 5) {
+    const group = itemElements.slice(i, i + 5);
+    rows.push(
+      <div key={i} style={{ display: 'flex', gap: 1 }}>
+        {group}
+      </div>
+    );
+  }
+
+  return <div>{rows}</div>;
 };
