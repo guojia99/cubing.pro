@@ -138,11 +138,13 @@ export function resultsTimeFormat(value: number, event: string, isAvg: boolean):
   }
 }
 // 格式化 attempts 显示（高亮最佳与最差）
+// wrapLayout: true 时多个成绩可换行（Statistics 表格展开用），false 时固定每行 5 个（个人主页用）
 export const formatAttempts = (
   attempts: number[],
   eventId: string,
   best_index: number,
   worst_index: number,
+  wrapLayout = false,
 ): JSX.Element => {
   let cellWidth = 75; // 默认单元格宽度
 
@@ -175,12 +177,17 @@ export const formatAttempts = (
     return (
       <span
         key={i}
+        title={formatted}
         style={{
           display: 'inline-block',
-          width: cellWidth,
+          flexShrink: 0,
+          minWidth: cellWidth,
           textAlign: 'left',
           fontWeight: len === 5 && (i === best_index || i === worst_index) ? 800 : 500,
           fontFamily: 'monospace',
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
         }}
       >
         {displayText}
@@ -188,16 +195,24 @@ export const formatAttempts = (
     );
   }).filter(Boolean); // 移除 null（即 time === 0 的项）
 
-  // 将 itemElements 每5个分一组
-  const rows: JSX.Element[] = [];
-  for (let i = 0; i < itemElements.length; i += 5) {
-    const group = itemElements.slice(i, i + 5);
-    rows.push(
-      <div key={i} style={{ display: 'flex', gap: 1 }}>
-        {group}
+  if (wrapLayout) {
+    // Statistics 表格展开：每个成绩不换行，多个成绩可自动换到下一行
+    return (
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 8px' }}>
+        {itemElements}
       </div>
     );
   }
 
-  return <div>{rows}</div>;
+  // 个人主页：固定每行 5 个成绩
+  const rows: JSX.Element[] = [];
+  for (let i = 0; i < itemElements.length; i += 5) {
+    const group = itemElements.slice(i, i + 5);
+    rows.push(
+      <div key={i} style={{ display: 'flex', gap: 8 }}>
+        {group}
+      </div>
+    );
+  }
+  return <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>{rows}</div>;
 };

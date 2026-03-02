@@ -190,4 +190,14 @@ export default {
   'wca.stats.historicalRankDesc': 'View historical ranks by year',
   'wca.stats.fullRank': 'Full Results Rank',
   'wca.stats.fullRankDesc': 'View complete ranking of all results',
+  'wca.stats.yearlyFullRank': 'Yearly Results Rank',
+  'wca.stats.yearlyFullRankDesc': 'View complete ranking of results for a specific year and event',
+  'wca.stats.successRate': 'Event Success Rate',
+  'wca.stats.successRateDesc': 'View success rate ranking by event',
+
+  // Success Rate
+  'wca.successRate.solved': 'Solved',
+  'wca.successRate.attempted': 'Attempted',
+  'wca.successRate.percentage': 'Success Rate',
+  'wca.successRate.minAttempted': 'Min Attempted',
 };

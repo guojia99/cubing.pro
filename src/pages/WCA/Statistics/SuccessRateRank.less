@@ -1,4 +1,4 @@
-.full-rank {
+.success-rate-rank {
   padding: 16px;
   max-width: 1000px;
   margin: 0 auto;
@@ -24,6 +24,17 @@
       .filter-select.ant-select {
         min-width: 100px;
       }
+
+      &.filter-item-min-attempted {
+        flex-wrap: wrap;
+        gap: 8px;
+        .filter-input-number {
+          flex-shrink: 0;
+        }
+        .filter-presets {
+          flex-wrap: wrap;
+        }
+      }
     }
   }
 
@@ -31,61 +42,10 @@
     font-size: 12px;
     width: 100%;
   }
-
-  .competition-tag {
-    font-size: 12px;
-    line-height: 18px;
-    padding: 0 6px;
-    margin: 0;
-  }
-
-  // 详细成绩列：限制内容不溢出到相邻列
-  .ant-table-cell.attempts-col {
-    overflow: hidden;
-  }
-
-  .attempts-cell {
-    display: flex;
-    align-items: flex-start;
-    gap: 4px;
-    line-height: 1.4;
-    max-width: 100%;
-
-    &:not(.expanded) {
-      overflow: hidden;
-    }
-
-    .attempts-toggle {
-      flex-shrink: 0;
-      cursor: pointer;
-      color: rgba(0, 0, 0, 0.45);
-      font-size: 10px;
-      padding: 2px 0;
-
-      &:hover {
-        color: rgba(0, 0, 0, 0.85);
-      }
-    }
-
-    .attempts-single-line {
-      flex: 1;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      min-width: 0;
-    }
-
-    .attempts-detail {
-      flex: 1;
-      min-width: 0;
-      max-width: 100%;
-      overflow: visible;
-    }
-  }
 }
 
 @media (max-width: 768px) {
-  .full-rank {
+  .success-rate-rank {
     padding: 12px 8px;
 
     .filter-row {
@@ -110,6 +70,13 @@
         .filter-select.ant-select {
           flex: 1;
           min-width: 0;
+        }
+
+        &.filter-item-min-attempted {
+          .filter-presets {
+            flex: 1;
+            min-width: 0;
+          }
         }
       }
     }

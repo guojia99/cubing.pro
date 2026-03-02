@@ -5,13 +5,13 @@ import { getCountryNameByIso2 } from '@/pages/WCA/PlayerComponents/region/all_co
 import { formatAttempts, get333MBFResult, get333MBOResult, resultsTimeFormat } from '@/pages/WCA/utils/wca_results';
 import { eventOrder } from '@/pages/WCA/utils/events';
 import { CountryList } from '@/services/cubing-pro/wca/country';
-import { GetEventRankWithFullNow } from '@/services/cubing-pro/wca/static';
+import { GetEventRankWithOnlyYear } from '@/services/cubing-pro/wca/static';
 import { Country, WCAResult } from '@/services/cubing-pro/wca/types';
 import { Select, Table, Spin, Space, Tag } from 'antd';
 import { DownOutlined, RightOutlined } from '@ant-design/icons';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useIntl } from '@@/plugin-locale';
-import './FullRank.less';
+import './YearlyFullRank.less';
 
 const WORLD_KEY = '__world__';
 const DEFAULT_PAGE_SIZE = 50;
@@ -19,7 +19,6 @@ const PAGE_SIZE_OPTIONS = [20, 50, 100];
 
 /** 判断 a1 是否优于或等于 a2（用于排序：a1 更好时返回 true） */
 function isBestResult(event: string, a1: number, a2: number): boolean {
-  // DNF/DNS（负数）
   if (a1 < 0 && a2 < 0) return true;
   if (a1 < 0 && a2 > 0) return false;
   if (a2 < 0 && a1 > 0) return true;
@@ -49,7 +48,7 @@ function isBestResult(event: string, a1: number, a2: number): boolean {
   }
 }
 
-/** 为成绩列表分配排名，相同成绩同排名，后续按实际位置；offset 为分页偏移（如第2页 offset=50） */
+/** 为成绩列表分配排名，相同成绩同排名，后续按实际位置；offset 为分页偏移 */
 function assignRanks(
   items: WCAResult[],
   eventId: string,
@@ -103,7 +102,6 @@ function formatAttemptsSingleLine(
   return <span className="attempts-single-line" style={{ fontFamily: 'monospace' }}>{parts}</span>;
 }
 
-/** 格式化比赛日期，补全月份和日期前导 0，如 "2025-6-22" -> "2025-06-22" */
 function formatCompetitionTime(timeStr: string | undefined): string {
   if (!timeStr || typeof timeStr !== 'string') return '';
   const parts = timeStr.trim().split(/[-/\s]+/).map((p) => p.trim()).filter(Boolean);
@@ -113,8 +111,12 @@ function formatCompetitionTime(timeStr: string | undefined): string {
   return `${y}-${pad(m)}-${pad(d)}`;
 }
 
-const FullRank: React.FC = () => {
+const YearlyFullRank: React.FC = () => {
   const intl = useIntl();
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: currentYear - 2006 }, (_, i) => 2007 + i).reverse();
+
+  const [year, setYear] = useState<number>(currentYear);
   const [country, setCountry] = useState<string>(WORLD_KEY);
   const [eventId, setEventId] = useState<string>('333');
   const [isAvg, setIsAvg] = useState<boolean>(false);
@@ -142,7 +144,7 @@ const FullRank: React.FC = () => {
   useEffect(() => {
     setLoading(true);
     const countryParam = country === WORLD_KEY ? '' : country;
-    GetEventRankWithFullNow(eventId, countryParam, isAvg, page, pageSize)
+    GetEventRankWithOnlyYear(eventId, year, countryParam, isAvg, page, pageSize)
       .then((res) => {
         setData(res.data || []);
         setTotal(res.total || 0);
@@ -152,7 +154,7 @@ const FullRank: React.FC = () => {
         setTotal(0);
       })
       .finally(() => setLoading(false));
-  }, [country, eventId, isAvg, page, pageSize]);
+  }, [year, country, eventId, isAvg, page, pageSize]);
 
   const rankedData = useMemo(
     () => assignRanks(data, eventId, isAvg, (page - 1) * pageSize),
@@ -162,7 +164,7 @@ const FullRank: React.FC = () => {
   const singleCol = {
     title: intl.formatMessage({ id: 'wca.resultTable.single' }),
     key: 'single',
-    width: eventId === "333mbf" ? 120 : 85,
+    width: eventId === '333mbf' ? 120 : 85,
     render: (_: unknown, record: WCAResult) => (
       <span style={{ fontWeight: !isAvg ? 600 : 400 }}>
         {resultsTimeFormat(record.best, eventId, false)}
@@ -212,7 +214,6 @@ const FullRank: React.FC = () => {
     {
       title: intl.formatMessage({ id: 'wca.results.detailAttempts' }),
       key: 'attempts',
-      // width: eventId === '333mbf' ? 180 : 160,
       onCell: () => ({ className: 'attempts-col' }),
       render: (_: unknown, record: WCAResult) => {
         const expanded = expandedAttempts.has(record.id);
@@ -294,8 +295,21 @@ const FullRank: React.FC = () => {
   ];
 
   return (
-    <div className="full-rank">
+    <div className="yearly-full-rank">
       <div className="filter-row">
+        <div className="filter-item">
+          <span className="filter-label">{intl.formatMessage({ id: 'wca.historicalRank.year' })}:</span>
+          <Select
+            size="small"
+            value={year}
+            onChange={(v) => {
+              setYear(v);
+              setPage(1);
+            }}
+            options={years.map((y) => ({ value: y, label: String(y) }))}
+            className="filter-select"
+          />
+        </div>
         <div className="filter-item">
           <span className="filter-label">{intl.formatMessage({ id: 'wca.players.country' })}:</span>
           <Select
@@ -383,4 +397,4 @@ const FullRank: React.FC = () => {
   );
 };
 
-export default FullRank;
+export default YearlyFullRank;

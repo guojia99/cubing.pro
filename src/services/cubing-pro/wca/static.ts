@@ -1,6 +1,6 @@
 import { AuthHeader } from '@/services/cubing-pro/auth/token';
 import { Request } from '@/services/cubing-pro/request';
-import { StaticWithTimerRank, WCAResult } from '@/services/cubing-pro/wca/types';
+import { StaticSuccessRateResult, StaticWithTimerRank, WCAResult } from '@/services/cubing-pro/wca/types';
 
 export async function GetEventRankTimers(
   eventID: string,
@@ -17,7 +17,7 @@ export async function GetEventRankTimers(
     data: StaticWithTimerRank[];
     total: number;
   }>(
-    `/wca/ranks/historical/${eventID}`,
+    `/wca/ranks/historical/full/${eventID}`,
     {
       year: year,
       country: country,
@@ -53,6 +53,66 @@ export async function GetEventRankWithFullNow(
       is_avg: is_avg,
       page: page,
       size: size,
+    },
+    {
+      headers: AuthHeader(),
+    },
+  );
+  return response.data;
+}
+
+
+export async function GetEventRankWithOnlyYear(
+  eventID: string,
+  year: number,
+  country: string,
+  is_avg: boolean,
+  page: number,
+  size: number,
+): Promise<{
+  data: WCAResult[];
+  total: number;
+}> {
+  const response = await Request.post<{
+    data: WCAResult[];
+    total: number;
+  }>(
+    `/wca/ranks/historical/${eventID}`,
+    {
+      year: year,
+      country: country,
+      is_avg: is_avg,
+      page: page,
+      size: size,
+    },
+    {
+      headers: AuthHeader(),
+    },
+  );
+  return response.data;
+}
+
+
+export async function GetStaticSuccessRateResult(
+  eventID: string,
+  country: string,
+  page: number,
+  size: number,
+  minAttempted: number = 3,
+): Promise<{
+  data: StaticSuccessRateResult[];
+  total: number;
+}> {
+  const response = await Request.post<{
+    data: StaticSuccessRateResult[];
+    total: number;
+  }>(
+    `/wca/ranks/success_rate/${eventID}`,
+    {
+      country: country,
+      page: page,
+      size: size,
+      min_attempted: minAttempted,
     },
     {
       headers: AuthHeader(),

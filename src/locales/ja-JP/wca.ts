@@ -190,4 +190,14 @@ export default {
   'wca.stats.historicalRankDesc': '年別で歴史ランキングを表示',
   'wca.stats.fullRank': '全成績ランキング',
   'wca.stats.fullRankDesc': '全成績の完全ランキングを表示',
+  'wca.stats.yearlyFullRank': '年間成績ランキング',
+  'wca.stats.yearlyFullRankDesc': '特定年の特定種目の完全成績ランキングを表示',
+  'wca.stats.successRate': '種目成功率',
+  'wca.stats.successRateDesc': '種目別の成功率ランキングを表示',
+
+  // Success Rate 成功率
+  'wca.successRate.solved': '成功数',
+  'wca.successRate.attempted': '試行数',
+  'wca.successRate.percentage': '成功率',
+  'wca.successRate.minAttempted': '最小試行数',
 };
