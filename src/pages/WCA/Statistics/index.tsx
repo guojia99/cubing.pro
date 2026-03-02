@@ -1,14 +1,16 @@
-import { HistoryOutlined, UnorderedListOutlined } from '@ant-design/icons';
+import { HistoryOutlined, UnorderedListOutlined, CalendarOutlined, RiseOutlined } from '@ant-design/icons';
 import { Card, Typography } from 'antd';
 import React, { useState } from 'react';
 import { useIntl } from '@@/plugin-locale';
 import FullRank from './FullRank';
 import HistoricalRank from './HistoricalRank';
+import YearlyFullRank from './YearlyFullRank';
+import SuccessRateRank from './SuccessRateRank';
 import './index.less';
 
 const { Title } = Typography;
 
-type StatsTabKey = 'historical' | 'full';
+type StatsTabKey = 'historical' | 'full' | 'yearlyFull' | 'successRate';
 
 const Statistics: React.FC = () => {
   const intl = useIntl();
@@ -26,6 +28,18 @@ const Statistics: React.FC = () => {
       icon: <UnorderedListOutlined />,
       title: intl.formatMessage({ id: 'wca.stats.fullRank' }),
       desc: intl.formatMessage({ id: 'wca.stats.fullRankDesc' }),
+    },
+    {
+      key: 'yearlyFull' as StatsTabKey,
+      icon: <CalendarOutlined />,
+      title: intl.formatMessage({ id: 'wca.stats.yearlyFullRank' }),
+      desc: intl.formatMessage({ id: 'wca.stats.yearlyFullRankDesc' }),
+    },
+    {
+      key: 'successRate' as StatsTabKey,
+      icon: <RiseOutlined />,
+      title: intl.formatMessage({ id: 'wca.stats.successRate' }),
+      desc: intl.formatMessage({ id: 'wca.stats.successRateDesc' }),
     },
   ];
 
@@ -56,6 +70,8 @@ const Statistics: React.FC = () => {
       <div className="stats-content">
         {activeKey === 'historical' && <HistoricalRank />}
         {activeKey === 'full' && <FullRank />}
+        {activeKey === 'yearlyFull' && <YearlyFullRank />}
+        {activeKey === 'successRate' && <SuccessRateRank />}
       </div>
     </div>
   );

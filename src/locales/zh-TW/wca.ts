@@ -190,4 +190,14 @@ export default {
   'wca.stats.historicalRankDesc': '按年份查看歷史排名',
   'wca.stats.fullRank': '全部成績排行',
   'wca.stats.fullRankDesc': '查看所有成績的完整排行',
+  'wca.stats.yearlyFullRank': '當年成績排行',
+  'wca.stats.yearlyFullRankDesc': '查看某年某項目的完整成績排行',
+  'wca.stats.successRate': '項目成功率',
+  'wca.stats.successRateDesc': '按項目查看選手成功率排行',
+
+  // Success Rate 成功率
+  'wca.successRate.solved': '復原數',
+  'wca.successRate.attempted': '嘗試數',
+  'wca.successRate.percentage': '成功率',
+  'wca.successRate.minAttempted': '最小嘗試數',
 };

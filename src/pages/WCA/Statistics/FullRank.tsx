@@ -232,7 +232,7 @@ const FullRank: React.FC = () => {
             </span>
             {expanded ? (
               <div className="attempts-detail">
-                {formatAttempts(attempts, eventId, bestIdx, worstIdx)}
+                {formatAttempts(attempts, eventId, bestIdx, worstIdx, true)}
               </div>
             ) : (
               formatAttemptsSingleLine(attempts, eventId, bestIdx, worstIdx)

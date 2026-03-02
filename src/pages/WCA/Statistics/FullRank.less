@@ -50,7 +50,10 @@
     gap: 4px;
     line-height: 1.4;
     max-width: 100%;
-    overflow: hidden;
+
+    &:not(.expanded) {
+      overflow: hidden;
+    }
 
     .attempts-toggle {
       flex-shrink: 0;
@@ -75,13 +78,8 @@
     .attempts-detail {
       flex: 1;
       min-width: 0;
-      overflow-x: auto;
-      overflow-y: hidden;
       max-width: 100%;
-      // 横向滚动条，避免溢出
-      &::-webkit-scrollbar {
-        height: 4px;
-      }
+      overflow: visible;
     }
   }
 }

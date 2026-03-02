@@ -467,3 +467,16 @@ export interface StaticWithTimerRank {
   avgWorldRank: number;
   avgContinentRank: number;
 }
+
+
+export interface StaticSuccessRateResult {
+  wcaId: string;
+  wcaName: string;
+  country: string;
+
+  eventId: string;
+
+  solved: number;      // 数量
+  attempted: number;   // 尝试
+  percentage: number;  // 成功率
+}
