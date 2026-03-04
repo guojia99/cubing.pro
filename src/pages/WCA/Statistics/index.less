@@ -71,30 +71,62 @@
     padding: 12px 8px;
 
     .stats-cards {
-      flex-direction: column;
+      display: flex;
+      flex-wrap: nowrap;
       gap: 10px;
       margin-bottom: 16px;
+      margin-left: -16px; /* 突破 layout(8px) + stats-index(8px) 的左侧 padding */
+      margin-right: -16px;
+      padding: 0 16px 4px;
+      padding-left: 280px; /* 最左侧留白为两倍单卡宽度 (140px * 2) */
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+
+      &::-webkit-scrollbar {
+        height: 4px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 2px;
+      }
 
       .stats-card {
-        min-width: 100%;
-        max-width: 100%;
+        flex: 0 0 140px;
+        min-width: 140px;
+        max-width: 140px;
 
         .ant-card-body {
-          padding: 10px 12px;
+          padding: 8px 10px;
         }
 
         .stats-card-content {
+          gap: 6px;
+
           .stats-card-icon {
-            font-size: 18px;
+            font-size: 16px;
+            flex-shrink: 0;
           }
 
           .stats-card-text {
+            min-width: 0;
+            overflow: hidden;
+
             .stats-card-title {
-              font-size: 13px;
+              font-size: 12px;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
             }
 
             .stats-card-desc {
-              font-size: 11px;
+              font-size: 10px;
+              display: -webkit-box;
+              -webkit-line-clamp: 2;
+              -webkit-box-orient: vertical;
+              overflow: hidden;
+              line-height: 1.3;
             }
           }
         }

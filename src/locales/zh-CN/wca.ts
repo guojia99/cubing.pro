@@ -47,6 +47,13 @@ export default {
   'wca.resultTable.showPodium': '显示领奖台',
   'wca.resultTable.copySuccess': '✅ 成绩已复制到剪贴板！',
   'wca.resultTable.copyFailed': '❌ 复制失败，请手动选择复制',
+  'wca.resultTable.currentView': '当前',
+  'wca.resultTable.historicalBest': '历史最佳排名',
+  'wca.resultTable.achievedAt': '达成时间',
+  'wca.resultTable.sortNR': 'NR',
+  'wca.resultTable.sortCR': 'CR',
+  'wca.resultTable.sortWR': 'WR',
+  'wca.resultTable.sortBest': '最佳',
 
   // WCAPlayerStaticsTab
   'wca.tabs.results': '成绩',
@@ -194,6 +201,19 @@ export default {
   'wca.stats.yearlyFullRankDesc': '查看某年某项目的完整成绩排行',
   'wca.stats.successRate': '项目成功率',
   'wca.stats.successRateDesc': '按项目查看选手成功率排行',
+  'wca.stats.allEventsAchievement': '全项目达成排行榜',
+  'wca.stats.allEventsAchievementDesc': '按达成天数排序的全项目达成排行',
+
+  // All Events Achievement 全项目达成
+  'wca.allEventsAchievement.viewMode': '视图',
+  'wca.allEventsAchievement.fullAchievement': '全达成',
+  'wca.allEventsAchievement.missingEventsMode': '缺项目',
+  'wca.allEventsAchievement.lackNum': '缺少项目数',
+  'wca.allEventsAchievement.useDate': '达成天数',
+  'wca.allEventsAchievement.days': '天',
+  'wca.allEventsAchievement.achievedAt': '达成比赛',
+  'wca.allEventsAchievement.useCompNum': '比赛场次',
+  'wca.allEventsAchievement.missingEvents': '缺少项目',
 
   // Success Rate 成功率
   'wca.successRate.solved': '复原数',

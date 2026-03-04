@@ -29,11 +29,12 @@ const WCAPlayerDetails: React.FC<WCAPlayerDetailsProps> = ({ wcaProfile, wcaResu
      }
      for (let j = 0; j < res.attempts.length; j++) {
        const attp = res.attempts[j];
-       if (attp === 0){
+       // DNS
+       if (attp === 0 || attp === -2){
          continue;
        }
        totalAttempts += 1
-       if (attp !== -1){
+       if (attp >= 0){
          totalSolves += 1
        }
      }

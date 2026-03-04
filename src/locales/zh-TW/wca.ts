@@ -47,6 +47,13 @@ export default {
   'wca.resultTable.showPodium': '顯示領獎台',
   'wca.resultTable.copySuccess': '✅ 成績已複製到剪貼簿！',
   'wca.resultTable.copyFailed': '❌ 複製失敗，請手動選擇複製',
+  'wca.resultTable.currentView': '當前',
+  'wca.resultTable.historicalBest': '歷史最佳排名',
+  'wca.resultTable.achievedAt': '達成時間',
+  'wca.resultTable.sortNR': 'NR',
+  'wca.resultTable.sortCR': 'CR',
+  'wca.resultTable.sortWR': 'WR',
+  'wca.resultTable.sortBest': '最佳',
 
   // WCAPlayerStaticsTab
   'wca.tabs.results': '成績',
@@ -194,6 +201,19 @@ export default {
   'wca.stats.yearlyFullRankDesc': '查看某年某項目的完整成績排行',
   'wca.stats.successRate': '項目成功率',
   'wca.stats.successRateDesc': '按項目查看選手成功率排行',
+  'wca.stats.allEventsAchievement': '全項目達成排行榜',
+  'wca.stats.allEventsAchievementDesc': '按達成天數排序的全項目達成排行',
+
+  // All Events Achievement 全項目達成
+  'wca.allEventsAchievement.viewMode': '視圖',
+  'wca.allEventsAchievement.fullAchievement': '全達成',
+  'wca.allEventsAchievement.missingEventsMode': '缺項目',
+  'wca.allEventsAchievement.lackNum': '缺少項目數',
+  'wca.allEventsAchievement.useDate': '達成天數',
+  'wca.allEventsAchievement.days': '天',
+  'wca.allEventsAchievement.achievedAt': '達成比賽',
+  'wca.allEventsAchievement.useCompNum': '比賽場次',
+  'wca.allEventsAchievement.missingEvents': '缺少項目',
 
   // Success Rate 成功率
   'wca.successRate.solved': '復原數',
