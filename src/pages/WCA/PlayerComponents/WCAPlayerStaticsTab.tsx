@@ -16,7 +16,13 @@ interface WCAPlayerStaticsTabProps {
 
 const WCAPlayerStaticsTab: React.FC<WCAPlayerStaticsTabProps> = ({ wcaProfile, wcaResults, comps, wcaRankTimer }) => {
   const intl = useIntl();
-  const wcaResultsRes = wcaResults.sort((a, b) => b.id - a.id);
+  // 按比赛时间（start_date）从最新到最早排序，避免用 id 排序导致早年数据错位（如 2007 插在 2009 中）
+  const compDateMap = new Map(comps.map((c) => [c.id, c.start_date]));
+  const wcaResultsRes = [...wcaResults].sort((a, b) => {
+    const dateA = compDateMap.get(a.competition_id) ?? '';
+    const dateB = compDateMap.get(b.competition_id) ?? '';
+    return dateB.localeCompare(dateA);
+  });
 
   return (
     <Card

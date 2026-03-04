@@ -97,7 +97,6 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
             width: '100%',
             maxWidth: '100%',
             overflowX: 'hidden',
-            overflowY: 'auto',
             minHeight: '100vh',
           }}
         >

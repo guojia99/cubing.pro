@@ -47,6 +47,13 @@ export default {
   'wca.resultTable.showPodium': '表彰台を表示',
   'wca.resultTable.copySuccess': '✅ 成績をクリップボードにコピーしました！',
   'wca.resultTable.copyFailed': '❌ コピーに失敗しました。手動でコピーしてください',
+  'wca.resultTable.currentView': '現在',
+  'wca.resultTable.historicalBest': '歴代ベスト',
+  'wca.resultTable.achievedAt': '達成日',
+  'wca.resultTable.sortNR': 'NR',
+  'wca.resultTable.sortCR': 'CR',
+  'wca.resultTable.sortWR': 'WR',
+  'wca.resultTable.sortBest': 'ベスト',
 
   // WCAPlayerStaticsTab
   'wca.tabs.results': '成績',
@@ -194,6 +201,19 @@ export default {
   'wca.stats.yearlyFullRankDesc': '特定年の特定種目の完全成績ランキングを表示',
   'wca.stats.successRate': '種目成功率',
   'wca.stats.successRateDesc': '種目別の成功率ランキングを表示',
+  'wca.stats.allEventsAchievement': '全種目達成ランキング',
+  'wca.stats.allEventsAchievementDesc': '達成日数でソートした全種目達成ランキング',
+
+  // All Events Achievement 全種目達成
+  'wca.allEventsAchievement.viewMode': '表示',
+  'wca.allEventsAchievement.fullAchievement': '全達成',
+  'wca.allEventsAchievement.missingEventsMode': '不足',
+  'wca.allEventsAchievement.lackNum': '不足種目数',
+  'wca.allEventsAchievement.useDate': '達成日数',
+  'wca.allEventsAchievement.days': '日',
+  'wca.allEventsAchievement.achievedAt': '達成大会',
+  'wca.allEventsAchievement.useCompNum': '大会数',
+  'wca.allEventsAchievement.missingEvents': '不足種目',
 
   // Success Rate 成功率
   'wca.successRate.solved': '成功数',

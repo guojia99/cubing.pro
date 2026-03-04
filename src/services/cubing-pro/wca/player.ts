@@ -4,7 +4,7 @@
 
 import { Request } from '@/services/cubing-pro/request';
 import { AuthHeader } from '@/services/cubing-pro/auth/token';
-import { StaticWithTimerRank, WCACompetition, WCAPerson, WcaProfile, WCAResult } from './types';
+import { PersonBestRanks, StaticWithTimerRank, WCACompetition, WCAPerson, WcaProfile, WCAResult } from './types';
 
 
 
@@ -68,5 +68,18 @@ export async function getWCAPersons(query: string): Promise<WCAPerson[]> {
       headers: AuthHeader(),
     },
   );
+  return response.data
+}
+
+
+export async function getPersonBestRanks(wcaID: string): Promise<PersonBestRanks> {
+  if (wcaID.length !== 10) throw new Error('WCAID错误');
+  const response = await Request.get<PersonBestRanks>(
+    `/wca/player/${wcaID}/best_ranks`,
+    {
+      headers: AuthHeader(),
+    },
+  );
+
   return response.data
 }

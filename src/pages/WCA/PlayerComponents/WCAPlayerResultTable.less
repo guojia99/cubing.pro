@@ -1,28 +1,116 @@
+// 滑块切换按钮
+.view-mode-toggle {
+  display: inline-flex;
+
+  &.historical-sort-toggle .toggle-option {
+    padding: 5px 10px;
+    font-size: 12px;
+  }
+  background: #f0f2f5;
+  border-radius: 10px;
+  padding: 3px;
+  gap: 2px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+
+  .toggle-option {
+    padding: 6px 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #595959;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.25s ease;
+
+    &:hover:not(:disabled) {
+      color: #1890ff;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    &.active {
+      background: #fff;
+      color: #1890ff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+  }
+}
+
+.wca-result-table-card {
+  position: relative;
+  padding-top: 48px !important;
+}
+
+.wca-result-table-options {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: flex-end;
+  clear: both;
+}
+
 .wca-player-result-table {
   .ant-table {
-    font-family: 'Courier New', monospace;
+    font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
   }
 
   .ant-table-thead > tr > th {
-    background: #f3fafa;
+    background: linear-gradient(180deg, #f8fafb 0%, #f0f4f6 100%);
     text-align: center;
-    font-weight: bold;
-    border-bottom: 2px solid #d9d9d9 !important;
+    font-weight: 600;
+    font-size: 13px;
+    border-bottom: 2px solid #e2e8ed !important;
+    color: #434343;
+    padding: 10px 8px;
+  }
+
+  .ant-table-tbody > tr > th.ant-table-cell-fix-left {
+    background: #fafbfc !important;
   }
 
   .wca-result-row {
-    border-bottom: 1px solid #e8e8e8;
-    height: 48px;
+    border-bottom: 1px solid #f0f0f0;
+    height: 52px;
 
     &:hover td {
-      background-color: #edd7d7 !important;
+      background-color: #f6f9fc !important;
     }
   }
 
   .ant-table-tbody > tr > td {
     text-align: center;
-    padding: 8px;
+    padding: 10px 8px;
     white-space: nowrap;
+    font-size: 13px;
+  }
+
+  .times-cell {
+    color: #8c8c8c;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  // 最佳模式：排名、时间分别居中对齐
+  .best-rank-cell {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+
+    .best-rank-value {
+      display: flex;
+      justify-content: center;
+    }
+
+    .times-cell {
+      display: block;
+      text-align: center;
+    }
   }
 }
 
@@ -31,18 +119,13 @@
   .wca-player-result-table {
     .ant-table-thead > tr > th,
     .ant-table-tbody > tr > td {
-      padding: 6px 4px;
+      padding: 8px 6px;
       font-size: 12px;
     }
   }
-}
 
-// 强化列分组视觉
-//.ant-table-thead > tr > th[colspan] + th {
-//  border-left: 2px solid #d9d9d9;
-//}
-//
-//  .ant-table-tbody > tr > td:nth-child(4),
-//  .ant-table-tbody > tr > td:nth-child(7) {
-//    border-left: 2px solid #f0f0f0;
-//  }
+  .view-mode-toggle .toggle-option {
+    padding: 5px 10px;
+    font-size: 12px;
+  }
+}

@@ -60,11 +60,16 @@ ol {
 }
 
 
-// PC 端保持最小宽度，手机端自适应无留白
+// PC 端保持最小宽度，手机端自适应无留白，浏览器滚动条显示（app 内部不滚动）
 @media (min-width: 769px) {
   html, body, #root {
     min-width: 1200px !important;
     overflow-x: auto;
+    overflow-y: scroll; // 浏览器滚动条始终显示
+  }
+  // app 内容区不滚动，由浏览器整页滚动
+  .ant-pro-layout-content {
+    overflow: visible !important;
   }
 }
 

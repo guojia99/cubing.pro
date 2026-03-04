@@ -406,7 +406,7 @@ interface PersonalRecord {
   country_rank: number;
 }
 
-interface EventRecords {
+export interface EventRecords {
   single?: PersonalRecord;
   average?: PersonalRecord;
 }
@@ -479,4 +479,96 @@ export interface StaticSuccessRateResult {
   solved: number;      // 数量
   attempted: number;   // 尝试
   percentage: number;  // 成功率
+}
+
+
+export interface PersonResult {
+  eventId: string;
+  best: number;
+  personName : string;
+  personId: string;
+
+
+  world_rank: number;
+  continent_rank: number;
+  country_rank: number;
+
+  times: string;
+}
+
+export interface PersonBestRank{
+  best: Record<string, PersonResult> // key eventID
+  average: Record<string, PersonResult> // key eventID
+}
+
+export interface PersonBestRanks{
+  withNR: PersonBestRank;
+  withCR: PersonBestRank;
+  withWR: PersonBestRank;
+}
+
+
+export interface AllEventAvgPersonResults {
+  // 个人信息
+  wcaId: string;
+  name: string;
+  country: string;
+
+  // 完成项目的列表（前端通常直接使用这个字段）
+  doneEventList: string[];
+
+  // 存储为 JSON 字符串的完成项目（用于与后端交互）
+  doneEventJSON: string;
+
+  // 缺少项目的数量
+  lackNum: number;
+
+  // 是否已完成“粗饼大满贯”
+  isDone: boolean;
+
+  // 开始和结束时间（可能为 null）
+  startTime: string | null; // ISO 8601 格式字符串，如 "2025-01-01T12:00:00Z"
+  endTime: string | null;
+
+  // 所用天数
+  useDate: number;
+
+  // 完成时所用的比赛信息
+  allEventCompId: string;
+  allEventCompName: string;
+
+  // 使用的比赛场次数
+  useCompNum: number;
+}
+
+
+export interface AllEventChampionshipsPodium {
+  // 个人信息
+  wcaID: string;
+  wcaName: string;
+  country: string;
+
+  // 项目
+  eventID: string;
+  best: number;
+  average: number;
+
+  // 只记录首场成绩
+  worldChampionshipID: string;
+  worldChampionshipName: string;
+  worldChampionshipRank: number; // 决赛排名
+  worldChampionshipBest: number;
+  worldChampionshipAverage: number;
+
+  continentChampionshipID: string;
+  continentChampionshipName: string;
+  continentChampionshipRank: number;
+  continentChampionshipBest: number;
+  continentChampionshipAverage: number;
+
+  countryChampionshipID: string;
+  countryChampionshipName: string;
+  countryChampionshipRank: number;
+  countryChampionshipBest: number;
+  countryChampionshipAverage: number;
 }

@@ -47,6 +47,13 @@ export default {
   'wca.resultTable.showPodium': 'Show podium',
   'wca.resultTable.copySuccess': '✅ Results copied to clipboard!',
   'wca.resultTable.copyFailed': '❌ Copy failed, please copy manually',
+  'wca.resultTable.currentView': 'Current',
+  'wca.resultTable.historicalBest': 'Historical Best Ranks',
+  'wca.resultTable.achievedAt': 'Achieved',
+  'wca.resultTable.sortNR': 'NR',
+  'wca.resultTable.sortCR': 'CR',
+  'wca.resultTable.sortWR': 'WR',
+  'wca.resultTable.sortBest': 'Best',
 
   // WCAPlayerStaticsTab
   'wca.tabs.results': 'Results',
@@ -194,6 +201,19 @@ export default {
   'wca.stats.yearlyFullRankDesc': 'View complete ranking of results for a specific year and event',
   'wca.stats.successRate': 'Event Success Rate',
   'wca.stats.successRateDesc': 'View success rate ranking by event',
+  'wca.stats.allEventsAchievement': 'All Events Achievement',
+  'wca.stats.allEventsAchievementDesc': 'Ranking by days to achieve all events',
+
+  // All Events Achievement
+  'wca.allEventsAchievement.viewMode': 'View',
+  'wca.allEventsAchievement.fullAchievement': 'Full',
+  'wca.allEventsAchievement.missingEventsMode': 'Missing',
+  'wca.allEventsAchievement.lackNum': 'Missing events',
+  'wca.allEventsAchievement.useDate': 'Days',
+  'wca.allEventsAchievement.days': ' days',
+  'wca.allEventsAchievement.achievedAt': 'Achieved at',
+  'wca.allEventsAchievement.useCompNum': 'Comps',
+  'wca.allEventsAchievement.missingEvents': 'Missing events',
 
   // Success Rate
   'wca.successRate.solved': 'Solved',

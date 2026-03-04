@@ -1,6 +1,11 @@
 import { AuthHeader } from '@/services/cubing-pro/auth/token';
 import { Request } from '@/services/cubing-pro/request';
-import { StaticSuccessRateResult, StaticWithTimerRank, WCAResult } from '@/services/cubing-pro/wca/types';
+import {
+  AllEventAvgPersonResults, AllEventChampionshipsPodium,
+  StaticSuccessRateResult,
+  StaticWithTimerRank,
+  WCAResult,
+} from '@/services/cubing-pro/wca/types';
 
 export async function GetEventRankTimers(
   eventID: string,
@@ -119,4 +124,43 @@ export async function GetStaticSuccessRateResult(
     },
   );
   return response.data;
+}
+
+
+
+export async function GetAllEventsAchievement(
+  lackNum: number = 0,
+  country: string,
+  page: number,
+  size: number,
+): Promise<{
+  data: AllEventAvgPersonResults[];
+  total: number;
+}> {
+  const response = await Request.post<{
+    data: AllEventAvgPersonResults[];
+    total: number;
+  }>(
+    `/wca/ranks/all-events-achiever`,
+    {
+      country: country,
+      page: page,
+      size: size,
+      lackNum: lackNum,
+    },
+    {
+      headers: AuthHeader(),
+    },
+  );
+  return response.data;
+}
+
+
+export async function GetAllEventChampionshipsPodium(): Promise<AllEventChampionshipsPodium[]>{
+  const response = await Request.get<AllEventChampionshipsPodium[]>(
+    `/wca/grand-slam`,    {
+      headers: AuthHeader(),
+    },
+  )
+  return response.data
 }
