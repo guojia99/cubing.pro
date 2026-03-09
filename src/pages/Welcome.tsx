@@ -3,6 +3,7 @@ import { PageContainer } from '@ant-design/pro-components';
 import { Card, Image, theme } from 'antd';
 import React from 'react';
 import ThanksSection from './Welcome/ThanksSection';
+import AdvertisementCarousel from './Welcome/AdvertisementCarousel';
 
 const intl = getIntl();
 
@@ -98,7 +99,7 @@ const BuyCoffeeQuickJump: React.FC = () => {
     <Card
       style={{
         borderRadius: 8,
-        background: `linear-gradient(135deg, ${token.colorBgContainer} 0%, ${token.colorFillQuaternary} 100%)`,
+        marginBottom: 24,
       }}
     >
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24, alignItems: 'center' }}>
@@ -222,6 +223,8 @@ const Welcome: React.FC = () => {
   return (
     <PageContainer>
       <ThanksSection />
+      <BuyCoffeeQuickJump />
+      <AdvertisementCarousel />
       <GroupInfoCards
         groupName={'welcome'}
         title={intl.formatMessage({ id: 'home.welcome.title' })}
@@ -345,7 +348,7 @@ const Welcome: React.FC = () => {
       />
 
       <div style={{ marginTop: 30 }} />
-      <BuyCoffeeQuickJump />
+
     </PageContainer>
   );
 };

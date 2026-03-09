@@ -1,6 +1,9 @@
 import { WCAResult } from '@/services/cubing-pro/wca/types';
 
 
+/** 已移除/停办的项目，不参与统计和展示 */
+export const EXCLUDED_EVENTS = ['333ft', 'magic', 'mmagic'];
+
 export const eventOrder = [
   '333',
   '222',
@@ -20,7 +23,7 @@ export const eventOrder = [
   '555bf',
   '333mbf',
   '333ft',
-];
+].filter((e) => !EXCLUDED_EVENTS.includes(e));
 
 export function getCompsEvents(wcaResults: WCAResult[]): Map<string, string[]> {
   const competitionEventMap = new Map<string, string[]>();

@@ -1,8 +1,9 @@
-import { HistoryOutlined, UnorderedListOutlined, CalendarOutlined, RiseOutlined, TrophyOutlined } from '@ant-design/icons';
+import { HistoryOutlined, UnorderedListOutlined, CalendarOutlined, RiseOutlined, TrophyOutlined, CrownOutlined } from '@ant-design/icons';
 import { Card, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useIntl } from '@@/plugin-locale';
 import { useLocation, useNavigate } from '@@/exports';
+import GrandSlamRank from './GrandSlamRank';
 import FullRank from './FullRank';
 import HistoricalRank from './HistoricalRank';
 import YearlyFullRank from './YearlyFullRank';
@@ -12,15 +13,15 @@ import './index.less';
 
 const { Title } = Typography;
 
-type StatsTabKey = 'historical' | 'full' | 'yearlyFull' | 'successRate' | 'allEventsAchievement';
+type StatsTabKey = 'grandSlam' | 'historical' | 'full' | 'yearlyFull' | 'successRate' | 'allEventsAchievement';
 
 const TAB_PARAM = 'tab';
-const VALID_TAB_KEYS: StatsTabKey[] = ['historical', 'full', 'yearlyFull', 'successRate', 'allEventsAchievement'];
+const VALID_TAB_KEYS: StatsTabKey[] = ['grandSlam', 'historical', 'full', 'yearlyFull', 'successRate', 'allEventsAchievement'];
 
 const getTabFromSearch = (search: string): StatsTabKey => {
   const params = new URLSearchParams(search);
   const tab = params.get(TAB_PARAM);
-  return tab && VALID_TAB_KEYS.includes(tab as StatsTabKey) ? (tab as StatsTabKey) : 'historical';
+  return tab && VALID_TAB_KEYS.includes(tab as StatsTabKey) ? (tab as StatsTabKey) : 'grandSlam';
 };
 
 const Statistics: React.FC = () => {
@@ -42,6 +43,12 @@ const Statistics: React.FC = () => {
   };
 
   const cards = [
+    {
+      key: 'grandSlam' as StatsTabKey,
+      icon: <CrownOutlined />,
+      title: intl.formatMessage({ id: 'wca.stats.grandSlam' }),
+      desc: intl.formatMessage({ id: 'wca.stats.grandSlamDesc' }),
+    },
     {
       key: 'historical' as StatsTabKey,
       icon: <HistoryOutlined />,
@@ -99,6 +106,10 @@ const Statistics: React.FC = () => {
         ))}
       </div>
       <div className="stats-content">
+        <h1 className="stats-tab-title">
+          {cards.find((c) => c.key === activeKey)?.title}
+        </h1>
+        {activeKey === 'grandSlam' && <GrandSlamRank />}
         {activeKey === 'historical' && <HistoricalRank />}
         {activeKey === 'full' && <FullRank />}
         {activeKey === 'yearlyFull' && <YearlyFullRank />}

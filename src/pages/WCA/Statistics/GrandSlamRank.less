@@ -1,4 +1,4 @@
-.all-events-achievement-rank {
+.grand-slam-rank {
   padding: 16px;
   max-width: 1000px;
   margin: 0 auto;
@@ -8,12 +8,34 @@
     max-width: none;
   }
 
+  .grand-slam-definition {
+    font-size: 12px;
+    line-height: 1.5;
+    color: rgba(0, 0, 0, 0.55);
+    margin: 0 0 16px 0;
+  }
+
+  .section-title {
+    font-size: 14px;
+    font-weight: 500;
+    margin: 20px 0 12px 0;
+    color: rgba(0, 0, 0, 0.85);
+
+    &:first-of-type {
+      margin-top: 0;
+    }
+  }
+
   .filter-row {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
     align-items: center;
-    margin-bottom: 16px;
+    padding: 12px 16px;
+    margin-bottom: 0;
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 8px;
 
     .filter-item {
       display: flex;
@@ -29,16 +51,22 @@
         min-width: 100px;
       }
 
+      .filter-input {
+        min-width: 100px;
+      }
+
       &.filter-item-switch {
         .ant-switch {
           margin-left: 4px;
         }
       }
-
-      .filter-select-lack {
-        min-width: 90px;
-      }
     }
+  }
+
+  .table-section {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
   }
 
   .table-wrapper {
@@ -46,40 +74,24 @@
     width: 100%;
   }
 
-  .competition-tag {
-    font-size: 12px;
-    line-height: 18px;
-    padding: 0 6px;
-    margin: 0;
-  }
-
-  .missing-events-cell {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
+  .championship-tag {
+    display: inline-flex;
     align-items: center;
+    white-space: normal;
+    word-break: break-word;
+    max-width: 100%;
     line-height: 1.4;
-
-    .missing-event-tag {
-      display: inline-flex;
-      align-items: center;
-      padding: 2px 6px;
-      background: rgba(24, 144, 255, 0.08);
-      border-radius: 4px;
-      font-size: 11px;
-    }
   }
 }
 
 @media (max-width: 1079px) {
-  .all-events-achievement-rank {
+  .grand-slam-rank {
     padding: 12px 8px;
 
     .filter-row {
       flex-direction: column;
       align-items: stretch;
       gap: 10px;
-      margin-bottom: 12px;
 
       .filter-item {
         display: flex;
@@ -94,7 +106,8 @@
           font-size: 12px;
         }
 
-        .filter-select.ant-select {
+        .filter-select.ant-select,
+        .filter-input {
           flex: 1;
           min-width: 0;
         }
@@ -108,23 +121,6 @@
 
     .ant-table-cell {
       padding: 6px 4px !important;
-    }
-
-    .ant-pagination {
-      flex-wrap: wrap;
-      justify-content: center;
-      padding: 8px 0;
-
-      .ant-pagination-options {
-        margin-left: 0;
-        margin-top: 6px;
-      }
-
-      .ant-pagination-item,
-      .ant-pagination-prev,
-      .ant-pagination-next {
-        min-width: 28px;
-      }
     }
   }
 }
