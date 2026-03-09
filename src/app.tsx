@@ -4,11 +4,10 @@ import React from 'react';
 import { currentUser } from '@/services/cubing-pro/auth/auth';
 import defaultSettings from '../config/defaultSettings';
 import { UserOutlined, UserSwitchOutlined } from '@ant-design/icons';
-import { AvatarProps, Col, Row } from 'antd';
+import { AvatarProps } from 'antd';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { AvatarURL } from '@/pages/Admin/AvatarDropdown';
 import { AuthAPI } from '@/services/cubing-pro/auth/typings';
-import ScrollToTopButton from '@/components/Buttons/toTop';
 import LanguageSelect from '@/locales/Language/LanguageSelect';
 import { ExtAppList } from '@/services/layout_config';
 
@@ -59,8 +58,8 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     disableMobile: false, // 支持手机端
     contentWidth: 'Fluid',
     contentStyle: {
-      margin: '0 auto',
-      padding: '16px',
+      margin: 0,
+      padding: 0,
     },
 
     // 标准配置
@@ -85,29 +84,9 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     },
     footerRender: () => <Footer />,
     childrenRender: (children) => {
-      // 判断是否为移动端（例如屏幕宽度 <= 768px）
-      // const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
-      // const scale = isMobile ? 0.7 : 1; // 手机端 70%，桌面端 100%
-      // const containerWidth = scale === 1 ? '100%' : `${100 / scale}%`; // 补偿缩放后留白
-
       return (
-        <div
-          style={{
-            position: 'relative',
-            width: '100%',
-            maxWidth: '100%',
-            overflowX: 'hidden',
-            minHeight: '100vh',
-          }}
-        >
-          <ScrollToTopButton />
-          <Row gutter={0}>
-            <Col xs={0} sm={0} md={0} lg={1} xl={2} xxl={2} />
-            <Col xs={24} sm={24} md={24} lg={22} xl={20} xxl={20} style={{ maxWidth: '100%' }}>
-              {children}
-            </Col>
-            <Col xs={0} sm={0} md={0} lg={1} xl={2} xxl={2} />
-          </Row>
+        <div className="app-content-wrapper">
+          {children}
         </div>
       );
     },

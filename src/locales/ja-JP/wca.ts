@@ -193,6 +193,8 @@ export default {
 
   // Stats 統計モジュール
   'wca.stats.title': 'WCAデータ',
+  'wca.stats.grandSlam': 'グランドスラム統計',
+  'wca.stats.grandSlamDesc': '世界大会・大陸大会・国内大会表彰台達成統計',
   'wca.stats.historicalRank': '歴史ランキング',
   'wca.stats.historicalRankDesc': '年別で歴史ランキングを表示',
   'wca.stats.fullRank': '全成績ランキング',
@@ -214,6 +216,30 @@ export default {
   'wca.allEventsAchievement.achievedAt': '達成大会',
   'wca.allEventsAchievement.useCompNum': '大会数',
   'wca.allEventsAchievement.missingEvents': '不足種目',
+
+  // Grand Slam グランドスラム
+  'wca.grandSlam.definitionTitle': 'グランドスラムの定義',
+  'wca.grandSlam.definitionContent': '単一種目において、選手が世界大会表彰台、所属国の大陸大会表彰台、所属国の国内大会表彰台を達成し、かつその種目でWRを更新した場合、その種目のグランドスラム達成とする。表彰台の最も良いかつ最も早い結果をデフォルトで採用する。なお、世界大会、大陸大会の一部は開催国の国内大会としてもカウントされる場合がある。',
+  'wca.grandSlam.table1Title': 'グランドスラム成績一覧',
+  'wca.grandSlam.table2Title': 'グランドスラム達成回数ランキング',
+  'wca.grandSlam.event': '種目',
+  'wca.grandSlam.allEvents': '全種目',
+  'wca.grandSlam.worldChampionship': '世界大会',
+  'wca.grandSlam.continentChampionship': '大陸大会',
+  'wca.grandSlam.countryChampionship': '国内大会',
+  'wca.grandSlam.playerCountry': '選手の国',
+  'wca.grandSlam.achievedCount': 'グランドスラム達成種目数',
+  'wca.grandSlam.events': '種目',
+  'wca.grandSlam.namePlaceholder': '選手名またはWCA ID',
+  'wca.grandSlam.viewResults': 'グランドスラム',
+  'wca.grandSlam.viewRank': '達成ランキング',
+  'wca.grandSlam.viewDetail': '詳細を見る',
+  'wca.grandSlam.filterGrandSlamOnly': 'フィルター',
+  'wca.grandSlam.filterGrandSlamOnlyOn': '1位のみ',
+  'wca.grandSlam.filterGrandSlamOnlyOff': '全て',
+  'wca.grandSlam.filterHasWR': 'WR達成',
+  'wca.grandSlam.filterHasWROn': 'はい',
+  'wca.grandSlam.filterHasWROff': '全て',
 
   // Success Rate 成功率
   'wca.successRate.solved': '成功数',

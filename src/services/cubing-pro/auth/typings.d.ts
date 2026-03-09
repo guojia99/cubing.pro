@@ -213,3 +213,13 @@ export declare namespace OrganizersAPI {
     }
   }
 }
+
+
+
+export interface Thank {
+  wcaID: string;
+  nickname: string;
+  amount: number;
+  avatar: string;
+  other: string;
+}

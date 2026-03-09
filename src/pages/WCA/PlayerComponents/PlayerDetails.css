@@ -30,7 +30,7 @@
 }
 
 /* 响应式适配 - 手机端 */
-@media (max-width: 768px) {
+@media (max-width: 1079px) {
   .wca-player-container {
     padding: 0 4px;
   }

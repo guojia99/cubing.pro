@@ -192,7 +192,9 @@ export default {
   'wca.historicalRank.worldwide': '全世界',
 
   // Stats 统计模块
-  'wca.stats.title': 'WCA数据',
+  'wca.stats.title': 'WCA统计',
+  'wca.stats.grandSlam': '大满贯',
+  'wca.stats.grandSlamDesc': '世锦赛、洲际赛、国家赛领奖台全达成统计',
   'wca.stats.historicalRank': '历史排名',
   'wca.stats.historicalRankDesc': '按年份查看历史排名',
   'wca.stats.fullRank': '全部成绩排行',
@@ -214,6 +216,30 @@ export default {
   'wca.allEventsAchievement.achievedAt': '达成比赛',
   'wca.allEventsAchievement.useCompNum': '比赛场次',
   'wca.allEventsAchievement.missingEvents': '缺少项目',
+
+  // Grand Slam 大满贯
+  'wca.grandSlam.definitionTitle': '大满贯定义',
+  'wca.grandSlam.definitionContent': '单个项目，某位选手获得世锦赛领奖台、选手所属国家洲际赛领奖台、选手所属国家赛领奖台，且打破过该项目WR，即达成该项目大满贯。默认采用领奖台最佳且最早的比赛。注意某些世锦赛、洲际赛可能会被当作该举办国家的国家锦标赛。',
+  'wca.grandSlam.table1Title': '大满贯成绩单',
+  'wca.grandSlam.table2Title': '大满贯达成次数排名',
+  'wca.grandSlam.event': '项目',
+  'wca.grandSlam.allEvents': '全部项目',
+  'wca.grandSlam.worldChampionship': '世锦赛',
+  'wca.grandSlam.continentChampionship': '洲际赛',
+  'wca.grandSlam.countryChampionship': '国家赛',
+  'wca.grandSlam.playerCountry': '选手所属国家',
+  'wca.grandSlam.achievedCount': '达成大满贯项目数',
+  'wca.grandSlam.events': '项',
+  'wca.grandSlam.namePlaceholder': '选手名或WCA ID',
+  'wca.grandSlam.viewResults': '大满贯',
+  'wca.grandSlam.viewRank': '达成排名',
+  'wca.grandSlam.viewDetail': '详情',
+  'wca.grandSlam.filterGrandSlamOnly': '筛选',
+  'wca.grandSlam.filterGrandSlamOnlyOn': '仅全部第一',
+  'wca.grandSlam.filterGrandSlamOnlyOff': '全部',
+  'wca.grandSlam.filterHasWR': '破WR',
+  'wca.grandSlam.filterHasWROn': '是',
+  'wca.grandSlam.filterHasWROff': '全部',
 
   // Success Rate 成功率
   'wca.successRate.solved': '复原数',

@@ -571,4 +571,6 @@ export interface AllEventChampionshipsPodium {
   countryChampionshipRank: number;
   countryChampionshipBest: number;
   countryChampionshipAverage: number;
+
+  hasWR: boolean;
 }

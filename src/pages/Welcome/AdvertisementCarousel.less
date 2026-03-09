@@ -1,0 +1,64 @@
+// 广告轮播：去除底部空白，切换按钮样式
+.ad-carousel-wrapper {
+  .ant-card-body {
+    padding: 0 !important;
+    overflow: hidden;
+  }
+  .ad-carousel-container {
+    overflow: hidden;
+    line-height: 0; // 去除 inline 元素产生的空隙
+    position: relative;
+    .ant-carousel {
+      display: block;
+    }
+    .slick-slider {
+      display: block;
+      height: 100%;
+    }
+    .slick-list {
+      height: 100%;
+      overflow: hidden;
+    }
+    .slick-track {
+      height: 100%;
+    }
+    .slick-slide {
+      height: 100%;
+      & > div {
+        height: 100%;
+      }
+    }
+  }
+
+  // 兼容 antd Carousel / rc-carousel 的 dots 结构：淡蓝色未选中，海蓝色选中
+  .slick-dots,
+  .ad-carousel-dots {
+    bottom: 12px !important;
+    li {
+      margin: 0 5px;
+      button {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #91d5ff !important; // 淡蓝色
+        opacity: 1;
+      }
+      &.slick-active button {
+        background: #096dd9 !important; // 海蓝色
+        width: 24px;
+        border-radius: 5px;
+      }
+    }
+  }
+}
+
+// 暗色主题下 dots 保持蓝系
+[data-theme='dark'] .ad-carousel-wrapper .slick-dots li,
+[data-theme='dark'] .ad-carousel-wrapper .ad-carousel-dots li {
+  button {
+    background: rgba(145, 213, 255, 0.6) !important;
+  }
+  &.slick-active button {
+    background: #40a9ff !important;
+  }
+}

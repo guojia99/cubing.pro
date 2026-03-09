@@ -2,7 +2,7 @@ import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import { CubesCn } from '@/components/CubeIcon/cube';
 import { WCALinkWithCnName } from '@/components/Link/Links';
 import { getCountryNameByIso2 } from '@/pages/WCA/PlayerComponents/region/all_contiry';
-import { eventOrder } from '@/pages/WCA/utils/events';
+import { eventOrder, EXCLUDED_EVENTS } from '@/pages/WCA/utils/events';
 import { CountryList } from '@/services/cubing-pro/wca/country';
 import { GetAllEventsAchievement } from '@/services/cubing-pro/wca/static';
 import { AllEventAvgPersonResults, Country } from '@/services/cubing-pro/wca/types';
@@ -29,7 +29,7 @@ function parseCompletedEvents(record: AllEventAvgPersonResults): string[] {
  */
 function getMissingEvents(completedEvents: string[]): string[] {
   const completedSet = new Set(completedEvents);
-  return eventOrder.filter((eventId) => !completedSet.has(eventId) && eventId !== '333ft');
+  return eventOrder.filter((eventId) => !completedSet.has(eventId) && !EXCLUDED_EVENTS.includes(eventId));
 }
 
 /** 为数据分配排名（按 useDate 升序，天数少的排前面，同天数并列） */

@@ -193,6 +193,8 @@ export default {
 
   // Stats
   'wca.stats.title': 'WCA Data',
+  'wca.stats.grandSlam': 'Grand Slam',
+  'wca.stats.grandSlamDesc': 'World, Continental, National championship podium achievements',
   'wca.stats.historicalRank': 'Historical Ranks',
   'wca.stats.historicalRankDesc': 'View historical ranks by year',
   'wca.stats.fullRank': 'Full Results Rank',
@@ -214,6 +216,30 @@ export default {
   'wca.allEventsAchievement.achievedAt': 'Achieved at',
   'wca.allEventsAchievement.useCompNum': 'Comps',
   'wca.allEventsAchievement.missingEvents': 'Missing events',
+
+  // Grand Slam
+  'wca.grandSlam.definitionTitle': 'Grand Slam Definition',
+  'wca.grandSlam.definitionContent': 'For a single event, a player achieves a championship podium at Worlds, their continental championship podium, and their national championship podium, and has broken the world record in that event. The earliest best podium result is used by default. Note that some World or Continental championships may also count as the host country\'s national championship.',
+  'wca.grandSlam.table1Title': 'Grand Slam Results',
+  'wca.grandSlam.table2Title': 'Grand Slam Achievement Rank',
+  'wca.grandSlam.event': 'Event',
+  'wca.grandSlam.allEvents': 'All Events',
+  'wca.grandSlam.worldChampionship': 'World Championship',
+  'wca.grandSlam.continentChampionship': 'Continental Championship',
+  'wca.grandSlam.countryChampionship': 'National Championship',
+  'wca.grandSlam.playerCountry': "Player's Country",
+  'wca.grandSlam.achievedCount': 'Grand Slam Events',
+  'wca.grandSlam.events': ' events',
+  'wca.grandSlam.namePlaceholder': 'Name or WCA ID',
+  'wca.grandSlam.viewResults': 'Grand Slam',
+  'wca.grandSlam.viewRank': 'Achievement Rank',
+  'wca.grandSlam.viewDetail': 'View Details',
+  'wca.grandSlam.filterGrandSlamOnly': 'Filter',
+  'wca.grandSlam.filterGrandSlamOnlyOn': 'First only',
+  'wca.grandSlam.filterGrandSlamOnlyOff': 'All',
+  'wca.grandSlam.filterHasWR': 'Has WR',
+  'wca.grandSlam.filterHasWROn': 'Yes',
+  'wca.grandSlam.filterHasWROff': 'All',
 
   // Success Rate
   'wca.successRate.solved': 'Solved',

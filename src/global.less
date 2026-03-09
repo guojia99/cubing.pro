@@ -1,9 +1,9 @@
 html,
 body,
 #root {
-  height: 100%;
   margin: 0;
   padding: 0;
+  min-height: 100%;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
   'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
   'Noto Color Emoji';
@@ -12,6 +12,8 @@ body,
 html {
   scroll-behavior: smooth;
 }
+
+// 不对外层 body 等元素设置 overflow，由文档自然滚动
 
 .colorWeak {
   filter: invert(80%);
@@ -40,7 +42,7 @@ ol {
   list-style: none;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1079px) {
   .ant-table {
     width: 100%;
     overflow-x: auto;
@@ -59,39 +61,48 @@ ol {
   }
 }
 
-
-// PC 端保持最小宽度，手机端自适应无留白，浏览器滚动条显示（app 内部不滚动）
-@media (min-width: 769px) {
-  html, body, #root {
-    min-width: 1200px !important;
-    overflow-x: auto;
-    overflow-y: scroll; // 浏览器滚动条始终显示
-  }
-  // app 内容区不滚动，由浏览器整页滚动
-  .ant-pro-layout-content {
-    overflow: visible !important;
-  }
-}
-
-@media (max-width: 768px) {
-  html, body, #root {
-    min-width: unset !important;
+// 断点 1080px：>=1080 PC 端，<1080 手机端
+@media (max-width: 1079px) {
+  html,
+  body,
+  #root {
     overflow-x: hidden;
     width: 100%;
     max-width: 100vw;
   }
+
   .ant-pro-sider {
     position: relative !important;
   }
-  .ant-pro-layout-content {
-    padding: 12px 8px !important;
-  }
 }
 
-// 禁止 ProLayout 的响应式折叠（仅 PC）
-@media (min-width: 769px) {
+// 禁止 ProLayout 的响应式折叠（仅 PC >=1080）
+@media (min-width: 1080px) {
   .ant-pro-sider {
     transform: none !important;
     width: 256px !important;
+  }
+}
+
+// 内容区布局：PC 左右留空缩小，手机端全宽
+.app-content-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  min-height: 100vh;
+}
+
+@media (min-width: 1080px) {
+  .app-content-wrapper {
+    width: 80%;
+    max-width: 1980px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+}
+
+@media (max-width: 1079px) {
+  .app-content-wrapper {
+    padding: 12px;
   }
 }

@@ -146,9 +146,9 @@ const HistoricalRank: React.FC = () => {
 
   return (
     <div className="historical-rank">
-      <Title level={3} className="page-title">
-        {intl.formatMessage({ id: 'wca.historicalRank.title' })}
-      </Title>
+      {/*<Title level={3} className="page-title">*/}
+      {/*  {intl.formatMessage({ id: 'wca.historicalRank.title' })}*/}
+      {/*</Title>*/}
 
       <div className="filter-row">
         <div className="filter-item">

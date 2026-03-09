@@ -23,7 +23,7 @@ export default {
 
   "menu.WCA": "WCA 查詢",
   "menu.WCA.Players": "選手",
-  'menu.WCA.statistics': "數據",
+  'menu.WCA.statistics': "統計數據",
 
   'menu.Algs': "公式库",
   'menu.buyCoffee': "請作者喝咖啡",
