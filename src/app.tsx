@@ -1,7 +1,9 @@
 import { Footer, AvatarDropdown, AvatarName } from '@/components';
+import { TokenCallbackHandler } from '@/components/TokenCallbackHandler';
 import type { RunTimeLayoutConfig } from '@umijs/max';
 import React from 'react';
 import { currentUser } from '@/services/cubing-pro/auth/auth';
+import { saveToken } from '@/services/cubing-pro/auth/token';
 import defaultSettings from '../config/defaultSettings';
 import { UserOutlined, UserSwitchOutlined } from '@ant-design/icons';
 import { AvatarProps } from 'antd';
@@ -12,6 +14,22 @@ import LanguageSelect from '@/locales/Language/LanguageSelect';
 import { ExtAppList } from '@/services/layout_config';
 
 /**
+ * 在获取用户前处理 WCA 回调的 token（必须在 getInitialState 最开头执行）
+ * 否则 currentUser() 调用时 localStorage 中还没有 token
+ */
+function processWcaCallbackToken() {
+  if (typeof window === 'undefined') return;
+  const params = new URLSearchParams(window.location.search);
+  const tokenStr = params.get('token');
+  if (tokenStr) {
+    saveToken({ token: tokenStr, expire: '', status: '' });
+    const url = new URL(window.location.href);
+    url.searchParams.delete('token');
+    window.history.replaceState({}, '', url.toString());
+  }
+}
+
+/**
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
  * */
 export async function getInitialState(): Promise<{
@@ -19,6 +37,9 @@ export async function getInitialState(): Promise<{
   currentUser?: AuthAPI.CurrentUser;
   fetchUserInfo?: () => Promise<{ data: AuthAPI.CurrentUser } | undefined>;
 }> {
+  // 必须在 currentUser() 之前处理 URL 中的 token，否则获取用户会失败
+  processWcaCallbackToken();
+
   const fetchUserInfo = async () => {
     let currentUserValue: AuthAPI.CurrentUser;
     await currentUser()
@@ -85,9 +106,11 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     footerRender: () => <Footer />,
     childrenRender: (children) => {
       return (
-        <div className="app-content-wrapper">
-          {children}
-        </div>
+        <TokenCallbackHandler>
+          <div className="app-content-wrapper" style={{marginTop: 32}}>
+            {children}
+          </div>
+        </TokenCallbackHandler>
       );
     },
     ...initialState?.settings,

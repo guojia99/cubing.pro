@@ -10,6 +10,7 @@ import {
   FcDatabase,
   FcGenealogy,
   FcList,
+  FcLike,
   FcMindMap,
   FcParallelTasks,
   FcServices,
@@ -34,6 +35,12 @@ const Admin: React.FC = () => {
           description: '设置网站主页内容、网站图标、网站名等',
           to: '/',
           avatar: <FcServices style={{ fontSize: 40 }} />,
+        },
+        {
+          title: '赞助管理',
+          description: '管理主页致谢赞助列表',
+          to: '/admin/acknowledgments',
+          avatar: <FcLike style={{ fontSize: 40 }} />,
         },
         {
           title: '报表',
