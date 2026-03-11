@@ -27,4 +27,6 @@ export default {
 
   'menu.Algs': "Algs",
   'menu.buyCoffee': "Buy Me a Coffee",
+  'menu.Recipes': "Recipes",
+  'menu.RecipeDetail': "Recipe Detail",
 }

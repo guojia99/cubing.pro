@@ -105,6 +105,15 @@ export default [
     hideInMenu: true,
   },
 
+  // 菜谱
+  { path: 'recipes', name: 'Recipes', component: './Recipes/RecipeList' },
+  {
+    path: 'recipes/:category/:id',
+    name: 'RecipeDetail',
+    component: './Recipes/RecipeDetail',
+    hideInMenu: true,
+  },
+
   // 工具
   {
     path: 'tools',

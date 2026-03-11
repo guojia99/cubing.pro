@@ -27,4 +27,6 @@ export default {
 
   'menu.Algs': "公式库",
   'menu.buyCoffee': "請作者喝咖啡",
+  'menu.Recipes': "菜譜",
+  'menu.RecipeDetail': "菜譜詳情",
 }

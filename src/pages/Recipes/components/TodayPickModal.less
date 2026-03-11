@@ -1,0 +1,23 @@
+.today-pick-modal-result {
+  .today-pick-name {
+    transition: transform 0.15s ease-out;
+    &.spinning {
+      animation: today-pick-roll 0.12s ease-in-out infinite;
+    }
+  }
+}
+
+@keyframes today-pick-roll {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-4px) scale(1.02);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}

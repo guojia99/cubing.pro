@@ -60,3 +60,5 @@ dist.zip
 .husky
 
 node_modules
+./public/HowToCook
+./public/HowToCook/*

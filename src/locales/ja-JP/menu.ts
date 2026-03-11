@@ -27,4 +27,6 @@ export default {
 
   'menu.Algs': "公式库",
   'menu.buyCoffee': "作者にコーヒーをおごる",
+  'menu.Recipes': "レシピ",
+  'menu.RecipeDetail': "レシピ詳細",
 }
