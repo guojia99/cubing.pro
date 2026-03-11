@@ -2,8 +2,9 @@ import { getIntl } from '@@/exports';
 import { Avatar, Button, Card, theme } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { WCALink } from '@/components/Link/Links';
+import { getAcknowledgments } from '@/services/cubing-pro/public/orgs';
+import { Thank } from '@/services/cubing-pro/auth/typings';
 import { apiGetWCAPersonProfile } from '@/services/cubing-pro/wca/wca_api';
-import thanksData from './thanks.json';
 
 const intl = getIntl();
 
@@ -17,11 +18,19 @@ export type ThanksPerson = {
   avatar?: string;
 };
 
-const thanksList: ThanksPerson[] = thanksData as ThanksPerson[];
 const MAX_VISIBLE = 12;
 
 function hasValidWcaId(wcaID: string): boolean {
   return !!wcaID && wcaID !== '-' && wcaID.length === 10;
+}
+
+function thankToThanksPerson(t: Thank): ThanksPerson {
+  return {
+    wcaID: t.wcaID ?? '',
+    nickname: t.nickname ?? '',
+    amount: t.amount ?? 0,
+    avatar: t.avatar || undefined,
+  };
 }
 
 /**
@@ -39,10 +48,28 @@ function getAvatarUrl(
 /**
  * 致谢栏 - 感谢支持者的赞助
  */
-const ThanksSection: React.FC = () => {
+const ThanksSection: React.FC<{ data?: Thank[] }> = ({ data }) => {
   const { token } = theme.useToken();
   const [expanded, setExpanded] = useState(false);
   const [avatarCache, setAvatarCache] = useState<Record<string, string>>({});
+  const [thanksList, setThanksList] = useState<ThanksPerson[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const list = data ?? (await getAcknowledgments());
+        setThanksList(list.map(thankToThanksPerson));
+      } catch (err) {
+        console.warn('Failed to fetch acknowledgments:', err);
+        setThanksList([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [data]);
+
   const hasMore = thanksList.length > MAX_VISIBLE;
   const displayList = expanded ? thanksList : thanksList.slice(0, MAX_VISIBLE);
 
@@ -61,9 +88,9 @@ const ThanksSection: React.FC = () => {
           console.warn(`Failed to fetch avatar for ${person.wcaID}:`, err);
         });
     });
-  }, []);
+  }, [thanksList]);
 
-  if (thanksList.length === 0) return null;
+  if (loading || thanksList.length === 0) return null;
 
   return (
     <Card

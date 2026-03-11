@@ -1,6 +1,7 @@
 import { history, useModel } from '@@/exports';
-import {message, Tag} from 'antd';
-import {AuthAPI} from "@/services/cubing-pro/auth/typings";
+import { stringify } from 'querystring';
+import { message, Tag } from 'antd';
+import { AuthAPI } from '@/services/cubing-pro/auth/typings';
 
 export enum Auth {
   AuthPlayer = 1 << 0, // 选手
@@ -42,7 +43,11 @@ export function checkAuth(requiredAuths: Auth[]): AuthAPI.CurrentUser | null {
 
   if (currentUser === null || currentUser === undefined) {
     message.warning('请先登陆帐号后访问').then();
-    history.replace({ pathname: '/login' });
+    const { pathname, search } = window.location;
+    history.replace({
+      pathname: '/login',
+      search: stringify({ redirect: pathname + search }),
+    });
     return null;
   }
   const user = currentUser as AuthAPI.CurrentUser;

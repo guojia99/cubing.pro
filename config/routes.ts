@@ -65,8 +65,9 @@ export default [
   { path: 'settings', component: './Settings' },
 
   // 用户相关
-  { path: '/login', component: './Admin/Login', hidden: true }, // 登录
-  { path: '/register', component: './Admin/Register', hidden: true }, // 注册
+  { path: '/login', component: './Admin/Login', hidden: true }, // WCA 登录
+  { path: '/auth/callback', component: './Admin/AuthCallback', hidden: true }, // WCA 回调（接收 token 后跳转）
+  { path: '/old_login', component: './Admin/OldLogin', hidden: true }, // 旧版账号密码登录（已隐藏）
   { path: '/user/profile', component: './Admin/Profile' }, // 个人中心
   // {path: '/user',  component: './Admin/UserInfo'}, // 用户个人信息
   // {path: '/user/settings', component: './Admin/Settings'}, // 个人设置
@@ -90,6 +91,7 @@ export default [
   { path: 'admin/admins', component: './Admin/Admin' },
   { path: 'admin/users', component: './Admin/AdminComponent/Users' },
   { path: 'admin/diy_ranking', component: './Admin/AdminComponent/DiyRanking' },
+  { path: 'admin/acknowledgments', component: './Admin/AdminComponent/AdminAcknowledgments' },
 
   // 管理
   { path: 'admin/sports', component: './Admin/SportsComponents/Sports' },

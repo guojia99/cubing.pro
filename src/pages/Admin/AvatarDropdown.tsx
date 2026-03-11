@@ -71,7 +71,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
       history.replace({
         pathname: '/login',
         search: stringify({
-          redirect: pathname + search,
+          redirect: pathname + (search || ''),
         }),
       });
     }
