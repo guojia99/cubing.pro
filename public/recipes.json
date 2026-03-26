@@ -8,6 +8,22 @@
       "category": "aquatic",
       "categoryName": "水产",
       "mdPath": "dishes/aquatic/小龙虾/小龙虾.md",
+      "ingredients": [
+        "小龙虾",
+        "油",
+        "香叶",
+        "八角",
+        "桂皮",
+        "青花椒",
+        "花椒",
+        "子弹头辣椒",
+        "葱姜蒜",
+        "郫县豆瓣",
+        "黄豆酱",
+        "啤酒",
+        "生抽",
+        "盐"
+      ],
       "hasImage": true,
       "coverImage": "dishes/aquatic/小龙虾/成品.jpg"
     },
@@ -19,6 +35,18 @@
       "category": "aquatic",
       "categoryName": "水产",
       "mdPath": "dishes/aquatic/干煎阿根廷红虾/干煎阿根廷红虾.md",
+      "ingredients": [
+        "阿根廷红虾",
+        "海盐",
+        "黑胡椒",
+        "白葡萄酒",
+        "生抽",
+        "香菜",
+        "柠檬",
+        "洋葱",
+        "生姜",
+        "大蒜"
+      ],
       "hasImage": true,
       "coverImage": "dishes/aquatic/干煎阿根廷红虾/干煎阿根廷红虾.jpg"
     },
@@ -30,6 +58,16 @@
       "category": "aquatic",
       "categoryName": "水产",
       "mdPath": "dishes/aquatic/油焖大虾/油焖大虾.md",
+      "ingredients": [
+        "黑虎虾",
+        "明虾",
+        "葱",
+        "姜",
+        "料酒",
+        "盐",
+        "冰糖",
+        "植物油"
+      ],
       "hasImage": true,
       "coverImage": "dishes/aquatic/油焖大虾/油焖大虾.jpg"
     },
@@ -41,6 +79,29 @@
       "category": "aquatic",
       "categoryName": "水产",
       "mdPath": "dishes/aquatic/混合烤鱼/烤鱼.md",
+      "ingredients": [
+        "草鱼",
+        "大葱",
+        "料酒",
+        "白胡椒粉",
+        "食用盐",
+        "大蒜",
+        "桂皮",
+        "八角",
+        "香叶",
+        "青花椒",
+        "干辣椒段",
+        "灯笼椒",
+        "火锅底料",
+        "千张",
+        "绿豆芽",
+        "洋葱",
+        "豆瓣酱",
+        "芹菜段",
+        "熟花生米",
+        "白芝麻",
+        "香菜"
+      ],
       "hasImage": true,
       "coverImage": "dishes/aquatic/混合烤鱼/烤鱼.jpg"
     },
@@ -52,6 +113,15 @@
       "category": "aquatic",
       "categoryName": "水产",
       "mdPath": "dishes/aquatic/清蒸鲈鱼/清蒸鲈鱼.md",
+      "ingredients": [
+        "鲈鱼",
+        "香葱",
+        "姜",
+        "食用油",
+        "蒸鱼豉油",
+        "料酒",
+        "食用盐"
+      ],
       "hasImage": true,
       "coverImage": "dishes/aquatic/清蒸鲈鱼/改刀.jpg"
     },
@@ -63,6 +133,19 @@
       "category": "aquatic",
       "categoryName": "水产",
       "mdPath": "dishes/aquatic/白灼虾/白灼虾.md",
+      "ingredients": [
+        "活虾",
+        "洋葱",
+        "姜",
+        "蒜",
+        "葱",
+        "食用油",
+        "酱油",
+        "料酒",
+        "芝麻",
+        "蚝油",
+        "香醋"
+      ],
       "hasImage": true,
       "coverImage": "dishes/aquatic/白灼虾/白灼虾.webp"
     },
@@ -74,6 +157,18 @@
       "category": "aquatic",
       "categoryName": "水产",
       "mdPath": "dishes/aquatic/糖醋鲤鱼/糖醋鲤鱼.md",
+      "ingredients": [
+        "鲤鱼",
+        "番茄酱",
+        "白糖",
+        "白醋",
+        "淀粉",
+        "盐",
+        "葱",
+        "姜",
+        "料酒",
+        "香菜"
+      ],
       "hasImage": true,
       "coverImage": "dishes/aquatic/糖醋鲤鱼/腌制.jpg"
     },
@@ -85,6 +180,20 @@
       "category": "aquatic",
       "categoryName": "水产",
       "mdPath": "dishes/aquatic/芥末黄油罗氏虾/芥末黄油罗氏虾.md",
+      "ingredients": [
+        "罗氏虾",
+        "黄油",
+        "芥末",
+        "白糖",
+        "生抽",
+        "蚝油",
+        "盐",
+        "料酒",
+        "朗姆酒",
+        "啤酒",
+        "香菜",
+        "蒜"
+      ],
       "hasImage": true,
       "coverImage": "dishes/aquatic/芥末黄油罗氏虾/芥末黄油罗氏虾.jpg"
     },
@@ -96,6 +205,16 @@
       "category": "aquatic",
       "categoryName": "水产",
       "mdPath": "dishes/aquatic/葱油桂鱼/葱油桂鱼.md",
+      "ingredients": [
+        "桂鱼",
+        "小葱",
+        "小米辣",
+        "姜",
+        "料酒",
+        "植物油",
+        "盐",
+        "蒸鱼豉油"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -107,6 +226,10 @@
       "category": "aquatic",
       "categoryName": "水产",
       "mdPath": "dishes/aquatic/葱烧海参/葱烧海参.md",
+      "ingredients": [
+        "泡发好的海参",
+        "大葱葱白"
+      ],
       "hasImage": true,
       "coverImage": "dishes/aquatic/葱烧海参/葱烧海参.jpeg"
     },
@@ -118,6 +241,12 @@
       "category": "aquatic",
       "categoryName": "水产",
       "mdPath": "dishes/aquatic/蒜蓉虾/蒜蓉虾.md",
+      "ingredients": [
+        "海虾",
+        "蒜蓉酱",
+        "食用油",
+        "生抽"
+      ],
       "hasImage": true,
       "coverImage": "dishes/aquatic/蒜蓉虾/1.jpeg"
     },
@@ -129,6 +258,13 @@
       "category": "aquatic",
       "categoryName": "水产",
       "mdPath": "dishes/aquatic/蒜香黄油虾/蒜香黄油虾.md",
+      "ingredients": [
+        "大虾",
+        "无盐黄油",
+        "大蒜",
+        "白葡萄酒",
+        "柠檬"
+      ],
       "hasImage": true,
       "coverImage": "dishes/aquatic/蒜香黄油虾/1.jpg"
     },
@@ -140,6 +276,16 @@
       "category": "aquatic",
       "categoryName": "水产",
       "mdPath": "dishes/aquatic/蛏抱蛋/蛏抱蛋.md",
+      "ingredients": [
+        "蛏子",
+        "鸡蛋",
+        "食用油",
+        "洋葱",
+        "淀粉",
+        "生抽",
+        "鸡精",
+        "料酒"
+      ],
       "hasImage": true,
       "coverImage": "dishes/aquatic/蛏抱蛋/1.jpeg"
     },
@@ -151,6 +297,20 @@
       "category": "aquatic",
       "categoryName": "水产",
       "mdPath": "dishes/aquatic/香煎翘嘴鱼/香煎翘嘴鱼.md",
+      "ingredients": [
+        "翘嘴鱼",
+        "姜",
+        "葱",
+        "蒜",
+        "青椒",
+        "香菜",
+        "老抽",
+        "白糖",
+        "豆瓣酱",
+        "料酒",
+        "生抽",
+        "盐"
+      ],
       "hasImage": true,
       "coverImage": "dishes/aquatic/香煎翘嘴鱼/香煎翘嘴鱼.jpeg"
     },
@@ -162,6 +322,21 @@
       "category": "aquatic",
       "categoryName": "水产",
       "mdPath": "dishes/aquatic/鲤鱼炖白菜/鲤鱼炖白菜.md",
+      "ingredients": [
+        "食用油",
+        "姜",
+        "蒜",
+        "鲤鱼",
+        "白菜心",
+        "娃娃菜",
+        "盐",
+        "老抽",
+        "生抽",
+        "桂皮",
+        "八角",
+        "郫县豆瓣酱",
+        "干辣椒"
+      ],
       "hasImage": true,
       "coverImage": "dishes/aquatic/鲤鱼炖白菜/鲤鱼炖白菜.jpeg"
     },
@@ -173,6 +348,22 @@
       "category": "aquatic",
       "categoryName": "水产",
       "mdPath": "dishes/aquatic/鳊鱼炖豆腐/鳊鱼炖豆腐.md",
+      "ingredients": [
+        "鳊鱼",
+        "老豆腐",
+        "姜",
+        "葱",
+        "蒜",
+        "老抽",
+        "桂皮",
+        "冰糖",
+        "干辣椒",
+        "料酒",
+        "生抽",
+        "盐",
+        "八角",
+        "香叶"
+      ],
       "hasImage": true,
       "coverImage": "dishes/aquatic/鳊鱼炖豆腐/鳊鱼炖豆腐.jpg"
     },
@@ -184,6 +375,15 @@
       "category": "aquatic",
       "categoryName": "水产",
       "mdPath": "dishes/aquatic/黄油煎虾/黄油煎虾.md",
+      "ingredients": [
+        "鲜虾",
+        "黄油",
+        "黑胡椒粒",
+        "生抽",
+        "盐",
+        "白糖",
+        "米酒"
+      ],
       "hasImage": true,
       "coverImage": "dishes/aquatic/黄油煎虾/黄油煎虾.jpg"
     },
@@ -195,6 +395,15 @@
       "category": "aquatic",
       "categoryName": "水产",
       "mdPath": "dishes/aquatic/咖喱炒蟹.md",
+      "ingredients": [
+        "青蟹",
+        "咖喱块",
+        "洋葱",
+        "椰浆",
+        "鸡蛋",
+        "生粉",
+        "大蒜"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -206,6 +415,22 @@
       "category": "aquatic",
       "categoryName": "水产",
       "mdPath": "dishes/aquatic/响油鳝丝.md",
+      "ingredients": [
+        "鳝丝",
+        "大蒜",
+        "姜末",
+        "料酒",
+        "生抽",
+        "蚝油",
+        "老抽",
+        "食用盐",
+        "白糖",
+        "胡椒粉",
+        "淀粉",
+        "蒜末",
+        "葱花",
+        "猪油"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -217,6 +442,16 @@
       "category": "aquatic",
       "categoryName": "水产",
       "mdPath": "dishes/aquatic/微波葱姜黑鳕鱼.md",
+      "ingredients": [
+        "黑鳕鱼",
+        "带皮",
+        "青葱",
+        "姜",
+        "料酒",
+        "酱油",
+        "芝麻油",
+        "花生油"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -228,6 +463,17 @@
       "category": "aquatic",
       "categoryName": "水产",
       "mdPath": "dishes/aquatic/水煮鱼.md",
+      "ingredients": [
+        "巴沙鱼",
+        "蔬菜",
+        "红油豆瓣酱",
+        "藤椒油",
+        "菜籽油",
+        "白胡椒粉",
+        "蒜瓣",
+        "盐",
+        "糖"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -239,6 +485,13 @@
       "category": "aquatic",
       "categoryName": "水产",
       "mdPath": "dishes/aquatic/清蒸生蚝.md",
+      "ingredients": [
+        "生蚝",
+        "葱",
+        "蒜",
+        "姜",
+        "酱油"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -250,6 +503,23 @@
       "category": "aquatic",
       "categoryName": "水产",
       "mdPath": "dishes/aquatic/红烧鱼.md",
+      "ingredients": [
+        "姜",
+        "蒜瓣",
+        "干辣椒",
+        "油",
+        "盐",
+        "料酒",
+        "醋",
+        "酱油",
+        "白砂糖",
+        "鱼",
+        "蚝油",
+        "葱",
+        "香菜",
+        "小米椒",
+        "味精"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -261,6 +531,24 @@
       "category": "aquatic",
       "categoryName": "水产",
       "mdPath": "dishes/aquatic/红烧鱼头.md",
+      "ingredients": [
+        "大葱",
+        "姜",
+        "大蒜",
+        "香菜",
+        "美人椒",
+        "油",
+        "盐",
+        "鸡精",
+        "生抽",
+        "老抽",
+        "陈醋",
+        "黑胡椒粉",
+        "料酒",
+        "八角",
+        "干辣椒",
+        "鱼头"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -272,6 +560,22 @@
       "category": "aquatic",
       "categoryName": "水产",
       "mdPath": "dishes/aquatic/红烧鲤鱼.md",
+      "ingredients": [
+        "大葱",
+        "姜",
+        "大蒜",
+        "干辣椒",
+        "油",
+        "盐",
+        "生抽",
+        "老抽",
+        "陈醋",
+        "蚝油",
+        "料酒",
+        "白糖",
+        "鲤鱼",
+        "五花肉"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -283,6 +587,31 @@
       "category": "aquatic",
       "categoryName": "水产",
       "mdPath": "dishes/aquatic/肉蟹煲.md",
+      "ingredients": [
+        "肉蟹",
+        "虾",
+        "土豆",
+        "年糕",
+        "洋葱",
+        "大蒜",
+        "生姜",
+        "干辣椒",
+        "青椒",
+        "红椒",
+        "蚝油",
+        "海鲜酱",
+        "黄豆酱",
+        "甜面酱",
+        "番茄酱",
+        "淀粉",
+        "冰糖",
+        "鸡精",
+        "白胡椒粉",
+        "料酒",
+        "生抽",
+        "老抽",
+        "啤酒"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -294,6 +623,19 @@
       "category": "aquatic",
       "categoryName": "水产",
       "mdPath": "dishes/aquatic/酱炖蟹.md",
+      "ingredients": [
+        "螃蟹",
+        "豆瓣酱",
+        "冰糖",
+        "老抽",
+        "菜油",
+        "番茄酱",
+        "料酒",
+        "老姜",
+        "小葱",
+        "鸡蛋",
+        "猪肉末"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -305,6 +647,11 @@
       "category": "breakfast",
       "categoryName": "早餐",
       "mdPath": "dishes/breakfast/温泉蛋/温泉蛋.md",
+      "ingredients": [
+        "鸡蛋",
+        "昆布酱油",
+        "香葱"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -316,6 +663,12 @@
       "category": "breakfast",
       "categoryName": "早餐",
       "mdPath": "dishes/breakfast/苏格兰蛋/苏格兰蛋.md",
+      "ingredients": [
+        "鸡蛋",
+        "手抓饼皮",
+        "芝士",
+        "培根"
+      ],
       "hasImage": true,
       "coverImage": "dishes/breakfast/苏格兰蛋/egg1.png"
     },
@@ -327,6 +680,10 @@
       "category": "breakfast",
       "categoryName": "早餐",
       "mdPath": "dishes/breakfast/吐司果酱.md",
+      "ingredients": [
+        "新鲜吐司",
+        "果酱"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -338,6 +695,11 @@
       "category": "breakfast",
       "categoryName": "早餐",
       "mdPath": "dishes/breakfast/太阳蛋.md",
+      "ingredients": [
+        "鸡蛋",
+        "盐",
+        "油"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -349,6 +711,9 @@
       "category": "breakfast",
       "categoryName": "早餐",
       "mdPath": "dishes/breakfast/完美水煮蛋.md",
+      "ingredients": [
+        "新鲜鸡蛋"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -360,6 +725,11 @@
       "category": "breakfast",
       "categoryName": "早餐",
       "mdPath": "dishes/breakfast/微波炉荷包蛋.md",
+      "ingredients": [
+        "鸡蛋",
+        "芝麻油",
+        "盐"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -371,6 +741,13 @@
       "category": "breakfast",
       "categoryName": "早餐",
       "mdPath": "dishes/breakfast/微波炉蒸蛋.md",
+      "ingredients": [
+        "鸡蛋",
+        "高汤",
+        "食盐",
+        "生抽",
+        "香油"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -382,6 +759,12 @@
       "category": "breakfast",
       "categoryName": "早餐",
       "mdPath": "dishes/breakfast/微波炉蛋糕.md",
+      "ingredients": [
+        "黄油",
+        "面粉",
+        "泡打粉",
+        "鸡蛋"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -393,6 +776,19 @@
       "category": "breakfast",
       "categoryName": "早餐",
       "mdPath": "dishes/breakfast/意式香肠北非蛋.md",
+      "ingredients": [
+        "意式猪肉香肠",
+        "辣香肠",
+        "切块的午餐肉",
+        "鸡蛋",
+        "甜椒",
+        "洋葱",
+        "橄榄油",
+        "帕马森干酪",
+        "新鲜欧芹",
+        "干辣椒碎",
+        "面包"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -404,6 +800,15 @@
       "category": "breakfast",
       "categoryName": "早餐",
       "mdPath": "dishes/breakfast/手抓饼.md",
+      "ingredients": [
+        "普通面粉",
+        "食用油",
+        "盐",
+        "鸡蛋",
+        "生菜",
+        "火腿",
+        "芝士片"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -415,6 +820,11 @@
       "category": "breakfast",
       "categoryName": "早餐",
       "mdPath": "dishes/breakfast/桂圆红枣粥.md",
+      "ingredients": [
+        "糯米",
+        "红枣",
+        "桂圆"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -426,6 +836,11 @@
       "category": "breakfast",
       "categoryName": "早餐",
       "mdPath": "dishes/breakfast/水煮玉米.md",
+      "ingredients": [
+        "新鲜玉米",
+        "盐",
+        "糖"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -437,6 +852,9 @@
       "category": "breakfast",
       "categoryName": "早餐",
       "mdPath": "dishes/breakfast/溏心蛋.md",
+      "ingredients": [
+        "鸡蛋"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -448,6 +866,11 @@
       "category": "breakfast",
       "categoryName": "早餐",
       "mdPath": "dishes/breakfast/煎饺.md",
+      "ingredients": [
+        "饺子",
+        "芝麻",
+        "葱花"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -459,6 +882,12 @@
       "category": "breakfast",
       "categoryName": "早餐",
       "mdPath": "dishes/breakfast/燕麦鸡蛋饼.md",
+      "ingredients": [
+        "鸡蛋",
+        "燕麦",
+        "牛奶",
+        "菠菜"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -470,6 +899,11 @@
       "category": "breakfast",
       "categoryName": "早餐",
       "mdPath": "dishes/breakfast/牛奶燕麦.md",
+      "ingredients": [
+        "牛奶",
+        "燕麦",
+        "鸡蛋"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -481,6 +915,9 @@
       "category": "breakfast",
       "categoryName": "早餐",
       "mdPath": "dishes/breakfast/空气炸锅面包片.md",
+      "ingredients": [
+        "面包片"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -492,6 +929,13 @@
       "category": "breakfast",
       "categoryName": "早餐",
       "mdPath": "dishes/breakfast/美式炒蛋.md",
+      "ingredients": [
+        "鸡蛋",
+        "全脂牛奶",
+        "奶油",
+        "黄油",
+        "盐"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -503,6 +947,18 @@
       "category": "breakfast",
       "categoryName": "早餐",
       "mdPath": "dishes/breakfast/茶叶蛋.md",
+      "ingredients": [
+        "鸡蛋",
+        "八角",
+        "香叶",
+        "桂皮",
+        "茴香",
+        "冰糖",
+        "红茶",
+        "生抽",
+        "老抽",
+        "食盐"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -514,6 +970,9 @@
       "category": "breakfast",
       "categoryName": "早餐",
       "mdPath": "dishes/breakfast/蒸水蛋.md",
+      "ingredients": [
+        "新鲜鸡蛋"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -525,6 +984,11 @@
       "category": "breakfast",
       "categoryName": "早餐",
       "mdPath": "dishes/breakfast/蒸花卷.md",
+      "ingredients": [
+        "冷冻花卷",
+        "圆碟子",
+        "蒸架"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -536,6 +1000,12 @@
       "category": "breakfast",
       "categoryName": "早餐",
       "mdPath": "dishes/breakfast/蛋煎糍粑.md",
+      "ingredients": [
+        "鸡蛋",
+        "糍粑",
+        "白糖",
+        "红糖"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -547,6 +1017,14 @@
       "category": "breakfast",
       "categoryName": "早餐",
       "mdPath": "dishes/breakfast/金枪鱼酱三明治.md",
+      "ingredients": [
+        "水浸金枪鱼罐头",
+        "方形吐司片",
+        "蛋黄酱",
+        "俄式酸黄瓜汁",
+        "芝士片",
+        "火腿片"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -558,6 +1036,15 @@
       "category": "breakfast",
       "categoryName": "早餐",
       "mdPath": "dishes/breakfast/韩国麻药鸡蛋.md",
+      "ingredients": [
+        "鸡蛋",
+        "韩式酱油",
+        "日式味淋",
+        "白糖",
+        "芝麻油",
+        "青葱",
+        "辣椒"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -569,6 +1056,15 @@
       "category": "breakfast",
       "categoryName": "早餐",
       "mdPath": "dishes/breakfast/鸡蛋三明治.md",
+      "ingredients": [
+        "鸡蛋",
+        "吐司",
+        "培根",
+        "黄油",
+        "蛋黄酱",
+        "盐",
+        "黑胡椒"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -580,6 +1076,24 @@
       "category": "condiment",
       "categoryName": "调味料",
       "mdPath": "dishes/condiment/油泼辣子/油泼辣子.md",
+      "ingredients": [
+        "蒜头",
+        "干辣椒面",
+        "盐",
+        "熟白芝麻",
+        "小米椒",
+        "花生油",
+        "五香粉",
+        "草寇",
+        "小葱",
+        "八角",
+        "花椒",
+        "香叶",
+        "白芷",
+        "姜片",
+        "糖",
+        "白醋"
+      ],
       "hasImage": true,
       "coverImage": "dishes/condiment/油泼辣子/口水鸡+油泼辣子.jpg"
     },
@@ -591,6 +1105,10 @@
       "category": "condiment",
       "categoryName": "调味料",
       "mdPath": "dishes/condiment/草莓酱/草莓酱.md",
+      "ingredients": [
+        "草莓",
+        "白砂糖"
+      ],
       "hasImage": true,
       "coverImage": "dishes/condiment/草莓酱/洗好的草莓.jpeg"
     },
@@ -602,6 +1120,9 @@
       "category": "condiment",
       "categoryName": "调味料",
       "mdPath": "dishes/condiment/蔗糖糖浆/蔗糖糖浆.md",
+      "ingredients": [
+        "白砂糖"
+      ],
       "hasImage": true,
       "coverImage": "dishes/condiment/蔗糖糖浆/bottle.jpg"
     },
@@ -613,6 +1134,11 @@
       "category": "condiment",
       "categoryName": "调味料",
       "mdPath": "dishes/condiment/油酥.md",
+      "ingredients": [
+        "面粉",
+        "油",
+        "盐"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -624,6 +1150,16 @@
       "category": "condiment",
       "categoryName": "调味料",
       "mdPath": "dishes/condiment/炸串酱料.md",
+      "ingredients": [
+        "干辣椒面",
+        "孜然粉",
+        "胡椒粉",
+        "五香粉",
+        "花椒粉",
+        "十三香",
+        "麻辣鲜",
+        "白芝麻"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -635,6 +1171,9 @@
       "category": "condiment",
       "categoryName": "调味料",
       "mdPath": "dishes/condiment/简易版炒糖色.md",
+      "ingredients": [
+        "糖"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -646,6 +1185,13 @@
       "category": "condiment",
       "categoryName": "调味料",
       "mdPath": "dishes/condiment/糖醋汁.md",
+      "ingredients": [
+        "白糖",
+        "白醋",
+        "米醋",
+        "料酒",
+        "生抽"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -657,6 +1203,15 @@
       "category": "condiment",
       "categoryName": "调味料",
       "mdPath": "dishes/condiment/葱油.md",
+      "ingredients": [
+        "油",
+        "葱",
+        "姜",
+        "洋葱",
+        "料酒",
+        "香菜",
+        "开洋"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -668,6 +1223,13 @@
       "category": "condiment",
       "categoryName": "调味料",
       "mdPath": "dishes/condiment/蒜香酱油.md",
+      "ingredients": [
+        "蒜头",
+        "白芝麻",
+        "花生油",
+        "酱油",
+        "蘸料碟"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -679,6 +1241,12 @@
       "category": "dessert",
       "categoryName": "甜品",
       "mdPath": "dishes/dessert/反沙芋头/反沙芋头.md",
+      "ingredients": [
+        "荔浦芋头",
+        "白砂糖",
+        "冰糖",
+        "葱"
+      ],
       "hasImage": true,
       "coverImage": "dishes/dessert/反沙芋头/反沙芋头成品.jpg"
     },
@@ -690,6 +1258,12 @@
       "category": "dessert",
       "categoryName": "甜品",
       "mdPath": "dishes/dessert/咖啡椰奶冻/咖啡椰奶冻.md",
+      "ingredients": [
+        "淡奶油",
+        "椰树牌椰汁",
+        "椰子水",
+        "吉利丁"
+      ],
       "hasImage": true,
       "coverImage": "dishes/dessert/咖啡椰奶冻/咖啡椰奶冻.png"
     },
@@ -701,6 +1275,10 @@
       "category": "dessert",
       "categoryName": "甜品",
       "mdPath": "dishes/dessert/奥利奥冰淇淋/奥利奥冰淇淋.md",
+      "ingredients": [
+        "淡奶油",
+        "原味奥利奥"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -712,6 +1290,14 @@
       "category": "dessert",
       "categoryName": "甜品",
       "mdPath": "dishes/dessert/戚风蛋糕/戚风蛋糕.md",
+      "ingredients": [
+        "鸡蛋",
+        "白糖",
+        "牛奶",
+        "食用油",
+        "低筋面粉",
+        "白醋"
+      ],
       "hasImage": true,
       "coverImage": "dishes/dessert/戚风蛋糕/IMG_1516.jpg"
     },
@@ -723,6 +1309,15 @@
       "category": "dessert",
       "categoryName": "甜品",
       "mdPath": "dishes/dessert/提拉米苏/提拉米苏.md",
+      "ingredients": [
+        "马斯卡彭芝士",
+        "手指饼干",
+        "放凉浓缩咖啡",
+        "无菌鸡蛋",
+        "白砂糖",
+        "可可粉",
+        "朗姆酒"
+      ],
       "hasImage": true,
       "coverImage": "dishes/dessert/提拉米苏/提拉米苏成品.jpg"
     },
@@ -734,6 +1329,17 @@
       "category": "dessert",
       "categoryName": "甜品",
       "mdPath": "dishes/dessert/无厨师机蜂蜜面包/无厨师机蜂蜜面包.md",
+      "ingredients": [
+        "高筋面粉",
+        "牛奶",
+        "酵母",
+        "鸡蛋",
+        "白砂糖",
+        "盐",
+        "黄油",
+        "蜂蜜",
+        "芝麻"
+      ],
       "hasImage": true,
       "coverImage": "dishes/dessert/无厨师机蜂蜜面包/无厨师机蜂蜜面包.jpg"
     },
@@ -745,6 +1351,13 @@
       "category": "dessert",
       "categoryName": "甜品",
       "mdPath": "dishes/dessert/炸鲜奶/炸鲜奶.md",
+      "ingredients": [
+        "牛奶",
+        "玉米淀粉",
+        "面包糠",
+        "鸡蛋",
+        "白糖"
+      ],
       "hasImage": true,
       "coverImage": "dishes/dessert/炸鲜奶/炸鲜奶.jpg"
     },
@@ -756,6 +1369,15 @@
       "category": "dessert",
       "categoryName": "甜品",
       "mdPath": "dishes/dessert/烤箱版巴斯克芝士蛋糕/烤箱版巴斯克芝士蛋糕.md",
+      "ingredients": [
+        "奶油奶酪",
+        "白砂糖",
+        "鸡蛋",
+        "鸡蛋黄",
+        "淡奶油",
+        "低筋面粉",
+        "巧克力"
+      ],
       "hasImage": true,
       "coverImage": "dishes/dessert/烤箱版巴斯克芝士蛋糕/烤箱版巴斯克芝士蛋糕.jpg"
     },
@@ -767,6 +1389,13 @@
       "category": "dessert",
       "categoryName": "甜品",
       "mdPath": "dishes/dessert/烤蛋挞/烤蛋挞.md",
+      "ingredients": [
+        "蛋挞皮",
+        "鸡蛋",
+        "牛奶",
+        "淡奶油",
+        "白砂糖"
+      ],
       "hasImage": true,
       "coverImage": "dishes/dessert/烤蛋挞/烤蛋挞.png"
     },
@@ -778,6 +1407,14 @@
       "category": "dessert",
       "categoryName": "甜品",
       "mdPath": "dishes/dessert/玛格丽特饼干/玛格丽特饼干.md",
+      "ingredients": [
+        "熟蛋黄",
+        "黄油",
+        "白砂糖",
+        "盐",
+        "低筋面粉",
+        "玉米淀粉"
+      ],
       "hasImage": true,
       "coverImage": "dishes/dessert/玛格丽特饼干/玛格丽特饼干.jpg"
     },
@@ -789,6 +1426,13 @@
       "category": "dessert",
       "categoryName": "甜品",
       "mdPath": "dishes/dessert/红柚蛋糕/红柚蛋糕.md",
+      "ingredients": [
+        "鸡蛋",
+        "红柚果肉",
+        "面粉",
+        "油",
+        "糖"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -800,6 +1444,17 @@
       "category": "dessert",
       "categoryName": "甜品",
       "mdPath": "dishes/dessert/芋泥雪媚娘/芋泥雪媚娘.md",
+      "ingredients": [
+        "荔浦芋头",
+        "紫薯粉",
+        "牛奶",
+        "糯米粉",
+        "玉米淀粉",
+        "黄油",
+        "淡奶油",
+        "白砂糖",
+        "筛网"
+      ],
       "hasImage": true,
       "coverImage": "dishes/dessert/芋泥雪媚娘/芋泥雪媚娘成品.jpg"
     },
@@ -811,6 +1466,16 @@
       "category": "dessert",
       "categoryName": "甜品",
       "mdPath": "dishes/dessert/英式司康/英式司康.md",
+      "ingredients": [
+        "无盐黄油",
+        "低筋面粉",
+        "糖",
+        "盐",
+        "泡打粉",
+        "鸡蛋",
+        "淡奶油",
+        "奶油奶酪"
+      ],
       "hasImage": true,
       "coverImage": "dishes/dessert/英式司康/英式司康.png"
     },
@@ -822,6 +1487,12 @@
       "category": "dessert",
       "categoryName": "甜品",
       "mdPath": "dishes/dessert/草莓冰淇淋/草莓冰淇淋.md",
+      "ingredients": [
+        "加糖炼乳",
+        "草莓",
+        "重奶油",
+        "香草精"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -833,6 +1504,13 @@
       "category": "dessert",
       "categoryName": "甜品",
       "mdPath": "dishes/dessert/酸奶意式奶冻/酸奶意式奶冻.md",
+      "ingredients": [
+        "淡奶油",
+        "糖",
+        "原味酸奶",
+        "吉利丁片",
+        "筛网"
+      ],
       "hasImage": true,
       "coverImage": "dishes/dessert/酸奶意式奶冻/酸奶意式奶冻.png"
     },
@@ -844,6 +1522,13 @@
       "category": "dessert",
       "categoryName": "甜品",
       "mdPath": "dishes/dessert/雪花酥/雪花酥.md",
+      "ingredients": [
+        "无盐黄油",
+        "棉花糖",
+        "全脂奶粉",
+        "混合坚果",
+        "饼干"
+      ],
       "hasImage": true,
       "coverImage": "dishes/dessert/雪花酥/雪花酥成品.jpg"
     },
@@ -855,6 +1540,13 @@
       "category": "dessert",
       "categoryName": "甜品",
       "mdPath": "dishes/dessert/魔芋蛋糕/魔芋蛋糕.md",
+      "ingredients": [
+        "鸡蛋",
+        "赤藓糖醇",
+        "可可粉",
+        "魔芋粉",
+        "塔塔粉"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -866,6 +1558,11 @@
       "category": "dessert",
       "categoryName": "甜品",
       "mdPath": "dishes/dessert/龟苓膏/龟苓膏.md",
+      "ingredients": [
+        "龟苓膏粉",
+        "白砂糖",
+        "搅拌工具"
+      ],
       "hasImage": true,
       "coverImage": "dishes/dessert/龟苓膏/龟苓膏成品.jpg"
     },
@@ -877,6 +1574,16 @@
       "category": "dessert",
       "categoryName": "甜品",
       "mdPath": "dishes/dessert/胡萝卜甜糕.md",
+      "ingredients": [
+        "胡萝卜",
+        "全脂牛奶",
+        "糖",
+        "酥油",
+        "小豆蔻粉",
+        "腰果",
+        "杏仁",
+        "葡萄干"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -888,6 +1595,11 @@
       "category": "drink",
       "categoryName": "饮料",
       "mdPath": "dishes/drink/冰粉/冰粉.md",
+      "ingredients": [
+        "冰粉籽",
+        "薄荷汁",
+        "薄荷粉"
+      ],
       "hasImage": true,
       "coverImage": "dishes/drink/冰粉/石凉粉(冰粉"
     },
@@ -899,6 +1611,12 @@
       "category": "drink",
       "categoryName": "饮料",
       "mdPath": "dishes/drink/奇异果菠菜特调/奇异果菠菜特调.md",
+      "ingredients": [
+        "奇异果",
+        "苹果",
+        "菠菜叶",
+        "白砂糖"
+      ],
       "hasImage": true,
       "coverImage": "dishes/drink/奇异果菠菜特调/kiwi-example.jpg"
     },
@@ -910,6 +1628,11 @@
       "category": "drink",
       "categoryName": "饮料",
       "mdPath": "dishes/drink/柠檬水/柠檬水.md",
+      "ingredients": [
+        "柠檬",
+        "果蜜",
+        "冰"
+      ],
       "hasImage": true,
       "coverImage": "dishes/drink/柠檬水/柠檬水.jpg"
     },
@@ -921,6 +1644,12 @@
       "category": "drink",
       "categoryName": "饮料",
       "mdPath": "dishes/drink/泰国手标红茶/泰国手标红茶.md",
+      "ingredients": [
+        "茶粉",
+        "炼乳",
+        "白糖",
+        "牛奶"
+      ],
       "hasImage": true,
       "coverImage": "dishes/drink/泰国手标红茶/泰国手标红茶.jpg"
     },
@@ -932,6 +1661,16 @@
       "category": "drink",
       "categoryName": "饮料",
       "mdPath": "dishes/drink/海边落日/海边落日.md",
+      "ingredients": [
+        "红石榴糖浆",
+        "NFC 橙汁",
+        "苏打水",
+        "白朗姆",
+        "蓝橙力娇酒",
+        "柠檬汁",
+        "冰块",
+        "柠檬"
+      ],
       "hasImage": true,
       "coverImage": "dishes/drink/海边落日/海边落日.jpg"
     },
@@ -943,6 +1682,16 @@
       "category": "drink",
       "categoryName": "饮料",
       "mdPath": "dishes/drink/百香果橙子特调/百香果橙子特调.md",
+      "ingredients": [
+        "百香果",
+        "橙子",
+        "茉莉绿茶茶叶",
+        "苏打气泡水二选一",
+        "白砂糖",
+        "冰块",
+        "蜂蜜",
+        "薄荷叶"
+      ],
       "hasImage": true,
       "coverImage": "dishes/drink/百香果橙子特调/tea-version.jpg"
     },
@@ -954,6 +1703,10 @@
       "category": "drink",
       "categoryName": "饮料",
       "mdPath": "dishes/drink/砂糖椰子冰沙/砂糖椰子冰沙.md",
+      "ingredients": [
+        "瓶装椰汁",
+        "咖啡调糖"
+      ],
       "hasImage": true,
       "coverImage": "dishes/drink/砂糖椰子冰沙/砂糖椰子冰沙-1.jpg"
     },
@@ -965,6 +1718,12 @@
       "category": "drink",
       "categoryName": "饮料",
       "mdPath": "dishes/drink/耙耙柑茶/耙耙柑茶.md",
+      "ingredients": [
+        "耙耙柑",
+        "茉莉绿茶",
+        "冰块",
+        "蔗糖糖浆"
+      ],
       "hasImage": true,
       "coverImage": "dishes/drink/耙耙柑茶/citrus-tea.jpg"
     },
@@ -976,6 +1735,17 @@
       "category": "drink",
       "categoryName": "饮料",
       "mdPath": "dishes/drink/菠萝咖啡特调/菠萝咖啡特调.md",
+      "ingredients": [
+        "咖啡液",
+        "菠萝汁",
+        "冰块",
+        "苏打水",
+        "奶油",
+        "牛奶",
+        "糖",
+        "海盐",
+        "朗姆酒"
+      ],
       "hasImage": true,
       "coverImage": "dishes/drink/菠萝咖啡特调/菠萝咖啡特调.png"
     },
@@ -987,6 +1757,10 @@
       "category": "drink",
       "categoryName": "饮料",
       "mdPath": "dishes/drink/酒酿醪糟/酒酿醪糟.md",
+      "ingredients": [
+        "糯米",
+        "安琪甜酒曲"
+      ],
       "hasImage": true,
       "coverImage": "dishes/drink/酒酿醪糟/酒酿醪糟.jpeg"
     },
@@ -998,6 +1772,16 @@
       "category": "drink",
       "categoryName": "饮料",
       "mdPath": "dishes/drink/酸梅汤/酸梅汤.md",
+      "ingredients": [
+        "乌枣",
+        "乌梅",
+        "山楂片",
+        "黄冰糖",
+        "甘草",
+        "陈皮",
+        "红豆蔻",
+        "干桂花"
+      ],
       "hasImage": true,
       "coverImage": "dishes/drink/酸梅汤/imges/sour_plum_soup.jpg"
     },
@@ -1009,6 +1793,13 @@
       "category": "drink",
       "categoryName": "饮料",
       "mdPath": "dishes/drink/金汤力/金汤力.md",
+      "ingredients": [
+        "金酒",
+        "汤力水气泡水",
+        "柠檬",
+        "冰块",
+        "新鲜绿叶"
+      ],
       "hasImage": true,
       "coverImage": "dishes/drink/金汤力/gin-tonic.jpg"
     },
@@ -1020,6 +1811,14 @@
       "category": "drink",
       "categoryName": "饮料",
       "mdPath": "dishes/drink/金菲士/金菲士.md",
+      "ingredients": [
+        "金酒",
+        "苏打气泡水",
+        "柠檬",
+        "蔗糖糖浆",
+        "冰块",
+        "新鲜绿叶"
+      ],
       "hasImage": true,
       "coverImage": "dishes/drink/金菲士/gin-fizz.jpg"
     },
@@ -1031,6 +1830,11 @@
       "category": "drink",
       "categoryName": "饮料",
       "mdPath": "dishes/drink/B52轰炸机.md",
+      "ingredients": [
+        "甘露咖啡酒",
+        "爱尔兰百利甜酒",
+        "蓝天原味伏特加"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -1042,6 +1846,11 @@
       "category": "drink",
       "categoryName": "饮料",
       "mdPath": "dishes/drink/Mojito莫吉托.md",
+      "ingredients": [
+        "打碎的冰块",
+        "冰镇苏打水",
+        "研杵"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -1053,6 +1862,10 @@
       "category": "drink",
       "categoryName": "饮料",
       "mdPath": "dishes/drink/冬瓜茶.md",
+      "ingredients": [
+        "冬瓜",
+        "冰糖"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -1064,6 +1877,16 @@
       "category": "drink",
       "categoryName": "饮料",
       "mdPath": "dishes/drink/印度奶茶.md",
+      "ingredients": [
+        "红茶",
+        "全脂牛奶",
+        "生姜",
+        "小豆蔻",
+        "肉桂棒",
+        "丁香",
+        "黑胡椒粒",
+        "糖"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -1075,6 +1898,12 @@
       "category": "drink",
       "categoryName": "饮料",
       "mdPath": "dishes/drink/可乐桶.md",
+      "ingredients": [
+        "波旁威士忌",
+        "可口可乐",
+        "冰块",
+        "柠檬"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -1086,6 +1915,11 @@
       "category": "drink",
       "categoryName": "饮料",
       "mdPath": "dishes/drink/奶茶.md",
+      "ingredients": [
+        "袋泡红茶",
+        "全脂奶粉",
+        "淡奶"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -1097,6 +1931,10 @@
       "category": "drink",
       "categoryName": "饮料",
       "mdPath": "dishes/drink/杨枝甘露.md",
+      "ingredients": [
+        "牛奶",
+        "冰块"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -1108,6 +1946,15 @@
       "category": "drink",
       "categoryName": "饮料",
       "mdPath": "dishes/drink/牛油果拉西.md",
+      "ingredients": [
+        "原味酸奶",
+        "熟透的牛油果",
+        "蜂蜜",
+        "冷牛奶",
+        "小豆蔻粉",
+        "薄荷叶",
+        "坚果碎"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -1119,6 +1966,11 @@
       "category": "drink",
       "categoryName": "饮料",
       "mdPath": "dishes/drink/酸梅汤（半成品加工）.md",
+      "ingredients": [
+        "酸梅晶固体饮料",
+        "方糖",
+        "北京二锅头酒"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -1130,6 +1982,17 @@
       "category": "drink",
       "categoryName": "饮料",
       "mdPath": "dishes/drink/长岛冰茶.md",
+      "ingredients": [
+        "金酒",
+        "龙舌兰酒",
+        "伏特加",
+        "白朗姆酒",
+        "橙味甜酒",
+        "柠檬",
+        "枫糖浆",
+        "可乐",
+        "冰块"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -1141,6 +2004,7 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/农家一碗香/农家一碗香.md",
+      "ingredients": [],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/农家一碗香/农家一碗香成品.jpg"
     },
@@ -1152,6 +2016,16 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/冬瓜酿肉/冬瓜酿肉.md",
+      "ingredients": [
+        "冬瓜",
+        "猪肉末",
+        "鸡蛋",
+        "葱",
+        "葱姜末",
+        "胡椒粉",
+        "生抽",
+        "淀粉"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/冬瓜酿肉/冬瓜酿肉成品.jpg"
     },
@@ -1163,6 +2037,17 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/凉拌鸡丝/凉拌鸡丝.md",
+      "ingredients": [
+        "鸡胸肉",
+        "麻油",
+        "生抽",
+        "香醋",
+        "白糖",
+        "盐",
+        "料酒",
+        "姜",
+        "凉白开水"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/凉拌鸡丝/凉拌鸡丝.jpg"
     },
@@ -1174,6 +2059,24 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/卤菜/卤菜.md",
+      "ingredients": [
+        "卤料包",
+        "黄豆酱",
+        "豆瓣酱",
+        "蚝油",
+        "南腐乳",
+        "洋葱",
+        "生姜",
+        "大蒜",
+        "干辣椒",
+        "生抽",
+        "老抽",
+        "盐",
+        "白糖",
+        "啤酒",
+        "牛腱子",
+        "滤网"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/卤菜/卤牛肉.jpeg"
     },
@@ -1185,6 +2088,17 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/口水鸡/口水鸡.md",
+      "ingredients": [
+        "鸡",
+        "辣椒粉",
+        "花椒",
+        "花生",
+        "葱姜蒜",
+        "白糖",
+        "生抽",
+        "醋",
+        "味精"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/口水鸡/口水鸡.jpg"
     },
@@ -1196,6 +2110,21 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/台式卤肉饭/台式卤肉饭.md",
+      "ingredients": [
+        "红葱头",
+        "带皮五花肉",
+        "鸡蛋",
+        "食用油",
+        "生抽酱油",
+        "米酒",
+        "大蒜",
+        "香叶",
+        "八角",
+        "冰糖",
+        "白胡椒粉",
+        "五香粉",
+        "米饭"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/台式卤肉饭/1.jpg"
     },
@@ -1207,6 +2136,15 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/咖喱肥牛/咖喱肥牛.md",
+      "ingredients": [
+        "香叶",
+        "纯牛奶",
+        "洋葱",
+        "胡萝卜",
+        "土豆",
+        "肥牛卷",
+        "咖喱块"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/咖喱肥牛/咖喱肥牛.jpg"
     },
@@ -1218,6 +2156,23 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/啤酒鸭/啤酒鸭.md",
+      "ingredients": [
+        "鸭肉",
+        "啤酒",
+        "生抽酱油",
+        "老抽酱油",
+        "姜",
+        "蒜",
+        "冰糖",
+        "干辣椒",
+        "料酒",
+        "盐",
+        "鸡精",
+        "丁香",
+        "八角",
+        "香叶",
+        "豆瓣酱"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/啤酒鸭/啤酒鸭.jpg"
     },
@@ -1229,6 +2184,17 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/回锅肉/回锅肉.md",
+      "ingredients": [
+        "五花肉",
+        "小葱",
+        "生姜",
+        "青红椒",
+        "蒜苗",
+        "料酒",
+        "豆瓣酱",
+        "生抽酱油",
+        "味精"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/回锅肉/1.jpeg"
     },
@@ -1240,6 +2206,22 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/土豆炖排骨/土豆炖排骨.md",
+      "ingredients": [
+        "肋排",
+        "土豆",
+        "姜",
+        "小葱",
+        "料酒",
+        "白糖",
+        "干辣椒",
+        "八角",
+        "花椒",
+        "桂皮",
+        "生抽",
+        "老抽",
+        "蚝油",
+        "黄豆酱"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/土豆炖排骨/排骨1.jpg"
     },
@@ -1251,6 +2233,16 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/奶酪培根通心粉/奶酪培根通心粉.md",
+      "ingredients": [
+        "通心粉",
+        "奶酪",
+        "肉类",
+        "洋葱",
+        "黄油",
+        "面粉",
+        "牛奶",
+        "大蒜"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/奶酪培根通心粉/oven.jpg"
     },
@@ -1262,6 +2254,18 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/姜炒鸡/姜炒鸡.md",
+      "ingredients": [
+        "鸡",
+        "生姜",
+        "啤酒",
+        "生抽",
+        "老抽",
+        "盐",
+        "小米椒",
+        "美人辣",
+        "泡椒",
+        "大蒜"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/姜炒鸡/姜炒鸡.jpg"
     },
@@ -1273,6 +2277,12 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/姜葱捞鸡/姜葱捞鸡.md",
+      "ingredients": [
+        "鸡腿肉",
+        "盐焗鸡粉",
+        "葱",
+        "姜"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -1284,6 +2294,25 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/宫保鸡丁/宫保鸡丁.md",
+      "ingredients": [
+        "手枪腿",
+        "大葱",
+        "干辣椒",
+        "熟花生",
+        "生抽酱油",
+        "香醋",
+        "白糖",
+        "料酒",
+        "盐",
+        "鸡精",
+        "淀粉",
+        "植物油",
+        "芝麻油",
+        "油泼辣子",
+        "莴笋",
+        "生花生",
+        "豆瓣酱"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/宫保鸡丁/宫保鸡丁.jpg"
     },
@@ -1295,6 +2324,21 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/小炒鸡肝/小炒鸡肝.md",
+      "ingredients": [
+        "生鸡肝",
+        "蒜苗",
+        "大葱",
+        "姜",
+        "料酒",
+        "食用盐",
+        "鸡精",
+        "五香粉",
+        "胡椒粉",
+        "烧烤料",
+        "孜然粉",
+        "芝麻",
+        "食用油"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/小炒鸡肝/成品.jpg"
     },
@@ -1306,6 +2350,13 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/小炒黄牛肉/小炒黄牛肉.md",
+      "ingredients": [
+        "牛里脊",
+        "芹菜",
+        "小米椒",
+        "野山椒",
+        "香菜"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/小炒黄牛肉/小炒黄牛肉.jpg"
     },
@@ -1317,6 +2368,23 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/尖叫牛蛙/尖叫牛蛙.md",
+      "ingredients": [
+        "牛蛙肉",
+        "泡姜",
+        "泡椒",
+        "野山椒",
+        "青红辣椒",
+        "大蒜",
+        "豆瓣酱",
+        "盐巴",
+        "胡椒粉",
+        "生粉",
+        "啤酒",
+        "料酒",
+        "藤椒油",
+        "猪油",
+        "葱花"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/尖叫牛蛙/尖叫牛蛙.jpg"
     },
@@ -1328,6 +2396,15 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/巴基斯坦牛肉咖喱/巴基斯坦牛肉咖喱.md",
+      "ingredients": [
+        "Masala 粉",
+        "牛肉",
+        "番茄",
+        "螺丝椒",
+        "原味酸奶",
+        "蒜粉",
+        "姜粉"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/巴基斯坦牛肉咖喱/巴基斯坦牛肉咖喱.png"
     },
@@ -1339,6 +2416,21 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/干煸仔鸡/干煸仔鸡.md",
+      "ingredients": [
+        "鸡腿",
+        "土豆",
+        "青椒",
+        "大蒜",
+        "盐",
+        "胡椒粉",
+        "生抽",
+        "老抽",
+        "料酒",
+        "淀粉",
+        "郫县红油豆瓣酱",
+        "白糖",
+        "花椒碎"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/干煸仔鸡/干煸仔鸡成品.jpg"
     },
@@ -1350,6 +2442,24 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/广式萝卜牛腩/广式萝卜牛腩.md",
+      "ingredients": [
+        "牛腩",
+        "白萝卜",
+        "姜片",
+        "蒜瓣",
+        "葱",
+        "八角",
+        "桂皮",
+        "干辣椒",
+        "香叶",
+        "南乳",
+        "柱侯酱",
+        "蚝油",
+        "酱油",
+        "冰糖",
+        "盐",
+        "老抽"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/广式萝卜牛腩/广式萝卜牛腩.webp"
     },
@@ -1361,6 +2471,20 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/徽派红烧肉/徽派红烧肉.md",
+      "ingredients": [
+        "五花肉",
+        "白砂糖",
+        "食用油",
+        "生抽",
+        "蚝油",
+        "老抽",
+        "姜片",
+        "蒜头",
+        "料酒",
+        "葱",
+        "五香粉",
+        "盐"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/徽派红烧肉/1.jpeg"
     },
@@ -1372,6 +2496,23 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/新疆大盘鸡/新疆大盘鸡.md",
+      "ingredients": [
+        "花椒",
+        "香叶",
+        "香果",
+        "干线椒",
+        "大蒜",
+        "大葱",
+        "油",
+        "盐",
+        "生抽",
+        "蚝油",
+        "料酒",
+        "白糖",
+        "鸡肉",
+        "土豆",
+        "菜椒和甜椒"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/新疆大盘鸡/大盘鸡.jpeg"
     },
@@ -1383,6 +2524,23 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/无骨鸡爪/无骨鸡爪.md",
+      "ingredients": [
+        "鸡爪",
+        "姜",
+        "料酒",
+        "大葱",
+        "大蒜",
+        "小米辣",
+        "洋葱",
+        "生抽",
+        "蚝油",
+        "黑醋",
+        "白糖",
+        "盐",
+        "花椒油",
+        "香菜",
+        "柠檬"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/无骨鸡爪/无骨鸡爪.jpg"
     },
@@ -1394,6 +2552,28 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/枝竹羊腩煲/枝竹羊腩煲.md",
+      "ingredients": [
+        "羊腩",
+        "腐竹",
+        "柱侯酱",
+        "腐乳",
+        "南乳",
+        "老抽",
+        "料酒",
+        "蚝油",
+        "冰糖",
+        "葱段",
+        "姜片",
+        "香菇",
+        "洋葱",
+        "红葱头",
+        "蒜瓣",
+        "香叶",
+        "八角",
+        "桂皮",
+        "马蹄",
+        "土豆"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -1405,6 +2585,27 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/柱候牛腩/柱候牛腩.md",
+      "ingredients": [
+        "牛腩",
+        "柱候酱",
+        "郫县豆瓣酱",
+        "南腐乳",
+        "叉烧酱",
+        "蚝油",
+        "老抽",
+        "生抽",
+        "花雕酒",
+        "白酒",
+        "香叶",
+        "花椒",
+        "八角",
+        "干辣椒",
+        "丁香",
+        "甘草",
+        "小米辣",
+        "姜",
+        "蒜"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/柱候牛腩/柱候牛腩.jpeg"
     },
@@ -1416,6 +2617,19 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/梅菜扣肉/梅菜扣肉.md",
+      "ingredients": [
+        "五花肉",
+        "梅菜",
+        "五香粉",
+        "食用油",
+        "白砂糖",
+        "老抽",
+        "生抽",
+        "小米椒",
+        "蒜末",
+        "食用盐",
+        "鸡精"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/梅菜扣肉/1.jpeg"
     },
@@ -1427,6 +2641,20 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/水煮牛肉/水煮牛肉.md",
+      "ingredients": [
+        "牛肉",
+        "豆芽",
+        "鸡蛋",
+        "香菜",
+        "豆瓣酱",
+        "料酒",
+        "淀粉",
+        "干辣椒粉",
+        "姜",
+        "蒜",
+        "红辣椒",
+        "蚝油"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/水煮牛肉/sznr1.jpg"
     },
@@ -1438,6 +2666,15 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/清蒸鳜鱼/清蒸鳜鱼.md",
+      "ingredients": [
+        "鳜鱼",
+        "大葱",
+        "小葱",
+        "生抽",
+        "红辣椒",
+        "姜片",
+        "食用油"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/清蒸鳜鱼/清蒸鳜鱼成品图.jpg"
     },
@@ -1449,6 +2686,20 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/湖南家常红烧肉/湖南家常红烧肉.md",
+      "ingredients": [
+        "带皮五花肉",
+        "干小米椒",
+        "姜",
+        "生抽",
+        "老抽",
+        "香叶",
+        "桂皮",
+        "八角",
+        "冰糖",
+        "料酒",
+        "盐",
+        "食用油"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/湖南家常红烧肉/湖南家常红烧肉.jpeg"
     },
@@ -1460,6 +2711,18 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/湘祁米夫鸭/湘祁米夫鸭.md",
+      "ingredients": [
+        "鸭子",
+        "糯米粉",
+        "粘米粉",
+        "蒸肉粉",
+        "细辣椒粉",
+        "白胡椒粉",
+        "五花肉",
+        "姜蒜",
+        "盐",
+        "食用油"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/湘祁米夫鸭/湘祁米夫鸭.jpg"
     },
@@ -1471,6 +2734,22 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/煎烤羊排/煎烤羊排.md",
+      "ingredients": [
+        "羊排",
+        "桂皮",
+        "花椒",
+        "八角",
+        "白芷",
+        "香叶",
+        "盐",
+        "料酒",
+        "辣椒粉",
+        "孜然粒",
+        "烧烤撒料",
+        "孜然粉",
+        "白芝麻",
+        "糖"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -1482,6 +2761,16 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/牛排/牛排.md",
+      "ingredients": [
+        "牛排",
+        "橄榄油",
+        "黄油",
+        "盐",
+        "黑胡椒粉",
+        "大蒜",
+        "香料",
+        "预制牛排酱汁"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/牛排/牛排.jpg"
     },
@@ -1493,6 +2782,16 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/猪皮冻/猪皮冻.md",
+      "ingredients": [
+        "猪皮",
+        "大料",
+        "花椒",
+        "白芷",
+        "桂皮",
+        "丁香",
+        "香叶",
+        "小茴香"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/猪皮冻/猪皮冻.jpg"
     },
@@ -1504,6 +2803,15 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/瘦肉土豆片/瘦肉土豆片.md",
+      "ingredients": [
+        "纯瘦肉",
+        "土豆",
+        "蒜苗",
+        "生粉",
+        "生抽",
+        "老抽",
+        "食用盐"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/瘦肉土豆片/瘦肉土豆片.jpg"
     },
@@ -1515,6 +2823,20 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/糖醋排骨/糖醋排骨.md",
+      "ingredients": [
+        "排骨",
+        "白砂糖",
+        "食用油",
+        "生抽",
+        "蚝油",
+        "老抽",
+        "鸡精",
+        "姜片",
+        "芝麻",
+        "番茄酱",
+        "香醋",
+        "五香粉"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/糖醋排骨/1.jpeg"
     },
@@ -1526,6 +2848,20 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/红烧猪蹄/红烧猪蹄.md",
+      "ingredients": [
+        "猪蹄",
+        "香叶",
+        "姜",
+        "葱",
+        "老抽",
+        "桂皮",
+        "冰糖",
+        "料酒",
+        "生抽",
+        "盐",
+        "八角",
+        "食用油"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/红烧猪蹄/红烧猪蹄.jpg"
     },
@@ -1537,6 +2873,20 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/红烧肉/南派红烧肉.md",
+      "ingredients": [
+        "五花肉",
+        "油",
+        "冰糖",
+        "老抽",
+        "料酒",
+        "香叶",
+        "八角",
+        "生姜",
+        "盐",
+        "葱",
+        "蒜",
+        "花椒"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -1548,6 +2898,17 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/羊排焖面/羊排焖面.md",
+      "ingredients": [
+        "带皮羊排肉",
+        "青椒",
+        "甜椒",
+        "大葱",
+        "花椒",
+        "干辣椒",
+        "生姜",
+        "白砂糖",
+        "老抽"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/羊排焖面/羊排焖面.jpg"
     },
@@ -1559,6 +2920,24 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/老妈蹄花/老妈蹄花.md",
+      "ingredients": [
+        "猪蹄",
+        "葱",
+        "姜",
+        "料酒",
+        "生抽",
+        "白芷",
+        "当归",
+        "鸡精",
+        "盐",
+        "蒜",
+        "小米椒",
+        "白胡椒粉",
+        "香醋",
+        "花椒油",
+        "油泼辣子",
+        "白芸豆"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/老妈蹄花/result3.jpg"
     },
@@ -1570,6 +2949,24 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/老式锅包肉/老式锅包肉.md",
+      "ingredients": [
+        "猪通脊肉",
+        "大葱",
+        "姜",
+        "蒜",
+        "胡萝卜",
+        "香菜",
+        "白醋",
+        "白糖",
+        "料酒",
+        "盐",
+        "味精",
+        "土豆淀粉",
+        "中筋面粉",
+        "小苏打",
+        "白熟芝麻",
+        "食用油"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -1581,6 +2978,20 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/芥末罗氏虾/芥末罗氏虾.md",
+      "ingredients": [
+        "罗氏虾",
+        "蒜",
+        "青芥末",
+        "生抽",
+        "生粉",
+        "胡椒粉",
+        "白糖",
+        "蚝油",
+        "盐",
+        "小米辣",
+        "黄油",
+        "食用油"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/芥末罗氏虾/芥末罗氏虾成品.jpg"
     },
@@ -1592,6 +3003,17 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/茭白炒肉/茭白炒肉.md",
+      "ingredients": [
+        "茭白",
+        "瘦肉",
+        "淀粉",
+        "食用油",
+        "鸡精",
+        "姜",
+        "蒜",
+        "料酒",
+        "盐"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/茭白炒肉/1.jpeg"
     },
@@ -1603,6 +3025,20 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/荔枝肉/荔枝肉.md",
+      "ingredients": [
+        "瘦肉",
+        "凤梨",
+        "鸡蛋",
+        "食用油",
+        "白砂糖",
+        "淀粉",
+        "生抽",
+        "鸡精",
+        "姜末",
+        "芝麻",
+        "番茄酱",
+        "香醋"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/荔枝肉/1.jpeg"
     },
@@ -1614,6 +3050,12 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/荷兰豆炒腊肠/荷兰豆炒腊肠.md",
+      "ingredients": [
+        "荷兰豆",
+        "腊肠",
+        "生抽",
+        "食用油"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/荷兰豆炒腊肠/1.png"
     },
@@ -1625,6 +3067,19 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/血浆鸭/血浆鸭.md",
+      "ingredients": [
+        "鲜仔鸭肉",
+        "鲜鸭血",
+        "姜",
+        "蒜仔",
+        "葱",
+        "辣椒",
+        "酒",
+        "生抽",
+        "料酒",
+        "盐",
+        "鸡精"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/血浆鸭/血浆鸭(特辣"
     },
@@ -1636,6 +3091,24 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/西红柿土豆炖牛肉/西红柿土豆炖牛肉.md",
+      "ingredients": [
+        "牛肉",
+        "小料",
+        "葱",
+        "姜",
+        "料酒",
+        "花椒",
+        "八角",
+        "香叶",
+        "白糖",
+        "冰糖",
+        "酱油",
+        "老抽",
+        "黑胡椒粉",
+        "土豆",
+        "西红柿",
+        "洋葱"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/西红柿土豆炖牛肉/abaaba_1.png"
     },
@@ -1647,6 +3120,21 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/西红柿牛腩/西红柿牛腩.md",
+      "ingredients": [
+        "西红柿",
+        "牛腩",
+        "燃气灶",
+        "葱段",
+        "姜片",
+        "葱花",
+        "姜",
+        "生抽",
+        "白胡椒粉",
+        "白糖",
+        "料",
+        "黄酒",
+        "八角三小片"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -1658,6 +3146,14 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/豆豉鲮鱼油麦菜/豆豉鲮鱼油麦菜.md",
+      "ingredients": [
+        "油麦菜",
+        "甘竹牌鲮鱼罐头",
+        "蒜",
+        "生抽",
+        "白糖",
+        "食用油"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/豆豉鲮鱼油麦菜/豆豉鲮鱼油麦菜成品.jpg"
     },
@@ -1669,6 +3165,19 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/豉汁蒸白鱔/豉汁蒸白鱔.md",
+      "ingredients": [
+        "白鱔",
+        "豆豉",
+        "蒜头",
+        "姜",
+        "葱",
+        "生抽",
+        "老抽",
+        "糖",
+        "麻油",
+        "生粉",
+        "红椒"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/豉汁蒸白鱔/豉汁蒸白鱔.jpeg"
     },
@@ -1680,6 +3189,22 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/贵州辣子鸡/贵州辣子鸡.md",
+      "ingredients": [
+        "农村玉米鸡",
+        "土豆",
+        "大蒜",
+        "香叶",
+        "姜",
+        "老抽",
+        "花椒",
+        "麻椒",
+        "糍粑辣椒",
+        "豆瓣酱",
+        "啤酒",
+        "蒜苗",
+        "酒糟",
+        "食用油"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/贵州辣子鸡/贵州辣子鸡.jpg"
     },
@@ -1691,6 +3216,19 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/酱排骨/酱排骨.md",
+      "ingredients": [
+        "排骨",
+        "五香粉",
+        "料酒",
+        "食用油",
+        "白砂糖",
+        "老抽",
+        "生抽",
+        "蚝油",
+        "小米椒",
+        "蒜",
+        "姜"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/酱排骨/1.jpeg"
     },
@@ -1702,6 +3240,21 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/酱牛肉/酱牛肉.md",
+      "ingredients": [
+        "牛腱子肉",
+        "香叶",
+        "姜",
+        "葱",
+        "老抽",
+        "桂皮",
+        "冰糖",
+        "花椒",
+        "料酒",
+        "生抽",
+        "盐",
+        "八角",
+        "黄豆酱"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/酱牛肉/酱牛肉.jpg"
     },
@@ -1713,6 +3266,19 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/醉排骨/醉排骨.md",
+      "ingredients": [
+        "排骨",
+        "白砂糖",
+        "食用油",
+        "鱼露",
+        "芝麻",
+        "番茄酱",
+        "香醋",
+        "蒜头",
+        "葱",
+        "地瓜粉",
+        "鸡蛋黄"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/醉排骨/1.jpeg"
     },
@@ -1724,6 +3290,17 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/青椒土豆炒肉/青椒土豆炒肉.md",
+      "ingredients": [
+        "青椒",
+        "土豆",
+        "猪肉",
+        "葱",
+        "姜",
+        "蒜",
+        "盐",
+        "酱油",
+        "土豆淀粉"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -1735,6 +3312,21 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/香干芹菜炒肉/香干芹菜炒肉.md",
+      "ingredients": [
+        "豆干",
+        "香芹",
+        "芹菜",
+        "猪肉",
+        "大蒜",
+        "辣椒",
+        "红椒都可以",
+        "花椒",
+        "盐",
+        "鸡精",
+        "老抽",
+        "蚝油",
+        "食用油"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/香干芹菜炒肉/香干芹菜炒肉.jpg"
     },
@@ -1746,6 +3338,17 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/香煎五花肉/香煎五花肉.md",
+      "ingredients": [
+        "五花肉条",
+        "生菜",
+        "酱油",
+        "盐",
+        "味精",
+        "料酒",
+        "姜蒜",
+        "油",
+        "豆瓣酱"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/香煎五花肉/香煎五花肉.jpg"
     },
@@ -1757,6 +3360,13 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/香菇滑鸡/香菇滑鸡.md",
+      "ingredients": [
+        "大鸡腿",
+        "干香菇",
+        "姜",
+        "葱",
+        "蒜"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/香菇滑鸡/香菇滑鸡.jpg"
     },
@@ -1768,6 +3378,23 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/香辣鸡爪煲/香辣鸡爪煲.md",
+      "ingredients": [
+        "鸡爪",
+        "葱",
+        "姜",
+        "料酒",
+        "香叶",
+        "八角",
+        "生抽",
+        "老抽",
+        "蒜",
+        "小米椒",
+        "辣椒面",
+        "蚝油",
+        "五香粉",
+        "盐",
+        "鸡精"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/香辣鸡爪煲/result2.jpg"
     },
@@ -1779,6 +3406,18 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/鱼香茄子/鱼香茄子.md",
+      "ingredients": [
+        "茄子",
+        "肉末",
+        "盐",
+        "糖",
+        "味精",
+        "生抽",
+        "老抽",
+        "醋",
+        "水淀粉",
+        "豆瓣酱"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/鱼香茄子/yxqz1.jpg"
     },
@@ -1790,6 +3429,18 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/麻婆豆腐/麻婆豆腐.md",
+      "ingredients": [
+        "内脂豆腐",
+        "咸鸭蛋",
+        "五花肉",
+        "大蒜",
+        "生姜",
+        "小米椒",
+        "香辣酱",
+        "花椒",
+        "食盐",
+        "酱油"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/麻婆豆腐/1.jpeg"
     },
@@ -1801,6 +3452,16 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/黑椒牛柳/黑椒牛柳.md",
+      "ingredients": [
+        "牛肉",
+        "洋葱",
+        "菜椒",
+        "淀粉",
+        "黑胡椒",
+        "黑椒",
+        "盐",
+        "花生油"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/黑椒牛柳/黑椒牛柳.jpg"
     },
@@ -1812,6 +3473,10 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/黔式腊肠娃娃菜/黔式腊肠娃娃菜.md",
+      "ingredients": [
+        "黔式腊肠",
+        "娃娃菜"
+      ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/黔式腊肠娃娃菜/黔式腊肠娃娃菜.jpg"
     },
@@ -1823,6 +3488,22 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/乡村啤酒鸭.md",
+      "ingredients": [
+        "鸭肉",
+        "啤酒",
+        "青椒",
+        "红椒",
+        "大蒜",
+        "生姜",
+        "小米椒",
+        "蒜苗",
+        "大葱",
+        "草果",
+        "桂皮",
+        "八角",
+        "香叶",
+        "干辣椒"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -1834,6 +3515,27 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/冷吃兔.md",
+      "ingredients": [
+        "兔肉",
+        "盐",
+        "味精",
+        "蚝油",
+        "料酒",
+        "蒜",
+        "姜",
+        "小葱",
+        "大葱",
+        "洋葱",
+        "干辣椒",
+        "青花椒",
+        "八角",
+        "桂皮",
+        "香叶",
+        "山奈",
+        "白蔻",
+        "小茴香",
+        "白芝麻"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -1845,6 +3547,17 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/可乐鸡翅.md",
+      "ingredients": [
+        "鸡翅中",
+        "可乐",
+        "白糖",
+        "生抽",
+        "盐",
+        "生姜",
+        "料酒",
+        "啤酒",
+        "小葱"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -1856,6 +3569,18 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/咕噜肉.md",
+      "ingredients": [
+        "梅头猪肉",
+        "青椒",
+        "罐头菠萝片",
+        "盐",
+        "茄汁",
+        "白醋",
+        "蒜蓉",
+        "生抽",
+        "生粉",
+        "白砂糖"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -1867,6 +3592,23 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/商芝肉.md",
+      "ingredients": [
+        "带皮猪五花肉",
+        "商芝",
+        "葱",
+        "姜",
+        "八角",
+        "蜂蜜",
+        "醋",
+        "料酒",
+        "味精",
+        "酱油",
+        "摊鸡蛋皮",
+        "精盐",
+        "鸡汤",
+        "芝麻油",
+        "熟猪油"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -1878,6 +3620,19 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/孜然牛肉.md",
+      "ingredients": [
+        "牛柳",
+        "牛肩肉",
+        "青椒",
+        "孜然",
+        "小米椒",
+        "生抽酱油",
+        "淀粉",
+        "油",
+        "盐",
+        "葱",
+        "捣药罐"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -1889,6 +3644,18 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/小炒肉.md",
+      "ingredients": [
+        "五花肉",
+        "朝天椒",
+        "小米椒",
+        "豆豉",
+        "豆瓣酱",
+        "老抽",
+        "淀粉",
+        "盐",
+        "葱",
+        "蒜"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -1900,6 +3667,20 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/小米辣炒肉.md",
+      "ingredients": [
+        "小米辣",
+        "花生油",
+        "五花肉",
+        "瘦肉",
+        "盐",
+        "生抽",
+        "蚝油",
+        "大蒜",
+        "姜",
+        "豆瓣酱",
+        "鸡精",
+        "白糖"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -1911,6 +3692,24 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/小酥肉.md",
+      "ingredients": [
+        "去皮猪肉",
+        "植物油",
+        "老姜",
+        "小葱",
+        "料酒",
+        "盐",
+        "十三香",
+        "胡椒粉",
+        "味精",
+        "鸡精",
+        "花椒碎",
+        "花椒粒",
+        "生抽",
+        "鸡蛋",
+        "面粉",
+        "红薯淀粉"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -1922,6 +3721,16 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/尖椒炒牛肉.md",
+      "ingredients": [
+        "牛肉",
+        "葱",
+        "姜",
+        "蒜",
+        "尖椒",
+        "酱油",
+        "盐",
+        "糖"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -1933,6 +3742,22 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/山西过油肉.md",
+      "ingredients": [
+        "猪里脊",
+        "蒜苔",
+        "盐",
+        "酱油",
+        "葱姜蒜",
+        "鸡蛋",
+        "淀粉",
+        "食用油",
+        "木耳",
+        "葱头",
+        "料酒",
+        "陈醋",
+        "花椒粉",
+        "鸡精"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -1944,6 +3769,21 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/带把肘子.md",
+      "ingredients": [
+        "带脚",
+        "爪猪前肘",
+        "红豆腐乳",
+        "甜面酱",
+        "精盐",
+        "红酱油",
+        "白酱油",
+        "料酒",
+        "蒜片",
+        "姜末",
+        "八角",
+        "桂皮",
+        "葱"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -1955,6 +3795,15 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/意式烤鸡.md",
+      "ingredients": [
+        "鸡腿肉",
+        "盐",
+        "黑胡椒",
+        "橄榄油",
+        "蒜",
+        "柠檬汁",
+        "欧芹"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -1966,6 +3815,19 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/杀猪菜.md",
+      "ingredients": [
+        "血肠",
+        "酸菜",
+        "排骨",
+        "料酒",
+        "辣椒",
+        "香叶",
+        "八角",
+        "葱结",
+        "香油",
+        "菜籽油",
+        "蒜"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -1977,6 +3839,17 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/椒盐排条.md",
+      "ingredients": [
+        "大排",
+        "鸡蛋",
+        "盐",
+        "椒盐粉",
+        "葱姜水",
+        "面粉",
+        "淀粉",
+        "吉士粉",
+        "油"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -1988,6 +3861,30 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/水煮肉片.md",
+      "ingredients": [
+        "猪里脊肉",
+        "食用盐",
+        "胡椒粉",
+        "生抽酱油",
+        "料酒",
+        "鸡蛋清",
+        "土豆淀粉",
+        "植物油",
+        "豆芽",
+        "凤尾",
+        "芹菜",
+        "蒜苗",
+        "大蒜",
+        "生姜",
+        "红泡椒",
+        "青花椒",
+        "干辣椒",
+        "红油豆瓣",
+        "鸡精",
+        "白砂糖",
+        "小葱",
+        "菜籽油"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -1999,6 +3896,12 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/洋葱炒猪肉.md",
+      "ingredients": [
+        "洋葱",
+        "猪肉片",
+        "蕃茄酱",
+        "麻油"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2010,6 +3913,21 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/澳门湿版免治牛肉饭.md",
+      "ingredients": [
+        "牛肉末",
+        "洋葱",
+        "鸡蛋",
+        "黄油",
+        "小葱",
+        "生抽",
+        "老抽",
+        "番茄酱",
+        "白糖",
+        "料酒",
+        "黑胡椒",
+        "淀粉",
+        "米饭"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2021,6 +3939,13 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/烤鸡翅.md",
+      "ingredients": [
+        "鸡翅中",
+        "盐",
+        "黑胡椒粉",
+        "酱油",
+        "料酒"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2032,6 +3957,19 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/猪肉烩酸菜.md",
+      "ingredients": [
+        "猪五花肉",
+        "猪肉排骨",
+        "东北酸菜",
+        "大葱",
+        "姜",
+        "蒜",
+        "盐",
+        "生抽酱油",
+        "五香粉",
+        "料酒",
+        "大料"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2043,6 +3981,18 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/甜辣烤全翅.md",
+      "ingredients": [
+        "鸡全翅",
+        "生抽",
+        "老抽",
+        "蒜粉",
+        "胡椒粉",
+        "糖",
+        "甜椒粉",
+        "辣椒粉",
+        "蚝油",
+        "油"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2054,6 +4004,21 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/番茄红酱.md",
+      "ingredients": [
+        "碎牛肉",
+        "蒜瓣",
+        "胡萝卜",
+        "芹菜",
+        "洋葱",
+        "橄榄油",
+        "糖",
+        "食盐",
+        "胡椒粉",
+        "番茄酱",
+        "牛奶",
+        "干罗勒",
+        "百里香"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2065,6 +4030,16 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/白菜猪肉炖粉条.md",
+      "ingredients": [
+        "五花肉",
+        "白菜",
+        "土豆干粉条",
+        "十三香",
+        "鸡精",
+        "食用盐",
+        "老抽",
+        "生抽"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2076,6 +4051,18 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/粉蒸肉.md",
+      "ingredients": [
+        "五花肉",
+        "蒸肉米粉",
+        "生抽",
+        "老抽",
+        "料酒",
+        "郫县豆瓣酱",
+        "姜末",
+        "蒜末",
+        "白砂糖",
+        "土豆"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2087,6 +4074,19 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/糖醋里脊.md",
+      "ingredients": [
+        "里脊肉",
+        "醋",
+        "白糖",
+        "淀粉",
+        "鸡蛋",
+        "生抽",
+        "料酒",
+        "蚝油",
+        "番茄酱",
+        "白胡椒粉",
+        "盐"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2098,6 +4098,25 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/红烧鸡翅.md",
+      "ingredients": [
+        "新鲜鸡翅",
+        "姜片",
+        "葱段",
+        "大蒜",
+        "香叶",
+        "八角",
+        "干辣椒",
+        "冰糖",
+        "黄酒",
+        "料酒",
+        "生抽",
+        "老抽",
+        "盐",
+        "白糖",
+        "胡椒粉",
+        "白芝麻",
+        "小葱花"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2109,6 +4128,14 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/肉饼炖蛋.md",
+      "ingredients": [
+        "猪肉末",
+        "鸡蛋",
+        "料酒",
+        "生抽",
+        "白胡椒粉",
+        "芝麻香油"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2120,6 +4147,16 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/腐乳肉.md",
+      "ingredients": [
+        "带皮五花肉",
+        "红腐乳",
+        "冰糖",
+        "老抽",
+        "料酒",
+        "香葱",
+        "生姜",
+        "食用油"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2131,6 +4168,18 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/萝卜炖羊排.md",
+      "ingredients": [
+        "羊排",
+        "白萝卜",
+        "大葱",
+        "花椒",
+        "白芷",
+        "姜",
+        "料酒",
+        "黄酒",
+        "食用盐",
+        "冰糖"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2142,6 +4191,14 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/蒜苔炒肉末.md",
+      "ingredients": [
+        "五花肉薄片",
+        "蒜苔",
+        "食用盐",
+        "生抽",
+        "食用油",
+        "蒜瓣"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2153,6 +4210,25 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/虎皮肘子.md",
+      "ingredients": [
+        "猪前肘",
+        "食用植物油",
+        "冰糖",
+        "盐",
+        "老抽",
+        "生抽",
+        "白醋",
+        "香叶",
+        "肉桂皮",
+        "豆蔻",
+        "花椒",
+        "大料",
+        "淀粉",
+        "葱",
+        "姜",
+        "蒜",
+        "料酒"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2164,6 +4240,17 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/蚂蚁上树.md",
+      "ingredients": [
+        "红薯粉丝",
+        "猪肉末",
+        "郫县豆瓣酱",
+        "生抽",
+        "老抽",
+        "食用油",
+        "蒜末",
+        "姜末",
+        "小葱"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2175,6 +4262,20 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/豉汁排骨.md",
+      "ingredients": [
+        "肋排",
+        "阳江豆豉",
+        "蒜蓉",
+        "姜末",
+        "生抽",
+        "老抽",
+        "蚝油",
+        "白砂糖",
+        "生粉",
+        "食用油",
+        "葱花",
+        "白芝麻"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2186,6 +4287,17 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/辣椒炒肉.md",
+      "ingredients": [
+        "青椒",
+        "猪瘦肉",
+        "盐",
+        "生抽",
+        "蚝油",
+        "大蒜",
+        "姜",
+        "酱油",
+        "豆豉"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2197,6 +4309,16 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/香干肉丝.md",
+      "ingredients": [
+        "猪里脊",
+        "香干",
+        "盐",
+        "生抽",
+        "淀粉",
+        "大蒜",
+        "青椒",
+        "鸡精"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2208,6 +4330,23 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/鱼香肉丝.md",
+      "ingredients": [
+        "里脊肉",
+        "胡萝卜",
+        "青椒",
+        "木耳",
+        "生抽",
+        "料酒",
+        "蛋清",
+        "淀粉",
+        "醋",
+        "白糖",
+        "盐",
+        "姜",
+        "葱",
+        "蒜 2 瓣",
+        "豆瓣酱"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2219,6 +4358,13 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/麻辣香锅.md",
+      "ingredients": [
+        "青菜",
+        "无骨肉",
+        "干豆腐",
+        "北京麻辣方便面",
+        "干辣椒"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2230,6 +4376,26 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/黄油鸡.md",
+      "ingredients": [
+        "鸡腿肉",
+        "酸奶",
+        "黄油",
+        "淡奶油",
+        "番茄",
+        "洋葱",
+        "生姜",
+        "大蒜",
+        "腰果",
+        "姜黄粉",
+        "红辣椒粉",
+        "印度综合香料粉",
+        "香菜粉",
+        "孜然粉",
+        "小豆蔻粉",
+        "糖",
+        "盐",
+        "食用油"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2241,6 +4407,20 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/黄焖鸡.md",
+      "ingredients": [
+        "鸡腿",
+        "香菇",
+        "青椒",
+        "生姜片",
+        "干辣椒",
+        "盐",
+        "料酒",
+        "白胡椒粉",
+        "白糖",
+        "酱油",
+        "味精",
+        "土豆"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2252,6 +4432,15 @@
       "category": "meat_dish",
       "categoryName": "荤菜",
       "mdPath": "dishes/meat_dish/黄瓜炒肉.md",
+      "ingredients": [
+        "黄瓜",
+        "猪瘦肉",
+        "食用油",
+        "生抽",
+        "盐",
+        "蒜",
+        "小米辣"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2263,6 +4452,10 @@
       "category": "semi-finished",
       "categoryName": "半成品",
       "mdPath": "dishes/semi-finished/懒人蛋挞/懒人蛋挞.md",
+      "ingredients": [
+        "蛋挞液",
+        "蛋挞皮"
+      ],
       "hasImage": true,
       "coverImage": "dishes/semi-finished/懒人蛋挞/懒人蛋挞.png"
     },
@@ -2274,6 +4467,9 @@
       "category": "semi-finished",
       "categoryName": "半成品",
       "mdPath": "dishes/semi-finished/炸薯条/炸薯条.md",
+      "ingredients": [
+        "半成品薯条"
+      ],
       "hasImage": true,
       "coverImage": "dishes/semi-finished/炸薯条/炸薯条.jpg"
     },
@@ -2285,6 +4481,14 @@
       "category": "semi-finished",
       "categoryName": "半成品",
       "mdPath": "dishes/semi-finished/空气炸锅羊排/空气炸锅羊排.md",
+      "ingredients": [
+        "羊排",
+        "黑椒混合牛排调味料",
+        "蒜蓉酱",
+        "黄油",
+        "烧烤料",
+        "罗勒碎"
+      ],
       "hasImage": true,
       "coverImage": "dishes/semi-finished/空气炸锅羊排/羊排.jpg"
     },
@@ -2296,6 +4500,11 @@
       "category": "semi-finished",
       "categoryName": "半成品",
       "mdPath": "dishes/semi-finished/空气炸锅鸡翅中/空气炸锅鸡翅中.md",
+      "ingredients": [
+        "鸡翅中",
+        "罗勒碎",
+        "云南单山蘸水"
+      ],
       "hasImage": true,
       "coverImage": "dishes/semi-finished/空气炸锅鸡翅中/鸡翅中_0.jpg"
     },
@@ -2307,6 +4516,9 @@
       "category": "semi-finished",
       "categoryName": "半成品",
       "mdPath": "dishes/semi-finished/速冻汤圆/速冻汤圆.md",
+      "ingredients": [
+        "速冻汤圆"
+      ],
       "hasImage": true,
       "coverImage": "dishes/semi-finished/速冻汤圆/速冻汤圆.jpg"
     },
@@ -2318,6 +4530,23 @@
       "category": "semi-finished",
       "categoryName": "半成品",
       "mdPath": "dishes/semi-finished/凉皮.md",
+      "ingredients": [
+        "凉皮",
+        "面筋",
+        "盐",
+        "鸡精",
+        "蚝油",
+        "生抽",
+        "老抽",
+        "香油",
+        "香醋",
+        "芝麻酱",
+        "黄瓜",
+        "大蒜",
+        "绿豆芽",
+        "盘子",
+        "蒜臼"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2329,6 +4558,9 @@
       "category": "semi-finished",
       "categoryName": "半成品",
       "mdPath": "dishes/semi-finished/半成品意面.md",
+      "ingredients": [
+        "半成品意大利面"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2340,6 +4572,38 @@
       "category": "semi-finished",
       "categoryName": "半成品",
       "mdPath": "dishes/semi-finished/牛油火锅底料.md",
+      "ingredients": [
+        "牛油",
+        "纯猪油",
+        "豆瓣",
+        "糍粑辣椒",
+        "老姜",
+        "大葱",
+        "洋葱",
+        "大蒜",
+        "豆鼓",
+        "豆母子",
+        "红花椒",
+        "麦芽粉",
+        "白酒",
+        "老油 干辣椒面",
+        "山奈",
+        "八角",
+        "草果",
+        "肉桂",
+        "丁香",
+        "小茴香",
+        "白芷",
+        "荜拨",
+        "香草",
+        "香果",
+        "山楂",
+        "陈皮",
+        "香茅",
+        "砂仁",
+        "白蔻",
+        "香叶"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2351,6 +4615,9 @@
       "category": "semi-finished",
       "categoryName": "半成品",
       "mdPath": "dishes/semi-finished/速冻水饺.md",
+      "ingredients": [
+        "速冻水饺"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2362,6 +4629,14 @@
       "category": "semi-finished",
       "categoryName": "半成品",
       "mdPath": "dishes/semi-finished/速冻馄饨.md",
+      "ingredients": [
+        "速冻馄饨",
+        "盐",
+        "鸡精",
+        "胡椒粉",
+        "香油",
+        "香菜"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2373,6 +4648,14 @@
       "category": "soup",
       "categoryName": "汤",
       "mdPath": "dishes/soup/勾芡香菇汤/勾芡香菇汤.md",
+      "ingredients": [
+        "香菇",
+        "香葱",
+        "食用油",
+        "食用盐",
+        "鸡精",
+        "生粉"
+      ],
       "hasImage": true,
       "coverImage": "dishes/soup/勾芡香菇汤/1.jpeg"
     },
@@ -2384,6 +4667,7 @@
       "category": "soup",
       "categoryName": "汤",
       "mdPath": "dishes/soup/排骨苦瓜汤/排骨苦瓜汤.md",
+      "ingredients": [],
       "hasImage": false,
       "coverImage": null
     },
@@ -2395,6 +4679,17 @@
       "category": "soup",
       "categoryName": "汤",
       "mdPath": "dishes/soup/昂刺鱼豆腐汤/昂刺鱼豆腐汤.md",
+      "ingredients": [
+        "昂刺鱼",
+        "沙光鱼",
+        "豆腐",
+        "香葱",
+        "姜",
+        "食用油",
+        "料酒",
+        "食用盐",
+        "胡椒粉"
+      ],
       "hasImage": true,
       "coverImage": "dishes/soup/昂刺鱼豆腐汤/沙光鱼豆腐汤.jpg"
     },
@@ -2406,6 +4701,11 @@
       "category": "soup",
       "categoryName": "汤",
       "mdPath": "dishes/soup/朱雀汤/朱雀汤.md",
+      "ingredients": [
+        "鸡蛋",
+        "香油",
+        "白糖"
+      ],
       "hasImage": true,
       "coverImage": "dishes/soup/朱雀汤/朱雀汤.jpg"
     },
@@ -2417,6 +4717,18 @@
       "category": "soup",
       "categoryName": "汤",
       "mdPath": "dishes/soup/玉米排骨汤/玉米排骨汤.md",
+      "ingredients": [
+        "排骨",
+        "玉米",
+        "胡箩卜",
+        "生姜",
+        "大葱",
+        "食用油",
+        "醋",
+        "料酒",
+        "黑胡椒粉",
+        "食用盐"
+      ],
       "hasImage": true,
       "coverImage": "dishes/soup/玉米排骨汤/玉米排骨汤.jpeg"
     },
@@ -2428,6 +4740,17 @@
       "category": "soup",
       "categoryName": "汤",
       "mdPath": "dishes/soup/羊肉汤/羊肉汤.md",
+      "ingredients": [
+        "羊肉",
+        "羊杂",
+        "食用油",
+        "料酒",
+        "大葱",
+        "白胡椒粉",
+        "食用盐",
+        "孜然粉",
+        "香菜"
+      ],
       "hasImage": true,
       "coverImage": "dishes/soup/羊肉汤/羊肉汤.jpg"
     },
@@ -2439,6 +4762,14 @@
       "category": "soup",
       "categoryName": "汤",
       "mdPath": "dishes/soup/菌菇炖乳鸽/菌菇炖乳鸽.md",
+      "ingredients": [
+        "乳鸽",
+        "菌菇",
+        "玉米",
+        "姜",
+        "料酒",
+        "食用盐"
+      ],
       "hasImage": true,
       "coverImage": "dishes/soup/菌菇炖乳鸽/菌菇炖乳鸽.jpg"
     },
@@ -2450,6 +4781,13 @@
       "category": "soup",
       "categoryName": "汤",
       "mdPath": "dishes/soup/银耳莲子粥/银耳莲子粥.md",
+      "ingredients": [
+        "银耳",
+        "去心莲子",
+        "红枣",
+        "枸杞",
+        "冰糖"
+      ],
       "hasImage": true,
       "coverImage": "dishes/soup/银耳莲子粥/银耳莲子粥.png"
     },
@@ -2461,6 +4799,16 @@
       "category": "soup",
       "categoryName": "汤",
       "mdPath": "dishes/soup/陈皮排骨汤/陈皮排骨汤.md",
+      "ingredients": [
+        "排骨",
+        "陈皮",
+        "西洋参",
+        "石斛",
+        "玉竹",
+        "麦冬",
+        "煲汤盅",
+        "盐"
+      ],
       "hasImage": true,
       "coverImage": "dishes/soup/陈皮排骨汤/陈皮排骨汤.jpg"
     },
@@ -2472,6 +4820,16 @@
       "category": "soup",
       "categoryName": "汤",
       "mdPath": "dishes/soup/奶油蘑菇汤.md",
+      "ingredients": [
+        "白蘑菇",
+        "洋葱",
+        "黄油",
+        "面粉",
+        "牛奶",
+        "淡奶油",
+        "黑胡椒碎",
+        "盐"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2483,6 +4841,9 @@
       "category": "soup",
       "categoryName": "汤",
       "mdPath": "dishes/soup/小米粥.md",
+      "ingredients": [
+        "小米"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2494,6 +4855,22 @@
       "category": "soup",
       "categoryName": "汤",
       "mdPath": "dishes/soup/生汆丸子汤.md",
+      "ingredients": [
+        "前腿肉",
+        "盐",
+        "胡椒粉",
+        "葱姜花椒水",
+        "鸡蛋清",
+        "土豆淀粉",
+        "熟豆油",
+        "木耳",
+        "黄花",
+        "小香葱",
+        "泡好的粉丝",
+        "鸡粉",
+        "香油",
+        "香菜"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2505,6 +4882,16 @@
       "category": "soup",
       "categoryName": "汤",
       "mdPath": "dishes/soup/番茄牛肉蛋花汤.md",
+      "ingredients": [
+        "牛肉",
+        "番茄",
+        "鸡蛋",
+        "葱",
+        "姜",
+        "蒜",
+        "盐",
+        "胡椒粉"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2516,6 +4903,21 @@
       "category": "soup",
       "categoryName": "汤",
       "mdPath": "dishes/soup/皮蛋瘦肉粥.md",
+      "ingredients": [
+        "饮用水",
+        "皮蛋",
+        "瘦肉",
+        "大米",
+        "小葱",
+        "香菜",
+        "生菜",
+        "生姜",
+        "酱油",
+        "蚝油",
+        "盐",
+        "胡椒粉",
+        "食用油"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2527,6 +4929,10 @@
       "category": "soup",
       "categoryName": "汤",
       "mdPath": "dishes/soup/米粥.md",
+      "ingredients": [
+        "米",
+        "植物油"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2538,6 +4944,14 @@
       "category": "soup",
       "categoryName": "汤",
       "mdPath": "dishes/soup/紫菜蛋花汤.md",
+      "ingredients": [
+        "鸡蛋",
+        "紫菜",
+        "葱花",
+        "盐",
+        "油",
+        "虾仁"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2549,6 +4963,12 @@
       "category": "soup",
       "categoryName": "汤",
       "mdPath": "dishes/soup/罗宋汤.md",
+      "ingredients": [
+        "蔬菜高汤",
+        "牛肉高汤",
+        "牛肉",
+        "番茄"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2560,6 +4980,27 @@
       "category": "soup",
       "categoryName": "汤",
       "mdPath": "dishes/soup/腊八粥.md",
+      "ingredients": [
+        "饮用水",
+        "大米",
+        "糯米",
+        "花生",
+        "红豆",
+        "红枣",
+        "薏米",
+        "黑米",
+        "小米",
+        "莲子",
+        "绿豆",
+        "黄豆",
+        "豌豆",
+        "红腰豆",
+        "桂圆",
+        "栗子",
+        "去壳核桃",
+        "葡萄干",
+        "冰糖"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2571,6 +5012,16 @@
       "category": "soup",
       "categoryName": "汤",
       "mdPath": "dishes/soup/西红柿鸡蛋汤.md",
+      "ingredients": [
+        "西红柿",
+        "鸡蛋",
+        "香油",
+        "味素",
+        "盐",
+        "葱",
+        "姜",
+        "蒜"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2582,6 +5033,10 @@
       "category": "soup",
       "categoryName": "汤",
       "mdPath": "dishes/soup/金针菇汤.md",
+      "ingredients": [
+        "金针菇",
+        "鸡蛋"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2593,6 +5048,15 @@
       "category": "soup",
       "categoryName": "汤",
       "mdPath": "dishes/soup/黄瓜皮蛋汤.md",
+      "ingredients": [
+        "黄瓜",
+        "皮蛋",
+        "大蒜",
+        "小葱",
+        "食用油",
+        "盐",
+        "鸡精"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2604,6 +5068,20 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/中式馅饼/中式馅饼.md",
+      "ingredients": [
+        "面粉",
+        "肉沫",
+        "油",
+        "盐",
+        "糖",
+        "生粉",
+        "酱油",
+        "风味调料",
+        "蒜头",
+        "大葱",
+        "鸡蛋",
+        "胡萝卜"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2615,6 +5093,19 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/凉粉/凉粉.md",
+      "ingredients": [
+        "豌豆淀粉",
+        "大蒜",
+        "小米辣",
+        "辣椒粉",
+        "酱油",
+        "醋",
+        "白糖",
+        "鸡精",
+        "盐",
+        "花生碎",
+        "香菜"
+      ],
       "hasImage": true,
       "coverImage": "dishes/staple/凉粉/lf1.jpg"
     },
@@ -2626,6 +5117,18 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/基础牛奶面包/基础牛奶面包.md",
+      "ingredients": [
+        "高筋",
+        "中筋面粉",
+        "鸡蛋",
+        "糖",
+        "干酵母",
+        "盐",
+        "黄油",
+        "玉米油",
+        "谷朊粉",
+        "香草精"
+      ],
       "hasImage": true,
       "coverImage": "dishes/staple/基础牛奶面包/1-1成品.jpg"
     },
@@ -2637,6 +5140,16 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/微波炉腊肠煲仔饭/微波炉腊肠煲仔饭.md",
+      "ingredients": [
+        "米",
+        "腊肠",
+        "鸡蛋",
+        "红萝卜",
+        "盐",
+        "油",
+        "生抽",
+        "香葱"
+      ],
       "hasImage": true,
       "coverImage": "dishes/staple/微波炉腊肠煲仔饭/微波炉腊肠煲仔饭.png"
     },
@@ -2648,6 +5161,12 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/意式肉酱面/意式肉酱面.md",
+      "ingredients": [
+        "意大利面",
+        "意大利面酱",
+        "肉沫",
+        "白洋葱"
+      ],
       "hasImage": true,
       "coverImage": "dishes/staple/意式肉酱面/final.jpg"
     },
@@ -2659,6 +5178,18 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/扬州炒饭/扬州炒饭.md",
+      "ingredients": [
+        "冷饭",
+        "鸡蛋",
+        "冷冻去皮基围虾",
+        "午餐肉罐头",
+        "青豆",
+        "胡萝卜",
+        "玉米粒",
+        "葱",
+        "油",
+        "盐"
+      ],
       "hasImage": true,
       "coverImage": "dishes/staple/扬州炒饭/veg.png"
     },
@@ -2670,6 +5201,13 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/披萨饼皮/披萨饼皮.md",
+      "ingredients": [
+        "中筋面粉",
+        "安琪干酵母粉",
+        "食用盐",
+        "橄榄油",
+        "白砂糖"
+      ],
       "hasImage": true,
       "coverImage": "dishes/staple/披萨饼皮/001.jpeg"
     },
@@ -2681,6 +5219,18 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/日式咖喱饭/日式咖喱饭.md",
+      "ingredients": [
+        "咖喱块",
+        "土豆",
+        "胡萝卜",
+        "洋葱",
+        "肉",
+        "蒜头",
+        "花椰菜",
+        "培根",
+        "煎蛋",
+        "太阳蛋"
+      ],
       "hasImage": true,
       "coverImage": "dishes/staple/日式咖喱饭/成品.jpg"
     },
@@ -2692,6 +5242,15 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/日式肥牛丼饭/日式肥牛丼饭.md",
+      "ingredients": [
+        "洋葱",
+        "肥牛",
+        "葱",
+        "白芝麻",
+        "味淋",
+        "温泉蛋",
+        "出汁"
+      ],
       "hasImage": true,
       "coverImage": "dishes/staple/日式肥牛丼饭/成品.png"
     },
@@ -2703,6 +5262,13 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/河南蒸面条/河南蒸面条.md",
+      "ingredients": [
+        "挂面",
+        "五花肉",
+        "蒜薹",
+        "麻油",
+        "蒸篦子"
+      ],
       "hasImage": true,
       "coverImage": "dishes/staple/河南蒸面条/河南蒸面条.png"
     },
@@ -2714,6 +5280,14 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/火腿饭团/火腿饭团.md",
+      "ingredients": [
+        "火腿",
+        "米饭",
+        "冷冻青豆",
+        "冷冻玉米粒",
+        "海苔碎",
+        "喜欢的沙拉酱"
+      ],
       "hasImage": true,
       "coverImage": "dishes/staple/火腿饭团/饭团.png"
     },
@@ -2725,6 +5299,19 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/炒凉粉/炒凉粉.md",
+      "ingredients": [
+        "凉粉",
+        "玉米油",
+        "大蒜",
+        "香葱",
+        "豆瓣酱",
+        "生抽",
+        "老抽",
+        "食盐",
+        "十三香",
+        "中粗辣椒面",
+        "矿泉水"
+      ],
       "hasImage": true,
       "coverImage": "dishes/staple/炒凉粉/chaoliangfen.jpg"
     },
@@ -2736,6 +5323,13 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/炒意大利面/炒意大利面.md",
+      "ingredients": [
+        "意大利面",
+        "肥牛片",
+        "番茄酱",
+        "黑胡椒酱",
+        "菜籽油"
+      ],
       "hasImage": true,
       "coverImage": "dishes/staple/炒意大利面/a.jpg"
     },
@@ -2747,6 +5341,11 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/烙饼/烙饼.md",
+      "ingredients": [
+        "油",
+        "面粉",
+        "电饼铛"
+      ],
       "hasImage": true,
       "coverImage": "dishes/staple/烙饼/成品.jpg"
     },
@@ -2758,6 +5357,13 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/烧饼/芝麻烧饼.md",
+      "ingredients": [
+        "面粉",
+        "酵母粉",
+        "白糖",
+        "十三香",
+        "食用油"
+      ],
       "hasImage": true,
       "coverImage": "dishes/staple/烧饼/芝麻烧饼.jpg"
     },
@@ -2769,6 +5375,14 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/电饭煲三文鱼炊饭/电饭煲三文鱼炊饭.md",
+      "ingredients": [
+        "有盐牛油",
+        "三文鱼",
+        "米",
+        "粟米",
+        "金菇",
+        "冬菇"
+      ],
       "hasImage": true,
       "coverImage": "dishes/staple/电饭煲三文鱼炊饭/电饭煲三文鱼炊饭.webp"
     },
@@ -2780,6 +5394,11 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/空气炸锅照烧鸡饭/空气炸锅照烧鸡饭.md",
+      "ingredients": [
+        "丽滋饼干",
+        "酱油",
+        "糖"
+      ],
       "hasImage": true,
       "coverImage": "dishes/staple/空气炸锅照烧鸡饭/空气炸锅照烧鸡饭.jpg"
     },
@@ -2791,6 +5410,10 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/米饭/电饭煲蒸米饭.md",
+      "ingredients": [
+        "江南米",
+        "北方大米"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2802,6 +5425,22 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/老友猪肉粉/老友猪肉粉.md",
+      "ingredients": [
+        "米粉",
+        "猪肉",
+        "酸笋",
+        "剁椒",
+        "豆豉",
+        "大蒜",
+        "料酒",
+        "生抽",
+        "白糖",
+        "米醋",
+        "盐",
+        "油",
+        "生粉",
+        "胡椒粉"
+      ],
       "hasImage": true,
       "coverImage": "dishes/staple/老友猪肉粉/老友猪肉粉.jpg"
     },
@@ -2813,6 +5452,15 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/茄子肉煎饼/茄子肉煎饼.md",
+      "ingredients": [
+        "米粉",
+        "小麦粉",
+        "鸡蛋",
+        "煮熟的腊肉",
+        "茄子",
+        "食用油",
+        "食盐"
+      ],
       "hasImage": true,
       "coverImage": "dishes/staple/茄子肉煎饼/茄子肉煎饼.jpg"
     },
@@ -2824,6 +5472,20 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/西红柿鸡蛋挂面/西红柿鸡蛋挂面.md",
+      "ingredients": [
+        "挂面",
+        "鲜面条也行",
+        "西红柿",
+        "盐",
+        "鸡蛋",
+        "葱",
+        "酱油",
+        "蚝油",
+        "鸡精",
+        "白砂糖",
+        "青椒",
+        "香油"
+      ],
       "hasImage": true,
       "coverImage": "dishes/staple/西红柿鸡蛋挂面/food.jpg"
     },
@@ -2835,6 +5497,21 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/豆角焖面/豆角焖面.md",
+      "ingredients": [
+        "鲜面条",
+        "肉",
+        "盐",
+        "豆角",
+        "鸡精",
+        "耗油",
+        "味精",
+        "十三香",
+        "生抽",
+        "老抽",
+        "葱",
+        "蒜头",
+        "姜"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2846,6 +5523,12 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/酱拌荞麦面/酱拌荞麦面.md",
+      "ingredients": [
+        "荞麦面",
+        "黄瓜",
+        "红萝卜",
+        "老干妈"
+      ],
       "hasImage": true,
       "coverImage": "dishes/staple/酱拌荞麦面/1.jpeg"
     },
@@ -2857,6 +5540,17 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/陕西油泼面/陕西油泼面.md",
+      "ingredients": [
+        "鲜面条",
+        "盐",
+        "葱",
+        "蒜",
+        "干辣椒面",
+        "食用油",
+        "生抽",
+        "香醋",
+        "青菜"
+      ],
       "hasImage": true,
       "coverImage": "dishes/staple/陕西油泼面/chemian.png"
     },
@@ -2868,6 +5562,19 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/韩式拌饭/韩式拌饭.md",
+      "ingredients": [
+        "米饭",
+        "鸡蛋",
+        "火锅牛肉卷",
+        "豆芽",
+        "蘑菇",
+        "胡萝卜",
+        "西葫芦",
+        "韩式辣酱",
+        "雪碧",
+        "芝麻",
+        "芝麻油"
+      ],
       "hasImage": true,
       "coverImage": "dishes/staple/韩式拌饭/韩式拌饭.png"
     },
@@ -2879,6 +5586,11 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/鲣鱼海苔玉米饭/鲣鱼海苔玉米饭.md",
+      "ingredients": [
+        "东北米",
+        "鲣鱼海苔碎",
+        "玉米粒"
+      ],
       "hasImage": true,
       "coverImage": "dishes/staple/鲣鱼海苔玉米饭/米饭.jpg"
     },
@@ -2890,6 +5602,27 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/利提巧卡.md",
+      "ingredients": [
+        "全麦面粉",
+        "烤鹰嘴豆粉",
+        "茄子",
+        "番茄",
+        "土豆",
+        "洋葱",
+        "大蒜",
+        "生姜",
+        "青辣椒",
+        "柠檬",
+        "香菜",
+        "芥末油",
+        "孜然籽",
+        "印度黑盐",
+        "红辣椒粉",
+        "芝麻",
+        "酥油",
+        "盐",
+        "明火"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2901,6 +5634,19 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/印度烤饼.md",
+      "ingredients": [
+        "中筋面粉",
+        "酸奶",
+        "酵母",
+        "糖",
+        "盐",
+        "酥油",
+        "黄油",
+        "黑芝麻",
+        "白芝麻",
+        "香菜叶",
+        "大蒜"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2912,6 +5658,32 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/印度焖饭.md",
+      "ingredients": [
+        "巴斯马蒂长粒香米",
+        "鸡腿肉",
+        "酸奶",
+        "洋葱",
+        "番茄",
+        "生姜",
+        "大蒜",
+        "青辣椒",
+        "香菜",
+        "薄荷叶",
+        "藏红花",
+        "牛奶",
+        "酥油",
+        "食用油",
+        "姜黄粉",
+        "红辣椒粉",
+        "印度综合香料粉",
+        "全香料",
+        "肉桂棒",
+        "小豆蔻",
+        "丁香",
+        "八角",
+        "盐",
+        "面团"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2923,6 +5695,19 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/可乐炒饭.md",
+      "ingredients": [
+        "米饭",
+        "可乐",
+        "鸡蛋",
+        "火腿肠",
+        "油",
+        "生抽",
+        "老抽",
+        "蚝油",
+        "豆瓣酱",
+        "葱花",
+        "胡椒粉"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2934,6 +5719,16 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/咸肉菜饭.md",
+      "ingredients": [
+        "大米",
+        "青菜",
+        "咸肉",
+        "冬笋",
+        "猪油",
+        "料酒",
+        "白糖",
+        "白胡椒粉"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2945,6 +5740,10 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/手工水饺.md",
+      "ingredients": [
+        "面粉",
+        "芝麻香油"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2956,6 +5755,14 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/汤面.md",
+      "ingredients": [
+        "面食材料",
+        "龙须面",
+        "面鱼",
+        "也可以是泡面面饼",
+        "各类规格粉丝",
+        "菜类材料"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2967,6 +5774,14 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/炒年糕.md",
+      "ingredients": [
+        "年糕",
+        "白粿",
+        "葱",
+        "酱油",
+        "盐",
+        "青菜"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2978,6 +5793,12 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/炒方便面.md",
+      "ingredients": [
+        "方便面",
+        "盐",
+        "鸡蛋",
+        "火腿肠"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -2989,6 +5810,24 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/炒河粉.md",
+      "ingredients": [
+        "炒河粉",
+        "猪肉",
+        "牛肉",
+        "炒料",
+        "味精",
+        "老抽",
+        "生抽",
+        "孜然粉",
+        "黄瓜",
+        "面筋块",
+        "绿豆芽",
+        "鸡蛋",
+        "蒜瓣",
+        "小葱",
+        "淀粉",
+        "盘子"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3000,6 +5839,15 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/炒馍.md",
+      "ingredients": [
+        "馒头",
+        "盐",
+        "油",
+        "孜然粉",
+        "五香粉",
+        "小葱",
+        "鸡蛋"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3011,6 +5859,15 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/炸酱面.md",
+      "ingredients": [
+        "肉丁",
+        "肉末",
+        "面条",
+        "蒜",
+        "菜码",
+        "豆瓣酱",
+        "甜面酱"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3022,6 +5879,21 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/热干面.md",
+      "ingredients": [
+        "热干面特有的碱水面",
+        "小葱",
+        "酸豆角",
+        "肉末",
+        "蒜水",
+        "肉汤汁",
+        "萝卜干",
+        "芝麻酱",
+        "辣椒油",
+        "胡椒粉",
+        "酱油",
+        "食盐",
+        "鸡精"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3033,6 +5905,22 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/照烧鸡腿饭.md",
+      "ingredients": [
+        "鸡腿",
+        "料酒",
+        "生抽",
+        "蜂蜜",
+        "黑椒碎",
+        "黑椒粉",
+        "盐",
+        "西兰花",
+        "胡萝卜",
+        "老抽",
+        "大蒜",
+        "生姜",
+        "食用油",
+        "米饭"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3044,6 +5932,10 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/煮泡面加蛋.md",
+      "ingredients": [
+        "泡面",
+        "鸡蛋"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3055,6 +5947,15 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/猪油拌饭.md",
+      "ingredients": [
+        "米饭",
+        "猪油",
+        "生抽",
+        "老抽",
+        "蚝油",
+        "葱花",
+        "猪油渣"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3066,6 +5967,26 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/红芸豆拌饭.md",
+      "ingredients": [
+        "红芸豆",
+        "巴斯马蒂香米",
+        "普通大米",
+        "洋葱",
+        "番茄",
+        "生姜",
+        "大蒜",
+        "青辣椒",
+        "香菜",
+        "食用油",
+        "酥油",
+        "姜黄粉",
+        "红辣椒粉",
+        "香菜粉",
+        "孜然粉",
+        "印度综合香料粉",
+        "月桂叶",
+        "盐"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3077,6 +5998,11 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/老干妈拌面.md",
+      "ingredients": [
+        "面",
+        "老干妈",
+        "酱油"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3088,6 +6014,18 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/肉蛋盖饭.md",
+      "ingredients": [
+        "米饭",
+        "鸡蛋",
+        "肉馅",
+        "老抽",
+        "生抽",
+        "醋",
+        "红葱油",
+        "葱",
+        "油",
+        "糖"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3099,6 +6037,13 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/葱油拌面.md",
+      "ingredients": [
+        "干面条",
+        "小葱",
+        "生抽",
+        "老抽",
+        "白糖"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3110,6 +6055,16 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/蒸卤面.md",
+      "ingredients": [
+        "猪五花肉",
+        "芹菜",
+        "鲜面条",
+        "葱,姜,蒜",
+        "食用油",
+        "花椒",
+        "干红椒",
+        "青椒"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3121,6 +6076,19 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/蛋包饭.md",
+      "ingredients": [
+        "鸡蛋",
+        "洋葱",
+        "胡萝卜",
+        "玉米粒",
+        "青豆",
+        "火腿肠",
+        "鸡胸肉",
+        "米饭",
+        "番茄酱",
+        "食用油",
+        "牛奶"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3132,6 +6100,22 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/蛋炒饭.md",
+      "ingredients": [
+        "冷饭",
+        "鸡蛋",
+        "火腿",
+        "黄瓜",
+        "胡萝卜",
+        "油",
+        "盐",
+        "胡椒粉",
+        "生抽",
+        "香葱",
+        "灯影牛肉丝",
+        "午餐肉",
+        "腊肠",
+        "卤肉等熟肉"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3143,6 +6127,10 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/螺蛳粉.md",
+      "ingredients": [
+        "袋装螺蛳粉",
+        "其中应该包含"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3154,6 +6142,17 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/酸辣蕨根粉.md",
+      "ingredients": [
+        "蕨根粉",
+        "油泼辣子",
+        "酱油",
+        "香醋",
+        "小米辣",
+        "蒜",
+        "葱",
+        "盐",
+        "糖"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3165,6 +6164,12 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/醪糟小汤圆.md",
+      "ingredients": [
+        "小汤圆",
+        "醪糟",
+        "白糖",
+        "枸杞"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3176,6 +6181,14 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/韭菜盒子.md",
+      "ingredients": [
+        "韭菜",
+        "虾仁",
+        "鸡蛋",
+        "香油",
+        "盐",
+        "面粉"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3187,6 +6200,26 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/鲜肉烧卖.md",
+      "ingredients": [
+        "烧卖皮",
+        "猪肉末",
+        "生姜末",
+        "葱末",
+        "生抽",
+        "料酒",
+        "盐",
+        "糖",
+        "白胡椒粉",
+        "芝麻油",
+        "高汤",
+        "浓汤宝",
+        "冬笋",
+        "皮冻",
+        "香菇",
+        "虾仁",
+        "猪油",
+        "复配食品增稠剂"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3198,6 +6231,27 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/鹰嘴豆炸饼.md",
+      "ingredients": [
+        "鹰嘴豆",
+        "中筋面粉",
+        "酸奶",
+        "洋葱",
+        "番茄",
+        "生姜",
+        "大蒜",
+        "青辣椒",
+        "香菜",
+        "红茶包",
+        "食用油",
+        "姜黄粉",
+        "红辣椒粉",
+        "香菜粉",
+        "孜然粉",
+        "印度综合香料粉",
+        "石榴粉",
+        "盐",
+        "小苏打"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3209,6 +6263,14 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/麻油拌面.md",
+      "ingredients": [
+        "风干快熟面",
+        "任何牌子的快熟面",
+        "麻油",
+        "胡椒粉",
+        "老抽",
+        "盐"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3220,6 +6282,18 @@
       "category": "staple",
       "categoryName": "主食",
       "mdPath": "dishes/staple/麻辣减脂荞麦面.md",
+      "ingredients": [
+        "火锅底料",
+        "花生酱",
+        "全脂牛奶",
+        "生抽",
+        "辣椒油",
+        "醋",
+        "花椒油",
+        "半干荞麦面",
+        "娃娃菜",
+        "生菜"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3231,6 +6305,11 @@
       "category": "template",
       "categoryName": "模板",
       "mdPath": "dishes/template/示例菜/示例菜.md",
+      "ingredients": [
+        "咖喱块",
+        "土豆",
+        "藤椒油"
+      ],
       "hasImage": true,
       "coverImage": "dishes/template/示例菜/示例菜.jpg"
     },
@@ -3242,6 +6321,17 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/上汤娃娃菜/上汤娃娃菜.md",
+      "ingredients": [
+        "娃娃菜",
+        "皮蛋",
+        "午餐肉",
+        "葱",
+        "姜",
+        "蒜",
+        "盐",
+        "糖",
+        "淀粉"
+      ],
       "hasImage": true,
       "coverImage": "dishes/vegetable_dish/上汤娃娃菜/上汤娃娃菜.png"
     },
@@ -3253,6 +6343,17 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/凉拌木耳/凉拌木耳.md",
+      "ingredients": [
+        "干木耳",
+        "蒜瓣",
+        "白糖",
+        "小米辣",
+        "盐",
+        "香油",
+        "生抽",
+        "醋",
+        "芥末"
+      ],
       "hasImage": true,
       "coverImage": "dishes/vegetable_dish/凉拌木耳/1.jpg"
     },
@@ -3264,6 +6365,15 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/凉拌莴笋/凉拌莴笋.md",
+      "ingredients": [
+        "莴笋",
+        "萝卜",
+        "小米辣",
+        "姜",
+        "蒜头",
+        "盐",
+        "食用油"
+      ],
       "hasImage": true,
       "coverImage": "dishes/vegetable_dish/凉拌莴笋/1.jpeg"
     },
@@ -3275,6 +6385,20 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/包菜炒鸡蛋粉丝/包菜炒鸡蛋粉丝.md",
+      "ingredients": [
+        "包菜",
+        "鸡蛋",
+        "粉丝",
+        "胡萝卜",
+        "菜籽油",
+        "盐",
+        "生抽",
+        "老抽",
+        "蚝油",
+        "葱",
+        "蒜",
+        "干辣椒"
+      ],
       "hasImage": true,
       "coverImage": "dishes/vegetable_dish/包菜炒鸡蛋粉丝/1.jpg"
     },
@@ -3286,6 +6410,15 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/小炒藕丁/小炒藕丁.md",
+      "ingredients": [
+        "大葱",
+        "小米辣",
+        "莲藕",
+        "生抽",
+        "老抽",
+        "耗油",
+        "油"
+      ],
       "hasImage": true,
       "coverImage": "dishes/vegetable_dish/小炒藕丁/小炒藕丁.jpg"
     },
@@ -3297,6 +6430,16 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/干锅花菜/干锅花菜.md",
+      "ingredients": [
+        "花菜",
+        "五花肉",
+        "辣椒",
+        "生抽",
+        "白糖",
+        "蒜",
+        "盐",
+        "油"
+      ],
       "hasImage": true,
       "coverImage": "dishes/vegetable_dish/干锅花菜/干锅花菜.jpg"
     },
@@ -3308,6 +6451,20 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/手撕包菜/手撕包菜.md",
+      "ingredients": [
+        "包菜",
+        "五花肉",
+        "小米辣",
+        "食用油",
+        "料酒",
+        "生抽",
+        "香醋",
+        "鸡精",
+        "姜",
+        "蒜头",
+        "蒜苗",
+        "盐"
+      ],
       "hasImage": true,
       "coverImage": "dishes/vegetable_dish/手撕包菜/1.jpeg"
     },
@@ -3319,6 +6476,13 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/拔丝土豆/拔丝土豆.md",
+      "ingredients": [
+        "土豆",
+        "食用油",
+        "淀粉",
+        "白砂糖",
+        "芝麻"
+      ],
       "hasImage": true,
       "coverImage": "dishes/vegetable_dish/拔丝土豆/1.jpeg"
     },
@@ -3330,6 +6494,13 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/椒盐玉米/椒盐玉米.md",
+      "ingredients": [
+        "玉米粒",
+        "椒盐",
+        "芝麻粒",
+        "油",
+        "淀粉"
+      ],
       "hasImage": true,
       "coverImage": "dishes/vegetable_dish/椒盐玉米/椒盐玉米.jpeg"
     },
@@ -3341,6 +6512,13 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/榄菜肉末四季豆/榄菜肉末四季豆.md",
+      "ingredients": [
+        "四季豆",
+        "五花肉",
+        "橄榄菜",
+        "大蒜",
+        "小米辣"
+      ],
       "hasImage": true,
       "coverImage": "dishes/vegetable_dish/榄菜肉末四季豆/榄菜肉末四季豆.JPG"
     },
@@ -3352,6 +6530,14 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/洋葱炒鸡蛋/洋葱炒鸡蛋.md",
+      "ingredients": [
+        "鸡蛋",
+        "洋葱",
+        "食用油",
+        "盐",
+        "葱",
+        "料酒"
+      ],
       "hasImage": true,
       "coverImage": "dishes/vegetable_dish/洋葱炒鸡蛋/1.jpeg"
     },
@@ -3363,6 +6549,10 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/炒滑蛋/炒滑蛋.md",
+      "ingredients": [
+        "鸡蛋",
+        "牛奶"
+      ],
       "hasImage": true,
       "coverImage": "dishes/vegetable_dish/炒滑蛋/炒滑蛋.jpg"
     },
@@ -3374,6 +6564,15 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/烤茄子/烤茄子.md",
+      "ingredients": [
+        "茄子",
+        "食用油",
+        "酱油",
+        "蒜蓉",
+        "辣椒",
+        "孜然",
+        "食用盐"
+      ],
       "hasImage": true,
       "coverImage": "dishes/vegetable_dish/烤茄子/烤茄子.jpg"
     },
@@ -3385,6 +6584,15 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/白灼菜心/白灼菜心.md",
+      "ingredients": [
+        "新鲜菜心",
+        "生抽",
+        "蚝油",
+        "盐",
+        "大蒜",
+        "小米辣",
+        "食用油"
+      ],
       "hasImage": true,
       "coverImage": "dishes/vegetable_dish/白灼菜心/白灼菜心.jpg"
     },
@@ -3396,6 +6604,11 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/糖拌西红柿/糖拌西红柿.md",
+      "ingredients": [
+        "西红柿",
+        "白砂糖",
+        "冰箱"
+      ],
       "hasImage": true,
       "coverImage": "dishes/vegetable_dish/糖拌西红柿/火山飘雪.jpg"
     },
@@ -3407,6 +6620,18 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/红烧冬瓜/红烧冬瓜.md",
+      "ingredients": [
+        "冬瓜",
+        "食用油",
+        "料酒",
+        "淀粉",
+        "生抽",
+        "老抽",
+        "鸡精",
+        "香葱",
+        "姜末",
+        "蚝油"
+      ],
       "hasImage": true,
       "coverImage": "dishes/vegetable_dish/红烧冬瓜/1.jpeg"
     },
@@ -3418,6 +6643,14 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/芹菜拌茶树菇/芹菜拌茶树菇.md",
+      "ingredients": [
+        "闽星茶树菇",
+        "芹菜",
+        "香油",
+        "蚝油",
+        "味极鲜",
+        "食用盐"
+      ],
       "hasImage": true,
       "coverImage": "dishes/vegetable_dish/芹菜拌茶树菇/芹菜拌茶树菇.jpg"
     },
@@ -3429,6 +6662,14 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/莴笋叶煎饼/莴笋叶煎饼.md",
+      "ingredients": [
+        "莴笋叶",
+        "鸡蛋",
+        "食用油",
+        "生抽",
+        "淀粉",
+        "鸡精"
+      ],
       "hasImage": true,
       "coverImage": "dishes/vegetable_dish/莴笋叶煎饼/1.jpeg"
     },
@@ -3440,6 +6681,12 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/菠菜炒鸡蛋/菠菜炒鸡蛋.md",
+      "ingredients": [
+        "菠菜",
+        "鸡蛋",
+        "食用油",
+        "食用盐"
+      ],
       "hasImage": true,
       "coverImage": "dishes/vegetable_dish/菠菜炒鸡蛋/菠菜炒鸡蛋.jpg"
     },
@@ -3451,6 +6698,12 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/蒜蓉空心菜/蒜蓉空心菜.md",
+      "ingredients": [
+        "空心菜",
+        "蒜末",
+        "盐",
+        "生抽"
+      ],
       "hasImage": true,
       "coverImage": "dishes/vegetable_dish/蒜蓉空心菜/1.JPG"
     },
@@ -3462,6 +6715,14 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/虎皮青椒/虎皮青椒.md",
+      "ingredients": [
+        "青椒",
+        "大蒜",
+        "白糖",
+        "醋",
+        "生抽",
+        "盐"
+      ],
       "hasImage": true,
       "coverImage": "dishes/vegetable_dish/虎皮青椒/虎皮青椒.jpg"
     },
@@ -3473,6 +6734,23 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/蚝油三鲜菇/蚝油三鲜菇.md",
+      "ingredients": [
+        "香菇",
+        "蟹味菇",
+        "白玉菇",
+        "小米辣",
+        "菜椒",
+        "食用油",
+        "盐",
+        "料酒",
+        "淀粉",
+        "生抽",
+        "鸡精",
+        "香葱",
+        "姜末",
+        "蚝油",
+        "西蓝花"
+      ],
       "hasImage": true,
       "coverImage": "dishes/vegetable_dish/蚝油三鲜菇/1.jpeg"
     },
@@ -3484,6 +6762,17 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/西红柿豆腐汤羹/西红柿豆腐汤羹.md",
+      "ingredients": [
+        "西红柿",
+        "鸡蛋",
+        "豆腐",
+        "食用油",
+        "盐",
+        "淀粉",
+        "鸡精",
+        "香葱",
+        "姜"
+      ],
       "hasImage": true,
       "coverImage": "dishes/vegetable_dish/西红柿豆腐汤羹/1.jpeg"
     },
@@ -3495,6 +6784,13 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/西葫芦炒鸡蛋/西葫芦炒鸡蛋.md",
+      "ingredients": [
+        "西葫芦",
+        "鸡蛋",
+        "西红柿",
+        "食用盐",
+        "食用油"
+      ],
       "hasImage": true,
       "coverImage": "dishes/vegetable_dish/西葫芦炒鸡蛋/西葫芦炒鸡蛋.jpeg"
     },
@@ -3506,6 +6802,11 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/话梅煮毛豆/话梅煮毛豆.md",
+      "ingredients": [
+        "毛豆",
+        "话梅",
+        "食用盐"
+      ],
       "hasImage": true,
       "coverImage": "dishes/vegetable_dish/话梅煮毛豆/1.jpeg"
     },
@@ -3517,6 +6818,15 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/鸡蛋羹/鸡蛋羹.md",
+      "ingredients": [
+        "鸡蛋",
+        "食用盐",
+        "香油",
+        "生抽",
+        "味极鲜",
+        "白醋",
+        "藤椒油"
+      ],
       "hasImage": true,
       "coverImage": "dishes/vegetable_dish/鸡蛋羹/鸡蛋羹.jpg"
     },
@@ -3528,6 +6838,12 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/鸡蛋花/鸡蛋花.md",
+      "ingredients": [
+        "鸡蛋",
+        "白糖",
+        "食盐",
+        "搅拌器"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3539,6 +6855,17 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/凉拌油麦菜.md",
+      "ingredients": [
+        "油麦菜",
+        "芝麻酱",
+        "酱油",
+        "醋",
+        "蚝油",
+        "白糖",
+        "香油",
+        "蒜",
+        "盐"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3550,6 +6877,16 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/凉拌豆腐.md",
+      "ingredients": [
+        "豆腐",
+        "小葱",
+        "大蒜",
+        "生抽",
+        "香油",
+        "醋",
+        "白糖",
+        "辣椒油"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3561,6 +6898,16 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/凉拌金针菇.md",
+      "ingredients": [
+        "金针菇",
+        "小葱",
+        "大蒜",
+        "生抽",
+        "醋",
+        "白糖",
+        "香油",
+        "辣椒油"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3572,6 +6919,12 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/凉拌黄瓜.md",
+      "ingredients": [
+        "黄瓜",
+        "醋",
+        "酱油",
+        "蒜"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3583,6 +6936,23 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/印度土豆花菜.md",
+      "ingredients": [
+        "土豆",
+        "花菜",
+        "洋葱",
+        "番茄",
+        "生姜",
+        "大蒜",
+        "青辣椒",
+        "香菜",
+        "食用油",
+        "孜然籽",
+        "姜黄粉",
+        "红辣椒粉",
+        "香菜粉",
+        "印度综合香料粉",
+        "盐"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3594,6 +6964,23 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/印度葫芦丸子.md",
+      "ingredients": [
+        "瓠瓜",
+        "鹰嘴豆粉",
+        "洋葱",
+        "番茄",
+        "生姜",
+        "大蒜",
+        "青辣椒",
+        "香菜",
+        "姜黄粉",
+        "红辣椒粉",
+        "香菜粉",
+        "孜然粉",
+        "印度综合香料粉",
+        "盐",
+        "食用油"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3605,6 +6992,19 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/地三鲜.md",
+      "ingredients": [
+        "茄子",
+        "土豆",
+        "尖椒",
+        "葱",
+        "姜",
+        "蒜",
+        "豆瓣酱",
+        "生抽",
+        "盐",
+        "糖",
+        "淀粉"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3616,6 +7016,23 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/家常日本豆腐.md",
+      "ingredients": [
+        "日本豆腐",
+        "青椒",
+        "胡萝卜",
+        "火腿肠",
+        "黑木耳",
+        "洋葱",
+        "生粉",
+        "蒜",
+        "油",
+        "生抽",
+        "蚝油",
+        "盐",
+        "鸡精",
+        "番茄酱",
+        "白砂糖"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3627,6 +7044,15 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/松仁玉米.md",
+      "ingredients": [
+        "玉米粒",
+        "熟松子仁",
+        "胡萝卜",
+        "食用油",
+        "白砂糖",
+        "盐",
+        "淀粉"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3638,6 +7064,12 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/水油焖蔬菜.md",
+      "ingredients": [
+        "食用油",
+        "盐",
+        "蚝油",
+        "叶菜类蔬菜"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3649,6 +7081,17 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/油醋爆蛋.md",
+      "ingredients": [
+        "鸡蛋",
+        "小米辣",
+        "小葱",
+        "蒜",
+        "油",
+        "香醋",
+        "生抽",
+        "蚝油",
+        "白糖"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3660,6 +7103,11 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/清炒花菜.md",
+      "ingredients": [
+        "花菜",
+        "大蒜",
+        "盐"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3671,6 +7119,9 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/清蒸南瓜.md",
+      "ingredients": [
+        "南瓜"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3682,6 +7133,18 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/炒茄子.md",
+      "ingredients": [
+        "茄子",
+        "八角",
+        "虾皮",
+        "香葱",
+        "肉末",
+        "酱油",
+        "糖",
+        "醋",
+        "菜籽油",
+        "花生油"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3693,6 +7156,9 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/炒青菜.md",
+      "ingredients": [
+        "青菜"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3704,6 +7170,18 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/皮蛋豆腐.md",
+      "ingredients": [
+        "皮蛋",
+        "内酯豆腐",
+        "生抽",
+        "白砂糖",
+        "醋",
+        "香油",
+        "辣椒油",
+        "花生碎",
+        "葱花",
+        "香菜"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3715,6 +7193,16 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/素炒豆角.md",
+      "ingredients": [
+        "豆角",
+        "小米椒",
+        "葱",
+        "蒜",
+        "生抽",
+        "老抽",
+        "耗油",
+        "盐"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3726,6 +7214,19 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/红烧茄子.md",
+      "ingredients": [
+        "大蒜",
+        "大葱",
+        "青辣椒",
+        "洋葱",
+        "西红柿",
+        "青茄子",
+        "盐",
+        "酱油",
+        "鸡蛋",
+        "面粉",
+        "淀粉"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3737,6 +7238,15 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/脆皮豆腐.md",
+      "ingredients": [
+        "老豆腐",
+        "鸡蛋",
+        "生抽",
+        "老抽",
+        "蚝油",
+        "白糖",
+        "玉米淀粉"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3748,6 +7258,15 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/茄子炖土豆.md",
+      "ingredients": [
+        "茄子",
+        "土豆",
+        "肉",
+        "辣椒",
+        "酱油",
+        "盐",
+        "蒜"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3759,6 +7278,13 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/葱煎豆腐.md",
+      "ingredients": [
+        "白豆腐",
+        "葱",
+        "青辣椒",
+        "盐",
+        "鸡精"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3770,6 +7296,13 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/蒜蓉西兰花.md",
+      "ingredients": [
+        "西兰花",
+        "大蒜 3-4 瓣",
+        "生抽",
+        "蚝油",
+        "白糖"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3781,6 +7314,15 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/蒲烧茄子.md",
+      "ingredients": [
+        "茄子",
+        "蒲烧汁",
+        "蜂蜜",
+        "白糖",
+        "生抽",
+        "老抽",
+        "料酒"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3792,6 +7334,15 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/蚝油生菜.md",
+      "ingredients": [
+        "生菜",
+        "蚝油",
+        "大蒜",
+        "生抽",
+        "盐",
+        "白糖",
+        "食用油"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3803,6 +7354,14 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/西红柿炒鸡蛋.md",
+      "ingredients": [
+        "西红柿",
+        "鸡蛋",
+        "食用油",
+        "盐",
+        "糖",
+        "葱花"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3814,6 +7373,17 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/酸辣土豆丝.md",
+      "ingredients": [
+        "土豆",
+        "大蒜",
+        "青椒",
+        "红椒",
+        "干辣椒",
+        "葱",
+        "生抽",
+        "陈醋",
+        "盐"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3825,6 +7395,16 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/金针菇日本豆腐煲.md",
+      "ingredients": [
+        "金针菇",
+        "日本豆腐",
+        "小米椒",
+        "生抽",
+        "蚝油",
+        "盐",
+        "糖",
+        "食用油"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3836,6 +7416,19 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/金钱蛋.md",
+      "ingredients": [
+        "鸡蛋",
+        "线椒",
+        "小米辣",
+        "豆瓣酱",
+        "蒜",
+        "小葱",
+        "玉米淀粉",
+        "食用油",
+        "生抽",
+        "蚝油",
+        "糖"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3847,6 +7440,19 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/陕北熬豆角.md",
+      "ingredients": [
+        "豆角",
+        "土豆",
+        "西红柿",
+        "螺丝椒",
+        "盐",
+        "生抽",
+        "五香粉",
+        "蚝油",
+        "葱",
+        "姜",
+        "蒜"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3858,6 +7464,19 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/雷椒皮蛋.md",
+      "ingredients": [
+        "皮蛋",
+        "长条青椒",
+        "葱",
+        "蒜",
+        "小米辣",
+        "食用油",
+        "生抽",
+        "陈醋",
+        "白糖",
+        "香油",
+        "深一点的小铁盆"
+      ],
       "hasImage": false,
       "coverImage": null
     },
@@ -3869,6 +7488,14 @@
       "category": "vegetable_dish",
       "categoryName": "素菜",
       "mdPath": "dishes/vegetable_dish/鸡蛋火腿炒黄瓜.md",
+      "ingredients": [
+        "黄瓜",
+        "鸡蛋",
+        "火腿肠",
+        "盐",
+        "生抽",
+        "红尖椒"
+      ],
       "hasImage": false,
       "coverImage": null
     }

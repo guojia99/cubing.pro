@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Anchor, Button, Image, message, Spin, theme } from 'antd';
-import { ArrowLeftOutlined, HeartFilled, HeartOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, HeartFilled, HeartOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from '@@/exports';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -11,10 +11,16 @@ import {
   isFavorite,
   removeFavorite,
 } from './utils/favoriteStorage';
+import {
+  addToTonight,
+  isInTonight,
+  removeFromTonight,
+} from './utils/tonightStorage';
 import './detail.less';
 
 const RECIPES_JSON = '/recipes.json';
 const MAX_FAVORITES = 20;
+const MAX_TONIGHT = 20;
 
 const RecipeDetail: React.FC = () => {
   const { token } = theme.useToken();
@@ -27,11 +33,15 @@ const RecipeDetail: React.FC = () => {
   const [headings, setHeadings] = useState<{ id: string; text: string; level: number }[]>([]);
   const [mdPath, setMdPath] = useState<string>('');
   const [favState, setFavState] = useState(false);
+  const [tonightState, setTonightState] = useState(false);
   const headingIndexRef = useRef(0);
 
   useEffect(() => {
     if (category && id) {
-      setFavState(isFavorite(decodeURIComponent(category), decodeURIComponent(id)));
+      const cat = decodeURIComponent(category);
+      const rid = decodeURIComponent(id);
+      setFavState(isFavorite(cat, rid));
+      setTonightState(isInTonight(cat, rid));
     }
   }, [category, id]);
 
@@ -105,7 +115,44 @@ const RecipeDetail: React.FC = () => {
   };
   headingIndexRef.current = 0;
 
+  const resolveTipsLink = (href: string | undefined): { category: string; id: string } | null => {
+    if (!href || !href.endsWith('.md')) return null;
+    const match = href.match(/tips\/([^/]+)\/([^/]+)\.md$/);
+    if (match) {
+      return { category: match[1], id: match[2] };
+    }
+    return null;
+  };
+
   const mdComponents: Components = {
+    a({ href, children, ...props }) {
+      const tipsTarget = resolveTipsLink(href ?? undefined);
+      if (tipsTarget) {
+        return (
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate(
+                `/other/kitchen-skills/${encodeURIComponent(tipsTarget.category)}/${encodeURIComponent(tipsTarget.id)}`,
+              );
+            }}
+            style={{ color: token.colorPrimary }}
+            {...props}
+          >
+            {children}
+          </a>
+        );
+      }
+      if (href?.startsWith('#')) {
+        return <a href={href} {...props}>{children}</a>;
+      }
+      return (
+        <a href={href} target="_blank" rel="noreferrer" {...props}>
+          {children}
+        </a>
+      );
+    },
     img({ src, alt }) {
       if (!src) return null;
       let fullSrc = src;
@@ -190,6 +237,25 @@ const RecipeDetail: React.FC = () => {
     }
   };
 
+  const handleTonightClick = () => {
+    if (!category || !id) return;
+    const cat = decodeURIComponent(category);
+    const rid = decodeURIComponent(id);
+    if (tonightState) {
+      removeFromTonight(cat, rid);
+      setTonightState(false);
+      message.success('已从今晚吃啥移除');
+    } else {
+      const added = addToTonight(cat, rid);
+      if (added) {
+        setTonightState(true);
+        message.success('已添加到今晚吃啥');
+      } else {
+        message.warning(`今晚吃啥最多 ${MAX_TONIGHT} 道菜`);
+      }
+    }
+  };
+
   return (
     <div className="recipe-detail-page" style={{ padding: 24 }}>
       <div
@@ -205,10 +271,18 @@ const RecipeDetail: React.FC = () => {
         <Button
           type="text"
           icon={<ArrowLeftOutlined />}
-          onClick={() => navigate('/recipes')}
+          onClick={() => navigate('/other/recipes')}
           style={{ borderRadius: 8 }}
         >
           返回列表
+        </Button>
+        <Button
+          type={tonightState ? 'primary' : 'default'}
+          icon={<ShoppingCartOutlined />}
+          onClick={handleTonightClick}
+          style={{ borderRadius: 8 }}
+        >
+          {tonightState ? '已在今晚吃啥' : '添加到今晚吃啥'}
         </Button>
         <Button
           type={favState ? 'primary' : 'default'}

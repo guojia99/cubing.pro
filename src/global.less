@@ -84,6 +84,29 @@ ol {
   }
 }
 
+// PC 端 TopNavHeader：logo+标题与导航菜单垂直对齐
+@media (min-width: 1080px) {
+  .ant-pro-top-nav-header-main-left {
+    display: flex;
+    align-items: center;
+  }
+  .ant-pro-top-nav-header-logo {
+    display: flex;
+    align-items: center;
+    height: 100%;
+  }
+  .ant-pro-top-nav-header-logo > div {
+    display: flex;
+    align-items: center;
+    height: 100%;
+  }
+  .ant-pro-top-nav-header-logo h1 {
+    margin: 0;
+    line-height: 24px;
+    font-size: 16px;
+  }
+}
+
 // 内容区布局：PC 左右留空缩小，手机端全宽
 .app-content-wrapper {
   position: relative;
@@ -104,5 +127,37 @@ ol {
 @media (max-width: 1079px) {
   .app-content-wrapper {
     padding: 12px;
+  }
+}
+
+// 手机端：抽屉从右侧展开，子菜单向右展开，宽度合适
+@media (max-width: 1079px) {
+  // 将 ProLayout 的抽屉从左侧改为右侧展开
+  .ant-pro-drawer-sider.ant-drawer-left {
+    .ant-drawer-content-wrapper {
+      right: 0 !important;
+      left: auto !important;
+      width: min(85vw, 300px) !important;
+    }
+    .ant-drawer-content {
+      box-shadow: -6px 0 16px -8px rgba(0, 0, 0, 0.08), -9px 0 28px 0 rgba(0, 0, 0, 0.05);
+    }
+    // 覆盖动画：从右侧滑入（原 left 为 translateX(-100%)，改为 translateX(100%) 实现从右展开）
+    .ant-drawer-content-wrapper.ant-drawer-panel-motion-left-enter,
+    .ant-drawer-content-wrapper.ant-drawer-panel-motion-left-appear {
+      transform: translateX(100%) !important;
+    }
+    .ant-drawer-content-wrapper.ant-drawer-panel-motion-left-leave.ant-drawer-panel-motion-left-leave-active {
+      transform: translateX(100%) !important;
+    }
+  }
+  // 子菜单向右缩进展开，确保可见
+  .ant-pro-drawer-sider .ant-menu-sub {
+    padding-inline-start: 24px !important;
+  }
+  .ant-pro-drawer-sider .ant-pro-sider-menu {
+    width: 100% !important;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 }

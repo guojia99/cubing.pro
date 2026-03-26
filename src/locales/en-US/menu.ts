@@ -27,6 +27,13 @@ export default {
 
   'menu.Algs': "Algs",
   'menu.buyCoffee': "Buy Me a Coffee",
+  'menu.Other': "Other",
+  'menu.Other.Recipes': "Recipes",
+  'menu.Other.RecipeDetail': "Recipe Detail",
+  'menu.Other.KitchenSkills': "Kitchen Skills",
+  'menu.Other.KitchenSkillDetail': "Kitchen Skill Detail",
   'menu.Recipes': "Recipes",
   'menu.RecipeDetail': "Recipe Detail",
+  'menu.KitchenSkills': "Kitchen Skills",
+  'menu.KitchenSkillDetail': "Kitchen Skill Detail",
 }

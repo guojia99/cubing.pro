@@ -1,0 +1,153 @@
+{
+  "tips": [
+    {
+      "id": "油温判断技巧",
+      "title": "油温判断技巧及常见温度和单位换算表",
+      "description": "* 油温在 120&deg;C-140&deg;C 之间：适合软炸[^1]、滑炒[^2], 把筷子放入油锅中，周围基本不起泡泡，无青烟、无响声、油温平静。 * 油温在 150&deg;C-160&deg;C 之间：最佳烹饪温度，把筷子放入油锅中，周围会冒出少许油泡，略有青烟，油从四周往中间翻动。 *",
+      "category": "advanced",
+      "categoryName": "进阶",
+      "mdPath": "tips/advanced/油温判断技巧.md"
+    },
+    {
+      "id": "糖色的炒制",
+      "title": "糖色的炒制",
+      "description": "原理： 糖遇高温融化，且在加热不同时间后呈不同性状 以炒制 200ml 糖色为例",
+      "category": "advanced",
+      "categoryName": "进阶",
+      "mdPath": "tips/advanced/糖色的炒制.md"
+    },
+    {
+      "id": "辅料技巧",
+      "title": "辅料技巧",
+      "description": "* 辅料的放入顺序基本为下：先放姜、后放葱和蒜、辣椒、再放干料（八角/花椒/麻椒）、再放干辣椒。以上每一步骤根据所做菜的不同，可以把不需要的辅料从队列中移除。 * 姜的含水量是最大的，这意味着我们需要更多的时间将姜的汁水煸出。 * 如果你使用的是葱段（葱段最好使用菜刀拍两下），那么我推荐你先放入葱段",
+      "category": "advanced",
+      "categoryName": "进阶",
+      "mdPath": "tips/advanced/辅料技巧.md"
+    },
+    {
+      "id": "高级专业术语",
+      "title": "做菜专业术语",
+      "description": "做菜和学习编程一样，首先得认识专业术语就好比学习基础语法，通过术语之间的组合方能完成一道菜。 【炒(chǎo)】古写作“煼(chǎo)”，是目前最基本的烹调方法之一；即将食物切成小件，放入烧猛油的铁镬(huò)（锅）中迅速翻搅致熟后加调料调味的手法。 【炝(qiàng)】食物切好后，经沸水或热油的“",
+      "category": "advanced",
+      "categoryName": "进阶",
+      "mdPath": "tips/advanced/高级专业术语.md"
+    },
+    {
+      "id": "去腥",
+      "title": "去腥",
+      "description": "去腥是做菜过程中的一道工序。 去腥指通过包括但不限于添加调料、焯水等手段去除肉类、水产等食物中腥膻味。 **腥膻味是某些食物的风味来源，过度去腥可能导致食物丧失风味。** 去腥的手段多种多样，在烹饪工程中要灵活选择。",
+      "category": "learn",
+      "categoryName": "学习",
+      "mdPath": "tips/learn/去腥.md"
+    },
+    {
+      "id": "学习凉拌",
+      "title": "凉拌",
+      "description": "",
+      "category": "learn",
+      "categoryName": "学习",
+      "mdPath": "tips/learn/学习凉拌.md"
+    },
+    {
+      "id": "学习炒与煎",
+      "title": "炒/煎",
+      "description": "",
+      "category": "learn",
+      "categoryName": "学习",
+      "mdPath": "tips/learn/学习炒与煎.md"
+    },
+    {
+      "id": "学习焯水",
+      "title": "焯水",
+      "description": "焯水是做饭的一道工序，读作 chāo shuǐ。 焯水指将初步加工的原料放在开水锅中加热至半熟或全熟，取出以备进一步烹调或调味。 焯水是烹调中特别是冷拌菜不可缺少的一道工序。 对菜肴的色、香、味，特别是色起着关键作用。 大部分蔬菜和带有腥羶气味的肉类原料都需要焯水。",
+      "category": "learn",
+      "categoryName": "学习",
+      "mdPath": "tips/learn/学习焯水.md"
+    },
+    {
+      "id": "学习煮",
+      "title": "煮",
+      "description": "",
+      "category": "learn",
+      "categoryName": "学习",
+      "mdPath": "tips/learn/学习煮.md"
+    },
+    {
+      "id": "学习腌",
+      "title": "腌（肉）",
+      "description": "",
+      "category": "learn",
+      "categoryName": "学习",
+      "mdPath": "tips/learn/学习腌.md"
+    },
+    {
+      "id": "学习蒸",
+      "title": "蒸",
+      "description": "",
+      "category": "learn",
+      "categoryName": "学习",
+      "mdPath": "tips/learn/学习蒸.md"
+    },
+    {
+      "id": "微波炉",
+      "title": "使用微波炉",
+      "description": "",
+      "category": "learn",
+      "categoryName": "学习",
+      "mdPath": "tips/learn/微波炉.md"
+    },
+    {
+      "id": "空气炸锅",
+      "title": "使用空气炸锅",
+      "description": "",
+      "category": "learn",
+      "categoryName": "学习",
+      "mdPath": "tips/learn/空气炸锅.md"
+    },
+    {
+      "id": "食品安全",
+      "title": "食品安全",
+      "description": "",
+      "category": "learn",
+      "categoryName": "学习",
+      "mdPath": "tips/learn/食品安全.md"
+    },
+    {
+      "id": "高压力锅",
+      "title": "蒸（米）/炖（使用电饭煲/高压锅/电压力锅）",
+      "description": "",
+      "category": "learn",
+      "categoryName": "学习",
+      "mdPath": "tips/learn/高压力锅.md"
+    },
+    {
+      "id": "厨房准备",
+      "title": "厨房准备",
+      "description": "在阅读和参考菜谱之前，假想你已经在厨房中准备好了下列物品。这些物品不会在原材料和工具部分提及。 ```text 燃气灶，饮用水，炒锅，蒸锅，煮锅，电饭锅，食用油，洗菜盆，碟子，碗，筷子，勺子，汤勺，漏勺，洗涤剂，抹布，钢丝球，菜刀，生食案板，熟食案板，削皮刀，热水壶 ``` 下列材料可能会被高频使用",
+      "category": "base",
+      "categoryName": "基础",
+      "mdPath": "tips/厨房准备.md"
+    },
+    {
+      "id": "如何选择现在吃什么",
+      "title": "如何决策吃什么",
+      "description": "如何决策吃什么也是我做菜之前一大难题。所以只能用数学描述一下了。",
+      "category": "base",
+      "categoryName": "基础",
+      "mdPath": "tips/如何选择现在吃什么.md"
+    },
+    {
+      "id": "食材相克与禁忌",
+      "title": "揭秘食材搭配的智慧：这些食物不宜同食",
+      "description": "在日常烹饪中，我们都希望做出美味又健康的家常菜。然而，有些食材看似普通，搭配在一起却可能暗藏“玄机”，不仅影响食物的色香味，更可能阻碍营养吸收，甚至对身体健康产生微妙的影响。了解这些“食材相克”与“食用禁忌”，是提升饮食智慧、守护家人健康的重要一步。",
+      "category": "base",
+      "categoryName": "基础",
+      "mdPath": "tips/食材相克与禁忌.md"
+    }
+  ],
+  "categories": [
+    "base",
+    "learn",
+    "advanced"
+  ]
+}

@@ -25,8 +25,15 @@ export default {
   "menu.WCA.Players": "選手",
   'menu.WCA.statistics': "データ",
 
-  'menu.Algs': "公式库",
+  'menu.Algs': "公式",
   'menu.buyCoffee': "作者にコーヒーをおごる",
+  'menu.Other': "その他",
+  'menu.Other.Recipes': "レシピ",
+  'menu.Other.RecipeDetail': "レシピ詳細",
+  'menu.Other.KitchenSkills': "キッチンスキル",
+  'menu.Other.KitchenSkillDetail': "キッチンスキル詳細",
   'menu.Recipes': "レシピ",
   'menu.RecipeDetail': "レシピ詳細",
+  'menu.KitchenSkills': "キッチンスキル",
+  'menu.KitchenSkillDetail': "キッチンスキル詳細",
 }

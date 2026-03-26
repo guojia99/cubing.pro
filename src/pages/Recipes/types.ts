@@ -6,6 +6,7 @@ export interface Recipe {
   category: string;
   categoryName: string;
   mdPath: string;
+  ingredients?: string[];
   hasImage?: boolean;
   coverImage?: string | null;
 }

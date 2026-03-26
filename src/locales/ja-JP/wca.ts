@@ -59,6 +59,18 @@ export default {
   'wca.tabs.results': '成績',
   'wca.tabs.competitions': '大会',
   'wca.tabs.milestones': 'マイルストーン',
+  'wca.tabs.eventStats': '種目統計',
+
+  // WCAPlayerEventStatsTab
+  'wca.eventStats.event': '種目',
+  'wca.eventStats.firstComp': '初参加',
+  'wca.eventStats.lastComp': '最終参加',
+  'wca.eventStats.compCount': '大会数',
+  'wca.eventStats.roundCount': 'ラウンド数',
+  'wca.eventStats.totalAttempts': '試行数',
+  'wca.eventStats.successCount': '成功数',
+  'wca.eventStats.failureCount': '失敗数',
+  'wca.eventStats.noData': '種目別統計データがありません',
 
   // WCAPlayerStaticsTabResults
   'wca.tabs.byEvent': '種目別',
