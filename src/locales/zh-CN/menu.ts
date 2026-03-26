@@ -27,6 +27,13 @@ export default {
 
   'menu.Algs': "公式库",
   'menu.buyCoffee': "请作者喝咖啡",
+  'menu.Other': "其他",
+  'menu.Other.Recipes': "菜谱",
+  'menu.Other.RecipeDetail': "菜谱详情",
+  'menu.Other.KitchenSkills': "厨房技能",
+  'menu.Other.KitchenSkillDetail': "厨房技能详情",
   'menu.Recipes': "菜谱",
   'menu.RecipeDetail': "菜谱详情",
+  'menu.KitchenSkills': "厨房技能",
+  'menu.KitchenSkillDetail': "厨房技能详情",
 };

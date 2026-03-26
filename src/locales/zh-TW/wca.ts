@@ -59,6 +59,18 @@ export default {
   'wca.tabs.results': '成績',
   'wca.tabs.competitions': '賽事',
   'wca.tabs.milestones': '里程碑',
+  'wca.tabs.eventStats': '項目統計',
+
+  // WCAPlayerEventStatsTab 項目統計
+  'wca.eventStats.event': '項目',
+  'wca.eventStats.firstComp': '首次參賽',
+  'wca.eventStats.lastComp': '最後參賽',
+  'wca.eventStats.compCount': '比賽次數',
+  'wca.eventStats.roundCount': '輪次次數',
+  'wca.eventStats.totalAttempts': '嘗試數',
+  'wca.eventStats.successCount': '成功數',
+  'wca.eventStats.failureCount': '失敗數',
+  'wca.eventStats.noData': '暫無項目統計數據',
 
   // WCAPlayerStaticsTabResults
   'wca.tabs.byEvent': '按項目',

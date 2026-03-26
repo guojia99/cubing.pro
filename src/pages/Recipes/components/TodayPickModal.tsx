@@ -98,7 +98,7 @@ const TodayPickModal: React.FC<TodayPickModalProps> = ({ open, onClose, data }) 
   const handleViewRecipe = () => {
     if (resultRecipe) {
       navigate(
-        `/recipes/${encodeURIComponent(resultRecipe.category)}/${encodeURIComponent(resultRecipe.id)}`,
+        `/other/recipes/${encodeURIComponent(resultRecipe.category)}/${encodeURIComponent(resultRecipe.id)}`,
       );
       onClose();
     }

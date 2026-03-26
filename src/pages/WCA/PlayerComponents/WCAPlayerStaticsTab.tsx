@@ -5,6 +5,7 @@ import { useIntl } from '@@/plugin-locale';
 import WCAPlayerStaticsTabResults from '@/pages/WCA/PlayerComponents/WCAPlayerStaticsTabResults';
 import CompetitionTable from '@/pages/WCA/PlayerComponents/WCAPlayerStaticsTabComps';
 import MilestoneTimelines from '@/pages/WCA/PlayerComponents/Milestone';
+import WCAPlayerEventStatsTab from '@/pages/WCA/PlayerComponents/WCAPlayerEventStatsTab';
 import { StaticWithTimerRank, WCACompetition, WcaProfile, WCAResult } from '@/services/cubing-pro/wca/types';
 const { TabPane } = Tabs;
 interface WCAPlayerStaticsTabProps {
@@ -45,6 +46,11 @@ const WCAPlayerStaticsTab: React.FC<WCAPlayerStaticsTabProps> = ({ wcaProfile, w
         {/* 赛事 Tab */}
         <TabPane tab={intl.formatMessage({ id: 'wca.tabs.competitions' })} key="competitions">
           <CompetitionTable competitions={comps} wcaResults={wcaResultsRes} />
+        </TabPane>
+
+        {/* 项目统计 */}
+        <TabPane tab={intl.formatMessage({ id: 'wca.tabs.eventStats' })} key="eventStats">
+          <WCAPlayerEventStatsTab wcaResults={wcaResultsRes} comps={comps} />
         </TabPane>
 
         <TabPane tab={intl.formatMessage({ id: 'wca.tabs.milestones' })} key="milestones">

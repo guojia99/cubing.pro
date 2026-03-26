@@ -6,7 +6,11 @@ import defaultSettings from './defaultSettings';
 import proxy from './proxy';
 import routes from './routes';
 
-const { REACT_APP_ENV = 'dev' } = process.env;
+const { REACT_APP_ENV = 'dev', BUILD_TIMESTAMP } = process.env;
+
+// 构建时间戳：每次打包唯一，用于静态资源缓存失效
+// Makefile 中通过 BUILD_TIMESTAMP=$(date +%s) 传入；直接 npm run build 时使用当前时间
+const buildTimestamp = BUILD_TIMESTAMP || String(Date.now());
 
 export default defineConfig({
   /**
@@ -15,6 +19,13 @@ export default defineConfig({
    * @doc https://umijs.org/docs/api/config#hash
    */
   hash: true,
+
+  /**
+   * @name 路由 history 类型
+   * @description 使用 browser 模式，URL 为 /other/recipes/... 形式，无 /#/
+   * @doc https://umijs.org/docs/api/config#history
+   */
+  history: { type: 'browser' },
 
   /**
    * @name 兼容性设置
@@ -125,8 +136,8 @@ export default defineConfig({
    * @description 配置 <head> 中额外的 script
    */
   headScripts: [
-    // 解决首次加载时白屏的问题
-    { src: '/scripts/loading.js', async: true },
+    // 解决首次加载时白屏的问题；?v= 用于缓存失效，确保每次构建后重新请求
+    { src: `/scripts/loading.js?v=${buildTimestamp}`, async: true },
   ],
   //================ pro 插件配置 =================
   presets: ['umi-presets-pro'],
@@ -160,5 +171,7 @@ export default defineConfig({
   define: {
     'process.env.CHOKIDAR_USEPOLLING': 'true',
     'process.env.CHOKIDAR_INTERVAL': '1000',
+    // 注入构建时间戳，使打包产物内容变化，从而 contenthash 每次构建都不同
+    'process.env.BUILD_TIMESTAMP': JSON.stringify(buildTimestamp),
   },
 });

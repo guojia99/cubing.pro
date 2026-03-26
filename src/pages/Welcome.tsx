@@ -350,14 +350,21 @@ const Welcome: React.FC = () => {
       <div style={{ marginTop: 30 }} />
       <GroupInfoCards
         groupName={'recipes'}
-        title="菜谱"
-        desc="基于 HowToCook 开源菜谱项目，收录数百道家常菜做法，按分类与难度筛选，支持「今天吃什么」随机推荐，详情页可查看完整步骤与图片。"
+        title="吃吃喝喝"
+        desc="基于 HowToCook 开源菜谱项目，收录数百道家常菜做法，按分类与难度筛选，支持「今天吃什么」随机推荐；厨房技能提供烹饪技巧与进阶知识。"
         childrens={[
           {
             index: 1,
-            href: './recipes',
+            href: '/other/recipes',
             title: '菜谱列表',
-            desc: '浏览全部菜谱，按分类、难度筛选，一键随机推荐今日菜单',
+            desc: '浏览全部菜谱，按分类、难度、原材料筛选，一键随机推荐今日菜单',
+            internal: true,
+          },
+          {
+            index: 2,
+            href: '/other/kitchen-skills',
+            title: '厨房技能',
+            desc: '烹饪技巧、食材选购、专业术语等厨房必备知识',
             internal: true,
           },
         ]}

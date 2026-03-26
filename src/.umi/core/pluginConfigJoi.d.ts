@@ -3,6 +3,7 @@
 // Created by Umi Plugin
 
 export interface IConfigFromPluginsJoi {
+stagewise?: unknown
 openAPI?: ({
 requestLibPath?: string
 schemaPath?: string

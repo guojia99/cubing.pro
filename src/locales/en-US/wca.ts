@@ -59,6 +59,18 @@ export default {
   'wca.tabs.results': 'Results',
   'wca.tabs.competitions': 'Competitions',
   'wca.tabs.milestones': 'Milestones',
+  'wca.tabs.eventStats': 'Event Stats',
+
+  // WCAPlayerEventStatsTab
+  'wca.eventStats.event': 'Event',
+  'wca.eventStats.firstComp': 'First Comp',
+  'wca.eventStats.lastComp': 'Last Comp',
+  'wca.eventStats.compCount': 'Comps',
+  'wca.eventStats.roundCount': 'Rounds',
+  'wca.eventStats.totalAttempts': 'Attempts',
+  'wca.eventStats.successCount': 'Success',
+  'wca.eventStats.failureCount': 'Failed',
+  'wca.eventStats.noData': 'No event stats available',
 
   // WCAPlayerStaticsTabResults
   'wca.tabs.byEvent': 'By Event',

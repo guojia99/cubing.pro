@@ -8,7 +8,6 @@ import { DropDownProps } from 'antd/es/dropdown';
 import { getLocale, getAllLocales, setLocale } from './localeExports';
 
 export interface HeaderDropdownProps extends DropDownProps {
-  overlayClassName?: string;
   placement?:
     | 'bottomLeft'
     | 'bottomRight'
@@ -19,11 +18,9 @@ export interface HeaderDropdownProps extends DropDownProps {
 }
 
 const HeaderDropdown: React.FC<HeaderDropdownProps> = ({
-  overlayClassName: cls,
   ...restProps
 }) => (
   <Dropdown
-    overlayClassName={cls}
     {...restProps}
   />
 );
@@ -439,9 +436,9 @@ export const SelectLang: React.FC<SelectLangProps> = (props) => {
     })),
   };
 
-  // antd@5 和  4.24 之后推荐使用 menu，性能更好
+  // antd 4.24 之后推荐使用 menu，性能更好
   let dropdownProps;
-  if (version.startsWith("5.") || version.startsWith("4.24.")) {
+  if (version.startsWith("6.") || version.startsWith("5.") || version.startsWith("4.24.")) {
     dropdownProps = { menu: langMenu };
   } else if (version.startsWith("3.")) {
     dropdownProps = {

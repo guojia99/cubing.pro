@@ -3,7 +3,7 @@
 // DO NOT CHANGE IT MANUALLY!
 import React from 'react';
 import { Avatar, version, Dropdown, Menu, Spin } from 'antd';
-import { LogoutOutlined } from '/home/guojia/worker/code/cube/cubing.pro/node_modules/@ant-design/icons';
+import { LogoutOutlined } from '/Users/guojia/worker/code/cube/cubing.pro/node_modules/@ant-design/icons';
 import { SelectLang } from '@@/plugin-locale';
 
 export function getRightRenderContent (opts: {
@@ -73,7 +73,7 @@ export function getRightRenderContent (opts: {
   };
   // antd@5 和  4.24 之后推荐使用 menu，性能更好
   let dropdownProps;
-  if (version.startsWith("5.") || version.startsWith("4.24.")) {
+  if (version.startsWith("6.") || version.startsWith("5.") || version.startsWith("4.24.")) {
     dropdownProps = { menu: langMenu };
   } else if (version.startsWith("3.")) {
     dropdownProps = {

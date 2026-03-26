@@ -59,6 +59,18 @@ export default {
   'wca.tabs.results': '成绩',
   'wca.tabs.competitions': '赛事',
   'wca.tabs.milestones': '里程碑',
+  'wca.tabs.eventStats': '项目统计',
+
+  // WCAPlayerEventStatsTab 项目统计
+  'wca.eventStats.event': '项目',
+  'wca.eventStats.firstComp': '首次参赛',
+  'wca.eventStats.lastComp': '最后参赛',
+  'wca.eventStats.compCount': '比赛次数',
+  'wca.eventStats.roundCount': '轮次次数',
+  'wca.eventStats.totalAttempts': '尝试数',
+  'wca.eventStats.successCount': '成功数',
+  'wca.eventStats.failureCount': '失败数',
+  'wca.eventStats.noData': '暂无项目统计数据',
 
   // WCAPlayerStaticsTabResults
   'wca.tabs.byEvent': '按项目',

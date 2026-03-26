@@ -1,11 +1,12 @@
 import { Footer, AvatarDropdown, AvatarName } from '@/components';
 import { TokenCallbackHandler } from '@/components/TokenCallbackHandler';
 import type { RunTimeLayoutConfig } from '@umijs/max';
+import { Link } from '@umijs/max';
 import React from 'react';
 import { currentUser } from '@/services/cubing-pro/auth/auth';
 import { saveToken } from '@/services/cubing-pro/auth/token';
 import defaultSettings from '../config/defaultSettings';
-import { UserOutlined, UserSwitchOutlined } from '@ant-design/icons';
+import { HomeOutlined, UserOutlined, UserSwitchOutlined } from '@ant-design/icons';
 import { AvatarProps } from 'antd';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { AvatarURL } from '@/pages/Admin/AvatarDropdown';
@@ -77,7 +78,35 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     fixSiderbar: true,
     siderMenuType: 'sub',
     disableMobile: false, // 支持手机端
+    siderWidth: 280, // 手机端抽屉宽度，确保子菜单有足够空间
     contentWidth: 'Fluid',
+    // PC 端维持原样；手机端抽屉：logo+标题可点击回主页，并显示主页 icon
+    menuHeaderRender: (logoDom, titleDom, props) =>
+      props?.isMobile ? (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%' }}>
+          <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 12, color: 'inherit' }}>
+            {logoDom}
+            {titleDom}
+          </Link>
+          <Link
+            to="/"
+            style={{
+              marginLeft: 'auto',
+              padding: '4px 8px',
+              color: 'rgba(255,255,255,0.85)',
+              fontSize: 18,
+            }}
+            aria-label="回到主页"
+          >
+            <HomeOutlined />
+          </Link>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', alignItems: 'center', height: '100%', minHeight: 22, gap: 6 }}>
+          {logoDom}
+          {titleDom}
+        </div>
+      ),
     contentStyle: {
       margin: 0,
       padding: 0,

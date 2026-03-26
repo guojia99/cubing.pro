@@ -1,4 +1,71 @@
 .recipe-list-page {
+  .recipe-tonight-layout {
+    display: flex;
+    gap: 24px;
+    min-height: 400px;
+
+    @media (min-width: 769px) {
+      .recipe-tonight-receipt-wrap {
+        width: 320px;
+        flex-shrink: 0;
+        position: sticky;
+        top: 80px;
+        align-self: flex-start;
+        max-height: calc(100vh - 120px);
+        display: flex;
+        flex-direction: column;
+
+        .recipe-tonight-receipt-inner {
+          flex: 1;
+          min-height: 0;
+          overflow: hidden;
+        }
+
+        .recipe-tonight-receipt-toggle {
+          display: none;
+        }
+      }
+
+      .recipe-tonight-recipes {
+        flex: 1;
+        min-width: 0;
+      }
+    }
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+
+      .recipe-tonight-receipt-wrap {
+        order: 1;
+        border-radius: 8px;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+
+        &.collapsed {
+          .recipe-tonight-receipt-inner {
+            display: none;
+          }
+
+          .recipe-tonight-receipt-toggle {
+            border-radius: 8px;
+          }
+        }
+
+        /* 手机端小票不限制高度，完整展示内容 */
+
+        .recipe-tonight-receipt-toggle {
+          width: 100%;
+          margin: 0;
+          border-radius: 0;
+        }
+      }
+
+      .recipe-tonight-recipes {
+        order: 2;
+      }
+    }
+  }
+
   .recipe-grid-responsive {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));

@@ -105,13 +105,26 @@ export default [
     hideInMenu: true,
   },
 
-  // 菜谱
-  { path: 'recipes', name: 'Recipes', component: './Recipes/RecipeList' },
+  // 其他（菜谱、厨房技能）- 父级不设 redirect，避免 Maximum update depth 无限循环
   {
-    path: 'recipes/:category/:id',
-    name: 'RecipeDetail',
-    component: './Recipes/RecipeDetail',
-    hideInMenu: true,
+    path: 'other',
+    name: 'Other',
+    routes: [
+      { path: 'recipes', name: 'Recipes', component: './Recipes/RecipeList' },
+      {
+        path: 'recipes/:category/:id',
+        name: 'RecipeDetail',
+        component: './Recipes/RecipeDetail',
+        hideInMenu: true,
+      },
+      { path: 'kitchen-skills', name: 'KitchenSkills', component: './KitchenSkills/KitchenSkillList' },
+      {
+        path: 'kitchen-skills/:category/:id',
+        name: 'KitchenSkillDetail',
+        component: './KitchenSkills/KitchenSkillDetail',
+        hideInMenu: true,
+      },
+    ],
   },
 
   // 工具
