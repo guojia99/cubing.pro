@@ -60,6 +60,26 @@ export default {
   'wca.tabs.competitions': '賽事',
   'wca.tabs.milestones': '里程碑',
   'wca.tabs.eventStats': '項目統計',
+  'wca.tabs.litCities': '點亮城市',
+
+  // WCAPlayerLitCitiesTab
+  'wca.litCities.modeMap': '地圖',
+  'wca.litCities.modeList': '列表',
+  'wca.litCities.scopeWorld': '世界',
+  'wca.litCities.scopeChina': '中國',
+  'wca.litCities.chinaLocked':
+    '尚未在「中國」參加過比賽，中國地圖未解鎖（臺灣、香港、澳門等在中國地圖中展示）。',
+  'wca.litCities.backToChina': '返回中國地圖',
+  'wca.litCities.count': '次數',
+  'wca.litCities.country': '國家/地區',
+  'wca.litCities.province': '省 / 直轄市 / 特別行政區',
+  'wca.litCities.cityRaw': '城市（原始）',
+  'wca.litCities.prefecture': '地級市',
+  'wca.litCities.otherRegions': '未匹配到地圖區域',
+  'wca.litCities.empty': '暫無城市/地區資料',
+  'wca.litCities.provinceDetail': '詳情',
+  'wca.litCities.high': '多',
+  'wca.litCities.low': '少',
 
   // WCAPlayerEventStatsTab 項目統計
   'wca.eventStats.event': '項目',

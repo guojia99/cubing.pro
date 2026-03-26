@@ -60,6 +60,26 @@ export default {
   'wca.tabs.competitions': 'Competitions',
   'wca.tabs.milestones': 'Milestones',
   'wca.tabs.eventStats': 'Event Stats',
+  'wca.tabs.litCities': 'Cities Visited',
+
+  // WCAPlayerLitCitiesTab
+  'wca.litCities.modeMap': 'Map',
+  'wca.litCities.modeList': 'List',
+  'wca.litCities.scopeWorld': 'World',
+  'wca.litCities.scopeChina': 'China',
+  'wca.litCities.chinaLocked':
+    'China map unlocks after you compete in China (Taiwan, Hong Kong, Macau, etc. are shown on the China map).',
+  'wca.litCities.backToChina': 'Back to China map',
+  'wca.litCities.count': 'Times',
+  'wca.litCities.country': 'Country / Region',
+  'wca.litCities.province': 'Province / Municipality / SAR',
+  'wca.litCities.cityRaw': 'City (raw)',
+  'wca.litCities.prefecture': 'Prefecture',
+  'wca.litCities.otherRegions': 'Unmapped on map',
+  'wca.litCities.empty': 'No geo data yet',
+  'wca.litCities.provinceDetail': 'detail',
+  'wca.litCities.high': 'High',
+  'wca.litCities.low': 'Low',
 
   // WCAPlayerEventStatsTab
   'wca.eventStats.event': 'Event',
