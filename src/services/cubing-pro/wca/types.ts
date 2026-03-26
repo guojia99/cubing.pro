@@ -432,12 +432,19 @@ interface Records {
 export interface WcaProfilePerson {
   person: Person;
 }
+export interface CompGeo {
+  iso2: string;
+  countryId: string;
+  province: string;
+  city: string;
+  count: number;
+}
+
 
 export interface WcaProfile {
-
   name: string;
-  wcaId : string;
-  countryId : string;
+  wcaId: string;
+  countryId: string;
   gender: string;
   thumb_url: string;
   country_iso2: string;
@@ -446,6 +453,7 @@ export interface WcaProfile {
   personal_records: PersonalRecords;
   medals: Medals;
   records: Records;
+  geos?: CompGeo[];
 }
 
 

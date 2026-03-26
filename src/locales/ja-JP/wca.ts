@@ -60,6 +60,26 @@ export default {
   'wca.tabs.competitions': '大会',
   'wca.tabs.milestones': 'マイルストーン',
   'wca.tabs.eventStats': '種目統計',
+  'wca.tabs.litCities': '訪問都市',
+
+  // WCAPlayerLitCitiesTab
+  'wca.litCities.modeMap': '地図',
+  'wca.litCities.modeList': '一覧',
+  'wca.litCities.scopeWorld': '世界',
+  'wca.litCities.scopeChina': '中国',
+  'wca.litCities.chinaLocked':
+    '中国での大会参加がないため、中国地図は未解放です（台湾・香港・マカオ等は中国地図に含まれます）。',
+  'wca.litCities.backToChina': '中国地図に戻る',
+  'wca.litCities.count': '回数',
+  'wca.litCities.country': '国・地域',
+  'wca.litCities.province': '省・直轄市・特別行政区',
+  'wca.litCities.cityRaw': '都市（原文）',
+  'wca.litCities.prefecture': '地級市',
+  'wca.litCities.otherRegions': '地図に未対応',
+  'wca.litCities.empty': '都市データがありません',
+  'wca.litCities.provinceDetail': '詳細',
+  'wca.litCities.high': '多',
+  'wca.litCities.low': '少',
 
   // WCAPlayerEventStatsTab
   'wca.eventStats.event': '種目',
