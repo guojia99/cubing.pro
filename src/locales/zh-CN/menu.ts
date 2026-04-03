@@ -27,6 +27,18 @@ export default {
 
   'menu.Algs': "公式库",
   'menu.buyCoffee': "请作者喝咖啡",
+  'menu.ExternalLinks': '魔方导航',
+  'menu.ExternalLinks.subtitle': '按分组浏览常用网站与资源',
+  'menu.ExternalLinks.empty': '暂无魔方导航链接',
+  'menu.ExternalLinks.adminTitle': '魔方导航维护',
+  'menu.ExternalLinks.fetchError': '获取魔方导航数据失败',
+  'menu.ExternalLinks.homeTip':
+    '暂无首页置顶链接。请在管理后台「魔方导航」中为最多 3 条链接开启「首页置顶」。',
+  'menu.ExternalLinks.homeSectionTitle': '外部导航',
+  'menu.ExternalLinks.viewAll': '查看全部',
+  'menu.ExternalLinks.adminCardDesc': '维护首页与展示页的魔方导航链接分组、排序与置顶',
+  'menu.ExternalLinks.searchPlaceholder': '搜索分组或链接名称、描述、地址…',
+  'menu.ExternalLinks.searchEmpty': '没有匹配的链接，请换个关键词试试',
   'menu.Other': "其他",
   'menu.Other.Recipes': "菜谱",
   'menu.Other.RecipeDetail': "菜谱详情",

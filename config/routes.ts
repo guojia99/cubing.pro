@@ -58,6 +58,7 @@
 export default [
   { path: '/welcome', component: './Welcome' },
   { path: '/buy-coffee', name: 'buyCoffee', component: './BuyCoffee' },
+  { path: '/external-links', name: 'ExternalLinks', component: './ExternalLinks/ExternalLinksPage' },
   { path: '/advertisement', component: './Advertisement', hidden: true },
   { path: '/', redirect: '/welcome' },
   { path: '*', component: './404' },
@@ -92,6 +93,7 @@ export default [
   { path: 'admin/users', component: './Admin/AdminComponent/Users' },
   { path: 'admin/diy_ranking', component: './Admin/AdminComponent/DiyRanking' },
   { path: 'admin/acknowledgments', component: './Admin/AdminComponent/AdminAcknowledgments' },
+  { path: 'admin/other-links', component: './Admin/AdminComponent/AdminExternalLinks' },
 
   // 管理
   { path: 'admin/sports', component: './Admin/SportsComponents/Sports' },
@@ -124,6 +126,7 @@ export default [
         component: './KitchenSkills/KitchenSkillDetail',
         hideInMenu: true,
       },
+      { path: 'external-links', redirect: '/external-links' },
     ],
   },
 

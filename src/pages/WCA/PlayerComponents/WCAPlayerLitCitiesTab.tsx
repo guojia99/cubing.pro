@@ -21,7 +21,9 @@ import './WCAPlayerLitCitiesTab.less';
 
 const WORLD_JSON =
   'https://cdn.jsdelivr.net/gh/apache/echarts@5.6.0/test/data/map/json/world.json';
-const CHINA_JSON = 'https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json';
+/** 阿里云 DataV 边界数据已放入 public/geo/bound，避免线上 403 / 跨域问题 */
+const CHINA_BOUND_BASE = '/geo/bound';
+const CHINA_JSON = `${CHINA_BOUND_BASE}/100000_full.json`;
 
 type GeoFeature = {
   properties?: { name?: string; adcode?: number; COUNTYNAME?: string };
@@ -122,7 +124,7 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos }) =
           setProvinceMapReady(true);
           return;
         }
-        const url = `https://geo.datav.aliyun.com/areas_v3/bound/${adcode}_full.json`;
+        const url = `${CHINA_BOUND_BASE}/${adcode}_full.json`;
         const res = await fetch(url);
         const gj = await res.json();
         if (cancelled) return;

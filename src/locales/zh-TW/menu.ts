@@ -27,6 +27,18 @@ export default {
 
   'menu.Algs': '公式庫',
   'menu.buyCoffee': '請作者喝咖啡',
+  'menu.ExternalLinks': '魔方導航',
+  'menu.ExternalLinks.subtitle': '依分類瀏覽常用網站與資源',
+  'menu.ExternalLinks.empty': '暫無魔方導航連結',
+  'menu.ExternalLinks.adminTitle': '魔方導航維護',
+  'menu.ExternalLinks.fetchError': '取得魔方導航資料失敗',
+  'menu.ExternalLinks.homeTip':
+    '暫無首頁置頂連結。請在管理後台「魔方導航」中為最多 3 條連結開啟「首頁置頂」。',
+  'menu.ExternalLinks.homeSectionTitle': '外部導航',
+  'menu.ExternalLinks.viewAll': '查看全部',
+  'menu.ExternalLinks.adminCardDesc': '維護首頁與展示頁的魔方導航連結分組、排序與置頂',
+  'menu.ExternalLinks.searchPlaceholder': '搜尋分組或連結名稱、描述、網址…',
+  'menu.ExternalLinks.searchEmpty': '沒有符合的連結，請換個關鍵字試試',
   'menu.Other': '其他',
   'menu.Other.Recipes': '菜譜',
   'menu.Other.RecipeDetail': '菜譜詳情',

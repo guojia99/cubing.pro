@@ -27,6 +27,19 @@ export default {
 
   'menu.Algs': "公式",
   'menu.buyCoffee': "作者にコーヒーをおごる",
+  'menu.ExternalLinks': 'Cubing Hub',
+  'menu.ExternalLinks.subtitle': 'カテゴリ別に便利なサイトを閲覧',
+  'menu.ExternalLinks.empty': 'Cubing Hub にリンクがありません',
+  'menu.ExternalLinks.adminTitle': 'Cubing Hub（管理）',
+  'menu.ExternalLinks.fetchError': 'Cubing Hub の取得に失敗しました',
+  'menu.ExternalLinks.homeTip':
+    'ホームにピン留めされたリンクはまだありません。管理画面の Cubing Hub で最大 3 件までピン留めできます。',
+  'menu.ExternalLinks.homeSectionTitle': '外部ナビ',
+  'menu.ExternalLinks.viewAll': 'すべて見る',
+  'menu.ExternalLinks.adminCardDesc':
+    'ホームと一覧ページの Cubing Hub のグループ・並び・ピン留めを管理',
+  'menu.ExternalLinks.searchPlaceholder': 'グループ名・リンク名・説明・URL で検索…',
+  'menu.ExternalLinks.searchEmpty': '該当するリンクがありません。別のキーワードを試してください。',
   'menu.Other': "その他",
   'menu.Other.Recipes': "レシピ",
   'menu.Other.RecipeDetail': "レシピ詳細",

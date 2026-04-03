@@ -27,6 +27,19 @@ export default {
 
   'menu.Algs': "Algs",
   'menu.buyCoffee': "Buy Me a Coffee",
+  'menu.ExternalLinks': 'Cubing Hub',
+  'menu.ExternalLinks.subtitle': 'Browse useful sites by category',
+  'menu.ExternalLinks.empty': 'No links in Cubing Hub yet',
+  'menu.ExternalLinks.adminTitle': 'Cubing Hub (admin)',
+  'menu.ExternalLinks.fetchError': 'Failed to load Cubing Hub data',
+  'menu.ExternalLinks.homeTip':
+    'No pinned links on the home page yet. In the admin, open Cubing Hub and pin up to 3 links.',
+  'menu.ExternalLinks.homeSectionTitle': 'External navigation',
+  'menu.ExternalLinks.viewAll': 'View all',
+  'menu.ExternalLinks.adminCardDesc':
+    'Manage Cubing Hub groups, order, and home-page pins for the showcase page',
+  'menu.ExternalLinks.searchPlaceholder': 'Search groups or link name, description, URL…',
+  'menu.ExternalLinks.searchEmpty': 'No matching links. Try a different keyword.',
   'menu.Other': "Other",
   'menu.Other.Recipes': "Recipes",
   'menu.Other.RecipeDetail': "Recipe Detail",

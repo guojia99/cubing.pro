@@ -129,9 +129,6 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
       },
     },
     appList: ExtAppList(),
-    waterMarkProps: {
-      content: initialState?.currentUser?.data.CubeID,
-    },
     footerRender: () => <Footer />,
     childrenRender: (children) => {
       return (

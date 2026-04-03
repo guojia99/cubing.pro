@@ -4,6 +4,7 @@ import { Card, Image, theme } from 'antd';
 import React from 'react';
 import ThanksSection from './Welcome/ThanksSection';
 import AdvertisementCarousel from './Welcome/AdvertisementCarousel';
+import ExternalLinksHomeSection from './ExternalLinks/ExternalLinksHomeSection';
 
 const intl = getIntl();
 
@@ -223,6 +224,7 @@ const Welcome: React.FC = () => {
   return (
     <PageContainer>
       <ThanksSection />
+      <ExternalLinksHomeSection />
       <BuyCoffeeQuickJump />
       <AdvertisementCarousel />
       <GroupInfoCards
