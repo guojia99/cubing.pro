@@ -117,12 +117,12 @@ const WCAPlayer: React.FC = () => {
     );
   }
 
-  // ✅ 正常渲染 - 响应式布局：PC 居中限宽，手机端全宽
+  // ✅ 正常渲染 - 响应式布局：与 1200px 内容区对齐，卡片在列宽内 100% 铺满
   return (
     <div
       style={{
         width: '100%',
-        maxWidth: 1000,
+        maxWidth: 1200,
         margin: '0 auto',
         padding: '0 16px',
         boxSizing: 'border-box',

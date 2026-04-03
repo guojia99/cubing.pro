@@ -1,6 +1,7 @@
+import { useIntl } from '@@/plugin-locale';
 import { Auth, checkAuth, hasAuth } from '@/pages/Admin/AuthComponents/AuthComponents';
 import { MetaCards } from '@/pages/Admin/Organizers';
-import { UnorderedListOutlined } from '@ant-design/icons';
+import { LinkOutlined, UnorderedListOutlined } from '@ant-design/icons';
 import React from 'react';
 import {
   FcApprove,
@@ -22,6 +23,7 @@ import {
 import { RiTimerFlashFill } from 'react-icons/ri';
 
 const Admin: React.FC = () => {
+  const intl = useIntl();
   const user = checkAuth([Auth.AuthAdmin, Auth.AuthSuperAdmin]);
   if (user === null) {
     return <>无权限</>;
@@ -41,6 +43,12 @@ const Admin: React.FC = () => {
           description: '管理主页致谢赞助列表',
           to: '/admin/acknowledgments',
           avatar: <FcLike style={{ fontSize: 40 }} />,
+        },
+        {
+          title: intl.formatMessage({ id: 'menu.ExternalLinks' }),
+          description: intl.formatMessage({ id: 'menu.ExternalLinks.adminCardDesc' }),
+          to: '/admin/other-links',
+          avatar: <LinkOutlined style={{ fontSize: 40 }} />,
         },
         {
           title: '报表',

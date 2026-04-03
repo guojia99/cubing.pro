@@ -43,14 +43,7 @@ export const WCALink = (wcaId: any, name: string | null = null) => {
   if (wca !== undefined && wca !== '' && wca !== "-") {
     return (
       <strong>
-        <a
-          href={'https://www.cubing.pro/wca/player/' + wca}
-          // href={'https://www.worldcubeassociation.org/persons/' + wca}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {dataName}
-        </a>
+        <Link to={'/wca/player/' + wca}>{dataName}</Link>
       </strong>
     );
   }

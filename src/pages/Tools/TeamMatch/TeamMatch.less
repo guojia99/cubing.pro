@@ -1,0 +1,988 @@
+.tmJsonToolbar {
+  flex: 0 0 auto;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  background: #f5f5f7;
+}
+
+.tmJsonToolbar--dark {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.tmJsonToolbarLabel {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.55);
+}
+
+.tmJsonToolbarLabel--dark {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.tmFullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  width: 100%;
+  height: 100%;
+  min-height: 100dvh;
+  max-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: #0a0a12;
+  overflow: hidden;
+}
+
+.tmFullscreenInner {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  padding: 12px;
+}
+
+.tmBracketRoot {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 0;
+  flex: 1;
+  background: var(--tm-br-page-bg, transparent);
+  border-radius: 8px;
+}
+
+.tmRoundsRow {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  overflow-x: auto;
+  flex: 1;
+  min-height: 0;
+  align-items: flex-start;
+}
+
+.tmRoundCol {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: min(220px, 28vw);
+  flex: 0 0 auto;
+}
+
+.tmMatchStack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tmMatchCard {
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+
+.tmMatchCard:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.tmMatchDone {
+  border-color: #52c41a;
+}
+
+.tmMatchTeams {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+}
+
+.tmVs {
+  text-align: center;
+  color: #999;
+  font-weight: 600;
+}
+
+.tmLoser {
+  opacity: 0.45;
+  filter: grayscale(1);
+}
+
+.tmPkArena {
+  position: relative;
+  flex: 0 0 auto;
+  min-height: min(42vh, 420px);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.tmPkArenaBg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 20% 50%, rgba(255, 77, 79, 0.35), transparent 55%),
+    radial-gradient(ellipse at 80% 50%, rgba(22, 119, 255, 0.4), transparent 55%),
+    linear-gradient(180deg, #0f0f18, #050508);
+  animation: tmPkBgPulse 2.4s ease-in-out infinite;
+}
+
+@keyframes tmPkBgPulse {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.15);
+  }
+}
+
+.tmPkArenaInner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  min-height: min(42vh, 420px);
+}
+
+.tmPkStrip.red {
+  background: linear-gradient(180deg, rgba(255, 77, 79, 0.15), transparent);
+}
+
+.tmPkStrip.blue {
+  background: linear-gradient(180deg, rgba(22, 119, 255, 0.15), transparent);
+}
+
+.tmPkStripDim {
+  opacity: 0.4;
+  filter: grayscale(0.9);
+}
+
+.tmPkCenter {
+  flex: 0 0 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  position: relative;
+}
+
+.tmPkVs {
+  color: #fff !important;
+  text-shadow: 0 0 24px rgba(255, 255, 255, 0.35);
+  margin: 0 !important;
+}
+
+.tmFistLeft,
+.tmFistRight {
+  position: absolute;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  top: 50%;
+  margin-top: -80px;
+  animation: tmFistClash 1.2s ease-in-out infinite;
+}
+
+.tmFistLeft {
+  left: 8px;
+  background: radial-gradient(circle at 30% 30%, #ff7875, #a8071a);
+  box-shadow: 0 0 24px rgba(255, 77, 79, 0.6);
+}
+
+.tmFistRight {
+  right: 8px;
+  background: radial-gradient(circle at 70% 30%, #69c0ff, #0958d9);
+  box-shadow: 0 0 24px rgba(22, 119, 255, 0.6);
+  animation-delay: 0.15s;
+}
+
+@keyframes tmFistClash {
+  0%,
+  100% {
+    transform: translateX(0) scale(1);
+  }
+  50% {
+    transform: translateX(6px) scale(1.05);
+  }
+}
+
+.tmAvatarCell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+}
+
+.tmAvatarImg {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.tmAvatarPlaceholder {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #333;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.tmAvatarName {
+  max-width: 72px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tmPlaybackOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.tmDrawGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+}
+
+.tmDrawCell {
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  padding: 8px;
+  min-height: 88px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.tmDrawCellEmpty {
+  color: #bbb;
+  background: #fafafa;
+}
+
+.tmDrawCellSeed {
+  border: 2px solid #52c41a;
+  background: rgba(82, 196, 26, 0.06);
+}
+
+.tmSeedTeamCard.ant-card {
+  border: 2px solid #52c41a;
+  box-shadow: 0 0 0 1px rgba(82, 196, 26, 0.15);
+}
+
+.tmSeedTeamCard .ant-card-head {
+  background: rgba(82, 196, 26, 0.08);
+}
+
+.tmDrawPairBlock {
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  background: #fafafa;
+}
+
+.tmDrawPairVs {
+  text-align: center;
+  font-weight: 700;
+  color: #888;
+  font-size: 12px;
+  padding: 0 8px;
+  flex: 0 0 auto;
+}
+
+.tmDrawPairSide {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid #f0f0f0;
+}
+
+.tmDrawPairSideSeed {
+  border-color: #95de64;
+  background: rgba(82, 196, 26, 0.06);
+}
+
+/* 正赛：左右半区横向收拢 — 左 1–8 / 右 9–16 → 8 强×2 → 半决×2 → 中：冠军 + 铜牌格 */
+.tmBracketLr {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 1480px;
+  margin: 0 auto;
+}
+
+.tmBracketToolbar {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+}
+
+.tmBracketLrHint {
+  font-size: var(--tm-br-hint-font, 12px) !important;
+  color: var(--tm-br-hint-color, rgba(255, 255, 255, 0.45)) !important;
+  margin-bottom: 4px !important;
+  line-height: 1.5;
+  flex: 1 1 200px;
+}
+
+.tmBracketLrRow {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tmBracketWing {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.tmBracketWingTitle {
+  font-size: var(--tm-br-wing-title-font, 11px) !important;
+  color: var(--tm-br-wing-title-color, rgba(255, 255, 255, 0.55)) !important;
+  text-align: center;
+  line-height: 1.35;
+}
+
+.tmBracketWingLeft {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border-left: 4px solid var(--tm-br-wing-left-border, #1677ff);
+  background: var(
+    --tm-br-wing-left-fill,
+    linear-gradient(90deg, rgba(22, 119, 255, 0.12) 0%, transparent 70%)
+  );
+}
+
+.tmBracketWingRight {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border-right: 4px solid var(--tm-br-wing-right-border, #fa8c16);
+  background: var(
+    --tm-br-wing-right-fill,
+    linear-gradient(270deg, rgba(250, 140, 22, 0.12) 0%, transparent 70%)
+  );
+}
+
+/* 半区内部：首轮对 + 晋级列并排，晋级卡垂直居中于两场首轮总高度内 */
+.tmBracketWingCluster {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 10px;
+  flex: 1 1 auto;
+}
+
+.tmBracketWingClusterLeaves {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+
+.tmBracketPairRow {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.tmBracketPairRowMirror {
+  flex-direction: row-reverse;
+}
+
+.tmBracketPairLeaves {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  min-width: 128px;
+  max-width: 168px;
+}
+
+.tmBracketPairAdvance {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  flex: 0 0 auto;
+  min-width: 128px;
+  max-width: 168px;
+}
+
+.tmBracketSemiSlot {
+  min-width: 140px;
+  max-width: 180px;
+}
+
+.tmBracketStageSlot {
+  width: 100%;
+}
+
+.tmBracketCenterColumn {
+  flex: 0 0 auto;
+  align-self: stretch;
+  min-width: 168px;
+  max-width: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 14px;
+  padding: 8px 12px;
+  border-left: 1px solid var(--tm-br-center-border, rgba(255, 255, 255, 0.12));
+  border-right: 1px solid var(--tm-br-center-border, rgba(255, 255, 255, 0.12));
+  background: var(--tm-br-center-bg, rgba(255, 255, 255, 0.03));
+  border-radius: 12px;
+}
+
+.tmBracketCenterChamp {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  flex: 1 1 auto;
+  justify-content: center;
+  min-height: 0;
+}
+
+.tmBracketCenterBronze {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  flex: 0 0 auto;
+}
+
+.tmBracketBlockTitle {
+  font-size: var(--tm-br-block-title-font, 13px) !important;
+  color: var(--tm-br-block-title-color, rgba(255, 255, 255, 0.88)) !important;
+  text-align: center;
+}
+
+.tmBracketFinalSlot {
+  width: 100%;
+}
+
+.tmBracketBronzeHint {
+  margin-top: 6px;
+  font-size: var(--tm-br-bronze-hint-font, 11px);
+  color: var(--tm-br-bronze-hint-color, rgba(255, 255, 255, 0.4));
+  line-height: 1.4;
+}
+
+@media (max-width: 1100px) {
+  .tmBracketLrRow {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .tmBracketCenterColumn {
+    order: -1;
+    max-width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    border-left: none;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 14px;
+    margin-bottom: 8px;
+  }
+
+  .tmBracketCenterChamp,
+  .tmBracketCenterBronze {
+    flex: 1 1 200px;
+    max-width: 280px;
+  }
+}
+
+.tmBracketMatchCard {
+  background: var(--tm-br-card-bg, rgba(255, 255, 255, 0.06)) !important;
+  border-color: var(--tm-br-card-border, rgba(255, 255, 255, 0.14)) !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+.tmBracketMatchCard.tmBracketMatchCardClickable {
+  cursor: pointer;
+  border: 2px solid var(--tm-br-click-border, rgba(255, 255, 255, 0.88)) !important;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+.tmBracketMatchCard.tmBracketMatchCardClickable:hover {
+  border-color: #fff !important;
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.18);
+}
+
+.tmBracketMatchCard.tmBracketMatchCardDisabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+.tmBracketMatchCard.tmBracketMatchCardDisabled:hover {
+  opacity: 0.55;
+}
+
+.tmBracketMatchCard.tmMatchDone {
+  border-color: rgba(82, 196, 26, 0.55);
+}
+
+.tmBracketMatchCard.tmBracketMatchCardClickable.tmMatchDone {
+  border-color: var(--tm-br-click-border, rgba(255, 255, 255, 0.88)) !important;
+}
+
+.tmBracketMatchCard .ant-card-head {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  min-height: 36px;
+  padding: 0 12px;
+}
+
+.tmBracketMatchCard .ant-card-body {
+  padding: 10px 12px;
+}
+
+.tmBracketMatchCard .ant-card-head-title {
+  padding: 8px 0;
+  color: var(--tm-br-match-id-color, rgba(255, 255, 255, 0.55));
+  font-size: var(--tm-br-match-id-font, 13px);
+}
+
+.tmBracketMatchCardEmpty .ant-card-body {
+  padding: 10px;
+}
+
+.tmBracketMatchCardCompact .ant-card-body {
+  padding: 8px 10px;
+}
+
+.tmBracketMatchCardCompact .ant-card-head {
+  padding: 0 10px;
+  min-height: 32px;
+}
+
+.tmBracketMatchCardCompact .tmBracketTeamLine {
+  font-size: 14px;
+}
+
+.tmBracketMatchCardCompact .tmBracketTeamLine.tmBracketWinner {
+  font-size: 15px;
+  padding: 6px 10px;
+}
+
+.tmBracketMatchCardCompact .tmBracketMatchId {
+  font-size: 12px;
+}
+
+.tmBracketMatchId {
+  font-size: var(--tm-br-match-id-font, 13px);
+  font-family: ui-monospace, monospace;
+  color: var(--tm-br-match-id-color, rgba(255, 255, 255, 0.55));
+}
+
+.tmBracketMatchTeams {
+  gap: 6px !important;
+  font-size: 15px;
+}
+
+.tmBracketTeamLine {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px 8px;
+  font-size: var(--tm-br-team-line-font, 15px);
+  line-height: 1.45;
+  color: var(--tm-br-team-line-color, rgba(255, 255, 255, 0.92));
+}
+
+.tmBracketTeamName {
+  font-weight: 600;
+}
+
+.tmBracketTeamLine.tmBracketWinner {
+  opacity: 1 !important;
+  filter: none !important;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 17px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(
+    100deg,
+    rgba(82, 196, 26, 0.42) 0%,
+    rgba(255, 255, 255, 0.14) 55%,
+    rgba(82, 196, 26, 0.22) 100%
+  );
+  border: 2px solid rgba(255, 255, 255, 0.55);
+  box-shadow: 0 0 18px rgba(82, 196, 26, 0.35), inset 0 0 24px rgba(255, 255, 255, 0.06);
+}
+
+.tmBracketTeamLine.tmBracketWinner .tmBracketTeamName {
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.35);
+}
+
+.tmBracketMedal {
+  display: inline-flex;
+  align-items: center;
+  font-size: 1.05em;
+  line-height: 1;
+  margin-left: 2px;
+}
+
+.tmBracketMedal-gold {
+  filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.75));
+}
+
+.tmBracketMedal-silver {
+  filter: drop-shadow(0 0 4px rgba(192, 192, 220, 0.6));
+}
+
+.tmBracketMedal-bronze {
+  filter: drop-shadow(0 0 4px rgba(205, 127, 50, 0.65));
+}
+
+.tmBracketByeHint {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.tmBracketVs {
+  font-size: var(--tm-br-vs-font, 13px) !important;
+  letter-spacing: 0.12em;
+  color: var(--tm-br-vs-color, rgba(255, 255, 255, 0.4)) !important;
+}
+
+.tmFullscreenInner .tmMatchTeams .tmVs,
+.tmFullscreenInner .tmMatchTeams .tmBracketVs {
+  color: var(--tm-br-vs-color, rgba(255, 255, 255, 0.4));
+}
+
+.tmBracketScaleWrap {
+  width: 100%;
+  transform-origin: top center;
+}
+
+/* 领奖台：左亚军 · 中冠军 · 右季军，阶梯高度中 > 左 > 右 */
+.tmPodiumRoot {
+  padding: 16px;
+  min-height: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.tmPodiumTitle {
+  color: rgba(255, 255, 255, 0.88) !important;
+  margin-bottom: 28px !important;
+  text-align: center;
+}
+
+.tmPodiumStage {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 14px;
+  padding: 0 16px 32px;
+  max-width: 760px;
+  width: 100%;
+}
+
+.tmPodiumLane {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 240px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tmPodiumCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 10px 0;
+  width: 100%;
+  text-align: center;
+}
+
+.tmPodiumCardChamp {
+  padding-top: 6px;
+}
+
+.tmPodiumMedal {
+  font-size: 36px;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.tmPodiumMedalGold {
+  filter: drop-shadow(0 0 14px rgba(255, 215, 0, 0.8));
+}
+
+.tmPodiumLabel {
+  font-size: 12px !important;
+  color: rgba(255, 255, 255, 0.5) !important;
+  margin: 0 !important;
+}
+
+.tmPodiumTeam {
+  font-size: 18px !important;
+  color: rgba(255, 255, 255, 0.96) !important;
+  margin: 0 !important;
+  word-break: break-word;
+}
+
+.tmPodiumRiser {
+  width: 100%;
+  margin-top: 10px;
+  border-radius: 10px 10px 0 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tmPodiumRiserFirst {
+  height: 152px;
+  background: linear-gradient(180deg, rgba(250, 200, 60, 0.42) 0%, rgba(250, 140, 22, 0.14) 100%);
+  box-shadow: inset 0 0 28px rgba(255, 255, 255, 0.08);
+}
+
+.tmPodiumRiserSecond {
+  height: 108px;
+  background: linear-gradient(180deg, rgba(210, 218, 238, 0.5) 0%, rgba(180, 190, 220, 0.12) 100%);
+}
+
+.tmPodiumRiserThird {
+  height: 72px;
+  background: linear-gradient(180deg, rgba(200, 130, 75, 0.48) 0%, rgba(160, 95, 55, 0.14) 100%);
+}
+
+@media (max-width: 520px) {
+  .tmPodiumStage {
+    gap: 8px;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .tmPodiumTeam {
+    font-size: 15px !important;
+  }
+
+  .tmPodiumMedal {
+    font-size: 28px;
+  }
+
+  .tmPodiumRiserFirst {
+    height: 120px;
+  }
+
+  .tmPodiumRiserSecond {
+    height: 88px;
+  }
+
+  .tmPodiumRiserThird {
+    height: 58px;
+  }
+}
+
+/* 全屏对战动画（点击对阵卡进入，100% 视口高） */
+.tmPkArenaFs {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.tmPkArenaFsBg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.tmPkArenaFsTopBar {
+  position: relative;
+  z-index: 2;
+  flex: 0 0 auto;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tmPkArenaFsBody {
+  flex: 1 1 auto;
+  min-height: 0;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px 20px;
+}
+
+.tmPkArenaFsScale {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tmPkArenaFsRow {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: center;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  gap: 8px;
+  flex: 1;
+  min-height: 0;
+}
+
+.tmPkArenaFsSide {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 16px 12px;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+
+.tmPkArenaFsSideLeft {
+  align-items: flex-start;
+}
+
+.tmPkArenaFsSideRight {
+  align-items: flex-end;
+}
+
+.tmPkArenaFsDim {
+  opacity: 0.42;
+  filter: grayscale(0.88);
+}
+
+.tmPkArenaFsCenter {
+  flex: 0 1 220px;
+  min-width: min(200px, 18vw);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tmPkArenaFsTeamName {
+  display: block;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.92);
+}
+
+.tmPkDiagCol {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.tmPkDiagColLeft {
+  align-items: flex-start;
+}
+
+.tmPkDiagColRight {
+  align-items: flex-end;
+}
+
+.tmPkDiagCell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.tmPkDiagColRight .tmPkDiagCell {
+  align-items: flex-end;
+}
+
+.tmPkDiagColRight .tmPkArenaFsPlayerName {
+  text-align: right;
+}
+
+.tmPkArenaFsAvatar {
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.45);
+  flex-shrink: 0;
+}
+
+.tmPkArenaFsAvatarPh {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-weight: 800;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.35);
+}
+
+.tmPkArenaFsPlayerName {
+  text-align: center;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.tmPkArenaFsPkTitle {
+  text-shadow: 0 0 48px rgba(255, 255, 255, 0.45);
+  font-weight: 900 !important;
+  letter-spacing: 0.08em;
+}

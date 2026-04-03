@@ -156,6 +156,95 @@ const TAIWAN_COUNTIES = [
   '高雄市',
 ];
 
+/**
+ * WCA 等城市字段常用英文地名（与汉语拼音不同：Taichung≠taizhong、Taipei≠taibei）。
+ * 较长别名优先，避免「Taipei」误匹配「New Taipei City」中的子串（由 sort 保证）。
+ */
+const TAIWAN_WCA_ENGLISH_ALIASES = [
+  ['New Taipei City', '新北市'],
+  ['New Taipei', '新北市'],
+  ['new taipei city', '新北市'],
+  ['new taipei', '新北市'],
+  ['Taichung City', '台中市'],
+  ['Taichung', '台中市'],
+  ['taichung city', '台中市'],
+  ['taichung', '台中市'],
+  ['Taipei City', '台北市'],
+  ['Taipei', '台北市'],
+  ['taipei city', '台北市'],
+  ['taipei', '台北市'],
+  ['Tainan City', '台南市'],
+  ['Tainan', '台南市'],
+  ['tainan city', '台南市'],
+  ['tainan', '台南市'],
+  ['Kaohsiung City', '高雄市'],
+  ['Kaohsiung', '高雄市'],
+  ['kaohsiung city', '高雄市'],
+  ['kaohsiung', '高雄市'],
+  ['Taoyuan City', '桃園縣'],
+  ['Taoyuan', '桃園縣'],
+  ['taoyuan city', '桃園縣'],
+  ['taoyuan', '桃園縣'],
+  ['Keelung City', '基隆市'],
+  ['Keelung', '基隆市'],
+  ['keelung city', '基隆市'],
+  ['keelung', '基隆市'],
+  ['Hsinchu City', '新竹市'],
+  ['Hsinchu', '新竹市'],
+  ['hsinchu city', '新竹市'],
+  ['hsinchu', '新竹市'],
+  ['Chiayi City', '嘉義市'],
+  ['Chiayi', '嘉義市'],
+  ['chiayi city', '嘉義市'],
+  ['chiayi', '嘉義市'],
+  ['Hualien City', '花蓮縣'],
+  ['Hualien', '花蓮縣'],
+  ['hualien city', '花蓮縣'],
+  ['hualien', '花蓮縣'],
+  ['Taitung City', '台東縣'],
+  ['Taitung', '台東縣'],
+  ['taitung city', '台東縣'],
+  ['taitung', '台東縣'],
+  ['Yilan City', '宜蘭縣'],
+  ['Yilan', '宜蘭縣'],
+  ['yilan city', '宜蘭縣'],
+  ['yilan', '宜蘭縣'],
+  ['Miaoli City', '苗栗縣'],
+  ['Miaoli', '苗栗縣'],
+  ['miaoli city', '苗栗縣'],
+  ['miaoli', '苗栗縣'],
+  ['Changhua City', '彰化縣'],
+  ['Changhua', '彰化縣'],
+  ['changhua city', '彰化縣'],
+  ['changhua', '彰化縣'],
+  ['Nantou County', '南投縣'],
+  ['Nantou', '南投縣'],
+  ['nantou county', '南投縣'],
+  ['nantou', '南投縣'],
+  ['Pingtung City', '屏東縣'],
+  ['Pingtung', '屏東縣'],
+  ['pingtung city', '屏東縣'],
+  ['pingtung', '屏東縣'],
+  ['Yunlin County', '雲林縣'],
+  ['Yunlin', '雲林縣'],
+  ['yunlin county', '雲林縣'],
+  ['yunlin', '雲林縣'],
+  ['Penghu County', '澎湖縣'],
+  ['Penghu', '澎湖縣'],
+  ['penghu county', '澎湖縣'],
+  ['penghu', '澎湖縣'],
+  ['Kinmen County', '金門縣'],
+  ['Kinmen', '金門縣'],
+  ['kinmen county', '金門縣'],
+  ['kinmen', '金門縣'],
+  ['Lienchiang County', '連江縣'],
+  ['Lienchiang', '連江縣'],
+  ['Matsu', '連江縣'],
+  ['lienchiang county', '連江縣'],
+  ['lienchiang', '連江縣'],
+  ['matsu', '連江縣'],
+];
+
 function buildTaiwanPairs() {
   const pairs = [];
   const firstTarget = new Map();
@@ -189,6 +278,10 @@ function buildTaiwanPairs() {
     for (const v of variants) {
       if (v) addPair(v, name);
     }
+  }
+
+  for (const [alias, target] of TAIWAN_WCA_ENGLISH_ALIASES) {
+    addPair(alias, target);
   }
 
   pairs.sort((x, y) => y.alias.length - x.alias.length);
