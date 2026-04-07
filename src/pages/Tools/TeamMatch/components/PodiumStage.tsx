@@ -19,12 +19,14 @@ const PodiumStage: React.FC = () => {
   if (!podium) {
     return (
       <div className="tmPodiumRoot">
-        <Typography.Text type="secondary">暂无领奖台数据（比赛可能尚未全部结束）。</Typography.Text>
+        <Typography.Text className="tmPodiumEmptyHint">
+          暂无领奖台数据（比赛可能尚未全部结束）。
+        </Typography.Text>
       </div>
     );
   }
 
-  const { gold, silver, bronze } = podium;
+  const { gold, silver, bronze, thirdFourthShared } = podium;
 
   return (
     <div className="tmPodiumRoot">
@@ -62,10 +64,24 @@ const PodiumStage: React.FC = () => {
             <span className="tmPodiumMedal" aria-hidden>
               🥉
             </span>
-            <Typography.Text className="tmPodiumLabel">季军</Typography.Text>
-            <Typography.Text strong className="tmPodiumTeam">
-              {bronze ? nameOf(bronze) : '—'}
+            <Typography.Text className="tmPodiumLabel">
+              {thirdFourthShared ? '第三、四名（并列）' : '季军'}
             </Typography.Text>
+            {thirdFourthShared ? (
+              <div className="tmPodiumTeamStack">
+                <Typography.Text strong className="tmPodiumTeam tmPodiumTeamLine">
+                  {nameOf(thirdFourthShared[0])}
+                </Typography.Text>
+                <Typography.Text className="tmPodiumSharedSep">/</Typography.Text>
+                <Typography.Text strong className="tmPodiumTeam tmPodiumTeamLine">
+                  {nameOf(thirdFourthShared[1])}
+                </Typography.Text>
+              </div>
+            ) : (
+              <Typography.Text strong className="tmPodiumTeam">
+                {bronze ? nameOf(bronze) : '—'}
+              </Typography.Text>
+            )}
           </div>
           <div className="tmPodiumRiser tmPodiumRiserThird" />
         </div>

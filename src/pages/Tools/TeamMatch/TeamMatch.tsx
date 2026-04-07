@@ -10,12 +10,12 @@ import { TeamMatchProvider, useTeamMatchStore } from '@/pages/Tools/TeamMatch/Te
 import TeamMatchJsonToolbar from '@/pages/Tools/TeamMatch/components/TeamMatchJsonToolbar';
 import TeamMatchSteps from '@/pages/Tools/TeamMatch/TeamMatchSteps';
 import { TEAM_MATCH_WCA_EVENT_OPTIONS } from '@/pages/Tools/TeamMatch/wcaCubeEvents';
-import { MAX_TEAMS, MIN_TEAMS, type TeamMatchSession } from '@/pages/Tools/TeamMatch/types';
+import { MAX_ROSTER_TEAMS, MIN_TEAMS, type TeamMatchSession } from '@/pages/Tools/TeamMatch/types';
 import { Button, Card, Input, InputNumber, List, Modal, Popconfirm, Select, message, Space, Steps, Typography } from 'antd';
 import React from 'react';
 import './TeamMatch.less';
 
-const stepTitles = ['学校', '选手', '组队', '种子', '抽签', '正赛'];
+const stepTitles = ['学校与选手', '组队', '成绩录入', '队伍确认', '抽签', '正赛'];
 
 function TeamMatchInner() {
   const { state, dispatch } = useTeamMatchStore();
@@ -31,7 +31,7 @@ function TeamMatchInner() {
   }, [liveUISettings]);
 
   React.useEffect(() => {
-    if (step !== 5) setLiveSettingsOpen(false);
+    if (step !== 6) setLiveSettingsOpen(false);
   }, [step]);
 
   const activeTeamCount = session.teams.filter(
@@ -41,11 +41,11 @@ function TeamMatchInner() {
   const canNext = () => {
     switch (step) {
       case 0:
-        return session.schools.length > 0;
+        return session.schools.length > 0 && session.players.length > 0;
       case 1:
-        return session.players.length > 0;
+        return activeTeamCount >= MIN_TEAMS && activeTeamCount <= MAX_ROSTER_TEAMS;
       case 2:
-        return activeTeamCount >= MIN_TEAMS && activeTeamCount <= MAX_TEAMS;
+        return activeTeamCount >= MIN_TEAMS && activeTeamCount <= MAX_ROSTER_TEAMS;
       case 3:
         return session.seedTeamIds.some(Boolean);
       case 4:
@@ -70,7 +70,7 @@ function TeamMatchInner() {
   const goToStepByClick = (target: number) => {
     if (target < 0 || target > 4) return;
     if (!canAccessWizardStep(session, target)) {
-      message.warning('请先完成前置步骤（学校 → 选手 → 组队 → 种子）');
+      message.warning('请先完成前置步骤（学校与选手 → 组队 → 成绩 → 队伍确认）');
       return;
     }
     dispatch({ type: 'SET_WIZARD_STEP', step: target });
@@ -83,8 +83,11 @@ function TeamMatchInner() {
     onImportLiveUI: setLiveUISettings,
   };
 
-  if (session.status === 'live' && (step === 5 || step === 6)) {
+  if (session.status === 'live' && (step === 6 || step === 7)) {
     const bracketComplete = isBracketFullyComplete(session);
+    const podiumBlockHint = session.skipBronzeMatch
+      ? '请完成全部淘汰赛（已跳过季军赛）'
+      : '请完成全部淘汰赛与铜牌战';
     return (
       <div className="tmFullscreen">
         <TeamMatchJsonToolbar {...jsonToolbarProps} variant="dark" />
@@ -100,13 +103,13 @@ function TeamMatchInner() {
         >
           <Space wrap align="center" size="middle">
             <Typography.Text style={{ color: 'rgba(255,255,255,0.65)' }}>
-              {step === 6 ? '领奖台' : '正赛'}
+              {step === 7 ? '领奖台' : '正赛'}
             </Typography.Text>
             <MatchNameField variant="dark" />
           </Space>
           <Space wrap>
-            {step === 6 ? (
-              <Button type="primary" onClick={() => dispatch({ type: 'SET_WIZARD_STEP', step: 5 })}>
+            {step === 7 ? (
+              <Button type="primary" onClick={() => dispatch({ type: 'SET_WIZARD_STEP', step: 6 })}>
                 返回正赛
               </Button>
             ) : (
@@ -116,8 +119,8 @@ function TeamMatchInner() {
                 <Button
                   type="primary"
                   disabled={!bracketComplete}
-                  title={!bracketComplete ? '请完成全部淘汰赛与铜牌战' : undefined}
-                  onClick={() => dispatch({ type: 'SET_WIZARD_STEP', step: 6 })}
+                  title={!bracketComplete ? podiumBlockHint : undefined}
+                  onClick={() => dispatch({ type: 'SET_WIZARD_STEP', step: 7 })}
                 >
                   下一步：领奖台
                 </Button>
@@ -126,13 +129,13 @@ function TeamMatchInner() {
           </Space>
         </div>
         <div className="tmFullscreenInner">
-          {step === 6 ? (
+          {step === 7 ? (
             <PodiumStage />
           ) : (
             <BracketStage liveSettings={liveUISettings} onOpenLiveSettings={() => setLiveSettingsOpen(true)} />
           )}
         </div>
-        {step === 5 && (
+        {step === 6 && (
           <LiveSettingsModal
             open={liveSettingsOpen}
             onClose={() => setLiveSettingsOpen(false)}
@@ -180,9 +183,9 @@ function TeamMatchInner() {
             onCancel={() => setMockModalOpen(false)}
             onOk={() => {
               const n = Math.max(1, Math.floor(mockGroupCount));
-              const room = MAX_TEAMS - session.teams.length;
+              const room = MAX_ROSTER_TEAMS - session.teams.length;
               if (room <= 0) {
-                message.warning(`队伍已达上限 ${MAX_TEAMS}，无法继续添加`);
+                message.warning(`队伍已达上限 ${MAX_ROSTER_TEAMS}，无法继续添加`);
                 return;
               }
               const add = Math.min(n, room);
@@ -194,13 +197,13 @@ function TeamMatchInner() {
           >
             <Typography.Paragraph type="secondary" style={{ marginBottom: 12 }}>
               按预设校名顺序追加（与「一键填充16队」同一套校名表；满16队时广工共5队）。当前队伍{' '}
-              {session.teams.length}/{MAX_TEAMS}。
+              {session.teams.length}/{MAX_ROSTER_TEAMS}。
             </Typography.Paragraph>
             <Space align="center">
               <Typography.Text>组数</Typography.Text>
               <InputNumber
                 min={1}
-                max={Math.max(1, MAX_TEAMS - session.teams.length)}
+                max={Math.max(1, MAX_ROSTER_TEAMS - session.teams.length)}
                 value={mockGroupCount}
                 onChange={(v) => setMockGroupCount(v === null ? 1 : Number(v))}
               />
@@ -243,7 +246,7 @@ function TeamMatchInner() {
           }}
         />
         <Steps
-          current={step}
+          current={step <= 4 ? step : step >= 6 ? 5 : 4}
           onChange={goToStepByClick}
           items={stepTitles.map((t) => ({ title: t }))}
         />
