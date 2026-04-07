@@ -44,17 +44,17 @@ export function getDefaultBracketPageSettings(): BracketPageSettings {
     pageBg: 'transparent',
     scale: 1,
     hintFontPx: 12,
-    hintColor: 'rgba(255, 255, 255, 0.45)',
+    hintColor: 'rgba(255, 255, 255, 0.72)',
     wingTitleFontPx: 11,
-    wingTitleColor: 'rgba(255, 255, 255, 0.55)',
+    wingTitleColor: 'rgba(255, 255, 255, 0.68)',
     blockTitleFontPx: 13,
     blockTitleColor: 'rgba(255, 255, 255, 0.88)',
     teamLineFontPx: 15,
     teamLineColor: 'rgba(255, 255, 255, 0.92)',
     vsFontPx: 13,
-    vsColor: 'rgba(255, 255, 255, 0.4)',
+    vsColor: 'rgba(255, 255, 255, 0.55)',
     matchIdFontPx: 13,
-    matchIdColor: 'rgba(255, 255, 255, 0.55)',
+    matchIdColor: 'rgba(255, 255, 255, 0.68)',
     cardBg: 'rgba(255, 255, 255, 0.06)',
     cardBorderColor: 'rgba(255, 255, 255, 0.14)',
     clickableBorderColor: 'rgba(255, 255, 255, 0.88)',
@@ -65,7 +65,7 @@ export function getDefaultBracketPageSettings(): BracketPageSettings {
     centerColumnBg: 'rgba(255, 255, 255, 0.03)',
     centerColumnBorder: 'rgba(255, 255, 255, 0.12)',
     bronzeHintFontPx: 11,
-    bronzeHintColor: 'rgba(255, 255, 255, 0.4)',
+    bronzeHintColor: 'rgba(255, 255, 255, 0.62)',
   };
 }
 
@@ -132,5 +132,6 @@ export function bracketSettingsToCssVars(b: BracketPageSettings): CSSProperties 
     '--tm-br-center-border': b.centerColumnBorder,
     '--tm-br-bronze-hint-font': `${b.bronzeHintFontPx}px`,
     '--tm-br-bronze-hint-color': b.bronzeHintColor,
+    '--tm-br-toolbar-label-color': b.blockTitleColor,
   } as CSSProperties;
 }

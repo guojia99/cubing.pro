@@ -10,6 +10,14 @@
  * @doc https://umijs.org/docs/guides/proxy
  */
 export default {
+  /** 本地开发：One 成绩 API 走同源代理，避免 CORS */
+  dev: {
+    '/one-ss-api': {
+      target: 'https://ss.sxmfxh.com',
+      changeOrigin: true,
+      pathRewrite: { '^/one-ss-api': '' },
+    },
+  },
   // 如果需要自定义本地开发服务器  请取消注释按需调整
   // dev: {
   //   // localhost:8000/api/** -> https://preview.pro.ant.design/api/**

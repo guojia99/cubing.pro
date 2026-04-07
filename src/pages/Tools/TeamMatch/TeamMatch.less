@@ -343,9 +343,59 @@
   width: 100%;
 }
 
+.tmBracketExportBlock {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.tmBracketExportTitleWrap {
+  width: 100%;
+  text-align: center;
+  padding: 4px 12px 12px;
+  flex: 0 0 auto;
+}
+
+.tmBracketExportTitle {
+  color: rgba(255, 255, 255, 0.92) !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+}
+
+.tmBracketToolbarExtras {
+  flex: 0 0 auto;
+}
+
+.tmBracketSkipBronzeLabel {
+  font-size: 12px !important;
+  white-space: nowrap;
+  color: var(--tm-br-toolbar-label-color, rgba(255, 255, 255, 0.88)) !important;
+}
+
+.tmBracketSkipBronzeCard .tmBracketBronzeHint {
+  text-align: center;
+}
+
+.tmBracketToolbar .ant-switch {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.tmBracketToolbar .ant-switch:hover:not(.ant-switch-disabled) {
+  background: rgba(255, 255, 255, 0.32);
+}
+
+.tmBracketToolbar .ant-switch-checked {
+  background: #1677ff;
+}
+
+.tmBracketToolbar .ant-switch-checked:hover:not(.ant-switch-disabled) {
+  background: #4096ff;
+}
+
 .tmBracketLrHint {
   font-size: var(--tm-br-hint-font, 12px) !important;
-  color: var(--tm-br-hint-color, rgba(255, 255, 255, 0.45)) !important;
+  color: var(--tm-br-hint-color, rgba(255, 255, 255, 0.72)) !important;
   margin-bottom: 4px !important;
   line-height: 1.5;
   flex: 1 1 200px;
@@ -375,7 +425,7 @@
 
 .tmBracketWingTitle {
   font-size: var(--tm-br-wing-title-font, 11px) !important;
-  color: var(--tm-br-wing-title-color, rgba(255, 255, 255, 0.55)) !important;
+  color: var(--tm-br-wing-title-color, rgba(255, 255, 255, 0.68)) !important;
   text-align: center;
   line-height: 1.35;
 }
@@ -507,7 +557,7 @@
 .tmBracketBronzeHint {
   margin-top: 6px;
   font-size: var(--tm-br-bronze-hint-font, 11px);
-  color: var(--tm-br-bronze-hint-color, rgba(255, 255, 255, 0.4));
+  color: var(--tm-br-bronze-hint-color, rgba(255, 255, 255, 0.62));
   line-height: 1.4;
 }
 
@@ -583,12 +633,16 @@
 
 .tmBracketMatchCard .ant-card-head-title {
   padding: 8px 0;
-  color: var(--tm-br-match-id-color, rgba(255, 255, 255, 0.55));
+  color: var(--tm-br-match-id-color, rgba(255, 255, 255, 0.68));
   font-size: var(--tm-br-match-id-font, 13px);
 }
 
 .tmBracketMatchCardEmpty .ant-card-body {
   padding: 10px;
+}
+
+.tmBracketRoot .tmBracketMatchCardEmpty .tmBracketEmptyCardPrimary {
+  color: var(--tm-br-team-line-color, rgba(255, 255, 255, 0.92)) !important;
 }
 
 .tmBracketMatchCardCompact .ant-card-body {
@@ -616,7 +670,7 @@
 .tmBracketMatchId {
   font-size: var(--tm-br-match-id-font, 13px);
   font-family: ui-monospace, monospace;
-  color: var(--tm-br-match-id-color, rgba(255, 255, 255, 0.55));
+  color: var(--tm-br-match-id-color, rgba(255, 255, 255, 0.68));
 }
 
 .tmBracketMatchTeams {
@@ -685,18 +739,18 @@
 .tmBracketByeHint {
   font-size: 12px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.45);
+  color: var(--tm-br-hint-color, rgba(255, 255, 255, 0.72));
 }
 
 .tmBracketVs {
   font-size: var(--tm-br-vs-font, 13px) !important;
   letter-spacing: 0.12em;
-  color: var(--tm-br-vs-color, rgba(255, 255, 255, 0.4)) !important;
+  color: var(--tm-br-vs-color, rgba(255, 255, 255, 0.55)) !important;
 }
 
 .tmFullscreenInner .tmMatchTeams .tmVs,
 .tmFullscreenInner .tmMatchTeams .tmBracketVs {
-  color: var(--tm-br-vs-color, rgba(255, 255, 255, 0.4));
+  color: var(--tm-br-vs-color, rgba(255, 255, 255, 0.55));
 }
 
 .tmBracketScaleWrap {
@@ -713,6 +767,13 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+}
+
+.tmPodiumEmptyHint {
+  color: rgba(255, 255, 255, 0.72) !important;
+  font-size: 14px;
+  text-align: center;
+  padding: 0 16px;
 }
 
 .tmPodiumTitle {
@@ -751,6 +812,26 @@
   text-align: center;
 }
 
+.tmPodiumTeamStack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+}
+
+.tmPodiumTeamLine {
+  font-size: 15px;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.tmPodiumSharedSep {
+  font-size: 12px !important;
+  line-height: 1 !important;
+  color: rgba(255, 255, 255, 0.45) !important;
+}
+
 .tmPodiumCardChamp {
   padding-top: 6px;
 }
@@ -767,7 +848,7 @@
 
 .tmPodiumLabel {
   font-size: 12px !important;
-  color: rgba(255, 255, 255, 0.5) !important;
+  color: rgba(255, 255, 255, 0.72) !important;
   margin: 0 !important;
 }
 
@@ -855,6 +936,17 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.tmPkArenaFsBottomBar {
+  position: relative;
+  z-index: 2;
+  flex: 0 0 auto;
+  padding: 14px 16px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .tmPkArenaFsBody {
   flex: 1 1 auto;
   min-height: 0;
@@ -863,7 +955,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 12px 20px;
+  padding: 8px 12px 12px;
 }
 
 .tmPkArenaFsScale {
@@ -979,6 +1071,21 @@
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95);
   font-weight: 600;
   line-height: 1.25;
+}
+
+.tmPkArenaFsPlayerMeta {
+  display: block;
+  text-align: center;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.88);
+  font-weight: 500;
+}
+
+.tmPkDiagColRight .tmPkArenaFsPlayerMeta {
+  text-align: right;
+}
+
+.tmPkDiagColLeft .tmPkArenaFsPlayerMeta {
+  text-align: left;
 }
 
 .tmPkArenaFsPkTitle {

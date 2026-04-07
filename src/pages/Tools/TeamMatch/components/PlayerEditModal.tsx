@@ -34,6 +34,7 @@ const PlayerEditModal: React.FC<Props> = ({ open, onClose, editing, schools, onS
         schoolId: editing.schoolId,
         name: editing.name,
         wcaId: editing.wcaId ?? '',
+        oneId: editing.oneId ?? '',
       });
       setAvatarDraft(editing.avatarDataUrl);
       const u = editing.avatarDataUrl;
@@ -53,16 +54,25 @@ const PlayerEditModal: React.FC<Props> = ({ open, onClose, editing, schools, onS
   }, [open, editing, form]);
 
   const handleOk = () => {
-    void form.validateFields().then((v: { schoolId: string; name: string; wcaId: string }) => {
+    void form
+      .validateFields()
+      .then((v: { schoolId: string; name: string; wcaId: string; oneId: string }) => {
       const wca = v.wcaId?.trim() || null;
       if (wca && wca.length !== 10) {
         form.setFields([{ name: 'wcaId', errors: ['WCA ID 须为 10 位或留空'] }]);
+        return;
+      }
+      const oneRaw = v.oneId?.trim() || '';
+      const oneId = oneRaw === '' ? null : oneRaw;
+      if (oneId && !/^\d+$/.test(oneId)) {
+        form.setFields([{ name: 'oneId', errors: ['One ID 须为数字或留空'] }]);
         return;
       }
       const base = {
         schoolId: v.schoolId,
         name: v.name.trim(),
         wcaId: wca,
+        oneId,
       };
       if (!base.name) return;
       if (editing) {
@@ -141,6 +151,9 @@ const PlayerEditModal: React.FC<Props> = ({ open, onClose, editing, schools, onS
               if (v !== initialWcaIdRef.current) setWcaAvatarFetchedOnce(false);
             }}
           />
+        </Form.Item>
+        <Form.Item name="oneId" label="One ID（可选）">
+          <Input placeholder="数字 uid，用于拉取 One 平台成绩" inputMode="numeric" />
         </Form.Item>
         <Form.Item label="头像">
           <Space direction="vertical" size="small" style={{ width: '100%' }}>

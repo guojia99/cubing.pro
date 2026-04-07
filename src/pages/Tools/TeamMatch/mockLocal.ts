@@ -1,6 +1,22 @@
 import type { Player, School, Team, TeamMatchSession } from '@/pages/Tools/TeamMatch/types';
-import { MAX_TEAMS, MIN_TEAMS, TEAM_PLAYERS } from '@/pages/Tools/TeamMatch/types';
+import { MAX_ROSTER_TEAMS, MIN_TEAMS, TEAM_PLAYERS } from '@/pages/Tools/TeamMatch/types';
 import { v4 as uuidv4 } from 'uuid';
+
+/**
+ * 真实 WCA ID（三阶顶尖选手示例，用于 mock 循环分配）
+ * Feliks / Max / Tymon / Luke / SeungBeom Cho / Patrick Ponce
+ */
+export const MOCK_STRONG_333_WCA_IDS = [
+  '2010ZEMD01',
+  '2012PARK01',
+  '2019KOLA01',
+  '2014GARR01',
+  '2016CHOE01',
+  '2014PONC01',
+] as const;
+
+/** One 平台数字 uid 示例（与公开接口一致，用于 mock 循环） */
+export const MOCK_ONE_UIDS = [2572, 2533, 2556, 1002, 7052] as const;
 
 /** 测试用学校名（与业务约定一致） */
 export const MOCK_SCHOOL_NAMES = [
@@ -53,7 +69,7 @@ function buildFromPlan(plan: { school: string; teamLabel: string }[]): {
   const schools: School[] = [];
   for (const row of plan) {
     if (!nameToSchoolId.has(row.school)) {
-      const s: School = { id: uuidv4(), name: row.school };
+      const s: School = { id: uuidv4(), name: row.school, kind: 'standard' };
       nameToSchoolId.set(row.school, s.id);
       schools.push(s);
     }
@@ -61,16 +77,21 @@ function buildFromPlan(plan: { school: string; teamLabel: string }[]): {
 
   const players: Player[] = [];
   const teams: Team[] = [];
+  let mockPlayerIdx = 0;
 
   plan.forEach((row, idx) => {
     const schoolId = nameToSchoolId.get(row.school)!;
     const pids: string[] = [];
     for (let k = 0; k < TEAM_PLAYERS; k++) {
+      const wcaId = MOCK_STRONG_333_WCA_IDS[mockPlayerIdx % MOCK_STRONG_333_WCA_IDS.length];
+      const oneId = String(MOCK_ONE_UIDS[mockPlayerIdx % MOCK_ONE_UIDS.length]);
+      mockPlayerIdx += 1;
       const p: Player = {
         id: uuidv4(),
         schoolId,
         name: `${row.school.slice(0, 2)}${idx + 1}-${k + 1}`,
-        wcaId: null,
+        wcaId,
+        oneId,
         avatarDataUrl: null,
       };
       players.push(p);
@@ -79,6 +100,7 @@ function buildFromPlan(plan: { school: string; teamLabel: string }[]): {
     teams.push({
       id: uuidv4(),
       schoolId,
+      kind: 'school',
       name: `${row.school}${row.teamLabel}`,
       playerIds: pids,
       disabled: false,
@@ -106,7 +128,7 @@ export function appendMockGroups(
   session: TeamMatchSession,
   count: number,
 ): { schools: School[]; players: Player[]; teams: Team[] } {
-  const n = Math.max(0, Math.min(count, MAX_TEAMS - session.teams.length));
+  const n = Math.max(0, Math.min(count, MAX_ROSTER_TEAMS - session.teams.length));
   const start = session.teams.length;
   const plan = MOCK_TEAM_PLAN_16.slice(start, start + n);
   if (plan.length === 0) {
@@ -127,7 +149,7 @@ export function appendMockGroups(
       if (ex) {
         nameToId.set(row.school, ex.id);
       } else {
-        const sch: School = { id: uuidv4(), name: row.school };
+        const sch: School = { id: uuidv4(), name: row.school, kind: 'standard' };
         newSchools.push(sch);
         nameToId.set(row.school, sch.id);
       }
@@ -136,17 +158,22 @@ export function appendMockGroups(
 
   const players: Player[] = [];
   const teams: Team[] = [];
+  const basePlayerIdx = session.players.length;
 
   plan.forEach((row, i) => {
     const globalIdx = start + i;
     const schoolId = nameToId.get(row.school)!;
     const pids: string[] = [];
     for (let k = 0; k < TEAM_PLAYERS; k++) {
+      const mockPlayerIdx = basePlayerIdx + i * TEAM_PLAYERS + k;
+      const wcaId = MOCK_STRONG_333_WCA_IDS[mockPlayerIdx % MOCK_STRONG_333_WCA_IDS.length];
+      const oneId = String(MOCK_ONE_UIDS[mockPlayerIdx % MOCK_ONE_UIDS.length]);
       const p: Player = {
         id: uuidv4(),
         schoolId,
         name: `${row.school.slice(0, 2)}${globalIdx + 1}-${k + 1}`,
-        wcaId: null,
+        wcaId,
+        oneId,
         avatarDataUrl: null,
       };
       players.push(p);
@@ -155,6 +182,7 @@ export function appendMockGroups(
     teams.push({
       id: uuidv4(),
       schoolId,
+      kind: 'school',
       name: `${row.school}${row.teamLabel}`,
       playerIds: pids,
       disabled: false,

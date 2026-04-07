@@ -6,7 +6,13 @@ import classNames from 'classnames';
 import React, { useEffect, useMemo } from 'react';
 import '../TeamMatch.less';
 
-type PlayerLite = { id: string; name: string; avatarDataUrl: string | null };
+type PlayerLite = {
+  id: string;
+  name: string;
+  avatarDataUrl: string | null;
+  schoolName: string;
+  scoresLine: string;
+};
 
 type Props = {
   open: boolean;
@@ -57,6 +63,8 @@ function PkArenaFullscreen({
 
   const step = settings.diagonalStepPx;
   const av = settings.avatarSizePx;
+  const metaFont = Math.max(11, Math.round(settings.playerNameFontPx * 0.52));
+  const metaColor = 'rgba(245, 245, 245, 0.78)';
 
   return (
     <div className="tmPkArenaFs">
@@ -67,9 +75,6 @@ function PkArenaFullscreen({
             关闭对战
           </Button>
           <LiveSettingsButton type="default" ghost onClick={onOpenLiveSettings} style={{ fontSize: settings.buttonFontPx }} />
-          <Button type="primary" size="large" onClick={onOpenScoreEntry} style={{ fontSize: settings.buttonFontPx }}>
-            录入成绩
-          </Button>
         </Space>
       </div>
       <div className="tmPkArenaFsBody">
@@ -112,6 +117,28 @@ function PkArenaFullscreen({
                       style={{ color: settings.playerNameColor, fontSize: settings.playerNameFontPx, maxWidth: av + step * 4 }}
                     >
                       {p.name}
+                    </span>
+                    <span
+                      className="tmPkArenaFsPlayerMeta"
+                      style={{
+                        color: metaColor,
+                        fontSize: metaFont,
+                        maxWidth: av + step * 5,
+                        lineHeight: 1.3,
+                      }}
+                    >
+                      {p.scoresLine}
+                    </span>
+                    <span
+                      className="tmPkArenaFsPlayerMeta tmPkArenaFsPlayerSchool"
+                      style={{
+                        color: metaColor,
+                        fontSize: Math.max(10, metaFont - 1),
+                        maxWidth: av + step * 5,
+                        lineHeight: 1.3,
+                      }}
+                    >
+                      {p.schoolName}
                     </span>
                   </div>
                 ))}
@@ -160,12 +187,39 @@ function PkArenaFullscreen({
                     >
                       {p.name}
                     </span>
+                    <span
+                      className="tmPkArenaFsPlayerMeta"
+                      style={{
+                        color: metaColor,
+                        fontSize: metaFont,
+                        maxWidth: av + step * 5,
+                        lineHeight: 1.3,
+                      }}
+                    >
+                      {p.scoresLine}
+                    </span>
+                    <span
+                      className="tmPkArenaFsPlayerMeta tmPkArenaFsPlayerSchool"
+                      style={{
+                        color: metaColor,
+                        fontSize: Math.max(10, metaFont - 1),
+                        maxWidth: av + step * 5,
+                        lineHeight: 1.3,
+                      }}
+                    >
+                      {p.schoolName}
+                    </span>
                   </div>
                 ))}
               </div>
             </div>
           </div>
         </div>
+      </div>
+      <div className="tmPkArenaFsBottomBar" style={{ background: settings.barBg }}>
+        <Button type="primary" size="large" onClick={onOpenScoreEntry} style={{ fontSize: settings.buttonFontPx }}>
+          录入成绩
+        </Button>
       </div>
     </div>
   );

@@ -9,7 +9,7 @@ import { randomizeDraw } from '@/pages/Tools/TeamMatch/drawRandom';
 import { appendMockGroups, buildMockTeamMatchData16 } from '@/pages/Tools/TeamMatch/mockLocal';
 import { computePkSettlement } from '@/pages/Tools/TeamMatch/pkSettlement';
 import { pickSeedTeamIds } from '@/pages/Tools/TeamMatch/seedingMath';
-import { createEmptySession } from '@/pages/Tools/TeamMatch/sessionFactory';
+import { createEmptySession, normalizeSession } from '@/pages/Tools/TeamMatch/sessionFactory';
 import type {
   BracketMatch,
   Player,
@@ -30,15 +30,20 @@ export type TeamMatchAction =
   | { type: 'SET_STATUS'; status: TeamMatchSession['status'] }
   | { type: 'SET_EVENT_IDS'; eventIds: string[] }
   | { type: 'SET_SEEDING_PRIMARY'; primary: TeamMatchSession['seedingPrimary'] }
+  | { type: 'SET_DRAW_RANDOM_MODE'; mode: TeamMatchSession['drawRandomMode'] }
+  | { type: 'SET_DRAW_AVOID_SAME_SCHOOL'; value: boolean }
+  | { type: 'SET_SEED_TEAM_IDS'; seedTeamIds: TeamMatchSession['seedTeamIds'] }
   | { type: 'UPSERT_SCHOOLS'; schools: School[] }
   | { type: 'UPSERT_PLAYERS'; players: Player[] }
   | { type: 'UPSERT_TEAMS'; teams: Team[] }
   | { type: 'DELETE_TEAM'; teamId: string }
   | { type: 'SET_TEAM_DISABLED'; teamId: string; disabled: boolean }
   | { type: 'SET_SEEDING'; seeding: SeedingEntry[] }
+  | { type: 'SET_ONE_COMP_IMPORT'; value: TeamMatchSession['oneCompImport'] }
   | { type: 'COMPUTE_SEED_TEAMS' }
   | { type: 'RANDOMIZE_DRAW' }
   | { type: 'REBUILD_BRACKET' }
+  | { type: 'SET_SKIP_BRONZE_MATCH'; value: boolean }
   | { type: 'SET_UI_FOCUS'; matchId: string | null }
   | { type: 'SET_PK_DRAFT'; matchId: string; results: PkPlayerResult[] }
   | {
@@ -52,10 +57,11 @@ export type TeamMatchAction =
   | { type: 'SET_MATCH_WINNER'; matchId: string; winnerTeamId: string };
 
 function touch(s: TeamMatchSession): TeamMatchSession {
-  return { ...s, updatedAt: Date.now() };
+  return { ...normalizeSession(s), updatedAt: Date.now() };
 }
 
-function mergeSeeding(prev: SeedingEntry[], players: Player[], eventIds: string[]): SeedingEntry[] {
+/** 保证每位选手 × 每个比赛项目都有一条 seeding（供初赛导入等合并写入） */
+export function mergeSeeding(prev: SeedingEntry[], players: Player[], eventIds: string[]): SeedingEntry[] {
   const map = new Map<string, SeedingEntry>();
   for (const e of prev) {
     map.set(`${e.playerId}:${e.eventId}`, e);
@@ -64,7 +70,16 @@ function mergeSeeding(prev: SeedingEntry[], players: Player[], eventIds: string[
     for (const ev of eventIds) {
       const k = `${p.id}:${ev}`;
       if (!map.has(k)) {
-        map.set(k, { playerId: p.id, eventId: ev, single: null, average: null });
+        map.set(k, {
+          playerId: p.id,
+          eventId: ev,
+          single: null,
+          average: null,
+          adoptStrategy: undefined,
+          wcaBest: null,
+          oneBest: null,
+          preliminary: null,
+        });
       }
     }
   }
@@ -135,6 +150,7 @@ export function reduceSession(session: TeamMatchSession, action: TeamMatchAction
         flatSlots: null,
         rounds: [],
         bronzeMatch: null,
+        skipBronzeMatch: false,
         drawVersion: 0,
       };
       break;
@@ -177,6 +193,22 @@ export function reduceSession(session: TeamMatchSession, action: TeamMatchAction
     case 'SET_SEEDING_PRIMARY':
       next = { ...next, seedingPrimary: action.primary };
       break;
+    case 'SET_DRAW_RANDOM_MODE':
+      next = { ...next, drawRandomMode: action.mode };
+      break;
+    case 'SET_DRAW_AVOID_SAME_SCHOOL':
+      next = { ...next, drawAvoidSameSchool: action.value };
+      break;
+    case 'SET_SEED_TEAM_IDS': {
+      const ids = action.seedTeamIds;
+      const set = new Set(ids.filter(Boolean) as string[]);
+      next = {
+        ...next,
+        seedTeamIds: ids,
+        teams: next.teams.map((t) => ({ ...t, isSeed: set.has(t.id) })),
+      };
+      break;
+    }
     case 'UPSERT_SCHOOLS':
       next = { ...next, schools: action.schools };
       break;
@@ -223,6 +255,9 @@ export function reduceSession(session: TeamMatchSession, action: TeamMatchAction
     case 'SET_SEEDING':
       next = { ...next, seeding: action.seeding };
       break;
+    case 'SET_ONE_COMP_IMPORT':
+      next = { ...next, oneCompImport: action.value };
+      break;
     case 'COMPUTE_SEED_TEAMS': {
       const eventId = next.eventIds[0] ?? '333';
       const ids = pickSeedTeamIds(next.teams, next.players, next.seeding, eventId, next.seedingPrimary);
@@ -258,6 +293,10 @@ export function reduceSession(session: TeamMatchSession, action: TeamMatchAction
     }
     case 'REBUILD_BRACKET':
       next = rebuildBracketFromSession(next);
+      break;
+    case 'SET_SKIP_BRONZE_MATCH':
+      next = { ...next, skipBronzeMatch: action.value };
+      next = action.value ? { ...next, bronzeMatch: null } : syncBronzeToSession(next);
       break;
     case 'SET_UI_FOCUS':
       next = { ...next, uiFocusMatchId: action.matchId };

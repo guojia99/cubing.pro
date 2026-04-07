@@ -71,6 +71,9 @@ export function syncBronzeFromSemis(
 }
 
 export function syncBronzeToSession(session: TeamMatchSession): TeamMatchSession {
+  if (session.skipBronzeMatch) {
+    return { ...session, bronzeMatch: null };
+  }
   const bronzeMatch = syncBronzeFromSemis(session.rounds, session.bronzeMatch);
   return { ...session, bronzeMatch };
 }
@@ -253,7 +256,9 @@ export function rebuildBracketFromSession(session: TeamMatchSession): TeamMatchS
   const flat = session.flatSlots ?? flatRegions(session.regionSlots);
   let rounds = buildRoundsFromFlat16(flat);
   rounds = advanceWinners(rounds, flat);
-  const bronzeMatch = syncBronzeFromSemis(rounds, session.bronzeMatch);
+  const bronzeMatch = session.skipBronzeMatch
+    ? null
+    : syncBronzeFromSemis(rounds, session.bronzeMatch);
   return {
     ...session,
     flatSlots: flat,
