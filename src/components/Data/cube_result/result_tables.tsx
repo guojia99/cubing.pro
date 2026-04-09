@@ -8,6 +8,7 @@ import { RecordTagWithResult } from '@/components/Data/cube_record/record_tag';
 import { generateRecordMap } from '@/components/Data/cube_record/record_utils';
 import { Record } from '@/components/Data/types/record';
 import { CompetitionLink, PlayerLink } from '@/components/Link/Links';
+import '@/components/Data/table_fixed_column.css';
 import './result_tables.css';
 
 export const playerResultKeys = ['EventNameOnlyOne', 'Round', 'Best', 'Average', 'Result'];
@@ -37,10 +38,6 @@ export const ResultsTable = (
         dataIndex: 'Round',
         key: 'Round',
         width: 80,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        onCell: (result: any, rowIndex: number) => ({
-          className: 'custom-cell',
-        }),
       },
     ],
     [
@@ -104,7 +101,7 @@ export const ResultsTable = (
             );
           }
           return (
-            <td className={'cube_result_Best_col'}>
+            <span className={'cube_result_Best_col'}>
               {RecordTagWithResult(
                 resultTimeString(results, inter),
                 result.id + '_best',
@@ -112,7 +109,7 @@ export const ResultsTable = (
                 false,
                 recordsMap,
               )}
-            </td>
+            </span>
           );
         },
       },
@@ -142,7 +139,7 @@ export const ResultsTable = (
 
           // todo 需要pb
           return (
-            <td className={'cube_result_Average_col'}>
+            <span className={'cube_result_Average_col'}>
               {RecordTagWithResult(
                 resultTimeString(results, false, false, m.integer),
                 result.id + '_average',
@@ -150,7 +147,7 @@ export const ResultsTable = (
                 false,
                 recordsMap,
               )}
-            </td>
+            </span>
           );
         },
       },
@@ -166,8 +163,12 @@ export const ResultsTable = (
           // eslint-disable-next-line array-callback-return
           const data = resultStringPro(results, result.EventRoute);
           // eslint-disable-next-line array-callback-return
-          data.map((value: string) => {
-            body.push(<td style={{ minWidth: '80px' }}>{value}</td>);
+          data.map((value: string, idx: number) => {
+            body.push(
+              <span key={idx} className="cube_result_result_cell" style={{ minWidth: '80px', display: 'inline-block' }}>
+                {value}
+              </span>,
+            );
           });
           return <div className={'cube_result_results_col'}>{body}</div>;
         },
@@ -184,11 +185,11 @@ export const ResultsTable = (
           // eslint-disable-next-line array-callback-return
           const data = resultStringPro(results, result.EventRoute);
           // eslint-disable-next-line array-callback-return
-          data.map((value: string) => {
+          data.map((value: string, idx: number) => {
             body.push(
-              <td style={{ minWidth: '80px' }}>
+              <span key={idx} className="cube_result_result_cell" style={{ minWidth: '80px', display: 'inline-block' }}>
                 {RecordTagWithResult(value, result.id + '_repeatedly', true, false, recordsMap)}
-              </td>,
+              </span>,
             );
           });
           return <div className={'cube_result_results_col'}>{body}</div>;
@@ -208,9 +209,9 @@ export const ResultsTable = (
         }),
         render: (value: string, result: Result) => {
           return (
-            <td style={{ minWidth: '80px', width: '80px' }}>
+            <span style={{ minWidth: '80px', width: '80px', display: 'inline-block' }}>
               {CubeIcon(result.EventID, result.EventID, {})} {CubesCn(value)}
-            </td>
+            </span>
           );
         },
       },
@@ -228,13 +229,13 @@ export const ResultsTable = (
         }),
         render: (value: string, result: Result) => {
           if (result.RoundNumber !== 1) {
-            return <td style={{ minWidth: '80px', width: '80px' }}></td>;
+            return null;
           }
           // todo 中英文？
           return (
-            <td style={{ minWidth: '80px', width: '80px' }}>
+            <span style={{ minWidth: '80px', width: '80px', display: 'inline-block' }}>
               {CubeIcon(result.EventID, result.EventID, {})} {CubesCn(value)}
-            </td>
+            </span>
           );
         },
       },
@@ -251,7 +252,7 @@ export const ResultsTable = (
           className: 'custom-cell cube_result_rank_col',
         }),
         render: (value: number) => {
-          return <td>{value + 1}</td>;
+          return <span>{value + 1}</span>;
         },
       },
     ],
@@ -285,6 +286,10 @@ export const ResultsTable = (
     columns.push(column);
   }
 
+  if (columns.length > 0) {
+    columns[0] = { ...columns[0], fixed: 'left' as const };
+  }
+
   return (
     <Table
       dataSource={dataSource}
@@ -292,7 +297,8 @@ export const ResultsTable = (
       columns={columns}
       pagination={false}
       size="small"
-      scroll={{ x: 'max-content' }} // 启用横向滚动
+      className="cube-results-table"
+      scroll={{ x: 'max-content' }}
     />
   );
 };

@@ -1,3 +1,4 @@
+import '@/components/Data/table_fixed_column.css';
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import { Comp } from '@/components/Data/types/comps';
 import { parseDateTime } from '@/utils/time/data_time';
@@ -267,6 +268,9 @@ export const CompsTable = (dataSource: Comp[], keys: string[]) => {
       }
     }
   }
+  if (columns.length > 0) {
+    columns[0] = { ...columns[0], fixed: 'left' as const };
+  }
   return (
     <Table
       dataSource={dataSource}
@@ -274,7 +278,8 @@ export const CompsTable = (dataSource: Comp[], keys: string[]) => {
       columns={columns}
       pagination={false}
       size="small"
-      scroll={{ x: 'max-content' }} // 启用横向滚动
+      className="cube-comps-table"
+      scroll={{ x: 'max-content' }}
     />
   );
 };

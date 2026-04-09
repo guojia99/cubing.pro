@@ -3,6 +3,7 @@ import { apiPlayer } from '@/services/cubing-pro/players/players';
 import { PlayersAPI } from '@/services/cubing-pro/players/typings';
 import { useParams } from '@@/exports';
 import React, { lazy, useEffect, useState } from 'react';
+import styles from './playerPage.less';
 
 const UpdateTitle = lazy(() => import('@/components/Title/Title'));
 const PlayerDetail = lazy(() => import('@/pages/Player/PlayerComponents/PlayerDetail'));
@@ -43,7 +44,7 @@ const Player: React.FC = () => {
           {loading ? (
             <div>加载中...</div>
           ) : (
-            <div>
+            <div className={styles.playerPageRoot}>
               <UpdateTitle title={player?.Name} />
               <PlayerDetail player={player} key={'player_detail'} />
               <PlayerResults player={player} />

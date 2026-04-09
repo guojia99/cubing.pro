@@ -61,7 +61,7 @@ const PlayerResultsListWithComps: React.FC<PlayerResultsListWithCompsProps> = ({
     );
   }
 
-  return <>{bodys}</>;
+  return <div style={{ minWidth: 0, maxWidth: '100%' }}>{bodys}</div>;
 };
 
 export default PlayerResultsListWithComps;

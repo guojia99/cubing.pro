@@ -1,4 +1,3 @@
-
 .cube_result_Best_col {
   min-width: 30px;
   /*border-right: rgba(220, 220, 220, 0.74) 1px solid;*/
@@ -7,6 +6,16 @@
 }
 .cube_result_Average_col {
   min-width: 30px;
+}
+
+/*
+ * 固定首列右侧有宽约 30px 的 ::after（含 ping 时 inset 阴影），会叠在下一列（轮次）上，
+ * 表现为每行文字上方/旁边的灰块。整表关闭该伪元素。
+ */
+.ant-table-wrapper.cube-results-table .ant-table-cell-fix-left-last::after,
+.ant-table-wrapper.cube-results-table .ant-table-cell-fix-left-first::after {
+  display: none !important;
+  box-shadow: none !important;
 }
 
 .custom-cell {

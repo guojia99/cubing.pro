@@ -40,7 +40,7 @@ const AlgsFilterPanel: React.FC<AlgsFilterPanelProps> = ({
     <>
       <Card size="small" style={{ marginBottom: compact ? 12 : 16 }}>
         <div style={{ marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 12, color: 'rgba(0,0,0,0.6)' }}>
+          <span style={{ fontSize: 12, color: 'var(--ant-color-text-secondary)' }}>
             {intl.formatMessage({ id: 'algs.detail.set' })}
           </span>
           <Button size="small" onClick={onSetSelectAll}>
@@ -72,7 +72,7 @@ const AlgsFilterPanel: React.FC<AlgsFilterPanelProps> = ({
 
       <Card size="small" style={{ marginBottom: 0 }}>
         <div style={{ marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 12, color: 'rgba(0,0,0,0.6)' }}>
+          <span style={{ fontSize: 12, color: 'var(--ant-color-text-secondary)' }}>
             {intl.formatMessage({ id: 'algs.detail.group' })}
           </span>
           <Button size="small" onClick={onGroupSelectAll}>
@@ -91,7 +91,7 @@ const AlgsFilterPanel: React.FC<AlgsFilterPanelProps> = ({
               if (groupKeys.length === 0) return null;
               return (
                 <div key={setName}>
-                  <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.5)', marginBottom: 6 }}>
+                  <div style={{ fontSize: 12, color: 'var(--ant-color-text-tertiary)', marginBottom: 6 }}>
                     {setName}
                   </div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>

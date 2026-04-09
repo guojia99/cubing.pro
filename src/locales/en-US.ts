@@ -5,6 +5,7 @@ import home from "@/locales/en-US/home";
 import layout from "@/locales/en-US/layout";
 import algs from "@/locales/en-US/algs";
 import wca from "@/locales/en-US/wca";
+import userData from "@/locales/en-US/userData";
 
 export default {
   'navBar.lang': 'Languages',
@@ -16,5 +17,6 @@ export default {
   ...home,
   ...layout,
   ...algs,
-  ...wca
+  ...wca,
+  ...userData,
 };

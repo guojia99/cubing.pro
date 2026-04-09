@@ -1,9 +1,13 @@
 import { Record } from '@/components/Data/types/record';
 import { Tag } from 'antd';
 
-const CR_color = '#f50';
-const GR_color = '#ffd049';
-const PB_color = '#87d068';
+/** Ant Design Tag 预设色：浅色/深色主题下可读性优于自填 hex */
+const tagPreset: { [key: string]: string } = {
+  PB: 'success',
+  NR: 'warning',
+  GR: 'gold',
+  CR: 'volcano',
+};
 
 export const RecordTagWithResult = (
   resultVal: string,
@@ -12,17 +16,14 @@ export const RecordTagWithResult = (
   isPB: boolean,
   recordMap: Map<string, Record>,
 ) => {
-  let color = '';
   let tag = '';
   if (isPB) {
-    color = PB_color;
     tag = 'PB';
   }
 
-  const r_keys: string[] = ['GR', 'CR'];
-  const r_keys_colors: string[] = [GR_color, CR_color];
+  const r_keys: string[] = ['NR', 'GR', 'CR'];
   for (let i = 0; i < r_keys.length; i++) {
-    let cr_key = resultId + '_' + r_keys[i];
+    const cr_key = resultId + '_' + r_keys[i];
     const record = recordMap.get(cr_key);
     if (
       !(
@@ -32,20 +33,21 @@ export const RecordTagWithResult = (
       )
     ) {
       if (record.Type === r_keys[i]) {
-        color = r_keys_colors[i];
         tag = r_keys[i];
       }
     }
   }
 
-  if (color === '') {
+  if (tag === '') {
     return <>{resultVal}</>;
   }
 
+  const preset = tagPreset[tag] ?? 'default';
+
   return (
     <>
-      <strong style={{ color: color }}>{resultVal}</strong>{' '}
-      <Tag color={color} style={{ marginLeft: '3px' }}>
+      <strong>{resultVal}</strong>{' '}
+      <Tag color={preset} style={{ marginLeft: 3 }}>
         {tag}
       </Tag>
     </>
@@ -53,20 +55,14 @@ export const RecordTagWithResult = (
 };
 
 export const RecordTag = (record: Record, values: string) => {
-  let color = '';
-  if (record.Type === 'CR') {
-    color = CR_color;
-  }
-  if (record.Type === 'GR') {
-    color = GR_color;
-  }
+  const preset = tagPreset[record.Type] ?? 'default';
 
   return (
     <>
-      <Tag color={color} style={{ marginLeft: '3px', maxWidth: "30px"}}>
+      <Tag color={preset} style={{ marginLeft: '3px', maxWidth: '30px' }}>
         {record.Type}
       </Tag>
-      <strong style={{ color: color }}>{values}</strong>
+      <strong>{values}</strong>
     </>
   );
 };

@@ -1,4 +1,4 @@
-// 滑块切换按钮
+// 滑块切换按钮（颜色随 ConfigProvider 主题 token）
 .view-mode-toggle {
   display: inline-flex;
 
@@ -6,7 +6,7 @@
     padding: 5px 10px;
     font-size: 12px;
   }
-  background: #f0f2f5;
+  background: var(--ant-color-fill-secondary, #f0f2f5);
   border-radius: 10px;
   padding: 3px;
   gap: 2px;
@@ -18,13 +18,13 @@
     border-radius: 8px;
     font-size: 13px;
     font-weight: 500;
-    color: #595959;
+    color: var(--ant-color-text-secondary, #595959);
     background: transparent;
     cursor: pointer;
     transition: all 0.25s ease;
 
     &:hover:not(:disabled) {
-      color: #1890ff;
+      color: var(--ant-color-primary, #1890ff);
     }
 
     &:disabled {
@@ -33,9 +33,9 @@
     }
 
     &.active {
-      background: #fff;
-      color: #1890ff;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      background: var(--ant-color-fill-tertiary, #fff);
+      color: var(--ant-color-primary, #1890ff);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
     }
   }
 }
@@ -43,6 +43,10 @@
 .wca-result-table-card {
   position: relative;
   padding-top: 48px !important;
+
+  :global(.ant-card-body) {
+    background: var(--ant-color-bg-container) !important;
+  }
 }
 
 .wca-result-table-options {
@@ -55,30 +59,41 @@
 }
 
 .wca-player-result-table {
+  .ant-table-wrapper,
+  .ant-table-container,
   .ant-table {
     font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
+    background: var(--ant-color-bg-container) !important;
   }
 
-  .ant-table-thead > tr > th {
-    background: linear-gradient(180deg, #f8fafb 0%, #f0f4f6 100%);
+  /* 表头含 sticky 场景 */
+  .ant-table-thead > tr > th,
+  .ant-table-thead th.ant-table-cell,
+  .ant-table-sticky-holder thead th {
+    background: var(--ant-color-fill-tertiary) !important;
     text-align: center;
     font-weight: 600;
     font-size: 13px;
-    border-bottom: 2px solid #e2e8ed !important;
-    color: #434343;
+    border-bottom: 2px solid var(--ant-color-border-secondary) !important;
+    color: var(--ant-color-text) !important;
     padding: 10px 8px;
   }
 
   .ant-table-tbody > tr > th.ant-table-cell-fix-left {
-    background: #fafbfc !important;
+    background: var(--ant-color-fill-alter) !important;
+  }
+
+  /* 数据格默认跟容器底色，避免 antd 默认浅色底透出 */
+  .ant-table-tbody > tr.ant-table-row > td {
+    background: var(--ant-color-bg-container) !important;
   }
 
   .wca-result-row {
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--ant-color-split);
     height: 52px;
 
     &:hover td {
-      background-color: #f6f9fc !important;
+      background-color: var(--ant-color-fill-tertiary) !important;
     }
   }
 
@@ -89,8 +104,12 @@
     font-size: 13px;
   }
 
+  .ant-table-tbody > tr > td.ant-table-cell-fix-left {
+    background: var(--ant-color-bg-container) !important;
+  }
+
   .times-cell {
-    color: #8c8c8c;
+    color: var(--ant-color-text-tertiary, #8c8c8c);
     font-size: 12px;
     font-weight: 500;
   }

@@ -13,7 +13,7 @@ import type { ProficiencyLevel } from '@/services/cubing-pro/algs/formulaPractic
 const PROFICIENCY_CONFIG: { value: ProficiencyLevel; icon: React.ReactNode; color?: string }[] = [
   { value: 'mastered', icon: <CheckCircleOutlined />, color: '#52c41a' },
   { value: 'skilled', icon: <ThunderboltOutlined />, color: '#1890ff' },
-  { value: 'average', icon: <MinusCircleOutlined />, color: 'rgba(0,0,0,0.65)' },
+  { value: 'average', icon: <MinusCircleOutlined />, color: 'var(--ant-color-text-secondary)' },
   { value: 'unskilled', icon: <ExclamationCircleOutlined />, color: '#faad14' },
   { value: 'unknown', icon: <CloseCircleOutlined />, color: '#ff4d4f' },
 ];

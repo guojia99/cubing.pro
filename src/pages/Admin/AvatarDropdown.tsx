@@ -8,7 +8,7 @@ import { flushSync } from 'react-dom';
 import { BsClipboard2Data, BsFillPersonLinesFill } from 'react-icons/bs';
 import { FaHospitalUser } from 'react-icons/fa6';
 import { LuComponent } from 'react-icons/lu';
-import { RiAdminLine, RiLoginBoxFill, RiLogoutBoxRFill, RiSettings5Fill } from 'react-icons/ri';
+import { RiAdminLine, RiDatabase2Line, RiLoginBoxFill, RiLogoutBoxRFill, RiSettings5Fill } from 'react-icons/ri';
 import HeaderDropdown from '../../components/HeaderDropdown';
 import {getAPIUrl, isLocal} from "@/services/cubing-pro/request";
 import {AuthAPI} from "@/services/cubing-pro/auth/typings";
@@ -161,6 +161,11 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
       key: 'user/pre_result',
       icon: <BsClipboard2Data />,
       label: '成绩录入',
+    },
+    {
+      key: 'user/kv-data',
+      icon: <RiDatabase2Line />,
+      label: '个人数据',
     },
     {
       type: 'divider' as const,

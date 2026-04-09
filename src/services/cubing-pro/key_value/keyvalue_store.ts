@@ -18,9 +18,9 @@ async function setKeyValue(key: string, value: any) {
   const response = await Request.post<{ data: KeyValue }>(
     `/user/kv/`,
     {
-      Key: key,
-      Value: JSON.stringify(value),
-      Type: 3,
+      key,
+      value: JSON.stringify(value),
+      type: 3,
     },
     { headers: AuthHeader() },
   );
@@ -31,7 +31,8 @@ async function setKeyValue(key: string, value: any) {
 export async function getKeyMap(key: string): Promise<Record<string, any>> {
   try {
     const { data } = await getKeyValue(key);
-    return JSON.parse(data.Value);
+    const raw = (data as { value?: string; Value?: string }).value ?? (data as { Value?: string }).Value ?? '';
+    return raw ? JSON.parse(raw) : {};
   } catch (e) {
     // 可以按需处理 404 等错误
   }

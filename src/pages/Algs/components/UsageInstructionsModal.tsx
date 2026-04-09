@@ -20,26 +20,26 @@ const UsageInstructionsModal: React.FC<UsageInstructionsModalProps> = ({ open, o
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         <div>
-          <div style={{ fontWeight: 600, marginBottom: 6, fontSize: 14 }}>
+          <div style={{ fontWeight: 600, marginBottom: 6, fontSize: 14, color: 'var(--ant-color-text)' }}>
             {intl.formatMessage({ id: 'algs.usageInstructions.clickSwitch' })}
           </div>
-          <div style={{ fontSize: 13, color: 'rgba(0,0,0,0.65)', lineHeight: 1.6 }}>
+          <div style={{ fontSize: 13, color: 'var(--ant-color-text-secondary)', lineHeight: 1.6 }}>
             {intl.formatMessage({ id: 'algs.usageInstructions.clickSwitchDesc' })}
           </div>
         </div>
         <div>
-          <div style={{ fontWeight: 600, marginBottom: 6, fontSize: 14 }}>
+          <div style={{ fontWeight: 600, marginBottom: 6, fontSize: 14, color: 'var(--ant-color-text)' }}>
             {intl.formatMessage({ id: 'algs.usageInstructions.randomFunc' })}
           </div>
-          <div style={{ fontSize: 13, color: 'rgba(0,0,0,0.65)', lineHeight: 1.6 }}>
+          <div style={{ fontSize: 13, color: 'var(--ant-color-text-secondary)', lineHeight: 1.6 }}>
             {intl.formatMessage({ id: 'algs.usageInstructions.randomFuncDesc' })}
           </div>
         </div>
         <div>
-          <div style={{ fontWeight: 600, marginBottom: 6, fontSize: 14 }}>
+          <div style={{ fontWeight: 600, marginBottom: 6, fontSize: 14, color: 'var(--ant-color-text)' }}>
             {intl.formatMessage({ id: 'algs.usageInstructions.formulaPractice' })}
           </div>
-          <div style={{ fontSize: 13, color: 'rgba(0,0,0,0.65)', lineHeight: 1.6 }}>
+          <div style={{ fontSize: 13, color: 'var(--ant-color-text-secondary)', lineHeight: 1.6 }}>
             {intl.formatMessage({ id: 'algs.usageInstructions.formulaPracticeDesc' })}
           </div>
         </div>

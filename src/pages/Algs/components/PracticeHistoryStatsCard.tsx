@@ -22,7 +22,7 @@ import { ALGS_COLORS } from '../constants';
 const PROFICIENCY_DISPLAY: { value: ProficiencyLevel; icon: React.ReactNode; color: string }[] = [
   { value: 'mastered', icon: <CheckCircleOutlined />, color: '#52c41a' },
   { value: 'skilled', icon: <ThunderboltOutlined />, color: '#1890ff' },
-  { value: 'average', icon: <MinusCircleOutlined />, color: 'rgba(0,0,0,0.65)' },
+  { value: 'average', icon: <MinusCircleOutlined />, color: 'var(--ant-color-text-secondary)' },
   { value: 'unskilled', icon: <ExclamationCircleOutlined />, color: '#faad14' },
   { value: 'unknown', icon: <CloseCircleOutlined />, color: '#ff4d4f' },
 ];
@@ -175,17 +175,17 @@ const PracticeHistoryStatsCard: React.FC<PracticeHistoryStatsCardProps> = ({
           }}
           onClick={() => setModalOpen(true)}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(0,0,0,0.85)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--ant-color-text)' }}>
             <BarChartOutlined style={{ color: 'rgba(100,149,237,0.8)' }} />
             <span style={{ fontWeight: 500 }}>
               {intl.formatMessage({ id: 'algs.practiceHistoryStats.title' })}
             </span>
             {stats.total > 0 && (
-              <span style={{ fontSize: 12, color: 'rgba(0,0,0,0.5)' }}>({stats.total})</span>
+              <span style={{ fontSize: 12, color: 'var(--ant-color-text-tertiary)' }}>({stats.total})</span>
             )}
           </div>
         </div>
-        <div style={{ marginTop: 8, fontSize: 12, color: 'rgba(0,0,0,0.45)' }}>
+        <div style={{ marginTop: 8, fontSize: 12, color: 'var(--ant-color-text-tertiary)' }}>
           {intl.formatMessage({ id: 'algs.practiceHistoryStats.desc' })}
         </div>
       </Card>
@@ -211,14 +211,14 @@ const PracticeHistoryStatsCard: React.FC<PracticeHistoryStatsCardProps> = ({
         width={880}
         styles={{ body: { maxHeight: 640, overflowY: 'auto' } }}
       >
-        <div style={{ marginBottom: 12, fontSize: 12, color: 'rgba(0,0,0,0.65)' }}>
+        <div style={{ marginBottom: 12, fontSize: 12, color: 'var(--ant-color-text-secondary)' }}>
           {intl.formatMessage(
             { id: 'algs.practiceHistoryStats.modalDesc' },
             { total: stats.total },
           )}
         </div>
         {stats.items.length === 0 ? (
-          <div style={{ padding: 24, textAlign: 'center', color: 'rgba(0,0,0,0.45)' }}>
+          <div style={{ padding: 24, textAlign: 'center', color: 'var(--ant-color-text-tertiary)' }}>
             {intl.formatMessage({ id: 'algs.formulaPractice.historyEmpty' })}
           </div>
         ) : (

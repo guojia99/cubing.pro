@@ -1,3 +1,4 @@
+import BracketFitTeamName from '@/pages/Tools/TeamMatch/components/BracketFitTeamName';
 import LiveSettingsButton from '@/pages/Tools/TeamMatch/components/LiveSettingsButton';
 import PkGroupArenaFullscreen, {
   type PkGroupArenaColumn,
@@ -54,7 +55,12 @@ function ElimMatchCard({ m, teams, onOpenArena }: ElimMatchCardProps) {
                   tmBracketWinner: win,
                 })}
               >
-                <span className="tmBracketTeamName">{t?.name ?? '—'}</span>
+                <BracketFitTeamName
+                  className="tmBracketTeamName"
+                  text={t?.name ?? '—'}
+                  winner={win}
+                  tone="elim"
+                />
               </div>
             </React.Fragment>
           );

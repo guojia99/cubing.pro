@@ -1,4 +1,6 @@
+import '@/components/Data/table_fixed_column.css';
 import { PlayerLink } from '@/components/Link/Links';
+import styles from '@/pages/Player/playerPage.less';
 import { PlayersAPI } from '@/services/cubing-pro/players/typings';
 import { Divider, Table } from 'antd';
 import React from 'react';
@@ -27,6 +29,7 @@ const PlayerResultsNemesis: React.FC<PlayerResultsNemesisProps> = ({ nemesis, pl
       dataIndex: 'Index',
       key: 'Index',
       width: 80,
+      fixed: 'left' as const,
     },
     {
       title: '宿敌',
@@ -40,14 +43,17 @@ const PlayerResultsNemesis: React.FC<PlayerResultsNemesisProps> = ({ nemesis, pl
 
   return (
     <>
-      <Table
-        dataSource={nemesis}
-        // @ts-ignore
-        columns={columns}
-        pagination={false}
-        size="small"
-        scroll={{ x: 'max-content' }} // 启用横向滚动
-      />
+      <div className={styles.playerTableScroll}>
+        <Table
+          dataSource={nemesis}
+          // @ts-ignore
+          columns={columns}
+          pagination={false}
+          size="small"
+          className="cube-player-nemesis-table"
+          scroll={{ x: 'max-content' }}
+        />
+      </div>
     </>
   );
 };

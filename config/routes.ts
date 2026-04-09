@@ -64,6 +64,7 @@ export default [
   { path: '*', component: './404' },
 
   { path: 'settings', component: './Settings' },
+  { path: 'user/kv-data', component: './UserData/PersonalKvList' },
 
   // 用户相关
   { path: '/login', component: './Admin/Login', hidden: true }, // WCA 登录

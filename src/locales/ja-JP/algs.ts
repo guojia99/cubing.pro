@@ -7,6 +7,13 @@ export default {
   'algs.practiceConfig.exportSuccess': '設定をエクスポートしました',
   'algs.practiceConfig.importSuccess': '設定をインポートしました',
   'algs.practiceConfig.importFailed': 'インポート失敗：{msg}',
+  'algs.cloud.title': 'クラウド練習設定',
+  'algs.cloud.desc':
+    '現在のエクスポート形式の練習設定をアカウントにバックアップするか、アカウントからこの端末に復元します（下のファイルのエクスポート/インポートと併用できます）。',
+  'algs.cloud.upload': 'クラウドにアップロード',
+  'algs.cloud.sync': 'クラウドから同期',
+  'algs.cloud.uploadOk': 'クラウドにアップロードしました',
+  'algs.cloud.syncOk': 'クラウドからこの端末に同期しました',
   'algs.detail.exportPdf': 'PDFをエクスポート',
   'algs.detail.exporting': 'PDFをエクスポート中、お待ちください...（時間がかかる場合があります）',
   'algs.detail.back': '戻る',

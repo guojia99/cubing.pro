@@ -1,5 +1,6 @@
 import { exportBracketElementToPng, formatBracketExportFilename } from '@/pages/Tools/TeamMatch/bracketExportPng';
 import { semiLoserPair } from '@/pages/Tools/TeamMatch/bracketComplete';
+import BracketFitTeamName from '@/pages/Tools/TeamMatch/components/BracketFitTeamName';
 import LiveSettingsButton from '@/pages/Tools/TeamMatch/components/LiveSettingsButton';
 import PkArenaFullscreen from '@/pages/Tools/TeamMatch/components/PkArenaFullscreen';
 import PkModal from '@/pages/Tools/TeamMatch/components/PkModal';
@@ -101,7 +102,12 @@ function BracketMatchCard({ m, teams, onOpenArena, compact, teamMedals }: MatchR
             tmBracketWinner: winA,
           })}
         >
-          <span className="tmBracketTeamName">{ta?.name ?? '—'}</span>
+          <BracketFitTeamName
+            className="tmBracketTeamName"
+            text={ta?.name ?? '—'}
+            compact={compact}
+            winner={winA}
+          />
           {medalA ? <MedalMark kind={medalA} /> : null}
           {m.byeWinnerId === m.teamAId ? (
             <span className="tmBracketByeHint">{done ? '轮空晋级' : '待决出'}</span>
@@ -114,7 +120,12 @@ function BracketMatchCard({ m, teams, onOpenArena, compact, teamMedals }: MatchR
             tmBracketWinner: winB,
           })}
         >
-          <span className="tmBracketTeamName">{tb?.name ?? '—'}</span>
+          <BracketFitTeamName
+            className="tmBracketTeamName"
+            text={tb?.name ?? '—'}
+            compact={compact}
+            winner={winB}
+          />
           {medalB ? <MedalMark kind={medalB} /> : null}
           {m.byeWinnerId === m.teamBId ? (
             <span className="tmBracketByeHint">{done ? '轮空晋级' : '待决出'}</span>
