@@ -92,14 +92,14 @@ const FormulaRandomPickCard: React.FC<FormulaRandomPickCardProps> = ({
                 flex: 1,
                 padding: 8,
                 borderRadius: 8,
-                background: 'rgba(255,255,255,0.5)',
+                background: 'var(--ant-color-fill-quaternary)',
                 transition: 'background 0.2s',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(100,149,237,0.15)';
+                e.currentTarget.style.background = 'var(--ant-color-primary-bg)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(255,255,255,0.5)';
+                e.currentTarget.style.background = 'var(--ant-color-fill-quaternary)';
               }}
             >
               <SvgRenderer
@@ -109,10 +109,10 @@ const FormulaRandomPickCard: React.FC<FormulaRandomPickCardProps> = ({
                 style={{ flexShrink: 0 }}
               />
               <div style={{ minWidth: 0, flex: 1 }}>
-                <div style={{ fontWeight: 600, fontSize: 14, color: 'rgba(0,0,0,0.85)' }}>
+                <div style={{ fontWeight: 600, fontSize: 14, color: 'var(--ant-color-text)' }}>
                   {latestPick.algName}
                 </div>
-                <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.5)' }}>
+                <div style={{ fontSize: 12, color: 'var(--ant-color-text-tertiary)' }}>
                   {latestPick.setName} · {latestPick.groupName}
                 </div>
               </div>
@@ -124,7 +124,7 @@ const FormulaRandomPickCard: React.FC<FormulaRandomPickCardProps> = ({
                 alignItems: 'center',
                 gap: 12,
                 flex: 1,
-                color: 'rgba(0,0,0,0.45)',
+                color: 'var(--ant-color-text-tertiary)',
                 fontSize: 14,
               }}
             >

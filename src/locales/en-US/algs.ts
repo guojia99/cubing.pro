@@ -7,6 +7,13 @@ export default {
   'algs.practiceConfig.exportSuccess': 'Config exported',
   'algs.practiceConfig.importSuccess': 'Config imported',
   'algs.practiceConfig.importFailed': 'Import failed: {msg}',
+  'algs.cloud.title': 'Cloud practice config',
+  'algs.cloud.desc':
+    'Back up practice config to your account or restore to this device (complements export/import file below).',
+  'algs.cloud.upload': 'Upload to cloud',
+  'algs.cloud.sync': 'Sync from cloud',
+  'algs.cloud.uploadOk': 'Uploaded to cloud',
+  'algs.cloud.syncOk': 'Synced from cloud to this device',
   'algs.detail.exportPdf': 'Export PDF',
   'algs.detail.exporting': 'Exporting PDF, please wait... (May be slow, do not close the page)',
   'algs.detail.back': 'Back',

@@ -191,7 +191,6 @@ const WCAPlayerDetails: React.FC<WCAPlayerDetailsProps> = ({ wcaProfile, wcaResu
             scroll={{ x: 'max-content' }}
             style={{
               borderRadius: 8,
-              background: '#fff',
               textAlign: 'center',
               minWidth: 500,
             }}

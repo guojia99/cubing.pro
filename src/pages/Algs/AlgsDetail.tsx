@@ -192,7 +192,7 @@ const AlgsDetail: React.FC = () => {
             {intl.formatMessage({ id: 'algs.detail.statistics' })}
           </Button>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 200 }}>
-            <span style={{ fontSize: 12, color: 'rgba(0,0,0,0.6)', whiteSpace: 'nowrap' }}>
+            <span style={{ fontSize: 12, color: 'var(--ant-color-text-secondary)', whiteSpace: 'nowrap' }}>
               {intl.formatMessage({ id: 'algs.detail.formulaFontSize' })}: {formulaFontSize}
             </span>
             <Slider
@@ -281,7 +281,7 @@ const AlgsDetail: React.FC = () => {
             status="active"
             strokeColor={{ from: '#108ee9', to: '#87d068' }}
           />
-          <div style={{ marginTop: 16, fontSize: 14, color: 'rgba(0,0,0,0.65)' }}>
+          <div style={{ marginTop: 16, fontSize: 14, color: 'var(--ant-color-text-secondary)' }}>
             {intl.formatMessage({ id: 'algs.detail.exporting' })}
           </div>
         </div>
@@ -329,7 +329,7 @@ const AlgsDetail: React.FC = () => {
                   display: 'flex',
                   alignItems: 'center',
                   gap: 8,
-                  color: 'rgba(0,0,0,0.85)',
+                  color: 'var(--ant-color-text)',
                 }}
               >
                 <PlayCircleOutlined style={{ color: 'rgba(0, 150, 170, 0.9)', fontSize: 18 }} />
@@ -337,7 +337,7 @@ const AlgsDetail: React.FC = () => {
                   {intl.formatMessage({ id: 'algs.formulaPractice.start' })}
                 </span>
               </div>
-              <div style={{ marginTop: 8, fontSize: 12, color: 'rgba(0,0,0,0.5)' }}>
+              <div style={{ marginTop: 8, fontSize: 12, color: 'var(--ant-color-text-tertiary)' }}>
                 {intl.formatMessage({ id: 'algs.formulaPractice.title' })}
               </div>
             </Card>

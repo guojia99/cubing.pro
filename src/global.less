@@ -113,6 +113,9 @@ ol {
   width: 100%;
   max-width: 100%;
   min-height: 100vh;
+  /* 与 ConfigProvider 深色算法一致，避免页面底色与顶栏脱节后出现大块默认白底 */
+  background: var(--ant-color-bg-layout, transparent);
+  color: var(--ant-color-text, inherit);
 }
 
 @media (min-width: 1080px) {

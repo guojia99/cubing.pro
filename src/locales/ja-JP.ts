@@ -4,6 +4,7 @@ import home from "@/locales/ja-JP/home";
 import layout from "@/locales/ja-JP/layout";
 import algs from "@/locales/ja-JP/algs";
 import wca from "@/locales/ja-JP/wca";
+import userData from "@/locales/ja-JP/userData";
 
 export default {
   'navBar.lang': '言語',
@@ -16,5 +17,6 @@ export default {
   ...home,
   ...layout,
   ...algs,
-  ...wca
+  ...wca,
+  ...userData,
 };

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Button, Modal, Space } from 'antd';
+import { Button, Modal, Space, theme } from 'antd';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import { useIntl } from '@@/plugin-locale';
 import type { Algorithm } from '@/services/cubing-pro/algs/typings';
@@ -39,6 +39,7 @@ const AlgsModal: React.FC<AlgsModalProps> = ({
   onNavigate,
 }) => {
   const intl = useIntl();
+  const { token } = theme.useToken();
   const item = items[currentIndex];
   const formulaKey = item ? buildFormulaKey(item.setName, item.groupName, item.alg.name) : '';
   const [proficiency, setProficiency] = useState<ProficiencyLevel>(() =>
@@ -94,7 +95,7 @@ const AlgsModal: React.FC<AlgsModalProps> = ({
         <Space>
           <span>{alg.name}</span>
           {items.length > 1 && (
-            <span style={{ fontSize: 14, fontWeight: 400, color: 'rgba(0,0,0,0.5)' }}>
+            <span style={{ fontSize: 14, fontWeight: 400, color: 'var(--ant-color-text-tertiary)' }}>
               ({currentIndex + 1} / {items.length})
             </span>
           )}
@@ -107,16 +108,20 @@ const AlgsModal: React.FC<AlgsModalProps> = ({
 
         {currentScramble && (
           <div style={{ marginBottom: 16, textAlign: 'left' }}>
-            <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.6)', marginBottom: 4 }}>
+            <div style={{ fontSize: 12, color: 'var(--ant-color-text-secondary)', marginBottom: 4 }}>
               {intl.formatMessage({ id: 'algs.modal.scramble' })}
             </div>
             <div
               style={{
                 padding: 12,
-                background: 'rgba(0,0,0,0.04)',
                 borderRadius: 8,
                 fontFamily: 'monospace',
                 fontSize: 14,
+                color: 'var(--ant-color-text)',
+                /* 恢复浅底 + 内阴影的「凹陷」层次，避免仅 fill-quaternary 发灰无纵深 */
+                background: 'rgba(0, 0, 0, 0.04)',
+                border: '1px solid rgba(0, 0, 0, 0.06)',
+                boxShadow: 'inset 0 2px 8px rgba(0, 0, 0, 0.08)',
               }}
             >
               {currentScramble}
@@ -125,7 +130,7 @@ const AlgsModal: React.FC<AlgsModalProps> = ({
         )}
 
         <div style={{ marginBottom: 12, textAlign: 'left' }}>
-          <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.6)', marginBottom: 8 }}>
+          <div style={{ fontSize: 12, color: 'var(--ant-color-text-secondary)', marginBottom: 8 }}>
             {intl.formatMessage({ id: 'algs.modal.formulaList' })}
           </div>
           <div
@@ -143,11 +148,16 @@ const AlgsModal: React.FC<AlgsModalProps> = ({
                 onClick={() => hasMultiple && handleIndexChange(idx)}
                 style={{
                   padding: 12,
-                  background: selectedIndex === idx ? 'rgba(82, 196, 26, 0.2)' : 'rgba(240, 248, 255, 0.8)',
-                  border: `2px solid ${selectedIndex === idx ? 'rgb(82, 196, 26)' : 'rgba(100, 149, 237, 0.3)'}`,
+                  /* 选中：绿色；未选中：用 token 主色浅底/边框，深色模式下不会过亮 */
+                  background:
+                    selectedIndex === idx ? 'rgba(82, 196, 26, 0.2)' : token.colorPrimaryBg,
+                  border: `2px solid ${
+                    selectedIndex === idx ? 'rgb(82, 196, 26)' : token.colorPrimaryBorder
+                  }`,
                   borderRadius: 8,
                   fontFamily: 'monospace',
                   fontSize: 16,
+                  color: 'var(--ant-color-text)',
                   cursor: hasMultiple ? 'pointer' : 'default',
                   whiteSpace: 'normal',
                   wordBreak: 'break-all',
@@ -160,7 +170,7 @@ const AlgsModal: React.FC<AlgsModalProps> = ({
         </div>
 
         <div style={{ marginTop: 16, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 12, color: 'rgba(0,0,0,0.6)' }}>
+          <span style={{ fontSize: 12, color: 'var(--ant-color-text-secondary)' }}>
             {intl.formatMessage({ id: 'algs.proficiencyCard.title' })}:
           </span>
           <ProficiencySelect value={proficiency} onChange={handleProficiencyChange} size="small" />

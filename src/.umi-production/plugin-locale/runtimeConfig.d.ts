@@ -3,7 +3,7 @@
 import {
   IntlCache,
   createIntl,
-} from '/Users/guojia/worker/code/cube/cubing.pro/node_modules/@umijs/plugins/node_modules/react-intl';
+} from '/Users/guojia/worker/code/cube/cubingPro/cubing.pro/node_modules/@umijs/plugins/node_modules/react-intl';
 type OptionalIntlConfig = Omit<Parameters<typeof createIntl>[0], 'locale' | 'defaultLocale'>;
 export interface IRuntimeConfig {
     locale?: {

@@ -1,0 +1,122 @@
+/* Player 页：窄屏下不撑破布局，Tab 可横向滑动 */
+.playerPageRoot {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  color: var(--ant-color-text, inherit);
+  /* 页面条用 layout（与 app-content 的 body 区一致），卡片用 elevated/container 叠在上面 */
+  background: var(--ant-color-bg-layout);
+  border-radius: var(--ant-border-radius-lg, 8px);
+  padding: 12px;
+
+  @media (min-width: 576px) {
+    padding: 16px 20px;
+  }
+
+  :global(.ant-card) {
+    max-width: 100%;
+    /* 独立表面色：elevated 为「浮起」组件语义，与 bg-layout 的页面底区分开 */
+    background: var(--ant-color-bg-elevated, var(--ant-color-bg-container)) !important;
+    /* 加粗 + 双层次描边，浅色/深色下都比默认 1px border 更易辨认 */
+    border: 2px solid var(--ant-color-border) !important;
+    box-shadow:
+      0 0 0 1px var(--ant-color-border-secondary),
+      var(--ant-box-shadow-secondary, 0 2px 8px rgba(0, 0, 0, 0.08)) !important;
+  }
+
+  :global(.ant-card .ant-card-body) {
+    background: var(--ant-color-bg-elevated, var(--ant-color-bg-container)) !important;
+  }
+
+  :global(.ant-tabs-nav-wrap) {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  :global(.ant-tabs-nav-list) {
+    flex-wrap: nowrap;
+  }
+
+  :global(.ant-tabs-content-holder) {
+    min-width: 0;
+  }
+}
+
+.playerDetailWrap {
+  padding: 12px;
+  max-width: 100%;
+  box-sizing: border-box;
+
+  h2,
+  h3 {
+    color: var(--ant-color-text-heading, var(--ant-color-text, inherit));
+  }
+
+  /* 最佳记录 / 趣味项目 / 顶部信息表：深色模式下禁止表体发白、字发浅 */
+  :global(.cube-player-best-table .ant-table),
+  :global(.cube-player-detail-meta-table .ant-table) {
+    background: var(--ant-color-bg-container) !important;
+    color: var(--ant-color-text);
+  }
+
+  :global(.cube-player-best-table .ant-table-container),
+  :global(.cube-player-detail-meta-table .ant-table-container) {
+    background: var(--ant-color-bg-container) !important;
+  }
+
+  :global(.cube-player-best-table .ant-table-thead > tr > th),
+  :global(.cube-player-detail-meta-table .ant-table-thead > tr > th) {
+    background: var(--ant-color-fill-tertiary) !important;
+    color: var(--ant-color-text) !important;
+    border-bottom-color: var(--ant-color-border-secondary) !important;
+  }
+
+  /* 顶部单行信息表 */
+  :global(.cube-player-detail-meta-table .ant-table-tbody > tr > td) {
+    background: var(--ant-color-bg-container) !important;
+    color: var(--ant-color-text) !important;
+    border-color: var(--ant-color-border-secondary);
+  }
+
+  /* 最佳记录：斑马纹（与 table_style 一致，并强制正文色，避免深主题下白底浅字） */
+  :global(.cube-player-best-table tr.lightitem > td) {
+    background: var(--ant-color-fill-alter) !important;
+    color: var(--ant-color-text) !important;
+  }
+
+  :global(.cube-player-best-table tr.darkitem > td) {
+    background: var(--ant-color-fill-tertiary) !important;
+    color: var(--ant-color-text) !important;
+  }
+
+  :global(.cube-player-best-table .ant-table-tbody > tr:hover > td),
+  :global(.cube-player-detail-meta-table .ant-table-tbody > tr:hover > td) {
+    background: var(--ant-color-fill-tertiary) !important;
+  }
+
+  :global(.cube-player-best-table .ant-table-cell-fix-left) {
+    background: var(--ant-color-bg-container) !important;
+  }
+
+  :global(.cube-player-best-table tr.lightitem > td.ant-table-cell-fix-left) {
+    background: var(--ant-color-fill-alter) !important;
+  }
+
+  :global(.cube-player-best-table tr.darkitem > td.ant-table-cell-fix-left) {
+    background: var(--ant-color-fill-tertiary) !important;
+  }
+
+  @media (min-width: 576px) {
+    padding: 24px;
+  }
+}
+
+.playerTableScroll {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}

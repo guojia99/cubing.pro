@@ -1,8 +1,10 @@
+import '@/components/Data/table_fixed_column.css';
 import { CubesCn } from '@/components/CubeIcon/cube';
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
-import {Button, Popover, Table} from 'antd';
+import styles from '@/pages/Player/playerPage.less';
+import { KinChSorResult } from '@/services/cubing-pro/statistics/typings';
+import { Button, Popover, Table } from 'antd';
 import React from 'react';
-import {KinChSorResult} from "@/services/cubing-pro/statistics/typings";
 
 interface PlayerResultsSorProps {
   kinchSor?: KinChSorResult;
@@ -18,6 +20,7 @@ const PlayerResultsSor: React.FC<PlayerResultsSorProps> = ({ kinchSor }) => {
       dataIndex: 'Rank',
       key: 'Rank',
       width: 60,
+      fixed: 'left' as const,
     },
     {
       title: '分数',
@@ -32,6 +35,7 @@ const PlayerResultsSor: React.FC<PlayerResultsSorProps> = ({ kinchSor }) => {
       title: '项目',
       dataIndex: 'Event',
       key: 'Event',
+      fixed: 'left' as const,
       render: (value: string) => {
         return (
           <>
@@ -76,29 +80,35 @@ const PlayerResultsSor: React.FC<PlayerResultsSorProps> = ({ kinchSor }) => {
         <strong>总分</strong>
       </h3>
 
-      <Table
-        style={{ maxWidth: 350 }}
-        // @ts-ignore
-        columns={kinchSorCol}
-        dataSource={[
-          {
-            Rank: kinchSor.Rank,
-            Value: kinchSor.Result,
-          },
-        ]}
-        pagination={false}
-      />
+      <div className={styles.playerTableScroll}>
+        <Table
+          // @ts-ignore
+          columns={kinchSorCol}
+          dataSource={[
+            {
+              Rank: kinchSor.Rank,
+              Value: kinchSor.Result,
+            },
+          ]}
+          pagination={false}
+          className="cube-player-sor-table"
+          scroll={{ x: 'max-content' }}
+        />
+      </div>
 
       <h3 style={{ marginTop: '20px', marginBottom: '20px' }}>
         <strong>项目分</strong>
       </h3>
-      <Table
-        style={{ maxWidth: 350 }}
-        // @ts-ignore
-        columns={kinchSorWithCol}
-        dataSource={withEvent}
-        pagination={false}
-      />
+      <div className={styles.playerTableScroll}>
+        <Table
+          // @ts-ignore
+          columns={kinchSorWithCol}
+          dataSource={withEvent}
+          pagination={false}
+          className="cube-player-sor-table"
+          scroll={{ x: 'max-content' }}
+        />
+      </div>
     </>
   );
 };

@@ -7,12 +7,23 @@ import { currentUser } from '@/services/cubing-pro/auth/auth';
 import { saveToken } from '@/services/cubing-pro/auth/token';
 import defaultSettings from '../config/defaultSettings';
 import { HomeOutlined, UserOutlined, UserSwitchOutlined } from '@ant-design/icons';
-import { AvatarProps } from 'antd';
+import { AvatarProps, ConfigProvider, theme as antdTheme } from 'antd';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { AvatarURL } from '@/pages/Admin/AvatarDropdown';
 import { AuthAPI } from '@/services/cubing-pro/auth/typings';
 import LanguageSelect from '@/locales/Language/LanguageSelect';
 import { ExtAppList } from '@/services/layout_config';
+import { NavThemeSwitch } from '@/components/NavThemeSwitch';
+import { Request } from '@/services/cubing-pro/request';
+import { AuthHeader } from '@/services/cubing-pro/auth/token';
+import { USER_KV_KEYS } from '@/services/cubing-pro/user/user_kv';
+import {
+  applyWebsiteUiToDocument,
+  layoutPatchFromWebsiteUi,
+  readWebsiteUiFromStorage,
+  writeWebsiteUiToStorage,
+  type WebsiteUiConfig,
+} from '@/utils/websiteUiConfig';
 
 /**
  * 在获取用户前处理 WCA 回调的 token（必须在 getInitialState 最开头执行）
@@ -55,9 +66,39 @@ export async function getInitialState(): Promise<{
     return currentUserValue;
   };
 
+  const mergedSettings = {
+    ...(defaultSettings as Partial<LayoutSettings>),
+    ...layoutPatchFromWebsiteUi(readWebsiteUiFromStorage()),
+  } as Partial<LayoutSettings>;
+  applyWebsiteUiToDocument(readWebsiteUiFromStorage());
+
+  const cu = await fetchUserInfo();
+  if (cu?.data?.id) {
+    const tryKeys = [USER_KV_KEYS.website_ui_config, USER_KV_KEYS.websize_ui_config];
+    for (const kvKey of tryKeys) {
+      try {
+        const r = await Request.get<{ data: { value?: string; Value?: string } }>(
+          `/user/kv/${encodeURIComponent(kvKey)}`,
+          { headers: AuthHeader() },
+        );
+        const inner = r.data?.data;
+        const raw = inner?.value ?? inner?.Value;
+        if (raw) {
+          const cfg = JSON.parse(raw) as WebsiteUiConfig;
+          writeWebsiteUiToStorage(cfg);
+          Object.assign(mergedSettings as object, layoutPatchFromWebsiteUi(cfg));
+          applyWebsiteUiToDocument(cfg);
+          break;
+        }
+      } catch {
+        // 未配置或 404，尝试下一键名
+      }
+    }
+  }
+
   return {
-    settings: defaultSettings as Partial<LayoutSettings>,
-    currentUser: await fetchUserInfo(),
+    settings: mergedSettings as Partial<LayoutSettings>,
+    currentUser: cu,
     // @ts-ignore
     fetchUserInfo: currentUser,
   };
@@ -123,6 +164,9 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
             <AvatarDropdown menu={initialState?.currentUser?.data.id !== 0}>
               {avatarChildren}
             </AvatarDropdown>
+            <span style={{ display: 'inline-flex', alignItems: 'center', marginInlineEnd: 8 }}>
+              <NavThemeSwitch />
+            </span>
             <LanguageSelect />
           </>
         );
@@ -131,12 +175,19 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     appList: ExtAppList(),
     footerRender: () => <Footer />,
     childrenRender: (children) => {
+      const contentDark = initialState?.settings?.navTheme === 'realDark';
       return (
-        <TokenCallbackHandler>
-          <div className="app-content-wrapper" style={{marginTop: 32}}>
-            {children}
-          </div>
-        </TokenCallbackHandler>
+        <ConfigProvider
+          theme={{
+            algorithm: contentDark ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
+          }}
+        >
+          <TokenCallbackHandler>
+            <div className="app-content-wrapper" style={{ marginTop: 32 }}>
+              {children}
+            </div>
+          </TokenCallbackHandler>
+        </ConfigProvider>
       );
     },
     ...initialState?.settings,

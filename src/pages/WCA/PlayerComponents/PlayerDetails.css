@@ -2,6 +2,15 @@
   width: 100%;
   margin-bottom: 16px;
   box-sizing: border-box;
+  color: var(--ant-color-text, inherit);
+}
+
+.wca-player-container .ant-card {
+  background: var(--ant-color-bg-container) !important;
+}
+
+.wca-player-container .ant-card-body {
+  background: var(--ant-color-bg-container) !important;
 }
 
 .wca-player-container .header-section {

@@ -105,14 +105,16 @@ const FormulaProficiencyCard: React.FC<FormulaProficiencyCardProps> = ({
                         alignItems: 'center',
                         gap: 12,
                         padding: '8px 12px',
-                        background: 'rgba(0,0,0,0.02)',
+                        background: 'var(--ant-color-fill-quaternary)',
                         borderRadius: 8,
                       }}
                     >
                       <SvgRenderer svg={item.alg.image ?? ''} maxWidth={40} maxHeight={56} style={{ flexShrink: 0 }} />
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontWeight: 500, fontSize: 13 }}>{item.alg.name}</div>
-                        <div style={{ fontSize: 11, color: 'rgba(0,0,0,0.5)' }}>
+                        <div style={{ fontWeight: 500, fontSize: 13, color: 'var(--ant-color-text)' }}>
+                          {item.alg.name}
+                        </div>
+                        <div style={{ fontSize: 11, color: 'var(--ant-color-text-tertiary)' }}>
                           {item.setName} · {item.groupName}
                         </div>
                       </div>
@@ -154,17 +156,17 @@ const FormulaProficiencyCard: React.FC<FormulaProficiencyCardProps> = ({
           }}
           onClick={() => setModalOpen(true)}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(0,0,0,0.85)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--ant-color-text)' }}>
             <FlagOutlined style={{ color: 'rgba(100,149,237,0.8)' }} />
             <span style={{ fontWeight: 500 }}>{intl.formatMessage({ id: 'algs.proficiencyCard.title' })}</span>
             {markedCount > 0 && (
-              <span style={{ fontSize: 12, color: 'rgba(0,0,0,0.5)' }}>
+              <span style={{ fontSize: 12, color: 'var(--ant-color-text-tertiary)' }}>
                 ({markedCount})
               </span>
             )}
           </div>
         </div>
-        <div style={{ marginTop: 8, fontSize: 12, color: 'rgba(0,0,0,0.45)' }}>
+        <div style={{ marginTop: 8, fontSize: 12, color: 'var(--ant-color-text-tertiary)' }}>
           {intl.formatMessage({ id: 'algs.proficiencyCard.desc' })}
         </div>
         {onOpenFormulaPractice && (
@@ -182,7 +184,7 @@ const FormulaProficiencyCard: React.FC<FormulaProficiencyCardProps> = ({
         width={760}
         styles={{ body: { maxHeight: 560, overflowY: 'auto' } }}
       >
-        <div style={{ marginBottom: 12, fontSize: 12, color: 'rgba(0,0,0,0.65)' }}>
+        <div style={{ marginBottom: 12, fontSize: 12, color: 'var(--ant-color-text-secondary)' }}>
           {intl.formatMessage({ id: 'algs.proficiencyCard.modalDesc' })}
         </div>
         <Collapse items={collapseItems} defaultActiveKey={Object.keys(groupedBySetAndGroup)} />

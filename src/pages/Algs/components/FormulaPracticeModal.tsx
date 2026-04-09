@@ -492,7 +492,7 @@ const FormulaPracticeModal: React.FC<FormulaPracticeModalProps> = ({
       >
         <div className="formula-practice-config">
           <div className="formula-practice-mode-row">
-            <div style={{ marginBottom: 8, fontWeight: 500 }}>
+            <div style={{ marginBottom: 8, fontWeight: 500, color: 'var(--ant-color-text)' }}>
               {intl.formatMessage({ id: 'algs.formulaPractice.mode' })}
             </div>
             <Radio.Group value={mode} onChange={(e) => setMode(e.target.value)}>
@@ -513,7 +513,7 @@ const FormulaPracticeModal: React.FC<FormulaPracticeModalProps> = ({
 
           <div className="formula-practice-selector">
             <div style={{ marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 12, color: 'rgba(0,0,0,0.6)' }}>
+              <span style={{ fontSize: 12, color: 'var(--ant-color-text-secondary)' }}>
                 {intl.formatMessage({ id: 'algs.detail.set' })}
               </span>
               <Button
@@ -551,13 +551,13 @@ const FormulaPracticeModal: React.FC<FormulaPracticeModalProps> = ({
                 );
               })}
             </div>
-            <div style={{ marginBottom: 8, fontSize: 12, color: 'rgba(0,0,0,0.6)' }}>
+            <div style={{ marginBottom: 8, fontSize: 12, color: 'var(--ant-color-text-secondary)' }}>
               {intl.formatMessage({ id: 'algs.detail.group' })}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {Array.from(groupedAlgs.entries()).map(([setName, groupMap]) => (
                 <div key={setName}>
-                  <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.5)', marginBottom: 6 }}>{setName}</div>
+                  <div style={{ fontSize: 12, color: 'var(--ant-color-text-tertiary)', marginBottom: 6 }}>{setName}</div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {Array.from(groupMap.entries()).map(([groupName, items]) => {
                       const groupKey = buildGroupKey(setName, groupName);
@@ -610,12 +610,12 @@ const FormulaPracticeModal: React.FC<FormulaPracticeModalProps> = ({
             </div>
           </div>
 
-          <div style={{ marginBottom: 12, fontSize: 13, color: 'rgba(0,0,0,0.65)' }}>
+          <div style={{ marginBottom: 12, fontSize: 13, color: 'var(--ant-color-text-secondary)' }}>
             {intl.formatMessage({ id: 'algs.formulaPractice.selectedCount' }, { count: selectedAlgs.length })}
           </div>
 
           <div style={{ marginBottom: 16 }}>
-            <div style={{ marginBottom: 8, fontWeight: 500 }}>
+            <div style={{ marginBottom: 8, fontWeight: 500, color: 'var(--ant-color-text)' }}>
               {intl.formatMessage({ id: 'algs.formulaPractice.trimRatio' })}
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -630,11 +630,11 @@ const FormulaPracticeModal: React.FC<FormulaPracticeModalProps> = ({
                 }}
                 style={{ flex: 1, maxWidth: 200 }}
               />
-              <span style={{ fontSize: 12, color: 'rgba(0,0,0,0.6)' }}>
+              <span style={{ fontSize: 12, color: 'var(--ant-color-text-secondary)' }}>
                 {trimRatio}%
               </span>
             </div>
-            <div style={{ fontSize: 11, color: 'rgba(0,0,0,0.5)', marginTop: 4 }}>
+            <div style={{ fontSize: 11, color: 'var(--ant-color-text-tertiary)', marginTop: 4 }}>
               {intl.formatMessage({ id: 'algs.formulaPractice.trimRatioDesc' }, { p: trimRatio })}
             </div>
           </div>
@@ -777,7 +777,7 @@ const FormulaPracticeModal: React.FC<FormulaPracticeModalProps> = ({
               )}
             </>
           ) : (
-            <div style={{ color: 'rgba(0,0,0,0.45)' }}>
+            <div style={{ color: 'var(--ant-color-text-tertiary)' }}>
               {intl.formatMessage({ id: 'algs.formulaPractice.noScramble' })}
             </div>
           )}
@@ -802,7 +802,9 @@ const FormulaPracticeModal: React.FC<FormulaPracticeModalProps> = ({
 
         <div className="formula-practice-history">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-            <span style={{ fontWeight: 500 }}>{intl.formatMessage({ id: 'algs.formulaPractice.historyTitle' })}</span>
+            <span className="formula-practice-history-header">
+              {intl.formatMessage({ id: 'algs.formulaPractice.historyTitle' })}
+            </span>
             <Button
               type="link"
               size="small"
@@ -833,7 +835,7 @@ const FormulaPracticeModal: React.FC<FormulaPracticeModalProps> = ({
             );
           })()}
           {history.length === 0 ? (
-            <div style={{ color: 'rgba(0,0,0,0.45)', fontSize: 12 }}>
+            <div className="formula-practice-empty">
               {intl.formatMessage({ id: 'algs.formulaPractice.historyEmpty' })}
             </div>
           ) : (
@@ -880,7 +882,7 @@ const FormulaPracticeModal: React.FC<FormulaPracticeModalProps> = ({
         >
           <div className="formula-practice-full-history-list">
             {history.length === 0 ? (
-              <div style={{ color: 'rgba(0,0,0,0.45)', fontSize: 12, padding: 24, textAlign: 'center' }}>
+              <div className="formula-practice-empty" style={{ padding: 24, textAlign: 'center' }}>
                 {intl.formatMessage({ id: 'algs.formulaPractice.historyEmpty' })}
               </div>
             ) : (
@@ -963,7 +965,7 @@ const FormulaPracticeModal: React.FC<FormulaPracticeModalProps> = ({
       >
         {lastPracticedFormula && (
           <div>
-            <div style={{ marginBottom: 12, color: 'rgba(0,0,0,0.65)' }}>
+            <div style={{ marginBottom: 12, color: 'var(--ant-color-text-secondary)' }}>
               {intl.formatMessage({ id: 'algs.formulaPractice.proficiencyRemindDesc' }, { name: lastPracticedFormula.formulaName })}
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
@@ -1006,7 +1008,7 @@ const FormulaPracticeModal: React.FC<FormulaPracticeModalProps> = ({
       >
         {detailRecord && (
           <div>
-            <div style={{ marginBottom: 8, fontSize: 12, color: 'rgba(0,0,0,0.6)' }}>
+            <div style={{ marginBottom: 8, fontSize: 12, color: 'var(--ant-color-text-secondary)' }}>
               {intl.formatMessage({ id: 'algs.modal.scramble' })}
             </div>
             <div className="formula-practice-detail-scramble">{detailRecord.scramble}</div>
@@ -1016,7 +1018,7 @@ const FormulaPracticeModal: React.FC<FormulaPracticeModalProps> = ({
               style={{ marginBottom: 16 }}
             />
             <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 12, color: 'rgba(0,0,0,0.6)' }}>
+              <span style={{ fontSize: 12, color: 'var(--ant-color-text-secondary)' }}>
                 {intl.formatMessage({ id: 'algs.proficiencyCard.title' })}:
               </span>
               <ProficiencySelect
@@ -1028,7 +1030,7 @@ const FormulaPracticeModal: React.FC<FormulaPracticeModalProps> = ({
                 size="small"
               />
             </div>
-            <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.6)', marginBottom: 8 }}>
+            <div style={{ fontSize: 12, color: 'var(--ant-color-text-secondary)', marginBottom: 8 }}>
               {intl.formatMessage({ id: 'algs.modal.formulaList' })}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -1037,10 +1039,12 @@ const FormulaPracticeModal: React.FC<FormulaPracticeModalProps> = ({
                   key={idx}
                   style={{
                     padding: 12,
-                    background: 'rgba(0,0,0,0.04)',
+                    background: 'var(--ant-color-fill-tertiary)',
+                    border: '1px solid var(--ant-color-border-secondary)',
                     borderRadius: 8,
                     fontFamily: 'monospace',
                     fontSize: 14,
+                    color: 'var(--ant-color-text)',
                   }}
                 >
                   {alg}

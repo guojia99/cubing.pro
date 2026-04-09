@@ -2,19 +2,15 @@ import { Link } from '@@/exports';
 import React from 'react';
 
 export const PlayerLink = (userId: any, name: string, color: string) => {
-  let cor = '#000';
-  if (color !== '') {
-    cor = color;
-  }
+  const linkColor =
+    color !== '' ? color : 'var(--ant-color-link)';
 
   return (
-    <td>
-      <strong>
-        <Link to={'/player/' + userId} style={{ color: cor }}>
-          {name}
-        </Link>
-      </strong>
-    </td>
+    <strong>
+      <Link to={'/player/' + userId} style={{ color: linkColor }}>
+        {name}
+      </Link>
+    </strong>
   );
 };
 

@@ -53,7 +53,7 @@ export const PlayerEventResultPanel: React.FC<PlayerEventResultPanelProps> = ({
   }
 
   return (
-    <>
+    <div style={{ minWidth: 0, maxWidth: '100%' }}>
       <h3 style={{ textAlign: 'center', marginBottom: '10px' }}>
         <strong>{CubesCn(eventId)}</strong>
       </h3>
@@ -127,7 +127,7 @@ export const PlayerEventResultPanel: React.FC<PlayerEventResultPanelProps> = ({
       {m?.repeatedly
         ? ResultsTable(res, ['CompetitionName', 'Round', 'Result_with_repeatedly'], records)
         : ResultsTable(res, ['CompetitionName', 'Round', 'Best', 'Average', 'Result'], records)}
-    </>
+    </div>
   );
 };
 
@@ -177,7 +177,7 @@ const PlayerResultsListWithEvent: React.FC<PlayerResultsListWithEventProps> = ({
   }
 
   return (
-    <>
+    <div style={{ minWidth: 0, maxWidth: '100%' }}>
       <NavTabs
         type="line"
         centered={true}
@@ -185,7 +185,7 @@ const PlayerResultsListWithEvent: React.FC<PlayerResultsListWithEventProps> = ({
         tabsKey="player_result_result_list_with_events_tabs"
         indicator={{ size: (origin: number) => origin - 20, align: 'center' }}
       />
-    </>
+    </div>
   );
 };
 

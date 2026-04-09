@@ -2,12 +2,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Button, Card, Col, Divider, Empty, Row, Select, Spin, message } from 'antd';
 import { DownloadOutlined, UploadOutlined } from '@ant-design/icons';
 import { useIntl } from '@@/plugin-locale';
-import { useNavigate } from '@@/exports';
+import { useModel, useNavigate } from '@@/exports';
+import { UserCloudKvPanel } from '@/components/UserData/UserCloudKvPanel';
 import { getAlgCubeMap } from '@/services/cubing-pro/algs/algs';
 import {
   exportPracticeConfig,
   importPracticeConfig,
 } from '@/services/cubing-pro/algs/practiceConfigExport';
+import { USER_KV_KEYS, assertPayloadWithinLimit } from '@/services/cubing-pro/user/user_kv';
 import type { AlgorithmGroupsResponse, OutputClass } from '@/services/cubing-pro/algs/typings';
 import SvgRenderer from './components/SvgRenderer';
 import RandomPickModal from './components/RandomPickModal';
@@ -27,7 +29,9 @@ const RANDOM_PICK_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0
 
 const AlgsList: React.FC = () => {
   const intl = useIntl();
+  const { initialState } = useModel('@@initialState');
   const navigate = useNavigate();
+  const loggedIn = !!initialState?.currentUser?.data?.id;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [data, setData] = useState<AlgorithmGroupsResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -102,6 +106,28 @@ const AlgsList: React.FC = () => {
       <h2 style={{ marginBottom: 16, color: 'rgba(0,0,0,0.85)' }}>
         {intl.formatMessage({ id: 'algs.title' })}
       </h2>
+      {loggedIn ? (
+        <UserCloudKvPanel
+          kvKey={USER_KV_KEYS.algorithm_config}
+          title={intl.formatMessage({ id: 'algs.cloud.title' })}
+          description={intl.formatMessage({ id: 'algs.cloud.desc' })}
+          uploadButtonText={intl.formatMessage({ id: 'algs.cloud.upload' })}
+          syncButtonText={intl.formatMessage({ id: 'algs.cloud.sync' })}
+          uploadOkText={intl.formatMessage({ id: 'algs.cloud.uploadOk' })}
+          syncOkText={intl.formatMessage({ id: 'algs.cloud.syncOk' })}
+          getPayloadForUpload={() => {
+            const raw = JSON.stringify(exportPracticeConfig(), null, 2);
+            assertPayloadWithinLimit(raw);
+            return raw;
+          }}
+          applyCloudPayload={(raw) => {
+            const result = importPracticeConfig(raw);
+            if (!result.success) {
+              throw new Error(result.message ?? 'import failed');
+            }
+          }}
+        />
+      ) : null}
       <div style={{ marginBottom: 16, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12 }}>
         <Select
           placeholder={intl.formatMessage({ id: 'algs.filter.placeholder' })}

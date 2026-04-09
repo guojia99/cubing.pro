@@ -4,6 +4,7 @@ import { RecordTag } from '@/components/Data/cube_record/record_tag';
 import { eventRouteM } from '@/components/Data/cube_result/event_route';
 import { MRecord, Record } from '@/components/Data/types/record';
 import { resultTimeString } from '@/components/Data/types/result';
+import '@/components/Data/table_fixed_column.css';
 import { CompetitionLink, PlayerLink } from '@/components/Link/Links';
 import { Table } from 'antd';
 
@@ -179,6 +180,10 @@ export const RecordsTable = (
     columns.push(column);
   }
 
+  if (columns.length > 0) {
+    columns[0] = { ...columns[0], fixed: 'left' as const };
+  }
+
   return (
     <Table
       dataSource={dataSource}
@@ -186,7 +191,8 @@ export const RecordsTable = (
       columns={columns}
       size="small"
       pagination={false}
-      scroll={{ x: 'max-content' }} // 启用横向滚动
+      className="cube-records-table"
+      scroll={{ x: 'max-content' }}
       sticky
     />
   );

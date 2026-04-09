@@ -38,7 +38,6 @@ const SuccessRateBox: React.FC<SuccessRateBoxProps> = ({ data }) => {
           boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
           textAlign: 'center',
           padding: 24,
-          background: '#fff',
         }}
       >
         <Title level={5}>成功率</Title>
@@ -52,7 +51,7 @@ const SuccessRateBox: React.FC<SuccessRateBoxProps> = ({ data }) => {
           <Text>{successCount} / {totalCount}</Text>
         </div>
 
-        <div style={{ marginTop: 16, fontSize: 12, color: '#888' }}>
+        <div style={{ marginTop: 16, fontSize: 12, color: 'var(--ant-color-text-tertiary, #888)' }}>
           {rate20 !== null && <div>最近20把：{rate20.toFixed(0)}%</div>}
           {rate50 !== null && <div>最近50把：{rate50.toFixed(0)}%</div>}
           {rate100 !== null && <div>最近100把：{rate100.toFixed(0)}%</div>}

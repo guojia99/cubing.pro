@@ -55,7 +55,9 @@ const AlgsFormulaCard: React.FC<AlgsFormulaCardProps> = ({
           maxHeight={320}
           style={{ marginTop: 12, marginBottom: 16 }}
         />
-        <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 8 }}>{alg.name}</div>
+        <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 8, color: 'var(--ant-color-text)' }}>
+          {alg.name}
+        </div>
         <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
           <Tag
             style={{
@@ -69,6 +71,9 @@ const AlgsFormulaCard: React.FC<AlgsFormulaCardProps> = ({
               display: '-webkit-box',
               WebkitLineClamp: 5,
               WebkitBoxOrient: 'vertical' as const,
+              color: 'var(--ant-color-text)',
+              borderColor: 'var(--ant-color-border-secondary)',
+              background: 'var(--ant-color-fill-quaternary)',
             }}
           >
             {displayAlg}

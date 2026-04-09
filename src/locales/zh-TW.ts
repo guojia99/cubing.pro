@@ -4,6 +4,7 @@ import home from "@/locales/zh-TW/home";
 import layout from "@/locales/zh-TW/layout";
 import algs from "@/locales/zh-TW/algs";
 import wca from "@/locales/zh-TW/wca";
+import userData from "@/locales/zh-TW/userData";
 
 export default {
   'navBar.lang': '語言',
@@ -16,5 +17,6 @@ export default {
   ...home,
   ...layout,
   ...algs,
-  ...wca
+  ...wca,
+  ...userData,
 };

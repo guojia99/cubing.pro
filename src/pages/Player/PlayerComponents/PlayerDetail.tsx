@@ -11,6 +11,8 @@ import { PlayersAPI } from '@/services/cubing-pro/players/typings';
 import { ProColumns } from '@ant-design/pro-table/es/typing';
 import { Avatar, Card, Table, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
+import styles from '@/pages/Player/playerPage.less';
+import '@/components/Data/table_fixed_column.css';
 
 interface PlayerDetailProps {
   player?: PlayersAPI.Player;
@@ -69,12 +71,10 @@ type BestTableRow = {
 };
 
 const rankRender = (dom: number) => {
-  let color = '';
-
-  if (dom <= 1) {
-    color = 'red';
-  }
-  return <h4 style={{ textAlign: 'center', color: color }}>{dom}</h4>;
+  const color = dom <= 1 ? '#cf1322' : 'var(--ant-color-text)';
+  return (
+    <h4 style={{ textAlign: 'center', color, margin: 0, fontWeight: 600 }}>{dom}</h4>
+  );
 };
 
 const bestCol: ProColumns<BestTableRow>[] = [
@@ -82,6 +82,7 @@ const bestCol: ProColumns<BestTableRow>[] = [
     title: '项目',
     dataIndex: 'event',
     key: 'event',
+    fixed: 'left',
     render: (value: any) => {
       return (
         <strong>
@@ -207,45 +208,53 @@ const PlayerDetail: React.FC<PlayerDetailProps> = ({ player }) => {
   }
 
   return (
-    <div className="p-6">
-      <Card style={{ marginBottom: '30px' }}>
+    <div className={styles.playerDetailWrap}>
+      <Card style={{ marginBottom: '30px', maxWidth: '100%' }}>
         <div style={{ textAlign: 'center' }}>
           {player?.Avatar && (
             <Avatar size={100} src={AvatarURL(player?.Avatar)} style={{ marginBottom: '20px' }} />
           )}
-          <h2 style={{ fontWeight: '700' }}>{player?.Name}</h2>
+          <h2 style={{ fontWeight: '700', wordBreak: 'break-word' }}>{player?.Name}</h2>
           <>{tags}</>
 
-          <Table
-            // @ts-ignore
-            columns={detailCol}
-            dataSource={[
-              {
-                cubeId: player?.CubeID,
-                wcaId: player?.WcaID,
-                compNum: player?.Detail.Matches,
-                resultNum: '' + player?.Detail.SuccessesNum + ' / ' + player?.Detail.RestoresNum,
-                topNum: player?.Detail.PodiumNum,
-              },
-            ]}
-            pagination={false}
-          />
+          <div className={styles.playerTableScroll}>
+            <Table
+              // @ts-ignore
+              columns={detailCol}
+              dataSource={[
+                {
+                  cubeId: player?.CubeID,
+                  wcaId: player?.WcaID,
+                  compNum: player?.Detail.Matches,
+                  resultNum: '' + player?.Detail.SuccessesNum + ' / ' + player?.Detail.RestoresNum,
+                  topNum: player?.Detail.PodiumNum,
+                },
+              ]}
+              pagination={false}
+              className="cube-player-detail-meta-table"
+              scroll={{ x: 'max-content' }}
+            />
+          </div>
         </div>
 
-        <div>
+        <div style={{ minWidth: 0 }}>
           {wcaBestCols.length > 0 && (
             <>
               <h3 style={{ fontWeight: '700', textAlign: 'center', marginTop: '30px' }}>
                 最佳记录
               </h3>
-              <Table
-                // @ts-ignore
-                columns={bestCol}
-                rowClassName={rowClassNameWithStyleLines}
-                dataSource={wcaBestCols}
-                pagination={false}
-                size="small"
-              />
+              <div className={styles.playerTableScroll}>
+                <Table
+                  // @ts-ignore
+                  columns={bestCol}
+                  rowClassName={rowClassNameWithStyleLines}
+                  dataSource={wcaBestCols}
+                  pagination={false}
+                  size="small"
+                  className="cube-player-best-table"
+                  scroll={{ x: 'max-content' }}
+                />
+              </div>
             </>
           )}
 
@@ -255,14 +264,18 @@ const PlayerDetail: React.FC<PlayerDetailProps> = ({ player }) => {
               <h3 style={{ fontWeight: '700', textAlign: 'center', marginTop: '30px' }}>
                 趣味项目
               </h3>
-              <Table
-                // @ts-ignore
-                columns={bestCol}
-                rowClassName={rowClassNameWithStyleLines}
-                dataSource={bestCols}
-                pagination={false}
-                size="small"
-              />
+              <div className={styles.playerTableScroll}>
+                <Table
+                  // @ts-ignore
+                  columns={bestCol}
+                  rowClassName={rowClassNameWithStyleLines}
+                  dataSource={bestCols}
+                  pagination={false}
+                  size="small"
+                  className="cube-player-best-table"
+                  scroll={{ x: 'max-content' }}
+                />
+              </div>
             </>
           )}
         </div>

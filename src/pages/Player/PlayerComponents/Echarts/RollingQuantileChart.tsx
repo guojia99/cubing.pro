@@ -184,7 +184,14 @@ const RollingQuantileChart: React.FC<RollingQuantileChartProps> = ({ inputData, 
         }
 
         return (
-          <Card title="最新百分位成绩" style={{ marginTop: 16, background: '#f9f9f9', marginBottom: 16 }}>
+          <Card
+            title="最新百分位成绩"
+            style={{
+              marginTop: 16,
+              marginBottom: 16,
+              background: 'var(--ant-color-fill-alter, #f9f9f9)',
+            }}
+          >
             <div style={{ display: 'flex', justifyContent: 'space-around', fontSize: 16 }}>
               <div>
                 <strong style={{ color: '#111dff' }}>25%</strong><br />

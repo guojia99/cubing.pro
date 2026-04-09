@@ -137,7 +137,7 @@ const PlayerResults: React.FC<PlayerResultsProps> = ({ player }) => {
 
   return (
     <>
-      <Card>
+      <Card style={{ maxWidth: '100%' }}>
         <NavTabs
           type="line"
           items={items}

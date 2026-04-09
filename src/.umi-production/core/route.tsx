@@ -69,7 +69,7 @@ export async function getRoutes() {
 '59': React.lazy(() => import(/* webpackChunkName: "p__Competition__Competitions" */'@/pages/Competition/Competitions.tsx')),
 '60': React.lazy(() => import(/* webpackChunkName: "p__Player__Players" */'@/pages/Player/Players.tsx')),
 '61': React.lazy(() => import(/* webpackChunkName: "p__Static__Pktimers" */'@/pages/Static/Pktimers.tsx')),
-'ant-design-pro-layout': React.lazy(() => import(/* webpackChunkName: "t__plugin-layout__Layout" */'/Users/guojia/worker/code/cube/cubing.pro/src/.umi-production/plugin-layout/Layout.tsx')),
+'ant-design-pro-layout': React.lazy(() => import(/* webpackChunkName: "t__plugin-layout__Layout" */'/Users/guojia/worker/code/cube/cubingPro/cubing.pro/src/.umi-production/plugin-layout/Layout.tsx')),
 },
   };
 }

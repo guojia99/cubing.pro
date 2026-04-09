@@ -1,10 +1,8 @@
-.lightitem {
-  &>td {
-    background-color: #ffffff;
-  }
+/* 斑马纹：仅用 Ant Design token，勿写浅色回退（否则深色模式下会出现白底+浅色字） */
+.lightitem > td {
+  background-color: var(--ant-color-fill-alter) !important;
 }
-.darkitem {
-  &>td {
-    background-color: rgba(231, 231, 231, 0.5);
-  }
+
+.darkitem > td {
+  background-color: var(--ant-color-fill-tertiary) !important;
 }

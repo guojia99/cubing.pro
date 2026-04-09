@@ -72,7 +72,7 @@ const PlayerResultsList: React.FC<PlayerResultsListProps> = ({
   ];
 
   return (
-    <>
+    <div style={{ minWidth: 0, maxWidth: '100%' }}>
       {/*<h4 style={{textAlign:"center"}}><strong>成绩列表</strong></h4>*/}
       <DownloadExcelButton player={player} results={withDownloads} />
       <NavTabs
@@ -81,7 +81,7 @@ const PlayerResultsList: React.FC<PlayerResultsListProps> = ({
         tabsKey="player_result_result_list_tabs"
         indicator={{ size: (origin: number) => origin - 20, align: 'center' }}
       />
-    </>
+    </div>
   );
 };
 

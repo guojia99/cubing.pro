@@ -480,14 +480,18 @@
   flex-direction: row-reverse;
 }
 
+/* 正赛对阵列固定宽度，避免长队名撑开卡片 */
+@tm-bracket-col-width: 168px;
+
 .tmBracketPairLeaves {
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 8px;
-  flex: 0 0 auto;
-  min-width: 128px;
-  max-width: 168px;
+  flex: 0 0 @tm-bracket-col-width;
+  width: @tm-bracket-col-width;
+  min-width: @tm-bracket-col-width;
+  max-width: @tm-bracket-col-width;
 }
 
 .tmBracketPairAdvance {
@@ -495,25 +499,30 @@
   flex-direction: column;
   justify-content: center;
   align-items: stretch;
-  flex: 0 0 auto;
-  min-width: 128px;
-  max-width: 168px;
+  flex: 0 0 @tm-bracket-col-width;
+  width: @tm-bracket-col-width;
+  min-width: @tm-bracket-col-width;
+  max-width: @tm-bracket-col-width;
 }
 
 .tmBracketSemiSlot {
-  min-width: 140px;
-  max-width: 180px;
+  flex: 0 0 @tm-bracket-col-width;
+  width: @tm-bracket-col-width;
+  min-width: @tm-bracket-col-width;
+  max-width: @tm-bracket-col-width;
 }
 
 .tmBracketStageSlot {
   width: 100%;
+  min-width: 0;
 }
 
 .tmBracketCenterColumn {
   flex: 0 0 auto;
   align-self: stretch;
-  min-width: 168px;
-  max-width: 220px;
+  width: @tm-bracket-col-width;
+  min-width: @tm-bracket-col-width;
+  max-width: @tm-bracket-col-width;
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -629,6 +638,7 @@
 
 .tmBracketMatchCard .ant-card-body {
   padding: 10px 12px;
+  min-width: 0;
 }
 
 .tmBracketMatchCard .ant-card-head-title {
@@ -676,22 +686,36 @@
 .tmBracketMatchTeams {
   gap: 6px !important;
   font-size: 15px;
+  min-width: 0;
+  width: 100%;
+}
+
+.tmBracketRoot .tmBracketMatchCard.ant-card {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .tmBracketTeamLine {
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: flex-start;
   gap: 6px 8px;
   font-size: var(--tm-br-team-line-font, 15px);
   line-height: 1.45;
   color: var(--tm-br-team-line-color, rgba(255, 255, 255, 0.92));
+  min-width: 0;
 }
 
 .tmBracketTeamName {
   font-weight: 600;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .tmBracketTeamLine.tmBracketWinner {
@@ -719,6 +743,7 @@
 .tmBracketMedal {
   display: inline-flex;
   align-items: center;
+  flex-shrink: 0;
   font-size: 1.05em;
   line-height: 1;
   margin-left: 2px;
@@ -737,6 +762,11 @@
 }
 
 .tmBracketByeHint {
+  flex-shrink: 0;
+  max-width: 5.5em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: 12px;
   font-weight: 500;
   color: var(--tm-br-hint-color, rgba(255, 255, 255, 0.72));

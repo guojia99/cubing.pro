@@ -8,8 +8,9 @@ import { CubesCn } from '@/components/CubeIcon/cube';
 import { formatAttempts, resultsTimeFormat } from '@/pages/WCA/utils/wca_results';
 import { findCubingCompetitionByIdentifier } from '@/services/cubing-pro/cubing_china/cubing';
 import { WCACompetition, WCAResult } from '@/services/cubing-pro/wca/types';
+import './WCAPlayerStaticsTabResultsWithComps.less';
 
-const { Title } = Typography
+const { Title } = Typography;
 
 
 
@@ -26,7 +27,13 @@ const WCAPlayerStaticsTabResultsWithComp: React.FC<WCAPlayerStaticsTabResultsWit
   const intl = useIntl();
   if (!wcaResults || wcaResults.length === 0) {
     return (
-      <div style={{ color: '#999', textAlign: 'center', padding: '16px' }}>
+      <div
+        style={{
+          color: 'var(--ant-color-text-tertiary)',
+          textAlign: 'center',
+          padding: '16px',
+        }}
+      >
         {intl.formatMessage({ id: 'wca.results.noCompetitionResults' })}
       </div>
     );
@@ -331,8 +338,10 @@ const WCAPlayerStaticsTabResultsWithComp: React.FC<WCAPlayerStaticsTabResultsWit
     }
     return <>
       <div>
-        <Title level={4} style={{ margin: 0 }}>{cpName}</Title>
-        <div style={{ fontSize: '14px', color: '#666' }}>
+        <Title level={4} style={{ margin: 0, color: 'var(--ant-color-text-heading)' }}>
+          {cpName}
+        </Title>
+        <div style={{ fontSize: '14px', color: 'var(--ant-color-text-secondary)' }}>
           {formatDate(comp.startDate)} ~ {formatDate(comp.endDate)} | {city}
         </div>
       </div>
@@ -345,15 +354,18 @@ const WCAPlayerStaticsTabResultsWithComp: React.FC<WCAPlayerStaticsTabResultsWit
   };
 
   return (
-    <div style={{ marginTop: 16 }}>
+    <div className="wca-by-comp-root" style={{ marginTop: 16 }}>
       {sortedComps.length === 0 ? (
-        <div>{intl.formatMessage({ id: 'wca.results.noValidData' })}</div>
+        <div style={{ color: 'var(--ant-color-text-tertiary)' }}>
+          {intl.formatMessage({ id: 'wca.results.noValidData' })}
+        </div>
       ) : (
         <>
           {/* PR Streak 信息 */}
           <Card
             size="small"
-            style={{ marginBottom: 24, backgroundColor: '#f6ffed', borderColor: '#b7eb8f' }}
+            className="wca-pr-streak-card"
+            style={{ marginBottom: 24 }}
             title={intl.formatMessage({ id: 'wca.results.prStreakTitle' })}
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -387,9 +399,9 @@ const WCAPlayerStaticsTabResultsWithComp: React.FC<WCAPlayerStaticsTabResultsWit
                         key={idx}
                         style={{
                           padding: '10px 12px',
-                          backgroundColor: '#fff',
+                          backgroundColor: 'var(--ant-color-bg-elevated)',
                           borderRadius: 8,
-                          border: '1px solid #e8e8e8',
+                          border: '1px solid var(--ant-color-border-secondary)',
                           fontSize: 13,
                           lineHeight: 1.6,
                         }}
@@ -427,11 +439,12 @@ const WCAPlayerStaticsTabResultsWithComp: React.FC<WCAPlayerStaticsTabResultsWit
           <Card
             key={comp.compId}
             bordered={false}
-            style={{ marginBottom: 24, backgroundColor: '#fafafa' }}
-            headStyle={{ backgroundColor: '#e6f7ff', borderBottom: '1px solid #91d5ff' }}
+            className="wca-by-comp-comp-card"
+            style={{ marginBottom: 24 }}
             title={getCompTitle(comp)}
           >
             <Table
+              className="wca-by-comp-table"
               columns={columns}
               dataSource={comp.results.map((r) => ({ ...r, compIndex }))}
               rowKey="round_id"
