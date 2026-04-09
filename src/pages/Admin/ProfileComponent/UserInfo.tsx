@@ -1,6 +1,8 @@
 import { authTags } from '@/pages/Admin/AuthComponents/AuthComponents';
 import { currentUser, updateDetail } from '@/services/cubing-pro/auth/auth';
 import { AuthAPI } from '@/services/cubing-pro/auth/typings';
+import { getApiErrorDisplayMessage } from '@/services/cubing-pro/request';
+import type { AxiosError } from 'axios';
 import { ProDescriptions } from '@ant-design/pro-components';
 import { Card, Divider, message } from 'antd';
 import { useRef } from 'react';
@@ -157,6 +159,7 @@ const editColumns = [
     key: 'WcaID',
     dataIndex: 'WcaID',
     copyable: true,
+    editable: false,
   },
   {
     title: 'QQ',
@@ -217,7 +220,7 @@ export default function UserInfo(user: AuthAPI.CurrentUser) {
     };
   };
 
-  const updateFiled = (
+  const updateFiled = async (
     key: string,
     record: AuthAPI.CurrentUserData,
     originRow: AuthAPI.CurrentUserData,
@@ -251,22 +254,23 @@ export default function UserInfo(user: AuthAPI.CurrentUser) {
       birthdate = format(date, "yyyy-MM-dd")
     }
 
-    updateDetail({
-      Name: record.Name,
-      EnName: record.EnName,
-      WcaID: record.WcaID,
-      QQ: record.QQ,
-      Sex: Number(record.Sex),
-      Birthdate: birthdate,
-      Sign: record.Sign,
-    })
-      .then(() => {
-        // @ts-ignore
-        actionRef.current.reload();
-      })
-      .catch((value) => {
-        console.log(value);
+    try {
+      await updateDetail({
+        Name: record.Name,
+        EnName: record.EnName,
+        WcaID: record.WcaID,
+        QQ: record.QQ,
+        Sex: Number(record.Sex),
+        Birthdate: birthdate,
+        Sign: record.Sign,
       });
+      // @ts-ignore
+      actionRef.current.reload();
+    } catch (e) {
+      console.log("eeee", e)
+      // @ts-ignore
+      message.error(e?.response.data.error)
+    }
   };
 
   return (

@@ -1,4 +1,3 @@
-import { processAvatarFile } from '@/pages/Tools/TeamMatch/utils/avatar';
 import { Button, Modal, Upload } from 'antd';
 import React, { useState } from 'react';
 import ReactCrop, { type Crop, type PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop';

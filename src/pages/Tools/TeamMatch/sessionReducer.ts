@@ -6,12 +6,21 @@ import {
   syncBronzeToSession,
 } from '@/pages/Tools/TeamMatch/bracketGen';
 import { randomizeDraw } from '@/pages/Tools/TeamMatch/drawRandom';
+import {
+  buildElimGroupMatches,
+  defaultEliminationState,
+  groupTeamIdsRandom,
+  isEliminationGroupMatch,
+} from '@/pages/Tools/TeamMatch/eliminationDraw';
+import { computeMainBracketTeamIds } from '@/pages/Tools/TeamMatch/eliminationResolve';
 import { appendMockGroups, buildMockTeamMatchData16 } from '@/pages/Tools/TeamMatch/mockLocal';
-import { computePkSettlement } from '@/pages/Tools/TeamMatch/pkSettlement';
-import { pickSeedTeamIds } from '@/pages/Tools/TeamMatch/seedingMath';
+import { computeMultiTeamPkSettlement, computePkSettlement } from '@/pages/Tools/TeamMatch/pkSettlement';
+import { allRankedActiveTeamIds, pickSeedTeamIds } from '@/pages/Tools/TeamMatch/seedingMath';
 import { createEmptySession, normalizeSession } from '@/pages/Tools/TeamMatch/sessionFactory';
 import type {
   BracketMatch,
+  EliminationGroupMatch,
+  ElimGroupPkState,
   Player,
   PkMatchState,
   PkPlayerResult,
@@ -20,7 +29,13 @@ import type {
   Team,
   TeamMatchSession,
 } from '@/pages/Tools/TeamMatch/types';
-import { TEAM_PLAYERS } from '@/pages/Tools/TeamMatch/types';
+import {
+  MAX_ELIMINATION_BYE_TEAMS,
+  TEAM_PLAYERS,
+  WIZARD_STEP_MAIN_DRAW,
+  WIZARD_STEP_MAIN_LIVE,
+  type ElimGroupSize,
+} from '@/pages/Tools/TeamMatch/types';
 export type TeamMatchAction =
   | { type: 'RESET_SESSION'; session: TeamMatchSession }
   | { type: 'MOCK_FILL_TEST_DATA' }
@@ -54,10 +69,42 @@ export type TeamMatchAction =
   | { type: 'PK_MANUAL_WINNER'; matchId: string; winnerTeamId: string }
   | { type: 'PK_REPLAY'; matchId: string }
   | { type: 'PK_CLEAR_CURRENT'; matchId: string }
-  | { type: 'SET_MATCH_WINNER'; matchId: string; winnerTeamId: string };
+  | { type: 'SET_MATCH_WINNER'; matchId: string; winnerTeamId: string }
+  | { type: 'ENSURE_ELIMINATION_STATE' }
+  | { type: 'SET_ELIM_GROUP_SIZE'; value: ElimGroupSize }
+  | { type: 'SET_ELIM_BYE_TEAM_IDS'; teamIds: string[] }
+  | { type: 'SKIP_ELIMINATION_TO_MAIN_DRAW' }
+  | { type: 'RANDOMIZE_ELIM_DRAW' }
+  /** 在「正赛名单确认」页提交：写入 16 强、清空分区、进入正赛抽签 */
+  | { type: 'CONFIRM_MAIN_BRACKET_POOL' };
 
 function touch(s: TeamMatchSession): TeamMatchSession {
   return { ...normalizeSession(s), updatedAt: Date.now() };
+}
+
+function emptyRosterRegionSlots(): TeamMatchSession['regionSlots'] {
+  const row = [null, null, null, null] as TeamMatchSession['regionSlots'][0];
+  return [row, row, row, row];
+}
+
+/** 队伍确认（step≥3）之后任意队伍/种子变更：清空预选赛、正赛名单与对阵，回到队伍确认 */
+function resetDownstreamAfterRosterEdit(s: TeamMatchSession): TeamMatchSession {
+  if (s.wizardStep < 3) return s;
+  const wasLiveOrLater = s.wizardStep >= WIZARD_STEP_MAIN_LIVE;
+  return {
+    ...s,
+    wizardStep: 3,
+    status: wasLiveOrLater ? 'draft' : s.status,
+    elimination: null,
+    mainBracketTeamIds: null,
+    regionSlots: emptyRosterRegionSlots(),
+    flatSlots: null,
+    rounds: [],
+    bronzeMatch: null,
+    skipBronzeMatch: false,
+    drawVersion: 0,
+    uiFocusMatchId: null,
+  };
 }
 
 /** 保证每位选手 × 每个比赛项目都有一条 seeding（供初赛导入等合并写入） */
@@ -88,13 +135,22 @@ export function mergeSeeding(prev: SeedingEntry[], players: Player[], eventIds: 
   );
 }
 
-function findMatch(session: TeamMatchSession, matchId: string): BracketMatch | undefined {
+function findMatch(
+  session: TeamMatchSession,
+  matchId: string,
+): BracketMatch | EliminationGroupMatch | undefined {
+  const elim = session.elimination?.matches?.find((x) => x.id === matchId);
+  if (elim) return elim;
   if (session.bronzeMatch?.id === matchId) return session.bronzeMatch;
   for (const round of session.rounds) {
     const m = round.find((x) => x.id === matchId);
     if (m) return m;
   }
   return undefined;
+}
+
+function isEliminationMatchId(session: TeamMatchSession, matchId: string): boolean {
+  return !!session.elimination?.matches?.some((x) => x.id === matchId);
 }
 
 function mapRounds(session: TeamMatchSession, fn: (m: BracketMatch) => BracketMatch): TeamMatchSession {
@@ -107,6 +163,24 @@ function setMatch(session: TeamMatchSession, matchId: string, patch: Partial<Bra
     return { ...session, bronzeMatch: { ...session.bronzeMatch, ...patch } };
   }
   return mapRounds(session, (m) => (m.id === matchId ? { ...m, ...patch } : m));
+}
+
+function patchBracketOrElimMatch(
+  session: TeamMatchSession,
+  matchId: string,
+  patch: Partial<BracketMatch> | Partial<EliminationGroupMatch>,
+): TeamMatchSession {
+  const elim = session.elimination;
+  if (elim?.matches?.length) {
+    const idx = elim.matches.findIndex((m) => m.id === matchId);
+    if (idx >= 0) {
+      const cur = elim.matches[idx];
+      const merged = { ...cur, ...patch } as EliminationGroupMatch;
+      const matches = elim.matches.map((m, i) => (i === idx ? merged : m));
+      return { ...session, elimination: { ...elim, matches } };
+    }
+  }
+  return setMatch(session, matchId, patch as Partial<BracketMatch>);
 }
 
 function cascadeRounds(session: TeamMatchSession): TeamMatchSession {
@@ -152,6 +226,8 @@ export function reduceSession(session: TeamMatchSession, action: TeamMatchAction
         bronzeMatch: null,
         skipBronzeMatch: false,
         drawVersion: 0,
+        mainBracketTeamIds: null,
+        elimination: null,
       };
       break;
     }
@@ -175,6 +251,7 @@ export function reduceSession(session: TeamMatchSession, action: TeamMatchAction
         };
       });
       next = { ...next, schools, players, teams, seeding };
+      if (next.wizardStep >= 3) next = resetDownstreamAfterRosterEdit(next);
       break;
     }
     case 'SET_WIZARD_STEP':
@@ -207,6 +284,7 @@ export function reduceSession(session: TeamMatchSession, action: TeamMatchAction
         seedTeamIds: ids,
         teams: next.teams.map((t) => ({ ...t, isSeed: set.has(t.id) })),
       };
+      if (next.wizardStep >= 3) next = resetDownstreamAfterRosterEdit(next);
       break;
     }
     case 'UPSERT_SCHOOLS':
@@ -219,9 +297,11 @@ export function reduceSession(session: TeamMatchSession, action: TeamMatchAction
         seeding: mergeSeeding(next.seeding, action.players, next.eventIds),
       };
       break;
-    case 'UPSERT_TEAMS':
+    case 'UPSERT_TEAMS': {
       next = { ...next, teams: action.teams };
+      if (next.wizardStep >= 3) next = resetDownstreamAfterRosterEdit(next);
       break;
+    }
     case 'DELETE_TEAM': {
       const id = action.teamId;
       const teams = next.teams.filter((t) => t.id !== id);
@@ -243,7 +323,29 @@ export function reduceSession(session: TeamMatchSession, action: TeamMatchAction
       if (patched.rounds.length) {
         patched = rebuildBracketFromSession(patched);
       }
+      if (patched.elimination) {
+        const e = patched.elimination;
+        const byeTeamIds = e.byeTeamIds.filter((tid) => tid !== id);
+        const touched =
+          e.byeTeamIds.includes(id) || e.matches.some((m) => m.teamIds.includes(id));
+        patched = {
+          ...patched,
+          elimination: touched
+            ? {
+                ...e,
+                byeTeamIds,
+                matches: [],
+                waveSizes: [],
+                drawVersion: 0,
+                naturalByeTeamIds: [],
+                naturalByeTeamId: null,
+              }
+            : { ...e, byeTeamIds },
+          mainBracketTeamIds: patched.mainBracketTeamIds?.filter((tid) => tid !== id) ?? null,
+        };
+      }
       next = patched;
+      if (next.wizardStep >= 3) next = resetDownstreamAfterRosterEdit(next);
       break;
     }
     case 'SET_TEAM_DISABLED':
@@ -251,6 +353,7 @@ export function reduceSession(session: TeamMatchSession, action: TeamMatchAction
         ...next,
         teams: next.teams.map((t) => (t.id === action.teamId ? { ...t, disabled: action.disabled } : t)),
       };
+      if (next.wizardStep >= 3) next = resetDownstreamAfterRosterEdit(next);
       break;
     case 'SET_SEEDING':
       next = { ...next, seeding: action.seeding };
@@ -258,9 +361,122 @@ export function reduceSession(session: TeamMatchSession, action: TeamMatchAction
     case 'SET_ONE_COMP_IMPORT':
       next = { ...next, oneCompImport: action.value };
       break;
+    case 'ENSURE_ELIMINATION_STATE': {
+      if (!next.elimination) {
+        next = { ...next, elimination: defaultEliminationState(next) };
+      }
+      break;
+    }
+    case 'SET_ELIM_GROUP_SIZE': {
+      const base = next.elimination ?? defaultEliminationState(next);
+      next = { ...next, elimination: { ...base, groupSize: action.value } };
+      break;
+    }
+    case 'SET_ELIM_BYE_TEAM_IDS': {
+      const base = next.elimination ?? defaultEliminationState(next);
+      const eventId = next.eventIds[0] ?? '333';
+      const ranked = new Set(
+        allRankedActiveTeamIds(next.teams, next.players, next.seeding, eventId, next.seedingPrimary),
+      );
+      const uniq = [...new Set(action.teamIds)].filter((id) => ranked.has(id)).slice(0, MAX_ELIMINATION_BYE_TEAMS);
+      next = { ...next, elimination: { ...base, byeTeamIds: uniq } };
+      break;
+    }
+    case 'SKIP_ELIMINATION_TO_MAIN_DRAW': {
+      const elimBase = next.elimination ?? defaultEliminationState(next);
+      const skippedElim = {
+        ...elimBase,
+        skipped: true,
+        matches: [],
+        waveSizes: [],
+        drawVersion: 0,
+        naturalByeTeamIds: [],
+        naturalByeTeamId: null,
+      };
+      next = {
+        ...next,
+        elimination: skippedElim,
+        mainBracketTeamIds: null,
+        regionSlots: emptyRosterRegionSlots(),
+        flatSlots: null,
+        rounds: [],
+        bronzeMatch: null,
+        drawVersion: 0,
+      };
+      break;
+    }
+    case 'RANDOMIZE_ELIM_DRAW': {
+      const base = next.elimination ?? defaultEliminationState(next);
+      const eventId = next.eventIds[0] ?? '333';
+      const all = allRankedActiveTeamIds(next.teams, next.players, next.seeding, eventId, next.seedingPrimary);
+      const byeSet = new Set(base.byeTeamIds);
+      const competitors = all.filter((id) => !byeSet.has(id));
+      const { groups, naturalByeTeamIds } = groupTeamIdsRandom(competitors, base.groupSize, Math.random);
+      const waveSizes = groups.length > 0 ? [groups.length] : [];
+      const matches = groups.length > 0 ? buildElimGroupMatches(groups, waveSizes) : [];
+      next = {
+        ...next,
+        elimination: {
+          ...base,
+          skipped: false,
+          matches,
+          waveSizes,
+          naturalByeTeamIds,
+          naturalByeTeamId: naturalByeTeamIds[0] ?? null,
+          drawVersion: base.drawVersion + 1,
+        },
+        uiFocusMatchId: null,
+      };
+      break;
+    }
+    case 'CONFIRM_MAIN_BRACKET_POOL': {
+      const mainIds = computeMainBracketTeamIds(next);
+      const eventId = next.eventIds[0] ?? '333';
+      const picked = pickSeedTeamIds(
+        next.teams,
+        next.players,
+        next.seeding,
+        eventId,
+        next.seedingPrimary,
+        mainIds,
+      );
+      const seedTeamIds: TeamMatchSession['seedTeamIds'] = [
+        picked[0] ?? null,
+        picked[1] ?? null,
+        picked[2] ?? null,
+        picked[3] ?? null,
+      ];
+      const seedSet = new Set(seedTeamIds.filter(Boolean) as string[]);
+      next = {
+        ...next,
+        mainBracketTeamIds: mainIds,
+        seedTeamIds,
+        teams: next.teams.map((t) => ({ ...t, isSeed: seedSet.has(t.id) })),
+        regionSlots: [
+          [null, null, null, null],
+          [null, null, null, null],
+          [null, null, null, null],
+          [null, null, null, null],
+        ],
+        flatSlots: null,
+        rounds: [],
+        bronzeMatch: null,
+        drawVersion: 0,
+        wizardStep: WIZARD_STEP_MAIN_DRAW,
+      };
+      break;
+    }
     case 'COMPUTE_SEED_TEAMS': {
       const eventId = next.eventIds[0] ?? '333';
-      const ids = pickSeedTeamIds(next.teams, next.players, next.seeding, eventId, next.seedingPrimary);
+      const mainIds = computeMainBracketTeamIds(next);
+      const ids = pickSeedTeamIds(
+        next.teams,
+        next.players,
+        next.seeding,
+        eventId,
+        next.seedingPrimary,
+        mainIds,
+      );
       const seedTeamIds: TeamMatchSession['seedTeamIds'] = [
         ids[0] ?? null,
         ids[1] ?? null,
@@ -304,18 +520,50 @@ export function reduceSession(session: TeamMatchSession, action: TeamMatchAction
     case 'SET_PK_DRAFT': {
       const m = findMatch(next, action.matchId);
       if (!m?.pk) break;
-      const pk: PkMatchState = {
-        ...m.pk,
-        currentResults: action.results,
-      };
-      next = setMatch(next, action.matchId, { pk });
+      if (isEliminationGroupMatch(m)) {
+        const pk: ElimGroupPkState = { ...m.pk, currentResults: action.results };
+        next = patchBracketOrElimMatch(next, action.matchId, { pk });
+      } else {
+        const pk: PkMatchState = { ...m.pk, currentResults: action.results };
+        next = patchBracketOrElimMatch(next, action.matchId, { pk });
+      }
       break;
     }
     case 'PK_SETTLE': {
       const m = findMatch(next, action.matchId);
       if (!m?.pk) break;
-      const { teamAId, teamBId } = m.pk;
       const results = action.results;
+      if (isEliminationGroupMatch(m)) {
+        const teamIds = m.pk.teamIds;
+        const computed = computeMultiTeamPkSettlement(teamIds, results);
+        const snap = {
+          id: newSnapshotId(),
+          recordedAt: Date.now(),
+          reason: 'submit' as const,
+          results: [...results],
+          computed,
+        };
+        let resolution: ElimGroupPkState['resolution'] = null;
+        if (computed.allTeamsDnf) {
+          resolution = { mode: 'pending_both_dnf' };
+        } else if (computed.computedWinnerTeamId) {
+          resolution = { mode: 'computed', winnerTeamId: computed.computedWinnerTeamId };
+        }
+        const pk: ElimGroupPkState = {
+          ...m.pk,
+          currentResults: results,
+          scoreHistory: [...m.pk.scoreHistory, snap],
+          lastComputed: computed,
+          resolution,
+        };
+        const patch: Partial<EliminationGroupMatch> = { pk };
+        if (resolution?.mode === 'computed' && resolution.winnerTeamId) {
+          patch.winnerId = resolution.winnerTeamId;
+        }
+        next = patchBracketOrElimMatch(next, action.matchId, patch);
+        break;
+      }
+      const { teamAId, teamBId } = m.pk;
       const computed = computePkSettlement(teamAId, teamBId, results);
       const snap = {
         id: newSnapshotId(),
@@ -341,27 +589,56 @@ export function reduceSession(session: TeamMatchSession, action: TeamMatchAction
       if (resolution?.mode === 'computed' && resolution.winnerTeamId) {
         patch.winnerId = resolution.winnerTeamId;
       }
-      next = setMatch(next, action.matchId, patch);
-      if (patch.winnerId) next = cascadeRounds(next);
+      next = patchBracketOrElimMatch(next, action.matchId, patch);
+      if (patch.winnerId && !isEliminationMatchId(next, action.matchId)) next = cascadeRounds(next);
       break;
     }
     case 'PK_MANUAL_WINNER': {
       const m = findMatch(next, action.matchId);
       if (!m?.pk) break;
+      if (isEliminationGroupMatch(m)) {
+        if (!m.pk.teamIds.includes(action.winnerTeamId)) break;
+        const pk: ElimGroupPkState = {
+          ...m.pk,
+          resolution: { mode: 'manual', winnerTeamId: action.winnerTeamId },
+        };
+        next = patchBracketOrElimMatch(next, action.matchId, {
+          winnerId: action.winnerTeamId,
+          pk,
+        });
+        break;
+      }
       const pk: PkMatchState = {
         ...m.pk,
         resolution: { mode: 'manual', winnerTeamId: action.winnerTeamId },
       };
-      next = setMatch(next, action.matchId, {
+      next = patchBracketOrElimMatch(next, action.matchId, {
         winnerId: action.winnerTeamId,
         pk,
       });
-      next = cascadeRounds(next);
+      if (!isEliminationMatchId(next, action.matchId)) next = cascadeRounds(next);
       break;
     }
     case 'PK_REPLAY': {
       const m = findMatch(next, action.matchId);
       if (!m?.pk) break;
+      if (isEliminationGroupMatch(m)) {
+        const snap = {
+          id: newSnapshotId(),
+          recordedAt: Date.now(),
+          reason: 'replay' as const,
+          results: [...m.pk.currentResults],
+        };
+        const pk: ElimGroupPkState = {
+          ...m.pk,
+          currentResults: [],
+          scoreHistory: [...m.pk.scoreHistory, snap],
+          resolution: null,
+          lastComputed: undefined,
+        };
+        next = patchBracketOrElimMatch(next, action.matchId, { pk, winnerId: null });
+        break;
+      }
       const snap = {
         id: newSnapshotId(),
         recordedAt: Date.now(),
@@ -375,13 +652,30 @@ export function reduceSession(session: TeamMatchSession, action: TeamMatchAction
         resolution: null,
         lastComputed: undefined,
       };
-      next = setMatch(next, action.matchId, { pk, winnerId: null });
-      next = cascadeRounds(next);
+      next = patchBracketOrElimMatch(next, action.matchId, { pk, winnerId: null });
+      if (!isEliminationMatchId(next, action.matchId)) next = cascadeRounds(next);
       break;
     }
     case 'PK_CLEAR_CURRENT': {
       const m = findMatch(next, action.matchId);
       if (!m?.pk) break;
+      if (isEliminationGroupMatch(m)) {
+        const snap = {
+          id: newSnapshotId(),
+          recordedAt: Date.now(),
+          reason: 'correct' as const,
+          results: [...m.pk.currentResults],
+        };
+        const pk: ElimGroupPkState = {
+          ...m.pk,
+          currentResults: [],
+          scoreHistory: [...m.pk.scoreHistory, snap],
+          resolution: null,
+          lastComputed: undefined,
+        };
+        next = patchBracketOrElimMatch(next, action.matchId, { pk, winnerId: null });
+        break;
+      }
       const snap = {
         id: newSnapshotId(),
         recordedAt: Date.now(),
@@ -395,13 +689,13 @@ export function reduceSession(session: TeamMatchSession, action: TeamMatchAction
         resolution: null,
         lastComputed: undefined,
       };
-      next = setMatch(next, action.matchId, { pk, winnerId: null });
-      next = cascadeRounds(next);
+      next = patchBracketOrElimMatch(next, action.matchId, { pk, winnerId: null });
+      if (!isEliminationMatchId(next, action.matchId)) next = cascadeRounds(next);
       break;
     }
     case 'SET_MATCH_WINNER':
-      next = setMatch(next, action.matchId, { winnerId: action.winnerTeamId });
-      next = cascadeRounds(next);
+      next = patchBracketOrElimMatch(next, action.matchId, { winnerId: action.winnerTeamId });
+      if (!isEliminationMatchId(next, action.matchId)) next = cascadeRounds(next);
       break;
     default:
       break;
@@ -423,6 +717,19 @@ export function buildPkTemplateRows(
   }
   for (let i = 0; i < TEAM_PLAYERS; i++) {
     rows.push({ playerId: teamB.playerIds[i], teamId: teamBId, value: 0 });
+  }
+  return rows;
+}
+
+/** 预选赛小组战：按 teamIds 顺序，每队三人一行 */
+export function buildPkGroupTemplateRows(teamIds: string[], teams: Team[]): PkPlayerResult[] {
+  const rows: PkPlayerResult[] = [];
+  for (const tid of teamIds) {
+    const team = teams.find((t) => t.id === tid);
+    if (!team) continue;
+    for (let i = 0; i < TEAM_PLAYERS; i++) {
+      rows.push({ playerId: team.playerIds[i], teamId: tid, value: 0 });
+    }
   }
   return rows;
 }

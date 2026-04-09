@@ -8,6 +8,13 @@ export async function apiPublicOrganizers(): Promise<any>{
   return response.data
 }
 
+export async function apiPublicCompGroups(): Promise<any>{
+  const response = await Request.get<any>('public/comp_groups');
+
+  return response.data
+}
+
+
 
 export async function getAcknowledgments(): Promise<Thank[]> {
   const response = await Request.get<Thank[]>('/public/acknowledgments')

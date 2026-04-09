@@ -1,5 +1,7 @@
 import BulkFillSeedingButton from '@/pages/Tools/TeamMatch/components/BulkFillSeedingButton';
 import BulkOneUidImportModal from '@/pages/Tools/TeamMatch/components/BulkOneUidImportModal';
+import EliminationStage from '@/pages/Tools/TeamMatch/components/EliminationStage';
+import LiveSettingsModal from '@/pages/Tools/TeamMatch/components/LiveSettingsModal';
 import OneCompPrelimImportCard from '@/pages/Tools/TeamMatch/components/OneCompPrelimImportCard';
 import PreliminaryBatchModal from '@/pages/Tools/TeamMatch/components/PreliminaryBatchModal';
 import PlayerEditModal from '@/pages/Tools/TeamMatch/components/PlayerEditModal';
@@ -7,20 +9,57 @@ import SeedingPlayerModal from '@/pages/Tools/TeamMatch/components/SeedingPlayer
 import TeamEditModal from '@/pages/Tools/TeamMatch/components/TeamEditModal';
 import SyncWcaAvatarsButton from '@/pages/Tools/TeamMatch/components/SyncWcaAvatarsButton';
 import TeamRosterPasteCard from '@/pages/Tools/TeamMatch/components/TeamRosterPasteCard';
+import { buildMainPoolDisplayRows, computeMainBracketTeamIds, isEliminationComplete } from '@/pages/Tools/TeamMatch/eliminationResolve';
+import type { LiveUISettings } from '@/pages/Tools/TeamMatch/liveUiSettings';
 import { useTeamMatchStore } from '@/pages/Tools/TeamMatch/TeamMatchContext';
-import { rankedBracketTeamIds, sortTeamsBySeedingRank, teamSeedingSum } from '@/pages/Tools/TeamMatch/seedingMath';
+import { hasOverSixteenFullTeams } from '@/pages/Tools/TeamMatch/stepAccess';
+import { pickSeedTeamIds, rankedBracketTeamIds, sortTeamsBySeedingRank, teamSeedingSum } from '@/pages/Tools/TeamMatch/seedingMath';
 import { SEEDING_SOURCE_INLINE } from '@/pages/Tools/TeamMatch/seedingScorePick';
 import { teamKindLabel } from '@/pages/Tools/TeamMatch/teamClassify';
-import type { Player, School, SeedingEntry, Team, TeamMatchSession } from '@/pages/Tools/TeamMatch/types';
-import { BRACKET_TEAM_COUNT, MAX_ROSTER_TEAMS, MIN_TEAMS, TEAM_PLAYERS } from '@/pages/Tools/TeamMatch/types';
-import { Avatar, Button, Card, Checkbox, Form, Input, Popconfirm, Radio, Select, Space, Switch, Table, Tag, Typography, message } from 'antd';
-import React, { useMemo, useState } from 'react';
+import type { EliminationGroupMatch, Player, School, SeedingEntry, Team, TeamMatchSession } from '@/pages/Tools/TeamMatch/types';
+import {
+  BRACKET_TEAM_COUNT,
+  MAX_ELIMINATION_BYE_TEAMS,
+  MAX_ROSTER_TEAMS,
+  MIN_TEAMS,
+  TEAM_PLAYERS,
+  WIZARD_STEP_MAIN_DRAW,
+  WIZARD_STEP_MAIN_LIVE,
+  WIZARD_STEP_MAIN_POOL_CONFIRM,
+} from '@/pages/Tools/TeamMatch/types';
+import {
+  Avatar,
+  Button,
+  Card,
+  Checkbox,
+  Form,
+  Input,
+  Modal,
+  Popconfirm,
+  Radio,
+  Select,
+  Space,
+  Switch,
+  Table,
+  Tag,
+  Typography,
+  message,
+} from 'antd';
+import React, { useEffect, useMemo, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
-const TeamMatchSteps: React.FC = () => {
+type TeamMatchStepsProps = {
+  liveUISettings: LiveUISettings;
+  onLiveUISettingsChange: (next: LiveUISettings) => void;
+};
+
+/* 子步骤组件定义在文件后部，运行时在渲染前已完成初始化 */
+/* eslint-disable @typescript-eslint/no-use-before-define */
+const TeamMatchSteps: React.FC<TeamMatchStepsProps> = ({ liveUISettings, onLiveUISettingsChange }) => {
   const { state, dispatch } = useTeamMatchStore();
   const { session } = state;
   const step = session.wizardStep;
+  const [elimLiveSettingsOpen, setElimLiveSettingsOpen] = React.useState(false);
 
   const [schoolForm] = Form.useForm();
 
@@ -232,14 +271,283 @@ const TeamMatchSteps: React.FC = () => {
         <StepTeamConfirm session={session} dispatch={dispatch} eventId={eventId} />
       )}
 
-      {step === 4 && <StepDraw session={session} dispatch={dispatch} />}
+      {step === 4 && <StepElimDraw session={session} dispatch={dispatch} />}
+      {step === 5 && (
+        <>
+          <Card title="淘汰赛" className="tmElimStageCard">
+            <EliminationStage
+              liveSettings={liveUISettings}
+              onOpenLiveSettings={() => setElimLiveSettingsOpen(true)}
+            />
+            <div style={{ marginTop: 20 }}>
+              <Button
+                type="primary"
+                disabled={!isEliminationComplete(session)}
+                onClick={() => {
+                  dispatch({ type: 'SET_WIZARD_STEP', step: WIZARD_STEP_MAIN_POOL_CONFIRM });
+                  message.success('请确认正赛名单与排序');
+                }}
+              >
+                下一步：确认正赛名单
+              </Button>
+            </div>
+          </Card>
+          <LiveSettingsModal
+            open={elimLiveSettingsOpen}
+            onClose={() => setElimLiveSettingsOpen(false)}
+            value={liveUISettings}
+            onApply={(next) => {
+              onLiveUISettingsChange(next);
+              setElimLiveSettingsOpen(false);
+            }}
+          />
+        </>
+      )}
+      {step === WIZARD_STEP_MAIN_POOL_CONFIRM && <StepMainPoolConfirm session={session} dispatch={dispatch} />}
+      {step === WIZARD_STEP_MAIN_DRAW && <StepDraw session={session} dispatch={dispatch} />}
     </>
   );
 };
+/* eslint-enable @typescript-eslint/no-use-before-define */
 
 type StepDrawProps = {
   session: TeamMatchSession;
   dispatch: ReturnType<typeof useTeamMatchStore>['dispatch'];
+};
+
+/** 抽签 / 保送展示：三人正式平均之和（与队伍确认主排序一致；任一人 DNF 或缺成绩则无效） */
+function formatTeamAverageSumLine(team: Team, session: TeamMatchSession): string {
+  const ev = session.eventIds[0] ?? '333';
+  const { sum, valid } = teamSeedingSum(team, session.players, session.seeding, ev, 'average');
+  if (!valid) return '合计平均：—';
+  return `合计平均：${sum.toFixed(2)}s`;
+}
+
+function schoolTagLabelForByeTeam(team: Team, session: TeamMatchSession): string {
+  if ((team.kind ?? 'school') === 'freelancer') {
+    return teamKindLabel(team, session.schools);
+  }
+  return session.schools.find((s) => s.id === team.schoolId)?.name ?? '学校';
+}
+
+const StepElimDraw: React.FC<StepDrawProps> = ({ session, dispatch }) => {
+  useEffect(() => {
+    dispatch({ type: 'ENSURE_ELIMINATION_STATE' });
+  }, [dispatch]);
+
+  const eventId = session.eventIds[0] ?? '333';
+  const elim = session.elimination;
+  const over16 = hasOverSixteenFullTeams(session);
+  const [byeOpen, setByeOpen] = useState(false);
+  const [byeDraft, setByeDraft] = useState<string[]>([]);
+
+  const rankedTeams = useMemo(
+    () =>
+      sortTeamsBySeedingRank(
+        session.teams,
+        session.players,
+        session.seeding,
+        eventId,
+        session.seedingPrimary,
+      ),
+    [session.teams, session.players, session.seeding, eventId, session.seedingPrimary],
+  );
+
+  useEffect(() => {
+    if (byeOpen && elim) setByeDraft([...elim.byeTeamIds]);
+  }, [byeOpen, elim]);
+
+  const openByeModal = () => {
+    setByeDraft([...(elim?.byeTeamIds ?? [])]);
+    setByeOpen(true);
+  };
+
+  const toggleBye = (teamId: string, checked: boolean) => {
+    if (checked) {
+      if (byeDraft.length >= MAX_ELIMINATION_BYE_TEAMS) {
+        message.warning(`保送最多 ${MAX_ELIMINATION_BYE_TEAMS} 支队伍`);
+        return;
+      }
+      setByeDraft((d) => [...d, teamId]);
+    } else {
+      setByeDraft((d) => d.filter((id) => id !== teamId));
+    }
+  };
+
+  const waveBlocks = useMemo((): EliminationGroupMatch[][] => {
+    if (!elim?.matches.length || !elim.waveSizes.length) return [];
+    const out: EliminationGroupMatch[][] = [];
+    let o = 0;
+    for (const wn of elim.waveSizes) {
+      out.push(elim.matches.slice(o, o + wn));
+      o += wn;
+    }
+    return out;
+  }, [elim?.matches, elim?.waveSizes]);
+
+  const previewPoolCount =
+    elim && elim.drawVersion >= 1 ? computeMainBracketTeamIds(session).length : null;
+
+  if (!over16) {
+    return (
+      <Card title="淘汰赛抽签">
+        <Typography.Paragraph type="secondary">
+          当前满编有效队伍不超过 {BRACKET_TEAM_COUNT} 支，无需进行预选赛 PK。点击下方按钮进入「正赛名单」核对排序后再抽签。
+        </Typography.Paragraph>
+        <Button
+          type="primary"
+          onClick={() => {
+            dispatch({ type: 'SKIP_ELIMINATION_TO_MAIN_DRAW' });
+            dispatch({ type: 'SET_WIZARD_STEP', step: WIZARD_STEP_MAIN_POOL_CONFIRM });
+            message.success('请确认正赛名单');
+          }}
+        >
+          跳过淘汰赛，进入正赛名单
+        </Button>
+      </Card>
+    );
+  }
+
+  return (
+    <Card title="淘汰赛抽签">
+      <Typography.Paragraph type="secondary">
+        超过 {BRACKET_TEAM_COUNT} 支满编队时需决出正赛 {BRACKET_TEAM_COUNT} 强。预选赛按「每场小组」抽签：一场小组 = 多支队伍<strong>同一场地、同一次 PK</strong>比总秒，只晋级 1 队（例如选「3 队同场」即一场 1v1v1，<strong>不是</strong>三场互不相关的 1v1）。
+        举例：共 6 支参赛队、每场 3 队同场 → 共 <strong>2 场</strong>小组战（两场 1v1v1），不会变成 3 场 1v1。
+        若保送、晋级与轮空合计超过 {BRACKET_TEAM_COUNT} 支，按成绩排序取前 {BRACKET_TEAM_COUNT} 支进入正赛。
+      </Typography.Paragraph>
+      <div style={{ marginBottom: 12 }}>
+        <Typography.Text type="secondary">每场小组上场队数（同场竞技、只晋级 1 队）：</Typography.Text>
+        <Radio.Group
+          style={{ marginLeft: 12 }}
+          value={elim?.groupSize ?? 3}
+          onChange={(e) =>
+            dispatch({ type: 'SET_ELIM_GROUP_SIZE', value: e.target.value as 2 | 3 | 4 })
+          }
+          options={[
+            { label: '2（一场 1v1）', value: 2 },
+            { label: '3（一场 1v1v1）', value: 3 },
+            { label: '4（一场 4 队争 1）', value: 4 },
+          ]}
+        />
+      </div>
+      <Space wrap style={{ marginBottom: 16 }}>
+        <Button onClick={openByeModal}>
+          保送队伍选择（{elim?.byeTeamIds.length ?? 0}/{MAX_ELIMINATION_BYE_TEAMS}）
+        </Button>
+        <Button
+          type="primary"
+          onClick={() => {
+            dispatch({ type: 'RANDOMIZE_ELIM_DRAW' });
+            message.success('已随机分组');
+          }}
+        >
+          淘汰赛抽签
+        </Button>
+        <Popconfirm
+          title="跳过淘汰赛？"
+          description={`将直接按成绩排名前 ${BRACKET_TEAM_COUNT} 进入正赛名单确认，不进行预选赛 PK。`}
+          onConfirm={() => {
+            dispatch({ type: 'SKIP_ELIMINATION_TO_MAIN_DRAW' });
+            dispatch({ type: 'SET_WIZARD_STEP', step: WIZARD_STEP_MAIN_POOL_CONFIRM });
+            message.success('已跳过预选赛，请确认正赛名单');
+          }}
+          okText="确定跳过"
+          cancelText="取消"
+        >
+          <Button>跳过选择</Button>
+        </Popconfirm>
+      </Space>
+      {previewPoolCount !== null && elim && !elim.skipped && (
+        <Typography.Paragraph type="secondary" style={{ marginTop: 12 }}>
+          当前晋级池按规则可得 <strong>{previewPoolCount}</strong> 支正赛名额（至多 {BRACKET_TEAM_COUNT} 支抽签）。
+        </Typography.Paragraph>
+      )}
+
+      {elim && elim.drawVersion >= 1 && waveBlocks.length > 0 && (
+        <div style={{ marginTop: 20 }}>
+          <Typography.Title level={5}>分组预览（每标签 = 一场多队同场小组）</Typography.Title>
+          {waveBlocks.map((row, wi) => (
+            <div key={wi} style={{ marginBottom: 16 }}>
+              <Typography.Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>
+                {waveBlocks.length > 1 ? `第 ${wi + 1} 波 · ` : ''}
+                {row.length} 场小组
+              </Typography.Text>
+              <Space wrap>
+                {row.map((m) => (
+                  <Tag key={m.id}>
+                    {m.teamIds
+                      .map((tid) => session.teams.find((t) => t.id === tid)?.name ?? '?')
+                      .join(' / ')}
+                  </Tag>
+                ))}
+              </Space>
+            </div>
+          ))}
+          {(elim.naturalByeTeamIds?.length > 0 || elim.naturalByeTeamId) && (
+            <Typography.Text type="warning">
+              无法成组（仅 1 队）、直接进入晋级池：
+              {(elim.naturalByeTeamIds?.length
+                ? elim.naturalByeTeamIds
+                : elim.naturalByeTeamId
+                  ? [elim.naturalByeTeamId]
+                  : []
+              )
+                .map((tid) => session.teams.find((t) => t.id === tid)?.name ?? tid)
+                .join('、')}
+            </Typography.Text>
+          )}
+        </div>
+      )}
+
+      <Modal
+        title={`保送队伍选择（${byeDraft.length}/${MAX_ELIMINATION_BYE_TEAMS}）`}
+        open={byeOpen}
+        onCancel={() => setByeOpen(false)}
+        onOk={() => {
+          dispatch({ type: 'SET_ELIM_BYE_TEAM_IDS', teamIds: byeDraft });
+          setByeOpen(false);
+          message.success('已更新保送名单');
+        }}
+        width={620}
+      >
+        <Typography.Paragraph type="secondary" style={{ marginBottom: 12 }}>
+          顺序与队伍确认一致；最多 {MAX_ELIMINATION_BYE_TEAMS} 支。
+        </Typography.Paragraph>
+        <div style={{ maxHeight: 360, overflow: 'auto' }}>
+          {rankedTeams.map((t) => {
+            const full = !t.disabled && t.playerIds.length === TEAM_PLAYERS;
+            if (!full) {
+              return (
+                <div key={t.id} style={{ padding: '6px 0', borderBottom: '1px solid #f0f0f0' }}>
+                  <Typography.Text type="secondary">
+                    {t.name}
+                    {t.disabled ? '（已禁用，不可保送）' : '（未满编，不可保送）'}
+                  </Typography.Text>
+                </div>
+              );
+            }
+            return (
+              <div key={t.id} style={{ padding: '8px 0', borderBottom: '1px solid #f0f0f0' }}>
+                <Checkbox
+                  checked={byeDraft.includes(t.id)}
+                  disabled={!byeDraft.includes(t.id) && byeDraft.length >= MAX_ELIMINATION_BYE_TEAMS}
+                  onChange={(e) => toggleBye(t.id, e.target.checked)}
+                >
+                  <Space direction="vertical" size={4} style={{ width: '100%' }}>
+                    <Typography.Text strong>{t.name}</Typography.Text>
+                    <Space wrap size={6}>
+                      <Tag>{schoolTagLabelForByeTeam(t, session)}</Tag>
+                      <Tag color="processing">{formatTeamAverageSumLine(t, session)}</Tag>
+                    </Space>
+                  </Space>
+                </Checkbox>
+              </div>
+            );
+          })}
+        </div>
+      </Modal>
+    </Card>
+  );
 };
 
 /** 淘汰赛首轮与 bracketGen 一致：槽位 2i vs 2i+1 */
@@ -257,26 +565,26 @@ function firstRoundPairsFromFlat(flat: (string | null)[]) {
   return pairs;
 }
 
-/** 抽签展示：三人正式平均成绩之和（与「队伍确认」主排序为平均时排名规则一致；任一人 DNF/缺成绩则无效） */
-function formatTeamAverageSumLine(team: Team, session: TeamMatchSession): string {
-  const eventId = session.eventIds[0] ?? '333';
-  const { sum, valid } = teamSeedingSum(team, session.players, session.seeding, eventId, 'average');
-  if (!valid) return '合计平均：—';
-  return `合计平均：${sum.toFixed(2)}s`;
-}
-
 const StepDraw: React.FC<StepDrawProps> = ({ session, dispatch }) => {
-  const bracketEligibleCount = useMemo(
-    () =>
-      rankedBracketTeamIds(
-        session.teams,
-        session.players,
-        session.seeding,
-        session.eventIds[0] ?? '333',
-        session.seedingPrimary,
-      ).length,
-    [session.teams, session.players, session.seeding, session.eventIds, session.seedingPrimary],
-  );
+  const eventIdDraw = session.eventIds[0] ?? '333';
+  const bracketEligibleCount = useMemo(() => {
+    const fromMain = session.mainBracketTeamIds;
+    if (fromMain && fromMain.length >= MIN_TEAMS) return fromMain.length;
+    return rankedBracketTeamIds(
+      session.teams,
+      session.players,
+      session.seeding,
+      eventIdDraw,
+      session.seedingPrimary,
+    ).length;
+  }, [
+    session.mainBracketTeamIds,
+    session.teams,
+    session.players,
+    session.seeding,
+    eventIdDraw,
+    session.seedingPrimary,
+  ]);
 
   const flat = useMemo(
     () =>
@@ -327,7 +635,7 @@ const StepDraw: React.FC<StepDrawProps> = ({ session, dispatch }) => {
   };
 
   return (
-    <Card title="5. 分区与抽签">
+    <Card title="正赛抽签 · 分区与抽签">
       <Space wrap align="center" style={{ marginBottom: 12 }}>
         <Typography.Text type="secondary">随机方式：</Typography.Text>
         <Radio.Group
@@ -378,7 +686,7 @@ const StepDraw: React.FC<StepDrawProps> = ({ session, dispatch }) => {
             }
             dispatch({ type: 'REBUILD_BRACKET' });
             dispatch({ type: 'SET_STATUS', status: 'live' });
-            dispatch({ type: 'SET_WIZARD_STEP', step: 6 });
+            dispatch({ type: 'SET_WIZARD_STEP', step: WIZARD_STEP_MAIN_LIVE });
           }}
         >
           开始比赛
@@ -452,6 +760,162 @@ const StepDraw: React.FC<StepDrawProps> = ({ session, dispatch }) => {
           ))}
         </div>
       )}
+    </Card>
+  );
+};
+
+function mainPoolRoleTagColor(tag: string): string | undefined {
+  if (tag === '保送') return 'blue';
+  if (tag === '小组赛晋级') return 'green';
+  if (tag === '轮空进池') return 'cyan';
+  if (tag === '预选赛淘汰') return 'red';
+  if (tag === '正赛16强') return 'gold';
+  if (tag === '晋级池未出线') return 'orange';
+  if (tag === '小组赛待定') return 'processing';
+  if (tag === '未进正赛16强') return 'default';
+  return undefined;
+}
+
+/** 预选赛结束或跳过淘汰后：展示全员成绩榜与预选赛结果，再写入 mainBracketTeamIds 进入抽签 */
+const StepMainPoolConfirm: React.FC<StepDrawProps> = ({ session, dispatch }) => {
+  const poolIds = useMemo(() => computeMainBracketTeamIds(session), [session]);
+  const displayRows = useMemo(() => buildMainPoolDisplayRows(session), [session]);
+  const elimSkipped = !!session.elimination?.skipped;
+  const eventId = session.eventIds[0] ?? '333';
+  const seedFromMain16 = useMemo(
+    () =>
+      new Set(
+        pickSeedTeamIds(
+          session.teams,
+          session.players,
+          session.seeding,
+          eventId,
+          session.seedingPrimary,
+          poolIds,
+        ),
+      ),
+    [session.teams, session.players, session.seeding, eventId, session.seedingPrimary, poolIds],
+  );
+
+  const rows = useMemo(
+    () =>
+      displayRows.map((dr) => {
+        const team = session.teams.find((t) => t.id === dr.teamId);
+        return {
+          key: dr.teamId,
+          rankInList: dr.rankInList,
+          mainBracketRank: dr.mainBracketRank,
+          roleTags: dr.roleTags,
+          team,
+          schoolLine: team ? teamKindLabel(team, session.schools) : '—',
+          avgLine: team ? formatTeamAverageSumLine(team, session) : '—',
+          seed: seedFromMain16.has(dr.teamId),
+        };
+      }),
+    [displayRows, session, seedFromMain16],
+  );
+
+  const seedPreviewLine = useMemo(() => {
+    const ids = pickSeedTeamIds(
+      session.teams,
+      session.players,
+      session.seeding,
+      eventId,
+      session.seedingPrimary,
+      poolIds,
+    );
+    if (!ids.length) return '—（晋级队中暂无足够「三人有效主排序成绩」的队时可能不足 4 支）';
+    return ids.map((id) => session.teams.find((t) => t.id === id)?.name ?? id).join(' / ');
+  }, [session.teams, session.players, session.seeding, eventId, session.seedingPrimary, poolIds]);
+
+  return (
+    <Card title="正赛名单确认">
+      <Space wrap style={{ marginBottom: 12 }}>
+        <Typography.Text>主排序依据（计算种子用，与步骤 4 一致）：</Typography.Text>
+        <Select
+          style={{ width: 120 }}
+          value={session.seedingPrimary}
+          onChange={(v) => dispatch({ type: 'SET_SEEDING_PRIMARY', primary: v })}
+          options={[
+            { label: '平均', value: 'average' },
+            { label: '单次', value: 'single' },
+          ]}
+        />
+        <Button
+          type="primary"
+          onClick={() => {
+            dispatch({ type: 'COMPUTE_SEED_TEAMS' });
+            message.success('已按晋级名单与主排序写入种子队');
+          }}
+        >
+          计算种子队
+        </Button>
+      </Space>
+      <Typography.Paragraph type="secondary">
+        {elimSkipped ? (
+          <>
+            当前<strong>已跳过预选赛</strong>，正赛名单按成绩总榜取前 {BRACKET_TEAM_COUNT} 名。下表列出全部队伍及是否进线。
+            <strong>种子队</strong>仅从上列晋级队中按主排序取成绩最优的 4 支；可切换主排序后点「计算种子队」预览，点击「确认名单」时会按相同规则再次写入。
+          </>
+        ) : (
+          <>
+            下表与「队伍确认」<strong>成绩总榜</strong>同序，标注保送、小组赛晋级、轮空进池、预选赛淘汰及是否进入正赛 {BRACKET_TEAM_COUNT}{' '}
+            强（晋级人数多于 {BRACKET_TEAM_COUNT} 时，晋级池内按本榜截取）。
+            <strong>种子队</strong>仅从晋级 {BRACKET_TEAM_COUNT} 强中按主排序取 4 支。
+            请核对后再进入分区抽签。若在步骤 4「队伍确认」中修改队伍或缺席，后续预选赛与抽签将自动清空，需重新操作。
+          </>
+        )}
+      </Typography.Paragraph>
+      <Typography.Paragraph type="secondary" style={{ marginBottom: 12 }}>
+        当前规则下的四种子：{seedPreviewLine}
+      </Typography.Paragraph>
+      <Table
+        size="small"
+        pagination={false}
+        dataSource={rows}
+        rowKey="key"
+        scroll={{ x: 'max-content' }}
+        columns={[
+          { title: '总榜', dataIndex: 'rankInList', width: 56 },
+          { title: '队伍', render: (_, r) => r.team?.name ?? r.key },
+          { title: '归属', dataIndex: 'schoolLine', ellipsis: true },
+          { title: '合计平均', dataIndex: 'avgLine' },
+          {
+            title: '预选赛 / 出线',
+            render: (_, r) => (
+              <Space size={[4, 4]} wrap>
+                {r.roleTags.map((t) => (
+                  <Tag key={t} color={mainPoolRoleTagColor(t)}>
+                    {t}
+                  </Tag>
+                ))}
+              </Space>
+            ),
+          },
+          {
+            title: '正赛名次',
+            width: 88,
+            render: (_, r) => (r.mainBracketRank !== null ? `第 ${r.mainBracketRank} 名` : '—'),
+          },
+          {
+            title: '种子',
+            width: 88,
+            render: (_, r) => (r.seed ? <Tag color="success">种子</Tag> : '—'),
+          },
+        ]}
+      />
+      <div style={{ marginTop: 20 }}>
+        <Button
+          type="primary"
+          disabled={poolIds.length < MIN_TEAMS}
+          onClick={() => {
+            dispatch({ type: 'CONFIRM_MAIN_BRACKET_POOL' });
+            message.success('已确认名单，进入正赛抽签');
+          }}
+        >
+          确认名单，进入正赛抽签
+        </Button>
+      </div>
     </Card>
   );
 };
@@ -627,13 +1091,6 @@ function patchSeedingEntry(
   return next;
 }
 
-function formatSeedTeamNames(session: TeamMatchSession): string {
-  const parts = session.seedTeamIds
-    .filter((id): id is string => Boolean(id))
-    .map((id) => session.teams.find((t) => t.id === id)?.name ?? '（未知队伍）');
-  return parts.length ? parts.join(' / ') : '未计算';
-}
-
 function useSeedingTableHelpers(session: TeamMatchSession, eventId: string, dispatch: StepScoreOrConfirmProps['dispatch']) {
   const [seedingModalPlayer, setSeedingModalPlayer] = useState<Player | null>(null);
   const [batchPrelimOpen, setBatchPrelimOpen] = useState(false);
@@ -793,7 +1250,7 @@ const StepScoreEntry: React.FC<StepScoreOrConfirmProps> = ({ session, dispatch, 
       </Space>
       <OneCompPrelimImportCard session={session} dispatch={dispatch} />
       <Typography.Paragraph type="secondary" style={{ marginBottom: 12, marginTop: 12 }}>
-        当前 WCA 项目为页面顶部「比赛项目」所选。按队伍展示队员，点击「编辑成绩」填写单次/平均、DNF，或拉取 WCA / One（需在选手资料中填写对应 ID）。主排序依据与种子将在「队伍确认」中设置。登记超过 {BRACKET_TEAM_COUNT}{' '}
+        当前 WCA 项目为页面顶部「比赛项目」所选。按队伍展示队员，点击「编辑成绩」填写单次/平均、DNF，或拉取 WCA / One（需在选手资料中填写对应 ID）。主排序依据在「队伍确认」选择；种子队在「正赛名单确认」从晋级 {BRACKET_TEAM_COUNT} 强中计算。登记超过 {BRACKET_TEAM_COUNT}{' '}
         支有效队时，仅排名前 {BRACKET_TEAM_COUNT} 的进入正赛抽签（见各队标签）。
       </Typography.Paragraph>
 
@@ -880,28 +1337,11 @@ const StepTeamConfirm: React.FC<StepScoreOrConfirmProps> = ({ session, dispatch,
     [session.teams, session.players, session.seeding, eventId, session.seedingPrimary],
   );
 
-  const activeTeamOptions = useMemo(() => {
-    return session.teams
-      .filter((t) => !t.disabled && t.playerIds.length === TEAM_PLAYERS && bracketEligibleIds.has(t.id))
-      .map((t) => ({ label: t.name, value: t.id }));
-  }, [session.teams, bracketEligibleIds]);
-
-  const setSeedAtRegion = (regionIndex: number, teamId: string | null) => {
-    const next: [string | null, string | null, string | null, string | null] = [...session.seedTeamIds];
-    if (teamId) {
-      for (let i = 0; i < 4; i++) {
-        if (i !== regionIndex && next[i] === teamId) next[i] = null;
-      }
-    }
-    next[regionIndex] = teamId;
-    dispatch({ type: 'SET_SEED_TEAM_IDS', seedTeamIds: next });
-  };
-
   return (
     <Card title="4. 队伍确认">
       {confirmSeedingModal}
       <Space wrap style={{ marginBottom: 12 }}>
-        <Typography.Text>主排序依据（用于「计算种子队」）：</Typography.Text>
+        <Typography.Text>主排序依据（列表顺序与出线判定）：</Typography.Text>
         <Select
           style={{ width: 120 }}
           value={session.seedingPrimary}
@@ -911,41 +1351,11 @@ const StepTeamConfirm: React.FC<StepScoreOrConfirmProps> = ({ session, dispatch,
             { label: '单次', value: 'single' },
           ]}
         />
-        <Button
-          type="primary"
-          onClick={() => {
-            dispatch({ type: 'COMPUTE_SEED_TEAMS' });
-            message.success('已根据成绩确定种子队');
-          }}
-        >
-          计算种子队
-        </Button>
       </Space>
       <Typography.Paragraph type="secondary" style={{ marginBottom: 12 }}>
-        确认参赛名单与种子：可标记缺席。列表顺序：满编队内缺主排序成绩人数少的在前，其余按有效成绩之和升序；未满编队靠后。仅「正赛出线」队（满编、未缺席、按上列顺序取前 {BRACKET_TEAM_COUNT}；不足 16 支成绩齐全时会按排名纳入部分缺成绩队）参与抽签；种子仅可在出线队中选择或「计算种子队」。
+        确认参赛名单：可标记缺席。列表顺序：满编队内缺主排序成绩人数少的在前，其余按有效成绩之和升序；未满编队靠后。仅「正赛出线」队（满编、未缺席、按上列顺序取前 {BRACKET_TEAM_COUNT}；不足 16 支成绩齐全时会按排名纳入部分缺成绩队）在跳过预选赛时参与抽签。
+        <strong>种子队</strong>在「正赛名单确认」步骤从晋级 {BRACKET_TEAM_COUNT} 强中计算，不在本页设置。
       </Typography.Paragraph>
-
-      <Card size="small" type="inner" title="四区种子（各区首位）" style={{ marginBottom: 16 }}>
-        <Space direction="vertical" style={{ width: '100%' }} size="middle">
-          {[0, 1, 2, 3].map((r) => (
-            <Space key={r} wrap>
-              <Typography.Text style={{ minWidth: 88 }}>第 {r + 1} 区</Typography.Text>
-              <Select
-                style={{ minWidth: 220 }}
-                allowClear
-                placeholder="不指定"
-                value={session.seedTeamIds[r] ?? undefined}
-                options={activeTeamOptions.filter((o) => {
-                  const tid = o.value;
-                  if (session.seedTeamIds[r] === tid) return true;
-                  return !session.seedTeamIds.some((x, i) => i !== r && x === tid);
-                })}
-                onChange={(v) => setSeedAtRegion(r, v ?? null)}
-              />
-            </Space>
-          ))}
-        </Space>
-      </Card>
 
       {teamsSorted.map((team) => {
         const schoolName = teamKindLabel(team, session.schools);
@@ -959,16 +1369,10 @@ const StepTeamConfirm: React.FC<StepScoreOrConfirmProps> = ({ session, dispatch,
             key={team.id}
             size="small"
             style={{ marginBottom: 12 }}
-            className={team.isSeed ? 'tmSeedTeamCard' : undefined}
             title={
               <Space wrap>
                 <Typography.Text strong>{team.name}</Typography.Text>
                 <Typography.Text type="secondary">· {schoolName}</Typography.Text>
-                {team.isSeed && (
-                  <Tag color="success" style={{ marginInlineEnd: 0 }}>
-                    种子
-                  </Tag>
-                )}
                 {team.disabled && <Typography.Text type="danger">（已禁用）</Typography.Text>}
                 {!team.disabled && team.playerIds.length === TEAM_PLAYERS && (
                   <>
@@ -1004,10 +1408,6 @@ const StepTeamConfirm: React.FC<StepScoreOrConfirmProps> = ({ session, dispatch,
           </Card>
         );
       })}
-
-      <Typography.Paragraph style={{ marginTop: 12 }} type="secondary">
-        当前种子队：{formatSeedTeamNames(session)}
-      </Typography.Paragraph>
     </Card>
   );
 };

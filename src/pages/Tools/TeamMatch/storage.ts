@@ -43,10 +43,11 @@ export function upsertSession(root: TeamMatchStorageRoot, session: TeamMatchSess
 }
 
 export function deleteSession(root: TeamMatchStorageRoot, id: string): TeamMatchStorageRoot {
-  const { [id]: _, ...rest } = root.sessions;
+  const sessions = { ...root.sessions };
+  delete sessions[id];
   return {
     ...root,
-    sessions: rest,
+    sessions,
     historyIds: root.historyIds.filter((x) => x !== id),
     currentSessionId: root.currentSessionId === id ? null : root.currentSessionId,
   };

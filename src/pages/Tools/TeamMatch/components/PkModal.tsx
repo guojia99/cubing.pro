@@ -6,6 +6,8 @@ import React, { useMemo } from 'react';
 type Props = {
   open: boolean;
   onClose: () => void;
+  /** 弹窗标题，默认「录入 PK 成绩」 */
+  modalTitle?: string;
   match: BracketMatch | null;
   teams: Team[];
   players: Player[];
@@ -20,6 +22,7 @@ type Props = {
 const PkModal: React.FC<Props> = ({
   open,
   onClose,
+  modalTitle = '录入 PK 成绩',
   match,
   teams,
   players,
@@ -90,7 +93,7 @@ const PkModal: React.FC<Props> = ({
 
   return (
     <Modal
-      title="录入 PK 成绩"
+      title={modalTitle}
       open={open}
       onCancel={onClose}
       width={720}

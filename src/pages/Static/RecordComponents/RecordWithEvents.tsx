@@ -7,14 +7,22 @@ import { EventsAPI } from '@/services/cubing-pro/events/typings';
 import { apiRecords } from '@/services/cubing-pro/statistics/records';
 import { Select } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { apiPublicOrganizers } from '@/services/cubing-pro/public/orgs';
+import { apiPublicCompGroups } from '@/services/cubing-pro/public/orgs';
 
+export type RecordsWithEventsProps = {
+  groupId: number;
+  eventId: string;
+  onGroupIdChange: (id: number) => void;
+  onEventIdChange: (id: string) => void;
+};
 
-
-const RecordsWithEvents: React.FC = () => {
+const RecordsWithEvents: React.FC<RecordsWithEventsProps> = ({
+  groupId,
+  eventId,
+  onGroupIdChange,
+  onEventIdChange,
+}) => {
   const [events, setEvents] = useState<EventsAPI.Event[]>([]);
-  const [groupId, setGroupId] = useState<number>(0);
-  const [event, setEvent] = useState<string>('333');
 
   const [orgItems, setOrgItems] = useState<any[]>([]);
 
@@ -24,7 +32,7 @@ const RecordsWithEvents: React.FC = () => {
     setLoading(true);
     apiRecords({
       GroupId: groupId === 0 ? '' : String(groupId),
-      EventId: event || '333',
+      EventId: eventId || '333',
     })
       .then((value) => {
         if (value.data.Records) {
@@ -39,33 +47,51 @@ const RecordsWithEvents: React.FC = () => {
   useEffect(() => {
     apiEvents().then((value) => {
       setEvents(value.data.Events);
-      if (value.data.Events.length > 0) {
-        setEvent(value.data.Events[0].id);
-        fetchRecords();
-      }
     });
 
-    apiPublicOrganizers().then(value => {
+    apiPublicCompGroups().then((value) => {
       const ite = [
         {
           label: 'CubingPro',
           key: 'CubingPro',
           value: 0,
         },
-      ]
+      ];
 
-      if (value.data && value.data.items){
-        for (let i = 0; i < value.data.items.length; i++){
+      if (value.data && value.data.items) {
+        for (let i = 0; i < value.data.items.length; i++) {
           ite.push({
-            label: value.data.items[i].Name,
-            key: value.data.items[i].Name,
+            label: value.data.items[i].name,
+            key: value.data.items[i].name,
             value: value.data.items[i].id,
-          })
+          });
         }
       }
-      setOrgItems(ite)
-    })
+      setOrgItems(ite);
+    });
   }, []);
+
+  useEffect(() => {
+    if (events.length === 0) {
+      return;
+    }
+    const comp = events.filter((e) => e.isComp);
+    if (comp.length === 0) {
+      return;
+    }
+    if (!comp.some((e) => e.id === eventId)) {
+      onEventIdChange(comp[0].id);
+    }
+  }, [events, eventId, onEventIdChange]);
+
+  useEffect(() => {
+    if (orgItems.length === 0) {
+      return;
+    }
+    if (!orgItems.some((o) => o.value === groupId)) {
+      onGroupIdChange(0);
+    }
+  }, [orgItems, groupId, onGroupIdChange]);
 
   const GroupChildren = (list: EventsAPI.Event[]) => {
     if (list === null || list === undefined) {
@@ -88,7 +114,7 @@ const RecordsWithEvents: React.FC = () => {
 
   useEffect(() => {
     fetchRecords();
-  }, [event, groupId]);
+  }, [eventId, groupId]);
 
   const items = [
     {
@@ -127,24 +153,20 @@ const RecordsWithEvents: React.FC = () => {
       </h3>
 
       <Select
-        defaultValue="333"
+        value={eventId}
         style={{ marginBottom: '20px', width: '150px' }}
         loading={loading}
         options={items}
-        onChange={(value) => {
-          setEvent(value);
-        }}
+        onChange={(value) => onEventIdChange(value)}
       />
 
       <Select
-        defaultValue={0}
+        value={groupId}
         style={{ marginBottom: '20px', marginLeft: '20px', width: '150px' }}
         loading={loading}
         options={orgItems}
-        onChange={(value) => {
-          setGroupId(value);
-        }}
-      ></Select>
+        onChange={(value) => onGroupIdChange(value)}
+      />
 
       {RecordsTable(rc, ['Index', 'UserName', 'Best', 'Average', 'ResultTime', 'CompsName'])}
     </>

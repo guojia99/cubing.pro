@@ -1,26 +1,24 @@
 import { NavTabs } from '@/components/Tabs/nav_tabs';
 import KinCh from '@/pages/Static/Kinsor';
-import { BarChartOutlined, OrderedListOutlined, TrophyOutlined } from '@ant-design/icons';
-import React from 'react';
-import Records from "@/pages/Static/Record";
+import { BarChartOutlined, OrderedListOutlined } from '@ant-design/icons';
+import { useLocation, useNavigate } from '@umijs/max';
+import React, { useEffect } from 'react';
 import DiyRanks from "@/pages/Static/DiyRanks";
 import DiyRankView from "@/pages/Static/DiyRanks";
 import Statistics from '@/pages/WCA/Statistics';
 
 const Static: React.FC = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const sp = new URLSearchParams(location.search);
+    if (sp.get('static_tabs') === 'records') {
+      navigate('/groupCompetitions/records', { replace: true });
+    }
+  }, [location.search, navigate]);
+
   const items = [
-    // {
-    //   key: 'best',
-    //   label: '最佳成绩',
-    //   children: <Best />,
-    //   icon: <TrophyOutlined />,
-    // },
-    {
-      key: 'records',
-      label: '记录',
-      children: <Records />,
-      icon: <TrophyOutlined />,
-    },
     {
       key: 'kinch_sor',
       label: 'KinCh',

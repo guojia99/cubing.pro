@@ -9,7 +9,9 @@ export async function throttleBeforeWcaResultsRequest(): Promise<void> {
   const elapsed = now - lastWcaRequestStartAt;
   const wait = Math.max(0, WCA_REQUEST_MIN_INTERVAL_MS - elapsed);
   if (wait > 0) {
-    await new Promise<void>((resolve) => setTimeout(resolve, wait));
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, wait);
+    });
   }
   lastWcaRequestStartAt = Date.now();
 }
@@ -24,7 +26,9 @@ export async function throttleBeforeWcaAvatarRequest(): Promise<void> {
   const elapsed = now - lastWcaAvatarRequestAt;
   const wait = Math.max(0, WCA_AVATAR_MIN_INTERVAL_MS - elapsed);
   if (wait > 0) {
-    await new Promise<void>((resolve) => setTimeout(resolve, wait));
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, wait);
+    });
   }
   lastWcaAvatarRequestAt = Date.now();
 }
