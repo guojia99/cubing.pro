@@ -108,12 +108,19 @@ export type PkComputedSummary = {
   computedWinnerTeamId: string | null;
 };
 
+export type PkMultiTeamComputedSummary = {
+  teamTotals: Record<string, number | 'dnf_team' | 'incomplete'>;
+  /** 参赛队成绩均为 DNF 队伍 */
+  allTeamsDnf: boolean;
+  computedWinnerTeamId: string | null;
+};
+
 export type PkScoreSnapshot = {
   id: string;
   recordedAt: number;
   reason: 'submit' | 'replay' | 'correct';
   results: PkPlayerResult[];
-  computed?: PkComputedSummary;
+  computed?: PkComputedSummary | PkMultiTeamComputedSummary;
 };
 
 export type PkResolution =
@@ -186,6 +193,49 @@ export type TeamMatchSession = {
     cId: number | null;
     eRound: number;
   };
+  /**
+   * 正赛 16 强名单：超过 16 队时由淘汰赛晋级结果或「跳过淘汰赛」写入；未设置时抽签仍用成绩排名前 16。
+   */
+  mainBracketTeamIds: string[] | null;
+  /** 预选赛（小组战：每组多队同场，仅 1 队晋级）：超过 16 队时可选 */
+  elimination: EliminationPhaseState | null;
+};
+
+/** 每组同场 PK 的队伍数（2/3/4 队上场，仅 1 队晋级） */
+export type ElimGroupSize = 2 | 3 | 4;
+
+/** 预选赛一场小组战：多队同场比总秒，胜者唯一晋级 */
+export type ElimGroupPkState = {
+  teamIds: string[];
+  currentResults: PkPlayerResult[];
+  scoreHistory: PkScoreSnapshot[];
+  resolution: PkResolution | null;
+  lastComputed?: PkComputedSummary | PkMultiTeamComputedSummary;
+};
+
+export type EliminationGroupMatch = {
+  id: string;
+  teamIds: string[];
+  winnerId: string | null;
+  pk: ElimGroupPkState | null;
+};
+
+export type EliminationPhaseState = {
+  /** 主办选择跳过预选赛，直接按成绩取前 16 进入正赛抽签 */
+  skipped: boolean;
+  /** 每组上场队伍数（仅 1 队晋级） */
+  groupSize: ElimGroupSize;
+  /** 保送队伍（最多 15），不参与预选赛 PK，直接进入晋级池 */
+  byeTeamIds: string[];
+  /** 每次重新抽签 +1 */
+  drawVersion: number;
+  /** 抽签后不足一组、仅 1 队无法开赛时直接进晋级池（2 队及以上剩余会另组一场 PK） */
+  naturalByeTeamIds: string[];
+  /** @deprecated 使用 naturalByeTeamIds */
+  naturalByeTeamId?: string | null;
+  /** 每波包含几场小组；新抽签固定为单波 [总场数] */
+  waveSizes: number[];
+  matches: EliminationGroupMatch[];
 };
 
 export type ArchivedSessionMeta = {
@@ -206,8 +256,19 @@ export type TeamMatchStorageRoot = {
 export const TEAM_PLAYERS = 3;
 /** 淘汰赛签表固定 16 槽；报名可超过，按成绩排名取前 16 进入正赛 */
 export const BRACKET_TEAM_COUNT = 16;
+/** 预选赛保送队伍上限 */
+export const MAX_ELIMINATION_BYE_TEAMS = 15;
 /** 单场比赛最多登记的有效队伍数 */
 export const MAX_ROSTER_TEAMS = 64;
 export const MIN_TEAMS = 8;
 export const HISTORY_LIMIT = 15;
 export const STORAGE_KEY = 'cubing-pro:team-match:v1';
+
+/** 向导：队伍选择末步（0–3）后为预选赛与正赛抽签 */
+export const WIZARD_STEP_ELIM_DRAW = 4;
+export const WIZARD_STEP_ELIM_LIVE = 5;
+/** 正赛 16 强名单确认（排序预览） */
+export const WIZARD_STEP_MAIN_POOL_CONFIRM = 6;
+export const WIZARD_STEP_MAIN_DRAW = 7;
+export const WIZARD_STEP_MAIN_LIVE = 8;
+export const WIZARD_STEP_PODIUM = 9;

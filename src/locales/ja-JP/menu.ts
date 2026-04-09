@@ -1,6 +1,7 @@
 export default {
   "menu.groupCompetitions": "群の大会",
   "menu.groupCompetitions.Static": "統計",
+  "menu.groupCompetitions.Records": "記録",
   "menu.groupCompetitions.Project": "プロジェクト",
   "menu.groupCompetitions.Competitions": "大会",
   "menu.groupCompetitions.Player": "選手",

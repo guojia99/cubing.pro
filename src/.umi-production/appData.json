@@ -141,7 +141,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 6
+        "register": 2
       },
       "enableBy": "register"
     },
@@ -168,7 +168,7 @@
       "time": {
         "hooks": {
           "onStart": [
-            0
+            1
           ]
         },
         "register": 1
@@ -249,7 +249,7 @@
       "time": {
         "hooks": {
           "modifyAppData": [
-            11
+            14
           ]
         },
         "register": 9
@@ -265,7 +265,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 1
+        "register": 0
       },
       "enableBy": "register"
     },
@@ -332,7 +332,7 @@
             0
           ]
         },
-        "register": 3
+        "register": 2
       },
       "enableBy": "register"
     },
@@ -1201,7 +1201,7 @@
             0
           ]
         },
-        "register": 1
+        "register": 0
       },
       "enableBy": "register"
     },
@@ -1240,7 +1240,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 19
+        "register": 15
       },
       "enableBy": "config"
     },
@@ -1267,7 +1267,7 @@
       "time": {
         "hooks": {
           "modifyAppData": [
-            1
+            0
           ]
         },
         "register": 0
@@ -1283,7 +1283,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 1
+        "register": 0
       },
       "enableBy": "register"
     },
@@ -1296,7 +1296,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 0
+        "register": 1
       },
       "enableBy": "config"
     },
@@ -1373,7 +1373,7 @@
       "time": {
         "hooks": {
           "modifyConfig": [
-            1
+            0
           ]
         },
         "register": 1
@@ -1401,7 +1401,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 1
+        "register": 0
       },
       "enableBy": "register"
     },
@@ -1414,7 +1414,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 0
+        "register": 1
       },
       "enableBy": "config"
     },
@@ -1440,7 +1440,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 1
+        "register": 0
       },
       "enableBy": "register"
     },
@@ -1479,7 +1479,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 1
+        "register": 0
       }
     },
     "./node_modules/@umijs/preset-umi/dist/features/ssr/ssr": {
@@ -1517,7 +1517,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 2
+        "register": 1
       },
       "enableBy": "register"
     },
@@ -1543,7 +1543,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 1
+        "register": 0
       },
       "enableBy": "config"
     },
@@ -1568,7 +1568,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 10
+        "register": 9
       },
       "enableBy": "config"
     },
@@ -1581,7 +1581,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 0
+        "register": 1
       }
     },
     "./node_modules/@umijs/preset-umi/dist/features/clickToComponent/clickToComponent": {
@@ -1593,7 +1593,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 1
+        "register": 0
       }
     },
     "./node_modules/@umijs/preset-umi/dist/features/legacy/legacy": {
@@ -1685,7 +1685,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 1
+        "register": 0
       }
     },
     "./node_modules/@umijs/preset-umi/dist/features/hmrGuardian/hmrGuardian": {
@@ -1709,7 +1709,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 14
+        "register": 13
       }
     },
     "./node_modules/@umijs/preset-umi/dist/features/forget/forget": {
@@ -1747,7 +1747,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 2
+        "register": 1
       },
       "enableBy": "register"
     },
@@ -1760,7 +1760,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 15
+        "register": 14
       },
       "enableBy": "register"
     },
@@ -1773,7 +1773,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 13
+        "register": 12
       }
     },
     "./node_modules/@umijs/preset-umi/dist/commands/help": {
@@ -1967,7 +1967,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 1
+        "register": 0
       },
       "enableBy": "register"
     },
@@ -1980,7 +1980,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 0
+        "register": 1
       },
       "enableBy": "register"
     },
@@ -2006,7 +2006,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 1
+        "register": 0
       },
       "enableBy": "register"
     },
@@ -2019,7 +2019,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 9
+        "register": 10
       },
       "enableBy": "register"
     },
@@ -2095,7 +2095,7 @@
             0
           ]
         },
-        "register": 4
+        "register": 3
       }
     },
     "./node_modules/@umijs/plugins/dist/dva": {
@@ -2107,7 +2107,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 4
+        "register": 5
       },
       "enableBy": "config"
     },
@@ -2145,7 +2145,7 @@
             0
           ]
         },
-        "register": 2
+        "register": 1
       },
       "enableBy": "config"
     },
@@ -2184,7 +2184,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 2
+        "register": 3
       },
       "enableBy": "config"
     },
@@ -2214,7 +2214,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 1
+        "register": 0
       },
       "enableBy": "register"
     },
@@ -2227,7 +2227,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 0
+        "register": 1
       }
     },
     "./node_modules/@umijs/plugins/dist/qiankun/slave": {
@@ -2264,7 +2264,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 1
+        "register": 0
       },
       "enableBy": "config"
     },
@@ -2277,7 +2277,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 0
+        "register": 1
       },
       "enableBy": "config"
     },
@@ -2303,7 +2303,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 1
+        "register": 0
       },
       "enableBy": "config"
     },
@@ -2317,10 +2317,10 @@
       "time": {
         "hooks": {
           "modifyConfig": [
-            0
+            1
           ]
         },
-        "register": 0
+        "register": 1
       },
       "enableBy": "register"
     },
@@ -2371,7 +2371,7 @@
             0
           ]
         },
-        "register": 1
+        "register": 0
       },
       "enableBy": "register"
     },
@@ -2401,7 +2401,7 @@
             0
           ]
         },
-        "register": 99
+        "register": 87
       },
       "enableBy": "config"
     },
@@ -2414,7 +2414,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 61
+        "register": 53
       },
       "enableBy": "config"
     },
@@ -2429,7 +2429,7 @@
       },
       "time": {
         "hooks": {},
-        "register": 1
+        "register": 0
       },
       "enableBy": "config"
     },
@@ -2747,6 +2747,11 @@
             "component": "./Static/Static"
           },
           {
+            "name": "Records",
+            "path": "records",
+            "component": "./Static/Record"
+          },
+          {
             "name": "Project",
             "path": "events",
             "component": "./Events/Events"
@@ -2816,7 +2821,7 @@
     "access": {},
     "headScripts": [
       {
-        "src": "/scripts/loading.js?v=1775230254",
+        "src": "/scripts/loading.js?v=1775645465",
         "async": true
       }
     ],
@@ -2846,7 +2851,7 @@
     "define": {
       "process.env.CHOKIDAR_USEPOLLING": "true",
       "process.env.CHOKIDAR_INTERVAL": "1000",
-      "process.env.BUILD_TIMESTAMP": "\"1775230254\""
+      "process.env.BUILD_TIMESTAMP": "\"1775645465\""
     }
   },
   "mainConfigFile": "/Users/guojia/worker/code/cube/cubing.pro/config/config.ts",
@@ -3149,6 +3154,11 @@
             "name": "Static",
             "path": "static",
             "component": "./Static/Static"
+          },
+          {
+            "name": "Records",
+            "path": "records",
+            "component": "./Static/Record"
           },
           {
             "name": "Project",
@@ -4130,7 +4140,7 @@
     "access": {},
     "headScripts": [
       {
-        "src": "/scripts/loading.js?v=1775230254",
+        "src": "/scripts/loading.js?v=1775645465",
         "async": true
       }
     ],
@@ -4156,7 +4166,7 @@
     "define": {
       "process.env.CHOKIDAR_USEPOLLING": "true",
       "process.env.CHOKIDAR_INTERVAL": "1000",
-      "process.env.BUILD_TIMESTAMP": "\"1775230254\"",
+      "process.env.BUILD_TIMESTAMP": "\"1775645465\"",
       "ANT_DESIGN_PRO_ONLY_DO_NOT_USE_IN_YOUR_PRODUCTION": "",
       "REACT_APP_ENV": false
     },
@@ -4569,7 +4579,7 @@
       "parentId": "35",
       "id": "40",
       "absPath": "/tools/teamMatch",
-      "__content": "import BracketStage from '@/pages/Tools/TeamMatch/components/BracketStage';\nimport LiveSettingsButton from '@/pages/Tools/TeamMatch/components/LiveSettingsButton';\nimport LiveSettingsModal from '@/pages/Tools/TeamMatch/components/LiveSettingsModal';\nimport PodiumStage from '@/pages/Tools/TeamMatch/components/PodiumStage';\nimport { isBracketFullyComplete } from '@/pages/Tools/TeamMatch/bracketComplete';\nimport { loadLiveUISettings, saveLiveUISettings, type LiveUISettings } from '@/pages/Tools/TeamMatch/liveUiSettings';\nimport { canAccessWizardStep } from '@/pages/Tools/TeamMatch/stepAccess';\nimport { metaFromSession } from '@/pages/Tools/TeamMatch/storage';\nimport { TeamMatchProvider, useTeamMatchStore } from '@/pages/Tools/TeamMatch/TeamMatchContext';\nimport TeamMatchJsonToolbar from '@/pages/Tools/TeamMatch/components/TeamMatchJsonToolbar';\nimport TeamMatchSteps from '@/pages/Tools/TeamMatch/TeamMatchSteps';\nimport { TEAM_MATCH_WCA_EVENT_OPTIONS } from '@/pages/Tools/TeamMatch/wcaCubeEvents';\nimport { MAX_ROSTER_TEAMS, MIN_TEAMS, type TeamMatchSession } from '@/pages/Tools/TeamMatch/types';\nimport { Button, Card, Input, InputNumber, List, Modal, Popconfirm, Select, message, Space, Steps, Typography } from 'antd';\nimport React from 'react';\nimport './TeamMatch.less';\n\nconst stepTitles = ['学校与选手', '组队', '成绩录入', '队伍确认', '抽签', '正赛'];\n\nfunction TeamMatchInner() {\n  const { state, dispatch } = useTeamMatchStore();\n  const { session } = state;\n  const step = session.wizardStep;\n  const [mockModalOpen, setMockModalOpen] = React.useState(false);\n  const [mockGroupCount, setMockGroupCount] = React.useState(1);\n  const [liveUISettings, setLiveUISettings] = React.useState<LiveUISettings>(() => loadLiveUISettings());\n  const [liveSettingsOpen, setLiveSettingsOpen] = React.useState(false);\n\n  React.useEffect(() => {\n    saveLiveUISettings(liveUISettings);\n  }, [liveUISettings]);\n\n  React.useEffect(() => {\n    if (step !== 6) setLiveSettingsOpen(false);\n  }, [step]);\n\n  const activeTeamCount = session.teams.filter(\n    (t) => !t.disabled && t.playerIds.length === 3,\n  ).length;\n\n  const canNext = () => {\n    switch (step) {\n      case 0:\n        return session.schools.length > 0 && session.players.length > 0;\n      case 1:\n        return activeTeamCount >= MIN_TEAMS && activeTeamCount <= MAX_ROSTER_TEAMS;\n      case 2:\n        return activeTeamCount >= MIN_TEAMS && activeTeamCount <= MAX_ROSTER_TEAMS;\n      case 3:\n        return session.seedTeamIds.some(Boolean);\n      case 4:\n        return false;\n      default:\n        return false;\n    }\n  };\n\n  const next = () => {\n    if (step < 5 && canNext()) {\n      dispatch({ type: 'SET_WIZARD_STEP', step: step + 1 });\n    }\n  };\n\n  const prev = () => {\n    if (step > 0) {\n      dispatch({ type: 'SET_WIZARD_STEP', step: step - 1 });\n    }\n  };\n\n  const goToStepByClick = (target: number) => {\n    if (target < 0 || target > 4) return;\n    if (!canAccessWizardStep(session, target)) {\n      message.warning('请先完成前置步骤（学校与选手 → 组队 → 成绩 → 队伍确认）');\n      return;\n    }\n    dispatch({ type: 'SET_WIZARD_STEP', step: target });\n  };\n\n  const jsonToolbarProps = {\n    session,\n    liveUISettings,\n    onHydrate: (s: TeamMatchSession) => dispatch({ type: 'HYDRATE', session: s }),\n    onImportLiveUI: setLiveUISettings,\n  };\n\n  if (session.status === 'live' && (step === 6 || step === 7)) {\n    const bracketComplete = isBracketFullyComplete(session);\n    const podiumBlockHint = session.skipBronzeMatch\n      ? '请完成全部淘汰赛（已跳过季军赛）'\n      : '请完成全部淘汰赛与铜牌战';\n    return (\n      <div className=\"tmFullscreen\">\n        <TeamMatchJsonToolbar {...jsonToolbarProps} variant=\"dark\" />\n        <div\n          style={{\n            padding: '8px 12px',\n            display: 'flex',\n            flexWrap: 'wrap',\n            gap: 12,\n            justifyContent: 'space-between',\n            alignItems: 'center',\n          }}\n        >\n          <Space wrap align=\"center\" size=\"middle\">\n            <Typography.Text style={{ color: 'rgba(255,255,255,0.65)' }}>\n              {step === 7 ? '领奖台' : '正赛'}\n            </Typography.Text>\n            <MatchNameField variant=\"dark\" />\n          </Space>\n          <Space wrap>\n            {step === 7 ? (\n              <Button type=\"primary\" onClick={() => dispatch({ type: 'SET_WIZARD_STEP', step: 6 })}>\n                返回正赛\n              </Button>\n            ) : (\n              <>\n                <Button onClick={() => dispatch({ type: 'SET_WIZARD_STEP', step: 4 })}>返回抽签</Button>\n                <LiveSettingsButton type=\"default\" ghost onClick={() => setLiveSettingsOpen(true)} />\n                <Button\n                  type=\"primary\"\n                  disabled={!bracketComplete}\n                  title={!bracketComplete ? podiumBlockHint : undefined}\n                  onClick={() => dispatch({ type: 'SET_WIZARD_STEP', step: 7 })}\n                >\n                  下一步：领奖台\n                </Button>\n              </>\n            )}\n          </Space>\n        </div>\n        <div className=\"tmFullscreenInner\">\n          {step === 7 ? (\n            <PodiumStage />\n          ) : (\n            <BracketStage liveSettings={liveUISettings} onOpenLiveSettings={() => setLiveSettingsOpen(true)} />\n          )}\n        </div>\n        {step === 6 && (\n          <LiveSettingsModal\n            open={liveSettingsOpen}\n            onClose={() => setLiveSettingsOpen(false)}\n            value={liveUISettings}\n            onApply={(next) => {\n              setLiveUISettings(next);\n              setLiveSettingsOpen(false);\n            }}\n          />\n        )}\n      </div>\n    );\n  }\n\n  return (\n    <>\n      <TeamMatchJsonToolbar {...jsonToolbarProps} variant=\"light\" />\n      <Card>\n      <Space direction=\"vertical\" style={{ width: '100%' }} size=\"large\">\n        <Typography.Title level={4} style={{ margin: 0 }}>\n          组队赛工具\n        </Typography.Title>\n        <Space wrap align=\"center\" size=\"middle\">\n          <MatchNameField />\n          <MatchEventField />\n        </Space>\n        <Space wrap>\n          <Button onClick={() => dispatch({ type: 'NEW_SESSION' })}>新比赛</Button>\n          <Popconfirm\n            title=\"用测试数据覆盖当前比赛？\"\n            description=\"将替换为学校/选手/队伍及随机种子成绩（满16队：广工5队等预设校名）。\"\n            onConfirm={() => {\n              dispatch({ type: 'MOCK_FILL_TEST_DATA' });\n              message.success('已填充满16队测试数据');\n            }}\n            okText=\"覆盖\"\n            cancelText=\"取消\"\n          >\n            <Button>一键填充16队测试数据</Button>\n          </Popconfirm>\n          <Button onClick={() => setMockModalOpen(true)}>追加测试分组</Button>\n          <Modal\n            title=\"追加测试分组\"\n            open={mockModalOpen}\n            onCancel={() => setMockModalOpen(false)}\n            onOk={() => {\n              const n = Math.max(1, Math.floor(mockGroupCount));\n              const room = MAX_ROSTER_TEAMS - session.teams.length;\n              if (room <= 0) {\n                message.warning(`队伍已达上限 ${MAX_ROSTER_TEAMS}，无法继续添加`);\n                return;\n              }\n              const add = Math.min(n, room);\n              dispatch({ type: 'MOCK_APPEND_GROUPS', count: add });\n              message.success(`已追加 ${add} 组（学校+选手+队伍），并写入随机种子成绩`);\n              setMockModalOpen(false);\n            }}\n            okText=\"追加\"\n          >\n            <Typography.Paragraph type=\"secondary\" style={{ marginBottom: 12 }}>\n              按预设校名顺序追加（与「一键填充16队」同一套校名表；满16队时广工共5队）。当前队伍{' '}\n              {session.teams.length}/{MAX_ROSTER_TEAMS}。\n            </Typography.Paragraph>\n            <Space align=\"center\">\n              <Typography.Text>组数</Typography.Text>\n              <InputNumber\n                min={1}\n                max={Math.max(1, MAX_ROSTER_TEAMS - session.teams.length)}\n                value={mockGroupCount}\n                onChange={(v) => setMockGroupCount(v === null ? 1 : Number(v))}\n              />\n            </Space>\n          </Modal>\n        </Space>\n        <List\n          size=\"small\"\n          header={<Typography.Text strong>最近 {state.root.historyIds.length} 场</Typography.Text>}\n          dataSource={state.root.historyIds}\n          renderItem={(id) => {\n            const s = state.root.sessions[id];\n            if (!s) return null;\n            const meta = metaFromSession(s);\n            return (\n              <List.Item\n                actions={[\n                  <Button\n                    key=\"load\"\n                    type=\"link\"\n                    size=\"small\"\n                    onClick={() => dispatch({ type: 'LOAD_SESSION', id })}\n                  >\n                    打开\n                  </Button>,\n                  <Button\n                    key=\"del\"\n                    type=\"link\"\n                    danger\n                    size=\"small\"\n                    onClick={() => dispatch({ type: 'DELETE_SESSION', id })}\n                  >\n                    删除\n                  </Button>,\n                ]}\n              >\n                <List.Item.Meta title={meta.name} description={`${meta.summary} · ${new Date(meta.updatedAt).toLocaleString()}`} />\n              </List.Item>\n            );\n          }}\n        />\n        <Steps\n          current={step <= 4 ? step : step >= 6 ? 5 : 4}\n          onChange={goToStepByClick}\n          items={stepTitles.map((t) => ({ title: t }))}\n        />\n        <TeamMatchSteps />\n        <Space>\n          <Button disabled={step === 0} onClick={prev}>\n            上一步\n          </Button>\n          <Button type=\"primary\" disabled={step >= 4 || !canNext()} onClick={next}>\n            下一步\n          </Button>\n        </Space>\n      </Space>\n    </Card>\n    </>\n  );\n}\n\nfunction MatchEventField() {\n  const { state, dispatch } = useTeamMatchStore();\n  const ev = state.session.eventIds[0] ?? '333';\n  return (\n    <Space wrap align=\"center\">\n      <Typography.Text strong type=\"secondary\">\n        比赛项目\n      </Typography.Text>\n      <Select\n        style={{ minWidth: 200 }}\n        value={ev}\n        options={TEAM_MATCH_WCA_EVENT_OPTIONS}\n        onChange={(v) => dispatch({ type: 'SET_EVENT_IDS', eventIds: [v] })}\n        showSearch\n        optionFilterProp=\"label\"\n      />\n    </Space>\n  );\n}\n\nfunction MatchNameField({ variant = 'default' }: { variant?: 'default' | 'dark' }) {\n  const { state, dispatch } = useTeamMatchStore();\n  const [v, setV] = React.useState(state.session.name);\n  React.useEffect(() => setV(state.session.name), [state.session.id, state.session.name]);\n  const commit = () => dispatch({ type: 'SET_NAME', name: v });\n  const dark = variant === 'dark';\n  return (\n    <Space wrap align=\"center\">\n      {!dark && (\n        <Typography.Text strong type=\"secondary\">\n          比赛名称\n        </Typography.Text>\n      )}\n      {dark && (\n        <Typography.Text style={{ color: 'rgba(255,255,255,0.85)' }}>比赛名称</Typography.Text>\n      )}\n      <Input\n        style={{\n          maxWidth: 420,\n          minWidth: 200,\n          ...(dark\n            ? {\n                background: 'rgba(255,255,255,0.08)',\n                color: '#fff',\n                borderColor: 'rgba(255,255,255,0.25)',\n              }\n            : {}),\n        }}\n        placeholder=\"填写比赛名称\"\n        value={v}\n        onChange={(e) => setV(e.target.value)}\n        onBlur={commit}\n        onPressEnter={commit}\n      />\n    </Space>\n  );\n}\n\nconst TeamMatch: React.FC = () => (\n  <TeamMatchProvider>\n    <TeamMatchInner />\n  </TeamMatchProvider>\n);\n\nexport default TeamMatch;\n",
+      "__content": "import BracketStage from '@/pages/Tools/TeamMatch/components/BracketStage';\nimport LiveSettingsButton from '@/pages/Tools/TeamMatch/components/LiveSettingsButton';\nimport LiveSettingsModal from '@/pages/Tools/TeamMatch/components/LiveSettingsModal';\nimport PodiumStage from '@/pages/Tools/TeamMatch/components/PodiumStage';\nimport { isBracketFullyComplete } from '@/pages/Tools/TeamMatch/bracketComplete';\nimport { loadLiveUISettings, saveLiveUISettings, type LiveUISettings } from '@/pages/Tools/TeamMatch/liveUiSettings';\nimport {\n  canAccessStepBarIndex,\n  hasOverSixteenFullTeams,\n  stepBarIndexToWizardStep,\n  wizardStepToBarIndex,\n} from '@/pages/Tools/TeamMatch/stepAccess';\nimport { metaFromSession } from '@/pages/Tools/TeamMatch/storage';\nimport { TeamMatchProvider, useTeamMatchStore } from '@/pages/Tools/TeamMatch/TeamMatchContext';\nimport TeamMatchJsonToolbar from '@/pages/Tools/TeamMatch/components/TeamMatchJsonToolbar';\nimport TeamMatchSteps from '@/pages/Tools/TeamMatch/TeamMatchSteps';\nimport { TEAM_MATCH_WCA_EVENT_OPTIONS } from '@/pages/Tools/TeamMatch/wcaCubeEvents';\nimport {\n  MAX_ROSTER_TEAMS,\n  MIN_TEAMS,\n  WIZARD_STEP_ELIM_DRAW,\n  WIZARD_STEP_ELIM_LIVE,\n  WIZARD_STEP_MAIN_DRAW,\n  WIZARD_STEP_MAIN_LIVE,\n  WIZARD_STEP_MAIN_POOL_CONFIRM,\n  WIZARD_STEP_PODIUM,\n  type TeamMatchSession,\n} from '@/pages/Tools/TeamMatch/types';\nimport { Button, Card, Input, InputNumber, List, Modal, Popconfirm, Select, message, Space, Steps, Typography } from 'antd';\nimport React from 'react';\nimport './TeamMatch.less';\n\nconst ROSTER_STEP_TITLES = ['学校与选手', '组队', '成绩录入', '队伍确认'] as const;\n\nfunction buildStepBarTitles(over16: boolean): string[] {\n  if (over16) {\n    return [...ROSTER_STEP_TITLES, '淘汰赛抽签', '淘汰赛', '正赛名单', '正赛抽签', '正赛'];\n  }\n  return [...ROSTER_STEP_TITLES, '淘汰赛抽签', '正赛名单', '正赛抽签', '正赛'];\n}\n\nfunction MatchEventField() {\n  const { state, dispatch } = useTeamMatchStore();\n  const ev = state.session.eventIds[0] ?? '333';\n  return (\n    <Space wrap align=\"center\">\n      <Typography.Text strong type=\"secondary\">\n        比赛项目\n      </Typography.Text>\n      <Select\n        style={{ minWidth: 200 }}\n        value={ev}\n        options={TEAM_MATCH_WCA_EVENT_OPTIONS}\n        onChange={(v) => dispatch({ type: 'SET_EVENT_IDS', eventIds: [v] })}\n        showSearch\n        optionFilterProp=\"label\"\n      />\n    </Space>\n  );\n}\n\nfunction MatchNameField({ variant = 'default' }: { variant?: 'default' | 'dark' }) {\n  const { state, dispatch } = useTeamMatchStore();\n  const [v, setV] = React.useState(state.session.name);\n  React.useEffect(() => setV(state.session.name), [state.session.id, state.session.name]);\n  const commit = () => dispatch({ type: 'SET_NAME', name: v });\n  const dark = variant === 'dark';\n  return (\n    <Space wrap align=\"center\">\n      {!dark && (\n        <Typography.Text strong type=\"secondary\">\n          比赛名称\n        </Typography.Text>\n      )}\n      {dark && (\n        <Typography.Text style={{ color: 'rgba(255,255,255,0.85)' }}>比赛名称</Typography.Text>\n      )}\n      <Input\n        style={{\n          maxWidth: 420,\n          minWidth: 200,\n          ...(dark\n            ? {\n                background: 'rgba(255,255,255,0.08)',\n                color: '#fff',\n                borderColor: 'rgba(255,255,255,0.25)',\n              }\n            : {}),\n        }}\n        placeholder=\"填写比赛名称\"\n        value={v}\n        onChange={(e) => setV(e.target.value)}\n        onBlur={commit}\n        onPressEnter={commit}\n      />\n    </Space>\n  );\n}\n\nfunction TeamMatchInner() {\n  const { state, dispatch } = useTeamMatchStore();\n  const { session } = state;\n  const step = session.wizardStep;\n  const [mockModalOpen, setMockModalOpen] = React.useState(false);\n  const [mockGroupCount, setMockGroupCount] = React.useState(1);\n  const [liveUISettings, setLiveUISettings] = React.useState<LiveUISettings>(() => loadLiveUISettings());\n  const [liveSettingsOpen, setLiveSettingsOpen] = React.useState(false);\n\n  const over16 = hasOverSixteenFullTeams(session);\n  const stepBarTitles = buildStepBarTitles(over16);\n\n  React.useEffect(() => {\n    saveLiveUISettings(liveUISettings);\n  }, [liveUISettings]);\n\n  React.useEffect(() => {\n    if (step !== WIZARD_STEP_MAIN_LIVE) setLiveSettingsOpen(false);\n  }, [step]);\n\n  const activeTeamCount = session.teams.filter(\n    (t) => !t.disabled && t.playerIds.length === 3,\n  ).length;\n\n  const canNext = () => {\n    switch (step) {\n      case 0:\n        return session.schools.length > 0 && session.players.length > 0;\n      case 1:\n      case 2:\n        return activeTeamCount >= MIN_TEAMS && activeTeamCount <= MAX_ROSTER_TEAMS;\n      case 3:\n        return activeTeamCount >= MIN_TEAMS && activeTeamCount <= MAX_ROSTER_TEAMS;\n      case 4:\n        return over16 && (session.elimination?.drawVersion ?? 0) >= 1;\n      default:\n        return false;\n    }\n  };\n\n  const next = () => {\n    if (!canNext()) return;\n    if (step <= 2) {\n      dispatch({ type: 'SET_WIZARD_STEP', step: step + 1 });\n      return;\n    }\n    if (step === 3) {\n      dispatch({ type: 'ENSURE_ELIMINATION_STATE' });\n      dispatch({ type: 'SET_WIZARD_STEP', step: 4 });\n      return;\n    }\n    if (step === 4) {\n      dispatch({ type: 'SET_WIZARD_STEP', step: 5 });\n    }\n  };\n\n  const prev = () => {\n    if (step === 0) return;\n    if (step === WIZARD_STEP_MAIN_DRAW) {\n      dispatch({ type: 'SET_WIZARD_STEP', step: WIZARD_STEP_MAIN_POOL_CONFIRM });\n      return;\n    }\n    if (step === WIZARD_STEP_MAIN_POOL_CONFIRM) {\n      if (over16 && !session.elimination?.skipped) {\n        dispatch({ type: 'SET_WIZARD_STEP', step: WIZARD_STEP_ELIM_LIVE });\n      } else {\n        dispatch({ type: 'SET_WIZARD_STEP', step: WIZARD_STEP_ELIM_DRAW });\n      }\n      return;\n    }\n    if (step === WIZARD_STEP_ELIM_LIVE) {\n      dispatch({ type: 'SET_WIZARD_STEP', step: WIZARD_STEP_ELIM_DRAW });\n      return;\n    }\n    if (step === WIZARD_STEP_ELIM_DRAW) {\n      dispatch({ type: 'SET_WIZARD_STEP', step: 3 });\n      return;\n    }\n    dispatch({ type: 'SET_WIZARD_STEP', step: step - 1 });\n  };\n\n  const goToStepBarIndex = (stepIndex: number) => {\n    if (!canAccessStepBarIndex(session, stepIndex, over16)) {\n      message.warning('请先完成前置步骤');\n      return;\n    }\n    const w = stepBarIndexToWizardStep(stepIndex, over16);\n    if (w === WIZARD_STEP_MAIN_LIVE && session.status !== 'live') {\n      message.warning('请先在「正赛抽签」中点击「开始比赛」进入正赛');\n      return;\n    }\n    dispatch({ type: 'SET_WIZARD_STEP', step: w });\n  };\n\n  const jsonToolbarProps = {\n    session,\n    liveUISettings,\n    onHydrate: (s: TeamMatchSession) => dispatch({ type: 'HYDRATE', session: s }),\n    onImportLiveUI: setLiveUISettings,\n  };\n\n  if (session.status === 'live' && (step === WIZARD_STEP_MAIN_LIVE || step === WIZARD_STEP_PODIUM)) {\n    const bracketComplete = isBracketFullyComplete(session);\n    const podiumBlockHint = session.skipBronzeMatch\n      ? '请完成全部淘汰赛（已跳过季军赛）'\n      : '请完成全部淘汰赛与铜牌战';\n    return (\n      <div className=\"tmFullscreen\">\n        <TeamMatchJsonToolbar {...jsonToolbarProps} variant=\"dark\" />\n        <div\n          style={{\n            padding: '8px 12px',\n            display: 'flex',\n            flexWrap: 'wrap',\n            gap: 12,\n            justifyContent: 'space-between',\n            alignItems: 'center',\n          }}\n        >\n          <Space wrap align=\"center\" size=\"middle\">\n            <Typography.Text style={{ color: 'rgba(255,255,255,0.65)' }}>\n              {step === WIZARD_STEP_PODIUM ? '领奖台' : '正赛'}\n            </Typography.Text>\n            <MatchNameField variant=\"dark\" />\n          </Space>\n          <Space wrap>\n            {step === WIZARD_STEP_PODIUM ? (\n              <Button type=\"primary\" onClick={() => dispatch({ type: 'SET_WIZARD_STEP', step: WIZARD_STEP_MAIN_LIVE })}>\n                返回正赛\n              </Button>\n            ) : (\n              <>\n                <Button onClick={() => dispatch({ type: 'SET_WIZARD_STEP', step: WIZARD_STEP_MAIN_DRAW })}>返回抽签</Button>\n                <LiveSettingsButton type=\"default\" ghost onClick={() => setLiveSettingsOpen(true)} />\n                <Button\n                  type=\"primary\"\n                  disabled={!bracketComplete}\n                  title={!bracketComplete ? podiumBlockHint : undefined}\n                  onClick={() => dispatch({ type: 'SET_WIZARD_STEP', step: WIZARD_STEP_PODIUM })}\n                >\n                  下一步：领奖台\n                </Button>\n              </>\n            )}\n          </Space>\n        </div>\n        <div className=\"tmFullscreenInner\">\n          {step === WIZARD_STEP_PODIUM ? (\n            <PodiumStage />\n          ) : (\n            <BracketStage liveSettings={liveUISettings} onOpenLiveSettings={() => setLiveSettingsOpen(true)} />\n          )}\n        </div>\n        {step === WIZARD_STEP_MAIN_LIVE && (\n          <LiveSettingsModal\n            open={liveSettingsOpen}\n            onClose={() => setLiveSettingsOpen(false)}\n            value={liveUISettings}\n            onApply={(next) => {\n              setLiveUISettings(next);\n              setLiveSettingsOpen(false);\n            }}\n          />\n        )}\n      </div>\n    );\n  }\n\n  return (\n    <>\n      <TeamMatchJsonToolbar {...jsonToolbarProps} variant=\"light\" />\n      <Card>\n      <Space direction=\"vertical\" style={{ width: '100%' }} size=\"large\">\n        <Typography.Title level={4} style={{ margin: 0 }}>\n          组队赛工具\n        </Typography.Title>\n        <Space wrap align=\"center\" size=\"middle\">\n          <MatchNameField />\n          <MatchEventField />\n        </Space>\n        <Space wrap>\n          <Button onClick={() => dispatch({ type: 'NEW_SESSION' })}>新比赛</Button>\n          <Popconfirm\n            title=\"用测试数据覆盖当前比赛？\"\n            description=\"将替换为学校/选手/队伍及随机种子成绩（满16队：广工5队等预设校名）。\"\n            onConfirm={() => {\n              dispatch({ type: 'MOCK_FILL_TEST_DATA' });\n              message.success('已填充满16队测试数据');\n            }}\n            okText=\"覆盖\"\n            cancelText=\"取消\"\n          >\n            <Button>一键填充16队测试数据</Button>\n          </Popconfirm>\n          <Button onClick={() => setMockModalOpen(true)}>追加测试分组</Button>\n          <Modal\n            title=\"追加测试分组\"\n            open={mockModalOpen}\n            onCancel={() => setMockModalOpen(false)}\n            onOk={() => {\n              const n = Math.max(1, Math.floor(mockGroupCount));\n              const room = MAX_ROSTER_TEAMS - session.teams.length;\n              if (room <= 0) {\n                message.warning(`队伍已达上限 ${MAX_ROSTER_TEAMS}，无法继续添加`);\n                return;\n              }\n              const add = Math.min(n, room);\n              dispatch({ type: 'MOCK_APPEND_GROUPS', count: add });\n              message.success(`已追加 ${add} 组（学校+选手+队伍），并写入随机种子成绩`);\n              setMockModalOpen(false);\n            }}\n            okText=\"追加\"\n          >\n            <Typography.Paragraph type=\"secondary\" style={{ marginBottom: 12 }}>\n              按预设校名顺序追加（与「一键填充16队」同一套校名表；满16队时广工共5队）。当前队伍{' '}\n              {session.teams.length}/{MAX_ROSTER_TEAMS}。\n            </Typography.Paragraph>\n            <Space align=\"center\">\n              <Typography.Text>组数</Typography.Text>\n              <InputNumber\n                min={1}\n                max={Math.max(1, MAX_ROSTER_TEAMS - session.teams.length)}\n                value={mockGroupCount}\n                onChange={(v) => setMockGroupCount(v === null ? 1 : Number(v))}\n              />\n            </Space>\n          </Modal>\n        </Space>\n        <List\n          size=\"small\"\n          header={<Typography.Text strong>最近 {state.root.historyIds.length} 场</Typography.Text>}\n          dataSource={state.root.historyIds}\n          renderItem={(id) => {\n            const s = state.root.sessions[id];\n            if (!s) return null;\n            const meta = metaFromSession(s);\n            return (\n              <List.Item\n                actions={[\n                  <Button\n                    key=\"load\"\n                    type=\"link\"\n                    size=\"small\"\n                    onClick={() => dispatch({ type: 'LOAD_SESSION', id })}\n                  >\n                    打开\n                  </Button>,\n                  <Button\n                    key=\"del\"\n                    type=\"link\"\n                    danger\n                    size=\"small\"\n                    onClick={() => dispatch({ type: 'DELETE_SESSION', id })}\n                  >\n                    删除\n                  </Button>,\n                ]}\n              >\n                <List.Item.Meta title={meta.name} description={`${meta.summary} · ${new Date(meta.updatedAt).toLocaleString()}`} />\n              </List.Item>\n            );\n          }}\n        />\n        <Steps\n          current={wizardStepToBarIndex(step, over16)}\n          onChange={goToStepBarIndex}\n          items={stepBarTitles.map((t) => ({ title: t }))}\n        />\n        <TeamMatchSteps liveUISettings={liveUISettings} onLiveUISettingsChange={setLiveUISettings} />\n        <Space>\n          <Button disabled={step === 0} onClick={prev}>\n            上一步\n          </Button>\n          <Button type=\"primary\" disabled={step >= 5 || !canNext()} onClick={next}>\n            下一步\n          </Button>\n        </Space>\n      </Space>\n    </Card>\n    </>\n  );\n}\n\nconst TeamMatch: React.FC = () => (\n  <TeamMatchProvider>\n    <TeamMatchInner />\n  </TeamMatchProvider>\n);\n\nexport default TeamMatch;\n",
       "__isJSFile": true,
       "__absFile": "/Users/guojia/worker/code/cube/cubing.pro/src/pages/Tools/TeamMatch/TeamMatch.tsx"
     },
@@ -4725,49 +4735,60 @@
       "parentId": "55",
       "id": "56",
       "absPath": "/groupCompetitions/static",
-      "__content": "import { NavTabs } from '@/components/Tabs/nav_tabs';\nimport KinCh from '@/pages/Static/Kinsor';\nimport { BarChartOutlined, OrderedListOutlined, TrophyOutlined } from '@ant-design/icons';\nimport React from 'react';\nimport Records from \"@/pages/Static/Record\";\nimport DiyRanks from \"@/pages/Static/DiyRanks\";\nimport DiyRankView from \"@/pages/Static/DiyRanks\";\nimport Statistics from '@/pages/WCA/Statistics';\n\nconst Static: React.FC = () => {\n  const items = [\n    // {\n    //   key: 'best',\n    //   label: '最佳成绩',\n    //   children: <Best />,\n    //   icon: <TrophyOutlined />,\n    // },\n    {\n      key: 'records',\n      label: '记录',\n      children: <Records />,\n      icon: <TrophyOutlined />,\n    },\n    {\n      key: 'kinch_sor',\n      label: 'KinCh',\n      children: <KinCh isSenior={false} otherDataFn={undefined}  isCountry={false}/>,\n      icon: <OrderedListOutlined />,\n    },\n    {\n      key: 'kinch_senior_sor',\n      label: 'WCA大龄KinCh',\n      children: <KinCh isSenior={true} otherDataFn={undefined} isCountry={true}/>,\n      icon: <OrderedListOutlined />,\n    },\n    {\n      // todo 做成不同的key\n      key: \"wca_view\",\n      label: 'WCA成绩榜单',\n      children: <DiyRankView />,\n      icon: <OrderedListOutlined />,\n    },\n    {\n      key: 'stats',\n      label: '统计',\n      children: <Statistics />,\n      icon: <BarChartOutlined />,\n    },\n\n  ];\n\n  return (\n    <>\n      <h1 style={{textAlign: \"center\"}}> 成绩统计 </h1>\n      <NavTabs\n        type=\"line\"\n        items={items}\n        tabsKey=\"static_tabs\"\n        indicator={{ size: (origin: number) => origin - 20, align: 'center' }}\n      />\n    </>\n  );\n};\n\nexport default Static;\n",
+      "__content": "import { NavTabs } from '@/components/Tabs/nav_tabs';\nimport KinCh from '@/pages/Static/Kinsor';\nimport { BarChartOutlined, OrderedListOutlined } from '@ant-design/icons';\nimport { useLocation, useNavigate } from '@umijs/max';\nimport React, { useEffect } from 'react';\nimport DiyRanks from \"@/pages/Static/DiyRanks\";\nimport DiyRankView from \"@/pages/Static/DiyRanks\";\nimport Statistics from '@/pages/WCA/Statistics';\n\nconst Static: React.FC = () => {\n  const location = useLocation();\n  const navigate = useNavigate();\n\n  useEffect(() => {\n    const sp = new URLSearchParams(location.search);\n    if (sp.get('static_tabs') === 'records') {\n      navigate('/groupCompetitions/records', { replace: true });\n    }\n  }, [location.search, navigate]);\n\n  const items = [\n    {\n      key: 'kinch_sor',\n      label: 'KinCh',\n      children: <KinCh isSenior={false} otherDataFn={undefined}  isCountry={false}/>,\n      icon: <OrderedListOutlined />,\n    },\n    {\n      key: 'kinch_senior_sor',\n      label: 'WCA大龄KinCh',\n      children: <KinCh isSenior={true} otherDataFn={undefined} isCountry={true}/>,\n      icon: <OrderedListOutlined />,\n    },\n    {\n      // todo 做成不同的key\n      key: \"wca_view\",\n      label: 'WCA成绩榜单',\n      children: <DiyRankView />,\n      icon: <OrderedListOutlined />,\n    },\n    {\n      key: 'stats',\n      label: '统计',\n      children: <Statistics />,\n      icon: <BarChartOutlined />,\n    },\n\n  ];\n\n  return (\n    <>\n      <h1 style={{textAlign: \"center\"}}> 成绩统计 </h1>\n      <NavTabs\n        type=\"line\"\n        items={items}\n        tabsKey=\"static_tabs\"\n        indicator={{ size: (origin: number) => origin - 20, align: 'center' }}\n      />\n    </>\n  );\n};\n\nexport default Static;\n",
       "__isJSFile": true,
       "__absFile": "/Users/guojia/worker/code/cube/cubing.pro/src/pages/Static/Static.tsx"
     },
     "57": {
+      "name": "Records",
+      "path": "records",
+      "file": "@/pages/Static/Record.tsx",
+      "parentId": "55",
+      "id": "57",
+      "absPath": "/groupCompetitions/records",
+      "__content": "import RecordsWithBest from '@/pages/Static/RecordComponents/RecordWithBest';\nimport RecordsWithEvents from '@/pages/Static/RecordComponents/RecordWithEvents';\nimport { useLocation, useNavigate } from '@umijs/max';\nimport { Switch } from 'antd';\nimport React, { useCallback, useMemo } from 'react';\n\nexport const RECORDS_QUERY_MODE = 'mode';\nexport const RECORDS_QUERY_GROUP = 'group';\nexport const RECORDS_QUERY_EVENT = 'event';\n\nexport const RECORDS_MODE_BEST = 'best';\nexport const RECORDS_MODE_HISTORY = 'history';\n\nfunction parseGroupId(raw: string | null): number {\n  if (raw == null || raw === '') {\n    return 0;\n  }\n  const n = Number(raw);\n  return Number.isFinite(n) ? n : 0;\n}\n\nconst Records: React.FC = () => {\n  const location = useLocation();\n  const navigate = useNavigate();\n\n  const searchParams = useMemo(() => new URLSearchParams(location.search), [location.search]);\n\n  const patchQuery = useCallback(\n    (patch: Record<string, string | null>) => {\n      const next = new URLSearchParams(location.search);\n      for (const [k, v] of Object.entries(patch)) {\n        if (v === null || v === '') {\n          next.delete(k);\n        } else {\n          next.set(k, v);\n        }\n      }\n      const qs = next.toString();\n      navigate(qs ? `${location.pathname}?${qs}` : location.pathname, { replace: true });\n    },\n    [location.pathname, location.search, navigate],\n  );\n\n  const mode = useMemo(() => {\n    const m = searchParams.get(RECORDS_QUERY_MODE);\n    return m === RECORDS_MODE_HISTORY ? RECORDS_MODE_HISTORY : RECORDS_MODE_BEST;\n  }, [searchParams]);\n\n  const groupId = useMemo(() => parseGroupId(searchParams.get(RECORDS_QUERY_GROUP)), [searchParams]);\n\n  const eventId = useMemo(() => searchParams.get(RECORDS_QUERY_EVENT) || '333', [searchParams]);\n\n  const isBest = mode === RECORDS_MODE_BEST;\n\n  const setGroupId = useCallback(\n    (id: number) => {\n      patchQuery({ [RECORDS_QUERY_GROUP]: String(id) });\n    },\n    [patchQuery],\n  );\n\n  const setEventId = useCallback(\n    (id: string) => {\n      patchQuery({ [RECORDS_QUERY_EVENT]: id });\n    },\n    [patchQuery],\n  );\n\n  const setBestMode = useCallback(\n    (nextBest: boolean) => {\n      patchQuery({\n        [RECORDS_QUERY_MODE]: nextBest ? RECORDS_MODE_BEST : RECORDS_MODE_HISTORY,\n      });\n    },\n    [patchQuery],\n  );\n\n  return (\n    <>\n      <h1 style={{ textAlign: 'center' }}>记录</h1>\n      <Switch\n        checked={isBest}\n        checkedChildren=\"总榜\"\n        unCheckedChildren=\"历史\"\n        onChange={(checked) => setBestMode(checked)}\n        style={{ float: 'right' }}\n      />\n      <br />\n      {isBest ? (\n        <RecordsWithBest groupId={groupId} onGroupIdChange={setGroupId} />\n      ) : (\n        <RecordsWithEvents\n          groupId={groupId}\n          eventId={eventId}\n          onGroupIdChange={setGroupId}\n          onEventIdChange={setEventId}\n        />\n      )}\n    </>\n  );\n};\n\nexport default Records;\n",
+      "__isJSFile": true,
+      "__absFile": "/Users/guojia/worker/code/cube/cubing.pro/src/pages/Static/Record.tsx"
+    },
+    "58": {
       "name": "Project",
       "path": "events",
       "file": "@/pages/Events/Events.tsx",
       "parentId": "55",
-      "id": "57",
+      "id": "58",
       "absPath": "/groupCompetitions/events",
       "__content": "import React, {useEffect, useState} from \"react\";\nimport {EventsAPI} from \"@/services/cubing-pro/events/typings\";\nimport {apiEvents} from \"@/services/cubing-pro/events/events\";\nimport {Divider, Table} from \"antd\";\nimport {eventRouteM} from \"@/components/Data/cube_result/event_route\";\nimport {CubeIcon} from \"@/components/CubeIcon/cube_icon\";\nimport {CubesCn} from \"@/components/CubeIcon/cube\";\n\nconst columns = [\n  {\n    title: 'Icon',\n    dataIndex: 'icon',\n    key: 'icon',\n    render: (value: string, events: EventsAPI.Event) => {\n      return CubeIcon(events.name, events.name, {})\n    },\n  },\n  {\n    title: '名',\n    dataIndex: 'id',\n    key: 'id',\n    render: (value: string, events: EventsAPI.Event) => {\n      return CubesCn(value)\n    }\n  },\n\n  {\n    title: '项目类型',\n    dataIndex: 'base_route_typ',\n    key: 'base_route_typ',\n    render: (value: number, events: EventsAPI.Event) => {\n      const m = eventRouteM(value)\n      return m.name\n    }\n  },\n  {\n    title: '别名',\n    dataIndex: 'otherNames',\n    key: 'otherNames',\n    render: (value: string, events:EventsAPI.Event) => {\n      const data = value.split(\";\")\n\n      let body : JSX.Element[] = []\n      data.map((value: string) => {\n        body.push(<div style={{ display: \"inline-block\", minWidth:\"100px\", width: \"100px\"}}>{value}</div>)\n      })\n      return <>{body}</>\n    }\n  },\n  {\n    title: \"打乱\",\n    dataIndex: 'scrambleValue',\n    key: 'scrambleValue',\n    render: (value: string, events: EventsAPI.Event) => {\n      if (!events.scrambleValue && !events.autoScrambleKey) {\n        return events.id\n      }\n\n      if (events.autoScrambleKey) {\n        return events.autoScrambleKey\n      }\n      const data = value.split(\",\")\n      let body : JSX.Element[] = []\n      data.map((value: string) => {\n        body.push(<div style={{ display: \"inline-block\", minWidth:\"100px\", width: \"100px\"}}>{value}</div>)\n      })\n      return <>{body}</>\n    }\n  }\n];\n\nconst Events: React.FC = () => {\n  const [events, setEvents] = useState<EventsAPI.Event[]>([]);\n  const fetchComp = () => {\n    apiEvents().then((value) => {\n      let data = value.data.Events\n      data = data.filter((value: EventsAPI.Event) => {\n        return value.isComp\n      })\n      setEvents(data)\n    })\n  }\n  useEffect(() => {\n    fetchComp();\n  }, []);\n\n  let notWCA =events.filter((value: EventsAPI.Event) => {\n    return !value.isWCA\n  })\n\n\n  let wca = events.filter((value: EventsAPI.Event)=>{\n    return value.isWCA\n  })\n\n  return (\n\n    <>\n      <Divider orientation=\"left\"><h4><strong>WCA项目</strong></h4></Divider>\n      <Table\n        dataSource={wca}\n        columns={columns}\n        pagination={false}\n      />\n      <Divider orientation=\"left\"><h4><strong>趣味项目</strong></h4></Divider>\n      <Table\n        dataSource={notWCA}\n        columns={columns}\n        pagination={false}\n      />\n\n    </>\n  );\n}\n\nexport default Events;\n",
       "__isJSFile": true,
       "__absFile": "/Users/guojia/worker/code/cube/cubing.pro/src/pages/Events/Events.tsx"
     },
-    "58": {
+    "59": {
       "name": "Competitions",
       "path": "competitions",
       "file": "@/pages/Competition/Competitions.tsx",
       "parentId": "55",
-      "id": "58",
+      "id": "59",
       "absPath": "/groupCompetitions/competitions",
       "__content": "import { CompsTableColumns } from '@/components/Data/cube_comps/comps_tables';\nimport { Comp } from '@/components/Data/types/comps';\nimport { rowClassNameWithStyleLines } from '@/components/Table/table_style';\nimport { apiComps } from '@/services/cubing-pro/comps/comps';\nimport { CompsAPI } from '@/services/cubing-pro/comps/typings';\nimport { ProTable } from '@ant-design/pro-table';\nimport React, { useRef, useState } from 'react';\n\nconst Competitions: React.FC = () => {\n  const actionRef = useRef();\n\n  const [tableParams, setTableParams] = useState<CompsAPI.CompsReq>({\n    size: 20,\n    page: 1,\n    name: '',\n  });\n\n  const resetParams = () => {\n    setTableParams({\n      ...tableParams,\n      name: '',\n    });\n  };\n\n  return (\n    <>\n      <ProTable<Comp, CompsAPI.CompsReq>\n        title={() => {\n          return <h2>赛事列表</h2>;\n        }}\n        size=\"small\"\n        columns={CompsTableColumns}\n        onReset={resetParams}\n        params={tableParams}\n        rowClassName={rowClassNameWithStyleLines}\n        request={async (params) => {\n          // @ts-ignore\n          const name = params.Name;\n          setTableParams({\n            ...tableParams,\n            name: name,\n          });\n          const value = await apiComps(tableParams);\n\n          let comps = value.data.items;\n\n          comps = comps.sort((a: Comp, b: Comp) => {\n            if (a.IsDone && !b.IsDone) return 1;\n            if (!a.IsDone && b.IsDone) return -1;\n            return 0;\n          });\n          for (let i = 0; i < comps.length; i++) {\n            comps[i].Index = (tableParams.page - 1) * tableParams.size + i + 1;\n          }\n          return { data: comps, success: true, total: value.data.total };\n        }}\n        search={{\n          labelWidth: 'auto',\n          defaultColsNumber: 1,\n          defaultCollapsed: false,\n          span: { xs: 24, sm: 24, md: 24, lg: 18, xl: 18, xxl: 12 },\n        }}\n        pagination={{\n          showQuickJumper: true,\n          current: tableParams.page,\n          pageSize: tableParams.size,\n        }}\n        onChange={(pagination) => {\n          setTableParams({\n            ...tableParams,\n            page: pagination.current ? pagination.current : 1,\n            size: pagination.pageSize ? pagination.pageSize : 20,\n          });\n        }}\n        options={false}\n        actionRef={actionRef}\n        sticky\n      />\n    </>\n  );\n};\n\nexport default Competitions;\n",
       "__isJSFile": true,
       "__absFile": "/Users/guojia/worker/code/cube/cubing.pro/src/pages/Competition/Competitions.tsx"
     },
-    "59": {
+    "60": {
       "name": "Player",
       "path": "players",
       "file": "@/pages/Player/Players.tsx",
       "parentId": "55",
-      "id": "59",
+      "id": "60",
       "absPath": "/groupCompetitions/players",
       "__content": "import {PlayerLink, WCALink} from '@/components/Link/Links';\nimport { apiPlayers } from '@/services/cubing-pro/players/players';\nimport { ProTable } from '@ant-design/pro-table';\nimport { ProColumns } from '@ant-design/pro-table/es/typing';\nimport React, { useRef, useState } from 'react';\nimport {rowClassNameWithStyleLines} from \"@/components/Table/table_style\";\nimport {PlayersAPI} from \"@/services/cubing-pro/players/typings\";\n\nconst columns: ProColumns<PlayersAPI.Player>[] = [\n  {\n    title: 'CubeID',\n    dataIndex: 'CubeID',\n    key: 'CubeID',\n    width: 150,\n    // @ts-ignore\n    render: (value: string, player: PlayersAPI.Player) => {\n      return <>{PlayerLink(player.CubeID, value, '#000')}</>;\n    },\n    hideInSearch: true,\n  },\n  {\n    title: '名称',\n    dataIndex: 'Name',\n    key: 'Name',\n    // @ts-ignore\n    render: (value: string, player: PlayersAPI.Player) => {\n      return <>{PlayerLink(player.CubeID, player.Name, 'rgb(29,177,236)')}</>;\n    },\n  },\n  {\n    title: 'WcaID',\n    dataIndex: 'WcaID',\n    key: 'WcaID',\n    width: 150,\n    // @ts-ignore\n    render: (value: string) => {\n      return WCALink(value)\n    },\n    hideInSearch: true,\n  },\n];\n\nconst Players: React.FC = () => {\n  const actionRef = useRef();\n  const [tableParams, setTableParams] = useState<PlayersAPI.PlayersReq>({\n    size: 20,\n    page: 1,\n    name: '',\n  });\n  const resetParams = () => {\n    setTableParams({\n      ...tableParams,\n      name: '',\n    });\n  };\n\n  return (\n    <>\n      <ProTable<PlayersAPI.Player, PlayersAPI.PlayersReq>\n        title={() => {\n          return <>选手列表</>;\n        }}\n        rowClassName={rowClassNameWithStyleLines}\n        columns={columns}\n        onReset={resetParams}\n        params={tableParams}\n        request={async (params) => {\n          // @ts-ignore\n          const name = params.Name;\n          setTableParams({\n            ...tableParams,\n            name: name,\n          });\n          const value = await apiPlayers(tableParams);\n\n          return {\n            data: value.data.items,\n            success: true,\n            total: value.data.total,\n          };\n        }}\n        search={{\n          labelWidth: 'auto',\n          defaultColsNumber: 1,\n          defaultCollapsed: false,\n          span: { xs: 24, sm: 24, md: 24, lg: 18, xl: 18, xxl: 12 },\n        }}\n        pagination={{\n          showQuickJumper: true,\n          current: tableParams.page,\n          pageSize: tableParams.size,\n        }}\n        onChange={(pagination) => {\n          setTableParams({\n            name: tableParams.name,\n            page: pagination.current ? pagination.current : 1,\n            size: pagination.pageSize ? pagination.pageSize : 20,\n          });\n        }}\n        options={false}\n\n        actionRef={actionRef}\n        sticky\n      />\n    </>\n  );\n};\n\nexport default Players;\n",
       "__isJSFile": true,
       "__absFile": "/Users/guojia/worker/code/cube/cubing.pro/src/pages/Player/Players.tsx"
     },
-    "60": {
+    "61": {
       "name": "PKTimer",
       "path": "pktimer",
       "file": "@/pages/Static/Pktimers.tsx",
       "parentId": "55",
-      "id": "60",
+      "id": "61",
       "absPath": "/groupCompetitions/pktimer",
       "__content": "import React, { useState, useEffect } from 'react';\nimport { Table, Button, Space, Tag, Card } from 'antd';\nimport { DownOutlined, UpOutlined } from '@ant-design/icons';\nimport type { ColumnsType } from 'antd/es/table';\nimport { GetPKTimer, PkTimerGroupRecord, PkTimerPlayer } from '@/services/cubing-pro/pktimer/pktimer';\nimport { resultString, resultTimeString } from '@/components/Data/types/result';\nimport { CubeIcon } from '@/components/CubeIcon/cube_icon';\nimport { CubesCn } from '@/components/CubeIcon/cube';\n\nconst PKTimerTable: React.FC = () => {\n  const [data, setData] = useState<PkTimerGroupRecord[]>([]);\n  const [loading, setLoading] = useState(false);\n  const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);\n  const [total, setTotal] = useState(0);\n  const [pagination, setPagination] = useState({\n    current: 1,\n    pageSize: 10,\n  });\n\n  const fetchData = async (page: number, size: number) => {\n    setLoading(true);\n    try {\n      const res = await GetPKTimer({ page, size });\n      setData(res.data.items);\n      setTotal(res.data.total);\n\n      // ✅ 默认全部展开：加载完成后自动展开所有行\n      setExpandedRowKeys(res.data.items.map((item) => item.id));\n    } catch (error) {\n      console.error('Failed to fetch PK timer data:', error);\n    } finally {\n      setLoading(false);\n    }\n  };\n\n  useEffect(() => {\n    fetchData(pagination.current, pagination.pageSize);\n  }, []);\n\n  const handleTableChange = (newPagination: any) => {\n    const { current, pageSize } = newPagination;\n    setPagination({ current, pageSize });\n    fetchData(current, pageSize);\n  };\n\n  const toggleAll = () => {\n    if (expandedRowKeys.length === data.length) {\n      setExpandedRowKeys([]);\n    } else {\n      setExpandedRowKeys(data.map((item) => item.id));\n    }\n  };\n\n  const expandedRowRender = (record: PkTimerGroupRecord) => {\n    const players = record.pkResults.players;\n\n    const playerColumns: ColumnsType<PkTimerPlayer> = [\n      { title: '玩家', dataIndex: 'userName', key: 'userName' },\n      {\n        title: '单次',\n        dataIndex: 'best',\n        key: 'best',\n        render: (_, pp: PkTimerPlayer) => resultTimeString(pp.best),\n      },\n      {\n        title: '平均',\n        dataIndex: 'average',\n        key: 'average',\n        render: (_, pp: PkTimerPlayer) => resultTimeString(pp.average),\n      },\n      {\n        title: '成绩列表',\n        key: 'results',\n        render: (_, player) => {\n          if (player.results.length === 0) return '-';\n          const d = resultString(player.results, record.pkResults.event.base_route_typ);\n          if (!d || d.length === 0) return '-';\n          return (\n            <>\n              {d.map((time, idx) => (\n                <Tag key={`${record.id}-${player.userId}-${idx}`} color=\"blue\">\n                  {time}\n                </Tag>\n              ))}\n            </>\n          );\n        },\n      },\n    ];\n\n    // ✅ 视觉增强：用 Card 包裹子表格，加 padding 和 border-radius\n    return (\n      <Card\n        size=\"small\"\n        style={{\n          margin: '8px 16px',\n          backgroundColor: '#fafafa',\n          borderRadius: 8,\n          boxShadow: '0 2px 4px rgba(0,0,0,0.05)',\n        }}\n      >\n        <Table\n          dataSource={players}\n          columns={playerColumns}\n          pagination={false}\n          rowKey={(player) => player.userId}\n          size=\"small\"\n        />\n      </Card>\n    );\n  };\n\n  const columns: ColumnsType<PkTimerGroupRecord> = [\n    {\n      title: '时间',\n      dataIndex: 'createdAt',\n      key: 'createdAt',\n      width: 200,\n      render: (date) => new Date(date).toLocaleString('zh-CN'),\n    },\n    {\n      title: '项目',\n      key: 'event',\n      width: 120,\n      render: (_, record) => (\n        <>\n          {CubesCn(record.pkResults.event.name)}{' '}\n          {CubeIcon(record.pkResults.event.name, String(record.id), {})}\n        </>\n      ),\n    },\n    {\n      title: '总把数',\n      dataIndex: ['pkResults', 'count'],\n      key: 'count',\n      width: 100,\n    },\n    {\n      title: '组名',\n      dataIndex: 'groupName',\n      key: 'groupName',\n      render: (_, record) => {\n        return (<Tag color={\"cyan\"}>{record.groupName}</Tag>)\n      }\n    },\n  ];\n\n\n  const expandable = {\n    expandedRowKeys,\n    onExpandedRowsChange: setExpandedRowKeys,\n    expandedRowRender,\n    // @ts-ignore\n    expandIcon: ({ expanded, onExpand, record }) =>\n      expanded ? (\n        <UpOutlined onClick={(e) => onExpand(record, e)} />\n      ) : (\n        <DownOutlined onClick={(e) => onExpand(record, e)} />\n      ),\n  };\n\n  return (\n    <div>\n      <div style={{ marginBottom: 16 }}>\n        <Space>\n          <Button onClick={toggleAll}>\n            {expandedRowKeys.length === data.length ? '收起所有' : '展开所有'}\n          </Button>\n        </Space>\n      </div>\n\n      <Table\n        columns={columns}\n        dataSource={data}\n        rowKey=\"id\"\n        loading={loading}\n        pagination={{\n          ...pagination,\n          total,\n          showSizeChanger: true,\n          pageSizeOptions: ['10', '20', '50'],\n        }}\n        onChange={handleTableChange}\n        // @ts-ignore\n        expandable={expandable}\n      />\n    </div>\n  );\n};\n\nexport default PKTimerTable;\n",
       "__isJSFile": true,

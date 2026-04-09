@@ -179,6 +179,7 @@ export default [
     path: 'groupCompetitions',
     routes: [
       { name: 'Static', path: 'static', component: './Static/Static' },
+      { name: 'Records', path: 'records', component: './Static/Record' },
       { name: 'Project', path: 'events', component: './Events/Events' },
       // 比赛网页
       { name: 'Competitions', path: 'competitions', component: './Competition/Competitions' },

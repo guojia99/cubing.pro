@@ -1,6 +1,7 @@
 export default {
   "menu.groupCompetitions": "群赛",
   "menu.groupCompetitions.Static": "统计",
+  "menu.groupCompetitions.Records": "记录",
   "menu.groupCompetitions.Project": "项目",
   "menu.groupCompetitions.Competitions": "比赛",
   "menu.groupCompetitions.Player": "选手",

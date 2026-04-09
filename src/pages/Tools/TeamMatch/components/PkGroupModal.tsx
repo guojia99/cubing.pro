@@ -1,14 +1,13 @@
-import { computePkSettlement } from '@/pages/Tools/TeamMatch/pkSettlement';
-import type { BracketMatch, Player, Team } from '@/pages/Tools/TeamMatch/types';
+import { computeMultiTeamPkSettlement } from '@/pages/Tools/TeamMatch/pkSettlement';
+import type { EliminationGroupMatch, Player, Team } from '@/pages/Tools/TeamMatch/types';
 import { Button, Checkbox, Input, Modal, Space, Table, Typography, message } from 'antd';
 import React, { useMemo } from 'react';
 
 type Props = {
   open: boolean;
   onClose: () => void;
-  /** 弹窗标题，默认「录入 PK 成绩」 */
   modalTitle?: string;
-  match: BracketMatch | null;
+  match: EliminationGroupMatch | null;
   teams: Team[];
   players: Player[];
   draft: { playerId: string; teamId: string; value: number | 'DNF' }[];
@@ -19,10 +18,16 @@ type Props = {
   onClearCurrent: () => void;
 };
 
-const PkModal: React.FC<Props> = ({
+function formatTotalLabel(v: number | 'dnf_team' | 'incomplete'): string {
+  if (v === 'dnf_team') return 'DNF';
+  if (v === 'incomplete') return '未完成';
+  return v.toFixed(2);
+}
+
+const PkGroupModal: React.FC<Props> = ({
   open,
   onClose,
-  modalTitle = '录入 PK 成绩',
+  modalTitle = '预选赛 · 小组录入',
   match,
   teams,
   players,
@@ -34,14 +39,16 @@ const PkModal: React.FC<Props> = ({
   onClearCurrent,
 }) => {
   const pk = match?.pk;
-  const teamA = teams.find((t) => t.id === pk?.teamAId);
-  const teamB = teams.find((t) => t.id === pk?.teamBId);
-
   const playerMap = useMemo(() => Object.fromEntries(players.map((p) => [p.id, p])), [players]);
 
-  if (!pk || !teamA || !teamB) return null;
+  if (!pk || !pk.teamIds.length) return null;
 
-  const computed = computePkSettlement(pk.teamAId, pk.teamBId, draft);
+  const teamRows = pk.teamIds
+    .map((id) => teams.find((t) => t.id === id))
+    .filter(Boolean) as Team[];
+  if (teamRows.length !== pk.teamIds.length) return null;
+
+  const computed = computeMultiTeamPkSettlement(pk.teamIds, draft);
 
   const cols = [
     {
@@ -96,13 +103,16 @@ const PkModal: React.FC<Props> = ({
       title={modalTitle}
       open={open}
       onCancel={onClose}
-      width={720}
+      width={760}
       footer={
         <Space wrap>
           <Button onClick={onClearCurrent}>全部取消本次成绩</Button>
           <Button onClick={onReplay}>重开一局</Button>
-          <Button onClick={() => onManualWinner(teamA.id)}>直接判定：{teamA.name} 胜</Button>
-          <Button onClick={() => onManualWinner(teamB.id)}>直接判定：{teamB.name} 胜</Button>
+          {teamRows.map((t) => (
+            <Button key={t.id} onClick={() => onManualWinner(t.id)}>
+              直接判定：{t.name} 晋级
+            </Button>
+          ))}
           <Button
             type="primary"
             onClick={() => {
@@ -119,19 +129,20 @@ const PkModal: React.FC<Props> = ({
       }
     >
       <Typography.Paragraph type="secondary">
-        三人成绩相加，和小者胜；任一人 DNF 则该队判负。DNF 可再次点击取消以恢复填写秒数。也可不依赖合计，用底部「直接判定」指定获胜方。
+        同组多队：每队三人成绩相加，总秒数最小者晋级；任一人 DNF 则该队视为 DNF。若无法自动决出唯一胜者，请用「直接判定」指定晋级队。
       </Typography.Paragraph>
-      {computed.bothSidesDnf && (
+      {computed.allTeamsDnf && (
         <Typography.Paragraph type="danger">
-          双方均有 DNF：无法按成绩自动判胜，请使用下方「直接判定」或重开一局。
+          全部参赛队均有 DNF：无法按成绩自动晋级，请使用「直接判定」或重开一局。
         </Typography.Paragraph>
       )}
-      {pk.lastComputed && !computed.bothSidesDnf && (
-        <Typography.Text>
-          上次计算：A 队合计{' '}
-          {typeof computed.teamATotal === 'number' ? computed.teamATotal.toFixed(2) : computed.teamATotal} · B 队合计{' '}
-          {typeof computed.teamBTotal === 'number' ? computed.teamBTotal.toFixed(2) : computed.teamBTotal}
-        </Typography.Text>
+      {!computed.allTeamsDnf && !computed.computedWinnerTeamId && (
+        <Typography.Paragraph type="secondary" style={{ marginBottom: 8 }}>
+          当前草稿：{pk.teamIds.map((tid) => {
+            const name = teams.find((t) => t.id === tid)?.name ?? tid;
+            return `${name} 合计 ${formatTotalLabel(computed.teamTotals[tid] ?? 'incomplete')}`;
+          }).join(' · ')}
+        </Typography.Paragraph>
       )}
       <Table
         size="small"
@@ -155,4 +166,4 @@ const PkModal: React.FC<Props> = ({
   );
 };
 
-export default PkModal;
+export default PkGroupModal;

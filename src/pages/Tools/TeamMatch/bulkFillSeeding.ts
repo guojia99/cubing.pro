@@ -47,11 +47,9 @@ export async function bulkFillSeedingScores(
   );
 
   let totalOps = 0;
-  for (const ev of eventIds) {
-    for (const p of players) {
-      if (p.wcaId?.length === 10) totalOps += 1;
-      if (p.oneId?.trim() && /^\d+$/.test(p.oneId.trim())) totalOps += 1;
-    }
+  for (const p of players) {
+    if (p.wcaId?.length === 10) totalOps += eventIds.length;
+    if (p.oneId?.trim() && /^\d+$/.test(p.oneId.trim())) totalOps += eventIds.length;
   }
 
   if (totalOps === 0) {

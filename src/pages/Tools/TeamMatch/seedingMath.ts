@@ -45,6 +45,8 @@ export function pickSeedTeamIds(
   seeding: SeedingEntry[],
   eventId: string,
   primary: SeedingPrimary,
+  /** 若提供，仅在该名单内（仍按成绩顺序）取种子；用于正赛 16 强已确定时 */
+  bracketPoolIds?: string[] | null,
 ): string[] {
   const active = teams.filter((t) => !t.disabled && t.playerIds.length === 3);
   const scored = active.map((t) => ({
@@ -54,7 +56,9 @@ export function pickSeedTeamIds(
   const valid = scored.filter((s) => s.valid).sort((a, b) => a.sum - b.sum);
   const invalid = scored.filter((s) => !s.valid);
   const ordered = [...valid, ...invalid];
-  const pool = ordered.slice(0, BRACKET_TEAM_COUNT);
+  const poolSet = bracketPoolIds?.length ? new Set(bracketPoolIds) : null;
+  const narrowed = poolSet ? ordered.filter((s) => poolSet.has(s.id)) : ordered;
+  const pool = narrowed.slice(0, BRACKET_TEAM_COUNT);
   return pool.slice(0, 4).map((s) => s.id);
 }
 
@@ -131,5 +135,18 @@ export function rankedBracketTeamIds(
   return ordered
     .filter((t) => !t.disabled && t.playerIds.length === TEAM_PLAYERS)
     .slice(0, BRACKET_TEAM_COUNT)
+    .map((t) => t.id);
+}
+
+/** 满编、未禁用的全部队伍 id，顺序与 {@link sortTeamsBySeedingRank} 一致（不限 16） */
+export function allRankedActiveTeamIds(
+  teams: Team[],
+  players: Player[],
+  seeding: SeedingEntry[],
+  eventId: string,
+  primary: SeedingPrimary,
+): string[] {
+  return sortTeamsBySeedingRank(teams, players, seeding, eventId, primary)
+    .filter((t) => !t.disabled && t.playerIds.length === TEAM_PLAYERS)
     .map((t) => t.id);
 }

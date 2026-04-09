@@ -1,4 +1,9 @@
-import type { PkComputedSummary, PkPlayerResult, ResultValue } from '@/pages/Tools/TeamMatch/types';
+import type {
+  PkComputedSummary,
+  PkMultiTeamComputedSummary,
+  PkPlayerResult,
+  ResultValue,
+} from '@/pages/Tools/TeamMatch/types';
 
 function hasDnf(teamId: string, results: PkPlayerResult[]): boolean {
   return results.some((r) => r.teamId === teamId && r.value === 'DNF');
@@ -79,6 +84,41 @@ export function computePkSettlement(
     bothSidesDnf: false,
     computedWinnerTeamId: sumA < sumB ? teamAId : teamBId,
   };
+}
+
+/**
+ * 多队同场：每队三人合计秒数，和小者胜；任一人 DNF 则该队为 dnf_team。
+ * 仅一支非 DNF 队有有效合计时该队胜；多支非 DNF 且最小和并列则无法自动判胜。
+ */
+export function computeMultiTeamPkSettlement(
+  teamIds: string[],
+  results: PkPlayerResult[],
+): PkMultiTeamComputedSummary {
+  const teamTotals: Record<string, number | 'dnf_team' | 'incomplete'> = {};
+  for (const tid of teamIds) {
+    teamTotals[tid] = sumTeam(tid, results);
+  }
+  const allTeamsDnf = teamIds.length > 0 && teamIds.every((tid) => teamTotals[tid] === 'dnf_team');
+  if (allTeamsDnf) {
+    return { teamTotals, allTeamsDnf: true, computedWinnerTeamId: null };
+  }
+  if (teamIds.some((tid) => teamTotals[tid] === 'incomplete')) {
+    return { teamTotals, allTeamsDnf: false, computedWinnerTeamId: null };
+  }
+  const numericIds = teamIds.filter((tid) => typeof teamTotals[tid] === 'number') as string[];
+  const nonDnfIds = teamIds.filter((tid) => teamTotals[tid] !== 'dnf_team');
+  if (nonDnfIds.length === 1 && numericIds.length === 1) {
+    return { teamTotals, allTeamsDnf: false, computedWinnerTeamId: nonDnfIds[0] };
+  }
+  if (numericIds.length === 0) {
+    return { teamTotals, allTeamsDnf: false, computedWinnerTeamId: null };
+  }
+  const minVal = Math.min(...numericIds.map((tid) => teamTotals[tid] as number));
+  const winners = numericIds.filter((tid) => (teamTotals[tid] as number) === minVal);
+  if (winners.length !== 1) {
+    return { teamTotals, allTeamsDnf: false, computedWinnerTeamId: null };
+  }
+  return { teamTotals, allTeamsDnf: false, computedWinnerTeamId: winners[0] };
 }
 
 export function formatResultValue(v: ResultValue): string {

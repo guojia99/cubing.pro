@@ -5,14 +5,18 @@ import { EventsAPI } from '@/services/cubing-pro/events/typings';
 import { apiRecords } from '@/services/cubing-pro/statistics/records';
 import React, { useEffect, useState } from 'react';
 import { Select } from 'antd';
-import { apiPublicOrganizers } from '@/services/cubing-pro/public/orgs';
+import { apiPublicCompGroups } from '@/services/cubing-pro/public/orgs';
 
-const RecordsWithBest: React.FC = () => {
+export type RecordsWithBestProps = {
+  groupId: number;
+  onGroupIdChange: (id: number) => void;
+};
+
+const RecordsWithBest: React.FC<RecordsWithBestProps> = ({ groupId, onGroupIdChange }) => {
   const [events, setEvents] = useState<EventsAPI.Event[]>([]);
   const [bestRecords, setBestRecords] = useState<any>();
   const [avgRecords, setAvgRecords] = useState<any>();
 
-  const [groupId, setGroupId] = useState<number>(0);
   const [orgItems, setOrgItems] = useState<any[]>([]);
 
 
@@ -33,35 +37,40 @@ const RecordsWithBest: React.FC = () => {
 
 
 
-    apiPublicOrganizers().then(value => {
+    apiPublicCompGroups().then((value) => {
       const ite = [
         {
           label: 'CubingPro',
           key: 'CubingPro',
           value: 0,
         },
-      ]
+      ];
 
-      if (value.data && value.data.items){
-        for (let i = 0; i < value.data.items.length; i++){
+      if (value.data && value.data.items) {
+        for (let i = 0; i < value.data.items.length; i++) {
           ite.push({
-            label: value.data.items[i].Name,
-            key: value.data.items[i].Name,
+            label: value.data.items[i].name,
+            key: value.data.items[i].name,
             value: value.data.items[i].id,
-          })
+          });
         }
       }
-      setOrgItems(ite)
-    })
-
-
-    fetchRecords()
+      setOrgItems(ite);
+    });
   }, []);
 
+  useEffect(() => {
+    fetchRecords();
+  }, [groupId]);
 
   useEffect(() => {
-    fetchRecords()
-  }, [groupId]);
+    if (orgItems.length === 0) {
+      return;
+    }
+    if (!orgItems.some((o) => o.value === groupId)) {
+      onGroupIdChange(0);
+    }
+  }, [orgItems, groupId, onGroupIdChange]);
 
 
   let records: MRecord[] = [];
@@ -118,13 +127,11 @@ const RecordsWithBest: React.FC = () => {
       </h3>
 
       <Select
-        defaultValue={0}
+        value={groupId}
         style={{ marginBottom: '20px', width: '150px' }}
         options={orgItems}
-        onChange={(value) => {
-          setGroupId(value);
-        }}
-      ></Select>
+        onChange={(value) => onGroupIdChange(value)}
+      />
 
       {RecordsTable(records, ['MEventId', 'BestUserName', 'Best', 'Average', 'AvgUserName'], false)}
     </>

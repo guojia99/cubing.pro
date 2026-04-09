@@ -1,6 +1,7 @@
 export default {
   'menu.groupCompetitions': '群賽',
   'menu.groupCompetitions.Static': '統計',
+  'menu.groupCompetitions.Records': '記錄',
   'menu.groupCompetitions.Project': '專案',
   'menu.groupCompetitions.Competitions': '比賽',
   'menu.groupCompetitions.Player': '選手',

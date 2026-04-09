@@ -1,6 +1,7 @@
 export default {
   "menu.groupCompetitions": "Group Competitions",
   "menu.groupCompetitions.Static": "Statistics",
+  "menu.groupCompetitions.Records": "Records",
   "menu.groupCompetitions.Project": "Project",
   "menu.groupCompetitions.Competitions": "Competitions",
   "menu.groupCompetitions.Player": "Person",

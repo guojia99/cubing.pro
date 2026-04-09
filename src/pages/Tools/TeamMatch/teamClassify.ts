@@ -8,10 +8,6 @@ export function getFreelancerSchoolId(schools: School[]): string | undefined {
   return schools.find((s) => s.kind === 'freelancer')?.id;
 }
 
-function isFreelancerPlayerSchool(schools: School[], playerSchoolId: string): boolean {
-  return schools.some((s) => s.id === playerSchoolId && s.kind === 'freelancer');
-}
-
 /**
  * 根据三名队员的学校归属判定队伍类型与归属 schoolId：
  * - 学校队：至少两名队员来自同一所「普通」学校（非自由人池），归属该校；可含外援或自由人选手。

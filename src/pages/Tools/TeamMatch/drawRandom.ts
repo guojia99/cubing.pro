@@ -288,13 +288,17 @@ export function randomizeDraw(session: TeamMatchSession): TeamMatchSession['regi
   const avoid = session.drawAvoidSameSchool ?? true;
   const mode = session.drawRandomMode ?? 'score';
   const eventId = session.eventIds[0] ?? '333';
-  const bracketIds = rankedBracketTeamIds(
-    session.teams,
-    session.players,
-    session.seeding,
-    eventId,
-    session.seedingPrimary,
-  );
+  const fromMain = session.mainBracketTeamIds;
+  const bracketIds =
+    fromMain && fromMain.length >= MIN_TEAMS
+      ? fromMain
+      : rankedBracketTeamIds(
+          session.teams,
+          session.players,
+          session.seeding,
+          eventId,
+          session.seedingPrimary,
+        );
   const n = bracketIds.length;
   if (n < MIN_TEAMS) {
     return session.regionSlots;

@@ -1,4 +1,8 @@
-import { fetchAndApplyOneCompPreliminary, fetchOneCompPrelimPreview } from '@/pages/Tools/TeamMatch/oneCompPrelimImport';
+import {
+  fetchAndApplyOneCompPreliminary,
+  fetchOneCompPrelimPreview,
+  type OneCompPrelimPreviewEventBlock,
+} from '@/pages/Tools/TeamMatch/oneCompPrelimImport';
 import { fetchOneCommonCompList, type OneCompItem } from '@/pages/Tools/TeamMatch/oneGradeApi';
 import type { TeamMatchStoreAction } from '@/pages/Tools/TeamMatch/TeamMatchContext';
 import type { TeamMatchSession } from '@/pages/Tools/TeamMatch/types';

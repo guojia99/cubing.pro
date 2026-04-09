@@ -2,7 +2,7 @@ import axios from "axios";
 import type {AxiosError, AxiosResponse} from 'axios';
 import {WarnToast} from "@/components/Alert/toast";
 
-const dev = true
+const dev = false
 
 
 export function getAPIUrl() {
@@ -41,6 +41,17 @@ export type  ErrorMsg = {
   ref: string;
   line: string;
   data: any;
+  error?: string;
+}
+
+/** 优先使用业务文案（如改名冷却提示），避免只显示泛化的 message（如「无权限」）。 */
+export function getApiErrorDisplayMessage(body: unknown): string | undefined {
+  if (body === null || typeof body !== 'object') return undefined;
+  const d = body as Record<string, unknown>;
+  if (typeof d.data === 'string' && d.data.trim()) return d.data.trim();
+  if (typeof d.error === 'string' && d.error.trim()) return d.error.trim();
+  if (typeof d.message === 'string' && d.message.trim()) return d.message.trim();
+  return undefined;
 }
 
 export const Request = axios.create({
@@ -60,8 +71,11 @@ Request.interceptors.response.use(
     }
     console.log(resp)
     const msg = resp.data as ErrorMsg
-    if (msg !== undefined) {
-      WarnToast(<>错误: {msg.message} ({msg.code}) </>)
+    const url = error.config?.url ?? ''
+    const skipGlobalToast = url.includes('/auth/user/detail')
+    if (msg !== undefined && !skipGlobalToast) {
+      const display = getApiErrorDisplayMessage(msg) ?? msg.message
+      WarnToast(<>错误: {display}{msg.code != null ? ` (${msg.code})` : ''}</>)
     } else {
       // const url = error.config?.url
       if (isLocal()){
