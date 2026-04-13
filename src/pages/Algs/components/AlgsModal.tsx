@@ -1,9 +1,22 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Button, Modal, Space, theme } from 'antd';
+import { Button, Modal, Select, Space, theme } from 'antd';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import { useIntl } from '@@/plugin-locale';
 import type { Algorithm } from '@/services/cubing-pro/algs/typings';
-import { getAlgsSelection, setAlgsSelection, buildAlgsKey } from '../utils/storage';
+import {
+  getAlgsSelection,
+  setAlgsSelection,
+  buildAlgsKey,
+  getCube333ViewMode,
+  setCube333ViewMode,
+  getTwistyPanelTone,
+  setTwistyPanelTone,
+  getTwistyBottomFaceColor,
+  setTwistyBottomFaceColor,
+  type Cube333ViewMode,
+  type TwistyPanelTone,
+  type CubeBottomFaceColor,
+} from '../utils/storage';
 import {
   getFormulaProficiency,
   setFormulaProficiency,
@@ -11,6 +24,9 @@ import {
 } from '@/services/cubing-pro/algs/formulaPracticeProficiency';
 import { buildFormulaKey } from '@/services/cubing-pro/algs/formulaPracticeSelection';
 import SvgRenderer from './SvgRenderer';
+import AlgsTwisty333 from './AlgsTwisty333';
+import { isTwisty333Cube } from '../utils/cube333';
+import { resolveTwistyStickering } from '../utils/twistyStickering';
 import ProficiencySelect from './ProficiencySelect';
 
 export interface AlgsModalItem {
@@ -45,6 +61,9 @@ const AlgsModal: React.FC<AlgsModalProps> = ({
   const [proficiency, setProficiency] = useState<ProficiencyLevel>(() =>
     item ? (getFormulaProficiency(cube, classId)[formulaKey] ?? 'average') : 'average',
   );
+  const [cube333ViewMode, setCube333ViewModeState] = useState<Cube333ViewMode>(() => getCube333ViewMode());
+  const [twistyPanelTone, setTwistyPanelToneState] = useState<TwistyPanelTone>(() => getTwistyPanelTone());
+  const [twistyBottomFace, setTwistyBottomFaceState] = useState<CubeBottomFaceColor>('yellow');
 
   useEffect(() => {
     if (item) {
@@ -52,6 +71,14 @@ const AlgsModal: React.FC<AlgsModalProps> = ({
       setProficiency(getFormulaProficiency(cube, classId)[key] ?? 'average');
     }
   }, [open, cube, classId, currentIndex]);
+
+  useEffect(() => {
+    if (open && isTwisty333Cube(cube)) {
+      setCube333ViewModeState(getCube333ViewMode());
+      setTwistyPanelToneState(getTwistyPanelTone());
+      setTwistyBottomFaceState(getTwistyBottomFaceColor(cube, classId));
+    }
+  }, [open, cube, classId]);
 
   const handleProficiencyChange = useCallback(
     (level: ProficiencyLevel) => {
@@ -84,13 +111,16 @@ const AlgsModal: React.FC<AlgsModalProps> = ({
 
   const canPrev = currentIndex > 0;
   const canNext = currentIndex < items.length - 1;
+  const showTwisty333 = isTwisty333Cube(cube);
+  const displayFormula = alg.algs[selectedIndex] ?? alg.algs[0] ?? '';
+  const twistyStickering = resolveTwistyStickering(classId, setName, groupName);
 
   return (
     <Modal
       open={open}
       onCancel={onClose}
       footer={null}
-      width={640}
+      width={700}
       title={
         <Space>
           <span>{alg.name}</span>
@@ -104,7 +134,74 @@ const AlgsModal: React.FC<AlgsModalProps> = ({
       styles={{ body: { paddingTop: 8 } }}
     >
       <div style={{ textAlign: 'center' }}>
-        <SvgRenderer svg={alg.image} maxHeight={180} style={{ marginTop: 12, marginBottom: 20 }} />
+        {showTwisty333 ? (
+          <>
+            <div style={{ marginBottom: 8 }}>
+              <Space wrap align="center" size={[8, 8]}>
+                <Button
+                  size="small"
+                  onClick={() => {
+                    const next: Cube333ViewMode = cube333ViewMode === '2d' ? '3d' : '2d';
+                    setCube333ViewModeState(next);
+                    setCube333ViewMode(next);
+                  }}
+                >
+                  {cube333ViewMode === '2d'
+                    ? intl.formatMessage({ id: 'algs.detail.switchTo3d' })
+                    : intl.formatMessage({ id: 'algs.detail.switchTo2d' })}
+                </Button>
+                <Space size={4} align="center">
+                  <span style={{ fontSize: 12, color: 'var(--ant-color-text-secondary)', whiteSpace: 'nowrap' }}>
+                    {intl.formatMessage({ id: 'algs.twisty.backgroundColor.label' })}
+                  </span>
+                  <Select<TwistyPanelTone>
+                    size="small"
+                    style={{ minWidth: 112 }}
+                    value={twistyPanelTone}
+                    onChange={(v) => {
+                      setTwistyPanelToneState(v);
+                      setTwistyPanelTone(v);
+                    }}
+                    options={(['cream', 'lightBlue', 'white', 'neutral'] as const).map((v) => ({
+                      value: v,
+                      label: intl.formatMessage({ id: `algs.twisty.backgroundColor.${v}` }),
+                    }))}
+                  />
+                </Space>
+                <Space size={4} align="center">
+                  <span style={{ fontSize: 12, color: 'var(--ant-color-text-secondary)', whiteSpace: 'nowrap' }}>
+                    {intl.formatMessage({ id: 'algs.twisty.bottomFace.label' })}
+                  </span>
+                  <Select<CubeBottomFaceColor>
+                    size="small"
+                    style={{ minWidth: 88 }}
+                    value={twistyBottomFace}
+                    onChange={(v) => {
+                      setTwistyBottomFaceState(v);
+                      setTwistyBottomFaceColor(cube, classId, v);
+                    }}
+                    options={(
+                      ['yellow', 'white', 'red', 'orange', 'green', 'blue'] as const
+                    ).map((v) => ({
+                      value: v,
+                      label: intl.formatMessage({ id: `algs.twisty.bottomFace.${v}` }),
+                    }))}
+                  />
+                </Space>
+              </Space>
+            </div>
+            <AlgsTwisty333
+              alg={displayFormula}
+              viewMode={cube333ViewMode}
+              experimentalStickering={twistyStickering}
+              panelTone={twistyPanelTone}
+              bottomFaceColor={twistyBottomFace}
+              style={{ marginTop: 0, marginBottom: 20 }}
+            />
+          </>
+        ) : (
+          <SvgRenderer svg={alg.image} maxHeight={180} style={{ marginTop: 12, marginBottom: 20 }} />
+        )}
 
         {currentScramble && (
           <div style={{ marginBottom: 16, textAlign: 'left' }}>
