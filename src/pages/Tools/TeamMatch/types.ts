@@ -34,6 +34,8 @@ export type Player = {
   name: string;
   schoolId: string;
   avatarDataUrl: string | null;
+  /** 作战宣言（对战全屏英雄详情等展示） */
+  battlecry?: string;
 };
 
 export type Team = {
@@ -46,6 +48,8 @@ export type Team = {
   disabled: boolean;
   /** 由种子步骤写入 */
   isSeed: boolean;
+  /** 队伍作战宣言 */
+  battlecry?: string;
 };
 
 /** 种子成绩采用来源（录入表与种子计算用 `single`/`average`） */

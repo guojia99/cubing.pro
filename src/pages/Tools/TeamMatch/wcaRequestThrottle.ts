@@ -32,3 +32,20 @@ export async function throttleBeforeWcaAvatarRequest(): Promise<void> {
   }
   lastWcaAvatarRequestAt = Date.now();
 }
+
+/** 粗饼头像经自家后端代理，后端仍有串行+间隔；前端再隔 1.6s，减轻并发压力 */
+export const CUBING_AVATAR_MIN_INTERVAL_MS = 1600;
+
+let lastCubingAvatarRequestAt = 0;
+
+export async function throttleBeforeCubingAvatarRequest(): Promise<void> {
+  const now = Date.now();
+  const elapsed = now - lastCubingAvatarRequestAt;
+  const wait = Math.max(0, CUBING_AVATAR_MIN_INTERVAL_MS - elapsed);
+  if (wait > 0) {
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, wait);
+    });
+  }
+  lastCubingAvatarRequestAt = Date.now();
+}

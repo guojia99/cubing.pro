@@ -277,6 +277,8 @@ const BracketStage: React.FC<BracketStageProps> = ({ liveSettings, onOpenLiveSet
             avatarDataUrl: p!.avatarDataUrl,
             schoolName: schoolNameForPlayer(p!, schools),
             scoresLine: formatPlayerSingleAverageLine(entry),
+            playerBattlecry: (p!.battlecry ?? '').trim(),
+            wcaId: p!.wcaId ?? null,
           };
         }) ?? []
     );
@@ -297,6 +299,8 @@ const BracketStage: React.FC<BracketStageProps> = ({ liveSettings, onOpenLiveSet
             avatarDataUrl: p!.avatarDataUrl,
             schoolName: schoolNameForPlayer(p!, schools),
             scoresLine: formatPlayerSingleAverageLine(entry),
+            playerBattlecry: (p!.battlecry ?? '').trim(),
+            wcaId: p!.wcaId ?? null,
           };
         }) ?? []
     );
@@ -438,6 +442,7 @@ const BracketStage: React.FC<BracketStageProps> = ({ liveSettings, onOpenLiveSet
           playersB={focusedPlayersB}
           dimA={!!focused.winnerId && focused.winnerId !== focused.pk!.teamAId}
           dimB={!!focused.winnerId && focused.winnerId !== focused.pk!.teamBId}
+          currentResults={focused.pk.currentResults}
           onOpenScoreEntry={openPkModal}
         />
       )}

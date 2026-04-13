@@ -7,6 +7,7 @@ import PreliminaryBatchModal from '@/pages/Tools/TeamMatch/components/Preliminar
 import PlayerEditModal from '@/pages/Tools/TeamMatch/components/PlayerEditModal';
 import SeedingPlayerModal from '@/pages/Tools/TeamMatch/components/SeedingPlayerModal';
 import TeamEditModal from '@/pages/Tools/TeamMatch/components/TeamEditModal';
+import SyncCubingAvatarsButton from '@/pages/Tools/TeamMatch/components/SyncCubingAvatarsButton';
 import SyncWcaAvatarsButton from '@/pages/Tools/TeamMatch/components/SyncWcaAvatarsButton';
 import TeamRosterPasteCard from '@/pages/Tools/TeamMatch/components/TeamRosterPasteCard';
 import { buildMainPoolDisplayRows, computeMainBracketTeamIds, isEliminationComplete } from '@/pages/Tools/TeamMatch/eliminationResolve';
@@ -119,6 +120,7 @@ const TeamMatchSteps: React.FC<TeamMatchStepsProps> = ({ liveUISettings, onLiveU
           <Space wrap style={{ marginBottom: 16 }}>
             <TeamRosterPasteCard session={session} dispatch={dispatch} />
             <SyncWcaAvatarsButton session={session} dispatch={dispatch} />
+            <SyncCubingAvatarsButton session={session} dispatch={dispatch} />
           </Space>
           <Typography.Title level={5} style={{ marginTop: 0, marginBottom: 12 }}>
             学校

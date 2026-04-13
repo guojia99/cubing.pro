@@ -958,17 +958,476 @@
   z-index: 0;
 }
 
+/* 队伍栏内波浪：柔光叠在条带底上，mix-blend 融入背景；动效慢、幅度小 */
+.tmPkArenaFsTeamWaves {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: inherit;
+  mix-blend-mode: soft-light;
+  opacity: 0.88;
+}
+
+.tmPkArenaFsSideContent {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 18px;
+}
+
+.tmPkArenaFsSideContent--left {
+  align-items: flex-start;
+}
+
+.tmPkArenaFsSideContent--right {
+  align-items: flex-end;
+}
+
+.tmPkArenaFsSideContent--group {
+  align-items: center;
+}
+
+.tmPkArenaFsTeamWavesBand {
+  position: absolute;
+  display: block;
+  left: 0;
+  bottom: 0;
+  width: 200%;
+  pointer-events: none;
+  will-change: transform, background-position;
+  backface-visibility: hidden;
+}
+
+/* 宽间距、低对比条纹 + 长周期缓动，避免「栅栏感」 */
+.tmPkArenaFsTeamWavesBand--1 {
+  height: min(40%, 200px);
+  min-height: 64px;
+  opacity: 0.38;
+  background: repeating-linear-gradient(
+    122deg,
+    rgba(255, 255, 255, 0.07) 0,
+    rgba(255, 255, 255, 0.07) 36px,
+    rgba(255, 255, 255, 0.015) 36px,
+    rgba(255, 255, 255, 0.015) 72px
+  );
+  background-size: 200% 100%;
+  filter: blur(0.6px);
+  mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.35) 38%,
+    rgba(0, 0, 0, 0.75) 62%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.35) 38%,
+    rgba(0, 0, 0, 0.75) 62%,
+    transparent 100%
+  );
+  animation: tmPkArenaWaveLayer1L 16s cubic-bezier(0.42, 0, 0.2, 1) infinite,
+    tmPkArenaWaveStripeScrollL 28s cubic-bezier(0.35, 0.02, 0.25, 1) infinite;
+}
+
+.tmPkArenaFsTeamWavesBand--2 {
+  height: min(30%, 140px);
+  min-height: 52px;
+  bottom: 5%;
+  left: -10%;
+  width: 210%;
+  opacity: 0.28;
+  background:
+    radial-gradient(ellipse 85% 70% at 50% 100%, rgba(120, 170, 255, 0.18) 0%, transparent 78%),
+    repeating-linear-gradient(
+      78deg,
+      rgba(255, 255, 255, 0.05) 0,
+      rgba(255, 255, 255, 0.05) 44px,
+      transparent 44px,
+      transparent 80px
+    );
+  background-size: 100% 100%, 180% 100%;
+  filter: blur(0.8px);
+  mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.5) 28%, rgba(0, 0, 0, 0.65) 55%, transparent 92%);
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.5) 28%,
+    rgba(0, 0, 0, 0.65) 55%,
+    transparent 92%
+  );
+  animation: tmPkArenaWaveLayer2L 18s cubic-bezier(0.42, 0, 0.2, 1) infinite,
+    tmPkArenaWaveBgSlideL 24s cubic-bezier(0.38, 0.01, 0.22, 1) infinite reverse;
+  animation-delay: -3s, -1.5s;
+}
+
+.tmPkArenaFsTeamWavesBand--3 {
+  height: min(20%, 88px);
+  min-height: 40px;
+  bottom: 16%;
+  left: -5%;
+  width: 170%;
+  opacity: 0.22;
+  background: radial-gradient(
+    ellipse 100% 85% at 48% 100%,
+    rgba(255, 255, 255, 0.1) 0%,
+    transparent 75%
+  );
+  filter: blur(1px);
+  animation: tmPkArenaWaveLayer3L 14s cubic-bezier(0.45, 0.02, 0.25, 1) infinite;
+  animation-delay: -5s;
+}
+
+.tmPkArenaFsTeamWaves--right .tmPkArenaFsTeamWavesBand--1 {
+  animation: tmPkArenaWaveLayer1R 16s cubic-bezier(0.42, 0, 0.2, 1) infinite,
+    tmPkArenaWaveStripeScrollR 28s cubic-bezier(0.35, 0.02, 0.25, 1) infinite;
+}
+
+.tmPkArenaFsTeamWaves--right .tmPkArenaFsTeamWavesBand--2 {
+  animation: tmPkArenaWaveLayer2R 18s cubic-bezier(0.42, 0, 0.2, 1) infinite,
+    tmPkArenaWaveBgSlideR 24s cubic-bezier(0.38, 0.01, 0.22, 1) infinite reverse;
+  animation-delay: -3s, -1.5s;
+}
+
+.tmPkArenaFsTeamWaves--right .tmPkArenaFsTeamWavesBand--3 {
+  animation: tmPkArenaWaveLayer3R 14s cubic-bezier(0.45, 0.02, 0.25, 1) infinite;
+  animation-delay: -5s;
+}
+
+/* band1 单层条纹横向滚动 */
+@keyframes tmPkArenaWaveStripeScrollL {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 100% 0;
+  }
+}
+
+@keyframes tmPkArenaWaveStripeScrollR {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
+
+/* band2 双层背景：第一层固定，第二层滑动 */
+@keyframes tmPkArenaWaveBgSlideL {
+  0% {
+    background-position: 0 0, 0 0;
+  }
+  100% {
+    background-position: 0 0, 100% 0;
+  }
+}
+
+@keyframes tmPkArenaWaveBgSlideR {
+  0% {
+    background-position: 0 0, 100% 0;
+  }
+  100% {
+    background-position: 0 0, 0 0;
+  }
+}
+
+@keyframes tmPkArenaWaveLayer1L {
+  0%,
+  100% {
+    transform: translate3d(0, 2px, 0) scaleY(1);
+  }
+  50% {
+    transform: translate3d(-14px, -4px, 0) scaleY(1.025);
+  }
+}
+
+@keyframes tmPkArenaWaveLayer1R {
+  0%,
+  100% {
+    transform: translate3d(0, 2px, 0) scaleY(1);
+  }
+  50% {
+    transform: translate3d(14px, -4px, 0) scaleY(1.025);
+  }
+}
+
+@keyframes tmPkArenaWaveLayer2L {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(-12px, 5px, 0);
+  }
+}
+
+@keyframes tmPkArenaWaveLayer2R {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(12px, 5px, 0);
+  }
+}
+
+@keyframes tmPkArenaWaveLayer3L {
+  0%,
+  100% {
+    transform: translate3d(-4px, 0, 0);
+  }
+  50% {
+    transform: translate3d(10px, -3px, 0);
+  }
+}
+
+@keyframes tmPkArenaWaveLayer3R {
+  0%,
+  100% {
+    transform: translate3d(4px, 0, 0);
+  }
+  50% {
+    transform: translate3d(-10px, -3px, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tmPkArenaFsTeamWavesBand {
+    animation: none !important;
+  }
+}
+
+.tmPkArenaHeroRoot {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  pointer-events: none;
+}
+
+.tmPkArenaHeroBackdrop {
+  position: absolute;
+  inset: 0;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  pointer-events: auto;
+  background: rgba(0, 0, 0, 0.52);
+}
+
+.tmPkArenaHeroPanel {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: min(560px, 96vw);
+  box-sizing: border-box;
+  border-left: 3px solid rgba(255, 255, 255, 0.35);
+  border-right: 3px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.65);
+  pointer-events: auto;
+  transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+  overflow: hidden auto;
+}
+
+.tmPkArenaHeroPanel--left {
+  left: 0;
+  transform: translateX(-104%);
+}
+
+.tmPkArenaHeroPanel--right {
+  right: 0;
+  transform: translateX(104%);
+}
+
+.tmPkArenaHeroPanel--left.tmPkArenaHeroPanelVisible {
+  transform: translateX(0);
+}
+
+.tmPkArenaHeroPanel--right.tmPkArenaHeroPanelVisible {
+  transform: translateX(0);
+}
+
+.tmPkArenaHeroPanelInner {
+  padding: 20px 22px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  min-height: 100%;
+}
+
+.tmPkArenaHeroHeader {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.tmPkArenaHeroAvatarBlock {
+  margin-top: 4px;
+}
+
+.tmPkArenaHeroAvatar {
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid rgba(255, 255, 255, 0.45);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.55);
+}
+
+.tmPkArenaHeroAvatarPh {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-weight: 900;
+  border-radius: 50%;
+}
+
+.tmPkArenaHeroName {
+  text-shadow: 0 4px 28px rgba(0, 0, 0, 0.95);
+  line-height: 1.15 !important;
+}
+
+.tmPkArenaHeroSchool {
+  color: rgba(245, 245, 245, 0.72) !important;
+}
+
+.tmPkArenaHeroWca {
+  display: block;
+  margin-top: 2px;
+  letter-spacing: 0.02em;
+}
+
+.tmPkArenaHeroScorePk {
+  margin-top: 4px;
+}
+
+.tmPkArenaHeroSeed {
+  margin-top: 2px;
+}
+
+.tmPkArenaHeroCryBlock {
+  width: 100%;
+  text-align: left;
+  margin-top: 8px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.tmPkArenaHeroCryLabel {
+  display: block;
+  color: rgba(255, 255, 255, 0.55) !important;
+  margin-bottom: 6px !important;
+  font-weight: 600;
+}
+
+.tmPkArenaHeroCryText {
+  margin-bottom: 0 !important;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.tmPkDiagCellClickable {
+  cursor: pointer;
+  border-radius: 12px;
+  padding: 6px 4px;
+  outline: none;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tmPkDiagCellClickable:hover {
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14);
+}
+
+.tmPkDiagCellClickable:focus-visible {
+  box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.65);
+}
+
 .tmPkArenaFsTopBar {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   flex: 0 0 auto;
   padding: 10px 16px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* 队员轮播：底栏上方细倒计时条（无数字） */
+.tmPkArenaFsCarouselTrack {
+  position: relative;
+  z-index: 3;
+  flex: 0 0 auto;
+  height: 3px;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.38);
+  overflow: hidden;
+}
+
+.tmPkArenaFsCarouselFill {
+  height: 100%;
+  width: 100%;
+  transform-origin: left center;
+  transform: scaleX(1);
+  background: linear-gradient(90deg, rgba(22, 119, 255, 0.28), rgba(190, 235, 255, 0.95));
+  animation-name: tmPkArenaCarouselBar;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes tmPkArenaCarouselBar {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+.tmPkArenaTeamCarouselBtn {
+  position: absolute;
+  z-index: 2;
+  pointer-events: auto;
+}
+
+.tmPkArenaTeamCarouselBtnInner.ant-btn {
+  color: rgba(255, 255, 255, 0.92) !important;
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  background: rgba(0, 0, 0, 0.22) !important;
+}
+
+.tmPkArenaTeamCarouselBtn--bottom-left {
+  left: 2px;
+  bottom: 2px;
+}
+
+.tmPkArenaTeamCarouselBtn--bottom-right {
+  right: 2px;
+  bottom: 2px;
+}
+
+.tmPkArenaTeamCarouselBtn--bottom-center {
+  left: 50%;
+  bottom: 2px;
+  transform: translateX(-50%);
+}
+
 .tmPkArenaFsBottomBar {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   flex: 0 0 auto;
   padding: 14px 16px 20px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -981,7 +1440,8 @@
   flex: 1 1 auto;
   min-height: 0;
   position: relative;
-  z-index: 1;
+  /* 高于旗帜层 (1)，主舞台与对战内容盖住装饰 */
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1010,23 +1470,15 @@
 }
 
 .tmPkArenaFsSide {
+  position: relative;
+  isolation: isolate;
   flex: 1 1 0;
   min-width: 0;
   padding: 16px 12px;
   border-radius: 14px;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 18px;
-}
-
-.tmPkArenaFsSideLeft {
-  align-items: flex-start;
-}
-
-.tmPkArenaFsSideRight {
-  align-items: flex-end;
 }
 
 .tmPkArenaFsDim {
@@ -1045,6 +1497,30 @@
 .tmPkArenaFsTeamName {
   display: block;
   text-shadow: 0 2px 14px rgba(0, 0, 0, 0.92);
+}
+
+.tmPkArenaFsTeamBattlecry {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.38;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.88);
+  font-weight: 500;
+}
+
+.tmPkArenaFsTeamBattlecry--left {
+  padding-right: 8px;
+}
+
+.tmPkArenaFsTeamBattlecry--right {
+  padding-left: 8px;
+}
+
+.tmPkArenaFsTeamBattlecry--center {
+  padding-left: 4px;
+  padding-right: 4px;
 }
 
 .tmPkDiagCol {
@@ -1144,7 +1620,6 @@
   flex: 1 1 0;
   min-width: min(180px, 20vw);
   max-width: 400px;
-  align-items: center !important;
   padding: 12px 6px;
 }
 

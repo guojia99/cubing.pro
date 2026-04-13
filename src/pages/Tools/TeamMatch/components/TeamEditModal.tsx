@@ -21,6 +21,7 @@ type Props = {
 type FormVals = {
   teamMode: TeamKind;
   name?: string;
+  battlecry?: string;
   p0: string;
   p1: string;
   p2: string;
@@ -55,6 +56,7 @@ const TeamEditModal: React.FC<Props> = ({
       form.setFieldsValue({
         teamMode: editing.kind ?? 'school',
         name: editing.name,
+        battlecry: editing.battlecry ?? '',
         p0,
         p1,
         p2,
@@ -111,6 +113,7 @@ const TeamEditModal: React.FC<Props> = ({
         schoolId: c.schoolId,
         kind: c.kind,
         name,
+        battlecry: (v.battlecry ?? '').trim(),
         playerIds: ids,
         disabled: editing?.disabled ?? false,
         isSeed: editing?.isSeed ?? false,
@@ -159,6 +162,9 @@ const TeamEditModal: React.FC<Props> = ({
         </Form.Item>
         <Form.Item name="name" label="队名（可空，将按学校或自由人池自动默认）">
           <Input />
+        </Form.Item>
+        <Form.Item name="battlecry" label="作战宣言（可选）">
+          <Input.TextArea rows={2} placeholder="全屏对战点击队员时放大展示" maxLength={200} showCount />
         </Form.Item>
         <Form.Item name="p0" label="队员 1" rules={[{ required: true, message: '请选择队员' }]}>
           <Select
