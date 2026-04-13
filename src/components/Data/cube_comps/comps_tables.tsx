@@ -162,7 +162,7 @@ export const CompsTableColumns: ProColumns<Comp>[] = [
     render: (text: any, result: Comp) => {
       return (
         <>
-          <Link to={'/competition/' + result.id} style={{ color: '#373737' }}>
+          <Link to={'/competition/' + result.id} style={{ color: 'var(--ant-color-link)' }}>
             {result.Name}
           </Link>
           {result.logo && (

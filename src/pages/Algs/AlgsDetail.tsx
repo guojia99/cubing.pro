@@ -118,7 +118,6 @@ const AlgsDetail: React.FC = () => {
   const dcube = decodeURIComponent(cube);
   const dclassId = decodeURIComponent(classId);
   const sets = data.sets ?? [];
-  const setKeys = data.setKeys ?? [];
 
   const groupedAlgs: Array<{
     setName: string;

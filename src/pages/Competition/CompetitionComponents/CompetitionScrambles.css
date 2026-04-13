@@ -1,12 +1,176 @@
-.highlight-row {
-  background-color: rgba(240, 219, 166, 0.45);
+/* 与 ConfigProvider 明暗主题一致，使用 ant token，勿写死浅色（见 table_style.css 说明） */
+.highlight-row > td {
+  background-color: var(--ant-color-warning-bg) !important;
 }
 
+.scramble-text {
+  color: var(--ant-color-text);
+}
 
+.scramble-text--compact {
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+/* 主边框用 colorBorder，对比度高于 border-secondary，避免与表格底色融在一起 */
+.scramble-pair-frame {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-start;
+  box-sizing: border-box;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--ant-color-border);
+  border-radius: 8px;
+  background: var(--ant-color-bg-container);
+}
+
+/* 高亮行：单元格已是 warning 底，内框透明，边框用 warning 色以免与底色糊成一片 */
+tr.highlight-row .scramble-pair-frame {
+  background: transparent;
+  border-color: var(--ant-color-warning-border, var(--ant-color-border));
+}
+
+.scramble-pair-frame--stack {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.scramble-pair-frame--stack.highlight-row {
+  background: var(--ant-color-warning-bg);
+  border-color: var(--ant-color-warning-border, var(--ant-color-border));
+}
+
+.scramble-pair-frame__label {
+  display: block;
+  font-size: 13px;
+  color: var(--ant-color-text-tertiary);
+  margin-bottom: 6px;
+}
+
+/* 横向：占满剩余宽度；高度随正文，不跟图齐高 */
+.scramble-pair-frame__text {
+  flex: 1 1 200px;
+  min-width: 0;
+  min-height: 0;
+  height: auto;
+  align-self: flex-start;
+}
+
+/* 纵向 stack 时主轴为垂直方向，若保留 flex-grow 会把文字区在竖直方向拉高 */
+.scramble-pair-frame--stack .scramble-pair-frame__text {
+  flex: 0 0 auto;
+  width: 100%;
+}
+
+.scramble-pair-frame__image {
+  flex: 0 1 auto;
+  width: 400px;
+  max-width: 100%;
+  min-width: 0;
+  align-self: flex-start;
+}
+
+.scramble-pair-frame--stack .scramble-pair-frame__image {
+  width: 100%;
+}
+
+.scramble-round-block {
+  margin-bottom: 24px;
+}
+
+.scramble-round-title {
+  margin: 0 0 10px;
+}
+
+.scramble-group-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px 0;
+  margin-bottom: 8px;
+  background: var(--ant-color-bg-layout);
+  border-bottom: 1px solid var(--ant-color-border-secondary);
+}
+
+.scramble-group-toolbar__label {
+  font-size: 14px;
+  color: var(--ant-color-text-secondary);
+  white-space: nowrap;
+}
+
+.scramble-group-toolbar__select {
+  min-width: 168px;
+}
+
+.scramble-toolbar-combo {
+  column-gap: 12px;
+  row-gap: 8px;
+}
+
+.scramble-toolbar-combo__gap {
+  margin-inline-start: 4px;
+}
+
+.scramble-group-panel {
+  padding-top: 4px;
+}
+
+.scramble-group-panel .scramble-mobile-list {
+  margin-top: 0;
+}
+
+.scramble-mobile-list {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.scramble-mobile-item__index {
+  font-size: 13px;
+  color: var(--ant-color-text-secondary);
+  margin-bottom: 8px;
+}
+
+.scramble-image-loading {
+  color: var(--ant-color-text-secondary);
+  font-size: 13px;
+  padding: 8px 0;
+}
+
+/* 高度随图片内容自适应，避免固定高度把「打乱」与图在纵向上拉得过开 */
 .svg-container {
+  box-sizing: border-box;
   width: 100%;
   max-width: 100%;
-  height: 180px;
+  min-width: 0;
+  min-height: 0;
+  height: auto;
   position: relative;
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.svg-container img {
+  display: block;
+  box-sizing: border-box;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: min(280px, 55vh);
+  object-fit: contain;
 }

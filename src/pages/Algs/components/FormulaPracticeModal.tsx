@@ -1,6 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Checkbox, Modal, Pagination, Popconfirm, Radio, Select, Slider } from 'antd';
-import { DeleteOutlined, EyeInvisibleOutlined, EyeOutlined, HistoryOutlined } from '@ant-design/icons';
+import {
+  DeleteOutlined,
+  EyeInvisibleOutlined,
+  EyeOutlined,
+  HistoryOutlined,
+  CloseOutlined,
+} from '@ant-design/icons';
 import { useIntl } from '@@/plugin-locale';
 import type { Algorithm } from '@/services/cubing-pro/algs/typings';
 import {
@@ -130,6 +136,16 @@ const FormulaPracticeModal: React.FC<FormulaPracticeModalProps> = ({
   const remindProficiencyRef = useRef(remindProficiency);
   timerStateRef.current = timerState;
   remindProficiencyRef.current = remindProficiency;
+
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const mq = window.matchMedia('(max-width: 768px)');
+    const apply = () => setIsMobile(mq.matches);
+    apply();
+    mq.addEventListener('change', apply);
+    return () => mq.removeEventListener('change', apply);
+  }, []);
 
   /** 练习会话：仅在 startPractice 时创建，结束计时时从此读取数据 */
   type PracticeSession = {
@@ -336,6 +352,14 @@ const FormulaPracticeModal: React.FC<FormulaPracticeModalProps> = ({
     setPhase('practice');
   };
 
+  const startTimer = useCallback(() => {
+    if (!open || phase !== 'practice') return;
+    if (timerStateRef.current !== 'ready') return;
+    startTimeRef.current = Date.now();
+    setTimerMs(0);
+    setTimerState('running');
+  }, [open, phase]);
+
   const stopTimerAndNext = useCallback(() => {
     if (timerRef.current != null) {
       clearInterval(timerRef.current);
@@ -415,9 +439,7 @@ const FormulaPracticeModal: React.FC<FormulaPracticeModalProps> = ({
       if (e.code === 'Space') {
         e.preventDefault();
         if (timerStateRef.current === 'ready') {
-          startTimeRef.current = Date.now();
-          setTimerMs(0);
-          setTimerState('running');
+          startTimer();
         }
       } else if (e.code === 'ArrowUp') {
         e.preventDefault();
@@ -427,7 +449,7 @@ const FormulaPracticeModal: React.FC<FormulaPracticeModalProps> = ({
         setCurrentSlotIndex((i) => (i + 1) % scrambleSlots.length);
       }
     },
-    [open, phase, scrambleSlots.length, stopTimerAndNext],
+    [open, phase, scrambleSlots.length, stopTimerAndNext, startTimer],
   );
 
   useEffect(() => {
@@ -487,7 +509,8 @@ const FormulaPracticeModal: React.FC<FormulaPracticeModalProps> = ({
         onCancel={onClose}
         title={intl.formatMessage({ id: 'algs.formulaPractice.title' })}
         footer={null}
-        width={640}
+        width={isMobile ? '100%' : 640}
+        wrapClassName={isMobile ? 'formula-practice-modal-wrap formula-practice-modal-wrap--fullscreen-mobile' : undefined}
         className="formula-practice-modal"
       >
         <div className="formula-practice-config">
@@ -657,140 +680,195 @@ const FormulaPracticeModal: React.FC<FormulaPracticeModalProps> = ({
       <Modal
         open={open}
         onCancel={onClose}
+        closable={false}
+        maskClosable={timerState !== 'running'}
+        keyboard={timerState !== 'running'}
         title={
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
             <span>{intl.formatMessage({ id: 'algs.formulaPractice.title' })}</span>
-            <Select
-              value={mode}
-              onChange={(v) => {
-                const newMode = v as FormulaPracticeMode;
-                setMode(newMode);
-                if (sessionRef.current) {
-                  const { algs, sessionId } = sessionRef.current;
-                  const newSlots = newMode === 'sequential'
-                    ? buildFormulaSlots(algs)
-                    : newMode === 'weightedRandom'
-                      ? buildWeightedSlots(algs, getWeightForKey, Math.max(algs.length, 1))
-                      : shuffle(buildFormulaSlots(algs));
-                  sessionRef.current = { ...sessionRef.current, mode: newMode, slots: newSlots };
-                  setScrambleSlots(newSlots);
-                  setCurrentSlotIndex(0);
-                }
-              }}
-              size="small"
-              style={{ width: 140 }}
-              options={[
-                { value: 'sequential', label: intl.formatMessage({ id: 'algs.formulaPractice.modeSequential' }) },
-                { value: 'random', label: intl.formatMessage({ id: 'algs.formulaPractice.modeRandom' }) },
-                { value: 'nonRepeatRandom', label: intl.formatMessage({ id: 'algs.formulaPractice.modeNonRepeat' }) },
-                { value: 'weightedRandom', label: intl.formatMessage({ id: 'algs.formulaPractice.modeWeighted' }) },
-              ]}
-            />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginLeft: 'auto' }}>
+              <Select
+                value={mode}
+                onChange={(v) => {
+                  const newMode = v as FormulaPracticeMode;
+                  setMode(newMode);
+                  if (sessionRef.current) {
+                    const { algs } = sessionRef.current;
+                    const newSlots = newMode === 'sequential'
+                      ? buildFormulaSlots(algs)
+                      : newMode === 'weightedRandom'
+                        ? buildWeightedSlots(algs, getWeightForKey, Math.max(algs.length, 1))
+                        : shuffle(buildFormulaSlots(algs));
+                    sessionRef.current = { ...sessionRef.current, mode: newMode, slots: newSlots };
+                    setScrambleSlots(newSlots);
+                    setCurrentSlotIndex(0);
+                  }
+                }}
+                size="small"
+                style={{ width: 140 }}
+                options={[
+                  { value: 'sequential', label: intl.formatMessage({ id: 'algs.formulaPractice.modeSequential' }) },
+                  { value: 'random', label: intl.formatMessage({ id: 'algs.formulaPractice.modeRandom' }) },
+                  { value: 'nonRepeatRandom', label: intl.formatMessage({ id: 'algs.formulaPractice.modeNonRepeat' }) },
+                  { value: 'weightedRandom', label: intl.formatMessage({ id: 'algs.formulaPractice.modeWeighted' }) },
+                ]}
+              />
+              {!isMobile && (
+                <Button type="default" icon={<CloseOutlined />} onClick={onClose}>
+                  {intl.formatMessage({ id: 'algs.formulaPractice.exitPractice' })}
+                </Button>
+              )}
+            </div>
           </div>
         }
         footer={null}
-        width={720}
-        className="formula-practice-modal"
+        width={isMobile ? '100%' : 1000}
+        wrapClassName={isMobile ? 'formula-practice-modal-wrap formula-practice-modal-wrap--fullscreen-mobile' : undefined}
+        className={`formula-practice-modal ${isMobile ? 'formula-practice-modal--mobile' : ''} ${
+          timerState === 'running' ? 'formula-practice-modal--timer-running' : ''
+        }`}
       >
-        <div className="formula-practice-main">
-          {currentScramble ? (
-            <>
-              {currentItem && (
-                <div className={`formula-practice-header ${contentVisible ? '' : 'formula-practice-header-hidden'}`}>
-                  {contentVisible ? (
-                    <>
-                      <SvgRenderer
-                        svg={currentItem.alg.image}
-                        maxWidth={140}
-                        maxHeight={200}
-                        style={{ flexShrink: 0 }}
-                      />
-                      <div className="formula-practice-header-info">
-                        <div className="formula-practice-formula-name">{currentItem.alg.name}</div>
-                        <div className="formula-practice-formula-meta">
-                          {currentItem.setName} · {currentItem.groupName}
-                        </div>
-                      </div>
-                    </>
-                  ) : (
-                    <div className="formula-practice-header-placeholder">•••</div>
-                  )}
-                  <Button
-                    type="text"
-                    size="small"
-                    icon={contentVisible ? <EyeInvisibleOutlined /> : <EyeOutlined />}
-                    onClick={() => setContentVisible(!contentVisible)}
-                    style={{ marginLeft: 8 }}
-                  >
-                    {contentVisible
-                      ? intl.formatMessage({ id: 'algs.formulaPractice.hideContent' })
-                      : intl.formatMessage({ id: 'algs.formulaPractice.showContent' })}
-                  </Button>
-                </div>
-              )}
-
-              <div
-                className="formula-practice-scramble-block formula-practice-scramble-clickable"
-                onClick={() =>
-                  currentItem &&
-                  setDetailRecord({
-                    id: '',
-                    createdAt: 0,
-                    timeMs: 0,
-                    formulaKey: buildFormulaKey(currentItem.setName, currentItem.groupName, currentItem.alg.name),
-                    formulaName: currentItem.alg.name,
-                    setName: currentItem.setName,
-                    groupName: currentItem.groupName,
-                    scramble: currentScramble,
-                    scrambleIndex: currentSlot?.scrambleIdx ?? 0,
-                    image: currentItem.alg.image,
-                    algs: currentItem.alg.algs ?? [],
-                  })
-                }
-              >
-                <div className="formula-practice-scramble-label">
-                  {intl.formatMessage({ id: 'algs.formulaPractice.scrambleLabel' })}
-                </div>
-                <div className="formula-practice-scramble">{currentScramble}</div>
-              </div>
-
-              <div
-                className={`formula-practice-timer ${timerState === 'ready' ? 'ready' : ''} ${timerState === 'running' ? 'running' : ''}`}
-              >
-                {timerState === 'ready'
-                  ? intl.formatMessage({ id: 'algs.formulaPractice.pressSpaceToStart' })
-                  : formatTime(timerMs)}
-              </div>
-              {timerState === 'running' && (
-                <Button type="primary" danger size="middle" onClick={stopTimerAndNext} style={{ marginTop: 8 }}>
-                  {intl.formatMessage({ id: 'algs.formulaPractice.stopTimer' })}
-                </Button>
-              )}
-
-              {currentItem && (
-                <div className="formula-practice-nav-hint">
-                  {intl.formatMessage(
-                    { id: 'algs.formulaPractice.formulaNavHint' },
-                    { current: currentSlotIndex + 1, total: scrambleSlots.length },
-                  )}
-                </div>
-              )}
-            </>
-          ) : (
-            <div style={{ color: 'var(--ant-color-text-tertiary)' }}>
-              {intl.formatMessage({ id: 'algs.formulaPractice.noScramble' })}
+        <div
+          className={`formula-practice-practice-root ${
+            timerState === 'running' ? 'formula-practice-practice-root--timing' : ''
+          }`}
+        >
+          {isMobile && timerState !== 'running' && (
+            <Button
+              type="text"
+              size="small"
+              className="formula-practice-mobile-exit"
+              icon={<CloseOutlined />}
+              onClick={onClose}
+            >
+              {intl.formatMessage({ id: 'algs.formulaPractice.exitPractice' })}
+            </Button>
+          )}
+          {timerState === 'running' && (
+            <div
+              className="formula-practice-timing-overlay"
+              onPointerDown={(e) => {
+                e.preventDefault();
+                stopTimerAndNext();
+              }}
+              role="presentation"
+            >
+              <div className="formula-practice-timing-digits">{formatTime(timerMs)}</div>
             </div>
           )}
 
-          <div className="formula-practice-hints">
-            {timerState === 'running'
-              ? intl.formatMessage({ id: 'algs.formulaPractice.hintAnyKey' })
-              : intl.formatMessage({ id: 'algs.formulaPractice.hintSpace' })}
-            <br />
-            {intl.formatMessage({ id: 'algs.formulaPractice.hintArrow' })}
-          </div>
-        </div>
+          <div
+            className="formula-practice-main"
+            aria-hidden={timerState === 'running'}
+          >
+            {currentScramble ? (
+              <>
+                <div className="formula-practice-formula-section">
+                  {currentItem && (
+                    <div className={`formula-practice-header ${contentVisible ? '' : 'formula-practice-header-hidden'}`}>
+                      {contentVisible ? (
+                        <>
+                          <SvgRenderer
+                            svg={currentItem.alg.image}
+                            maxWidth={isMobile ? 120 : 140}
+                            maxHeight={isMobile ? 160 : 200}
+                            style={{ flexShrink: 0 }}
+                          />
+                          <div className="formula-practice-header-info">
+                            <div className="formula-practice-formula-name">{currentItem.alg.name}</div>
+                            <div className="formula-practice-formula-meta">
+                              {currentItem.setName} · {currentItem.groupName}
+                            </div>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="formula-practice-header-placeholder">•••</div>
+                      )}
+                      <Button
+                        type="text"
+                        size="small"
+                        icon={contentVisible ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+                        onClick={() => setContentVisible(!contentVisible)}
+                        style={{ marginLeft: 8 }}
+                      >
+                        {contentVisible
+                          ? intl.formatMessage({ id: 'algs.formulaPractice.hideContent' })
+                          : intl.formatMessage({ id: 'algs.formulaPractice.showContent' })}
+                      </Button>
+                    </div>
+                  )}
 
+                  <div
+                    className="formula-practice-scramble-block formula-practice-scramble-clickable"
+                    onClick={() =>
+                      currentItem &&
+                      setDetailRecord({
+                        id: '',
+                        createdAt: 0,
+                        timeMs: 0,
+                        formulaKey: buildFormulaKey(currentItem.setName, currentItem.groupName, currentItem.alg.name),
+                        formulaName: currentItem.alg.name,
+                        setName: currentItem.setName,
+                        groupName: currentItem.groupName,
+                        scramble: currentScramble,
+                        scrambleIndex: currentSlot?.scrambleIdx ?? 0,
+                        image: currentItem.alg.image,
+                        algs: currentItem.alg.algs ?? [],
+                      })
+                    }
+                  >
+                    <div className="formula-practice-scramble-label">
+                      {intl.formatMessage({ id: 'algs.formulaPractice.scrambleLabel' })}
+                    </div>
+                    <div className="formula-practice-scramble">{currentScramble}</div>
+                  </div>
+                </div>
+
+                <div className="formula-practice-timer-panel">
+                  <div className="formula-practice-timer-panel-title">
+                    {intl.formatMessage({ id: 'algs.formulaPractice.timerZone' })}
+                  </div>
+                  <div
+                    className="formula-practice-start-zone"
+                    onPointerDown={(e) => {
+                      if (timerState !== 'ready') return;
+                      e.preventDefault();
+                      startTimer();
+                    }}
+                    role="presentation"
+                  >
+                    <div className={`formula-practice-timer ready ${isMobile ? 'formula-practice-timer--mobile-start' : ''}`}>
+                      {intl.formatMessage({ id: 'algs.formulaPractice.tapMiddleToStart' })}
+                    </div>
+                  </div>
+                </div>
+
+                {currentItem && (
+                  <div className="formula-practice-nav-hint">
+                    {intl.formatMessage(
+                      { id: 'algs.formulaPractice.formulaNavHint' },
+                      { current: currentSlotIndex + 1, total: scrambleSlots.length },
+                    )}
+                  </div>
+                )}
+              </>
+            ) : (
+              <div style={{ color: 'var(--ant-color-text-tertiary)' }}>
+                {intl.formatMessage({ id: 'algs.formulaPractice.noScramble' })}
+              </div>
+            )}
+
+            {timerState !== 'running' && (
+              <div className="formula-practice-hints">
+                {intl.formatMessage({ id: 'algs.formulaPractice.hintArrow' })}
+              </div>
+            )}
+          </div>
+
+          <div
+            className={`formula-practice-below-main ${timerState === 'running' ? 'formula-practice-below-main--inert' : ''}`}
+            aria-hidden={timerState === 'running'}
+          >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16 }}>
           <Button size="small" onClick={handleBackToConfig}>
             {intl.formatMessage({ id: 'algs.formulaPractice.backToConfig' })}
@@ -870,6 +948,8 @@ const FormulaPracticeModal: React.FC<FormulaPracticeModalProps> = ({
             );
             })
           )}
+        </div>
+          </div>
         </div>
 
         <Modal

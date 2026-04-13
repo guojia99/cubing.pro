@@ -18,12 +18,14 @@
   }
 
   .formula-practice-main {
-    min-height: 420px;
+    flex: 1;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 24px 32px 80px;
     position: relative;
+    width: 100%;
   }
 
   .formula-practice-header {
@@ -56,10 +58,47 @@
     color: var(--ant-color-text-tertiary);
   }
 
+  .formula-practice-formula-section {
+    width: 100%;
+    max-width: 680px;
+  }
+
+  .formula-practice-formula-section .formula-practice-scramble-block {
+    margin-bottom: 0;
+  }
+
   .formula-practice-scramble-block {
     width: 100%;
-    max-width: 500px;
+    max-width: 680px;
     margin-bottom: 20px;
+  }
+
+  .formula-practice-timer-panel {
+    width: 100%;
+    max-width: 680px;
+    margin-top: 24px;
+    padding: 14px 18px 18px;
+    border: 2px solid var(--ant-color-primary);
+    border-radius: 12px;
+    background: var(--ant-color-primary-bg);
+    box-sizing: border-box;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .formula-practice-timer-panel-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ant-color-primary);
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+
+  .formula-practice-timer-panel .formula-practice-timer.ready {
+    margin-bottom: 0;
+  }
+
+  .formula-practice-timer-panel .formula-practice-start-zone {
+    min-height: 100px;
   }
 
   .formula-practice-scramble-label {
@@ -222,6 +261,20 @@
     margin-left: 12px;
   }
 
+  @media (max-width: 768px) {
+    .formula-practice-main {
+      padding: 16px 12px 72px;
+    }
+
+    .formula-practice-header {
+      max-width: 100%;
+    }
+
+    .formula-practice-timer-panel {
+      margin-top: 20px;
+      padding: 12px 14px 16px;
+    }
+  }
 }
 
 .formula-practice-empty {
@@ -286,4 +339,128 @@
     font-size: 13px;
     color: rgba(100, 149, 237, 0.95);
   }
+}
+
+/* PC：练习弹窗固定高度，起表 / 停表时尺寸不变 */
+.ant-modal.formula-practice-modal:not(.formula-practice-modal--mobile) {
+  .ant-modal-content {
+    height: min(88vh, 820px);
+    max-height: 88vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ant-modal-body {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+/* 计时时隐藏标题栏；配合 .ant-modal-content 固定高度，body 自动铺满，弹窗总高度不变 */
+.ant-modal.formula-practice-modal.formula-practice-modal--timer-running {
+  .ant-modal-header {
+    display: none !important;
+  }
+}
+
+.formula-practice-below-main--inert {
+  visibility: hidden;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* 手机端：Modal 全屏铺满视口 */
+.formula-practice-modal-wrap--fullscreen-mobile.ant-modal-wrap {
+  padding: 0 !important;
+
+  .ant-modal {
+    max-width: 100vw !important;
+    width: 100% !important;
+    margin: 0 !important;
+    top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  .ant-modal-content {
+    display: flex;
+    flex-direction: column;
+    border-radius: 0;
+    height: 100dvh;
+    min-height: 100dvh;
+    max-height: 100dvh;
+  }
+
+  .ant-modal-body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+}
+
+.formula-practice-practice-root {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: auto;
+}
+
+/* 计时时彻底隐藏主区域（含「点击中间空白区域开始计时」），避免与遮罩叠字；占位不变 */
+.formula-practice-practice-root--timing .formula-practice-main {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.formula-practice-timing-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ant-color-bg-container);
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+/* 计时时仅显示等宽滚动的计时数字 */
+.formula-practice-timing-digits {
+  font-size: clamp(48px, 12vw, 88px);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--ant-color-success);
+  line-height: 1;
+  letter-spacing: 0.04em;
+}
+
+.formula-practice-start-zone {
+  flex: 1;
+  width: 100%;
+  max-width: 680px;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+.formula-practice-timer--mobile-start {
+  font-size: 18px;
+  line-height: 1.5;
+  text-align: center;
+  padding: 16px 12px;
+}
+
+.formula-practice-mobile-exit {
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  z-index: 15;
 }

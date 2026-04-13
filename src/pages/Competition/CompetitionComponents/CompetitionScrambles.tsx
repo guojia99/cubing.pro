@@ -5,13 +5,12 @@ import { NavTabs } from '@/components/Tabs/nav_tabs';
 import { CompAPI } from '@/services/cubing-pro/comps/typings';
 import { apiEvents } from '@/services/cubing-pro/events/events';
 import { EventsAPI } from '@/services/cubing-pro/events/typings';
-import { Table } from 'antd';
+import { Grid, Select, Table } from 'antd';
 import React, { useEffect, useState } from 'react';
 import './CompetitionScrambles.css';
 
 import cstimer from 'cstimer_module';
 
-// 定义组件的属性类型
 interface CompetitionScramblesProps {
   comp?: CompAPI.CompResp;
 }
@@ -50,12 +49,11 @@ const svgToPngUrl = (svg: string): Promise<string> => {
   });
 };
 
-
 interface ScrambleImageProps {
   sc: string;
   ev: string;
 }
-// todo 这个写法可能有问题， 强行缩成png
+
 const ScrambleImage: React.FC<ScrambleImageProps> = ({ sc, ev }) => {
   const [pngData, setPngData] = useState<string | null>(null);
   useEffect(() => {
@@ -67,19 +65,165 @@ const ScrambleImage: React.FC<ScrambleImageProps> = ({ sc, ev }) => {
   }, [sc, ev]);
 
   if (!pngData) {
-    return <div>Loading...</div>;
+    return <div className="scramble-image-loading">Loading...</div>;
   }
 
   return (
     <div className={'svg-container'}>
-      <img src={pngData} alt={sc}  style={{maxWidth: "100%", height: "auto"}} />
+      <img src={pngData} alt={sc} />
     </div>
   );
 };
 
+type ScrambleTableRow = {
+  Index: string;
+  Scramble: React.ReactNode;
+  ScrambleImage: React.ReactNode;
+};
+
+type ScrambleGroupDef = {
+  label: string;
+  tb: ScrambleTableRow[];
+};
+
+type ScheduleRoundDef = {
+  roundKey: string;
+  roundTitle: string;
+  groups: ScrambleGroupDef[];
+};
+
+interface ScrambleEventRoundsProps {
+  eventKey: string;
+  rounds: ScheduleRoundDef[];
+  rowClassName: (data: { Index: string }) => string;
+  isCompact: boolean;
+}
+
+const ScrambleEventRounds: React.FC<ScrambleEventRoundsProps> = ({
+  eventKey,
+  rounds,
+  rowClassName,
+  isCompact,
+}) => {
+  const [roundIndex, setRoundIndex] = useState(0);
+  const [groupIndex, setGroupIndex] = useState(0);
+
+  useEffect(() => {
+    setRoundIndex(0);
+    setGroupIndex(0);
+  }, [eventKey]);
+
+  useEffect(() => {
+    setGroupIndex(0);
+  }, [roundIndex]);
+
+  const safeRoundIdx = rounds.length === 0 ? 0 : Math.min(roundIndex, rounds.length - 1);
+  const currentRound = rounds[safeRoundIdx];
+  const groups = currentRound?.groups ?? [];
+  const safeGroupIdx = groups.length === 0 ? 0 : Math.min(groupIndex, groups.length - 1);
+  const currentGroup = groups[safeGroupIdx];
+
+  const showRoundSelect = rounds.length > 1;
+  const showGroupSelect = groups.length > 1;
+  const showToolbar = showRoundSelect || showGroupSelect;
+
+  const renderTableOrMobile = (tb: ScrambleTableRow[]) =>
+    isCompact ? (
+      <div className="scramble-mobile-list">
+        {tb.map((row, idx) => (
+          <div key={`${row.Index}-${idx}`} className="scramble-mobile-item">
+            <div className="scramble-mobile-item__index">序号：{row.Index}</div>
+            <div className={`scramble-pair-frame scramble-pair-frame--stack ${rowClassName(row)}`.trim()}>
+              <div className="scramble-pair-frame__text">
+                <span className="scramble-pair-frame__label">打乱</span>
+                {row.Scramble}
+              </div>
+              <div className="scramble-pair-frame__image">{row.ScrambleImage}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    ) : (
+      <Table
+        style={{ marginTop: 0, marginBottom: 0 }}
+        dataSource={tb}
+        rowKey={(record, index) => `${record.Index}-${index}`}
+        size={'small'}
+        rowClassName={rowClassName}
+        scroll={{ x: 'max-content' }}
+        columns={[
+          {
+            title: '序号',
+            dataIndex: 'Index',
+            key: 'index',
+            width: 60,
+            minWidth: 60,
+            onCell: () => ({ style: { verticalAlign: 'top' } }),
+          },
+          {
+            title: '打乱',
+            key: 'scramblePair',
+            minWidth: 400,
+            onCell: () => ({ style: { verticalAlign: 'top' } }),
+            render: (_, record) => (
+              <div className="scramble-pair-frame">
+                <div className="scramble-pair-frame__text">{record.Scramble}</div>
+                <div className="scramble-pair-frame__image">{record.ScrambleImage}</div>
+              </div>
+            ),
+          },
+        ]}
+        pagination={false}
+      />
+    );
+
+  return (
+    <div className="scramble-round-block">
+      {showToolbar ? (
+        <div className="scramble-group-toolbar scramble-toolbar-combo">
+          {showRoundSelect ? (
+            <>
+              <span className="scramble-group-toolbar__label">赛程</span>
+              <Select
+                className="scramble-group-toolbar__select"
+                value={safeRoundIdx}
+                onChange={setRoundIndex}
+                options={rounds.map((r, i) => ({ label: r.roundTitle, value: i }))}
+                popupMatchSelectWidth={false}
+              />
+            </>
+          ) : null}
+          {showGroupSelect ? (
+            <>
+              <span className="scramble-group-toolbar__label scramble-toolbar-combo__gap">打乱组</span>
+              <Select
+                className="scramble-group-toolbar__select"
+                value={safeGroupIdx}
+                onChange={setGroupIndex}
+                options={groups.map((g, i) => ({ label: g.label, value: i }))}
+                popupMatchSelectWidth={false}
+              />
+            </>
+          ) : null}
+        </div>
+      ) : null}
+      {currentRound ? (
+        <h3 className="scramble-round-title">
+          <strong>{currentRound.roundTitle}</strong>
+        </h3>
+      ) : null}
+      {currentGroup ? (
+        <div className="scramble-group-panel">{renderTableOrMobile(currentGroup.tb)}</div>
+      ) : null}
+    </div>
+  );
+};
 
 const CompetitionScrambles: React.FC<CompetitionScramblesProps> = ({ comp }) => {
   const [baseEvents, setBaseEvents] = useState<EventsAPI.Event[]>([]);
+  const screens = Grid.useBreakpoint();
+  const isCompact = screens.md === false;
+
   useEffect(() => {
     apiEvents().then((value) => {
       setBaseEvents(value.data.Events);
@@ -89,13 +233,13 @@ const CompetitionScrambles: React.FC<CompetitionScramblesProps> = ({ comp }) => 
     return <p>没有找到比赛信息。</p>;
   }
 
-
-  const scrambleValue = (sc: string) => {
+  const scrambleValue = (sc: string, compact: boolean) => {
     return (
       <p
+        className={compact ? 'scramble-text scramble-text--compact' : 'scramble-text'}
         style={{
           whiteSpace: 'pre-line',
-          width: 500,
+          ...(compact ? {} : { width: 500 }),
           wordWrap: 'break-word',
           wordBreak: 'break-word',
           fontSize: 18,
@@ -123,109 +267,99 @@ const CompetitionScrambles: React.FC<CompetitionScramblesProps> = ({ comp }) => 
       return '';
     };
 
-    let bodys = [];
+    const buildGroupRows = (ssc: string[]): ScrambleTableRow[] | 'skip' => {
+      const tb: ScrambleTableRow[] = [];
+
+      if (m.repeatedly) {
+        for (let evIdx = 0; evIdx < ssc.length; evIdx++) {
+          tb.push({
+            Index: '#' + (evIdx + 1),
+            Scramble: scrambleValue(ssc[evIdx], isCompact),
+            ScrambleImage: <ScrambleImage sc={ssc[evIdx]} ev={baseEvent?.puzzleId} />,
+          });
+        }
+      }
+
+      if (baseEvent?.scrambleValue) {
+        const sp = baseEvent.scrambleValue.split(',');
+        if (sp.length >= 2) {
+          if (sp.length !== ssc.length) {
+            return 'skip';
+          }
+          for (let evIdx = 0; evIdx < sp.length; evIdx++) {
+            tb.push({
+              Index: sp[evIdx],
+              Scramble: scrambleValue(ssc[evIdx], isCompact),
+              ScrambleImage: <ScrambleImage sc={ssc[evIdx]} ev={sp[evIdx]} />,
+            });
+          }
+        }
+      }
+
+      if (tb.length === 0) {
+        let extNum = 1;
+        for (let evIdx = 0; evIdx < ssc.length; evIdx++) {
+          let indexStr = '#' + (evIdx + 1);
+          if (evIdx + 1 > m.rounds) {
+            indexStr = 'Ex#' + extNum;
+            extNum += 1;
+          }
+          tb.push({
+            Index: indexStr,
+            Scramble: scrambleValue(ssc[evIdx], isCompact),
+            ScrambleImage: <ScrambleImage sc={ssc[evIdx]} ev={baseEvent?.puzzleId} />,
+          });
+        }
+      }
+
+      return tb;
+    };
+
+    const scheduleRounds: ScheduleRoundDef[] = [];
     for (let i = 0; i < ev.Schedule.length; i++) {
       const sc = ev.Schedule[i];
 
-      const data: JSX.Element[] = [];
-      if (sc.Scrambles) {
-        for (let j = 0; j < sc.Scrambles.length; j++) {
-          const ssc = sc.Scrambles[j];
-
-          const tb = [];
-
-          // 多盲等
-          if (m.repeatedly) {
-            for (let evIdx = 0; evIdx < ssc.length; evIdx++) {
-              tb.push({
-                Index: '#' + (evIdx + 1),
-                Scramble: scrambleValue(ssc[evIdx]),
-                ScrambleImage: <ScrambleImage sc={ssc[evIdx]} ev={baseEvent?.puzzleId} />,
-              });
-            }
-          }
-
-
-          // 多个项目的
-          if (baseEvent?.scrambleValue) {
-            const sp = baseEvent.scrambleValue.split(',');
-            if (sp.length >= 2) {
-              if (sp.length !== ssc.length) {
-                continue;
-              }
-              for (let evIdx = 0; evIdx < sp.length; evIdx++) {
-                tb.push({
-                  Index: sp[evIdx],
-                  Scramble: scrambleValue(ssc[evIdx]),
-                  ScrambleImage:  <ScrambleImage sc={ssc[evIdx]} ev={sp[evIdx]} />,
-                });
-              }
-            }
-          }
-
-          // 其他类型
-          if (tb.length === 0) {
-            let extNum = 1;
-            for (let evIdx = 0; evIdx < ssc.length; evIdx++) {
-              let indexStr = '#' + (evIdx + 1);
-              if (evIdx + 1 > m.rounds) {
-                indexStr = 'Ex#' + extNum;
-                extNum += 1;
-              }
-              tb.push({
-                Index: indexStr,
-                Scramble: scrambleValue(ssc[evIdx]),
-                ScrambleImage:  <ScrambleImage sc={ssc[evIdx]} ev={baseEvent?.puzzleId} />,
-              });
-            }
-          }
-
-          data.push(
-            <>
-              <strong>{'打乱组' + (j + 1)}</strong>
-              <Table
-                style={{ marginTop: 20, marginBottom: 20 }}
-                dataSource={tb}
-                size={'small'}
-                rowClassName={rowClassName}
-                columns={[
-                  {
-                    title: '序号',
-                    dataIndex: 'Index',
-                    key: 'index',
-                    width: 60,
-                  },
-                  {
-                    title: '打乱',
-                    dataIndex: 'Scramble',
-                    key: 'Scramble',
-                  },
-                  {
-                    title: '打乱图',
-                    width: 400,
-                    dataIndex: 'ScrambleImage',
-                    key: 'ScrambleImage',
-                  },
-                ]}
-                pagination={false}
-              />
-            </>,
-          );
-        }
-      } else {
-        data.push(<>暂无打乱</>)
+      if (!sc.Scrambles) {
+        continue;
       }
-      bodys.push(
-        <>
-          <h3 style={{ marginBottom: '10px' }}>
-            <strong>{sc.Round}</strong>
-          </h3>
-          {data}
-        </>,
-      );
+
+      const groups: ScrambleGroupDef[] = [];
+      for (let j = 0; j < sc.Scrambles.length; j++) {
+        const ssc = sc.Scrambles[j];
+        const built = buildGroupRows(ssc);
+        if (built === 'skip') {
+          continue;
+        }
+        groups.push({
+          label: '打乱组' + (j + 1),
+          tb: built,
+        });
+      }
+
+      if (groups.length === 0) {
+        continue;
+      }
+
+      scheduleRounds.push({
+        roundKey: `${ev.EventID}-${i}-${sc.Round}`,
+        roundTitle: sc.Round,
+        groups,
+      });
     }
 
-    return <>{bodys}</>;
+    if (scheduleRounds.length === 0) {
+      return <>暂无打乱</>;
+    }
+
+    return (
+      <ScrambleEventRounds
+        key={ev.EventID}
+        eventKey={ev.EventID}
+        rounds={scheduleRounds}
+        rowClassName={rowClassName}
+        isCompact={isCompact}
+      />
+    );
   };
   const items = [];
 
@@ -249,7 +383,6 @@ const CompetitionScrambles: React.FC<CompetitionScramblesProps> = ({ comp }) => 
         type="line"
         items={items}
         tabsKey="scrambles_key"
-        // style={{ minHeight: '100vh' }}
         indicator={{ size: (origin: number) => origin - 20, align: 'center' }}
       />
     </>
