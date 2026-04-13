@@ -5,7 +5,7 @@ import {
   type LiveUISettings,
 } from '@/pages/Tools/TeamMatch/liveUiSettings';
 import { getDefaultPkArenaSettings, type PkArenaSettings } from '@/pages/Tools/TeamMatch/pkArenaSettings';
-import { Button, ColorPicker, Form, Input, InputNumber, Modal, Slider, Space, Tabs, Typography } from 'antd';
+import { Button, ColorPicker, Form, Input, InputNumber, Modal, Slider, Space, Switch, Tabs, Typography } from 'antd';
 import React, { useEffect } from 'react';
 
 function colorFieldToString(v: unknown): string {
@@ -206,6 +206,12 @@ const LiveSettingsModal: React.FC<Props> = ({ open, onClose, value, onApply }) =
               label: '对战全屏',
               children: (
                 <>
+                  <Form.Item label="队伍区动态波浪" name={['arena', 'flagBackgroundEnabled']} valuePropName="checked">
+                    <Switch />
+                  </Form.Item>
+                  <Typography.Paragraph type="secondary" style={{ marginTop: -4, marginBottom: 8 }}>
+                    关闭后各队栏内无底部波浪动画。
+                  </Typography.Paragraph>
                   <Form.Item label="整体缩放" name={['arena', 'scale']}>
                     <Slider min={0.5} max={1.6} step={0.05} marks={{ 1: '1×' }} />
                   </Form.Item>
@@ -256,6 +262,51 @@ const LiveSettingsModal: React.FC<Props> = ({ open, onClose, value, onApply }) =
                   </Form.Item>
                   <Form.Item label="顶栏背景" name={['arena', 'barBg']}>
                     <ColorPicker showText />
+                  </Form.Item>
+
+                  <Typography.Paragraph strong style={{ marginBottom: 4, marginTop: 8 }}>
+                    英雄详情（点击队员展开）
+                  </Typography.Paragraph>
+                  <Typography.Paragraph type="secondary" style={{ marginTop: 0, marginBottom: 8 }}>
+                    以下为侧滑详情层尺寸，与主舞台「头像 / 队员字」独立可调。
+                  </Typography.Paragraph>
+                  <Form.Item label="详情头像边长 (px)" name={['arena', 'heroDetailAvatarPx']}>
+                    <InputNumber min={120} max={480} style={{ width: '100%' }} />
+                  </Form.Item>
+                  <Form.Item label="详情姓名字号 (px)" name={['arena', 'heroDetailNameFontPx']}>
+                    <InputNumber min={24} max={96} style={{ width: '100%' }} />
+                  </Form.Item>
+                  <Form.Item label="详情本场成绩字号 (px)" name={['arena', 'heroDetailPkScoreFontPx']}>
+                    <InputNumber min={20} max={88} style={{ width: '100%' }} />
+                  </Form.Item>
+                  <Form.Item label="详情种子成绩字号 (px)" name={['arena', 'heroDetailSeedFontPx']}>
+                    <InputNumber min={14} max={56} style={{ width: '100%' }} />
+                  </Form.Item>
+                  <Form.Item label="详情顶部队名字号 (px)" name={['arena', 'heroDetailTeamFontPx']}>
+                    <InputNumber min={14} max={48} style={{ width: '100%' }} />
+                  </Form.Item>
+                  <Form.Item label="详情学校字号 (px)" name={['arena', 'heroDetailSchoolFontPx']}>
+                    <InputNumber min={12} max={40} style={{ width: '100%' }} />
+                  </Form.Item>
+                  <Form.Item label="详情宣言字号 (px)" name={['arena', 'heroDetailCryFontPx']}>
+                    <InputNumber min={12} max={44} style={{ width: '100%' }} />
+                  </Form.Item>
+                  <Form.Item
+                    label="队员轮播间隔 (秒)"
+                    name={['arena', 'heroCarouselIntervalMs']}
+                    tooltip="队伍栏角「队员轮播」时，每人英雄弹窗停留时长；底部细条为倒计时进度。"
+                    getValueProps={(ms) => {
+                      const d = getDefaultPkArenaSettings().heroCarouselIntervalMs;
+                      const raw = typeof ms === 'number' && Number.isFinite(ms) ? ms : d;
+                      return { value: raw / 1000 };
+                    }}
+                    normalize={(sec) => {
+                      const d = getDefaultPkArenaSettings().heroCarouselIntervalMs;
+                      if (sec === null || sec === undefined || Number.isNaN(Number(sec))) return d;
+                      return Math.max(500, Math.round(Number(sec) * 1000));
+                    }}
+                  >
+                    <InputNumber min={0.5} max={60} step={0.5} style={{ width: '100%' }} />
                   </Form.Item>
                 </>
               ),

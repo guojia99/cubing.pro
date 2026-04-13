@@ -125,3 +125,10 @@ export function formatResultValue(v: ResultValue): string {
   if (v === 'DNF') return 'DNF';
   return v.toFixed(2);
 }
+
+/** 本场 PK 已录入时用于英雄详情一行展示 */
+export function formatPkLineForPlayer(results: PkPlayerResult[], playerId: string): string | null {
+  const r = results.find((x) => x.playerId === playerId);
+  if (!r) return null;
+  return `本场成绩 ${formatResultValue(r.value)}`;
+}

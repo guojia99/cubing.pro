@@ -117,6 +117,8 @@ const EliminationStage: React.FC<EliminationStageProps> = ({ liveSettings, onOpe
               avatarDataUrl: p.avatarDataUrl,
               schoolName: schoolNameForPlayer(p, schools),
               scoresLine: formatPlayerSingleAverageLine(entry),
+              playerBattlecry: (p.battlecry ?? '').trim(),
+              wcaId: p.wcaId ?? null,
             };
           })
           .filter(Boolean) as PkGroupArenaColumn['players'];
@@ -203,6 +205,7 @@ const EliminationStage: React.FC<EliminationStageProps> = ({ liveSettings, onOpe
           onOpenLiveSettings={onOpenLiveSettings}
           settings={liveSettings.arena}
           columns={groupArenaColumns}
+          currentResults={focused.pk.currentResults}
           onOpenScoreEntry={() => setPkOpen(true)}
         />
       )}

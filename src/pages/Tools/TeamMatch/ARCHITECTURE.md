@@ -48,14 +48,16 @@ TeamMatch/
 ├── oneCompPrelimImport.ts   # One 平台比赛初赛成绩预览与合并
 ├── oneGradeApi.ts           # One 平台 HTTP：用户成绩、比赛列表、轮次成绩
 ├── wcaSeeding.ts            # WCA 结果 JSON 里按项目取最佳单次/平均
-├── wcaRequestThrottle.ts    # WCA 请求节流（成绩与头像）
+├── wcaRequestThrottle.ts    # WCA 请求节流（成绩与头像）；粗饼头像节流
+├── syncCubingAvatars.ts       # 经后端批量拉粗饼头像 URL 写入选手
 ├── wcaCubeEvents.ts         # 页面可选 WCA 项目列表
-├── syncWcaAvatars.ts        # 批量拉 WCA 头像并转 data URL 的逻辑
+├── syncWcaAvatars.ts        # 批量拉 WCA 头像 URL 的逻辑
 ├── mockLocal.ts             # 测试数据：16 队预设、追加分组
 │
 ├── bracketExportPng.ts      # 对阵图 DOM 导出 PNG
 ├── utils/
 │   ├── wcaAvatar.ts         # 调 WCA API 取头像 thumb URL
+│   ├── cubingAvatar.ts      # 调自家后端粗饼选手接口取 avatar_url
 │   └── avatar.ts            # 本地图片裁剪为 JPEG data URL
 │
 └── components/              # UI 子组件（见第 5 节）
@@ -243,7 +245,7 @@ flowchart LR
 
 ### 4.24 `wcaRequestThrottle.ts`
 
-- `throttleBeforeWcaResultsRequest`、`throttleBeforeWcaAvatarRequest` 及间隔常量。
+- `throttleBeforeWcaResultsRequest`、`throttleBeforeWcaAvatarRequest`、`throttleBeforeCubingAvatarRequest` 及间隔常量。
 
 ### 4.25 `wcaCubeEvents.ts`
 
@@ -252,7 +254,11 @@ flowchart LR
 ### 4.26 `syncWcaAvatars.ts`
 
 - `playersWithWcaId`。  
-- `syncWcaAvatarsForPlayers`：节流请求 + 下载图片转 data URL（步骤回调类型 `WcaAvatarSyncStep`）。
+- `syncWcaAvatarsForPlayers`：节流请求 WCA profile（步骤回调类型 `WcaAvatarSyncStep`）。
+
+### 4.26b `syncCubingAvatars.ts`
+
+- `syncCubingAvatarsForPlayers`：经 `apiGetCubingChinaPerson` 取粗饼 `avatar_url`，写回 `avatarDataUrl`。
 
 ### 4.27 `mockLocal.ts`
 
@@ -278,6 +284,7 @@ flowchart LR
 | `LiveSettingsButton` / `LiveSettingsModal` | 编辑并应用 `LiveUISettings` |
 | `TeamRosterPasteCard` | 触发粘贴导入，调用 `buildTeamRosterPasteImport` |
 | `SyncWcaAvatarsButton` | 批量同步 WCA 头像 |
+| `SyncCubingAvatarsButton` | 批量同步粗饼头像（后端 `/wca/cubing-china/person/:wcaID`） |
 | `BulkOneUidImportModal` | 批量粘贴 One UID |
 | `BulkFillSeedingButton` | 触发 `bulkFillSeedingScores` 与进度 |
 | `OneCompPrelimImportCard` | One 比赛初赛导入 UI |

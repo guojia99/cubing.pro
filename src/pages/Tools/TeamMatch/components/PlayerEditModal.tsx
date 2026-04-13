@@ -35,6 +35,7 @@ const PlayerEditModal: React.FC<Props> = ({ open, onClose, editing, schools, onS
         name: editing.name,
         wcaId: editing.wcaId ?? '',
         oneId: editing.oneId ?? '',
+        battlecry: editing.battlecry ?? '',
       });
       setAvatarDraft(editing.avatarDataUrl);
       const u = editing.avatarDataUrl;
@@ -56,7 +57,7 @@ const PlayerEditModal: React.FC<Props> = ({ open, onClose, editing, schools, onS
   const handleOk = () => {
     void form
       .validateFields()
-      .then((v: { schoolId: string; name: string; wcaId: string; oneId: string }) => {
+      .then((v: { schoolId: string; name: string; wcaId: string; oneId: string; battlecry?: string }) => {
       const wca = v.wcaId?.trim() || null;
       if (wca && wca.length !== 10) {
         form.setFields([{ name: 'wcaId', errors: ['WCA ID 须为 10 位或留空'] }]);
@@ -73,6 +74,7 @@ const PlayerEditModal: React.FC<Props> = ({ open, onClose, editing, schools, onS
         name: v.name.trim(),
         wcaId: wca,
         oneId,
+        battlecry: (v.battlecry ?? '').trim(),
       };
       if (!base.name) return;
       if (editing) {
@@ -141,6 +143,9 @@ const PlayerEditModal: React.FC<Props> = ({ open, onClose, editing, schools, onS
         </Form.Item>
         <Form.Item name="name" label="姓名" rules={[{ required: true, message: '请输入姓名' }]}>
           <Input />
+        </Form.Item>
+        <Form.Item name="battlecry" label="作战宣言（可选）">
+          <Input.TextArea rows={2} placeholder="全屏对战点击队员时放大展示" maxLength={200} showCount />
         </Form.Item>
         <Form.Item name="wcaId" label="WCA ID（可选）">
           <Input
