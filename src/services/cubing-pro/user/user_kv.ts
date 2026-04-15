@@ -8,6 +8,8 @@ export const USER_KV_KEYS = {
   algorithm_config: 'algorithm_config',
   /** 网页设置（与后端白名单一致） */
   website_ui_config: 'website_ui_config',
+  /** 群赛计时器外观 */
+  group_timer_ui_config: 'group_timer_ui_config',
   /** 历史键名，仅用于兼容读取旧数据 */
   websize_ui_config: 'websize_ui_config',
 } as const;

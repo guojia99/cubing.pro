@@ -5,8 +5,17 @@ import { NavTabs } from '@/components/Tabs/nav_tabs';
 import { CompAPI } from '@/services/cubing-pro/comps/typings';
 import { apiEvents } from '@/services/cubing-pro/events/events';
 import { EventsAPI } from '@/services/cubing-pro/events/typings';
-import { Grid, Select, Table } from 'antd';
+import { Button, Grid, message, Select, Table, Tooltip } from 'antd';
 import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from '@umijs/max';
+import GroupTimer from './groupTimer/GroupTimer';
+import {
+  isMbfEventId,
+  isRelayMetaEvent,
+  parseScramblePuzzleIds,
+  resolveStructuredSegments,
+  shouldHideScrambleImage,
+} from './scrambleSegments';
 import './CompetitionScrambles.css';
 
 import cstimer from 'cstimer_module';
@@ -221,6 +230,9 @@ const ScrambleEventRounds: React.FC<ScrambleEventRoundsProps> = ({
 
 const CompetitionScrambles: React.FC<CompetitionScramblesProps> = ({ comp }) => {
   const [baseEvents, setBaseEvents] = useState<EventsAPI.Event[]>([]);
+  const [groupTimerOpen, setGroupTimerOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
   const screens = Grid.useBreakpoint();
   const isCompact = screens.md === false;
 
@@ -229,6 +241,36 @@ const CompetitionScrambles: React.FC<CompetitionScramblesProps> = ({ comp }) => 
       setBaseEvents(value.data.Events);
     });
   }, []);
+
+  /** 登录回跳或地址栏带 groupTimer=1：打开群赛计时器；保留 groupTimer=1 直至关闭计时器 */
+  useEffect(() => {
+    if (!comp) {
+      return;
+    }
+    const sp = new URLSearchParams(location.search);
+    const raw = sp.get('groupTimer');
+    if (raw !== '1' && raw !== 'true') {
+      return;
+    }
+    if (comp.data.IsDone) {
+      sp.delete('groupTimer');
+      navigate(`${location.pathname}?${sp.toString()}`, { replace: true });
+      message.info('比赛已结束，群赛计时器不可用');
+      return;
+    }
+    if (baseEvents.length === 0) {
+      return;
+    }
+    let needNav = false;
+    if (sp.get('comps_tabs') !== 'scrambles') {
+      sp.set('comps_tabs', 'scrambles');
+      needNav = true;
+    }
+    setGroupTimerOpen(true);
+    if (needNav) {
+      navigate(`${location.pathname}?${sp.toString()}`, { replace: true });
+    }
+  }, [comp, baseEvents.length, location.pathname, location.search, navigate]);
   if (!comp) {
     return <p>没有找到比赛信息。</p>;
   }
@@ -267,49 +309,95 @@ const CompetitionScrambles: React.FC<CompetitionScramblesProps> = ({ comp }) => 
       return '';
     };
 
+    const puzzleIds = parseScramblePuzzleIds(baseEvent.scrambleValue);
+    const isMbf = isMbfEventId(ev.EventID);
+    const isRelay = isRelayMetaEvent(baseEvent);
+    const hideImg = shouldHideScrambleImage(ev.EventID, baseEvent);
+
+    const scrambleImageCell = (sc: string, evForImg: string) =>
+      hideImg ? (
+        <span className="scramble-image-none" aria-hidden />
+      ) : (
+        <ScrambleImage sc={sc} ev={evForImg} />
+      );
+
     const buildGroupRows = (ssc: string[]): ScrambleTableRow[] | 'skip' => {
       const tb: ScrambleTableRow[] = [];
+
+      if ((isRelay || isMbf) && puzzleIds.length >= 2) {
+        const { segments, fallbackBlob } = resolveStructuredSegments(ssc, puzzleIds);
+        if (segments && segments.length === puzzleIds.length) {
+          for (let i = 0; i < segments.length; i++) {
+            tb.push({
+              Index: isMbf ? `#${i + 1}` : puzzleIds[i],
+              Scramble: scrambleValue(segments[i], isCompact),
+              ScrambleImage: scrambleImageCell(segments[i], puzzleIds[i]),
+            });
+          }
+          return tb;
+        }
+        if (fallbackBlob) {
+          tb.push({
+            Index: isMbf ? '#1' : puzzleIds[0],
+            Scramble: scrambleValue(fallbackBlob, isCompact),
+            ScrambleImage: scrambleImageCell(fallbackBlob, puzzleIds[0]),
+          });
+          return tb;
+        }
+      }
+
+      if (isMbf && puzzleIds.length < 2 && ssc.length >= 2) {
+        for (let i = 0; i < ssc.length; i++) {
+          tb.push({
+            Index: `#${i + 1}`,
+            Scramble: scrambleValue(ssc[i], isCompact),
+            ScrambleImage: scrambleImageCell(ssc[i], baseEvent.puzzleId),
+          });
+        }
+        return tb;
+      }
 
       if (m.repeatedly) {
         for (let evIdx = 0; evIdx < ssc.length; evIdx++) {
           tb.push({
             Index: '#' + (evIdx + 1),
             Scramble: scrambleValue(ssc[evIdx], isCompact),
-            ScrambleImage: <ScrambleImage sc={ssc[evIdx]} ev={baseEvent?.puzzleId} />,
+            ScrambleImage: scrambleImageCell(ssc[evIdx], baseEvent.puzzleId),
           });
         }
+        return tb;
       }
 
-      if (baseEvent?.scrambleValue) {
-        const sp = baseEvent.scrambleValue.split(',');
-        if (sp.length >= 2) {
-          if (sp.length !== ssc.length) {
-            return 'skip';
-          }
-          for (let evIdx = 0; evIdx < sp.length; evIdx++) {
-            tb.push({
-              Index: sp[evIdx],
-              Scramble: scrambleValue(ssc[evIdx], isCompact),
-              ScrambleImage: <ScrambleImage sc={ssc[evIdx]} ev={sp[evIdx]} />,
-            });
-          }
+      if (puzzleIds.length >= 2) {
+        if (puzzleIds.length !== ssc.length) {
+          return 'skip';
         }
-      }
-
-      if (tb.length === 0) {
-        let extNum = 1;
-        for (let evIdx = 0; evIdx < ssc.length; evIdx++) {
-          let indexStr = '#' + (evIdx + 1);
-          if (evIdx + 1 > m.rounds) {
-            indexStr = 'Ex#' + extNum;
-            extNum += 1;
-          }
+        for (let evIdx = 0; evIdx < puzzleIds.length; evIdx++) {
           tb.push({
-            Index: indexStr,
+            Index: puzzleIds[evIdx],
             Scramble: scrambleValue(ssc[evIdx], isCompact),
-            ScrambleImage: <ScrambleImage sc={ssc[evIdx]} ev={baseEvent?.puzzleId} />,
+            ScrambleImage: hideImg ? (
+              <span className="scramble-image-none" aria-hidden />
+            ) : (
+              <ScrambleImage sc={ssc[evIdx]} ev={puzzleIds[evIdx]} />
+            ),
           });
         }
+        return tb;
+      }
+
+      let extNum = 1;
+      for (let evIdx = 0; evIdx < ssc.length; evIdx++) {
+        let indexStr = '#' + (evIdx + 1);
+        if (evIdx + 1 > m.rounds) {
+          indexStr = 'Ex#' + extNum;
+          extNum += 1;
+        }
+        tb.push({
+          Index: indexStr,
+          Scramble: scrambleValue(ssc[evIdx], isCompact),
+          ScrambleImage: scrambleImageCell(ssc[evIdx], baseEvent.puzzleId),
+        });
       }
 
       return tb;
@@ -384,6 +472,51 @@ const CompetitionScrambles: React.FC<CompetitionScramblesProps> = ({ comp }) => 
         items={items}
         tabsKey="scrambles_key"
         indicator={{ size: (origin: number) => origin - 20, align: 'center' }}
+      />
+      {(() => {
+        const groupTimerDisabled = baseEvents.length === 0 || comp.data.IsDone;
+        const tip = comp.data.IsDone
+          ? '比赛已结束，无法使用群赛计时器'
+          : baseEvents.length === 0
+            ? '项目数据加载中…'
+            : undefined;
+        const openGroupTimer = () => {
+          const sp = new URLSearchParams(location.search);
+          sp.set('comps_tabs', 'scrambles');
+          sp.set('groupTimer', '1');
+          navigate(`${location.pathname}?${sp.toString()}`, { replace: true });
+          setGroupTimerOpen(true);
+        };
+        const btn = (
+          <Button
+            type="primary"
+            className="competition-scrambles-group-timer-btn"
+            disabled={groupTimerDisabled}
+            onClick={openGroupTimer}
+          >
+            群赛计时器
+          </Button>
+        );
+        return tip ? (
+          <Tooltip title={tip}>
+            <span style={{ display: 'inline-block' }}>{btn}</span>
+          </Tooltip>
+        ) : (
+          btn
+        );
+      })()}
+      <GroupTimer
+        comp={comp}
+        baseEvents={baseEvents}
+        open={groupTimerOpen}
+        onClose={() => {
+          setGroupTimerOpen(false);
+          const sp = new URLSearchParams(location.search);
+          if (sp.get('groupTimer')) {
+            sp.delete('groupTimer');
+            navigate(`${location.pathname}?${sp.toString()}`, { replace: true });
+          }
+        }}
       />
     </>
   );
