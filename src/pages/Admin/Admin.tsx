@@ -137,13 +137,13 @@ const Admin: React.FC = () => {
         {
           title: '主办管理',
           description: '主办团队管理、详情与修改',
-          to: '/',
+          to: '/admin/manage/organizers',
           avatar: <FcGenealogy style={{ fontSize: 40 }} />,
         },
         {
           title: '群组管理',
-          description: '群组修改、权限管理等',
-          to: '/',
+          description: '比赛群组创建、编辑与删除',
+          to: '/admin/manage/groups',
           avatar: <FcParallelTasks style={{ fontSize: 40 }} />,
         },
         {

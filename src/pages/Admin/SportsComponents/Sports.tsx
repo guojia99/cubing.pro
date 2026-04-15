@@ -1,5 +1,4 @@
-import { apiGetAllPlayers } from '@/services/cubing-pro/auth/organizers';
-import { PlayersAPI } from '@/services/cubing-pro/players/typings';
+import { AdminUserSearchSelect } from '@/components/Admin/AdminUserSearchSelect';
 import {
   apiCreateSportResult,
   apiDeleteSportResult,
@@ -43,16 +42,9 @@ const SportResultList: React.FC = () => {
   const [form] = Form.useForm();
   const [modalOpen, setModalOpen] = useState(false);
   const [events, setEvents] = useState<SportEvent[]>([]);
-  const [players, setPlayers] = useState<PlayersAPI.Player[]>();
-
   useEffect(() => {
-    // 获取事件列表用于下拉框
     apiGetSportEvents().then((res) => {
       setEvents(res.data.events);
-    });
-
-    apiGetAllPlayers('1', '1').then((value) => {
-      setPlayers(value.data.items);
     });
   }, []);
 
@@ -61,6 +53,7 @@ const SportResultList: React.FC = () => {
       const values = await form.validateFields();
       const params: CreateSportResultReq = {
         ...values,
+        user_id: Number(values.user_id),
         result: parseTimeToSeconds(values.result), // 使用新解析函数
         date: values.date.format('YYYY-MM-DD'),
       };
@@ -151,23 +144,22 @@ const SportResultList: React.FC = () => {
             />
           </Form.Item>
 
-          <Form.Item
-            name="user_id"
-            label="用户"
-            rules={[{ required: true, message: '请选择用户' }]}
-          >
-            <Select
-              showSearch
-              allowClear
-              placeholder="请输入姓名搜索用户"
-              filterOption={(input, option) =>
-                (option?.label as string).toLowerCase().includes(input.toLowerCase())
-              }
-              options={(players || []).map((player) => ({
-                label: `${player.Name}（ID: ${player.CubeID}）`,
-                value: player.id,
-              }))}
+          <Form.Item label="用户" required>
+            <AdminUserSearchSelect
+              placeholder="输入姓名或 CubeID 搜索并选择用户"
+              onPlayerChange={(p) => {
+                form.setFieldsValue({
+                  user_id: p?.id,
+                  cube_id: p?.CubeID,
+                });
+              }}
             />
+          </Form.Item>
+          <Form.Item name="user_id" hidden rules={[{ required: true, message: '请选择用户' }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="cube_id" hidden rules={[{ required: true, message: '请选择用户' }]}>
+            <Input />
           </Form.Item>
 
           <Form.Item

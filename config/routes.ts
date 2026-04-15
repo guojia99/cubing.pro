@@ -92,6 +92,8 @@ export default [
 
   { path: 'admin/admins', component: './Admin/Admin' },
   { path: 'admin/users', component: './Admin/AdminComponent/Users' },
+  { path: 'admin/manage/organizers', component: './Admin/AdminComponent/AdminOrganizers' },
+  { path: 'admin/manage/groups', component: './Admin/AdminComponent/AdminCompetitionGroups' },
   { path: 'admin/diy_ranking', component: './Admin/AdminComponent/DiyRanking' },
   { path: 'admin/acknowledgments', component: './Admin/AdminComponent/AdminAcknowledgments' },
   { path: 'admin/other-links', component: './Admin/AdminComponent/AdminExternalLinks' },
