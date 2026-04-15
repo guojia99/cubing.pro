@@ -1,3 +1,17 @@
+/* 群赛计时器入口：右下角浮动 */
+/* 连拧 / 多盲：不展示 cube 图占位 */
+.scramble-image-none {
+  display: none;
+}
+
+.competition-scrambles-group-timer-btn {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 100;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+}
+
 /* 与 ConfigProvider 明暗主题一致，使用 ant token，勿写死浅色（见 table_style.css 说明） */
 .highlight-row > td {
   background-color: var(--ant-color-warning-bg) !important;
