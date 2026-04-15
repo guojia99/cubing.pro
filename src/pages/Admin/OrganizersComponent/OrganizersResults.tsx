@@ -625,7 +625,7 @@ const OrganizersResults: React.FC = () => {
             <Form.Item label="选择选手">
               <Select
                 style={filedStyle}
-                placeholder={'选择选手'}
+                placeholder={'输入姓名或 CubeID 筛选已报名选手'}
                 onChange={(value) => {
                   setCurPlayer(value);
                 }}
@@ -707,7 +707,7 @@ const OrganizersResults: React.FC = () => {
               <Select
                 style={filedStyle}
                 clearIcon={<CloseCircleOutlined style={{ color: 'red' }} />}
-                placeholder={'选择选手'}
+                placeholder={'输入姓名或 CubeID 筛选已报名选手'}
                 onChange={(value) => {
                   updateMultiPlayer(value);
                 }}
