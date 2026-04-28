@@ -135,6 +135,28 @@ export function roundHasAnyRecorded(
   return false;
 }
 
+/**
+ * 底部「本轮」统计用 scheduleIdx：当前轮已有成绩则用当前轮；否则沿用「最近一次、且早于当前轮、且已有成绩」的轮次（如刚进复赛尚未录入时仍显示初赛数据）。
+ */
+export function getRoundStatsScheduleIdx(
+  ctx: EventContext,
+  solves: Record<string, unknown>,
+  eventId: string,
+  cursorScheduleIdx: number,
+): number {
+  if (roundHasAnyRecorded(ctx, solves, eventId, cursorScheduleIdx)) {
+    return cursorScheduleIdx;
+  }
+  const rounds = ctx.scheduleRounds.filter((r) => !r.skipped).map((r) => r.scheduleIdx);
+  const before = rounds.filter((idx) => idx < cursorScheduleIdx).sort((a, b) => b - a);
+  for (const idx of before) {
+    if (roundHasAnyRecorded(ctx, solves, eventId, idx)) {
+      return idx;
+    }
+  }
+  return cursorScheduleIdx;
+}
+
 export function isEventFullyRecorded(
   ctx: EventContext,
   solves: Record<string, unknown>,

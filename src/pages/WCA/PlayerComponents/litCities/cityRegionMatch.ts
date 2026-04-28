@@ -37,13 +37,32 @@ export function matchCityToPrefecture(
   const trimmed = city.trim();
   if (set.has(trimmed)) return trimmed;
 
+  const headSeg = trimmed.split(/[,，(（]/)[0].trim();
+
+  /** 拼音相同的若干地级市：省级 GeoJSON 内只会出现其中一个市级要素 */
+  if (/^taizhou$/i.test(headSeg)) {
+    if (set.has('台州市')) return '台州市';
+    if (set.has('泰州市')) return '泰州市';
+  }
+  if (/^yichun$/i.test(headSeg)) {
+    if (set.has('宜春市')) return '宜春市';
+    if (set.has('伊春市')) return '伊春市';
+  }
+  if (/^suzhou$/i.test(headSeg)) {
+    if (set.has('宿州市')) return '宿州市';
+    if (set.has('苏州市')) return '苏州市';
+  }
+  if (/^fuzhou$/i.test(headSeg)) {
+    if (set.has('抚州市')) return '抚州市';
+    if (set.has('福州市')) return '福州市';
+  }
+
   for (const n of prefectureNames) {
     if (trimmed.includes(n)) return n;
     if (n.includes(trimmed) && trimmed.length >= 2) return n;
   }
 
-  const firstSeg = trimmed.split(/[,，(（]/)[0].trim();
-  const tryStrings = firstSeg !== trimmed ? [trimmed, firstSeg] : [trimmed];
+  const tryStrings = headSeg !== trimmed ? [trimmed, headSeg] : [trimmed];
 
   for (const hay of tryStrings) {
     for (const { alias, target } of pairs) {

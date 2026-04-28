@@ -16,6 +16,14 @@ export async function apiApprovalComp(compId: number): Promise<any> {
   return response.data;
 }
 
+/** 管理员删除比赛（含成绩、报名等），需管理员或超级管理员权限 */
+export async function apiAdminDeleteComp(compId: number): Promise<any> {
+  const response = await Request.delete<any>(`/admin/competition/comps/${compId}`, {
+    headers: AuthHeader(),
+  });
+  return response.data;
+}
+
 export async function apiAdminPlayers(
   params: PlayersAPI.PlayersReq,
 ): Promise<PlayersAPI.PlayersResp> {

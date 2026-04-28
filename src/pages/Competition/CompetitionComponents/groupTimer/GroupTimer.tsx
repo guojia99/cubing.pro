@@ -5,6 +5,7 @@ import type { EventsAPI } from '@/services/cubing-pro/events/typings';
 import { MoreOutlined, UnorderedListOutlined } from '@ant-design/icons';
 import {
   Button,
+  Card,
   Checkbox,
   ColorPicker,
   Drawer,
@@ -34,6 +35,7 @@ import {
   getMainIndicesForRound,
   getNextMainSlot,
   getRoundExportNumber,
+  getRoundStatsScheduleIdx,
   hasStartedEvent,
   isEventFullyRecorded,
   normalizeCursor,
@@ -60,6 +62,14 @@ import {
 } from './stats';
 import type { GroupTimerPersisted, MbfPhase, SolveRecord } from './types';
 import { makeSlotKey } from './types';
+import {
+  INSPECTION_DNF_MS,
+  INSPECTION_WARN_ELAPSED_MS,
+  formatInspectionSeconds,
+  inspectionDnfFromElapsed,
+  inspectionPlus2FromElapsed,
+  isBlindEventId,
+} from './inspection';
 import { shouldHideScrambleImage } from '../scrambleSegments';
 import { ScrambleImageMini } from './ScrambleImageMini';
 import './GroupTimer.css';
@@ -68,6 +78,8 @@ const { Text, Paragraph: TypographyParagraph } = Typography;
 
 /** 松手开始计时的最短按住时间（毫秒） */
 const TIMER_HOLD_MIN_MS = 350;
+/** 观察阶段：同一套空格逻辑（待命 / 倒计时）在 120ms 内至多生效一次，抑制连按；与长按无关（长按仅一次 keydown→keyup） */
+const SPACE_INSPECTION_THROTTLE_MS = 120;
 
 /** 历史成绩：还原/录入时间，本地「月-日 时:分」 */
 function formatHistoryRecordedAt(iso: string): string {
@@ -190,6 +202,19 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
 
   const holdStartMsRef = useRef<number | null>(null);
   const holdPointerIdRef = useRef<number | null>(null);
+  const inspectionStartRef = useRef<number>(0);
+  const [inspectionElapsedMs, setInspectionElapsedMs] = useState(0);
+  /** 已点击计时区进入观察倒计时（未点击前仅待命） */
+  const [inspectionCounting, setInspectionCounting] = useState(false);
+  const pendingInspectionPlus2Ref = useRef(false);
+  const spaceAwaitingKeyDownRef = useRef(false);
+  const spaceCountingKeyDownRef = useRef(false);
+  /** 上次「待命→倒计时」由空格成功触发的时间；null 表示本格尚未触发过 */
+  const lastSpaceAwaitingEmitAtRef = useRef<number | null>(null);
+  /** 上次「倒计时内松手结束观察」由空格成功触发的时间 */
+  const lastSpaceCountingEmitAtRef = useRef<number | null>(null);
+  /** 本格观察倒计时是否已因超 17s 自动记 DNF（防重复提交） */
+  const inspectionAutoDnfDoneRef = useRef(false);
 
   /** 仅在打开计时器且 contexts 就绪时从本地恢复一次，避免覆盖项目/轮次切换 */
   const lastTimerInitSigRef = useRef<string | null>(null);
@@ -285,6 +310,16 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
   /** 当前格已有成绩时仅允许重试 / 切换，不允许再次录入（含项目已全部完成时停留在最后一格） */
   const inputLocked = currentSlotHasRecord;
 
+  const shouldUseInspection =
+    mode === 'timer' &&
+    uiConfig.inspectionEnabled &&
+    !inputLocked &&
+    !(uiConfig.blindSkipInspection && isBlindEventId(eventId)) &&
+    !isMbf;
+
+  const inspectionAwaitingTap = shouldUseInspection && !running && !inspectionCounting;
+  const inInspectionCountingPhase = shouldUseInspection && !running && inspectionCounting;
+
   const selectPopupProps = useMemo(
     () => ({
       styles: { popup: { root: { zIndex: 3100 } } },
@@ -328,6 +363,16 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
     const done = isEventFullyRecorded(ctx, store.solves, eventId);
     setEventDone(done);
   }, [ctx, eventId, store.solves]);
+
+  useEffect(() => {
+    setInspectionCounting(false);
+    setInspectionElapsedMs(0);
+    spaceAwaitingKeyDownRef.current = false;
+    spaceCountingKeyDownRef.current = false;
+    lastSpaceAwaitingEmitAtRef.current = null;
+    lastSpaceCountingEmitAtRef.current = null;
+    inspectionAutoDnfDoneRef.current = false;
+  }, [slotKey]);
 
   const commitRecord = useCallback(
     (rec: SolveRecord) => {
@@ -386,11 +431,13 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
       }
       const scramble = pendingSpare ? pendingSpare.spareScramble : currentRow.scramble;
       const originalScramble = pendingSpare ? pendingSpare.originalScramble : currentRow.scramble;
+      const plus2FromInspection = pendingInspectionPlus2Ref.current;
+      pendingInspectionPlus2Ref.current = false;
       const rec: SolveRecord = {
         timeMs: ms,
         dnf: false,
         dns: false,
-        plus2: false,
+        plus2: plus2FromInspection,
         usedSpare: !!pendingSpare,
         originalScramble: pendingSpare ? originalScramble : undefined,
         extraLineIndex: pendingSpare?.extraLineIndex,
@@ -605,6 +652,42 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
     });
   };
 
+  useEffect(() => {
+    if (!open || !inInspectionCountingPhase) {
+      return;
+    }
+    inspectionStartRef.current = performance.now();
+    setInspectionElapsedMs(0);
+    const id = window.setInterval(() => {
+      setInspectionElapsedMs(performance.now() - inspectionStartRef.current);
+    }, 100);
+    return () => window.clearInterval(id);
+  }, [open, inInspectionCountingPhase, slotKey]);
+
+  const onDnfRef = useRef(onDnf);
+  useEffect(() => {
+    onDnfRef.current = onDnf;
+  });
+
+  /** 观察超过 17s 自动结束并记 DNF（无需再松手） */
+  useEffect(() => {
+    if (!open || !inInspectionCountingPhase || running) {
+      return;
+    }
+    if (inspectionElapsedMs <= INSPECTION_DNF_MS) {
+      return;
+    }
+    if (inspectionAutoDnfDoneRef.current) {
+      return;
+    }
+    inspectionAutoDnfDoneRef.current = true;
+    setInspectionCounting(false);
+    setInspectionElapsedMs(0);
+    setTimerHoldOverlay(false);
+    message.warning('观察超过 17 秒，已记为 DNF');
+    onDnfRef.current();
+  }, [open, running, inInspectionCountingPhase, inspectionElapsedMs]);
+
   /** 长按松手后启动计时 */
   const beginTimerFromHold = useCallback(() => {
     if (inputLocked) {
@@ -615,6 +698,23 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
     }
     setRunning(true);
   }, [inputLocked, isMbf, mbfPhase]);
+
+  const tryFinishInspectionAndStartSolve = useCallback(
+    (insElapsedMs: number) => {
+      if (inspectionDnfFromElapsed(insElapsedMs)) {
+        onDnf();
+        return;
+      }
+      pendingInspectionPlus2Ref.current = inspectionPlus2FromElapsed(insElapsedMs);
+      beginTimerFromHold();
+    },
+    [beginTimerFromHold, onDnf],
+  );
+
+  const tryFinishInspectionAndStartSolveRef = useRef(tryFinishInspectionAndStartSolve);
+  useEffect(() => {
+    tryFinishInspectionAndStartSolveRef.current = tryFinishInspectionAndStartSolve;
+  });
 
   useEffect(() => {
     if (running) {
@@ -632,7 +732,102 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
   }, [open, mode]);
 
   useEffect(() => {
+    if (!open || running || mode !== 'timer' || inputLocked || !inInspectionCountingPhase) {
+      return;
+    }
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.code !== 'Space' && e.key !== ' ') {
+        return;
+      }
+      if (e.repeat) {
+        return;
+      }
+      e.preventDefault();
+      spaceCountingKeyDownRef.current = true;
+      setTimerHoldOverlay(true);
+    };
+    const onKeyUp = (e: KeyboardEvent) => {
+      if (e.code !== 'Space' && e.key !== ' ') {
+        return;
+      }
+      e.preventDefault();
+      if (!spaceCountingKeyDownRef.current) {
+        return;
+      }
+      spaceCountingKeyDownRef.current = false;
+      const now = performance.now();
+      if (
+        lastSpaceCountingEmitAtRef.current !== null &&
+        now - lastSpaceCountingEmitAtRef.current < SPACE_INSPECTION_THROTTLE_MS
+      ) {
+        setTimerHoldOverlay(false);
+        return;
+      }
+      lastSpaceCountingEmitAtRef.current = now;
+      setTimerHoldOverlay(false);
+      const insElapsedMs = now - inspectionStartRef.current;
+      tryFinishInspectionAndStartSolveRef.current(insElapsedMs);
+    };
+    window.addEventListener('keydown', onKeyDown, true);
+    window.addEventListener('keyup', onKeyUp, true);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown, true);
+      window.removeEventListener('keyup', onKeyUp, true);
+      spaceCountingKeyDownRef.current = false;
+      setTimerHoldOverlay(false);
+    };
+  }, [open, running, mode, inputLocked, inInspectionCountingPhase]);
+
+  /** 观察待命：空格一次进入倒计时 */
+  useEffect(() => {
+    if (!open || running || mode !== 'timer' || inputLocked || !inspectionAwaitingTap) {
+      return;
+    }
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.code !== 'Space' && e.key !== ' ') {
+        return;
+      }
+      if (e.repeat) {
+        return;
+      }
+      e.preventDefault();
+      spaceAwaitingKeyDownRef.current = true;
+    };
+    const onKeyUp = (e: KeyboardEvent) => {
+      if (e.code !== 'Space' && e.key !== ' ') {
+        return;
+      }
+      e.preventDefault();
+      if (!spaceAwaitingKeyDownRef.current) {
+        return;
+      }
+      spaceAwaitingKeyDownRef.current = false;
+      const now = performance.now();
+      if (
+        lastSpaceAwaitingEmitAtRef.current !== null &&
+        now - lastSpaceAwaitingEmitAtRef.current < SPACE_INSPECTION_THROTTLE_MS
+      ) {
+        return;
+      }
+      lastSpaceAwaitingEmitAtRef.current = now;
+      inspectionStartRef.current = performance.now();
+      setInspectionElapsedMs(0);
+      setInspectionCounting(true);
+    };
+    window.addEventListener('keydown', onKeyDown, true);
+    window.addEventListener('keyup', onKeyUp, true);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown, true);
+      window.removeEventListener('keyup', onKeyUp, true);
+      spaceAwaitingKeyDownRef.current = false;
+    };
+  }, [open, running, mode, inputLocked, inspectionAwaitingTap]);
+
+  useEffect(() => {
     if (!open || running || mode !== 'timer' || inputLocked) {
+      return;
+    }
+    if (shouldUseInspection) {
       return;
     }
     if (isMbf && mbfPhase !== 'time') {
@@ -683,7 +878,7 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
       window.removeEventListener('keydown', onKeyDown, true);
       window.removeEventListener('keyup', onKeyUp, true);
     };
-  }, [open, running, mode, inputLocked, isMbf, mbfPhase, beginTimerFromHold]);
+  }, [open, running, mode, inputLocked, shouldUseInspection, isMbf, mbfPhase, beginTimerFromHold]);
 
   const onTimerTapPointerDown = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
@@ -695,6 +890,19 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
       }
       e.preventDefault();
       e.stopPropagation();
+      if (shouldUseInspection) {
+        holdPointerIdRef.current = e.pointerId;
+        holdStartMsRef.current = null;
+        if (inspectionCounting) {
+          setTimerHoldOverlay(true);
+        }
+        try {
+          e.currentTarget.setPointerCapture(e.pointerId);
+        } catch {
+          /* noop */
+        }
+        return;
+      }
       holdStartMsRef.current = Date.now();
       holdPointerIdRef.current = e.pointerId;
       try {
@@ -704,7 +912,7 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
       }
       setTimerHoldOverlay(true);
     },
-    [inputLocked, running, mode, isMbf, mbfPhase],
+    [inputLocked, running, mode, isMbf, mbfPhase, shouldUseInspection, inspectionCounting],
   );
 
   const onTimerTapPointerUp = useCallback(
@@ -721,6 +929,18 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
         /* noop */
       }
       holdPointerIdRef.current = null;
+      if (shouldUseInspection && !running) {
+        if (!inspectionCounting) {
+          inspectionStartRef.current = performance.now();
+          setInspectionElapsedMs(0);
+          setInspectionCounting(true);
+          return;
+        }
+        setTimerHoldOverlay(false);
+        const insElapsedMs = performance.now() - inspectionStartRef.current;
+        tryFinishInspectionAndStartSolve(insElapsedMs);
+        return;
+      }
       const t = holdStartMsRef.current;
       holdStartMsRef.current = null;
       setTimerHoldOverlay(false);
@@ -732,7 +952,7 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
       }
       beginTimerFromHold();
     },
-    [beginTimerFromHold],
+    [beginTimerFromHold, shouldUseInspection, running, inspectionCounting, tryFinishInspectionAndStartSolve],
   );
 
   const onTimerTapPointerCancel = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
@@ -848,6 +1068,9 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
     }
     setPendingSpare(null);
     setManualRaw('');
+    setInspectionCounting(false);
+    setInspectionElapsedMs(0);
+    inspectionAutoDnfDoneRef.current = false;
     message.success('已重试');
   };
 
@@ -986,6 +1209,10 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
         fullscreenBg: bgStr,
         timerTapMinVh: v.timerTapMinVh,
         metaFontPx: v.metaFontPx,
+        inspectionEnabled: v.inspectionEnabled,
+        inspectionDisplayMode: v.inspectionDisplayMode,
+        inspectionPrecision: v.inspectionPrecision,
+        blindSkipInspection: v.blindSkipInspection,
       });
       saveGroupTimerUiToStorage(cfg);
       setUiConfig(cfg);
@@ -1027,21 +1254,44 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
 
   const currentSlotRec = slotKey ? store.solves[slotKey] : undefined;
 
+  /** 统计区「本轮最佳 / 本轮成绩」：当前轮尚无成绩时展示上一轮（如复赛第一把前显示初赛） */
+  const statsScheduleIdx = useMemo(() => {
+    if (!ctx) {
+      return store.cursor.scheduleIdx;
+    }
+    return getRoundStatsScheduleIdx(ctx, store.solves, eventId, store.cursor.scheduleIdx);
+  }, [ctx, store.solves, eventId, store.cursor.scheduleIdx]);
+
+  const statsRoundTitle = useMemo(() => {
+    if (!ctx) {
+      return '';
+    }
+    return ctx.scheduleRounds.find((r) => r.scheduleIdx === statsScheduleIdx)?.roundTitle ?? '';
+  }, [ctx, statsScheduleIdx]);
+
   const roundRecords = useMemo(() => {
-    if (!ctx || !scheduleRound) {
+    if (!ctx) {
       return [];
     }
-    const mains = getMainIndicesForRound(ctx, store.cursor.scheduleIdx);
+    const mains = getMainIndicesForRound(ctx, statsScheduleIdx);
     const out: { lineIndex: number; rec: SolveRecord }[] = [];
     for (const li of mains) {
-      const k = makeSlotKey(eventId, store.cursor.scheduleIdx, li);
+      const k = makeSlotKey(eventId, statsScheduleIdx, li);
       const r = store.solves[k];
       if (r) {
         out.push({ lineIndex: li, rec: r });
       }
     }
     return out;
-  }, [ctx, scheduleRound, eventId, store.cursor.scheduleIdx, store.solves]);
+  }, [ctx, statsScheduleIdx, eventId, store.solves]);
+
+  /** 仅当前轮是否已有成绩（备打等交互仍按当前轮） */
+  const hasAnyRecordInCursorRound = useMemo(() => {
+    if (!ctx) {
+      return false;
+    }
+    return roundHasAnyRecorded(ctx, store.solves, eventId, store.cursor.scheduleIdx);
+  }, [ctx, store.solves, eventId, store.cursor.scheduleIdx]);
 
   const eventAvg = useMemo(() => {
     if (!ctx) {
@@ -1530,7 +1780,36 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
                       onPointerCancel={onTimerTapPointerCancel}
                     >
                       {!running ? (
-                        <Text className="group-timer-tap-area__label">按住 · 松手开始计时</Text>
+                        shouldUseInspection ? (
+                          inspectionCounting ? (
+                            <div className="group-timer-inspection">
+                              <div
+                                className={`group-timer-inspection__value${
+                                  uiConfig.inspectionDisplayMode === 'countdown'
+                                    ? ' group-timer-inspection__value--countdown'
+                                    : ''
+                                }${
+                                  inspectionElapsedMs > INSPECTION_WARN_ELAPSED_MS
+                                    ? ' group-timer-inspection__value--warn-blink'
+                                    : ''
+                                }`}
+                              >
+                                {formatInspectionSeconds(
+                                  uiConfig.inspectionDisplayMode,
+                                  inspectionElapsedMs,
+                                  uiConfig.inspectionPrecision,
+                                )}
+                              </div>
+                              <Text type="secondary" className="group-timer-inspection__hint">
+                                长按开始计时
+                              </Text>
+                            </div>
+                          ) : (
+                            <Text className="group-timer-tap-area__label">点击计时区开始观察</Text>
+                          )
+                        ) : (
+                          <Text className="group-timer-tap-area__label">按住 · 松手开始计时</Text>
+                        )
                       ) : (
                         <Text type="secondary">计时中…</Text>
                       )}
@@ -1579,7 +1858,7 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
                 {!isMbf && (
                   <Button
                     size="small"
-                    disabled={inputLocked || roundRecords.length === 0}
+                    disabled={inputLocked || !hasAnyRecordInCursorRound}
                     onClick={onSpare}
                   >
                     {pendingSpare ? '取消备打' : '使用备打'}
@@ -1609,12 +1888,22 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
                 </div>
 
                 <div className="group-timer-bl group-timer-bl--stats">
-                  <div>本轮最佳：{rb != null ? formatMsForDisplay(rb, eventId) : '—'}</div>
+                  <div>
+                    本轮最佳：{rb != null ? formatMsForDisplay(rb, eventId) : '—'}
+                    {statsScheduleIdx !== store.cursor.scheduleIdx && statsRoundTitle ? (
+                      <Text type="secondary" style={{ marginLeft: 6 }}>
+                        （{statsRoundTitle}）
+                      </Text>
+                    ) : null}
+                  </div>
                   <div className="group-timer-small">
                     本轮成绩：
                     {roundRecords.length === 0
                       ? '—'
                       : roundRecords.map((x) => formatResultLine(x.rec, eventId)).join('，')}
+                    {statsScheduleIdx !== store.cursor.scheduleIdx && statsRoundTitle ? (
+                      <Text type="secondary"> （{statsRoundTitle}）</Text>
+                    ) : null}
                   </div>
                   <div className="group-timer-small">
                     本场该项目平均：{eventAvg ?? '—'}
@@ -1689,6 +1978,36 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
               <Radio value="manual">手动输入时间</Radio>
             </Radio.Group>
           </Form.Item>
+          <Card title="观察时间" size="small" style={{ marginBottom: 16 }}>
+            <Form.Item label="观察阶段（15s 规则）" name="inspectionEnabled" valuePropName="checked">
+              <Checkbox />
+            </Form.Item>
+            <Form.Item label="观察时间显示" name="inspectionDisplayMode" rules={[{ required: true }]}>
+              <Select
+                style={{ width: '100%' }}
+                options={[
+                  { value: 'countdown', label: '倒数 15.0→0' },
+                  { value: 'countup', label: '正计 0.0→…' },
+                ]}
+                getPopupContainer={() => document.body}
+                {...selectPopupProps}
+              />
+            </Form.Item>
+            <Form.Item label="显示精度" name="inspectionPrecision" rules={[{ required: true }]}>
+              <Select
+                style={{ width: '100%' }}
+                options={[
+                  { value: 'tenth', label: '0.1 秒' },
+                  { value: 'second', label: '精确到秒' },
+                ]}
+                getPopupContainer={() => document.body}
+                {...selectPopupProps}
+              />
+            </Form.Item>
+            <Form.Item label="盲拧项目不观察" name="blindSkipInspection" valuePropName="checked">
+              <Checkbox />
+            </Form.Item>
+          </Card>
           <Form.Item label="打乱区字号（px）" name="scrambleFontPx" rules={[{ required: true }]}>
             <InputNumber min={12} max={32} step={1} style={{ width: '100%' }} />
           </Form.Item>
