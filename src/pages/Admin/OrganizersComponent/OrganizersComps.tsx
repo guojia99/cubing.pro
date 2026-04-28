@@ -3,7 +3,7 @@ import { CompsTableColumns } from '@/components/Data/cube_comps/comps_tables';
 import { Comp } from '@/components/Data/types/comps';
 import { rowClassNameWithStyleLines } from '@/components/Table/table_style';
 import { Auth, checkAuth } from '@/pages/Admin/AuthComponents/AuthComponents';
-import { apiApprovalComp } from '@/services/cubing-pro/auth/admin';
+import { apiAdminDeleteComp, apiApprovalComp } from '@/services/cubing-pro/auth/admin';
 import {apiEndComp, apiGetComps, apiMeOrganizers, apiUpdateCompName} from '@/services/cubing-pro/auth/organizers';
 import { OrganizersAPI } from '@/services/cubing-pro/auth/typings';
 import { CompsAPI } from '@/services/cubing-pro/comps/typings';
@@ -185,12 +185,55 @@ const OrganizersComps: React.FC = () => {
           );
         }
 
-        if (adminUser !== null && result.Status === 'Running') {
+        if (adminUser !== null) {
+          const showDeleteCompModal = () => {
+            let confirmName = '';
+            Modal.confirm({
+              title: '删除比赛',
+              width: 520,
+              content: (
+                <div>
+                  <p style={{ marginBottom: 12, color: '#cf1322' }}>
+                    此操作将永久删除该比赛及其全部成绩（含预录入）、站点纪录、报名与赞助关联等数据，且不可恢复。
+                  </p>
+                  <p style={{ marginBottom: 8 }}>
+                    请输入比赛名称「{result.Name}」以确认：
+                  </p>
+                  <Input
+                    placeholder="输入比赛全称"
+                    onChange={(e) => {
+                      confirmName = e.target.value;
+                    }}
+                  />
+                </div>
+              ),
+              okText: '确认删除',
+              okButtonProps: { danger: true },
+              cancelText: '取消',
+              onOk: async () => {
+                if (confirmName.trim() !== result.Name.trim()) {
+                  message.error('比赛名称不一致，请重新输入');
+                  return Promise.reject();
+                }
+                try {
+                  await apiAdminDeleteComp(result.id);
+                  // @ts-ignore
+                  actionRef.current?.reload();
+                  message.success('比赛已删除');
+                } catch (e) {
+                  message.error('删除失败: ' + e);
+                  return Promise.reject();
+                }
+              },
+            });
+          };
+
           buttons.push(
             <Button
               style={{ backgroundColor: '#ff0000', fontWeight: 700, color: '#ffc', border: 'none' }}
               size={'small'}
               autoInsertSpace={false}
+              onClick={showDeleteCompModal}
             >
               删除
             </Button>,

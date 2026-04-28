@@ -14,6 +14,14 @@ export type GroupTimerUiConfig = {
   timerTapMinVh: number;
   /** 顶部项目/轮次/第几把 字号 px */
   metaFontPx: number;
+  /** 是否启用观察阶段（15s 规则：15–17s +2，>17s DNF） */
+  inspectionEnabled: boolean;
+  /** 观察显示：倒数 15→0 或正计 0→… */
+  inspectionDisplayMode: 'countdown' | 'countup';
+  /** 观察数字：精确到秒或 0.1 秒 */
+  inspectionPrecision: 'second' | 'tenth';
+  /** 勾选时盲拧项目跳过观察，仍使用长按松手开始 */
+  blindSkipInspection: boolean;
 };
 
 export function defaultGroupTimerUi(): GroupTimerUiConfig {
@@ -24,6 +32,10 @@ export function defaultGroupTimerUi(): GroupTimerUiConfig {
     fullscreenBg: '',
     timerTapMinVh: 42,
     metaFontPx: 16,
+    inspectionEnabled: false,
+    inspectionDisplayMode: 'countdown',
+    inspectionPrecision: 'tenth',
+    blindSkipInspection: true,
   };
 }
 
@@ -38,6 +50,12 @@ export function normalizeGroupTimerUi(patch: Partial<GroupTimerUiConfig>): Group
     fullscreenBg: typeof j.fullscreenBg === 'string' ? j.fullscreenBg : base.fullscreenBg,
     timerTapMinVh: clampNum(j.timerTapMinVh, 18, 70, base.timerTapMinVh),
     metaFontPx: clampNum(j.metaFontPx, 12, 24, base.metaFontPx),
+    inspectionEnabled: typeof j.inspectionEnabled === 'boolean' ? j.inspectionEnabled : base.inspectionEnabled,
+    inspectionDisplayMode:
+      j.inspectionDisplayMode === 'countup' ? 'countup' : base.inspectionDisplayMode,
+    inspectionPrecision: j.inspectionPrecision === 'second' ? 'second' : base.inspectionPrecision,
+    blindSkipInspection:
+      typeof j.blindSkipInspection === 'boolean' ? j.blindSkipInspection : base.blindSkipInspection,
   };
 }
 

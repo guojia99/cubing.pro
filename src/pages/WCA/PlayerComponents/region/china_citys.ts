@@ -106,7 +106,6 @@ const provinceCityPinyinMap: Record<string, string> = {
   'Hegang': '鹤岗',
   'Shuangyashan': '双鸭山',
   'Daqing': '大庆',
-  'Yichun': '伊春',
   'Jiamusi': '佳木斯',
   'Qitaihe': '七台河',
   'Mudanjiang': '牡丹江',
@@ -119,14 +118,12 @@ const provinceCityPinyinMap: Record<string, string> = {
   'Wuxi': '无锡',
   'Xuzhou': '徐州',
   'Changzhou': '常州',
-  'Suzhou': '苏州',
   'Nantong': '南通',
   'Lianyungang': '连云港',
   'HuaiAn': '淮安',
   'Yancheng': '盐城',
   'Yangzhou': '扬州',
   'Zhenjiang': '镇江',
-  'Taizhou': '泰州',
   'Suqian': '宿迁',
 
   // 浙江省
@@ -139,7 +136,6 @@ const provinceCityPinyinMap: Record<string, string> = {
   'Jinhua': '金华',
   'Quzhou': '衢州',
   'Zhoushan': '舟山',
-  'Taizhou2': '台州',
   'Lishui': '丽水',
 
   // 安徽省
@@ -154,14 +150,12 @@ const provinceCityPinyinMap: Record<string, string> = {
   'Huangshan': '黄山',
   'Chuzhou': '滁州',
   'Fuyang': '阜阳',
-  'Suzhou2': '宿州',
   'LuAn': '六安',
   'Bozhou': '亳州',
   'Chizhou': '池州',
   'Xuancheng': '宣城',
 
-  // 福建省
-  'Fuzhou': '福州',
+  // 福建省（福州 Fuzhou 与江西抚州同拼，见 getLocationByPinyin）
   'Xiamen': '厦门',
   'Putian': '莆田',
   'Sanming': '三明',
@@ -180,8 +174,6 @@ const provinceCityPinyinMap: Record<string, string> = {
   'Yingtan': '鹰潭',
   'Ganzhou': '赣州',
   'JiAn': '吉安',
-  'Yichun2': '宜春',
-  'Fuzhou2': '抚州',
   'Shangrao': '上饶',
 
   // 山东省
@@ -465,7 +457,40 @@ const provinceCityPinyinMap: Record<string, string> = {
 // 导出映射表和相关工具函数
 export { provinceCityPinyinMap };
 
-// 根据拼音获取城市/份名
-export function getLocationByPinyin(pinyin: string): string | undefined {
-  return provinceCityPinyinMap[pinyin];
+/**
+ * 根据 WCA 英文城市/省名查中文展示。
+ * 若干地级市汉语拼音相同（Taizhou / Suzhou / Yichun / Fuzhou），须凭省份英文名区分。
+ */
+export function getLocationByPinyin(pinyin: string, englishProvince?: string): string | undefined {
+  const key = pinyin.trim();
+  const prov = englishProvince?.trim().toLowerCase();
+  if (/^taizhou$/i.test(key)) {
+    if (prov === 'jiangsu') return '泰州';
+    if (prov === 'zhejiang') return '台州';
+    return undefined;
+  }
+  if (key === 'Taizhou2') return '台州';
+
+  if (/^suzhou$/i.test(key)) {
+    if (prov === 'jiangsu') return '苏州';
+    if (prov === 'anhui') return '宿州';
+    return undefined;
+  }
+  if (key === 'Suzhou2') return '宿州';
+
+  if (/^yichun$/i.test(key)) {
+    if (prov === 'heilongjiang') return '伊春';
+    if (prov === 'jiangxi') return '宜春';
+    return undefined;
+  }
+  if (key === 'Yichun2') return '宜春';
+
+  if (/^fuzhou$/i.test(key)) {
+    if (prov === 'fujian') return '福州';
+    if (prov === 'jiangxi') return '抚州';
+    return undefined;
+  }
+  if (key === 'Fuzhou2') return '抚州';
+
+  return provinceCityPinyinMap[key];
 }

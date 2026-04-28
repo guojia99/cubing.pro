@@ -308,6 +308,45 @@
   padding: 0 12px;
 }
 
+.group-timer-inspection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 8px;
+  box-sizing: border-box;
+}
+
+.group-timer-inspection__value {
+  font-size: clamp(36px, 11vw, 72px);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  color: var(--ant-color-text);
+}
+
+/* 观察倒数：深红 */
+.group-timer-inspection__value--countdown {
+  color: #7a0a0a;
+}
+
+.group-timer-inspection__value--warn-blink {
+  animation: group-timer-insp-blink 0.3s steps(1, end) infinite;
+}
+
+@keyframes group-timer-insp-blink {
+  50% {
+    opacity: 0.2;
+  }
+}
+
+.group-timer-inspection__hint {
+  font-size: 13px;
+  line-height: 1.35;
+}
+
 .group-timer-tap-area--locked {
   cursor: not-allowed;
   opacity: 0.55;

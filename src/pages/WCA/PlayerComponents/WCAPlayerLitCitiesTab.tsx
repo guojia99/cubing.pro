@@ -12,18 +12,29 @@ import {
   hasVisitedChina,
   splitWorldMapAndScatter,
 } from './litCities/aggregateGeos';
-import { displayProvinceName } from './litCities/chinaProvinceNormalize';
+import { displayProvinceName, resolveChinaProvinceMeta } from './litCities/chinaProvinceNormalize';
 import { aggregatePrefectureCounts, matchCityToPrefecture } from './litCities/cityRegionMatch';
+import { outlineGeoForChinaDirectMunicipality } from './litCities/municipalityOutlineGeo';
 import { normalizeTaiwanCountyGeoJson, TAIWAN_COUNTY_GEOJSON_URL } from './litCities/taiwanCountyGeo';
 import { safeGeoCount } from './litCities/safeCount';
 import { wcaCountryIdToWorldMapName } from './litCities/worldCountryMap';
 import './WCAPlayerLitCitiesTab.less';
+
+function litGeoProvinceLabel(g: CompGeo, localeZh: boolean): string {
+  const meta = resolveChinaProvinceMeta(g.province || '', g.city || '');
+  if (meta) return displayProvinceName(meta.mapNameZh, localeZh);
+  const p = (g.province || '').trim();
+  return p || '—';
+}
 
 const WORLD_JSON =
   'https://cdn.jsdelivr.net/gh/apache/echarts@5.6.0/test/data/map/json/world.json';
 /** 阿里云 DataV 边界数据已放入 public/geo/bound，避免线上 403 / 跨域问题 */
 const CHINA_BOUND_BASE = '/geo/bound';
 const CHINA_JSON = `${CHINA_BOUND_BASE}/100000_full.json`;
+
+/** 北京/天津/上海/重庆/香港：详图用全国省级单块轮廓，不按区县拼图（避免出现区内分界线） */
+const CHINA_DIRECT_MUNICIPALITY_ADCODES = new Set([110000, 120000, 310000, 500000, 810000]);
 
 type GeoFeature = {
   properties?: { name?: string; adcode?: number; COUNTYNAME?: string };
@@ -110,7 +121,19 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos }) =
       setProvinceMapReady(false);
       return;
     }
-    const { adcode } = provinceDrill;
+    const { adcode, nameZh } = provinceDrill;
+
+    /** 直辖市 / 香港：用全国图里的省级单块轮廓，不用区县拼图（避免出现区内分界线） */
+    if (CHINA_DIRECT_MUNICIPALITY_ADCODES.has(adcode)) {
+      const outline = outlineGeoForChinaDirectMunicipality(chinaGeoJson, adcode, nameZh);
+      if (outline) {
+        echarts.registerMap(`china_${adcode}`, outline as Parameters<typeof echarts.registerMap>[1]);
+        setProvinceGeo(outline as GeoFeatureCollection);
+        setProvinceMapReady(true);
+        return;
+      }
+    }
+
     let cancelled = false;
     (async () => {
       try {
@@ -287,12 +310,19 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos }) =
       .filter(Boolean) as string[];
   }, [provinceGeo]);
 
+  const drillIsDirectMunicipality =
+    provinceDrill != null && CHINA_DIRECT_MUNICIPALITY_ADCODES.has(provinceDrill.adcode);
+
   const provincePrefectureData = useMemo(() => {
     const rows = provinceGeosFiltered.map(g => ({ city: g.city || '', count: g.count }));
+    if (provinceDrill && CHINA_DIRECT_MUNICIPALITY_ADCODES.has(provinceDrill.adcode)) {
+      const total = provinceGeosFiltered.reduce((s, g) => s + safeGeoCount(g.count), 0);
+      return [{ name: provinceDrill.nameZh, value: total }];
+    }
     return aggregatePrefectureCounts(rows, prefectureNames, {
       taiwan: provinceDrill?.adcode === 710000,
     });
-  }, [provinceGeosFiltered, prefectureNames, provinceDrill?.adcode]);
+  }, [provinceGeosFiltered, prefectureNames, provinceDrill]);
 
   const maxProvinceDetail = useMemo(() => {
     const vals = provincePrefectureData.map(d => safeGeoCount(d.value)).filter(v => v > 0);
@@ -479,13 +509,15 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos }) =
           pagination={{ pageSize: 20 }}
           dataSource={provinceGeosFiltered.map((g, i) => ({
             key: i,
-            city: g.city,
-            province: g.province,
+            provinceLabel: litGeoProvinceLabel(g, localeZh),
             count: safeGeoCount(g.count),
-            prefecture:
-              matchCityToPrefecture(g.city || '', prefectureNames, {
-                taiwan: provinceDrill?.adcode === 710000,
-              }) || '—',
+            prefecture: drillIsDirectMunicipality
+              ? provinceDrill.adcode === 810000
+                ? intl.formatMessage({ id: 'wca.litCities.hkWholeArea' })
+                : intl.formatMessage({ id: 'wca.litCities.municipalityWholeArea' })
+              : matchCityToPrefecture(g.city || '', prefectureNames, {
+                  taiwan: provinceDrill?.adcode === 710000,
+                }) || '—',
           }))}
           columns={[
             {
@@ -493,8 +525,8 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos }) =
               dataIndex: 'prefecture',
             },
             {
-              title: intl.formatMessage({ id: 'wca.litCities.cityRaw' }),
-              dataIndex: 'city',
+              title: intl.formatMessage({ id: 'wca.litCities.geoProvince' }),
+              dataIndex: 'provinceLabel',
             },
             {
               title: intl.formatMessage({ id: 'wca.litCities.count' }),
@@ -542,13 +574,13 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos }) =
             pagination={{ pageSize: 12 }}
             dataSource={provinceGeosFiltered.map((g, i) => ({
               key: i,
-              city: g.city,
+              provinceLabel: litGeoProvinceLabel(g, localeZh),
               count: safeGeoCount(g.count),
             }))}
             columns={[
               {
-                title: intl.formatMessage({ id: 'wca.litCities.cityRaw' }),
-                dataIndex: 'city',
+                title: intl.formatMessage({ id: 'wca.litCities.geoProvince' }),
+                dataIndex: 'provinceLabel',
               },
               {
                 title: intl.formatMessage({ id: 'wca.litCities.count' }),

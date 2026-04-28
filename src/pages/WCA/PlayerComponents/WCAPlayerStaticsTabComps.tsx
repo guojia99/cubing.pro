@@ -136,17 +136,15 @@ const CompetitionTable: React.FC<WCACompetitionTableProps> = ({ competitions, wc
         // 如果是来自中国的比赛，则进行中文城市名转换
         let cityNames = city.replace('Province', '').split(',').map(name => name.trim()).reverse()
         if (record.country_iso2 === 'CN' || record.country_iso2 === 'TW' || record.country_iso2 === 'HK') {
-          // 转换城市名和省份名为中文
-          const convertedCityNames = cityNames.map(cityName => {
-            // 如果城市名在映射表中存在，则转换为中文，否则保持原样
-            return getLocationByPinyin(cityName) || cityName;
+          const englishProvince =
+            cityNames.length > 1 ? cityNames[cityNames.length - 1] : undefined;
+          const convertedCityNames = cityNames.map((cityName, idx) => {
+            const isProvinceSegment = idx === cityNames.length - 1;
+            if (isProvinceSegment) {
+              return getLocationByPinyin(cityName) || cityName;
+            }
+            return getLocationByPinyin(cityName, englishProvince) || cityName;
           });
-
-          // 假设最后一个元素是省份名，转换省份名
-          if (convertedCityNames.length > 1) {
-            const provinceIndex = convertedCityNames.length - 1;
-            convertedCityNames[provinceIndex] = getLocationByPinyin(convertedCityNames[provinceIndex]) || convertedCityNames[provinceIndex];
-          }
 
           // 用逗号连接并返回
           return `${getCountryNameByIso2(record.country_iso2)} ${convertedCityNames.join(' ')}`;
