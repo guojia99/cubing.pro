@@ -1,3 +1,63 @@
+.wca-lit-cities-container {
+  position: relative;
+}
+
+.wca-lit-cities-container:fullscreen {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 100vh;
+  padding: 16px 20px 24px;
+  overflow: auto;
+  background: var(--ant-color-bg-container, #fff);
+
+  .wca-lit-cities {
+    /* 为左上角全屏标题留出一行空间，避免与 Segmented / 全屏按钮重叠 */
+    padding-top: 28px;
+  }
+}
+
+.wca-lit-cities-fs-title {
+  position: absolute;
+  top: 16px;
+  left: 20px;
+  z-index: 10;
+  font-size: 16px;
+  color: var(--ant-color-text, rgba(0, 0, 0, 0.88));
+  text-shadow: 0 0 8px var(--ant-color-bg-container, #fff);
+  pointer-events: none;
+}
+
+.app-content-wrapper[data-ant-content-theme='dark'] .wca-lit-cities-container:fullscreen {
+  background: var(--ant-color-bg-container, #141414);
+}
+
 .wca-lit-cities {
   padding: 8px 0 16px;
+}
+
+/* 地图高度：非全屏固定；全屏按视口扣减工具栏与留白 */
+.wca-lit-cities-chart-host {
+  width: 100%;
+}
+.wca-lit-cities-chart-host--world {
+  height: 480px;
+}
+.wca-lit-cities-chart-host--china {
+  height: 520px;
+}
+.wca-lit-cities-chart-host--province {
+  height: 480px;
+}
+.wca-lit-cities-container:fullscreen .wca-lit-cities-chart-host--world,
+.wca-lit-cities-container:fullscreen .wca-lit-cities-chart-host--china {
+  /* 全屏内边距 + 标题行 + Segmented 行 + 间距（100dvh 优先，旧环境回退 100vh） */
+  height: calc(100vh - 132px);
+  height: calc(100dvh - 132px);
+  min-height: 280px;
+}
+.wca-lit-cities-container:fullscreen .wca-lit-cities-chart-host--province {
+  /* 另含省级标题与城市表表头若干行 */
+  height: calc(100vh - 300px);
+  height: calc(100dvh - 300px);
+  min-height: 220px;
 }

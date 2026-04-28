@@ -74,6 +74,7 @@ export default {
   'wca.litCities.country': '国・地域',
   'wca.litCities.province': '省・直轄市・特別行政区',
   'wca.litCities.geoProvince': '省・行政区',
+  'wca.litCities.city': '都市',
   'wca.litCities.municipalityWholeArea': '全市域',
   'wca.litCities.hkWholeArea': '香港全域',
   'wca.litCities.prefecture': '地級市',
@@ -82,6 +83,10 @@ export default {
   'wca.litCities.provinceDetail': '詳細',
   'wca.litCities.high': '多',
   'wca.litCities.low': '少',
+  'wca.litCities.fullscreen': '全画面',
+  'wca.litCities.exitFullscreen': '全画面を終了',
+  'wca.litCities.fullscreenTitle': '{name}の訪問都市',
+  'wca.litCities.fullscreenTitleFallback': '訪問都市',
 
   // WCAPlayerEventStatsTab
   'wca.eventStats.event': '種目',

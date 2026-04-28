@@ -5,6 +5,7 @@
 
 import chinaTable from './data/chinaPrefectureAliasTable.json';
 import taiwanTable from './data/taiwanCountyAliasTable.json';
+import { pinyinLookupVariants } from '@/pages/WCA/PlayerComponents/region/china_citys';
 import { safeGeoCount } from './safeCount';
 
 type Pair = { alias: string; target: string };
@@ -39,7 +40,9 @@ export function matchCityToPrefecture(
 
   const headSeg = trimmed.split(/[,，(（]/)[0].trim();
 
-  /** 拼音相同的若干地级市：省级 GeoJSON 内只会出现其中一个市级要素 */
+  const baseHaystacks = headSeg !== trimmed ? [trimmed, headSeg] : [trimmed];
+  /** Xi'an 等：撇号导致无法包含匹配别名 xian，须并入去掉撇号的变体 */
+  const tryStrings = [...new Set(baseHaystacks.flatMap((s) => pinyinLookupVariants(s)))];
   if (/^taizhou$/i.test(headSeg)) {
     if (set.has('台州市')) return '台州市';
     if (set.has('泰州市')) return '泰州市';
@@ -61,8 +64,6 @@ export function matchCityToPrefecture(
     if (trimmed.includes(n)) return n;
     if (n.includes(trimmed) && trimmed.length >= 2) return n;
   }
-
-  const tryStrings = headSeg !== trimmed ? [trimmed, headSeg] : [trimmed];
 
   for (const hay of tryStrings) {
     for (const { alias, target } of pairs) {
