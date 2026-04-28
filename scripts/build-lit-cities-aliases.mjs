@@ -131,6 +131,63 @@ function buildPairs(pcas) {
   return pairs;
 }
 
+/**
+ * WCA 常见错误：province 与 city 同为英文地级市名（如 Shaoxing / Shaoxing）。
+ * 仅收录纯拉丁别名；同一英文对应多省（如 Suzhou）时在写入阶段删除该项。
+ */
+function buildEnglishPrefectureToProvinceMeta(pcas) {
+  const ENGLISH_LIKE = /^[A-Za-z][A-Za-z'’\-]*$/;
+  /** @type {Record<string, { mapNameZh: string, adcode: number }>} */
+  const out = {};
+
+  function add(alias, mapNameZh, adcode) {
+    if (!alias || !ENGLISH_LIKE.test(String(alias).trim())) return;
+    const a = String(alias).trim();
+    const prev = out[a];
+    if (prev !== undefined) {
+      if (prev.adcode !== adcode) delete out[a];
+      return;
+    }
+    out[a] = { mapNameZh, adcode };
+  }
+
+  for (const prov of pcas) {
+    if (!prov.children?.length) continue;
+    const provName = prov.name;
+    const rawCode = prov.code;
+    const adcode = Number(String(rawCode).padEnd(6, '0'));
+    if (!Number.isFinite(adcode)) continue;
+
+    if (MUNICIPALITIES.has(prov.name)) {
+      for (const al of collectPrefectureAliases(prov.name)) {
+        add(al, provName, adcode);
+      }
+      for (const sub of prov.children) {
+        for (const dist of sub.children || []) {
+          for (const al of collectDistrictAliases(dist.name)) {
+            add(al, provName, adcode);
+          }
+        }
+      }
+      continue;
+    }
+
+    for (const city of prov.children) {
+      const target = city.name;
+      for (const al of collectPrefectureAliases(target)) {
+        add(al, provName, adcode);
+      }
+      for (const dist of city.children || []) {
+        for (const al of collectDistrictAliases(dist.name)) {
+          add(al, provName, adcode);
+        }
+      }
+    }
+  }
+
+  return out;
+}
+
 const TAIWAN_COUNTIES = [
   '南投縣',
   '台中市',
@@ -304,6 +361,19 @@ async function main() {
     'utf8',
   );
   console.log('Wrote chinaPrefectureAliasTable.json, pairs:', chinaPairs.length);
+
+  const cityToProv = buildEnglishPrefectureToProvinceMeta(pcas);
+  writeFileSync(
+    join(OUT_DIR, 'chinaCityEnglishToProvinceMeta.json'),
+    JSON.stringify({
+      version: 1,
+      source: 'modood/Administrative-divisions-of-China dist/pcas-code.json',
+      generatedAt: new Date().toISOString(),
+      entries: cityToProv,
+    }),
+    'utf8',
+  );
+  console.log('Wrote chinaCityEnglishToProvinceMeta.json, keys:', Object.keys(cityToProv).length);
 
   const twPairs = buildTaiwanPairs();
   writeFileSync(

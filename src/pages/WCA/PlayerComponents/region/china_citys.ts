@@ -458,39 +458,89 @@ const provinceCityPinyinMap: Record<string, string> = {
 export { provinceCityPinyinMap };
 
 /**
+ * 将 WCA 等城市英文中的各类撇号统一为 ASCII `'`，并生成查表用的等价串（如 Xi'an ↔ Xian）。
+ */
+export function pinyinLookupVariants(input: string): string[] {
+  const t = input.trim();
+  if (!t) return [];
+  const apostropheNorm = t.replace(/[\u2018\u2019\u0060\u00B4]/g, "'");
+  const collapsed = apostropheNorm.replace(/'/g, '');
+  const list: string[] = [t, apostropheNorm];
+  if (collapsed !== apostropheNorm) list.push(collapsed);
+  return [...new Set(list)];
+}
+
+/**
  * 根据 WCA 英文城市/省名查中文展示。
  * 若干地级市汉语拼音相同（Taizhou / Suzhou / Yichun / Fuzhou），须凭省份英文名区分。
+ * 支持 Xi'an / Xi’an 等与 Xian 地图键互通。
  */
 export function getLocationByPinyin(pinyin: string, englishProvince?: string): string | undefined {
-  const key = pinyin.trim();
   const prov = englishProvince?.trim().toLowerCase();
-  if (/^taizhou$/i.test(key)) {
-    if (prov === 'jiangsu') return '泰州';
-    if (prov === 'zhejiang') return '台州';
-    return undefined;
-  }
-  if (key === 'Taizhou2') return '台州';
+  const variants = pinyinLookupVariants(pinyin);
+  if (variants.length === 0) return undefined;
 
-  if (/^suzhou$/i.test(key)) {
-    if (prov === 'jiangsu') return '苏州';
-    if (prov === 'anhui') return '宿州';
-    return undefined;
-  }
-  if (key === 'Suzhou2') return '宿州';
+  const disambig = (key: string): string | undefined => {
+    if (/^taizhou$/i.test(key)) {
+      if (prov === 'jiangsu') return '泰州';
+      if (prov === 'zhejiang') return '台州';
+      return undefined;
+    }
+    if (key === 'Taizhou2') return '台州';
 
-  if (/^yichun$/i.test(key)) {
-    if (prov === 'heilongjiang') return '伊春';
-    if (prov === 'jiangxi') return '宜春';
-    return undefined;
-  }
-  if (key === 'Yichun2') return '宜春';
+    if (/^suzhou$/i.test(key)) {
+      if (prov === 'jiangsu') return '苏州';
+      if (prov === 'anhui') return '宿州';
+      return undefined;
+    }
+    if (key === 'Suzhou2') return '宿州';
 
-  if (/^fuzhou$/i.test(key)) {
-    if (prov === 'fujian') return '福州';
-    if (prov === 'jiangxi') return '抚州';
-    return undefined;
-  }
-  if (key === 'Fuzhou2') return '抚州';
+    if (/^yichun$/i.test(key)) {
+      if (prov === 'heilongjiang') return '伊春';
+      if (prov === 'jiangxi') return '宜春';
+      return undefined;
+    }
+    if (key === 'Yichun2') return '宜春';
 
-  return provinceCityPinyinMap[key];
+    if (/^fuzhou$/i.test(key)) {
+      if (prov === 'fujian') return '福州';
+      if (prov === 'jiangxi') return '抚州';
+      return undefined;
+    }
+    if (key === 'Fuzhou2') return '抚州';
+
+    return undefined;
+  };
+
+  for (const key of variants) {
+    const d = disambig(key);
+    if (d) return d;
+  }
+
+  for (const key of variants) {
+    const hit = provinceCityPinyinMap[key as keyof typeof provinceCityPinyinMap];
+    if (hit) return hit;
+  }
+
+  for (const key of variants) {
+    const lower = key.toLowerCase();
+    for (const [enKey, zhName] of Object.entries(provinceCityPinyinMap)) {
+      if (enKey.toLowerCase() !== lower) continue;
+      const d = disambig(enKey);
+      if (d) return d;
+      return zhName;
+    }
+  }
+
+  return undefined;
+}
+
+/**
+ * WCA geos 常见为英文城市名；中文界面下转为对应中文（依赖 province 英文名消歧 Taizhou 等同名拼音城市）。
+ * 已是中文或无法命中映射时返回 undefined，由调用方保留原文。
+ */
+export function resolveWcaCityToChinese(cityRaw: string, englishProvince?: string): string | undefined {
+  const head = cityRaw.split(/[,，(（]/)[0].trim();
+  if (!head || /[\u4e00-\u9fff]/.test(head)) return undefined;
+  return getLocationByPinyin(head, englishProvince);
 }

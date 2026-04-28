@@ -183,7 +183,11 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
           }}
         >
           <TokenCallbackHandler>
-            <div className="app-content-wrapper" style={{ marginTop: 32 }}>
+            <div
+              className="app-content-wrapper"
+              data-ant-content-theme={contentDark ? 'dark' : 'light'}
+              style={{ marginTop: 32 }}
+            >
               {children}
             </div>
           </TokenCallbackHandler>

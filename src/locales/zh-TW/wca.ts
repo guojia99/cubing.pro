@@ -74,6 +74,7 @@ export default {
   'wca.litCities.country': '國家/地區',
   'wca.litCities.province': '省 / 直轄市 / 特別行政區',
   'wca.litCities.geoProvince': '省份',
+  'wca.litCities.city': '城市',
   'wca.litCities.municipalityWholeArea': '全市',
   'wca.litCities.hkWholeArea': '全港',
   'wca.litCities.prefecture': '地級市',
@@ -82,6 +83,10 @@ export default {
   'wca.litCities.provinceDetail': '詳情',
   'wca.litCities.high': '多',
   'wca.litCities.low': '少',
+  'wca.litCities.fullscreen': '全螢幕',
+  'wca.litCities.exitFullscreen': '離開全螢幕',
+  'wca.litCities.fullscreenTitle': '{name}的點亮城市',
+  'wca.litCities.fullscreenTitleFallback': '點亮城市',
 
   // WCAPlayerEventStatsTab 項目統計
   'wca.eventStats.event': '項目',

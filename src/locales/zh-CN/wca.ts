@@ -73,6 +73,7 @@ export default {
   'wca.litCities.country': '国家/地区',
   'wca.litCities.province': '省 / 直辖市 / 特别行政区',
   'wca.litCities.geoProvince': '省份',
+  'wca.litCities.city': '城市',
   'wca.litCities.municipalityWholeArea': '全市',
   'wca.litCities.hkWholeArea': '全港',
   'wca.litCities.prefecture': '地级市',
@@ -81,6 +82,10 @@ export default {
   'wca.litCities.provinceDetail': '详情',
   'wca.litCities.high': '多',
   'wca.litCities.low': '少',
+  'wca.litCities.fullscreen': '全屏',
+  'wca.litCities.exitFullscreen': '退出全屏',
+  'wca.litCities.fullscreenTitle': '{name}的点亮城市',
+  'wca.litCities.fullscreenTitleFallback': '点亮城市',
 
   // WCAPlayerEventStatsTab 项目统计
   'wca.eventStats.event': '项目',

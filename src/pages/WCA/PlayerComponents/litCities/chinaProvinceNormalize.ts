@@ -1,5 +1,8 @@
 /** WCA geo 省份字段（英文等）→ DataV 中国地图 feature.properties.name + adcode */
 
+import cityEnglishToProvinceJson from './data/chinaCityEnglishToProvinceMeta.json';
+import { pinyinLookupVariants } from '@/pages/WCA/PlayerComponents/region/china_citys';
+
 export interface ChinaProvinceMeta {
   mapNameZh: string;
   adcode: number;
@@ -65,6 +68,27 @@ const CITY_OR_PROVINCE_FALLBACK: Record<string, ChinaProvinceMeta> = {
   Suzhou: { mapNameZh: '江苏省', adcode: 320000 },
 };
 
+/** pcas 生成的英文地级市/区拼音别名 → 所属省级（adcode 六位）；同英名跨省冲突项已剔除 */
+const CITY_ENGLISH_TO_PROVINCE_META: Record<string, ChinaProvinceMeta> = (
+  cityEnglishToProvinceJson as { entries: Record<string, ChinaProvinceMeta> }
+).entries;
+
+function metaFromEnglishPrefectureOrDistrictKey(name: string): ChinaProvinceMeta | undefined {
+  const t = name.trim();
+  if (!t) return undefined;
+  const direct = CITY_ENGLISH_TO_PROVINCE_META[t];
+  if (direct) return direct;
+  for (const v of pinyinLookupVariants(t)) {
+    const h = CITY_ENGLISH_TO_PROVINCE_META[v];
+    if (h) return h;
+  }
+  const lower = t.toLowerCase();
+  for (const [k, v] of Object.entries(CITY_ENGLISH_TO_PROVINCE_META)) {
+    if (k.toLowerCase() === lower) return v;
+  }
+  return undefined;
+}
+
 function normKey(s: string): string {
   return s.trim().toLowerCase();
 }
@@ -93,6 +117,20 @@ export function resolveChinaProvinceMeta(province: string, city: string): ChinaP
     const m = metaByEnglishProvinceKey(c);
     if (m) return m;
   }
+
+  /**
+   * WCA 偶发：province 与 city 同为地级市英文名，或 province 为空。
+   * 此时不应把「市」当作省名，用 pcas 生成的英文地名 → 省级映射反查（如 Shaoxing → 浙江省）。
+   */
+  if (c) {
+    if (!p || normKey(p) === normKey(c)) {
+      if (!p || !metaByEnglishProvinceKey(p)) {
+        const inferred = metaFromEnglishPrefectureOrDistrictKey(c);
+        if (inferred) return inferred;
+      }
+    }
+  }
+
   return null;
 }
 

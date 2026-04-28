@@ -58,6 +58,63 @@
   clear: both;
 }
 
+/* 项目列（左侧固定）底色：与 app.tsx data-ant-content-theme 一致 */
+.wca-result-event-col-fixed(@bg; @header; @hover) {
+  .ant-table-cell-fix-left {
+    z-index: 5 !important;
+    opacity: 1 !important;
+    background: @bg !important;
+    background-color: @bg !important;
+    background-image: none !important;
+  }
+
+  .ant-table-thead .ant-table-cell-fix-left,
+  .ant-table-sticky-holder .ant-table-cell-fix-left {
+    z-index: 6 !important;
+    background: @header !important;
+    background-color: @header !important;
+    background-image: none !important;
+  }
+
+  .ant-table-tbody > tr > th.ant-table-cell-fix-left {
+    background: @bg !important;
+    background-color: @bg !important;
+  }
+
+  .ant-table-tbody > tr:hover > td.ant-table-cell-fix-left {
+    background: @hover !important;
+    background-color: @hover !important;
+  }
+
+  .ant-table.ant-table-ping-left {
+    .ant-table-tbody > tr > td.ant-table-cell-fix-left-last::before {
+      opacity: 1 !important;
+      background-color: @bg !important;
+    }
+
+    .ant-table-tbody > tr:hover > td.ant-table-cell-fix-left-last::before {
+      background-color: @hover !important;
+    }
+
+    .ant-table-thead .ant-table-cell-fix-left-last::before,
+    .ant-table-sticky-holder .ant-table-cell-fix-left-last::before {
+      opacity: 1 !important;
+      background-color: @header !important;
+    }
+  }
+
+  .ant-table-tbody > tr.ant-table-row > td.ant-table-cell-fix-left {
+    background: @bg !important;
+    background-color: @bg !important;
+    background-image: none !important;
+  }
+
+  .wca-result-row:hover > td.ant-table-cell-fix-left {
+    background: @hover !important;
+    background-color: @hover !important;
+  }
+}
+
 .wca-player-result-table {
   .ant-table-wrapper,
   .ant-table-container,
@@ -79,9 +136,8 @@
     padding: 10px 8px;
   }
 
-  .ant-table-tbody > tr > th.ant-table-cell-fix-left {
-    background: var(--ant-color-fill-alter) !important;
-  }
+  /* 项目列：浅色白底；深色见文件末尾 .app-content-wrapper[data-ant-content-theme='dark'] */
+  .wca-result-event-col-fixed(#ffffff; #ffffff; #f5f5f5);
 
   /* 数据格默认跟容器底色，避免 antd 默认浅色底透出 */
   .ant-table-tbody > tr.ant-table-row > td {
@@ -102,10 +158,6 @@
     padding: 10px 8px;
     white-space: nowrap;
     font-size: 13px;
-  }
-
-  .ant-table-tbody > tr > td.ant-table-cell-fix-left {
-    background: var(--ant-color-bg-container) !important;
   }
 
   .times-cell {
@@ -131,6 +183,11 @@
       text-align: center;
     }
   }
+}
+
+/* 内容区深色模式（与 app.tsx ConfigProvider darkAlgorithm 同步） */
+.app-content-wrapper[data-ant-content-theme='dark'] .wca-player-result-table {
+  .wca-result-event-col-fixed(#000000; #000000; #262626);
 }
 
 /* 响应式 - 手机端 */

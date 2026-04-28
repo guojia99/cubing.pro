@@ -74,6 +74,7 @@ export default {
   'wca.litCities.country': 'Country / Region',
   'wca.litCities.province': 'Province / Municipality / SAR',
   'wca.litCities.geoProvince': 'Province',
+  'wca.litCities.city': 'City',
   'wca.litCities.municipalityWholeArea': 'Whole municipality',
   'wca.litCities.hkWholeArea': 'All of Hong Kong',
   'wca.litCities.prefecture': 'Prefecture',
@@ -82,6 +83,10 @@ export default {
   'wca.litCities.provinceDetail': 'detail',
   'wca.litCities.high': 'High',
   'wca.litCities.low': 'Low',
+  'wca.litCities.fullscreen': 'Fullscreen',
+  'wca.litCities.exitFullscreen': 'Exit fullscreen',
+  'wca.litCities.fullscreenTitle': "{name}'s lit cities",
+  'wca.litCities.fullscreenTitleFallback': 'Lit cities',
 
   // WCAPlayerEventStatsTab
   'wca.eventStats.event': 'Event',

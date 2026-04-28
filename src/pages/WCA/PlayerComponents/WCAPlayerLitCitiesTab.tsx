@@ -1,10 +1,11 @@
 import type { CompGeo } from '@/services/cubing-pro/wca/types';
 import { useIntl } from '@@/plugin-locale';
 import { getLocale } from 'umi';
+import { CompressOutlined, FullscreenOutlined } from '@ant-design/icons';
 import { Button, Empty, Segmented, Space, Table, Typography } from 'antd';
 import * as echarts from 'echarts';
 import ReactECharts from 'echarts-for-react';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   aggregateChinaProvinces,
   aggregateWorldByCountry,
@@ -12,25 +13,30 @@ import {
   hasVisitedChina,
   splitWorldMapAndScatter,
 } from './litCities/aggregateGeos';
-import { displayProvinceName, resolveChinaProvinceMeta } from './litCities/chinaProvinceNormalize';
+import { displayProvinceName, MAP_NAME_ZH_TO_EN, resolveChinaProvinceMeta } from './litCities/chinaProvinceNormalize';
 import { aggregatePrefectureCounts, matchCityToPrefecture } from './litCities/cityRegionMatch';
 import { outlineGeoForChinaDirectMunicipality } from './litCities/municipalityOutlineGeo';
 import { normalizeTaiwanCountyGeoJson, TAIWAN_COUNTY_GEOJSON_URL } from './litCities/taiwanCountyGeo';
 import { safeGeoCount } from './litCities/safeCount';
 import { wcaCountryIdToWorldMapName } from './litCities/worldCountryMap';
+import { resolveWcaCityToChinese } from '@/pages/WCA/PlayerComponents/region/china_citys';
 import './WCAPlayerLitCitiesTab.less';
 
-function litGeoProvinceLabel(g: CompGeo, localeZh: boolean): string {
+/** 省级详图列表：中文界面下将 WCA 英文城市转为中文；省级用 resolveChinaProvinceMeta 推断，供 Suzhou/Taizhou 等消歧 */
+function litGeoCityLabel(g: CompGeo, localeZh: boolean): string {
+  const raw = (g.city || '').trim();
+  if (!raw) return '—';
+  if (!localeZh) return raw;
   const meta = resolveChinaProvinceMeta(g.province || '', g.city || '');
-  if (meta) return displayProvinceName(meta.mapNameZh, localeZh);
-  const p = (g.province || '').trim();
-  return p || '—';
+  const provForDisambig =
+    meta != null ? MAP_NAME_ZH_TO_EN[meta.mapNameZh] || g.province : g.province;
+  const zh = resolveWcaCityToChinese(raw, provForDisambig);
+  return zh ?? raw;
 }
 
-const WORLD_JSON =
-  'https://cdn.jsdelivr.net/gh/apache/echarts@5.6.0/test/data/map/json/world.json';
-/** 阿里云 DataV 边界数据已放入 public/geo/bound，避免线上 403 / 跨域问题 */
+/** 世界 / 中国边界 JSON 已放入 public/geo/bound，避免线上 CDN 依赖与跨域问题 */
 const CHINA_BOUND_BASE = '/geo/bound';
+const WORLD_JSON = `${CHINA_BOUND_BASE}/world.json`;
 const CHINA_JSON = `${CHINA_BOUND_BASE}/100000_full.json`;
 
 /** 北京/天津/上海/重庆/香港：详图用全国省级单块轮廓，不按区县拼图（避免出现区内分界线） */
@@ -61,9 +67,38 @@ function maxFinite(values: number[], fallback: number): number {
 
 interface WCAPlayerLitCitiesTabProps {
   geos: CompGeo[];
+  /** 全屏左上角标题用，通常为 WCA 姓名 */
+  playerDisplayName?: string;
 }
 
-const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos }) => {
+function requestElementFullscreen(el: HTMLElement): Promise<void> {
+  if (el.requestFullscreen) return el.requestFullscreen();
+  const wk = el as HTMLElement & { webkitRequestFullscreen?: () => void };
+  if (wk.webkitRequestFullscreen) {
+    wk.webkitRequestFullscreen();
+    return Promise.resolve();
+  }
+  return Promise.reject(new Error('Fullscreen not supported'));
+}
+
+function exitDocumentFullscreen(): Promise<void> {
+  if (document.exitFullscreen) return document.exitFullscreen();
+  const d = document as Document & { webkitExitFullscreen?: () => void };
+  if (d.webkitExitFullscreen) {
+    d.webkitExitFullscreen();
+    return Promise.resolve();
+  }
+  return Promise.reject(new Error('Exit fullscreen not supported'));
+}
+
+function isElementFullscreen(el: HTMLElement | null): boolean {
+  if (!el) return false;
+  if (document.fullscreenElement === el) return true;
+  const d = document as Document & { webkitFullscreenElement?: Element | null };
+  return d.webkitFullscreenElement === el;
+}
+
+const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos, playerDisplayName = '' }) => {
   const intl = useIntl();
   const locale = getLocale() || intl.locale || 'zh-CN';
   const localeZh = locale.startsWith('zh');
@@ -76,6 +111,8 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos }) =
   const [provinceDrill, setProvinceDrill] = useState<{ adcode: number; nameZh: string } | null>(null);
   const [provinceGeo, setProvinceGeo] = useState<GeoFeatureCollection | null>(null);
   const [provinceMapReady, setProvinceMapReady] = useState(false);
+  const [fullscreenActive, setFullscreenActive] = useState(false);
+  const fsContainerRef = useRef<HTMLDivElement>(null);
 
   const chinaRegionToAdcode = useMemo(() => {
     const m = new Map<string, number>();
@@ -164,6 +201,44 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos }) =
       cancelled = true;
     };
   }, [provinceDrill, chinaGeoJson]);
+
+  useEffect(() => {
+    const node = fsContainerRef.current;
+    if (!node) return;
+    const sync = () => {
+      setFullscreenActive(isElementFullscreen(node));
+      requestAnimationFrame(() => window.dispatchEvent(new Event('resize')));
+    };
+    document.addEventListener('fullscreenchange', sync);
+    document.addEventListener('webkitfullscreenchange', sync);
+    return () => {
+      document.removeEventListener('fullscreenchange', sync);
+      document.removeEventListener('webkitfullscreenchange', sync);
+    };
+  }, []);
+
+  useEffect(() => {
+    const node = fsContainerRef.current;
+    return () => {
+      if (node && isElementFullscreen(node)) {
+        void exitDocumentFullscreen().catch(() => {});
+      }
+    };
+  }, []);
+
+  const toggleFullscreen = useCallback(async () => {
+    const el = fsContainerRef.current;
+    if (!el) return;
+    try {
+      if (isElementFullscreen(el)) {
+        await exitDocumentFullscreen();
+      } else {
+        await requestElementFullscreen(el);
+      }
+    } catch (e) {
+      console.warn('Lit cities fullscreen', e);
+    }
+  }, []);
 
   const byWorld = useMemo(() => aggregateWorldByCountry(geos), [geos]);
   const byChinaProvince = useMemo(() => aggregateChinaProvinces(geos), [geos]);
@@ -428,8 +503,19 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos }) =
 
   const empty = !geos?.length;
 
+  const fsTitle =
+    playerDisplayName.trim().length > 0
+      ? intl.formatMessage({ id: 'wca.litCities.fullscreenTitle' }, { name: playerDisplayName.trim() })
+      : intl.formatMessage({ id: 'wca.litCities.fullscreenTitleFallback' });
+
   return (
-    <div className="wca-lit-cities">
+    <div ref={fsContainerRef} className="wca-lit-cities-container">
+      {fullscreenActive && (
+        <Typography.Text strong className="wca-lit-cities-fs-title">
+          {fsTitle}
+        </Typography.Text>
+      )}
+      <div className="wca-lit-cities">
       <Space wrap style={{ marginBottom: 12 }}>
         <Segmented
           value={viewMode}
@@ -459,6 +545,15 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos }) =
             {intl.formatMessage({ id: 'wca.litCities.backToChina' })}
           </Button>
         )}
+        <Button
+          type="default"
+          icon={fullscreenActive ? <CompressOutlined /> : <FullscreenOutlined />}
+          onClick={() => void toggleFullscreen()}
+        >
+          {fullscreenActive
+            ? intl.formatMessage({ id: 'wca.litCities.exitFullscreen' })
+            : intl.formatMessage({ id: 'wca.litCities.fullscreen' })}
+        </Button>
       </Space>
 
       {empty && <Empty description={intl.formatMessage({ id: 'wca.litCities.empty' })} />}
@@ -509,7 +604,7 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos }) =
           pagination={{ pageSize: 20 }}
           dataSource={provinceGeosFiltered.map((g, i) => ({
             key: i,
-            provinceLabel: litGeoProvinceLabel(g, localeZh),
+            cityLabel: litGeoCityLabel(g, localeZh),
             count: safeGeoCount(g.count),
             prefecture: drillIsDirectMunicipality
               ? provinceDrill.adcode === 810000
@@ -525,8 +620,8 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos }) =
               dataIndex: 'prefecture',
             },
             {
-              title: intl.formatMessage({ id: 'wca.litCities.geoProvince' }),
-              dataIndex: 'provinceLabel',
+              title: intl.formatMessage({ id: 'wca.litCities.city' }),
+              dataIndex: 'cityLabel',
             },
             {
               title: intl.formatMessage({ id: 'wca.litCities.count' }),
@@ -538,21 +633,25 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos }) =
       )}
 
       {!empty && viewMode === 'map' && mapsReady && scope === 'world' && (
-        <ReactECharts
-          option={worldOption}
-          style={{ height: 480 }}
-          opts={{ renderer: 'canvas' }}
-          onEvents={{ click: onWorldChartClick }}
-        />
+        <div className="wca-lit-cities-chart-host wca-lit-cities-chart-host--world">
+          <ReactECharts
+            option={worldOption}
+            style={{ height: '100%', width: '100%' }}
+            opts={{ renderer: 'canvas' }}
+            onEvents={{ click: onWorldChartClick }}
+          />
+        </div>
       )}
 
       {!empty && viewMode === 'map' && mapsReady && scope === 'china' && unlockedChina && !provinceDrill && (
-        <ReactECharts
-          option={chinaOption}
-          style={{ height: 520 }}
-          opts={{ renderer: 'canvas' }}
-          onEvents={{ click: onChinaChartClick }}
-        />
+        <div className="wca-lit-cities-chart-host wca-lit-cities-chart-host--china">
+          <ReactECharts
+            option={chinaOption}
+            style={{ height: '100%', width: '100%' }}
+            opts={{ renderer: 'canvas' }}
+            onEvents={{ click: onChinaChartClick }}
+          />
+        </div>
       )}
 
       {!empty && viewMode === 'map' && scope === 'china' && unlockedChina && provinceDrill && (
@@ -562,11 +661,13 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos }) =
             {intl.formatMessage({ id: 'wca.litCities.provinceDetail' })}
           </Typography.Title>
           {provinceDetailOption && (
-            <ReactECharts
-              option={provinceDetailOption}
-              style={{ height: 480 }}
-              opts={{ renderer: 'canvas' }}
-            />
+            <div className="wca-lit-cities-chart-host wca-lit-cities-chart-host--province">
+              <ReactECharts
+                option={provinceDetailOption}
+                style={{ height: '100%', width: '100%' }}
+                opts={{ renderer: 'canvas' }}
+              />
+            </div>
           )}
           <Table
             size="small"
@@ -574,13 +675,13 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos }) =
             pagination={{ pageSize: 12 }}
             dataSource={provinceGeosFiltered.map((g, i) => ({
               key: i,
-              provinceLabel: litGeoProvinceLabel(g, localeZh),
+              cityLabel: litGeoCityLabel(g, localeZh),
               count: safeGeoCount(g.count),
             }))}
             columns={[
               {
-                title: intl.formatMessage({ id: 'wca.litCities.geoProvince' }),
-                dataIndex: 'provinceLabel',
+                title: intl.formatMessage({ id: 'wca.litCities.city' }),
+                dataIndex: 'cityLabel',
               },
               {
                 title: intl.formatMessage({ id: 'wca.litCities.count' }),
@@ -597,6 +698,7 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos }) =
           {intl.formatMessage({ id: 'wca.litCities.chinaLocked' })}
         </Typography.Paragraph>
       )}
+      </div>
     </div>
   );
 };
