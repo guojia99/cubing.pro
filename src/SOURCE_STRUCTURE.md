@@ -72,7 +72,7 @@ src/
 │   ├── Events/Events.tsx
 │   ├── Competition/              # 赛事列表与详情
 │   ├── Player/                   # 站内选手（非 WCA 专页）
-│   ├── WCA/                      # WCA 选手、统计、Players 列表
+│   ├── WCA/                      # WCA 选手、统计、成绩拟合、Players 列表
 │   ├── Admin/                    # 登录、个人中心、主办、后台管理
 │   ├── Algs/                     # 公式库、练习与随机抽公式等
 │   ├── Tools/                    # BLD、绘图、团体赛 TeamMatch、FMC、计时器解析等
@@ -243,6 +243,10 @@ src/
 ### `wca/static.ts`
 
 - `GetEventRankTimers`、`GetEventRankWithFullNow`、`GetEventRankWithOnlyYear`、`GetStaticSuccessRateResult`、`GetAllEventsAchievement`、`GetAllEventChampionshipsPodium`
+
+### `wca/proportion_estimation.ts`
+
+- `getResultProportionEstimation`（`GET /wca/extend/resultProportionEstimation`）、`interpolateRatioAt`；与 WCA 页 `ProportionEstimation` 展示多项目成绩比例拟合
 
 ### `wca/country.ts`
 

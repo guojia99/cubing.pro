@@ -1,0 +1,243 @@
+.proportion-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.proportion-hero {
+  margin-bottom: 20px;
+  text-align: center;
+
+  .proportion-hero-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+  }
+
+  .proportion-algorithm-btn {
+    padding: 0 4px;
+    height: auto;
+    line-height: 1.4;
+  }
+
+  .proportion-title {
+    margin-bottom: 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .proportion-desc {
+    margin-bottom: 0;
+    max-width: 720px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .proportion-intro-anchor {
+    margin-top: 8px !important;
+  }
+}
+
+.proportion-infer-controls {
+  margin-bottom: 16px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.proportion-infer-input-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.proportion-infer-input-row {
+  margin-top: 0;
+}
+
+.proportion-controls {
+  margin-bottom: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(24, 144, 255, 0.08);
+  background: linear-gradient(145deg, #fafdff 0%, #ffffff 45%, #f6fcff 100%);
+}
+
+.proportion-field-label {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.55);
+  margin-bottom: 8px;
+}
+
+.proportion-select-full {
+  width: 100%;
+}
+
+.proportion-wr-seg {
+  width: 100%;
+
+  .ant-segmented-item {
+    flex: 1;
+    justify-content: center;
+    min-width: 0;
+  }
+}
+
+.proportion-reload-wrap {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+
+  @media (min-width: 992px) {
+    justify-content: flex-end;
+  }
+}
+
+.proportion-stats-row {
+  margin-top: 16px;
+}
+
+.proportion-stat-card {
+  border-radius: 10px;
+  border: 1px solid rgba(24, 144, 255, 0.12);
+  height: 100%;
+
+  .ant-card-body {
+    padding: 16px;
+  }
+}
+
+.proportion-stat-anchor {
+  .proportion-anchor-block {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .proportion-anchor-title {
+    font-size: 14px;
+    display: block;
+  }
+
+  .proportion-anchor-input {
+    width: 100%;
+    max-width: 200px;
+  }
+}
+
+.proportion-alert {
+  margin-top: 16px;
+}
+
+.proportion-section {
+  margin-bottom: 20px;
+  border-radius: 12px;
+  overflow: hidden;
+
+  .ant-card-head-title {
+    font-weight: 600;
+  }
+}
+
+.proportion-chart-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.proportion-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.proportion-footnote {
+  display: block;
+  margin-top: 12px;
+  font-size: 12px;
+}
+
+.proportion-infer-table {
+  .ant-table {
+    table-layout: fixed;
+  }
+
+  .ant-table-tbody > tr.proportion-infer-row--anchor > td {
+    background: rgba(24, 144, 255, 0.09) !important;
+    box-shadow: inset 3px 0 0 #1890ff;
+  }
+
+  .ant-table-tbody > tr.proportion-infer-row--anchor:hover > td {
+    background: rgba(24, 144, 255, 0.14) !important;
+  }
+}
+
+.proportion-infer-event-tag {
+  margin-inline-end: 0;
+  max-width: 100%;
+  padding: 0 6px;
+  line-height: 1.4;
+  font-size: 12px;
+}
+
+.proportion-infer-event-tag-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+}
+
+.proportion-infer-event-code {
+  font-variant-numeric: tabular-nums;
+}
+
+.proportion-algorithm-modal {
+  .proportion-algorithm-modal-body {
+    max-height: min(70vh, 560px);
+    overflow: auto;
+    padding-right: 4px;
+    margin-top: -8px;
+
+    .markdown-body {
+      font-size: 14px;
+      line-height: 1.65;
+
+      h2 {
+        font-size: 16px;
+        margin-top: 0;
+      }
+
+      ul {
+        padding-left: 1.25em;
+      }
+    }
+  }
+}
+
+.proportion-global-item {
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(24, 144, 255, 0.06);
+  text-align: center;
+
+  .proportion-global-val {
+    margin-top: 6px;
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+    color: #1890ff;
+    font-weight: 600;
+  }
+}
+
+@media (max-width: 576px) {
+  .proportion-page {
+    padding: 12px;
+  }
+
+  .proportion-stat-anchor .proportion-anchor-input {
+    max-width: none;
+  }
+}

@@ -280,6 +280,61 @@ export default {
   'wca.grandSlam.filterHasWROn': 'Yes',
   'wca.grandSlam.filterHasWROff': 'All',
 
+  // Proportion estimation
+  'wca.proportion.title': 'Result proportion fit',
+  'wca.proportion.fieldType': 'Fit preset',
+  'wca.proportion.fieldAnchor': 'Anchor event',
+  'wca.proportion.fieldWr': 'World rank pool (top N per event, then intersect)',
+  'wca.proportion.changeHint': 'Changing preset or pool reloads data',
+  'wca.proportion.typeBigCube': '4×4–7×7 (444 / 555 / 666 / 777)',
+  'wca.proportion.type333oh': '3×3 / OH (333 / 333oh)',
+  'wca.proportion.typeBld': '3BLD / 4BLD / 5BLD (333bf / 444bf / 555bf)',
+  'wca.proportion.statFit': 'Players used in fit',
+  'wca.proportion.statPool': 'WR pool intersection size',
+  'wca.proportion.people': ' players',
+  'wca.proportion.anchorLabel': 'Anchor time input',
+  'wca.proportion.lowSample': 'Few effective samples — ratios may be unstable; try a larger WR pool.',
+  'wca.proportion.sectionInfer': 'Estimated results',
+  'wca.proportion.sectionChart': 'Reference curves',
+  'wca.proportion.sectionSegments': 'Segments',
+  'wca.proportion.sectionGlobal': 'Median parameters',
+  'wca.proportion.ratioToAnchor': 'Ratio vs {event}',
+  'wca.proportion.segRangeCol': 'Segment span',
+  'wca.proportion.estimated': 'Estimated result',
+  'wca.proportion.inferNote':
+    'The anchor time in this card only affects the table below. Reference curves, segments, and median parameters ignore it. Anchor event: {anchor}. Ratios use server-side reference ordering; extrapolation may be unreliable.',
+  'wca.proportion.segIndex': '#',
+  'wca.proportion.anchorRange': 'Anchor span ({event})',
+  'wca.proportion.segPersons': 'Players',
+  'wca.proportion.chartXAnchor': 'X (sec)',
+  'wca.proportion.chartY': 'Time (sec)',
+  'wca.proportion.algorithmBtn': 'How it works',
+  'wca.proportion.algorithmModalTitle': 'Model & algorithm',
+  'wca.proportion.algorithmMd': `## Algorithm
+
+- **Per-competitor representation**
+  - Single-attempt times across rounds and competitions come from **Attempts**. The “most recent data” requirement is handled upstream by taking the latest **Results** per person per event.
+  - For each competitor and each event, collect all Attempt values **> 0** across every Result for that event, then take the **median** as the representative time for that event.
+
+- **Ratio model**
+  - For competitor p and event j, let the median time be T_pj. Let the anchor event be a = events[0]. Define r_pj = T_pj / T_pa (r_pa = 1).
+  - Among similarly strong top players, the distribution of r should be tight; we take the **median of r** within each segment as the scale of j relative to a for that segment.
+  - This is akin to an **additive** difference in log space approximating a **multiplicative** ratio, which fits time structures that grow multiplicatively (e.g. big cubes).
+
+- **Segmentation (pooling similar levels)**
+  - Sort all players by T_pa (anchor median) ascending. **Equal-count bins** (about sqrt(N) bins, clamped to [1, 30]) keep players with similar anchor level in the same bin.
+  - In each bin, for every non-anchor event, take the **median of {r_pj}** to get that segment’s ratio, and record anchor range and count.
+  - If the sample is very small (roughly fewer than 5 people overall), fall back to a **single segment** and global ratios only, to avoid overfitting noise.
+
+- **Smooth curve (between segments)**
+  - Each segment has a median anchor range [AnchorMin, AnchorMax] with integer centisecond bounds from min/max anchor times in the bin.
+  - For each non-anchor event, segment-level ratios form a step function at segment-center anchors; to get a continuous reference curve, we **linearly interpolate ratios** between **segment centers** in one dimension.
+  - Below the lowest or above the highest center, **constant extrapolation** uses the nearest segment’s ratio (avoids unbounded linear tails).
+
+- **Prediction**
+  - Given anchor time t_a (centiseconds), obtain interpolated ratio_j(t_a) for each j ≠ a, then t_j = t_a × ratio_j.
+  - Example: in **bigcube** the backend anchor is 444. If t_a = 1900 (19.00s), then 555 ≈ 1900 × ratio_555 in centiseconds—convert to seconds for display.`,
+
   // Success Rate
   'wca.successRate.solved': 'Solved',
   'wca.successRate.attempted': 'Attempted',

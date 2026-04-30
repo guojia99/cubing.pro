@@ -24,6 +24,7 @@ export default {
 
   "menu.WCA": "WCA Lookup",
   "menu.WCA.Players": "Persons",
+  "menu.WCA.proportionEstimation": "Result fitting",
   'menu.WCA.statistics': "Data",
 
   'menu.Algs': "Algs",

@@ -142,7 +142,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 2
+        "register": 1
       },
       "enableBy": "register"
     },
@@ -206,7 +206,7 @@
             1
           ]
         },
-        "register": 1
+        "register": 0
       },
       "enableBy": "register"
     },
@@ -220,31 +220,6 @@
       "time": {
         "hooks": {
           "modifyRoutes": [
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
             0,
             0
           ]
@@ -263,73 +238,16 @@
       "time": {
         "hooks": {
           "onDevCompileDone": [
-            18,
-            9,
-            13,
-            14,
-            16,
-            8,
-            8,
-            6,
-            5,
-            8,
+            25,
+            7,
             11,
-            11,
-            8,
-            13,
-            10,
-            6,
             9,
-            10,
-            9,
-            10,
-            6,
-            10,
-            9,
-            9,
-            8,
-            9,
-            8,
-            9,
-            10,
-            10,
-            10,
-            10,
-            11,
             12,
-            11,
-            8,
-            11,
-            11,
-            7,
-            8,
-            8,
-            8,
-            11,
-            10,
-            8,
             9,
-            10,
-            8,
-            17,
-            16,
-            8,
-            10,
-            8,
-            8,
-            7,
-            14,
-            9,
-            11,
-            8,
-            11,
-            12,
-            10,
-            7,
-            12
+            7
           ]
         },
-        "register": 1
+        "register": 0
       },
       "enableBy": "register"
     },
@@ -343,39 +261,14 @@
       "time": {
         "hooks": {
           "modifyAppData": [
-            12
+            11
           ],
           "onGenerateFiles": [
             3,
-            12,
-            30,
-            34,
-            14,
-            33,
-            32,
-            36,
-            30,
-            31,
-            20,
-            31,
-            31,
-            27,
-            32,
-            33,
-            31,
-            18,
-            39,
-            35,
-            47,
-            36,
-            33,
-            38,
-            35,
-            27,
-            41
+            19
           ]
         },
-        "register": 10
+        "register": 7
       },
       "enableBy": "register"
     },
@@ -390,35 +283,10 @@
         "hooks": {
           "addEntryCode": [
             0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
             0
           ]
         },
-        "register": 0
+        "register": 1
       },
       "enableBy": "register"
     },
@@ -444,78 +312,9 @@
             0,
             0,
             0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            1,
-            0,
-            0,
-            0,
-            0,
-            1,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
             0
           ],
           "onCheckCode": [
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
             0,
             0,
             0,
@@ -612,10 +411,10 @@
       "time": {
         "hooks": {
           "modifyConfig": [
-            1
+            0
           ]
         },
-        "register": 3
+        "register": 4
       },
       "enableBy": "register"
     },
@@ -1481,7 +1280,7 @@
       "time": {
         "hooks": {
           "onStart": [
-            1
+            0
           ]
         },
         "register": 0
@@ -1501,7 +1300,7 @@
             5
           ]
         },
-        "register": 1
+        "register": 0
       },
       "enableBy": "register"
     },
@@ -1514,7 +1313,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 34
+        "register": 32
       },
       "enableBy": "register"
     },
@@ -1527,7 +1326,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 18
+        "register": 22
       },
       "enableBy": "config"
     },
@@ -1540,7 +1339,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 8
+        "register": 7
       },
       "enableBy": "config"
     },
@@ -1563,35 +1362,6 @@
             0,
             0,
             0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
             0
           ]
         },
@@ -1610,64 +1380,14 @@
         "hooks": {
           "onGenerateFiles": [
             0,
-            0,
-            0,
-            0,
-            1,
-            0,
-            1,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            1,
-            1,
-            0,
-            1,
-            0,
-            1,
-            0,
-            1,
-            0,
-            0,
-            0,
-            1,
-            1
+            0
           ],
           "addRuntimePlugin": [
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
             0,
             0
           ]
         },
-        "register": 1
+        "register": 0
       },
       "enableBy": "register"
     },
@@ -1680,7 +1400,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 0
+        "register": 1
       },
       "enableBy": "config"
     },
@@ -1694,13 +1414,13 @@
       "time": {
         "hooks": {
           "onStart": [
-            0
+            1
           ],
           "addBeforeMiddlewares": [
             0
           ]
         },
-        "register": 15
+        "register": 12
       }
     },
     "./node_modules/@umijs/preset-umi/dist/features/mpa/mpa": {
@@ -1712,7 +1432,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 1
+        "register": 0
       },
       "enableBy": "config"
     },
@@ -1725,7 +1445,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 0
+        "register": 1
       }
     },
     "./node_modules/@umijs/preset-umi/dist/features/overrides/overrides": {
@@ -1739,84 +1459,9 @@
         "hooks": {
           "onGenerateFiles": [
             0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            1,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
             0
           ],
           "addEntryImports": [
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
             0,
             0,
             0,
@@ -1853,92 +1498,17 @@
             0
           ],
           "onGenerateFiles": [
-            33,
-            9,
-            11,
-            8,
-            6,
-            9,
-            18,
-            14,
-            11,
-            13,
-            6,
-            12,
-            16,
-            11,
-            10,
-            8,
-            11,
-            8,
-            17,
-            13,
-            9,
-            14,
-            14,
-            12,
-            10,
-            8,
-            8
+            30,
+            10
           ],
           "addPolyfillImports": [
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
             0,
             0,
             0,
             0
           ]
         },
-        "register": 1
+        "register": 0
       }
     },
     "./node_modules/@umijs/preset-umi/dist/features/polyfill/publicPathPolyfill": {
@@ -1951,56 +1521,6 @@
       "time": {
         "hooks": {
           "addPolyfillImports": [
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
             0,
             0,
             0,
@@ -2021,36 +1541,11 @@
       "time": {
         "hooks": {
           "onGenerateFiles": [
-            114,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
+            116,
             0
           ]
         },
-        "register": 0
+        "register": 1
       },
       "enableBy": "register"
     },
@@ -2063,7 +1558,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 1
+        "register": 0
       },
       "enableBy": "config"
     },
@@ -2091,31 +1586,6 @@
         "hooks": {
           "onGenerateFiles": [
             0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            1,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
             0
           ],
           "addBeforeMiddlewares": [
@@ -2137,62 +1607,12 @@
         "hooks": {
           "onGenerateFiles": [
             8,
-            4,
-            13,
-            3,
-            11,
-            2,
-            12,
-            2,
-            9,
-            2,
-            13,
-            1,
-            11,
-            2,
-            14,
-            2,
-            14,
-            2,
-            12,
-            2,
-            10,
-            2,
-            13,
-            1,
-            17,
             3,
             12,
-            1,
-            12,
-            2,
-            15,
-            1,
-            15,
-            2,
-            9,
-            2,
-            12,
-            3,
-            16,
-            3,
-            11,
-            2,
-            14,
-            2,
-            13,
-            2,
-            14,
-            2,
-            12,
-            3,
-            11,
-            2,
-            13,
             2
           ]
         },
-        "register": 2
+        "register": 1
       },
       "enableBy": "register"
     },
@@ -2244,33 +1664,8 @@
       "time": {
         "hooks": {
           "onGenerateFiles": [
-            169,
-            6,
-            7,
-            8,
-            6,
-            7,
-            7,
-            6,
-            6,
-            5,
-            6,
-            10,
-            9,
-            6,
-            7,
-            5,
-            6,
-            7,
-            6,
-            6,
-            6,
-            6,
-            6,
-            7,
-            9,
-            6,
-            5
+            159,
+            9
           ]
         },
         "register": 1
@@ -2316,7 +1711,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 1
+        "register": 0
       },
       "enableBy": "config"
     },
@@ -2341,7 +1736,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 9
+        "register": 8
       },
       "enableBy": "config"
     },
@@ -2355,36 +1750,11 @@
       "time": {
         "hooks": {
           "onGenerateFiles": [
-            1,
             0,
-            0,
-            0,
-            1,
-            0,
-            0,
-            0,
-            0,
-            1,
-            1,
-            0,
-            1,
-            0,
-            0,
-            0,
-            0,
-            0,
-            1,
-            0,
-            1,
-            0,
-            1,
-            1,
-            0,
-            0,
-            1
+            0
           ]
         },
-        "register": 1
+        "register": 0
       }
     },
     "./node_modules/@umijs/preset-umi/dist/features/clickToComponent/clickToComponent": {
@@ -2396,7 +1766,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 0
+        "register": 1
       },
       "enableBy": "config"
     },
@@ -2409,7 +1779,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 1
+        "register": 0
       },
       "enableBy": "config"
     },
@@ -2464,7 +1834,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 2
+        "register": 1
       }
     },
     "./node_modules/@umijs/preset-umi/dist/features/mako/mako": {
@@ -2489,7 +1859,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 0
+        "register": 1
       }
     },
     "./node_modules/@umijs/preset-umi/dist/features/hmrGuardian/hmrGuardian": {
@@ -2501,7 +1871,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 2
+        "register": 1
       }
     },
     "./node_modules/@umijs/preset-umi/dist/features/routePreloadOnLoad/routePreloadOnLoad": {
@@ -2517,39 +1887,10 @@
             0,
             0,
             0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            1,
-            0,
-            1,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
             0
           ]
         },
-        "register": 12
+        "register": 11
       }
     },
     "./node_modules/@umijs/preset-umi/dist/features/forget/forget": {
@@ -2561,7 +1902,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 0
+        "register": 1
       },
       "enableBy": "config"
     },
@@ -2575,10 +1916,10 @@
       "time": {
         "hooks": {
           "modifyUniBundler": [
-            197
+            181
           ]
         },
-        "register": 1
+        "register": 0
       },
       "enableBy": "register"
     },
@@ -2604,7 +1945,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 15
+        "register": 13
       },
       "enableBy": "register"
     },
@@ -2618,10 +1959,10 @@
       "time": {
         "hooks": {
           "modifyAppData": [
-            5
+            4
           ]
         },
-        "register": 12
+        "register": 8
       }
     },
     "./node_modules/@umijs/preset-umi/dist/commands/help": {
@@ -2633,7 +1974,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 1
+        "register": 0
       },
       "enableBy": "register"
     },
@@ -2685,7 +2026,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 1
+        "register": 0
       },
       "enableBy": "register"
     },
@@ -2698,7 +2039,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 0
+        "register": 1
       },
       "enableBy": "register"
     },
@@ -2711,7 +2052,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 1
+        "register": 0
       },
       "enableBy": "register"
     },
@@ -2828,7 +2169,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 1
+        "register": 0
       },
       "enableBy": "register"
     },
@@ -2854,7 +2195,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 0
+        "register": 1
       },
       "enableBy": "register"
     },
@@ -2867,7 +2208,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 10
+        "register": 8
       },
       "enableBy": "register"
     },
@@ -2908,61 +2249,11 @@
         "hooks": {
           "addRuntimePlugin": [
             0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            1,
             0
           ],
           "onGenerateFiles": [
             1,
-            1,
-            1,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0
+            1
           ],
           "addTmpGenerateWatcherPaths": [
             0
@@ -3008,144 +2299,19 @@
             0,
             0,
             0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            1,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
             0
           ],
           "addRuntimePlugin": [
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
             0,
             0
           ],
           "addRuntimePluginKey": [
             0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
             0
           ],
           "onGenerateFiles": [
-            1,
             0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            1,
-            1,
-            0,
-            0,
-            0,
-            1,
-            0,
-            1,
-            1,
-            1,
-            1,
-            1,
-            0,
-            0,
-            1,
-            0,
-            0,
-            1,
-            1,
-            1
+            0
           ],
           "addExtraBabelPlugins": [
             0
@@ -3154,7 +2320,7 @@
             0
           ]
         },
-        "register": 4
+        "register": 2
       }
     },
     "./node_modules/@umijs/plugins/dist/dva": {
@@ -3166,7 +2332,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 4
+        "register": 3
       },
       "enableBy": "config"
     },
@@ -3181,118 +2347,18 @@
         "hooks": {
           "addRuntimePlugin": [
             0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
             0
           ],
           "addRuntimePluginKey": [
             0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
             0
           ],
           "onGenerateFiles": [
-            0,
-            0,
-            0,
             1,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            1,
-            0,
-            0,
-            0,
-            0,
-            0,
-            1,
-            1,
-            0,
-            0,
-            0,
-            0,
-            0,
             0
           ],
           "addExtraModels": [
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
+            1,
             0
           ]
         },
@@ -3316,122 +2382,22 @@
           ],
           "addLayouts": [
             0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
             0
           ],
           "modifyAppData": [
-            0
+            1
           ],
           "addRuntimePlugin": [
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
             0,
             0
           ],
           "addRuntimePluginKey": [
             0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
             0
           ],
           "onGenerateFiles": [
             3,
-            2,
-            1,
-            0,
-            1,
-            1,
-            1,
-            1,
-            2,
-            1,
-            1,
-            2,
-            2,
-            0,
-            1,
-            1,
-            1,
-            2,
-            1,
-            1,
-            1,
-            1,
-            2,
-            2,
-            2,
-            1,
-            2
+            1
           ]
         },
         "register": 1
@@ -3451,150 +2417,25 @@
             0,
             0,
             0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            1,
-            0,
-            0,
-            0,
-            0,
-            1,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
             0
           ],
           "addRuntimePlugin": [
-            1,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
             0,
             0
           ],
           "addRuntimePluginKey": [
             0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
             0
           ],
           "onGenerateFiles": [
-            17,
-            15,
-            14,
-            17,
-            14,
-            17,
-            14,
             16,
-            18,
-            17,
-            14,
-            16,
-            19,
-            18,
-            16,
-            20,
-            19,
-            14,
-            15,
-            16,
-            15,
-            16,
-            16,
-            16,
-            14,
-            16,
-            16
+            14
           ],
           "addTmpGenerateWatcherPaths": [
-            10
+            11
           ]
         },
-        "register": 1
+        "register": 0
       },
       "enableBy": "config"
     },
@@ -3622,67 +2463,17 @@
         "hooks": {
           "addRuntimePlugin": [
             0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            1
+            0
           ],
           "onGenerateFiles": [
-            31,
-            36,
-            35,
-            36,
-            39,
-            38,
-            34,
-            33,
-            35,
-            35,
-            41,
-            36,
-            36,
-            38,
-            36,
-            39,
-            35,
-            37,
-            34,
-            34,
-            34,
-            34,
-            33,
-            34,
-            37,
-            37,
+            43,
             35
           ],
           "addTmpGenerateWatcherPaths": [
             0
           ]
         },
-        "register": 0
+        "register": 2
       },
       "enableBy": "config"
     },
@@ -3700,64 +2491,14 @@
           ],
           "addEntryCodeAhead": [
             0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
             0
           ],
           "onGenerateFiles": [
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
             1,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0
+            1
           ]
         },
-        "register": 1
+        "register": 0
       },
       "enableBy": "config"
     },
@@ -3771,31 +2512,6 @@
       "time": {
         "hooks": {
           "addRuntimePluginKey": [
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
             0,
             0
           ]
@@ -3813,7 +2529,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 0
+        "register": 1
       }
     },
     "./node_modules/@umijs/plugins/dist/qiankun/slave": {
@@ -3825,7 +2541,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 1
+        "register": 0
       }
     },
     "./node_modules/@umijs/plugins/dist/react-query": {
@@ -3852,60 +2568,10 @@
         "hooks": {
           "addRuntimePluginKey": [
             0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
             0
           ],
           "onGenerateFiles": [
             1,
-            1,
-            0,
-            0,
-            1,
-            1,
-            1,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            1,
-            1,
-            0,
-            0,
-            0,
             0
           ]
         },
@@ -3948,7 +2614,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 1
+        "register": 0
       },
       "enableBy": "config"
     },
@@ -4029,7 +2695,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 1
+        "register": 0
       },
       "enableBy": "register"
     },
@@ -4044,31 +2710,6 @@
         "hooks": {
           "modifyRoutes": [
             0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
             0
           ],
           "onStart": [
@@ -4076,104 +2717,22 @@
           ],
           "onGenerateFiles": [
             0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
             0
           ],
           "addBeforeMiddlewares": [
             0
           ],
           "onDevCompileDone": [
-            10,
-            1,
+            6,
             2,
-            1,
-            2,
-            1,
-            1,
-            1,
-            1,
-            1,
-            2,
-            2,
-            1,
-            2,
-            1,
-            1,
-            2,
-            1,
-            1,
-            1,
-            0,
-            2,
-            1,
-            1,
-            1,
-            2,
-            1,
-            2,
-            1,
-            1,
-            1,
-            1,
-            4,
-            1,
-            1,
-            1,
-            2,
-            1,
-            1,
-            1,
-            0,
-            2,
-            1,
-            2,
-            2,
-            1,
-            1,
-            1,
-            1,
-            1,
-            1,
-            1,
-            1,
-            1,
-            1,
-            1,
-            1,
-            1,
-            1,
-            1,
+            3,
             1,
             1,
             1,
             1
           ]
         },
-        "register": 91
+        "register": 74
       },
       "enableBy": "config"
     },
@@ -4186,7 +2745,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 66
+        "register": 46
       },
       "enableBy": "config"
     },
@@ -4201,7 +2760,7 @@
       },
       "time": {
         "hooks": {},
-        "register": 0
+        "register": 1
       },
       "enableBy": "config"
     },
@@ -4231,35 +2790,10 @@
           ],
           "onGenerateFiles": [
             0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            1,
-            0,
-            0,
-            1,
-            0,
-            1,
-            0,
-            0,
-            0,
-            1,
-            0,
-            0,
-            1,
-            0,
-            0,
-            1,
-            0,
-            0,
             0
           ]
         },
-        "register": 26
+        "register": 23
       }
     },
     "./node_modules/@umijs/core/dist/service/generatePlugin": {
@@ -4532,6 +3066,11 @@
             "name": "Players"
           },
           {
+            "path": "proportion-estimation",
+            "component": "./WCA/ProportionEstimation",
+            "name": "proportionEstimation"
+          },
+          {
             "path": "statistics",
             "component": "./WCA/Statistics",
             "name": "statistics"
@@ -4634,7 +3173,7 @@
     "access": {},
     "headScripts": [
       {
-        "src": "/scripts/loading.js?v=1777361865659",
+        "src": "/scripts/loading.js?v=1777547184257",
         "async": true
       }
     ],
@@ -4664,7 +3203,7 @@
     "define": {
       "process.env.CHOKIDAR_USEPOLLING": "true",
       "process.env.CHOKIDAR_INTERVAL": "1000",
-      "process.env.BUILD_TIMESTAMP": "\"1777361865659\""
+      "process.env.BUILD_TIMESTAMP": "\"1777547184257\""
     }
   },
   "mainConfigFile": "/Users/guojia/worker/code/cube/cubingPro/cubing.pro/config/config.ts",
@@ -4951,6 +3490,11 @@
             "path": "players",
             "component": "./WCA/Players",
             "name": "Players"
+          },
+          {
+            "path": "proportion-estimation",
+            "component": "./WCA/ProportionEstimation",
+            "name": "proportionEstimation"
           },
           {
             "path": "statistics",
@@ -5965,7 +4509,7 @@
     "access": {},
     "headScripts": [
       {
-        "src": "/scripts/loading.js?v=1777361866051",
+        "src": "/scripts/loading.js?v=1777547184582",
         "async": true
       }
     ],
@@ -5991,7 +4535,7 @@
     "define": {
       "process.env.CHOKIDAR_USEPOLLING": "true",
       "process.env.CHOKIDAR_INTERVAL": "1000",
-      "process.env.BUILD_TIMESTAMP": "\"1777361866051\"",
+      "process.env.BUILD_TIMESTAMP": "\"1777547184582\"",
       "ANT_DESIGN_PRO_ONLY_DO_NOT_USE_IN_YOUR_PRODUCTION": "",
       "REACT_APP_ENV": false
     },
@@ -6539,111 +5083,122 @@
       "__absFile": "/Users/guojia/worker/code/cube/cubingPro/cubing.pro/src/pages/WCA/Players.tsx"
     },
     "54": {
+      "path": "proportion-estimation",
+      "name": "proportionEstimation",
+      "file": "@/pages/WCA/ProportionEstimation.tsx",
+      "parentId": "50",
+      "id": "54",
+      "absPath": "/wca/proportion-estimation",
+      "__content": "import { secondTimeFormat } from '@/pages/WCA/utils/wca_results';\nimport {\n  getResultProportionEstimation,\n  impliedCentisAllEvents,\n  interpolateRatioAt,\n  segmentRefRangeAsAnchorCs,\n  solveBackendAnchorCs,\n  type ProportionCurveSample,\n  type ProportionEstimationSegment,\n  type ResultProportionEstimationResult,\n  type ResultProportionEstimationType,\n} from '@/services/cubing-pro/wca/proportion_estimation';\nimport { CubeIcon } from '@/components/CubeIcon/cube_icon';\nimport Markdown from '@/components/Markdown/Markdown';\nimport { LineChartOutlined, ReadOutlined, TeamOutlined, ThunderboltOutlined } from '@ant-design/icons';\nimport { useIntl } from '@@/plugin-locale';\nimport {\n  Alert,\n  Button,\n  Card,\n  Col,\n  InputNumber,\n  Modal,\n  Row,\n  Segmented,\n  Select,\n  Space,\n  Statistic,\n  Table,\n  Tag,\n  Typography,\n} from 'antd';\nimport type { ColumnsType } from 'antd/es/table';\nimport ReactECharts from 'echarts-for-react';\nimport React, { useCallback, useEffect, useMemo, useState } from 'react';\nimport './ProportionEstimation.less';\n\nconst { Title, Paragraph, Text } = Typography;\n\nconst WR_OPTIONS = [100, 200, 500, 1000] as const;\n\nconst TYPE_OPTIONS: { value: ResultProportionEstimationType; labelKey: string }[] = [\n  { value: 'bigcube', labelKey: 'wca.proportion.typeBigCube' },\n  { value: '333-333oh', labelKey: 'wca.proportion.type333oh' },\n  { value: 'bld', labelKey: 'wca.proportion.typeBld' },\n];\n\nconst DEFAULT_ANCHOR_SEC: Record<ResultProportionEstimationType, number> = {\n  bigcube: 19,\n  '333-333oh': 6.5,\n  bld: 40,\n};\n\nconst CHART_COLORS = ['#1890ff', '#52c41a', '#fa8c16', '#722ed1', '#eb2f96', '#13c2c2', '#2f54eb'];\n\n/** 分段表：厘秒区间格式化为秒显示 */\nfunction formatCsRangeSec(minCs: number, maxCs: number): string {\n  return `${secondTimeFormat(minCs / 100, false)} – ${secondTimeFormat(maxCs / 100, false)}`;\n}\n\n/** 折线按横坐标升序，避免切换锚点后 X 与样本顺序不一致导致连线“打结” */\nfunction sortChartPointsByX(points: [number, number][]): [number, number][] {\n  return [...points].sort((a, b) => {\n    if (a[0] !== b[0]) {\n      return a[0] - b[0];\n    }\n    return a[1] - b[1];\n  });\n}\n\nconst ProportionEstimation: React.FC = () => {\n  const intl = useIntl();\n  const [estimationType, setEstimationType] = useState<ResultProportionEstimationType>('bigcube');\n  const [wrN, setWrN] = useState<number>(500);\n  const [data, setData] = useState<ResultProportionEstimationResult | null>(null);\n  const [loading, setLoading] = useState(false);\n  const [anchorSec, setAnchorSec] = useState<number>(DEFAULT_ANCHOR_SEC.bigcube);\n  const [algorithmModalOpen, setAlgorithmModalOpen] = useState(false);\n  /** 页面全局锚点：分段区间、横轴、各卡片标题与说明均以此为基准 */\n  const [anchorEvent, setAnchorEvent] = useState<string>('');\n\n  useEffect(() => {\n    setAnchorSec(DEFAULT_ANCHOR_SEC[estimationType]);\n  }, [estimationType]);\n\n  useEffect(() => {\n    if (!data?.events?.length) {\n      return;\n    }\n    setAnchorEvent((prev) => (prev && data.events.includes(prev) ? prev : data.events[0]));\n  }, [data?.events]);\n\n  const load = useCallback(async () => {\n    setLoading(true);\n    try {\n      const res = await getResultProportionEstimation(estimationType, wrN);\n      setData(res);\n    } catch {\n      setData(null);\n    } finally {\n      setLoading(false);\n    }\n  }, [estimationType, wrN]);\n\n  useEffect(() => {\n    load();\n  }, [load]);\n\n  const backendAnchor = data?.events[0] ?? '';\n  const globalMap = data?.global_ratio ?? {};\n\n  /** 仅用于「模拟推断」：由锚点成绩输入反解后端参考锚点再展开各项目 */\n  const inferResolved = useMemo(() => {\n    if (!data?.events?.length || !backendAnchor || !anchorEvent) {\n      return { ta: 0, centis: {} as Record<string, number> };\n    }\n    const targetCs = Math.max(0, anchorSec) * 100;\n    const ta = solveBackendAnchorCs(\n      targetCs,\n      anchorEvent,\n      backendAnchor,\n      data.segments,\n      globalMap,\n    );\n    const centis = impliedCentisAllEvents(ta, data.events, backendAnchor, data.segments, globalMap);\n    return { ta, centis };\n  }, [data, backendAnchor, anchorEvent, anchorSec, globalMap]);\n\n  /** 全局参考用时：固定取拟合曲线采样序列的中点参考锚点（厘秒），与锚点成绩输入无关 */\n  const globalRefBackendCs = useMemo(() => {\n    const samples = data?.curve_samples;\n    if (!samples?.length) {\n      return 0;\n    }\n    const mid = samples[Math.floor(samples.length / 2)];\n    return mid.anchor_sec * 100;\n  }, [data?.curve_samples]);\n\n  const inferredRows = useMemo(() => {\n    if (!data?.events?.length || !anchorEvent) {\n      return [];\n    }\n    const { centis } = inferResolved;\n    return data.events.map((ev) => ({\n      key: ev,\n      event: ev,\n      sec: centis[ev] / 100,\n    }));\n  }, [data?.events, inferResolved, anchorEvent]);\n\n  const chartOption = useMemo(() => {\n    if (!data?.curve_samples?.length || !data.events?.length || !backendAnchor || !anchorEvent) {\n      return null;\n    }\n    const samples = data.curve_samples;\n    const events = data.events;\n\n    const xForSample = (s: ProportionCurveSample) => {\n      const tAcs = s.anchor_sec * 100;\n      if (anchorEvent === backendAnchor) {\n        return s.anchor_sec;\n      }\n      const gSel = globalMap[anchorEvent] ?? 1;\n      const rSel = interpolateRatioAt(tAcs, data.segments, anchorEvent, gSel);\n      return (tAcs * rSel) / 100;\n    };\n\n    const series = events.map((ev, idx) => {\n      const pts = samples.map((s) => [xForSample(s), s.estimates[ev] ?? 0] as [number, number]);\n      return {\n        name: ev,\n        type: 'line' as const,\n        smooth: true,\n        showSymbol: samples.length <= 30,\n        symbolSize: 6,\n        lineStyle: { width: ev === anchorEvent ? 3 : 2 },\n        itemStyle: { color: CHART_COLORS[idx % CHART_COLORS.length] },\n        emphasis: { focus: 'series' as const },\n        data: sortChartPointsByX(pts),\n      };\n    });\n\n    const xName = intl.formatMessage({ id: 'wca.proportion.chartXAnchor' });\n    const yName = intl.formatMessage({ id: 'wca.proportion.chartY' });\n    const fmt = (n: number) => secondTimeFormat(n, false);\n\n    return {\n      color: CHART_COLORS,\n      tooltip: {\n        trigger: 'axis' as const,\n        axisPointer: { type: 'cross' as const },\n        formatter: (params: unknown) => {\n          const list = (Array.isArray(params) ? params : [params]) as Array<{\n            value?: [number, number] | number;\n            axisValue?: number;\n            seriesName?: string;\n            marker?: string;\n          }>;\n          if (!list.length) {\n            return '';\n          }\n          const first = list[0];\n          const v0 = first.value;\n          const xVal =\n            Array.isArray(v0) && typeof v0[0] === 'number'\n              ? v0[0]\n              : typeof first.axisValue === 'number'\n                ? first.axisValue\n                : Number(first.axisValue ?? 0);\n          const lines = list.map((p) => {\n            const v = p.value;\n            const y = Array.isArray(v) ? v[1] : Number(v);\n            return `${p.marker ?? ''} ${p.seriesName ?? ''}: ${fmt(y)}`;\n          });\n          return `${fmt(xVal)}<br/>${lines.join('<br/>')}`;\n        },\n      },\n      legend: {\n        type: 'scroll' as const,\n        bottom: 0,\n        data: events,\n      },\n      grid: {\n        left: 56,\n        right: 24,\n        top: 48,\n        bottom: events.length > 4 ? 72 : 56,\n        containLabel: false,\n      },\n      xAxis: {\n        type: 'value' as const,\n        name: xName,\n        nameLocation: 'middle' as const,\n        nameGap: 28,\n        scale: true,\n        axisLabel: {\n          formatter: (val: string | number) => fmt(typeof val === 'string' ? parseFloat(val) : val),\n        },\n      },\n      yAxis: {\n        type: 'value' as const,\n        name: yName,\n        nameLocation: 'middle' as const,\n        nameGap: 44,\n        scale: true,\n        axisLabel: {\n          formatter: (val: string | number) => fmt(typeof val === 'string' ? parseFloat(val) : val),\n        },\n      },\n      series,\n    };\n  }, [data, backendAnchor, anchorEvent, globalMap, intl]);\n\n  const segmentColumns: ColumnsType<ProportionEstimationSegment & { ratio: Record<string, number> }> =\n    useMemo(() => {\n      if (!data?.segments?.length || !data.events?.length || !backendAnchor || !anchorEvent) {\n        return [];\n      }\n      const events = data.events;\n      const gr = globalMap;\n      const segs = data.segments;\n\n      const evCols = events.map((ev) => ({\n        title: ev,\n        key: ev,\n        align: 'right' as const,\n        render: (_: unknown, row: ProportionEstimationSegment & { ratio: Record<string, number> }) => {\n          const centerCs = (row.anchor_min + row.anchor_max) / 2;\n          const r =\n            ev === backendAnchor ? 1 : row.ratio?.[ev] ?? gr[ev] ?? 1;\n          const sec = (centerCs * r) / 100;\n          return secondTimeFormat(sec, false);\n        },\n      }));\n\n      return [\n        {\n          title: intl.formatMessage({ id: 'wca.proportion.segIndex' }),\n          key: 'idx',\n          width: 56,\n          render: (_: unknown, __: unknown, i: number) => i + 1,\n        },\n        {\n          title: intl.formatMessage({ id: 'wca.proportion.segRangeCol' }),\n          key: 'range',\n          render: (_: unknown, row: ProportionEstimationSegment) => {\n            const [loCs, hiCs] = segmentRefRangeAsAnchorCs(\n              row.anchor_min,\n              row.anchor_max,\n              anchorEvent,\n              backendAnchor,\n              segs,\n              gr,\n            );\n            return formatCsRangeSec(loCs, hiCs);\n          },\n        },\n        {\n          title: intl.formatMessage({ id: 'wca.proportion.segPersons' }),\n          dataIndex: 'n_persons',\n          key: 'n_persons',\n          width: 88,\n        },\n        ...evCols,\n      ];\n    }, [data, backendAnchor, anchorEvent, globalMap, intl]);\n\n  const segmentDataSource = useMemo(\n    () =>\n      (data?.segments ?? []).map((s) => ({\n        ...s,\n        ratio: s.ratio ?? {},\n      })),\n    [data?.segments],\n  );\n\n  const inferredColumns: ColumnsType<(typeof inferredRows)[0]> = useMemo(\n    () => [\n      {\n        title: intl.formatMessage({ id: 'wca.resultTable.event' }),\n        dataIndex: 'event',\n        key: 'event',\n        width: 120,\n        render: (_: string, row) => {\n          const isAnchor = row.event === anchorEvent;\n          return (\n            <Tag\n              className=\"proportion-infer-event-tag\"\n              color={isAnchor ? 'geekblue' : 'default'}\n              bordered={!isAnchor}\n            >\n              <span className=\"proportion-infer-event-tag-inner\">\n                {CubeIcon(row.event, `proportion-infer-${row.event}`, {\n                  width: 16,\n                  height: 16,\n                })}\n                <span className=\"proportion-infer-event-code\">{row.event}</span>\n              </span>\n            </Tag>\n          );\n        },\n      },\n      {\n        title: intl.formatMessage({ id: 'wca.proportion.estimated' }),\n        key: 'est',\n        align: 'right' as const,\n        render: (_, row) => secondTimeFormat(row.sec, false),\n      },\n    ],\n    [anchorEvent, intl],\n  );\n\n  return (\n    <div className=\"proportion-page\">\n      <div className=\"proportion-hero\">\n        <div className=\"proportion-hero-bar\">\n          <Title level={3} className=\"proportion-title\">\n            <LineChartOutlined /> {intl.formatMessage({ id: 'wca.proportion.title' })}\n          </Title>\n          <Button\n            type=\"link\"\n            icon={<ReadOutlined />}\n            className=\"proportion-algorithm-btn\"\n            onClick={() => setAlgorithmModalOpen(true)}\n          >\n            {intl.formatMessage({ id: 'wca.proportion.algorithmBtn' })}\n          </Button>\n        </div>\n      </div>\n\n      <Card className=\"proportion-controls\" bordered={false} loading={loading}>\n        <Row gutter={[16, 16]} align=\"middle\">\n          <Col xs={24} md={10} lg={8}>\n            <div className=\"proportion-field-label\">{intl.formatMessage({ id: 'wca.proportion.fieldType' })}</div>\n            <Select\n              className=\"proportion-select-full\"\n              value={estimationType}\n              options={TYPE_OPTIONS.map((o) => ({\n                value: o.value,\n                label: intl.formatMessage({ id: o.labelKey }),\n              }))}\n              onChange={(v) => setEstimationType(v)}\n            />\n          </Col>\n          <Col xs={24} md={14} lg={10}>\n            <div className=\"proportion-field-label\">{intl.formatMessage({ id: 'wca.proportion.fieldWr' })}</div>\n            <Segmented\n              className=\"proportion-wr-seg\"\n              value={wrN}\n              onChange={(v) => setWrN(v as number)}\n              options={WR_OPTIONS.map((n) => ({\n                label: `WR${n}`,\n                value: n,\n              }))}\n            />\n          </Col>\n          <Col xs={24} lg={6} className=\"proportion-reload-wrap\">\n            <Text type=\"secondary\">{intl.formatMessage({ id: 'wca.proportion.changeHint' })}</Text>\n          </Col>\n        </Row>\n\n        {data && anchorEvent && (\n          <Row gutter={[16, 16]} className=\"proportion-stats-row\">\n            <Col xs={24} sm={12} md={8}>\n              <Card size=\"small\" className=\"proportion-stat-card\">\n                <Statistic\n                  title={\n                    <Space>\n                      <TeamOutlined />\n                      {intl.formatMessage({ id: 'wca.proportion.statFit' })}\n                    </Space>\n                  }\n                  value={data.sample_count}\n                  suffix={intl.formatMessage({ id: 'wca.proportion.people' })}\n                />\n              </Card>\n            </Col>\n            <Col xs={24} sm={12} md={8}>\n              <Card size=\"small\" className=\"proportion-stat-card\">\n                <Statistic\n                  title={intl.formatMessage({ id: 'wca.proportion.statPool' })}\n                  value={data.persons?.length ?? 0}\n                  suffix={intl.formatMessage({ id: 'wca.proportion.people' })}\n                />\n              </Card>\n            </Col>\n            <Col xs={24} md={8}>\n              <Card size=\"small\" className=\"proportion-stat-card proportion-stat-anchor\">\n                <div className=\"proportion-anchor-block\">\n                  <div className=\"proportion-field-label\" style={{ marginBottom: 8 }}>\n                    {intl.formatMessage({ id: 'wca.proportion.fieldAnchor' })}\n                  </div>\n                  <Select\n                    className=\"proportion-select-full\"\n                    value={anchorEvent}\n                    options={data.events.map((e) => ({ label: e, value: e }))}\n                    onChange={(v) => setAnchorEvent(v)}\n                  />\n                </div>\n              </Card>\n            </Col>\n          </Row>\n        )}\n\n        {data && data.sample_count < 5 && (\n          <Alert\n            type=\"warning\"\n            showIcon\n            className=\"proportion-alert\"\n            message={intl.formatMessage({ id: 'wca.proportion.lowSample' })}\n          />\n        )}\n      </Card>\n\n      {data && anchorEvent && (\n        <>\n          <Card\n            className=\"proportion-section\"\n            title={intl.formatMessage({ id: 'wca.proportion.sectionInfer' })}\n          >\n            <div className=\"proportion-infer-controls\">\n              <Row gutter={[16, 16]} align=\"bottom\">\n                <Col xs={24} sm={12} md={16}>\n                  <Text type=\"secondary\" className=\"proportion-infer-input-label\">\n                    <ThunderboltOutlined />{' '}\n                    {intl.formatMessage({ id: 'wca.proportion.anchorLabel' })}\n                  </Text>\n                  <Space align=\"center\" className=\"proportion-infer-input-row\">\n                    <InputNumber\n                      min={0}\n                      step={0.01}\n                      value={anchorSec}\n                      onChange={(v) => setAnchorSec(typeof v === 'number' ? v : 0)}\n                      className=\"proportion-anchor-input\"\n                    />\n                    <Text type=\"secondary\">s</Text>\n                  </Space>\n                </Col>\n              </Row>\n            </div>\n            <Table\n              className=\"proportion-infer-table\"\n              size=\"small\"\n              pagination={false}\n              tableLayout=\"fixed\"\n              columns={inferredColumns}\n              dataSource={inferredRows}\n              rowKey=\"key\"\n              onRow={(record) => ({\n                className:\n                  record.event === anchorEvent ? 'proportion-infer-row--anchor' : undefined,\n              })}\n            />\n            <Text type=\"secondary\" className=\"proportion-footnote\">\n              {intl.formatMessage({ id: 'wca.proportion.inferNote' }, { anchor: anchorEvent })}\n            </Text>\n          </Card>\n\n          {chartOption && (\n            <Card\n              className=\"proportion-section\"\n              title={intl.formatMessage({ id: 'wca.proportion.sectionChart' })}\n            >\n              <div className=\"proportion-chart-wrap\">\n                <ReactECharts option={chartOption} style={{ height: 380, width: '100%' }} notMerge lazyUpdate />\n              </div>\n            </Card>\n          )}\n\n          <Card\n            className=\"proportion-section\"\n            title={intl.formatMessage({ id: 'wca.proportion.sectionGlobal' })}\n          >\n            <Paragraph type=\"secondary\" style={{ marginBottom: 12 }}>\n              {intl.formatMessage({ id: 'wca.proportion.sectionGlobalHint' })}\n            </Paragraph>\n            {globalRefBackendCs > 0 && (\n              <Text type=\"secondary\" style={{ marginBottom: 12, display: 'block', fontSize: 12 }}>\n                {intl.formatMessage(\n                  { id: 'wca.proportion.sectionGlobalRefLine' },\n                  {\n                    event: backendAnchor,\n                    time: secondTimeFormat(globalRefBackendCs / 100, false),\n                  },\n                )}\n              </Text>\n            )}\n            <Row gutter={[16, 8]}>\n              {data.events.map((ev) => {\n                const gr = ev === backendAnchor ? 1 : globalMap[ev] ?? 1;\n                const sec = (globalRefBackendCs * gr) / 100;\n                return (\n                  <Col xs={12} sm={8} md={6} key={ev}>\n                    <div className=\"proportion-global-item\">\n                      <Text strong>{ev}</Text>\n                      <div className=\"proportion-global-val\">{secondTimeFormat(sec, false)}</div>\n                    </div>\n                  </Col>\n                );\n              })}\n            </Row>\n          </Card>\n\n          <Card\n            className=\"proportion-section\"\n            title={intl.formatMessage({ id: 'wca.proportion.sectionSegments' })}\n          >\n            <div className=\"proportion-table-wrap\">\n              <Table\n                size=\"small\"\n                scroll={{ x: 'max-content' }}\n                pagination={false}\n                columns={segmentColumns}\n                dataSource={segmentDataSource}\n                rowKey={(row) => `${row.anchor_min}-${row.anchor_max}-${row.n_persons}`}\n              />\n            </div>\n          </Card>\n        </>\n      )}\n\n      <Modal\n        title={intl.formatMessage({ id: 'wca.proportion.algorithmModalTitle' })}\n        open={algorithmModalOpen}\n        onCancel={() => setAlgorithmModalOpen(false)}\n        footer={null}\n        width={800}\n        destroyOnClose\n        className=\"proportion-algorithm-modal\"\n      >\n        <div className=\"proportion-algorithm-modal-body\">\n          <Markdown md={intl.formatMessage({ id: 'wca.proportion.algorithmMd' })} />\n        </div>\n      </Modal>\n    </div>\n  );\n};\n\nexport default ProportionEstimation;\n",
+      "__isJSFile": true,
+      "__absFile": "/Users/guojia/worker/code/cube/cubingPro/cubing.pro/src/pages/WCA/ProportionEstimation.tsx"
+    },
+    "55": {
       "path": "statistics",
       "name": "statistics",
       "file": "@/pages/WCA/Statistics/index.tsx",
       "parentId": "50",
-      "id": "54",
+      "id": "55",
       "absPath": "/wca/statistics",
       "__content": "import { HistoryOutlined, UnorderedListOutlined, CalendarOutlined, RiseOutlined, TrophyOutlined, CrownOutlined } from '@ant-design/icons';\nimport { Card, Typography } from 'antd';\nimport React, { useEffect, useState } from 'react';\nimport { useIntl } from '@@/plugin-locale';\nimport { useLocation, useNavigate } from '@@/exports';\nimport GrandSlamRank from './GrandSlamRank';\nimport FullRank from './FullRank';\nimport HistoricalRank from './HistoricalRank';\nimport YearlyFullRank from './YearlyFullRank';\nimport SuccessRateRank from './SuccessRateRank';\nimport AllEventsAchievementRank from './AllEventsAchievementRank';\nimport './index.less';\n\nconst { Title } = Typography;\n\ntype StatsTabKey = 'grandSlam' | 'historical' | 'full' | 'yearlyFull' | 'successRate' | 'allEventsAchievement';\n\nconst TAB_PARAM = 'tab';\nconst VALID_TAB_KEYS: StatsTabKey[] = ['grandSlam', 'historical', 'full', 'yearlyFull', 'successRate', 'allEventsAchievement'];\n\nconst getTabFromSearch = (search: string): StatsTabKey => {\n  const params = new URLSearchParams(search);\n  const tab = params.get(TAB_PARAM);\n  return tab && VALID_TAB_KEYS.includes(tab as StatsTabKey) ? (tab as StatsTabKey) : 'grandSlam';\n};\n\nconst Statistics: React.FC = () => {\n  const intl = useIntl();\n  const location = useLocation();\n  const navigate = useNavigate();\n  const [activeKey, setActiveKey] = useState<StatsTabKey>(() => getTabFromSearch(location.search));\n\n  // URL 变化时同步 activeKey（如浏览器前进/后退）\n  useEffect(() => {\n    setActiveKey(getTabFromSearch(location.search));\n  }, [location.search]);\n\n  const handleTabChange = (key: StatsTabKey) => {\n    setActiveKey(key);\n    const params = new URLSearchParams(location.search);\n    params.set(TAB_PARAM, key);\n    navigate(`${location.pathname}?${params.toString()}`, { replace: true });\n  };\n\n  const cards = [\n    {\n      key: 'grandSlam' as StatsTabKey,\n      icon: <CrownOutlined />,\n      title: intl.formatMessage({ id: 'wca.stats.grandSlam' }),\n      desc: intl.formatMessage({ id: 'wca.stats.grandSlamDesc' }),\n    },\n    {\n      key: 'historical' as StatsTabKey,\n      icon: <HistoryOutlined />,\n      title: intl.formatMessage({ id: 'wca.stats.historicalRank' }),\n      desc: intl.formatMessage({ id: 'wca.stats.historicalRankDesc' }),\n    },\n    {\n      key: 'full' as StatsTabKey,\n      icon: <UnorderedListOutlined />,\n      title: intl.formatMessage({ id: 'wca.stats.fullRank' }),\n      desc: intl.formatMessage({ id: 'wca.stats.fullRankDesc' }),\n    },\n    {\n      key: 'yearlyFull' as StatsTabKey,\n      icon: <CalendarOutlined />,\n      title: intl.formatMessage({ id: 'wca.stats.yearlyFullRank' }),\n      desc: intl.formatMessage({ id: 'wca.stats.yearlyFullRankDesc' }),\n    },\n    {\n      key: 'successRate' as StatsTabKey,\n      icon: <RiseOutlined />,\n      title: intl.formatMessage({ id: 'wca.stats.successRate' }),\n      desc: intl.formatMessage({ id: 'wca.stats.successRateDesc' }),\n    },\n    {\n      key: 'allEventsAchievement' as StatsTabKey,\n      icon: <TrophyOutlined />,\n      title: intl.formatMessage({ id: 'wca.stats.allEventsAchievement' }),\n      desc: intl.formatMessage({ id: 'wca.stats.allEventsAchievementDesc' }),\n    },\n  ];\n\n  return (\n    <div className=\"stats-index\">\n      <Title level={3} className=\"stats-page-title\">\n        {intl.formatMessage({ id: 'wca.stats.title' })}\n      </Title>\n      <div className=\"stats-cards\">\n        {cards.map((card) => (\n          <Card\n            key={card.key}\n            size=\"small\"\n            className={`stats-card ${activeKey === card.key ? 'active' : ''}`}\n            hoverable\n            onClick={() => handleTabChange(card.key)}\n          >\n            <div className=\"stats-card-content\">\n              <span className=\"stats-card-icon\">{card.icon}</span>\n              <div className=\"stats-card-text\">\n                <span className=\"stats-card-title\">{card.title}</span>\n                <span className=\"stats-card-desc\">{card.desc}</span>\n              </div>\n            </div>\n          </Card>\n        ))}\n      </div>\n      <div className=\"stats-content\">\n        <h1 className=\"stats-tab-title\">\n          {cards.find((c) => c.key === activeKey)?.title}\n        </h1>\n        {activeKey === 'grandSlam' && <GrandSlamRank />}\n        {activeKey === 'historical' && <HistoricalRank />}\n        {activeKey === 'full' && <FullRank />}\n        {activeKey === 'yearlyFull' && <YearlyFullRank />}\n        {activeKey === 'successRate' && <SuccessRateRank />}\n        {activeKey === 'allEventsAchievement' && <AllEventsAchievementRank />}\n      </div>\n    </div>\n  );\n};\n\nexport default Statistics;\n",
       "__isJSFile": true,
       "__absFile": "/Users/guojia/worker/code/cube/cubingPro/cubing.pro/src/pages/WCA/Statistics/index.tsx"
     },
-    "55": {
+    "56": {
       "path": "historical-rank",
       "redirect": "/wca/statistics",
       "parentId": "50",
-      "id": "55",
+      "id": "56",
       "absPath": "/wca/historical-rank"
     },
-    "56": {
+    "57": {
       "path": "competition/:id",
       "file": "@/pages/Competition/Competition.tsx",
       "parentId": "ant-design-pro-layout",
-      "id": "56",
+      "id": "57",
       "absPath": "/competition/:id",
       "__content": "import Pagination from '@/components/Buttons/pagination_button';\nimport { P404 } from '@/components/Status/404';\nimport { NavTabs } from '@/components/Tabs/nav_tabs';\nimport UpdateTitle from '@/components/Title/Title';\nimport { IfLoading } from '@/components/Wait/wait';\n\nimport { apiComp } from '@/services/cubing-pro/comps/comp';\nimport { CompAPI } from '@/services/cubing-pro/comps/typings';\nimport { useParams } from '@@/exports';\nimport { BuildOutlined, ProductOutlined, ProfileOutlined, TableOutlined } from '@ant-design/icons';\nimport React, { lazy, useEffect, useState } from 'react';\nimport { Link } from 'react-router-dom';\n\nconst CompetitionDetail = lazy(\n  () => import('@/pages/Competition/CompetitionComponents/CompetitionDetail'),\n);\nconst CompetitionRegulations = lazy(\n  () => import('@/pages/Competition/CompetitionComponents/CompetitionRegulations'),\n);\nconst CompetitionResults = lazy(\n  () => import('@/pages/Competition/CompetitionComponents/CompetitionResults'),\n);\n\nconst CompetitionScrambles = lazy(\n  () => import('@/pages/Competition/CompetitionComponents/CompetitionScrambles'),\n)\n\nconst Competition: React.FC = () => {\n  const { id } = useParams();\n\n  const [loading, setLoading] = useState(true);\n  const [is404, setIs404] = useState(false);\n  const [comp, setComp] = useState<CompAPI.CompResp>();\n\n  const items = [\n    {\n      key: 'detail',\n      label: '详情',\n      children: IfLoading(loading, <CompetitionDetail comp={comp} />),\n      icon: <ProductOutlined />,\n    },\n    // {\n    //   key: \"schedule\",\n    //   label: \"赛程\",\n    //   children: IfLoading(loading, <CompetitionSchedule comp={comp}/>),\n    //   icon: <InsertRowAboveOutlined/>\n    // },\n    // {\n    //   key: \"competitors\",\n    //   label: \"选手\",\n    //   children: IfLoading(loading, <CompetitionCompetitors comp={comp}/>),\n    //   icon: <SolutionOutlined/>,\n    // },\n    {\n      key: 'regulations',\n      label: '规则',\n      children: IfLoading(loading, <CompetitionRegulations comp={comp} />),\n      icon: <ProfileOutlined />,\n    },\n    // {\n    //   key: \"registration\",\n    //   label: \"报名\",\n    //   children: IfLoading(loading, <CompetitionRegistration comp={comp}/>),\n    //   icon: <UserAddOutlined/>\n    // },\n    {\n      key: 'results',\n      label: '赛果',\n      children: IfLoading(loading, <CompetitionResults comp={comp} />),\n      icon: <TableOutlined />,\n    },\n    {\n      key: 'scrambles',\n      label: '打乱',\n      children: IfLoading(loading, <CompetitionScrambles comp={comp} />),\n      icon: <BuildOutlined />,\n    },\n  ];\n\n  const fetchComp = () => {\n    if (id === undefined) {\n      return;\n    }\n    apiComp(id)\n      .then((value) => {\n        setComp(value);\n        setLoading(false);\n      })\n      .catch(() => {\n        setIs404(true);\n      });\n  };\n\n  // 动态加载数据\n  useEffect(() => {\n    fetchComp();\n  }, [id]); // useParams中的id改变时重新调用fetchComp\n\n  let Latest: JSX.Element | null = null;\n  let Earliest: JSX.Element | null = null;\n\n  const searchParams = new URLSearchParams(location.search);\n\n  if (comp?.data.EarliestID !== 0) {\n    Earliest = (\n      <Link to={'/competition/' + comp?.data.EarliestID + '?' + searchParams.toString()}>\n        {'<'} {comp?.data.EarliestName}{' '}\n      </Link>\n    );\n  }\n  if (comp?.data.LatestID !== 0) {\n    Latest = (\n      <Link to={'/competition/' + comp?.data.LatestID + '?' + searchParams.toString()}>\n        {' '}\n        {comp?.data.LatestName} {'>'}\n      </Link>\n    );\n  }\n\n  const tabs = (\n    <>\n      {/*</Watermark>*/}\n      <h1 style={{ textAlign: 'center' }}>{comp ? comp.data.Name : '比赛加载中'}</h1>\n      {IfLoading(loading, <UpdateTitle title={comp?.data.Name} />)}\n      <NavTabs\n        type=\"line\"\n        items={items}\n        tabsKey=\"comps_tabs\"\n        // style={{ minHeight: '100vh' }}\n        indicator={{ size: (origin: number) => origin - 20, align: 'center' }}\n      />\n      <Pagination Latest={Latest} Earliest={Earliest} />\n    </>\n  );\n\n  // todo 一段时间没有的话需要报404\n  return (\n    <>\n      {is404 && P404('比赛不存在')}\n      {!is404 && tabs}\n    </>\n  );\n};\n\nexport default Competition;\n",
       "__isJSFile": true,
       "__absFile": "/Users/guojia/worker/code/cube/cubingPro/cubing.pro/src/pages/Competition/Competition.tsx"
     },
-    "57": {
+    "58": {
       "path": "player/:id",
       "file": "@/pages/Player/Player.tsx",
       "parentId": "ant-design-pro-layout",
-      "id": "57",
+      "id": "58",
       "absPath": "/player/:id",
       "__content": "import { P404 } from '@/components/Status/404';\nimport { apiPlayer } from '@/services/cubing-pro/players/players';\nimport { PlayersAPI } from '@/services/cubing-pro/players/typings';\nimport { useParams } from '@@/exports';\nimport React, { lazy, useEffect, useState } from 'react';\nimport styles from './playerPage.less';\n\nconst UpdateTitle = lazy(() => import('@/components/Title/Title'));\nconst PlayerDetail = lazy(() => import('@/pages/Player/PlayerComponents/PlayerDetail'));\nconst PlayerResults = lazy(() => import('@/pages/Player/PlayerComponents/PlayerResults'));\n\nconst Player: React.FC = () => {\n  const { id } = useParams();\n  const [loading, setLoading] = useState(true);\n  const [is404, setIs404] = useState(false);\n  const [player, setPlayer] = useState<PlayersAPI.Player>();\n\n  const fetchPlayer = () => {\n    if (id === undefined) {\n      setLoading(true);\n      return;\n    }\n    apiPlayer(id)\n      .then((value) => {\n        setPlayer(value.data);\n        setIs404(false);\n        setLoading(false);\n      })\n      .catch(() => {\n        setIs404(true);\n        setLoading(true);\n      });\n  };\n\n  // 动态加载数据\n  useEffect(() => {\n    fetchPlayer();\n  }, [id]);\n  return (\n    <>\n      {is404 && P404('玩家不存在')}\n      {!is404 && (\n        <>\n          {loading ? (\n            <div>加载中...</div>\n          ) : (\n            <div className={styles.playerPageRoot}>\n              <UpdateTitle title={player?.Name} />\n              <PlayerDetail player={player} key={'player_detail'} />\n              <PlayerResults player={player} />\n            </div>\n          )}\n        </>\n      )}\n    </>\n  );\n};\n\nexport default Player;\n",
       "__isJSFile": true,
       "__absFile": "/Users/guojia/worker/code/cube/cubingPro/cubing.pro/src/pages/Player/Player.tsx"
     },
-    "58": {
+    "59": {
       "name": "groupCompetitions",
       "path": "groupCompetitions",
       "parentId": "ant-design-pro-layout",
-      "id": "58",
+      "id": "59",
       "absPath": "/groupCompetitions"
     },
-    "59": {
+    "60": {
       "name": "Static",
       "path": "static",
       "file": "@/pages/Static/Static.tsx",
-      "parentId": "58",
-      "id": "59",
+      "parentId": "59",
+      "id": "60",
       "absPath": "/groupCompetitions/static",
       "__content": "import { NavTabs } from '@/components/Tabs/nav_tabs';\nimport KinCh from '@/pages/Static/Kinsor';\nimport { BarChartOutlined, OrderedListOutlined } from '@ant-design/icons';\nimport { useLocation, useNavigate } from '@umijs/max';\nimport React, { useEffect } from 'react';\nimport DiyRanks from \"@/pages/Static/DiyRanks\";\nimport DiyRankView from \"@/pages/Static/DiyRanks\";\nimport Statistics from '@/pages/WCA/Statistics';\n\nconst Static: React.FC = () => {\n  const location = useLocation();\n  const navigate = useNavigate();\n\n  useEffect(() => {\n    const sp = new URLSearchParams(location.search);\n    if (sp.get('static_tabs') === 'records') {\n      navigate('/groupCompetitions/records', { replace: true });\n    }\n  }, [location.search, navigate]);\n\n  const items = [\n    {\n      key: 'kinch_sor',\n      label: 'KinCh',\n      children: <KinCh isSenior={false} otherDataFn={undefined}  isCountry={false}/>,\n      icon: <OrderedListOutlined />,\n    },\n    {\n      key: 'kinch_senior_sor',\n      label: 'WCA大龄KinCh',\n      children: <KinCh isSenior={true} otherDataFn={undefined} isCountry={true}/>,\n      icon: <OrderedListOutlined />,\n    },\n    {\n      // todo 做成不同的key\n      key: \"wca_view\",\n      label: 'WCA成绩榜单',\n      children: <DiyRankView />,\n      icon: <OrderedListOutlined />,\n    },\n    {\n      key: 'stats',\n      label: '统计',\n      children: <Statistics />,\n      icon: <BarChartOutlined />,\n    },\n\n  ];\n\n  return (\n    <>\n      <h1 style={{textAlign: \"center\"}}> 成绩统计 </h1>\n      <NavTabs\n        type=\"line\"\n        items={items}\n        tabsKey=\"static_tabs\"\n        indicator={{ size: (origin: number) => origin - 20, align: 'center' }}\n      />\n    </>\n  );\n};\n\nexport default Static;\n",
       "__isJSFile": true,
       "__absFile": "/Users/guojia/worker/code/cube/cubingPro/cubing.pro/src/pages/Static/Static.tsx"
     },
-    "60": {
+    "61": {
       "name": "Records",
       "path": "records",
       "file": "@/pages/Static/Record.tsx",
-      "parentId": "58",
-      "id": "60",
+      "parentId": "59",
+      "id": "61",
       "absPath": "/groupCompetitions/records",
       "__content": "import RecordsWithBest from '@/pages/Static/RecordComponents/RecordWithBest';\nimport RecordsWithEvents from '@/pages/Static/RecordComponents/RecordWithEvents';\nimport { useLocation, useNavigate } from '@umijs/max';\nimport { Switch } from 'antd';\nimport React, { useCallback, useMemo } from 'react';\n\nexport const RECORDS_QUERY_MODE = 'mode';\nexport const RECORDS_QUERY_GROUP = 'group';\nexport const RECORDS_QUERY_EVENT = 'event';\n\nexport const RECORDS_MODE_BEST = 'best';\nexport const RECORDS_MODE_HISTORY = 'history';\n\nfunction parseGroupId(raw: string | null): number {\n  if (raw == null || raw === '') {\n    return 0;\n  }\n  const n = Number(raw);\n  return Number.isFinite(n) ? n : 0;\n}\n\nconst Records: React.FC = () => {\n  const location = useLocation();\n  const navigate = useNavigate();\n\n  const searchParams = useMemo(() => new URLSearchParams(location.search), [location.search]);\n\n  const patchQuery = useCallback(\n    (patch: Record<string, string | null>) => {\n      const next = new URLSearchParams(location.search);\n      for (const [k, v] of Object.entries(patch)) {\n        if (v === null || v === '') {\n          next.delete(k);\n        } else {\n          next.set(k, v);\n        }\n      }\n      const qs = next.toString();\n      navigate(qs ? `${location.pathname}?${qs}` : location.pathname, { replace: true });\n    },\n    [location.pathname, location.search, navigate],\n  );\n\n  const mode = useMemo(() => {\n    const m = searchParams.get(RECORDS_QUERY_MODE);\n    return m === RECORDS_MODE_HISTORY ? RECORDS_MODE_HISTORY : RECORDS_MODE_BEST;\n  }, [searchParams]);\n\n  const groupId = useMemo(() => parseGroupId(searchParams.get(RECORDS_QUERY_GROUP)), [searchParams]);\n\n  const eventId = useMemo(() => searchParams.get(RECORDS_QUERY_EVENT) || '333', [searchParams]);\n\n  const isBest = mode === RECORDS_MODE_BEST;\n\n  const setGroupId = useCallback(\n    (id: number) => {\n      patchQuery({ [RECORDS_QUERY_GROUP]: String(id) });\n    },\n    [patchQuery],\n  );\n\n  const setEventId = useCallback(\n    (id: string) => {\n      patchQuery({ [RECORDS_QUERY_EVENT]: id });\n    },\n    [patchQuery],\n  );\n\n  const setBestMode = useCallback(\n    (nextBest: boolean) => {\n      patchQuery({\n        [RECORDS_QUERY_MODE]: nextBest ? RECORDS_MODE_BEST : RECORDS_MODE_HISTORY,\n      });\n    },\n    [patchQuery],\n  );\n\n  return (\n    <>\n      <h1 style={{ textAlign: 'center' }}>记录</h1>\n      <Switch\n        checked={isBest}\n        checkedChildren=\"总榜\"\n        unCheckedChildren=\"历史\"\n        onChange={(checked) => setBestMode(checked)}\n        style={{ float: 'right' }}\n      />\n      <br />\n      {isBest ? (\n        <RecordsWithBest groupId={groupId} onGroupIdChange={setGroupId} />\n      ) : (\n        <RecordsWithEvents\n          groupId={groupId}\n          eventId={eventId}\n          onGroupIdChange={setGroupId}\n          onEventIdChange={setEventId}\n        />\n      )}\n    </>\n  );\n};\n\nexport default Records;\n",
       "__isJSFile": true,
       "__absFile": "/Users/guojia/worker/code/cube/cubingPro/cubing.pro/src/pages/Static/Record.tsx"
     },
-    "61": {
+    "62": {
       "name": "Project",
       "path": "events",
       "file": "@/pages/Events/Events.tsx",
-      "parentId": "58",
-      "id": "61",
+      "parentId": "59",
+      "id": "62",
       "absPath": "/groupCompetitions/events",
       "__content": "import React, {useEffect, useState} from \"react\";\nimport {EventsAPI} from \"@/services/cubing-pro/events/typings\";\nimport {apiEvents} from \"@/services/cubing-pro/events/events\";\nimport {Divider, Table} from \"antd\";\nimport {eventRouteM} from \"@/components/Data/cube_result/event_route\";\nimport {CubeIcon} from \"@/components/CubeIcon/cube_icon\";\nimport {CubesCn} from \"@/components/CubeIcon/cube\";\n\nconst columns = [\n  {\n    title: 'Icon',\n    dataIndex: 'icon',\n    key: 'icon',\n    render: (value: string, events: EventsAPI.Event) => {\n      return CubeIcon(events.name, events.name, {})\n    },\n  },\n  {\n    title: '名',\n    dataIndex: 'id',\n    key: 'id',\n    render: (value: string, events: EventsAPI.Event) => {\n      return CubesCn(value)\n    }\n  },\n\n  {\n    title: '项目类型',\n    dataIndex: 'base_route_typ',\n    key: 'base_route_typ',\n    render: (value: number, events: EventsAPI.Event) => {\n      const m = eventRouteM(value)\n      return m.name\n    }\n  },\n  {\n    title: '别名',\n    dataIndex: 'otherNames',\n    key: 'otherNames',\n    render: (value: string, events:EventsAPI.Event) => {\n      const data = value.split(\";\")\n\n      let body : JSX.Element[] = []\n      data.map((value: string) => {\n        body.push(<div style={{ display: \"inline-block\", minWidth:\"100px\", width: \"100px\"}}>{value}</div>)\n      })\n      return <>{body}</>\n    }\n  },\n  {\n    title: \"打乱\",\n    dataIndex: 'scrambleValue',\n    key: 'scrambleValue',\n    render: (value: string, events: EventsAPI.Event) => {\n      if (!events.scrambleValue && !events.autoScrambleKey) {\n        return events.id\n      }\n\n      if (events.autoScrambleKey) {\n        return events.autoScrambleKey\n      }\n      const data = value.split(\",\")\n      let body : JSX.Element[] = []\n      data.map((value: string) => {\n        body.push(<div style={{ display: \"inline-block\", minWidth:\"100px\", width: \"100px\"}}>{value}</div>)\n      })\n      return <>{body}</>\n    }\n  }\n];\n\nconst Events: React.FC = () => {\n  const [events, setEvents] = useState<EventsAPI.Event[]>([]);\n  const fetchComp = () => {\n    apiEvents().then((value) => {\n      let data = value.data.Events\n      data = data.filter((value: EventsAPI.Event) => {\n        return value.isComp\n      })\n      setEvents(data)\n    })\n  }\n  useEffect(() => {\n    fetchComp();\n  }, []);\n\n  let notWCA =events.filter((value: EventsAPI.Event) => {\n    return !value.isWCA\n  })\n\n\n  let wca = events.filter((value: EventsAPI.Event)=>{\n    return value.isWCA\n  })\n\n  return (\n\n    <>\n      <Divider orientation=\"left\"><h4><strong>WCA项目</strong></h4></Divider>\n      <Table\n        dataSource={wca}\n        columns={columns}\n        pagination={false}\n      />\n      <Divider orientation=\"left\"><h4><strong>趣味项目</strong></h4></Divider>\n      <Table\n        dataSource={notWCA}\n        columns={columns}\n        pagination={false}\n      />\n\n    </>\n  );\n}\n\nexport default Events;\n",
       "__isJSFile": true,
       "__absFile": "/Users/guojia/worker/code/cube/cubingPro/cubing.pro/src/pages/Events/Events.tsx"
     },
-    "62": {
+    "63": {
       "name": "Competitions",
       "path": "competitions",
       "file": "@/pages/Competition/Competitions.tsx",
-      "parentId": "58",
-      "id": "62",
+      "parentId": "59",
+      "id": "63",
       "absPath": "/groupCompetitions/competitions",
       "__content": "import { CompsTableColumns } from '@/components/Data/cube_comps/comps_tables';\nimport { Comp } from '@/components/Data/types/comps';\nimport { rowClassNameWithStyleLines } from '@/components/Table/table_style';\nimport { apiComps } from '@/services/cubing-pro/comps/comps';\nimport { CompsAPI } from '@/services/cubing-pro/comps/typings';\nimport { ProTable } from '@ant-design/pro-table';\nimport React, { useRef, useState } from 'react';\n\nconst Competitions: React.FC = () => {\n  const actionRef = useRef();\n\n  const [tableParams, setTableParams] = useState<CompsAPI.CompsReq>({\n    size: 20,\n    page: 1,\n    name: '',\n  });\n\n  const resetParams = () => {\n    setTableParams({\n      ...tableParams,\n      name: '',\n    });\n  };\n\n  return (\n    <>\n      <ProTable<Comp, CompsAPI.CompsReq>\n        title={() => {\n          return <h2>赛事列表</h2>;\n        }}\n        size=\"small\"\n        columns={CompsTableColumns}\n        onReset={resetParams}\n        params={tableParams}\n        rowClassName={rowClassNameWithStyleLines}\n        request={async (params) => {\n          // @ts-ignore\n          const name = params.Name;\n          setTableParams({\n            ...tableParams,\n            name: name,\n          });\n          const value = await apiComps(tableParams);\n\n          let comps = value.data.items;\n\n          comps = comps.sort((a: Comp, b: Comp) => {\n            if (a.IsDone && !b.IsDone) return 1;\n            if (!a.IsDone && b.IsDone) return -1;\n            return 0;\n          });\n          for (let i = 0; i < comps.length; i++) {\n            comps[i].Index = (tableParams.page - 1) * tableParams.size + i + 1;\n          }\n          return { data: comps, success: true, total: value.data.total };\n        }}\n        search={{\n          labelWidth: 'auto',\n          defaultColsNumber: 1,\n          defaultCollapsed: false,\n          span: { xs: 24, sm: 24, md: 24, lg: 18, xl: 18, xxl: 12 },\n        }}\n        pagination={{\n          showQuickJumper: true,\n          current: tableParams.page,\n          pageSize: tableParams.size,\n        }}\n        onChange={(pagination) => {\n          setTableParams({\n            ...tableParams,\n            page: pagination.current ? pagination.current : 1,\n            size: pagination.pageSize ? pagination.pageSize : 20,\n          });\n        }}\n        options={false}\n        actionRef={actionRef}\n        sticky\n      />\n    </>\n  );\n};\n\nexport default Competitions;\n",
       "__isJSFile": true,
       "__absFile": "/Users/guojia/worker/code/cube/cubingPro/cubing.pro/src/pages/Competition/Competitions.tsx"
     },
-    "63": {
+    "64": {
       "name": "Player",
       "path": "players",
       "file": "@/pages/Player/Players.tsx",
-      "parentId": "58",
-      "id": "63",
+      "parentId": "59",
+      "id": "64",
       "absPath": "/groupCompetitions/players",
       "__content": "import {PlayerLink, WCALink} from '@/components/Link/Links';\nimport { apiPlayers } from '@/services/cubing-pro/players/players';\nimport { ProTable } from '@ant-design/pro-table';\nimport { ProColumns } from '@ant-design/pro-table/es/typing';\nimport React, { useRef, useState } from 'react';\nimport {rowClassNameWithStyleLines} from \"@/components/Table/table_style\";\nimport {PlayersAPI} from \"@/services/cubing-pro/players/typings\";\n\nconst columns: ProColumns<PlayersAPI.Player>[] = [\n  {\n    title: 'CubeID',\n    dataIndex: 'CubeID',\n    key: 'CubeID',\n    width: 150,\n    // @ts-ignore\n    render: (value: string, player: PlayersAPI.Player) => {\n      return <>{PlayerLink(player.CubeID, value, '#000')}</>;\n    },\n    hideInSearch: true,\n  },\n  {\n    title: '名称',\n    dataIndex: 'Name',\n    key: 'Name',\n    // @ts-ignore\n    render: (value: string, player: PlayersAPI.Player) => {\n      return <>{PlayerLink(player.CubeID, player.Name, 'rgb(29,177,236)')}</>;\n    },\n  },\n  {\n    title: 'WcaID',\n    dataIndex: 'WcaID',\n    key: 'WcaID',\n    width: 150,\n    // @ts-ignore\n    render: (value: string) => {\n      return WCALink(value)\n    },\n    hideInSearch: true,\n  },\n];\n\nconst Players: React.FC = () => {\n  const actionRef = useRef();\n  const [tableParams, setTableParams] = useState<PlayersAPI.PlayersReq>({\n    size: 20,\n    page: 1,\n    name: '',\n  });\n  const resetParams = () => {\n    setTableParams({\n      ...tableParams,\n      name: '',\n    });\n  };\n\n  return (\n    <>\n      <ProTable<PlayersAPI.Player, PlayersAPI.PlayersReq>\n        title={() => {\n          return <>选手列表</>;\n        }}\n        rowClassName={rowClassNameWithStyleLines}\n        columns={columns}\n        onReset={resetParams}\n        params={tableParams}\n        request={async (params) => {\n          // @ts-ignore\n          const name = params.Name;\n          setTableParams({\n            ...tableParams,\n            name: name,\n          });\n          const value = await apiPlayers(tableParams);\n\n          return {\n            data: value.data.items,\n            success: true,\n            total: value.data.total,\n          };\n        }}\n        search={{\n          labelWidth: 'auto',\n          defaultColsNumber: 1,\n          defaultCollapsed: false,\n          span: { xs: 24, sm: 24, md: 24, lg: 18, xl: 18, xxl: 12 },\n        }}\n        pagination={{\n          showQuickJumper: true,\n          current: tableParams.page,\n          pageSize: tableParams.size,\n        }}\n        onChange={(pagination) => {\n          setTableParams({\n            name: tableParams.name,\n            page: pagination.current ? pagination.current : 1,\n            size: pagination.pageSize ? pagination.pageSize : 20,\n          });\n        }}\n        options={false}\n\n        actionRef={actionRef}\n        sticky\n      />\n    </>\n  );\n};\n\nexport default Players;\n",
       "__isJSFile": true,
       "__absFile": "/Users/guojia/worker/code/cube/cubingPro/cubing.pro/src/pages/Player/Players.tsx"
     },
-    "64": {
+    "65": {
       "name": "PKTimer",
       "path": "pktimer",
       "file": "@/pages/Static/Pktimers.tsx",
-      "parentId": "58",
-      "id": "64",
+      "parentId": "59",
+      "id": "65",
       "absPath": "/groupCompetitions/pktimer",
       "__content": "import React, { useState, useEffect } from 'react';\nimport { Table, Button, Space, Tag, Card } from 'antd';\nimport { DownOutlined, UpOutlined } from '@ant-design/icons';\nimport type { ColumnsType } from 'antd/es/table';\nimport { GetPKTimer, PkTimerGroupRecord, PkTimerPlayer } from '@/services/cubing-pro/pktimer/pktimer';\nimport { resultString, resultTimeString } from '@/components/Data/types/result';\nimport { CubeIcon } from '@/components/CubeIcon/cube_icon';\nimport { CubesCn } from '@/components/CubeIcon/cube';\n\nconst PKTimerTable: React.FC = () => {\n  const [data, setData] = useState<PkTimerGroupRecord[]>([]);\n  const [loading, setLoading] = useState(false);\n  const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);\n  const [total, setTotal] = useState(0);\n  const [pagination, setPagination] = useState({\n    current: 1,\n    pageSize: 10,\n  });\n\n  const fetchData = async (page: number, size: number) => {\n    setLoading(true);\n    try {\n      const res = await GetPKTimer({ page, size });\n      setData(res.data.items);\n      setTotal(res.data.total);\n\n      // ✅ 默认全部展开：加载完成后自动展开所有行\n      setExpandedRowKeys(res.data.items.map((item) => item.id));\n    } catch (error) {\n      console.error('Failed to fetch PK timer data:', error);\n    } finally {\n      setLoading(false);\n    }\n  };\n\n  useEffect(() => {\n    fetchData(pagination.current, pagination.pageSize);\n  }, []);\n\n  const handleTableChange = (newPagination: any) => {\n    const { current, pageSize } = newPagination;\n    setPagination({ current, pageSize });\n    fetchData(current, pageSize);\n  };\n\n  const toggleAll = () => {\n    if (expandedRowKeys.length === data.length) {\n      setExpandedRowKeys([]);\n    } else {\n      setExpandedRowKeys(data.map((item) => item.id));\n    }\n  };\n\n  const expandedRowRender = (record: PkTimerGroupRecord) => {\n    const players = record.pkResults.players;\n\n    const playerColumns: ColumnsType<PkTimerPlayer> = [\n      { title: '玩家', dataIndex: 'userName', key: 'userName' },\n      {\n        title: '单次',\n        dataIndex: 'best',\n        key: 'best',\n        render: (_, pp: PkTimerPlayer) => resultTimeString(pp.best),\n      },\n      {\n        title: '平均',\n        dataIndex: 'average',\n        key: 'average',\n        render: (_, pp: PkTimerPlayer) => resultTimeString(pp.average),\n      },\n      {\n        title: '成绩列表',\n        key: 'results',\n        render: (_, player) => {\n          if (player.results.length === 0) return '-';\n          const d = resultString(player.results, record.pkResults.event.base_route_typ);\n          if (!d || d.length === 0) return '-';\n          return (\n            <>\n              {d.map((time, idx) => (\n                <Tag key={`${record.id}-${player.userId}-${idx}`} color=\"blue\">\n                  {time}\n                </Tag>\n              ))}\n            </>\n          );\n        },\n      },\n    ];\n\n    // ✅ 视觉增强：用 Card 包裹子表格，加 padding 和 border-radius\n    return (\n      <Card\n        size=\"small\"\n        style={{\n          margin: '8px 16px',\n          backgroundColor: '#fafafa',\n          borderRadius: 8,\n          boxShadow: '0 2px 4px rgba(0,0,0,0.05)',\n        }}\n      >\n        <Table\n          dataSource={players}\n          columns={playerColumns}\n          pagination={false}\n          rowKey={(player) => player.userId}\n          size=\"small\"\n        />\n      </Card>\n    );\n  };\n\n  const columns: ColumnsType<PkTimerGroupRecord> = [\n    {\n      title: '时间',\n      dataIndex: 'createdAt',\n      key: 'createdAt',\n      width: 200,\n      render: (date) => new Date(date).toLocaleString('zh-CN'),\n    },\n    {\n      title: '项目',\n      key: 'event',\n      width: 120,\n      render: (_, record) => (\n        <>\n          {CubesCn(record.pkResults.event.name)}{' '}\n          {CubeIcon(record.pkResults.event.name, String(record.id), {})}\n        </>\n      ),\n    },\n    {\n      title: '总把数',\n      dataIndex: ['pkResults', 'count'],\n      key: 'count',\n      width: 100,\n    },\n    {\n      title: '组名',\n      dataIndex: 'groupName',\n      key: 'groupName',\n      render: (_, record) => {\n        return (<Tag color={\"cyan\"}>{record.groupName}</Tag>)\n      }\n    },\n  ];\n\n\n  const expandable = {\n    expandedRowKeys,\n    onExpandedRowsChange: setExpandedRowKeys,\n    expandedRowRender,\n    // @ts-ignore\n    expandIcon: ({ expanded, onExpand, record }) =>\n      expanded ? (\n        <UpOutlined onClick={(e) => onExpand(record, e)} />\n      ) : (\n        <DownOutlined onClick={(e) => onExpand(record, e)} />\n      ),\n  };\n\n  return (\n    <div>\n      <div style={{ marginBottom: 16 }}>\n        <Space>\n          <Button onClick={toggleAll}>\n            {expandedRowKeys.length === data.length ? '收起所有' : '展开所有'}\n          </Button>\n        </Space>\n      </div>\n\n      <Table\n        columns={columns}\n        dataSource={data}\n        rowKey=\"id\"\n        loading={loading}\n        pagination={{\n          ...pagination,\n          total,\n          showSizeChanger: true,\n          pageSizeOptions: ['10', '20', '50'],\n        }}\n        onChange={handleTableChange}\n        // @ts-ignore\n        expandable={expandable}\n      />\n    </div>\n  );\n};\n\nexport default PKTimerTable;\n",
       "__isJSFile": true,
@@ -6723,7 +5278,7 @@
   "faviconFiles": [],
   "port": 8000,
   "host": "0.0.0.0",
-  "ip": "10.57.122.52",
+  "ip": "10.98.27.19",
   "antd": {
     "pkgPath": "/Users/guojia/worker/code/cube/cubingPro/cubing.pro/node_modules/antd",
     "version": "5.29.3"
@@ -8585,7 +7140,7 @@
             "format": "esm"
           },
           "src/locales/en-US/menu.ts": {
-            "bytes": 2338,
+            "bytes": 2391,
             "imports": [],
             "format": "esm"
           },
@@ -8610,7 +7165,7 @@
             "format": "esm"
           },
           "src/locales/en-US/wca.ts": {
-            "bytes": 12750,
+            "bytes": 17178,
             "imports": [],
             "format": "esm"
           },
@@ -8661,7 +7216,7 @@
             "format": "esm"
           },
           "src/locales/ja-JP/menu.ts": {
-            "bytes": 2554,
+            "bytes": 2611,
             "imports": [],
             "format": "esm"
           },
@@ -8686,7 +7241,7 @@
             "format": "esm"
           },
           "src/locales/ja-JP/wca.ts": {
-            "bytes": 13701,
+            "bytes": 18831,
             "imports": [],
             "format": "esm"
           },
@@ -8737,7 +7292,7 @@
             "format": "esm"
           },
           "src/locales/zh-CN/menu.ts": {
-            "bytes": 2282,
+            "bytes": 2333,
             "imports": [],
             "format": "esm"
           },
@@ -8762,7 +7317,7 @@
             "format": "esm"
           },
           "src/locales/zh-CN/wca.ts": {
-            "bytes": 12958,
+            "bytes": 17024,
             "imports": [],
             "format": "esm"
           },
@@ -8813,7 +7368,7 @@
             "format": "esm"
           },
           "src/locales/zh-TW/menu.ts": {
-            "bytes": 2304,
+            "bytes": 2355,
             "imports": [],
             "format": "esm"
           },
@@ -8838,7 +7393,7 @@
             "format": "esm"
           },
           "src/locales/zh-TW/wca.ts": {
-            "bytes": 12961,
+            "bytes": 17414,
             "imports": [],
             "format": "esm"
           },
@@ -15471,6 +14026,104 @@
             ],
             "format": "esm"
           },
+          "src/services/cubing-pro/wca/proportion_estimation.ts": {
+            "bytes": 4910,
+            "imports": [
+              {
+                "path": "src/services/cubing-pro/request.tsx",
+                "kind": "import-statement",
+                "original": "@/services/cubing-pro/request"
+              }
+            ],
+            "format": "esm"
+          },
+          "src/components/Markdown/Markdown.tsx": {
+            "bytes": 631,
+            "imports": [
+              {
+                "path": "react",
+                "kind": "import-statement",
+                "external": true
+              },
+              {
+                "path": "react-markdown",
+                "kind": "import-statement",
+                "external": true
+              },
+              {
+                "path": "remark-gfm",
+                "kind": "import-statement",
+                "external": true
+              },
+              {
+                "path": "./github-markdown.css",
+                "kind": "import-statement",
+                "external": true
+              },
+              {
+                "path": "antd",
+                "kind": "import-statement",
+                "external": true
+              }
+            ],
+            "format": "esm"
+          },
+          "src/pages/WCA/ProportionEstimation.tsx": {
+            "bytes": 19333,
+            "imports": [
+              {
+                "path": "src/pages/WCA/utils/wca_results.tsx",
+                "kind": "import-statement",
+                "original": "@/pages/WCA/utils/wca_results"
+              },
+              {
+                "path": "src/services/cubing-pro/wca/proportion_estimation.ts",
+                "kind": "import-statement",
+                "original": "@/services/cubing-pro/wca/proportion_estimation"
+              },
+              {
+                "path": "src/components/CubeIcon/cube_icon.tsx",
+                "kind": "import-statement",
+                "original": "@/components/CubeIcon/cube_icon"
+              },
+              {
+                "path": "src/components/Markdown/Markdown.tsx",
+                "kind": "import-statement",
+                "original": "@/components/Markdown/Markdown"
+              },
+              {
+                "path": "@ant-design/icons",
+                "kind": "import-statement",
+                "external": true
+              },
+              {
+                "path": "src/.umi/plugin-locale/index.ts",
+                "kind": "import-statement",
+                "original": "@@/plugin-locale"
+              },
+              {
+                "path": "antd",
+                "kind": "import-statement",
+                "external": true
+              },
+              {
+                "path": "echarts-for-react",
+                "kind": "import-statement",
+                "external": true
+              },
+              {
+                "path": "react",
+                "kind": "import-statement",
+                "external": true
+              },
+              {
+                "path": "./ProportionEstimation.less",
+                "kind": "import-statement",
+                "external": true
+              }
+            ],
+            "format": "esm"
+          },
           "src/services/cubing-pro/wca/country.ts": {
             "bytes": 380,
             "imports": [
@@ -16069,37 +14722,6 @@
               },
               {
                 "path": "@/services/cubing-pro/comps/typings",
-                "kind": "import-statement",
-                "external": true
-              }
-            ],
-            "format": "esm"
-          },
-          "src/components/Markdown/Markdown.tsx": {
-            "bytes": 631,
-            "imports": [
-              {
-                "path": "react",
-                "kind": "import-statement",
-                "external": true
-              },
-              {
-                "path": "react-markdown",
-                "kind": "import-statement",
-                "external": true
-              },
-              {
-                "path": "remark-gfm",
-                "kind": "import-statement",
-                "external": true
-              },
-              {
-                "path": "./github-markdown.css",
-                "kind": "import-statement",
-                "external": true
-              },
-              {
-                "path": "antd",
                 "kind": "import-statement",
                 "external": true
               }
@@ -18512,7 +17134,7 @@
             "format": "esm"
           },
           "src/.umi/core/route.tsx": {
-            "bytes": 13102,
+            "bytes": 13322,
             "imports": [
               {
                 "path": "react",
@@ -18783,6 +17405,11 @@
                 "path": "src/pages/WCA/Players.tsx",
                 "kind": "dynamic-import",
                 "original": "@/pages/WCA/Players.tsx"
+              },
+              {
+                "path": "src/pages/WCA/ProportionEstimation.tsx",
+                "kind": "dynamic-import",
+                "original": "@/pages/WCA/ProportionEstimation.tsx"
               },
               {
                 "path": "src/pages/WCA/Statistics/index.tsx",
@@ -21662,6 +20289,51 @@
                 "external": true
               },
               {
+                "path": "react",
+                "kind": "import-statement",
+                "external": true
+              },
+              {
+                "path": "react-markdown",
+                "kind": "import-statement",
+                "external": true
+              },
+              {
+                "path": "remark-gfm",
+                "kind": "import-statement",
+                "external": true
+              },
+              {
+                "path": "./github-markdown.css",
+                "kind": "import-statement",
+                "external": true
+              },
+              {
+                "path": "@ant-design/icons",
+                "kind": "import-statement",
+                "external": true
+              },
+              {
+                "path": "antd",
+                "kind": "import-statement",
+                "external": true
+              },
+              {
+                "path": "echarts-for-react",
+                "kind": "import-statement",
+                "external": true
+              },
+              {
+                "path": "react",
+                "kind": "import-statement",
+                "external": true
+              },
+              {
+                "path": "./ProportionEstimation.less",
+                "kind": "import-statement",
+                "external": true
+              },
+              {
                 "path": "antd",
                 "kind": "import-statement",
                 "external": true
@@ -21813,26 +20485,6 @@
               },
               {
                 "path": "react",
-                "kind": "import-statement",
-                "external": true
-              },
-              {
-                "path": "react",
-                "kind": "import-statement",
-                "external": true
-              },
-              {
-                "path": "react-markdown",
-                "kind": "import-statement",
-                "external": true
-              },
-              {
-                "path": "remark-gfm",
-                "kind": "import-statement",
-                "external": true
-              },
-              {
-                "path": "./github-markdown.css",
                 "kind": "import-statement",
                 "external": true
               },
@@ -23779,7 +22431,7 @@
                 "bytesInOutput": 2076
               },
               "src/locales/en-US/menu.ts": {
-                "bytesInOutput": 2619
+                "bytesInOutput": 2676
               },
               "src/locales/en-US/draws.ts": {
                 "bytesInOutput": 1784
@@ -23794,7 +22446,7 @@
                 "bytesInOutput": 9129
               },
               "src/locales/en-US/wca.ts": {
-                "bytesInOutput": 13911
+                "bytesInOutput": 18495
               },
               "src/locales/en-US/userData.ts": {
                 "bytesInOutput": 1284
@@ -23803,7 +22455,7 @@
                 "bytesInOutput": 578
               },
               "src/locales/ja-JP/menu.ts": {
-                "bytesInOutput": 3795
+                "bytesInOutput": 3874
               },
               "src/locales/ja-JP/draws.ts": {
                 "bytesInOutput": 2389
@@ -23818,7 +22470,7 @@
                 "bytesInOutput": 14176
               },
               "src/locales/ja-JP/wca.ts": {
-                "bytesInOutput": 19066
+                "bytesInOutput": 27735
               },
               "src/locales/ja-JP/userData.ts": {
                 "bytesInOutput": 2288
@@ -23827,7 +22479,7 @@
                 "bytesInOutput": 657
               },
               "src/locales/zh-CN/menu.ts": {
-                "bytesInOutput": 3358
+                "bytesInOutput": 3425
               },
               "src/locales/zh-CN/draws.ts": {
                 "bytesInOutput": 2069
@@ -23842,7 +22494,7 @@
                 "bytesInOutput": 11927
               },
               "src/locales/zh-CN/wca.ts": {
-                "bytesInOutput": 17568
+                "bytesInOutput": 24261
               },
               "src/locales/zh-CN/userData.ts": {
                 "bytesInOutput": 1718
@@ -23851,7 +22503,7 @@
                 "bytesInOutput": 615
               },
               "src/locales/zh-TW/menu.ts": {
-                "bytesInOutput": 3386
+                "bytesInOutput": 3453
               },
               "src/locales/zh-TW/draws.ts": {
                 "bytesInOutput": 2081
@@ -23866,7 +22518,7 @@
                 "bytesInOutput": 11915
               },
               "src/locales/zh-TW/wca.ts": {
-                "bytesInOutput": 17579
+                "bytesInOutput": 24945
               },
               "src/locales/zh-TW/userData.ts": {
                 "bytesInOutput": 1742
@@ -24576,6 +23228,15 @@
               "src/pages/WCA/Players.tsx": {
                 "bytesInOutput": 6282
               },
+              "src/services/cubing-pro/wca/proportion_estimation.ts": {
+                "bytesInOutput": 2860
+              },
+              "src/components/Markdown/Markdown.tsx": {
+                "bytesInOutput": 716
+              },
+              "src/pages/WCA/ProportionEstimation.tsx": {
+                "bytesInOutput": 20000
+              },
               "src/services/cubing-pro/wca/country.ts": {
                 "bytesInOutput": 298
               },
@@ -24601,7 +23262,7 @@
                 "bytesInOutput": 9429
               },
               "src/pages/WCA/Statistics/index.tsx": {
-                "bytesInOutput": 5506
+                "bytesInOutput": 5509
               },
               "src/components/Buttons/pagination_button.tsx": {
                 "bytesInOutput": 676
@@ -24617,9 +23278,6 @@
               },
               "src/services/cubing-pro/comps/comp.ts": {
                 "bytesInOutput": 382
-              },
-              "src/components/Markdown/Markdown.tsx": {
-                "bytesInOutput": 716
               },
               "src/pages/Competition/CompetitionComponents/CompetitionDetail.tsx": {
                 "bytesInOutput": 9286
@@ -24715,7 +23373,7 @@
                 "bytesInOutput": 1504
               },
               "src/pages/Player/PlayerComponents/BestBoGroup.tsx": {
-                "bytesInOutput": 3724
+                "bytesInOutput": 3728
               },
               "src/pages/Player/PlayerComponents/Echarts/RollingQuantileChart.tsx": {
                 "bytesInOutput": 6576
@@ -24766,7 +23424,7 @@
                 "bytesInOutput": 9876
               },
               "src/pages/Static/Sor.tsx": {
-                "bytesInOutput": 8615
+                "bytesInOutput": 8618
               },
               "src/pages/Static/DiyRanks.tsx": {
                 "bytesInOutput": 9001
@@ -24820,10 +23478,10 @@
                 "bytesInOutput": 1329
               },
               "src/.umi/core/route.tsx": {
-                "bytesInOutput": 12993
+                "bytesInOutput": 13222
               },
               "src/.umi/testBrowser.tsx": {
-                "bytesInOutput": 2451
+                "bytesInOutput": 2453
               },
               "src/.umi/exports.ts": {
                 "bytesInOutput": 4646
@@ -24841,7 +23499,7 @@
                 "bytesInOutput": 1860
               }
             },
-            "bytes": 2091890
+            "bytes": 2142673
           }
         }
       }
@@ -58892,6 +57550,293 @@
           "type": "ImportDeclaration"
         }
       ],
+      "/Users/guojia/worker/code/cube/cubingPro/cubing.pro/src/pages/WCA/ProportionEstimation.tsx": [
+        {
+          "end": 66,
+          "importKind": "value",
+          "source": "@/pages/WCA/utils/wca_results",
+          "specifiers": [
+            {
+              "imported": "secondTimeFormat",
+              "local": "secondTimeFormat",
+              "type": "ImportSpecifier"
+            }
+          ],
+          "start": 1,
+          "type": "ImportDeclaration"
+        },
+        {
+          "end": 413,
+          "importKind": "value",
+          "source": "@/services/cubing-pro/wca/proportion_estimation",
+          "specifiers": [
+            {
+              "imported": "getResultProportionEstimation",
+              "local": "getResultProportionEstimation",
+              "type": "ImportSpecifier"
+            },
+            {
+              "imported": "impliedCentisAllEvents",
+              "local": "impliedCentisAllEvents",
+              "type": "ImportSpecifier"
+            },
+            {
+              "imported": "interpolateRatioAt",
+              "local": "interpolateRatioAt",
+              "type": "ImportSpecifier"
+            },
+            {
+              "imported": "segmentRefRangeAsAnchorCs",
+              "local": "segmentRefRangeAsAnchorCs",
+              "type": "ImportSpecifier"
+            },
+            {
+              "imported": "solveBackendAnchorCs",
+              "local": "solveBackendAnchorCs",
+              "type": "ImportSpecifier"
+            },
+            {
+              "imported": "ProportionCurveSample",
+              "local": "ProportionCurveSample",
+              "type": "ImportSpecifier"
+            },
+            {
+              "imported": "ProportionEstimationSegment",
+              "local": "ProportionEstimationSegment",
+              "type": "ImportSpecifier"
+            },
+            {
+              "imported": "ResultProportionEstimationResult",
+              "local": "ResultProportionEstimationResult",
+              "type": "ImportSpecifier"
+            },
+            {
+              "imported": "ResultProportionEstimationType",
+              "local": "ResultProportionEstimationType",
+              "type": "ImportSpecifier"
+            }
+          ],
+          "start": 67,
+          "type": "ImportDeclaration"
+        },
+        {
+          "end": 473,
+          "importKind": "value",
+          "source": "@/components/CubeIcon/cube_icon",
+          "specifiers": [
+            {
+              "imported": "CubeIcon",
+              "local": "CubeIcon",
+              "type": "ImportSpecifier"
+            }
+          ],
+          "start": 414,
+          "type": "ImportDeclaration"
+        },
+        {
+          "end": 528,
+          "importKind": "value",
+          "source": "@/components/Markdown/Markdown",
+          "specifiers": [
+            {
+              "local": "Markdown",
+              "type": "ImportDefaultSpecifier"
+            }
+          ],
+          "start": 474,
+          "type": "ImportDeclaration"
+        },
+        {
+          "end": 632,
+          "importKind": "value",
+          "source": "@ant-design/icons",
+          "specifiers": [
+            {
+              "imported": "LineChartOutlined",
+              "local": "LineChartOutlined",
+              "type": "ImportSpecifier"
+            },
+            {
+              "imported": "ReadOutlined",
+              "local": "ReadOutlined",
+              "type": "ImportSpecifier"
+            },
+            {
+              "imported": "TeamOutlined",
+              "local": "TeamOutlined",
+              "type": "ImportSpecifier"
+            },
+            {
+              "imported": "ThunderboltOutlined",
+              "local": "ThunderboltOutlined",
+              "type": "ImportSpecifier"
+            }
+          ],
+          "start": 529,
+          "type": "ImportDeclaration"
+        },
+        {
+          "end": 676,
+          "importKind": "value",
+          "source": "@@/plugin-locale",
+          "specifiers": [
+            {
+              "imported": "useIntl",
+              "local": "useIntl",
+              "type": "ImportSpecifier"
+            }
+          ],
+          "start": 633,
+          "type": "ImportDeclaration"
+        },
+        {
+          "end": 840,
+          "importKind": "value",
+          "source": "antd",
+          "specifiers": [
+            {
+              "imported": "Alert",
+              "local": "Alert",
+              "type": "ImportSpecifier"
+            },
+            {
+              "imported": "Button",
+              "local": "Button",
+              "type": "ImportSpecifier"
+            },
+            {
+              "imported": "Card",
+              "local": "Card",
+              "type": "ImportSpecifier"
+            },
+            {
+              "imported": "Col",
+              "local": "Col",
+              "type": "ImportSpecifier"
+            },
+            {
+              "imported": "InputNumber",
+              "local": "InputNumber",
+              "type": "ImportSpecifier"
+            },
+            {
+              "imported": "Modal",
+              "local": "Modal",
+              "type": "ImportSpecifier"
+            },
+            {
+              "imported": "Row",
+              "local": "Row",
+              "type": "ImportSpecifier"
+            },
+            {
+              "imported": "Segmented",
+              "local": "Segmented",
+              "type": "ImportSpecifier"
+            },
+            {
+              "imported": "Select",
+              "local": "Select",
+              "type": "ImportSpecifier"
+            },
+            {
+              "imported": "Space",
+              "local": "Space",
+              "type": "ImportSpecifier"
+            },
+            {
+              "imported": "Statistic",
+              "local": "Statistic",
+              "type": "ImportSpecifier"
+            },
+            {
+              "imported": "Table",
+              "local": "Table",
+              "type": "ImportSpecifier"
+            },
+            {
+              "imported": "Tag",
+              "local": "Tag",
+              "type": "ImportSpecifier"
+            },
+            {
+              "imported": "Typography",
+              "local": "Typography",
+              "type": "ImportSpecifier"
+            }
+          ],
+          "start": 677,
+          "type": "ImportDeclaration"
+        },
+        {
+          "end": 890,
+          "importKind": "type",
+          "source": "antd/es/table",
+          "specifiers": [
+            {
+              "imported": "ColumnsType",
+              "local": "ColumnsType",
+              "type": "ImportSpecifier"
+            }
+          ],
+          "start": 841,
+          "type": "ImportDeclaration"
+        },
+        {
+          "end": 936,
+          "importKind": "value",
+          "source": "echarts-for-react",
+          "specifiers": [
+            {
+              "local": "ReactECharts",
+              "type": "ImportDefaultSpecifier"
+            }
+          ],
+          "start": 891,
+          "type": "ImportDeclaration"
+        },
+        {
+          "end": 1010,
+          "importKind": "value",
+          "source": "react",
+          "specifiers": [
+            {
+              "local": "React",
+              "type": "ImportDefaultSpecifier"
+            },
+            {
+              "imported": "useCallback",
+              "local": "useCallback",
+              "type": "ImportSpecifier"
+            },
+            {
+              "imported": "useEffect",
+              "local": "useEffect",
+              "type": "ImportSpecifier"
+            },
+            {
+              "imported": "useMemo",
+              "local": "useMemo",
+              "type": "ImportSpecifier"
+            },
+            {
+              "imported": "useState",
+              "local": "useState",
+              "type": "ImportSpecifier"
+            }
+          ],
+          "start": 937,
+          "type": "ImportDeclaration"
+        },
+        {
+          "end": 1048,
+          "importKind": "value",
+          "source": "./ProportionEstimation.less",
+          "specifiers": [],
+          "start": 1011,
+          "type": "ImportDeclaration"
+        }
+      ],
       "/Users/guojia/worker/code/cube/cubingPro/cubing.pro/src/pages/WCA/Statistics/AllEventsAchievementRank.tsx": [
         {
           "end": 60,
@@ -61847,6 +60792,22 @@
             }
           ],
           "start": 170,
+          "type": "ImportDeclaration"
+        }
+      ],
+      "/Users/guojia/worker/code/cube/cubingPro/cubing.pro/src/services/cubing-pro/wca/proportion_estimation.ts": [
+        {
+          "end": 57,
+          "importKind": "value",
+          "source": "@/services/cubing-pro/request",
+          "specifiers": [
+            {
+              "imported": "Request",
+              "local": "Request",
+              "type": "ImportSpecifier"
+            }
+          ],
+          "start": 1,
           "type": "ImportDeclaration"
         }
       ],

@@ -280,6 +280,61 @@ export default {
   'wca.grandSlam.filterHasWROn': 'はい',
   'wca.grandSlam.filterHasWROff': '全て',
 
+  // Proportion estimation 成績フィット
+  'wca.proportion.title': '成績プロポーション推定',
+  'wca.proportion.fieldType': 'プリセット',
+  'wca.proportion.fieldAnchor': 'アンカー種目',
+  'wca.proportion.fieldWr': 'ランキングプール（種目ごとに上位 N、共通部分）',
+  'wca.proportion.changeHint': 'プリセットやプールを変えるとデータを再取得します',
+  'wca.proportion.typeBigCube': '4×4–7×7（444 / 555 / 666 / 777）',
+  'wca.proportion.type333oh': '3×3 / 片手（333 / 333oh）',
+  'wca.proportion.typeBld': '3/4/5 BLD（333bf / 444bf / 555bf）',
+  'wca.proportion.statFit': 'フィットに使った有効人数',
+  'wca.proportion.statPool': 'WR プール共通人数',
+  'wca.proportion.people': '人',
+  'wca.proportion.anchorLabel': 'アンカー入力',
+  'wca.proportion.lowSample': '有効サンプルが少ないため不安定な場合があります。WR プールを大きくしてください。',
+  'wca.proportion.sectionInfer': 'シミュレーション',
+  'wca.proportion.sectionChart': '参照曲線',
+  'wca.proportion.sectionSegments': 'セグメント表',
+  'wca.proportion.sectionGlobal': '中央値パラメータ',
+  'wca.proportion.ratioToAnchor': '比率（対アンカー {event}）',
+  'wca.proportion.segRangeCol': '区間',
+  'wca.proportion.estimated': '推定タイム',
+  'wca.proportion.inferNote':
+    'このカード内のタイム入力は下の表のみに反映されます。参照曲線・セグメント表・中央値パラメータには影響しません。アンカー種目：{anchor}。比率はサーバー側の参照順で補間され、範囲外の外挿は不正確になることがあります。',
+  'wca.proportion.segIndex': '#',
+  'wca.proportion.anchorRange': 'アンカー範囲（{event}）',
+  'wca.proportion.segPersons': '人数',
+  'wca.proportion.chartXAnchor': '横軸（秒）',
+  'wca.proportion.chartY': 'タイム（秒）',
+  'wca.proportion.algorithmBtn': 'アルゴリズム',
+  'wca.proportion.algorithmModalTitle': 'アルゴリズムの説明',
+  'wca.proportion.algorithmMd': `## アルゴリズム
+
+- **個人の代表値**
+  - ラウンドや大会をまたいだ単発タイムは **Attempts** から得る。「直近のデータ」は、集計段階で人×種目ごとに直近の **Result** 行を取ることで満たす。
+  - 各選手・各種目について、その種目の全 Result に紐づく Attempt のうち **0 より大きい** 値を集め、**中央値**を代表タイムとする。
+
+- **比率モデル**
+  - 選手 p・種目 j の中央値を T_pj、アンカー種目を a = events[0] とする。比率 r_pj = T_pj / T_pa（j=a のとき 1）。
+  - 「近い水準のトップ層」では r のばらつきは小さくなるはずなので、段ごとに **r の中央値** を「種目 j が a に対するスケール」として使う。
+  - log 空間での **加法的** 差が、実時間での **乗法的** 比に対応する近似として、乗法的に伸びるタイム構造（高階パズルなど）に馴染む。
+
+- **セグメンテーション（近い成績のまとめ）**
+  - 全選手を T_pa（アンカー中央値）の昇順に並べ、**人数の等分ビン**（おおよそ √N 本、 [1, 30] にクランプ）で分ける。各ビン内でアンカー水準が近くなる。
+  - 各ビンで、アンカー以外の各種目について {r_pj} の**中央値**をその段の Ratio とし、ビン内のアンカー時間と人数を記録する。
+  - サンプルが極端に少ない（おおよそ全体 5 人未満）は **1 段だけ** に退化し、グローバル比率のみを使い過適合を避ける。
+
+- **滑らかな曲線（段間の補間）**
+  - 各段にはアンカーの中央レンジ [AnchorMin, AnchorMax] があり、境界はビン内アンカーの最小・最大（整数厘秒）。
+  - 非アンカー種目ごとに、段の中心アンカー（ビン内アンカー中央値）に「段比率」の階段がある。**段の中心同士の間**では比率を **1 次元の線形補間** して連続曲線にする。
+  - 最低・最高の中心を外れる場合は **定数外挿**（最も近い段の比率を維持）とし、無制限な線形外挿を防ぐ。
+
+- **予測の使い方**
+  - アンカータイム t_a（厘秒）が与えられたら、各 j≠a について補間後の ratio_j(t_a) を得て、t_j = t_a × ratio_j とする。
+  - 例：**bigcube** のバックエンドアンカーが 444 のとき、t_a = 1900（19.00s）なら 555 ≈ 1900 × ratio_555（厘秒）。秒表示はユーザー向けの換算。`,
+
   // Success Rate 成功率
   'wca.successRate.solved': '成功数',
   'wca.successRate.attempted': '試行数',

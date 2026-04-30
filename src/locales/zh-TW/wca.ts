@@ -280,6 +280,61 @@ export default {
   'wca.grandSlam.filterHasWROn': '是',
   'wca.grandSlam.filterHasWROff': '全部',
 
+  // Proportion estimation 成績擬合
+  'wca.proportion.title': '成績比例擬合',
+  'wca.proportion.fieldType': '擬合組合',
+  'wca.proportion.fieldAnchor': '錨點項目',
+  'wca.proportion.fieldWr': '世界排名池（每項目取前 N，再取交集）',
+  'wca.proportion.changeHint': '切換類型或池規模後將重新載入資料',
+  'wca.proportion.typeBigCube': '四階–七階（444 / 555 / 666 / 777）',
+  'wca.proportion.type333oh': '三階 / 單手（333 / 333oh）',
+  'wca.proportion.typeBld': '三盲 / 四盲 / 五盲（333bf / 444bf / 555bf）',
+  'wca.proportion.statFit': '參與擬合的有效人數',
+  'wca.proportion.statPool': 'WR 池交集人數',
+  'wca.proportion.people': '人',
+  'wca.proportion.anchorLabel': '錨點成績輸入',
+  'wca.proportion.lowSample': '有效樣本較少，比例曲線可能不穩定；可嘗試增大 WR 池。',
+  'wca.proportion.sectionInfer': '模擬推斷',
+  'wca.proportion.sectionChart': '參考曲線',
+  'wca.proportion.sectionSegments': '分段表',
+  'wca.proportion.sectionGlobal': '中位參數',
+  'wca.proportion.ratioToAnchor': '比例（相對錨點 {event}）',
+  'wca.proportion.segRangeCol': '分段區間',
+  'wca.proportion.estimated': '推斷成績',
+  'wca.proportion.inferNote':
+    '本卡片內「錨點成績」輸入僅影響下方表格；參考曲線、分段表、中位參數不受該輸入影響。目前錨點項目為 {anchor}；底層為服務端參考序列上的比例插值，極端外推可能失真。',
+  'wca.proportion.segIndex': '段',
+  'wca.proportion.anchorRange': '錨點區間（{event}）',
+  'wca.proportion.segPersons': '人數',
+  'wca.proportion.chartXAnchor': '橫軸（秒）',
+  'wca.proportion.chartY': '成績（秒）',
+  'wca.proportion.algorithmBtn': '演算法說明',
+  'wca.proportion.algorithmModalTitle': '演算法說明',
+  'wca.proportion.algorithmMd': `## 演算法
+
+- **個體表徵**
+  - 同一選手在不同輪次、不同賽事上的單次成績來自 Attempts。要求「最近的資料」已在採集層透過每人每項目取最近若干條 Result 滿足。
+  - 對每位選手、每個項目，蒐集該選手在該項目所有 Result 上、全部 Attempts 中 **>0** 的值，取**中位數**作為該項目上的代表時間。
+
+- **比例模型**
+  - 對選手 p、項目 j，記中位數時間為 T_pj，錨點項目 a=events[0]。定義比例 r_pj = T_pj / T_pa（j=a 時為 1）。
+  - 在「水準相近的頂尖選手」中，r 的分布應較集中；取群體在段內的 **r 的中位數** 作為該段上 j 相對 a 的標度關係。
+  - 這等價於在 log 域用「加性」差異近似乘性比例，對大魔術方塊等近似乘性成長的時間結構較自然。
+
+- **分段（相近成績併入）**
+  - 全體選手依 T_pa（錨點中位數）升序排列。將選手依**等人數分箱**（分箱數約 sqrt(N)，並限制在 [1, 30]），使每一檔內選手錨點水準接近，從而「相近成績擬合到一起」。
+  - 每箱內對除錨點外的每個項目，計算 {r_pj} 的**中位數**得到該段的 Ratio，並記錄箱內錨點時間與人數。
+  - 樣本過少（全程不足約 5 人）時退化為**單一段**，僅用全域比例，避免過度擬合雜訊。
+
+- **光滑曲線（分段間的插值）**
+  - 每個分段有中位錨點區間 [AnchorMin, AnchorMax]，取段內錨點的最小、最大作為邊界（整數厘秒）。
+  - 對每個非錨點項目，在各段中心錨點（段內錨點中位數）處有一條階梯式的「段比例」；為得到連續參考曲線，在**段中心**之間對**比例**做一維**線性插值**；
+  - 低於最低段中心或高於最高段中心時，**常數外推**為最近一段的比例（避免無依據的線性外推爆炸）。
+
+- **預測用法**
+  - 給定錨點成績 t_a（厘秒），先對各項目 j≠a 得到插值後的 ratio_j(t_a)，再估計 t_j = t_a × ratio_j。
+  - 範例：bigcube 錨點為 444，若 t_a=1900（19.00s），則 555≈1900×ratio_555 厘秒，換算為秒即使用者直覺數值。`,
+
   // Success Rate 成功率
   'wca.successRate.solved': '復原數',
   'wca.successRate.attempted': '嘗試數',

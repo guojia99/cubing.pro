@@ -24,6 +24,7 @@ export default {
 
   'menu.WCA': 'WCA 查詢',
   'menu.WCA.Players': '選手',
+  'menu.WCA.proportionEstimation': '成績擬合',
   'menu.WCA.statistics': '統計數據',
 
   'menu.Algs': '公式庫',

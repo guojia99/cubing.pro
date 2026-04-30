@@ -24,6 +24,7 @@ export default {
 
   'menu.WCA': "WCA查询",
   'menu.WCA.Players': "选手",
+  'menu.WCA.proportionEstimation': "成绩拟合",
   'menu.WCA.statistics': "统计",
 
   'menu.Algs': "公式库",
