@@ -3,7 +3,7 @@ import { CubesCn } from '@/components/CubeIcon/cube';
 import { WCALinkWithCnName } from '@/components/Link/Links';
 import { eventOrder, EXCLUDED_EVENTS } from '@/pages/WCA/utils/events';
 import { resultsTimeFormat } from '@/pages/WCA/utils/wca_results';
-import { CountryList } from '@/services/cubing-pro/wca/country';
+import { CountryList, getWcaCountryLabel } from '@/services/cubing-pro/wca/country';
 import { GetAllEventChampionshipsPodium } from '@/services/cubing-pro/wca/static';
 import { AllEventChampionshipsPodium, Country } from '@/services/cubing-pro/wca/types';
 import { Input, Modal, Select, Table, Spin, Space, Switch, Button, Tag } from 'antd';
@@ -120,29 +120,19 @@ const GrandSlamRank: React.FC = () => {
     return set;
   }, [data]);
 
-  const countryIdToName = useMemo(() => {
-    const map = new Map<string, string>();
-    countries.forEach((c) => {
-      if (countryIdsInData.has(c.id)) {
-        map.set(c.id, c.name || c.id);
-      }
-    });
-    return map;
-  }, [countries, countryIdsInData]);
-
   const countryOptions = useMemo(() => {
     const list = countries
       .filter((c) => c?.id && countryIdsInData.has(c.id) && !c.name?.includes('Multiple Countries'))
       .map((c) => ({
         value: c.id,
-        label: c.name || c.id,
+        label: getWcaCountryLabel(c.id, countries),
       }))
       .sort((a, b) => (a.label || '').localeCompare(b.label || ''));
     return [
       { value: WORLD_KEY, label: intl.formatMessage({ id: 'wca.historicalRank.worldwide' }) },
       ...list,
     ];
-  }, [countries, countryIdsInData, intl]);
+  }, [countries, countryIdsInData, intl.locale, intl]);
 
   const filteredData = useMemo(() => {
     let result = data.filter((r) => !EXCLUDED_EVENTS.includes(r.eventID));
@@ -219,6 +209,7 @@ const GrandSlamRank: React.FC = () => {
       title: '#',
       key: 'idx',
       width: 56,
+      fixed: 'left',
       render: (_: unknown, __: AllEventChampionshipsPodium, index: number) => index + 1,
     },
     {
@@ -311,7 +302,7 @@ const GrandSlamRank: React.FC = () => {
       dataIndex: 'country',
       key: 'playerCountry',
       width: 120,
-      render: (val: string) => countryIdToName.get(val) || val,
+      render: (val: string) => getWcaCountryLabel(val, countries),
     },
   ];
 
@@ -320,6 +311,7 @@ const GrandSlamRank: React.FC = () => {
       title: '',
       key: 'action',
       width: 80,
+      fixed: 'left',
       render: (_: unknown, record: PlayerGrandSlamSummary) => (
         <Button
           type="link"
@@ -339,6 +331,7 @@ const GrandSlamRank: React.FC = () => {
       dataIndex: 'displayRank',
       key: 'rank',
       width: 56,
+      fixed: 'left',
     },
     {
       title: intl.formatMessage({ id: 'wca.players.wcaId' }),
@@ -372,7 +365,7 @@ const GrandSlamRank: React.FC = () => {
       dataIndex: 'country',
       key: 'country',
       width: 120,
-      render: (val: string) => countryIdToName.get(val) || val,
+      render: (val: string) => getWcaCountryLabel(val, countries),
     },
   ];
 
@@ -506,6 +499,7 @@ const GrandSlamRank: React.FC = () => {
             rowKey={(r) => `${r.wcaID}-${r.eventID}`}
             size="small"
             tableLayout="auto"
+            scroll={{ x: 'max-content' }}
             pagination={false}
             showHeader
           />

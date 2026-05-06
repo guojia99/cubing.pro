@@ -229,6 +229,9 @@ export default {
   'wca.historicalRank.type': 'タイプ',
   'wca.historicalRank.rank': '順位',
   'wca.historicalRank.worldwide': '全世界',
+  'wca.historicalRank.month': '月',
+  'wca.historicalRank.monthWholeYear': '通年',
+  'wca.compYearRank.cohortYear': 'デビュー年（WCA ID）',
 
   // Stats 統計モジュール
   'wca.stats.title': 'WCAデータ',
@@ -240,6 +243,8 @@ export default {
   'wca.stats.fullRankDesc': '全成績の完全ランキングを表示',
   'wca.stats.yearlyFullRank': '年間成績ランキング',
   'wca.stats.yearlyFullRankDesc': '特定年の特定種目の完全成績ランキングを表示',
+  'wca.stats.compYearRank': 'デビュー年別ランキング',
+  'wca.stats.compYearRankDesc': 'WCA ID の年、国・地域、種目で絞り込んだベスト成績ランキング',
   'wca.stats.successRate': '種目成功率',
   'wca.stats.successRateDesc': '種目別の成功率ランキングを表示',
   'wca.stats.allEventsAchievement': '全種目達成ランキング',

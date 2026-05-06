@@ -1,16 +1,16 @@
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import { CubesCn } from '@/components/CubeIcon/cube';
 import { WCALinkWithCnName } from '@/components/Link/Links';
-import { getCountryNameByIso2 } from '@/pages/WCA/PlayerComponents/region/all_contiry';
 import { resultsTimeFormat } from '@/pages/WCA/utils/wca_results';
 import { eventOrder } from '@/pages/WCA/utils/events';
-import { CountryList } from '@/services/cubing-pro/wca/country';
+import { CountryList, getWcaCountryLabel } from '@/services/cubing-pro/wca/country';
 import { GetEventRankTimers } from '@/services/cubing-pro/wca/static';
 import { Country, StaticWithTimerRank } from '@/services/cubing-pro/wca/types';
-import { Select, Table, Spin, Space, Typography } from 'antd';
+import { Select, Table, Spin, Space, Typography, Card } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useIntl } from '@@/plugin-locale';
 import './HistoricalRank.less';
+import './StatisticsRankLayout.less';
 
 const { Title } = Typography;
 
@@ -21,7 +21,7 @@ const PAGE_SIZE_OPTIONS = [20, 50, 100];
 const HistoricalRank: React.FC = () => {
   const intl = useIntl();
   const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: currentYear - 2006 }, (_, i) => 2007 + i).reverse();
+  const years = Array.from({ length: currentYear - 2002 }, (_, i) => 2003 + i).reverse();
 
   const [year, setYear] = useState<number>(currentYear);
   const [country, setCountry] = useState<string>(WORLD_KEY);
@@ -62,7 +62,7 @@ const HistoricalRank: React.FC = () => {
     key: 'single',
     width: 100,
     render: (_: unknown, record: StaticWithTimerRank) => (
-      <span style={{ fontWeight: !isAvg ? 600 : 400 }}>
+      <span style={{ fontWeight: 600 }}>
         {resultsTimeFormat(record.single, eventId, false)}
       </span>
     ),
@@ -75,7 +75,7 @@ const HistoricalRank: React.FC = () => {
           key: 'average',
           width: 100,
           render: (_: unknown, record: StaticWithTimerRank) => (
-            <span style={{ fontWeight: isAvg ? 600 : 400 }}>
+            <span style={{ fontWeight: 600 }}>
               {resultsTimeFormat(record.average, eventId, true)}
             </span>
           ),
@@ -87,6 +87,7 @@ const HistoricalRank: React.FC = () => {
       title: intl.formatMessage({ id: 'wca.historicalRank.rank' }),
       key: 'rank',
       width: 70,
+      fixed: 'left',
       render: (_: unknown, record: StaticWithTimerRank) =>
         isWorld ? record[rankKey as keyof StaticWithTimerRank] : record[countryRankKey as keyof StaticWithTimerRank],
     },
@@ -105,8 +106,7 @@ const HistoricalRank: React.FC = () => {
       render: (_: string, record: StaticWithTimerRank) =>
         WCALinkWithCnName(record.wcaId, record.wcaName),
     },
-    singleCol,
-    ...(avgCol ? [avgCol] : []),
+    ...(isAvg && avgCol ? [avgCol] : [singleCol]),
     ...(isWorld
       ? [
           {
@@ -114,7 +114,7 @@ const HistoricalRank: React.FC = () => {
             dataIndex: 'country',
             key: 'country',
             width: 120,
-            render: (val: string) => getCountryNameByIso2(val) || val,
+            render: (val: string) => getWcaCountryLabel(val, countries),
           },
         ]
       : []),
@@ -134,7 +134,7 @@ const HistoricalRank: React.FC = () => {
     .filter((c) => c?.iso2 && !c.name?.includes('Multiple Countries'))
     .map((c) => ({
       value: c.iso2,
-      label: getCountryNameByIso2(c.iso2) || c.name,
+      label: getWcaCountryLabel(c.id, countries),
     }));
   const cnOption = filteredCountries.find((c) => c.value === 'CN');
   const otherOptions = filteredCountries.filter((c) => c.value !== 'CN');
@@ -150,7 +150,8 @@ const HistoricalRank: React.FC = () => {
       {/*  {intl.formatMessage({ id: 'wca.historicalRank.title' })}*/}
       {/*</Title>*/}
 
-      <div className="filter-row">
+      <Card size="small" bordered className="stats-rank-filter-card">
+        <div className="filter-row">
         <div className="filter-item">
           <span className="filter-label">{intl.formatMessage({ id: 'wca.historicalRank.year' })}:</span>
           <Select
@@ -216,32 +217,35 @@ const HistoricalRank: React.FC = () => {
             />
           </div>
         )}
-      </div>
-
-      <Spin spinning={loading}>
-        <div className="table-wrapper">
-          <Table
-            dataSource={data}
-            columns={columns}
-            rowKey="wcaId"
-            size="small"
-            scroll={{ x: 600 }}
-            pagination={{
-              current: page,
-              pageSize,
-              total,
-              showSizeChanger: true,
-              responsive: true,
-              pageSizeOptions: PAGE_SIZE_OPTIONS,
-              onChange: setPage,
-              onShowSizeChange: (_, size) => {
-                setPageSize(size);
-                setPage(1);
-              },
-            }}
-          />
         </div>
-      </Spin>
+      </Card>
+
+      <Card size="small" bordered className="stats-rank-table-card">
+        <Spin spinning={loading}>
+          <div className="table-wrapper">
+            <Table
+              dataSource={data}
+              columns={columns}
+              rowKey="wcaId"
+              size="small"
+              scroll={{ x: 600 }}
+              pagination={{
+                current: page,
+                pageSize,
+                total,
+                showSizeChanger: true,
+                responsive: true,
+                pageSizeOptions: PAGE_SIZE_OPTIONS,
+                onChange: setPage,
+                onShowSizeChange: (_, size) => {
+                  setPageSize(size);
+                  setPage(1);
+                },
+              }}
+            />
+          </div>
+        </Spin>
+      </Card>
     </div>
   );
 };

@@ -1,17 +1,17 @@
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import { CubesCn } from '@/components/CubeIcon/cube';
 import { WCALinkWithCnName } from '@/components/Link/Links';
-import { getCountryNameByIso2 } from '@/pages/WCA/PlayerComponents/region/all_contiry';
 import { formatAttempts, get333MBFResult, get333MBOResult, resultsTimeFormat } from '@/pages/WCA/utils/wca_results';
 import { eventOrder } from '@/pages/WCA/utils/events';
-import { CountryList } from '@/services/cubing-pro/wca/country';
+import { CountryList, getWcaCountryLabel } from '@/services/cubing-pro/wca/country';
 import { GetEventRankWithOnlyYear } from '@/services/cubing-pro/wca/static';
 import { Country, WCAResult } from '@/services/cubing-pro/wca/types';
-import { Select, Table, Spin, Space, Tag } from 'antd';
+import { Select, Table, Spin, Space, Tag, Card } from 'antd';
 import { DownOutlined, RightOutlined } from '@ant-design/icons';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useIntl } from '@@/plugin-locale';
 import './YearlyFullRank.less';
+import './StatisticsRankLayout.less';
 
 const WORLD_KEY = '__world__';
 const DEFAULT_PAGE_SIZE = 50;
@@ -114,9 +114,10 @@ function formatCompetitionTime(timeStr: string | undefined): string {
 const YearlyFullRank: React.FC = () => {
   const intl = useIntl();
   const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: currentYear - 2006 }, (_, i) => 2007 + i).reverse();
+  const years = Array.from({ length: currentYear - 2002 }, (_, i) => 2003 + i).reverse();
 
   const [year, setYear] = useState<number>(currentYear);
+  const [month, setMonth] = useState<number>(0);
   const [country, setCountry] = useState<string>(WORLD_KEY);
   const [eventId, setEventId] = useState<string>('333');
   const [isAvg, setIsAvg] = useState<boolean>(false);
@@ -144,7 +145,7 @@ const YearlyFullRank: React.FC = () => {
   useEffect(() => {
     setLoading(true);
     const countryParam = country === WORLD_KEY ? '' : country;
-    GetEventRankWithOnlyYear(eventId, year, countryParam, isAvg, page, pageSize)
+    GetEventRankWithOnlyYear(eventId, year, countryParam, isAvg, page, pageSize, month)
       .then((res) => {
         setData(res.data || []);
         setTotal(res.total || 0);
@@ -154,7 +155,7 @@ const YearlyFullRank: React.FC = () => {
         setTotal(0);
       })
       .finally(() => setLoading(false));
-  }, [year, country, eventId, isAvg, page, pageSize]);
+  }, [year, month, country, eventId, isAvg, page, pageSize]);
 
   const rankedData = useMemo(
     () => assignRanks(data, eventId, isAvg, (page - 1) * pageSize),
@@ -166,7 +167,7 @@ const YearlyFullRank: React.FC = () => {
     key: 'single',
     width: eventId === '333mbf' ? 120 : 85,
     render: (_: unknown, record: WCAResult) => (
-      <span style={{ fontWeight: !isAvg ? 600 : 400 }}>
+      <span style={{ fontWeight: 600 }}>
         {resultsTimeFormat(record.best, eventId, false)}
       </span>
     ),
@@ -179,7 +180,7 @@ const YearlyFullRank: React.FC = () => {
           key: 'average',
           width: 85,
           render: (_: unknown, record: WCAResult) => (
-            <span style={{ fontWeight: isAvg ? 600 : 400 }}>
+            <span style={{ fontWeight: 600 }}>
               {resultsTimeFormat(record.average, eventId, true)}
             </span>
           ),
@@ -191,6 +192,7 @@ const YearlyFullRank: React.FC = () => {
       title: intl.formatMessage({ id: 'wca.historicalRank.rank' }),
       key: 'rank',
       width: 56,
+      fixed: 'left',
       render: (_: unknown, record: WCAResult & { displayRank: number }) => record.displayRank,
     },
     {
@@ -209,8 +211,7 @@ const YearlyFullRank: React.FC = () => {
       render: (_: string, record: WCAResult) =>
         WCALinkWithCnName(record.wca_id, record.name),
     },
-    singleCol,
-    ...(avgCol ? [avgCol] : []),
+    ...(isAvg && avgCol ? [avgCol] : [singleCol]),
     {
       title: intl.formatMessage({ id: 'wca.results.detailAttempts' }),
       key: 'attempts',
@@ -264,7 +265,7 @@ const YearlyFullRank: React.FC = () => {
             dataIndex: 'country_iso2',
             key: 'country',
             width: 90,
-            render: (val: string) => getCountryNameByIso2(val) || val,
+            render: (val: string) => getWcaCountryLabel(val, countries),
           },
         ]
       : []),
@@ -284,7 +285,7 @@ const YearlyFullRank: React.FC = () => {
     .filter((c) => c?.iso2 && !c.name?.includes('Multiple Countries'))
     .map((c) => ({
       value: c.iso2,
-      label: getCountryNameByIso2(c.iso2) || c.name,
+      label: getWcaCountryLabel(c.id, countries),
     }));
   const cnOption = filteredCountries.find((c) => c.value === 'CN');
   const otherOptions = filteredCountries.filter((c) => c.value !== 'CN');
@@ -294,9 +295,21 @@ const YearlyFullRank: React.FC = () => {
     ...otherOptions,
   ];
 
+  const monthOptions = useMemo(
+    () => [
+      { value: 0, label: intl.formatMessage({ id: 'wca.historicalRank.monthWholeYear' }) },
+      ...Array.from({ length: 12 }, (_, i) => ({
+        value: i + 1,
+        label: String(i + 1),
+      })),
+    ],
+    [intl],
+  );
+
   return (
     <div className="yearly-full-rank">
-      <div className="filter-row">
+      <Card size="small" bordered className="stats-rank-filter-card">
+        <div className="filter-row">
         <div className="filter-item">
           <span className="filter-label">{intl.formatMessage({ id: 'wca.historicalRank.year' })}:</span>
           <Select
@@ -307,6 +320,19 @@ const YearlyFullRank: React.FC = () => {
               setPage(1);
             }}
             options={years.map((y) => ({ value: y, label: String(y) }))}
+            className="filter-select"
+          />
+        </div>
+        <div className="filter-item">
+          <span className="filter-label">{intl.formatMessage({ id: 'wca.historicalRank.month' })}:</span>
+          <Select
+            size="small"
+            value={month}
+            onChange={(v) => {
+              setMonth(v);
+              setPage(1);
+            }}
+            options={monthOptions}
             className="filter-select"
           />
         </div>
@@ -365,34 +391,37 @@ const YearlyFullRank: React.FC = () => {
             />
           </div>
         )}
-      </div>
-
-      <Spin spinning={loading}>
-        <div className="table-wrapper">
-          <Table
-            dataSource={rankedData}
-            columns={columns}
-            rowKey="id"
-            size="small"
-            tableLayout="fixed"
-            scroll={{ x: 1050 }}
-            pagination={{
-              size: 'small',
-              current: page,
-              pageSize,
-              total,
-              showSizeChanger: true,
-              responsive: true,
-              pageSizeOptions: PAGE_SIZE_OPTIONS,
-              onChange: setPage,
-              onShowSizeChange: (_, size) => {
-                setPageSize(size);
-                setPage(1);
-              },
-            }}
-          />
         </div>
-      </Spin>
+      </Card>
+
+      <Card size="small" bordered className="stats-rank-table-card">
+        <Spin spinning={loading}>
+          <div className="table-wrapper">
+            <Table
+              dataSource={rankedData}
+              columns={columns}
+              rowKey="id"
+              size="small"
+              tableLayout="fixed"
+              scroll={{ x: 1050 }}
+              pagination={{
+                size: 'small',
+                current: page,
+                pageSize,
+                total,
+                showSizeChanger: true,
+                responsive: true,
+                pageSizeOptions: PAGE_SIZE_OPTIONS,
+                onChange: setPage,
+                onShowSizeChange: (_, size) => {
+                  setPageSize(size);
+                  setPage(1);
+                },
+              }}
+            />
+          </div>
+        </Spin>
+      </Card>
     </div>
   );
 };

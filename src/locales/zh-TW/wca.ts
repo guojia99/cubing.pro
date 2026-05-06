@@ -229,6 +229,9 @@ export default {
   'wca.historicalRank.type': '類型',
   'wca.historicalRank.rank': '排名',
   'wca.historicalRank.worldwide': '全世界',
+  'wca.historicalRank.month': '月份',
+  'wca.historicalRank.monthWholeYear': '全年',
+  'wca.compYearRank.cohortYear': '屆別年份',
 
   // Stats 統計模組
   'wca.stats.title': 'WCA統計',
@@ -240,6 +243,8 @@ export default {
   'wca.stats.fullRankDesc': '查看所有成績的完整排行',
   'wca.stats.yearlyFullRank': '當年成績排行',
   'wca.stats.yearlyFullRankDesc': '查看某年某項目的完整成績排行',
+  'wca.stats.compYearRank': '參賽年限排行',
+  'wca.stats.compYearRankDesc': '依 WCA ID 屆別年份、國家與項目查看最佳成績排行',
   'wca.stats.successRate': '項目成功率',
   'wca.stats.successRateDesc': '按項目查看選手成功率排行',
   'wca.stats.allEventsAchievement': '全項目達成排行榜',

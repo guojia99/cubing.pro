@@ -1,4 +1,5 @@
 import { Avatar } from 'antd';
+import { getLocale } from '@@/exports';
 
 interface CountryMap {
   [key: string]: string;
@@ -273,6 +274,63 @@ export function getCountryNameByIso2(iso2Code: string): string {
     return find;
   }
   return '';
+}
+
+/** 港澳台等在繁体界面下与简体地图对齐的显示名 */
+const ZH_TW_ISO2_OVERRIDE: Record<string, string> = {
+  CN: '中國',
+  TW: '中國台灣',
+  HK: '中國香港',
+  MO: '中國澳門',
+};
+
+function regionNameIntl(iso2: string, intlLocales: readonly string[]): string {
+  if (typeof Intl === 'undefined' || typeof Intl.DisplayNames === 'undefined') return '';
+  try {
+    const dn = new Intl.DisplayNames([...intlLocales], { type: 'region' });
+    return dn.of(iso2) || '';
+  } catch {
+    return '';
+  }
+}
+
+function isIso3166Alpha2(code: string): boolean {
+  return /^[A-Z]{2}$/.test(code);
+}
+
+/**
+ * 按当前界面语言显示国家/地区：简体/繁体中文下优先中文（繁体用 ICU + 港澳台覆盖），其它语言沿用原 getCountryNameByIso2 与英文回退。
+ */
+export function getCountryDisplayName(iso2Code: string | undefined | null, fallbackName?: string): string {
+  if (!iso2Code || typeof iso2Code !== 'string') return fallbackName || '';
+  const code = iso2Code.toUpperCase().trim();
+  const locale = (typeof getLocale === 'function' && getLocale()) || '';
+  const lo = locale.toLowerCase();
+  const iso2 = isIso3166Alpha2(code);
+
+  if (lo === 'zh-tw' || lo.startsWith('zh-tw')) {
+    if (iso2) {
+      const tw = ZH_TW_ISO2_OVERRIDE[code];
+      if (tw) return tw;
+      const intl = regionNameIntl(code, ['zh-TW']);
+      if (intl) return intl;
+    }
+    const manualSc = countryIso2ToChinese[code];
+    if (manualSc) return manualSc;
+    return fallbackName || code;
+  }
+
+  if (lo === 'zh-cn' || lo.startsWith('zh-cn') || lo === 'zh') {
+    const manual = countryIso2ToChinese[code];
+    if (manual) return manual;
+    if (iso2) {
+      const intl = regionNameIntl(code, ['zh-CN']);
+      if (intl) return intl;
+    }
+    return fallbackName || code;
+  }
+
+  return getCountryNameByIso2(code) || fallbackName || code;
 }
 
 export function CountryAvatar(code: string) {

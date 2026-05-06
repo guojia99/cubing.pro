@@ -228,6 +228,9 @@ export default {
   'wca.historicalRank.type': '类型',
   'wca.historicalRank.rank': '排名',
   'wca.historicalRank.worldwide': '全世界',
+  'wca.historicalRank.month': '月份',
+  'wca.historicalRank.monthWholeYear': '全年',
+  'wca.compYearRank.cohortYear': '届别年份',
 
   // Stats 统计模块
   'wca.stats.title': 'WCA统计',
@@ -239,6 +242,8 @@ export default {
   'wca.stats.fullRankDesc': '查看所有成绩的完整排行',
   'wca.stats.yearlyFullRank': '当年成绩排行',
   'wca.stats.yearlyFullRankDesc': '查看某年某项目的完整成绩排行',
+  'wca.stats.compYearRank': '参赛年限排行',
+  'wca.stats.compYearRankDesc': '按 WCA ID 届别年份、国家与项目查看最佳成绩排行',
   'wca.stats.successRate': '项目成功率',
   'wca.stats.successRateDesc': '按项目查看选手成功率排行',
   'wca.stats.allEventsAchievement': '全项目达成排行榜',

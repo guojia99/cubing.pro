@@ -2,6 +2,7 @@ import { AuthHeader } from '@/services/cubing-pro/auth/token';
 import { Request } from '@/services/cubing-pro/request';
 import {
   AllEventAvgPersonResults, AllEventChampionshipsPodium,
+  RankWithPersonCompStartYear,
   StaticSuccessRateResult,
   StaticWithTimerRank,
   WCAResult,
@@ -74,6 +75,7 @@ export async function GetEventRankWithOnlyYear(
   is_avg: boolean,
   page: number,
   size: number,
+  month: number = 0,
 ): Promise<{
   data: WCAResult[];
   total: number;
@@ -85,10 +87,41 @@ export async function GetEventRankWithOnlyYear(
     `/wca/ranks/historical/${eventID}`,
     {
       year: year,
+      month,
       country: country,
       is_avg: is_avg,
       page: page,
       size: size,
+    },
+    {
+      headers: AuthHeader(),
+    },
+  );
+  return response.data;
+}
+
+export async function GetRankWithStartCompYear(
+  eventID: string,
+  year: number,
+  country: string,
+  is_avg: boolean,
+  page: number,
+  size: number,
+): Promise<{
+  data: RankWithPersonCompStartYear[];
+  total: number;
+}> {
+  const response = await Request.post<{
+    data: RankWithPersonCompStartYear[];
+    total: number;
+  }>(
+    `/wca/rank/rank-with-start-comp-year/${eventID}`,
+    {
+      year,
+      country,
+      is_avg,
+      page,
+      size,
     },
     {
       headers: AuthHeader(),

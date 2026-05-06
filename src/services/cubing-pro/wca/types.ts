@@ -476,6 +476,20 @@ export interface StaticWithTimerRank {
   avgContinentRank: number;
 }
 
+/** 与 WCA ID 届别年份对应的选手在某年纪录中的最佳成绩排行（后端 GetWithCompYearPersonRank） */
+export interface RankWithPersonCompStartYear {
+  personID: string;
+  personName: string;
+  countryID: string;
+  year: number;
+  isAvg: boolean;
+  eventID: string;
+  best: number;
+  /** 当前筛选（全世界/某国）下的展示名次，由后端分页后写入 */
+  rank: number;
+  worldRank: number;
+  countryRank: number;
+}
 
 export interface StaticSuccessRateResult {
   wcaId: string;

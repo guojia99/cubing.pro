@@ -229,6 +229,9 @@ export default {
   'wca.historicalRank.type': 'Type',
   'wca.historicalRank.rank': 'Rank',
   'wca.historicalRank.worldwide': 'Worldwide',
+  'wca.historicalRank.month': 'Month',
+  'wca.historicalRank.monthWholeYear': 'Full year',
+  'wca.compYearRank.cohortYear': 'Cohort year',
 
   // Stats
   'wca.stats.title': 'WCA Data',
@@ -240,6 +243,8 @@ export default {
   'wca.stats.fullRankDesc': 'View complete ranking of all results',
   'wca.stats.yearlyFullRank': 'Yearly Results Rank',
   'wca.stats.yearlyFullRankDesc': 'View complete ranking of results for a specific year and event',
+  'wca.stats.compYearRank': 'Cohort ranking',
+  'wca.stats.compYearRankDesc': 'Best results by WCA ID cohort year, country, and event',
   'wca.stats.successRate': 'Event Success Rate',
   'wca.stats.successRateDesc': 'View success rate ranking by event',
   'wca.stats.allEventsAchievement': 'All Events Achievement',
