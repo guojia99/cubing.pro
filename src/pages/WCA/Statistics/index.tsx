@@ -1,5 +1,13 @@
-import { HistoryOutlined, UnorderedListOutlined, CalendarOutlined, RiseOutlined, TrophyOutlined, CrownOutlined } from '@ant-design/icons';
-import { Card, Typography } from 'antd';
+import {
+  HistoryOutlined,
+  UnorderedListOutlined,
+  CalendarOutlined,
+  RiseOutlined,
+  TrophyOutlined,
+  CrownOutlined,
+  HourglassOutlined,
+} from '@ant-design/icons';
+import { Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useIntl } from '@@/plugin-locale';
 import { useLocation, useNavigate } from '@@/exports';
@@ -9,14 +17,30 @@ import HistoricalRank from './HistoricalRank';
 import YearlyFullRank from './YearlyFullRank';
 import SuccessRateRank from './SuccessRateRank';
 import AllEventsAchievementRank from './AllEventsAchievementRank';
+import CompYearRank from './CompYearRank';
 import './index.less';
 
 const { Title } = Typography;
 
-type StatsTabKey = 'grandSlam' | 'historical' | 'full' | 'yearlyFull' | 'successRate' | 'allEventsAchievement';
+type StatsTabKey =
+  | 'grandSlam'
+  | 'historical'
+  | 'full'
+  | 'yearlyFull'
+  | 'compYear'
+  | 'successRate'
+  | 'allEventsAchievement';
 
 const TAB_PARAM = 'tab';
-const VALID_TAB_KEYS: StatsTabKey[] = ['grandSlam', 'historical', 'full', 'yearlyFull', 'successRate', 'allEventsAchievement'];
+const VALID_TAB_KEYS: StatsTabKey[] = [
+  'grandSlam',
+  'historical',
+  'full',
+  'yearlyFull',
+  'compYear',
+  'successRate',
+  'allEventsAchievement',
+];
 
 const getTabFromSearch = (search: string): StatsTabKey => {
   const params = new URLSearchParams(search);
@@ -68,6 +92,12 @@ const Statistics: React.FC = () => {
       desc: intl.formatMessage({ id: 'wca.stats.yearlyFullRankDesc' }),
     },
     {
+      key: 'compYear' as StatsTabKey,
+      icon: <HourglassOutlined />,
+      title: intl.formatMessage({ id: 'wca.stats.compYearRank' }),
+      desc: intl.formatMessage({ id: 'wca.stats.compYearRankDesc' }),
+    },
+    {
       key: 'successRate' as StatsTabKey,
       icon: <RiseOutlined />,
       title: intl.formatMessage({ id: 'wca.stats.successRate' }),
@@ -86,24 +116,29 @@ const Statistics: React.FC = () => {
       <Title level={3} className="stats-page-title">
         {intl.formatMessage({ id: 'wca.stats.title' })}
       </Title>
-      <div className="stats-cards">
-        {cards.map((card) => (
-          <Card
-            key={card.key}
-            size="small"
-            className={`stats-card ${activeKey === card.key ? 'active' : ''}`}
-            hoverable
-            onClick={() => handleTabChange(card.key)}
-          >
-            <div className="stats-card-content">
-              <span className="stats-card-icon">{card.icon}</span>
-              <div className="stats-card-text">
-                <span className="stats-card-title">{card.title}</span>
-                <span className="stats-card-desc">{card.desc}</span>
-              </div>
-            </div>
-          </Card>
-        ))}
+      <div className="stats-tab-grid" role="tablist" aria-label={intl.formatMessage({ id: 'wca.stats.title' })}>
+        {cards.map((card) => {
+          const selected = activeKey === card.key;
+          return (
+            <button
+              key={card.key}
+              type="button"
+              role="tab"
+              aria-selected={selected}
+              tabIndex={0}
+              className={`stats-tab-item ${selected ? 'active' : ''}`}
+              onClick={() => handleTabChange(card.key)}
+            >
+              <span className="stats-tab-item-head">
+                <span className="stats-tab-icon" aria-hidden>
+                  {card.icon}
+                </span>
+                <span className="stats-tab-title-text">{card.title}</span>
+              </span>
+              <span className="stats-tab-desc">{card.desc}</span>
+            </button>
+          );
+        })}
       </div>
       <div className="stats-content">
         <h1 className="stats-tab-title">
@@ -113,6 +148,7 @@ const Statistics: React.FC = () => {
         {activeKey === 'historical' && <HistoricalRank />}
         {activeKey === 'full' && <FullRank />}
         {activeKey === 'yearlyFull' && <YearlyFullRank />}
+        {activeKey === 'compYear' && <CompYearRank />}
         {activeKey === 'successRate' && <SuccessRateRank />}
         {activeKey === 'allEventsAchievement' && <AllEventsAchievementRank />}
       </div>

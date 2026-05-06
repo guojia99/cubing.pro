@@ -1,14 +1,14 @@
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import { CubesCn } from '@/components/CubeIcon/cube';
 import { WCALinkWithCnName } from '@/components/Link/Links';
-import { getCountryNameByIso2 } from '@/pages/WCA/PlayerComponents/region/all_contiry';
-import { CountryList } from '@/services/cubing-pro/wca/country';
+import { CountryList, getWcaCountryLabel } from '@/services/cubing-pro/wca/country';
 import { GetStaticSuccessRateResult } from '@/services/cubing-pro/wca/static';
 import { Country, StaticSuccessRateResult } from '@/services/cubing-pro/wca/types';
-import { Select, Table, Spin, Space, InputNumber, Button } from 'antd';
+import { Select, Table, Spin, Space, InputNumber, Button, Card } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useIntl } from '@@/plugin-locale';
 import './SuccessRateRank.less';
+import './StatisticsRankLayout.less';
 
 const WORLD_KEY = '__world__';
 const DEFAULT_PAGE_SIZE = 50;
@@ -94,6 +94,7 @@ const SuccessRateRank: React.FC = () => {
       title: intl.formatMessage({ id: 'wca.historicalRank.rank' }),
       key: 'rank',
       width: 56,
+      fixed: 'left',
       render: (_: unknown, record: StaticSuccessRateResult & { displayRank: number }) =>
         record.displayRank,
     },
@@ -145,7 +146,7 @@ const SuccessRateRank: React.FC = () => {
             dataIndex: 'country',
             key: 'country',
             width: 90,
-            render: (val: string) => getCountryNameByIso2(val) || val,
+            render: (val: string) => getWcaCountryLabel(val, countries),
           },
         ]
       : []),
@@ -165,7 +166,7 @@ const SuccessRateRank: React.FC = () => {
     .filter((c) => c?.iso2 && !c.name?.includes('Multiple Countries'))
     .map((c) => ({
       value: c.iso2,
-      label: getCountryNameByIso2(c.iso2) || c.name,
+      label: getWcaCountryLabel(c.id, countries),
     }));
   const cnOption = filteredCountries.find((c) => c.value === 'CN');
   const otherOptions = filteredCountries.filter((c) => c.value !== 'CN');
@@ -177,7 +178,8 @@ const SuccessRateRank: React.FC = () => {
 
   return (
     <div className="success-rate-rank">
-      <div className="filter-row">
+      <Card size="small" bordered className="stats-rank-filter-card">
+        <div className="filter-row">
         <div className="filter-item">
           <span className="filter-label">{intl.formatMessage({ id: 'wca.players.country' })}:</span>
           <Select
@@ -246,34 +248,37 @@ const SuccessRateRank: React.FC = () => {
             ))}
           </Space>
         </div>
-      </div>
-
-      <Spin spinning={loading}>
-        <div className="table-wrapper">
-          <Table
-            dataSource={rankedData}
-            columns={columns}
-            rowKey="wcaId"
-            size="small"
-            tableLayout="fixed"
-            scroll={{ x: 800 }}
-            pagination={{
-              size: 'small',
-              current: page,
-              pageSize,
-              total,
-              showSizeChanger: true,
-              responsive: true,
-              pageSizeOptions: PAGE_SIZE_OPTIONS,
-              onChange: setPage,
-              onShowSizeChange: (_, size) => {
-                setPageSize(size);
-                setPage(1);
-              },
-            }}
-          />
         </div>
-      </Spin>
+      </Card>
+
+      <Card size="small" bordered className="stats-rank-table-card">
+        <Spin spinning={loading}>
+          <div className="table-wrapper">
+            <Table
+              dataSource={rankedData}
+              columns={columns}
+              rowKey="wcaId"
+              size="small"
+              tableLayout="fixed"
+              scroll={{ x: 800 }}
+              pagination={{
+                size: 'small',
+                current: page,
+                pageSize,
+                total,
+                showSizeChanger: true,
+                responsive: true,
+                pageSizeOptions: PAGE_SIZE_OPTIONS,
+                onChange: setPage,
+                onShowSizeChange: (_, size) => {
+                  setPageSize(size);
+                  setPage(1);
+                },
+              }}
+            />
+          </div>
+        </Spin>
+      </Card>
     </div>
   );
 };

@@ -13,7 +13,7 @@
     flex-wrap: wrap;
     gap: 12px;
     align-items: center;
-    margin-bottom: 16px;
+    margin-bottom: 0;
 
     .filter-item {
       display: flex;
@@ -91,32 +91,6 @@
 @media (max-width: 1079px) {
   .full-rank {
     padding: 12px 8px;
-
-    .filter-row {
-      flex-direction: column;
-      align-items: stretch;
-      gap: 10px;
-      margin-bottom: 12px;
-
-      .filter-item {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 6px;
-        width: 100%;
-
-        .filter-label {
-          flex-shrink: 0;
-          min-width: 60px;
-          font-size: 12px;
-        }
-
-        .filter-select.ant-select {
-          flex: 1;
-          min-width: 0;
-        }
-      }
-    }
 
     .table-wrapper {
       width: 100%;

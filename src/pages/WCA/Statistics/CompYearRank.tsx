@@ -4,21 +4,19 @@ import { WCALinkWithCnName } from '@/components/Link/Links';
 import { resultsTimeFormat } from '@/pages/WCA/utils/wca_results';
 import { eventOrder } from '@/pages/WCA/utils/events';
 import { CountryList, getWcaCountryLabel } from '@/services/cubing-pro/wca/country';
-import { GetEventRankTimers } from '@/services/cubing-pro/wca/static';
-import { Country, StaticWithTimerRank } from '@/services/cubing-pro/wca/types';
-import { Select, Table, Spin, Space, Typography, Card } from 'antd';
+import { GetRankWithStartCompYear } from '@/services/cubing-pro/wca/static';
+import { Country, RankWithPersonCompStartYear } from '@/services/cubing-pro/wca/types';
+import { Select, Table, Spin, Space, Card } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useIntl } from '@@/plugin-locale';
 import './HistoricalRank.less';
 import './StatisticsRankLayout.less';
 
-const { Title } = Typography;
-
 const WORLD_KEY = '__world__';
 const DEFAULT_PAGE_SIZE = 100;
 const PAGE_SIZE_OPTIONS = [20, 50, 100];
 
-const HistoricalRank: React.FC = () => {
+const CompYearRank: React.FC = () => {
   const intl = useIntl();
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: currentYear - 2002 }, (_, i) => 2003 + i).reverse();
@@ -28,7 +26,7 @@ const HistoricalRank: React.FC = () => {
   const [eventId, setEventId] = useState<string>('333');
   const [isAvg, setIsAvg] = useState<boolean>(false);
   const [countries, setCountries] = useState<Country[]>([]);
-  const [data, setData] = useState<StaticWithTimerRank[]>([]);
+  const [data, setData] = useState<RankWithPersonCompStartYear[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
@@ -41,7 +39,7 @@ const HistoricalRank: React.FC = () => {
   useEffect(() => {
     setLoading(true);
     const countryParam = country === WORLD_KEY ? '' : country;
-    GetEventRankTimers(eventId, year, countryParam, isAvg, page, pageSize)
+    GetRankWithStartCompYear(eventId, year, countryParam, isAvg, page, pageSize)
       .then((res) => {
         setData(res.data || []);
         setTotal(res.total || 0);
@@ -54,16 +52,14 @@ const HistoricalRank: React.FC = () => {
   }, [year, country, eventId, isAvg, page, pageSize]);
 
   const isWorld = country === WORLD_KEY;
-  const rankKey = isAvg ? 'avgWorldRank' : 'singleWorldRank';
-  const countryRankKey = isAvg ? 'avgCountryRank' : 'singleCountryRank';
 
   const singleCol = {
     title: intl.formatMessage({ id: 'wca.resultTable.single' }),
     key: 'single',
     width: 100,
-    render: (_: unknown, record: StaticWithTimerRank) => (
+    render: (_: unknown, record: RankWithPersonCompStartYear) => (
       <span style={{ fontWeight: 600 }}>
-        {resultsTimeFormat(record.single, eventId, false)}
+        {resultsTimeFormat(record.best, eventId, false)}
       </span>
     ),
   };
@@ -74,9 +70,9 @@ const HistoricalRank: React.FC = () => {
           title: intl.formatMessage({ id: 'wca.resultTable.average' }),
           key: 'average',
           width: 100,
-          render: (_: unknown, record: StaticWithTimerRank) => (
+          render: (_: unknown, record: RankWithPersonCompStartYear) => (
             <span style={{ fontWeight: 600 }}>
-              {resultsTimeFormat(record.average, eventId, true)}
+              {resultsTimeFormat(record.best, eventId, true)}
             </span>
           ),
         }
@@ -88,30 +84,30 @@ const HistoricalRank: React.FC = () => {
       key: 'rank',
       width: 70,
       fixed: 'left',
-      render: (_: unknown, record: StaticWithTimerRank) =>
-        isWorld ? record[rankKey as keyof StaticWithTimerRank] : record[countryRankKey as keyof StaticWithTimerRank],
+      render: (_: unknown, record: RankWithPersonCompStartYear) => record.rank,
     },
     {
       title: intl.formatMessage({ id: 'wca.players.wcaId' }),
-      dataIndex: 'wcaId',
-      key: 'wcaId',
+      dataIndex: 'personID',
+      key: 'personID',
       width: 120,
+      render: (val: string) => val?.toUpperCase?.() || val,
     },
     {
       title: intl.formatMessage({ id: 'wca.players.name' }),
-      dataIndex: 'wcaName',
-      key: 'wcaName',
+      dataIndex: 'personName',
+      key: 'personName',
       width: 200,
       ellipsis: true,
-      render: (_: string, record: StaticWithTimerRank) =>
-        WCALinkWithCnName(record.wcaId, record.wcaName),
+      render: (_: string, record: RankWithPersonCompStartYear) =>
+        WCALinkWithCnName(record.personID, record.personName),
     },
     ...(isAvg && avgCol ? [avgCol] : [singleCol]),
     ...(isWorld
       ? [
           {
             title: intl.formatMessage({ id: 'wca.players.country' }),
-            dataIndex: 'country',
+            dataIndex: 'countryID',
             key: 'country',
             width: 120,
             render: (val: string) => getWcaCountryLabel(val, countries),
@@ -146,18 +142,17 @@ const HistoricalRank: React.FC = () => {
 
   return (
     <div className="historical-rank">
-      {/*<Title level={3} className="page-title">*/}
-      {/*  {intl.formatMessage({ id: 'wca.historicalRank.title' })}*/}
-      {/*</Title>*/}
-
       <Card size="small" bordered className="stats-rank-filter-card">
         <div className="filter-row">
         <div className="filter-item">
-          <span className="filter-label">{intl.formatMessage({ id: 'wca.historicalRank.year' })}:</span>
+          <span className="filter-label">{intl.formatMessage({ id: 'wca.compYearRank.cohortYear' })}:</span>
           <Select
             size="small"
             value={year}
-            onChange={setYear}
+            onChange={(v) => {
+              setYear(v);
+              setPage(1);
+            }}
             options={years.map((y) => ({ value: y, label: String(y) }))}
             className="filter-select"
           />
@@ -226,7 +221,7 @@ const HistoricalRank: React.FC = () => {
             <Table
               dataSource={data}
               columns={columns}
-              rowKey="wcaId"
+              rowKey={(r) => `${r.personID}-${r.year}-${r.eventID}-${r.isAvg}-${r.rank}`}
               size="small"
               scroll={{ x: 600 }}
               pagination={{
@@ -250,4 +245,4 @@ const HistoricalRank: React.FC = () => {
   );
 };
 
-export default HistoricalRank;
+export default CompYearRank;
