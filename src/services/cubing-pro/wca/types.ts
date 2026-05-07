@@ -491,6 +491,24 @@ export interface RankWithPersonCompStartYear {
   countryRank: number;
 }
 
+/** 多项目综合排行（GetRankWithEvents / GetNotPodiumSor） */
+export interface RankEntry {
+  personId: string;
+  eventId: string;
+  rank: number;
+  missing?: boolean;
+}
+
+export interface RankWithEventsStatic {
+  wcaId: string;
+  name: string;
+  rank: number;
+  count: number;
+  /** WCA country id，如 China */
+  country?: string;
+  rankEntries?: RankEntry[];
+}
+
 export interface StaticSuccessRateResult {
   wcaId: string;
   wcaName: string;
