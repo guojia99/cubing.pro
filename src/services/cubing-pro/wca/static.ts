@@ -2,6 +2,7 @@ import { AuthHeader } from '@/services/cubing-pro/auth/token';
 import { Request } from '@/services/cubing-pro/request';
 import {
   AllEventAvgPersonResults, AllEventChampionshipsPodium,
+  RankWithEventsStatic,
   RankWithPersonCompStartYear,
   StaticSuccessRateResult,
   StaticWithTimerRank,
@@ -180,6 +181,68 @@ export async function GetAllEventsAchievement(
       page: page,
       size: size,
       lackNum: lackNum,
+    },
+    {
+      headers: AuthHeader(),
+    },
+  );
+  return response.data;
+}
+
+/** 多项目综合排行：所选项目的世界（或国家）名次之和，越小越靠前；events 传空表示全部正式项目 */
+export async function GetRankWithDiyEvents(
+  events: string[],
+  country: string,
+  is_avg: boolean,
+  page: number,
+  size: number,
+): Promise<{
+  data: RankWithEventsStatic[];
+  total: number;
+}> {
+  const response = await Request.post<{
+    data: RankWithEventsStatic[];
+    total: number;
+  }>(
+    `/wca/ranks/diy_events`,
+    {
+      events,
+      country,
+      is_avg,
+      page,
+      size,
+    },
+    {
+      headers: AuthHeader(),
+    },
+  );
+  return response.data;
+}
+
+/** 在综合排行基础上仅保留从未登上领奖台的选手；best_misser 为 4 时表示「殿军之王」 */
+export async function GetNotPodiumRankWithDiyEvents(
+  events: string[],
+  country: string,
+  best_misser: number,
+  is_avg: boolean,
+  page: number,
+  size: number,
+): Promise<{
+  data: RankWithEventsStatic[];
+  total: number;
+}> {
+  const response = await Request.post<{
+    data: RankWithEventsStatic[];
+    total: number;
+  }>(
+    `/wca/rank/diy_events/not_podium`,
+    {
+      events,
+      country,
+      best_misser,
+      is_avg,
+      page,
+      size,
     },
     {
       headers: AuthHeader(),

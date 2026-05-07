@@ -249,6 +249,13 @@ export default {
   'wca.stats.successRateDesc': '按項目查看選手成功率排行',
   'wca.stats.allEventsAchievement': '全項目達成排行榜',
   'wca.stats.allEventsAchievementDesc': '按達成天數排序的全項目達成排行',
+  'wca.stats.multiEventRank': '全項目排行',
+  'wca.stats.multiEventRankDesc': '依所選項目名次數字總和排序，預設計入全部正式項目',
+  'wca.multiEventRank.rankSum': '名次總和',
+  'wca.multiEventRank.notPodiumOnly': '未登領獎台',
+  'wca.multiEventRank.fourthKing': '殿軍之王（最佳名次為第 4 名）',
+  'wca.multiEventRank.collapseEventCols': '收起項目列',
+  'wca.multiEventRank.expandEventCols': '展開項目列',
 
   // All Events Achievement 全項目達成
   'wca.allEventsAchievement.viewMode': '視圖',

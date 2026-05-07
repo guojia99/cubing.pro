@@ -1,0 +1,78 @@
+/* 全项目排行：筛选区纵向留白 + 下拉默认宽度 */
+
+.diy-events-rank {
+  .stats-rank-filter-card {
+    .ant-card-body {
+      padding: 18px 20px 22px;
+    }
+
+    .filter-row {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 22px;
+    }
+
+    .filter-item {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      flex-wrap: wrap;
+
+      .filter-label {
+        white-space: nowrap;
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      /* 国家 / 单次平均 等下拉 */
+      .filter-select.ant-select {
+        width: 280px;
+        max-width: 100%;
+      }
+    }
+
+    .filter-item.filter-item-switch {
+      /* 与下拉行视觉节奏一致 */
+      min-height: 32px;
+    }
+  }
+}
+
+@media (max-width: 1079px) {
+  .diy-events-rank .stats-rank-filter-card .filter-item .filter-select.ant-select {
+    flex: 1;
+    width: auto !important;
+    min-width: 0;
+  }
+}
+
+.diy-events-table-toolbar {
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.diy-event-col-hdr {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.diy-event-rank-cell {
+  font-variant-numeric: tabular-nums;
+}
+
+.diy-event-rank-cell--top10 {
+  color: #cf1322;
+  font-weight: 700;
+}
+
+.diy-event-rank-cell--missing {
+  color: rgba(0, 0, 0, 0.28);
+  font-weight: 400;
+}

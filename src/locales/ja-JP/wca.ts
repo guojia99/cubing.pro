@@ -249,6 +249,13 @@ export default {
   'wca.stats.successRateDesc': '種目別の成功率ランキングを表示',
   'wca.stats.allEventsAchievement': '全種目達成ランキング',
   'wca.stats.allEventsAchievementDesc': '達成日数でソートした全種目達成ランキング',
+  'wca.stats.multiEventRank': '全種目ランキング',
+  'wca.stats.multiEventRankDesc': '選択種目の順位の合計で並べ替え（既定は全公式種目）',
+  'wca.multiEventRank.rankSum': '順位の合計',
+  'wca.multiEventRank.notPodiumOnly': '表彰台なしのみ',
+  'wca.multiEventRank.fourthKing': '「殿軍」王（最高が4位）',
+  'wca.multiEventRank.collapseEventCols': '種目列を隠す',
+  'wca.multiEventRank.expandEventCols': '種目列を表示',
 
   // All Events Achievement 全種目達成
   'wca.allEventsAchievement.viewMode': '表示',

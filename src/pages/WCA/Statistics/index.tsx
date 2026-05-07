@@ -6,6 +6,7 @@ import {
   TrophyOutlined,
   CrownOutlined,
   HourglassOutlined,
+  AppstoreOutlined,
 } from '@ant-design/icons';
 import { Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
@@ -18,6 +19,7 @@ import YearlyFullRank from './YearlyFullRank';
 import SuccessRateRank from './SuccessRateRank';
 import AllEventsAchievementRank from './AllEventsAchievementRank';
 import CompYearRank from './CompYearRank';
+import DiyEventsRank from './DiyEventsRank';
 import './index.less';
 
 const { Title } = Typography;
@@ -29,7 +31,8 @@ type StatsTabKey =
   | 'yearlyFull'
   | 'compYear'
   | 'successRate'
-  | 'allEventsAchievement';
+  | 'allEventsAchievement'
+  | 'multiEventRank';
 
 const TAB_PARAM = 'tab';
 const VALID_TAB_KEYS: StatsTabKey[] = [
@@ -40,6 +43,7 @@ const VALID_TAB_KEYS: StatsTabKey[] = [
   'compYear',
   'successRate',
   'allEventsAchievement',
+  'multiEventRank',
 ];
 
 const getTabFromSearch = (search: string): StatsTabKey => {
@@ -109,6 +113,12 @@ const Statistics: React.FC = () => {
       title: intl.formatMessage({ id: 'wca.stats.allEventsAchievement' }),
       desc: intl.formatMessage({ id: 'wca.stats.allEventsAchievementDesc' }),
     },
+    {
+      key: 'multiEventRank' as StatsTabKey,
+      icon: <AppstoreOutlined />,
+      title: intl.formatMessage({ id: 'wca.stats.multiEventRank' }),
+      desc: intl.formatMessage({ id: 'wca.stats.multiEventRankDesc' }),
+    },
   ];
 
   return (
@@ -151,6 +161,7 @@ const Statistics: React.FC = () => {
         {activeKey === 'compYear' && <CompYearRank />}
         {activeKey === 'successRate' && <SuccessRateRank />}
         {activeKey === 'allEventsAchievement' && <AllEventsAchievementRank />}
+        {activeKey === 'multiEventRank' && <DiyEventsRank />}
       </div>
     </div>
   );

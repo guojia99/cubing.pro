@@ -249,6 +249,13 @@ export default {
   'wca.stats.successRateDesc': 'View success rate ranking by event',
   'wca.stats.allEventsAchievement': 'All Events Achievement',
   'wca.stats.allEventsAchievementDesc': 'Ranking by days to achieve all events',
+  'wca.stats.multiEventRank': 'Multi-event ranking',
+  'wca.stats.multiEventRankDesc': 'Rank by sum of ranks across selected events (all official events by default)',
+  'wca.multiEventRank.rankSum': 'Sum of ranks',
+  'wca.multiEventRank.notPodiumOnly': 'Never on podium',
+  'wca.multiEventRank.fourthKing': 'Fourth-place kings (best finish is 4th)',
+  'wca.multiEventRank.collapseEventCols': 'Hide per-event ranks',
+  'wca.multiEventRank.expandEventCols': 'Show per-event ranks',
 
   // All Events Achievement
   'wca.allEventsAchievement.viewMode': 'View',
