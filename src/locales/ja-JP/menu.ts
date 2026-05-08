@@ -28,6 +28,11 @@ export default {
   'menu.WCA.statistics': "データ",
 
   'menu.Algs': "公式",
+  'menu.Changelog': '更新履歴',
+  'menu.Changelog.all': 'すべて',
+  'menu.Changelog.allYears': 'すべての年',
+  'menu.Changelog.frontend': 'フロントエンド',
+  'menu.Changelog.backend': 'バックエンド',
   'menu.buyCoffee': "作者にコーヒーをおごる",
   'menu.ExternalLinks': 'Cubing Hub',
   'menu.ExternalLinks.subtitle': 'カテゴリ別に便利なサイトを閲覧',

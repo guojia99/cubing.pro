@@ -58,6 +58,7 @@
 export default [
   { path: '/welcome', component: './Welcome' },
   { path: '/buy-coffee', name: 'buyCoffee', component: './BuyCoffee' },
+  { path: '/changelog', name: 'Changelog', component: './Changelog' },
   { path: '/external-links', name: 'ExternalLinks', component: './ExternalLinks/ExternalLinksPage' },
   { path: '/advertisement', component: './Advertisement', hidden: true },
   { path: '/', redirect: '/welcome' },
