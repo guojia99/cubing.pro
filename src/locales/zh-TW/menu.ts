@@ -28,6 +28,11 @@ export default {
   'menu.WCA.statistics': '統計數據',
 
   'menu.Algs': '公式庫',
+  'menu.Changelog': '更新日誌',
+  'menu.Changelog.all': '全部',
+  'menu.Changelog.allYears': '全部年份',
+  'menu.Changelog.frontend': '前端',
+  'menu.Changelog.backend': '後端',
   'menu.buyCoffee': '請作者喝咖啡',
   'menu.ExternalLinks': '魔方導航',
   'menu.ExternalLinks.subtitle': '依分類瀏覽常用網站與資源',

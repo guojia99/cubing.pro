@@ -28,6 +28,11 @@ export default {
   'menu.WCA.statistics': "统计",
 
   'menu.Algs': "公式库",
+  'menu.Changelog': '更新日志',
+  'menu.Changelog.all': '全部',
+  'menu.Changelog.allYears': '全部年份',
+  'menu.Changelog.frontend': '前端',
+  'menu.Changelog.backend': '后端',
   'menu.buyCoffee': "请作者喝咖啡",
   'menu.ExternalLinks': '魔方导航',
   'menu.ExternalLinks.subtitle': '按分组浏览常用网站与资源',

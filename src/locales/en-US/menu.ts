@@ -28,6 +28,11 @@ export default {
   'menu.WCA.statistics': "Data",
 
   'menu.Algs': "Algs",
+  'menu.Changelog': 'Changelog',
+  'menu.Changelog.all': 'All',
+  'menu.Changelog.allYears': 'All Years',
+  'menu.Changelog.frontend': 'Frontend',
+  'menu.Changelog.backend': 'Backend',
   'menu.buyCoffee': "Buy Me a Coffee",
   'menu.ExternalLinks': 'Cubing Hub',
   'menu.ExternalLinks.subtitle': 'Browse useful sites by category',
