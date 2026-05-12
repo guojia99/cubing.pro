@@ -290,6 +290,35 @@
       "coverImage": "dishes/aquatic/蛏抱蛋/1.jpeg"
     },
     {
+      "id": "阳朔啤酒鱼",
+      "title": "阳朔啤酒鱼的做法",
+      "description": "阳朔啤酒鱼是广西阳朔的地方名菜，选用漓江鲜鱼不去鳞，以啤酒代水焖煮，鱼鳞酥脆、鱼肉鲜嫩、啤酒香浓郁。一般 30 分钟即可完成。",
+      "difficulty": 3,
+      "category": "aquatic",
+      "categoryName": "水产",
+      "mdPath": "dishes/aquatic/阳朔啤酒鱼/阳朔啤酒鱼.md",
+      "ingredients": [
+        "剑骨鱼",
+        "鲤鱼",
+        "漓泉啤酒",
+        "番茄",
+        "青椒",
+        "红椒",
+        "大蒜",
+        "生姜",
+        "葱",
+        "桂林辣椒酱",
+        "料酒",
+        "生抽",
+        "老抽",
+        "白糖",
+        "食盐",
+        "食用油"
+      ],
+      "hasImage": true,
+      "coverImage": "dishes/aquatic/阳朔啤酒鱼/阳朔啤酒鱼.png"
+    },
+    {
       "id": "香煎翘嘴鱼",
       "title": "香煎翘嘴鱼的做法",
       "description": "",
@@ -658,7 +687,7 @@
     {
       "id": "苏格兰蛋",
       "title": "苏格兰蛋的做法",
-      "description": "<!-- 标题必须是 `菜名` + `的做法`。和文件名一致。 --> <!-- 如果有图片更好。 --> 苏格兰蛋是一种用新鲜肉糜裹住鸡蛋，放入油中炸至金黄制成，这个版本比较费事，所以在此就给大家带来简易版,苏格兰蛋复杂版大家就自行查找。 简易版苏格兰蛋是利用手抓饼皮包裹住芝士培根糖心蛋放入油中炸",
+      "description": "苏格兰蛋是一种用新鲜肉糜裹住鸡蛋，放入油中炸至金黄制成，这个版本比较费事，所以在此就给大家带来简易版,苏格兰蛋复杂版大家就自行查找。 简易版苏格兰蛋是利用手抓饼皮包裹住芝士培根糖心蛋放入油中炸至金黄制成，大约耗时 20-30 分钟。",
       "difficulty": 3,
       "category": "breakfast",
       "categoryName": "早餐",
@@ -2612,6 +2641,40 @@
       "coverImage": "dishes/meat_dish/柱候牛腩/柱候牛腩.jpeg"
     },
     {
+      "id": "桂林十八酿",
+      "title": "桂林十八酿的做法",
+      "description": "桂林十八酿是广西桂林地区的经典酿菜系列，将调好味的肉馅酿入各种食材中，或煎或焖，风味各异。当地有\"无酿不成席\"的说法，2016 年入选市级非物质文化遗产。",
+      "difficulty": 3,
+      "category": "meat_dish",
+      "categoryName": "荤菜",
+      "mdPath": "dishes/meat_dish/桂林十八酿/桂林十八酿.md",
+      "ingredients": [
+        "青椒",
+        "苦瓜",
+        "茄子",
+        "田螺",
+        "豆腐",
+        "香菇",
+        "南瓜花",
+        "柚子",
+        "笋",
+        "冬瓜",
+        "香芋",
+        "蒜",
+        "番茄",
+        "豆芽",
+        "蛋",
+        "香菌",
+        "原则",
+        "猪肉馅",
+        "虾滑馅",
+        "鱼肉馅",
+        "混合馅"
+      ],
+      "hasImage": true,
+      "coverImage": "dishes/meat_dish/桂林十八酿/arch.png"
+    },
+    {
       "id": "梅菜扣肉",
       "title": "梅菜扣肉的做法",
       "description": "梅菜扣肉造型别致、大方得体，颜色酱红油亮，汤汁黏稠鲜美，扣肉肥而不腻，食之软烂醇香。",
@@ -2796,6 +2859,35 @@
       ],
       "hasImage": true,
       "coverImage": "dishes/meat_dish/猪皮冻/猪皮冻.jpg"
+    },
+    {
+      "id": "田螺酿",
+      "title": "田螺酿的做法",
+      "description": "田螺酿是阳朔\"十八酿\"中最负盛名的一道，将田螺肉与猪肉剁碎调味后回填螺壳焖煮，螺肉韧而紧致、猪肉嫩滑，紫苏薄荷清香扑鼻。曾登上《舌尖上的中国 2》。属于节假日才做的重菜，上午买螺回家放一下午吐沙即可，制作耗时约 40 分钟。",
+      "difficulty": 4,
+      "category": "meat_dish",
+      "categoryName": "荤菜",
+      "mdPath": "dishes/meat_dish/田螺酿/田螺酿.md",
+      "ingredients": [
+        "大田螺",
+        "猪肉",
+        "新鲜薄荷叶",
+        "紫苏叶",
+        "生姜",
+        "葱",
+        "桂林三花酒",
+        "生抽",
+        "食盐",
+        "食用油",
+        "酸笋",
+        "大蒜",
+        "干辣椒",
+        "蚝油",
+        "淀粉",
+        "白胡椒粉"
+      ],
+      "hasImage": true,
+      "coverImage": "dishes/meat_dish/田螺酿/成品.jpeg"
     },
     {
       "id": "瘦肉土豆片",
@@ -3305,6 +3397,34 @@
       ],
       "hasImage": false,
       "coverImage": null
+    },
+    {
+      "id": "青椒酿",
+      "title": "青椒酿的做法",
+      "description": "青椒酿是广西经典家常菜，将调好味的肉馅或虾滑酿入青椒中，煎至虎皮色后焖煮入味，青椒清香与馅料鲜美交融，咸香微辣，十分下饭。汤汁浇在饭上非常之美味。一般 30 分钟即可完成。",
+      "difficulty": 3,
+      "category": "meat_dish",
+      "categoryName": "荤菜",
+      "mdPath": "dishes/meat_dish/青椒酿/青椒酿.md",
+      "ingredients": [
+        "青椒",
+        "猪肉",
+        "葱",
+        "生姜",
+        "生抽",
+        "老抽",
+        "食盐",
+        "食用油",
+        "淀粉",
+        "大蒜",
+        "蚝油",
+        "料酒",
+        "鸡蛋",
+        "白胡椒粉",
+        "白糖"
+      ],
+      "hasImage": true,
+      "coverImage": "dishes/meat_dish/青椒酿/成品.jpeg"
     },
     {
       "id": "香干芹菜炒肉",
@@ -5358,6 +5478,22 @@
       "coverImage": "dishes/staple/炒意大利面/a.jpg"
     },
     {
+      "id": "炒方便面",
+      "title": "炒方便面的做法",
+      "description": "这是在探究了传统煮方便面的改良方向之后，进行的一次最成功的尝试。它能够让方便面的美味程度提升很大程度，简单好做。开始炒吧！",
+      "difficulty": 2,
+      "category": "staple",
+      "categoryName": "主食",
+      "mdPath": "dishes/staple/炒方便面/炒方便面.md",
+      "ingredients": [
+        "方便面",
+        "鸡蛋",
+        "火腿肠"
+      ],
+      "hasImage": true,
+      "coverImage": "dishes/staple/炒方便面/炒方便面.png"
+    },
+    {
       "id": "烙饼",
       "title": "烙饼的做法",
       "description": "",
@@ -5804,22 +5940,6 @@
         "酱油",
         "盐",
         "青菜"
-      ],
-      "hasImage": false,
-      "coverImage": null
-    },
-    {
-      "id": "炒方便面",
-      "title": "炒方便面的做法",
-      "description": "这是在探究了传统煮方便面的改良方向之后，进行的一次最成功的尝试。它能够让方便面的美味程度提升很大程度，简单好做。开始炒吧！",
-      "difficulty": 2,
-      "category": "staple",
-      "categoryName": "主食",
-      "mdPath": "dishes/staple/炒方便面.md",
-      "ingredients": [
-        "方便面",
-        "鸡蛋",
-        "火腿肠"
       ],
       "hasImage": false,
       "coverImage": null
@@ -6601,7 +6721,7 @@
     {
       "id": "白灼菜心",
       "title": "白灼菜心的做法",
-      "description": "<!-- 标题必须是 `菜名` + `的做法`。和文件名一致。 --> > 没有拍照，上图是网图，不过做出来都差不多啦 白灼菜心是经典粤菜，白灼是粤菜的一种烹饪技法，用煮沸的水或汤将生的食物烫熟，称为白灼。这种烹饪手法能保持原有的鲜味，粤菜常用此法烹制虾和蔬菜。 总之吧，减肥或者是**快速解决绿叶菜",
+      "description": "> 没有拍照，上图是网图，不过做出来都差不多啦 白灼菜心是经典粤菜，白灼是粤菜的一种烹饪技法，用煮沸的水或汤将生的食物烫熟，称为白灼。这种烹饪手法能保持原有的鲜味，粤菜常用此法烹制虾和蔬菜。 总之吧，减肥或者是**快速解决绿叶菜的绝佳方式**。",
       "difficulty": 2,
       "category": "vegetable_dish",
       "categoryName": "素菜",
