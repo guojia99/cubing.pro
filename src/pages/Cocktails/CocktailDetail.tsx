@@ -21,6 +21,7 @@ import {
   isCocktailInTonight,
   removeCocktailFromTonight,
 } from './utils/cocktailTonightStorage';
+import CocktailFirstVisitModal from './components/CocktailFirstVisitModal';
 import './cocktailDetail.less';
 
 const COCKTAILS_JSON = '/iba/cocktails.json';
@@ -91,20 +92,26 @@ const CocktailDetail: React.FC = () => {
 
   if (loading) {
     return (
-      <div style={{ padding: 48, textAlign: 'center' }}>
-        <Spin size="large" />
-      </div>
+      <>
+        <CocktailFirstVisitModal />
+        <div style={{ padding: 48, textAlign: 'center' }}>
+          <Spin size="large" />
+        </div>
+      </>
     );
   }
 
   if (!cocktail) {
     return (
-      <div style={{ padding: 24 }}>
-        <Button type="text" icon={<ArrowLeftOutlined />} onClick={() => navigate('/other/cocktails')}>
-          返回列表
-        </Button>
-        <Paragraph style={{ marginTop: 24 }}>未找到该酒款，请检查链接。</Paragraph>
-      </div>
+      <>
+        <CocktailFirstVisitModal />
+        <div style={{ padding: 24 }}>
+          <Button type="text" icon={<ArrowLeftOutlined />} onClick={() => navigate('/other/cocktails')}>
+            返回列表
+          </Button>
+          <Paragraph style={{ marginTop: 24 }}>未找到该酒款，请检查链接。</Paragraph>
+        </div>
+      </>
     );
   }
 
@@ -112,7 +119,9 @@ const CocktailDetail: React.FC = () => {
   const imgSrc = cocktail.image_path ? `/iba/${cocktail.image_path}` : '';
 
   return (
-    <div className="cocktail-detail-page" style={{ padding: 24, maxWidth: 960, margin: '0 auto' }}>
+    <>
+      <CocktailFirstVisitModal />
+      <div className="cocktail-detail-page" style={{ padding: 24, maxWidth: 960, margin: '0 auto' }}>
       <div
         style={{
           marginBottom: 16,
@@ -222,6 +231,7 @@ const CocktailDetail: React.FC = () => {
         />
       </div>
     </div>
+    </>
   );
 };
 
