@@ -51,6 +51,8 @@ export default {
   'menu.Other.RecipeDetail': '菜譜詳情',
   'menu.Other.KitchenSkills': '廚房技能',
   'menu.Other.KitchenSkillDetail': '廚房技能詳情',
+  'menu.Other.Cocktails': '調酒',
+  'menu.Other.CocktailDetail': '雞尾酒詳情',
   'menu.Recipes': '菜譜',
   'menu.RecipeDetail': '菜譜詳情',
   'menu.KitchenSkills': '廚房技能',

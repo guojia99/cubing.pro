@@ -52,6 +52,8 @@ export default {
   'menu.Other.RecipeDetail': "Recipe Detail",
   'menu.Other.KitchenSkills': "Kitchen Skills",
   'menu.Other.KitchenSkillDetail': "Kitchen Skill Detail",
+  'menu.Other.Cocktails': "Cocktails",
+  'menu.Other.CocktailDetail': "Cocktail Detail",
   'menu.Recipes': "Recipes",
   'menu.RecipeDetail': "Recipe Detail",
   'menu.KitchenSkills': "Kitchen Skills",

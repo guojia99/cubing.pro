@@ -130,6 +130,13 @@ export default [
         component: './KitchenSkills/KitchenSkillDetail',
         hideInMenu: true,
       },
+      { path: 'cocktails', name: 'Cocktails', component: './Cocktails/CocktailList' },
+      {
+        path: 'cocktails/:slug',
+        name: 'CocktailDetail',
+        component: './Cocktails/CocktailDetail',
+        hideInMenu: true,
+      },
       { path: 'external-links', redirect: '/external-links' },
     ],
   },
