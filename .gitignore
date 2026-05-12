@@ -60,9 +60,6 @@ dist.zip
 .husky
 
 node_modules
-public/HowToCook
-./public/HowToCook
-/public/HowToCook/
 
 # IBA 导入脚本本地虚拟环境
 .venv-iba/
