@@ -22,6 +22,7 @@ import {
 import type { Cocktail } from './types';
 import CocktailTonightPickModal from './components/CocktailTonightPickModal';
 import CocktailTonightReceipt from './components/CocktailTonightReceipt';
+import CocktailFirstVisitModal from './components/CocktailFirstVisitModal';
 import { getCategoryLabelZh } from './categoryZh';
 import { getCocktailZhName } from './cocktailNameZhMap';
 import {
@@ -463,6 +464,7 @@ const CocktailList: React.FC = () => {
         onClose={() => setPickModalOpen(false)}
         cocktails={cocktails}
       />
+      <CocktailFirstVisitModal />
     </div>
   );
 };
