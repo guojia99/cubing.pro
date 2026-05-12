@@ -52,6 +52,8 @@ export default {
   'menu.Other.RecipeDetail': "レシピ詳細",
   'menu.Other.KitchenSkills': "キッチンスキル",
   'menu.Other.KitchenSkillDetail': "キッチンスキル詳細",
+  'menu.Other.Cocktails': "カクテル",
+  'menu.Other.CocktailDetail': "カクテル詳細",
   'menu.Recipes': "レシピ",
   'menu.RecipeDetail': "レシピ詳細",
   'menu.KitchenSkills': "キッチンスキル",

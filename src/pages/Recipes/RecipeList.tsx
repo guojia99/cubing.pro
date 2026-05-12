@@ -460,6 +460,16 @@ const RecipeList: React.FC = () => {
         >
           厨房技能
         </a>
+        <a
+          href="/other/cocktails"
+          style={{ color: token.colorPrimary }}
+          onClick={(e) => {
+            e.preventDefault();
+            navigate('/other/cocktails');
+          }}
+        >
+          调酒
+        </a>
       </div>
 
       {listMode === 'tonight' ? (
