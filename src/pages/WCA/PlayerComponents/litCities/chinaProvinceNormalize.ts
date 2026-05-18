@@ -99,6 +99,10 @@ export function metaByEnglishProvinceKey(key: string): ChinaProvinceMeta | undef
   if (direct) return direct;
   const alias = ALIAS_TO_KEY[normKey(k)];
   if (alias) return EN_PROVINCE_TO_META[alias];
+  const lk = normKey(k);
+  for (const enKey of Object.keys(EN_PROVINCE_TO_META) as (keyof typeof EN_PROVINCE_TO_META)[]) {
+    if (normKey(String(enKey)) === lk) return EN_PROVINCE_TO_META[enKey];
+  }
   return undefined;
 }
 
@@ -107,7 +111,17 @@ export function resolveChinaProvinceMeta(province: string, city: string): ChinaP
   const c = city.trim();
   if (p) {
     const m = metaByEnglishProvinceKey(p);
-    if (m) return m;
+    if (m) {
+      /** 拼音 Shanxi 常被误用于陕西；省会西安等可判定为陕 */
+      if (m.adcode === 140000 && c) {
+        const head = c.split(/[,，(（]/)[0].trim();
+        if (head) {
+          const inferred = metaFromEnglishPrefectureOrDistrictKey(head);
+          if (inferred?.adcode === 610000) return EN_PROVINCE_TO_META.Shaanxi;
+        }
+      }
+      return m;
+    }
     const fb = CITY_OR_PROVINCE_FALLBACK[p];
     if (fb) return fb;
   }

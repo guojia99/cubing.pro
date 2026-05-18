@@ -63,3 +63,5 @@ node_modules
 
 # IBA 导入脚本本地虚拟环境
 .venv-iba/
+
+scripts/myca_participant_monitor_config.json

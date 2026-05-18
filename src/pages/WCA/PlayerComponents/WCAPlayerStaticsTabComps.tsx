@@ -4,6 +4,7 @@ import { Button, Space, Table } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import React, { useEffect, useState } from 'react';
 import { useIntl } from '@@/plugin-locale';
+import { getLocale } from 'umi';
 import { getCountryNameByIso2 } from '@/pages/WCA/PlayerComponents/region/all_contiry';
 import { getLocationByPinyin } from '@/pages/WCA/PlayerComponents/region/china_citys';
 import { findCubingCompetitionByIdentifier } from '@/services/cubing-pro/cubing_china/cubing';
@@ -17,6 +18,27 @@ interface WCACompetitionTableProps {
 // 赛事列表表格组件
 const CompetitionTable: React.FC<WCACompetitionTableProps> = ({ competitions, wcaResults }) => {
   const intl = useIntl();
+  const locale = getLocale() || intl.locale || 'zh-CN';
+  /** 仅简体/繁体等中文界面将中港澳台省市区转为中文；英文、日文等保留 WCA 原文 */
+  const translateChinaPlaceNames = locale.toLowerCase().startsWith('zh');
+
+  const competitionRegionPrefix = (iso2: string): string => {
+    if (translateChinaPlaceNames) {
+      return getCountryNameByIso2(iso2) || iso2;
+    }
+    const code = iso2.toUpperCase();
+    try {
+      if (typeof Intl !== 'undefined' && typeof Intl.DisplayNames !== 'undefined') {
+        const dn = new Intl.DisplayNames([locale], { type: 'region' });
+        const n = dn.of(code);
+        if (n) return n;
+      }
+    } catch {
+      /* ignore */
+    }
+    return code;
+  };
+
   // 倒序排列（按开始日期倒序）
   const sortedCompetitions = [...competitions].sort((a, b) => {
     return new Date(b.start_date).getTime() - new Date(a.start_date).getTime();
@@ -138,20 +160,23 @@ const CompetitionTable: React.FC<WCACompetitionTableProps> = ({ competitions, wc
         if (record.country_iso2 === 'CN' || record.country_iso2 === 'TW' || record.country_iso2 === 'HK') {
           const englishProvince =
             cityNames.length > 1 ? cityNames[cityNames.length - 1] : undefined;
-          const convertedCityNames = cityNames.map((cityName, idx) => {
-            const isProvinceSegment = idx === cityNames.length - 1;
-            if (isProvinceSegment) {
-              return getLocationByPinyin(cityName) || cityName;
-            }
-            return getLocationByPinyin(cityName, englishProvince) || cityName;
-          });
+          const convertedCityNames = translateChinaPlaceNames
+            ? cityNames.map((cityName, idx) => {
+                const isProvinceSegment = idx === cityNames.length - 1;
+                if (isProvinceSegment) {
+                  const peer =
+                    cityNames.length >= 2 ? cityNames[0] : undefined;
+                  return getLocationByPinyin(cityName, peer) || cityName;
+                }
+                return getLocationByPinyin(cityName, englishProvince) || cityName;
+              })
+            : cityNames;
 
-          // 用逗号连接并返回
-          return `${getCountryNameByIso2(record.country_iso2)} ${convertedCityNames.join(' ')}`;
+          return `${competitionRegionPrefix(record.country_iso2)} ${convertedCityNames.join(' ')}`;
         }
 
         // 非中国比赛保持原有逻辑
-        return `${getCountryNameByIso2(record.country_iso2)} ${cityNames.join(' ')}`;
+        return `${competitionRegionPrefix(record.country_iso2)} ${cityNames.join(' ')}`;
       }
     },
   ];

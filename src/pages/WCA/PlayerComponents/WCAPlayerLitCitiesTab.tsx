@@ -34,6 +34,14 @@ function litGeoCityLabel(g: CompGeo, localeZh: boolean): string {
   return zh ?? raw;
 }
 
+/** 合并后地级市列展示：优先保留非「—」且一致的标签 */
+function mergePrefectureLabels(a: string, b: string): string {
+  if (a === b) return a;
+  if (a === '—') return b;
+  if (b === '—') return a;
+  return a;
+}
+
 /** 世界 / 中国边界 JSON 已放入 public/geo/bound，避免线上 CDN 依赖与跨域问题 */
 const CHINA_BOUND_BASE = '/geo/bound';
 const WORLD_JSON = `${CHINA_BOUND_BASE}/world.json`;
@@ -388,6 +396,46 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos, pla
   const drillIsDirectMunicipality =
     provinceDrill != null && CHINA_DIRECT_MUNICIPALITY_ADCODES.has(provinceDrill.adcode);
 
+  /** 同一展示城市名（如 Xi'an / Xian 均显示西安）合并次数，避免列表重复多行 */
+  const { mergedProvinceDrillListRows, mergedProvinceDrillCityRows } = useMemo(() => {
+    type WithPref = { key: string; cityLabel: string; count: number; prefecture: string };
+    const m = new Map<string, WithPref>();
+    for (const g of provinceGeosFiltered) {
+      const cityLabel = litGeoCityLabel(g, localeZh);
+      const count = safeGeoCount(g.count);
+      const prefecture = drillIsDirectMunicipality
+        ? provinceDrill!.adcode === 810000
+          ? intl.formatMessage({ id: 'wca.litCities.hkWholeArea' })
+          : intl.formatMessage({ id: 'wca.litCities.municipalityWholeArea' })
+        : matchCityToPrefecture(g.city || '', prefectureNames, {
+            taiwan: provinceDrill?.adcode === 710000,
+          }) || '—';
+      const cur = m.get(cityLabel);
+      if (!cur) {
+        m.set(cityLabel, { key: cityLabel, cityLabel, count, prefecture });
+      } else {
+        m.set(cityLabel, {
+          key: cityLabel,
+          cityLabel,
+          count: cur.count + count,
+          prefecture: mergePrefectureLabels(cur.prefecture, prefecture),
+        });
+      }
+    }
+    const sorted = [...m.values()].sort((a, b) => b.count - a.count);
+    return {
+      mergedProvinceDrillListRows: sorted,
+      mergedProvinceDrillCityRows: sorted.map(({ key, cityLabel, count }) => ({ key, cityLabel, count })),
+    };
+  }, [
+    provinceGeosFiltered,
+    localeZh,
+    drillIsDirectMunicipality,
+    provinceDrill,
+    prefectureNames,
+    intl,
+  ]);
+
   const provincePrefectureData = useMemo(() => {
     const rows = provinceGeosFiltered.map(g => ({ city: g.city || '', count: g.count }));
     if (provinceDrill && CHINA_DIRECT_MUNICIPALITY_ADCODES.has(provinceDrill.adcode)) {
@@ -602,18 +650,7 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos, pla
         <Table
           size="small"
           pagination={{ pageSize: 20 }}
-          dataSource={provinceGeosFiltered.map((g, i) => ({
-            key: i,
-            cityLabel: litGeoCityLabel(g, localeZh),
-            count: safeGeoCount(g.count),
-            prefecture: drillIsDirectMunicipality
-              ? provinceDrill.adcode === 810000
-                ? intl.formatMessage({ id: 'wca.litCities.hkWholeArea' })
-                : intl.formatMessage({ id: 'wca.litCities.municipalityWholeArea' })
-              : matchCityToPrefecture(g.city || '', prefectureNames, {
-                  taiwan: provinceDrill?.adcode === 710000,
-                }) || '—',
-          }))}
+          dataSource={mergedProvinceDrillListRows}
           columns={[
             {
               title: intl.formatMessage({ id: 'wca.litCities.prefecture' }),
@@ -673,11 +710,7 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos, pla
             size="small"
             style={{ marginTop: 16 }}
             pagination={{ pageSize: 12 }}
-            dataSource={provinceGeosFiltered.map((g, i) => ({
-              key: i,
-              cityLabel: litGeoCityLabel(g, localeZh),
-              count: safeGeoCount(g.count),
-            }))}
+            dataSource={mergedProvinceDrillCityRows}
             columns={[
               {
                 title: intl.formatMessage({ id: 'wca.litCities.city' }),
