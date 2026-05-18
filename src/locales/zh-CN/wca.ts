@@ -142,6 +142,10 @@ export default {
   'wca.milestone.excludeLabel': '不看里程碑',
   'wca.milestone.excludePlaceholder': '选择要排除的里程碑类型',
   'wca.milestone.improvementThreshold': '进步阈值',
+  'wca.milestone.timelineScale': '时间轴缩放',
+  'wca.milestone.timelinePinchHint':
+    '在下方区域内双指捏合即可缩放里程碑时间轴。电脑端：在里程碑区域内按住 Ctrl（Mac 为 ⌘）并滚动鼠标滚轮也可缩放。',
+  'wca.milestone.timelineScaleReset': '恢复默认大小',
   'wca.milestone.record': '记录',
   'wca.milestone.gold': '🥇 金牌',
   'wca.milestone.silver': '🥈 银牌',

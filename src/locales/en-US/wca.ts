@@ -143,6 +143,10 @@ export default {
   'wca.milestone.excludeLabel': 'Exclude types',
   'wca.milestone.excludePlaceholder': 'Select milestone types to exclude',
   'wca.milestone.improvementThreshold': 'Improvement threshold',
+  'wca.milestone.timelineScale': 'Timeline zoom',
+  'wca.milestone.timelinePinchHint':
+    'Pinch with two fingers inside the area below to zoom the milestone timeline. On desktop, hold Ctrl (⌘ on Mac) and scroll the mouse wheel inside the milestone area to zoom.',
+  'wca.milestone.timelineScaleReset': 'Reset zoom',
   'wca.milestone.record': 'Record',
   'wca.milestone.gold': '🥇 Gold',
   'wca.milestone.silver': '🥈 Silver',

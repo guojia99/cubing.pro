@@ -476,9 +476,23 @@ export function pinyinLookupVariants(input: string): string[] {
  * 支持 Xi'an / Xi’an 等与 Xian 地图键互通。
  */
 export function getLocationByPinyin(pinyin: string, englishProvince?: string): string | undefined {
+  const rawPinyin = pinyin.trim();
   const prov = englishProvince?.trim().toLowerCase();
   const variants = pinyinLookupVariants(pinyin);
   if (variants.length === 0) return undefined;
+
+  /**
+   * WCA 地址经 reverse 后，首段常为省名、末段为市名，第二参实际是「另一地理段」。
+   * 「Shanxi」易与「Shaanxi」混淆；若对侧为 Xi'an/Xian（西安），应按陕西省解析。
+   */
+  if (/^shanxi$/i.test(rawPinyin) && englishProvince?.trim()) {
+    const peerHead = englishProvince.trim().split(/[,，(（]/)[0].trim();
+    for (const v of pinyinLookupVariants(peerHead)) {
+      if (v.replace(/'/g, '').toLowerCase() === 'xian') {
+        return provinceCityPinyinMap.Shaanxi;
+      }
+    }
+  }
 
   const disambig = (key: string): string | undefined => {
     if (/^taizhou$/i.test(key)) {

@@ -58,6 +58,7 @@ const MilestoneItemContent: React.FC<MilestoneItemContentProps> = ({ milestone, 
 
   return (
     <div
+      className="milestone-item-bubble"
       style={{
         backgroundColor: bubbleStyle.bg,
         border: `1px solid ${bubbleStyle.border}`,
@@ -65,9 +66,6 @@ const MilestoneItemContent: React.FC<MilestoneItemContentProps> = ({ milestone, 
         padding: '12px 16px',
         position: 'relative',
         wordBreak: 'break-word',
-        width: '100%',
-        maxWidth: '100%',
-        minWidth: 0,
         display: 'flex',
         flexDirection: 'column',
         alignItems: isLeft ? 'flex-end' : 'flex-start',

@@ -143,6 +143,10 @@ export default {
   'wca.milestone.excludeLabel': '除外するタイプ',
   'wca.milestone.excludePlaceholder': '除外するマイルストーンタイプを選択',
   'wca.milestone.improvementThreshold': '改善閾値',
+  'wca.milestone.timelineScale': 'タイムラインの表示倍率',
+  'wca.milestone.timelinePinchHint':
+    '下のエリア内で二本指のピンチイン・ピンチアウトでマイルストーンのタイムラインを拡大・縮小できます。PC では同じエリア内で Ctrl（Mac は ⌘）を押しながらマウスホイールを回しても拡大・縮小できます。',
+  'wca.milestone.timelineScaleReset': '表示倍率をリセット',
   'wca.milestone.record': '記録',
   'wca.milestone.gold': '🥇 金',
   'wca.milestone.silver': '🥈 銀',

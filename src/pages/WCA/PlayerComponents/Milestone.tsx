@@ -12,7 +12,7 @@ import {
   Timeline,
   Typography,
 } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useIntl } from '@@/plugin-locale';
 
 import 'antd/dist/reset.css';
@@ -32,6 +32,19 @@ import './Milestone.less';
 
 const { Text } = Typography;
 type TagRender = SelectProps['tagRender'];
+
+const TIMELINE_ZOOM_MIN = 0.5;
+const TIMELINE_ZOOM_MAX = 1.75;
+const TIMELINE_ZOOM_DEFAULT = 1;
+/** 双指间距过小则忽略，避免误触与除零 */
+const MIN_PINCH_START_DIST = 28;
+
+function touchPairDistance(touches: TouchList): number {
+  if (touches.length < 2) return 0;
+  const a = touches[0];
+  const b = touches[1];
+  return Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+}
 
 // 获取显示用的年月（YYYY-MM-DD）
 const getYearMonthDay = (dateStr?: string): string | null => {
@@ -100,6 +113,97 @@ const MilestoneTimelines: React.FC<MilestoneTimelineProps> = ({
     { label: string; value: MilestoneType }[]
   >([]);
   const [improvementNumber, setImprovementNumber] = useState(33);
+  /** 仅作用于 Card 内时间轴区域；默认 1 */
+  const [timelineZoom, setTimelineZoom] = useState(TIMELINE_ZOOM_DEFAULT);
+  const timelineZoomRef = useRef(timelineZoom);
+  const scaleViewportRef = useRef<HTMLDivElement>(null);
+  const pinchRef = useRef<{ startDist: number; startScale: number } | null>(null);
+
+  timelineZoomRef.current = timelineZoom;
+
+  useEffect(() => {
+    const el = scaleViewportRef.current;
+    if (!el) return;
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length !== 2) {
+        pinchRef.current = null;
+        return;
+      }
+      const d = touchPairDistance(e.touches);
+      if (d < MIN_PINCH_START_DIST) {
+        pinchRef.current = null;
+        return;
+      }
+      pinchRef.current = {
+        startDist: d,
+        startScale: timelineZoomRef.current,
+      };
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length !== 2) return;
+      const d = touchPairDistance(e.touches);
+      if (!pinchRef.current) {
+        if (d >= MIN_PINCH_START_DIST) {
+          pinchRef.current = {
+            startDist: d,
+            startScale: timelineZoomRef.current,
+          };
+        }
+        return;
+      }
+      e.preventDefault();
+      const { startDist, startScale } = pinchRef.current;
+      if (startDist < 1e-3) return;
+      const raw = (startScale * d) / startDist;
+      const next = Math.min(
+        TIMELINE_ZOOM_MAX,
+        Math.max(TIMELINE_ZOOM_MIN, Math.round(raw * 100) / 100),
+      );
+      setTimelineZoom(next);
+    };
+
+    const onTouchEnd = (e: TouchEvent) => {
+      if (e.touches.length < 2) {
+        pinchRef.current = null;
+      } else if (e.touches.length === 2) {
+        const d = touchPairDistance(e.touches);
+        if (d >= MIN_PINCH_START_DIST) {
+          pinchRef.current = {
+            startDist: d,
+            startScale: timelineZoomRef.current,
+          };
+        } else {
+          pinchRef.current = null;
+        }
+      }
+    };
+
+    const onWheel = (e: WheelEvent) => {
+      if (!e.ctrlKey && !e.metaKey) return;
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -0.06 : 0.06;
+      setTimelineZoom((z) => {
+        const n = Math.round((z + delta) * 100) / 100;
+        return Math.min(TIMELINE_ZOOM_MAX, Math.max(TIMELINE_ZOOM_MIN, n));
+      });
+    };
+
+    el.addEventListener('touchstart', onTouchStart, { passive: true });
+    el.addEventListener('touchmove', onTouchMove, { passive: false });
+    el.addEventListener('touchend', onTouchEnd);
+    el.addEventListener('touchcancel', onTouchEnd);
+    el.addEventListener('wheel', onWheel, { passive: false });
+
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart);
+      el.removeEventListener('touchmove', onTouchMove);
+      el.removeEventListener('touchend', onTouchEnd);
+      el.removeEventListener('touchcancel', onTouchEnd);
+      el.removeEventListener('wheel', onWheel);
+    };
+  }, []);
 
   useEffect(() => {
     const milestones = GetMilestones(
@@ -145,7 +249,6 @@ const MilestoneTimelines: React.FC<MilestoneTimelineProps> = ({
       </Tag>
     );
   };
-
 
   return (
     <Card
@@ -220,35 +323,68 @@ const MilestoneTimelines: React.FC<MilestoneTimelineProps> = ({
         </div>
       }
     >
-      <div className="milestone-timeline-wrapper">
-      <Timeline mode="alternate">
-        {filteredMilestones.map((m, index) => {
-          const yearMonthDay = getYearMonthDay(
-            m.date ||
-              m.achieved_on ||
-              m.new_competition_date ||
-              m.last_competition_date ||
-              m.date_achieved,
-          );
+      <div className="milestone-scale-hint">
+        <Text type="secondary" style={{ fontSize: 12 }}>
+          {intl.formatMessage({ id: 'wca.milestone.timelinePinchHint' })}
+          {timelineZoom !== TIMELINE_ZOOM_DEFAULT ? (
+            <>
+              {' '}
+              <Button
+                type="link"
+                size="small"
+                style={{ padding: 0, height: 'auto', fontSize: 12 }}
+                onClick={() => setTimelineZoom(TIMELINE_ZOOM_DEFAULT)}
+              >
+                {intl.formatMessage({ id: 'wca.milestone.timelineScaleReset' })}
+              </Button>
+            </>
+          ) : null}
+        </Text>
+      </div>
+      <div
+        ref={scaleViewportRef}
+        className="milestone-scale-viewport"
+        aria-label={intl.formatMessage({ id: 'wca.milestone.timelineScale' })}
+      >
+        <div
+          className="milestone-timeline-wrapper"
+          style={{ zoom: timelineZoom } as React.CSSProperties}
+        >
+          <Timeline mode="alternate">
+            {filteredMilestones.map((m, index) => {
+              const yearMonthDay = getYearMonthDay(
+                m.date ||
+                  m.achieved_on ||
+                  m.new_competition_date ||
+                  m.last_competition_date ||
+                  m.date_achieved,
+              );
 
-          const isLeft = index % 2 === 1;
+              const isLeft = index % 2 === 1;
 
-          return (
-            <Timeline.Item
-              key={`${m.type}-${index}`} // 更健壮的 key
-              dot={
-                <Badge
-                  color={MILESTONE_COLOR_MAP[m.type as MilestoneType]}
-                  style={{ boxShadow: '0 0 0 2px #fff', marginTop: 8, width: 16, height: 16 }}
-                />
-              }
-              label={yearMonthDay ? <Text type="secondary" style={{position: 'relative', top: 3}}>{yearMonthDay}</Text> : null}
-            >
-              <MilestoneItemContent milestone={m} isLeft={isLeft} />
-            </Timeline.Item>
-          );
-        })}
-      </Timeline>
+              return (
+                <Timeline.Item
+                  key={`${m.type}-${index}`} // 更健壮的 key
+                  dot={
+                    <Badge
+                      color={MILESTONE_COLOR_MAP[m.type as MilestoneType]}
+                      style={{ boxShadow: '0 0 0 2px #fff', marginTop: 8, width: 16, height: 16 }}
+                    />
+                  }
+                  label={
+                    yearMonthDay ? (
+                      <Text type="secondary" style={{ position: 'relative', top: 3 }}>
+                        {yearMonthDay}
+                      </Text>
+                    ) : null
+                  }
+                >
+                  <MilestoneItemContent milestone={m} isLeft={isLeft} />
+                </Timeline.Item>
+              );
+            })}
+          </Timeline>
+        </div>
       </div>
     </Card>
   );
