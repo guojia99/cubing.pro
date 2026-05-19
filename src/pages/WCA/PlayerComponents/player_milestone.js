@@ -55,8 +55,41 @@ export function addCalendarYears(startDate, years) {
     base.setUTCFullYear(base.getUTCFullYear() + years);
     return base.toISOString().slice(0, 10);
 }
-/** 比赛举办地与选手 WCA 注册地是否一致（优先 country_id，缺失时比 country_iso2） */
+/** 中国大陆、香港、澳门、台湾在「是否出国赛」判定中视为同一地区（iso2 / WCA country_id） */
+const GREATER_CHINA_ISO2 = new Set(['CN', 'HK', 'MO', 'TW']);
+function regionKeyForOverseasCompare(countryId, iso2) {
+    const iso = (iso2 || '').trim().toUpperCase();
+    if (GREATER_CHINA_ISO2.has(iso))
+        return '__GREATER_CHINA__';
+    const raw = (countryId || '').trim();
+    if (!raw && !iso)
+        return null;
+    const firstSeg = raw.split(',')[0]?.trim() ?? raw;
+    const compact = firstSeg.toLowerCase().replace(/[\s_-]+/g, '');
+    if (compact === 'china' ||
+        compact === 'hongkong' ||
+        compact === 'macau' ||
+        compact === 'macao' ||
+        compact === 'taiwan' ||
+        compact === 'chinesetaipei') {
+        return '__GREATER_CHINA__';
+    }
+    if (iso)
+        return `iso:${iso}`;
+    if (raw)
+        return `id:${raw}`;
+    return null;
+}
+/**
+ * 比赛举办地与选手 WCA 注册地是否一致（优先 country_id，缺失时比 country_iso2）。
+ * 中国内地、香港、澳门、台湾之间互不算「出国」；文案仍沿用现有里程碑描述。
+ */
 export function competitionCountryMatchesProfile(comp, profile) {
+    const keyC = regionKeyForOverseasCompare(comp.country_id || '', comp.country_iso2 || '');
+    const keyP = regionKeyForOverseasCompare(profile.countryId || '', profile.country_iso2 || '');
+    if (keyP !== null && keyC !== null) {
+        return keyP === keyC;
+    }
     const pid = (profile.countryId || '').trim();
     const cid = (comp.country_id || '').trim();
     if (pid && cid)
@@ -95,6 +128,8 @@ export function createFirstOverseasCompetitionMilestone(sortedResults, compMap, 
                 date: comp.start_date,
                 competition_id: comp.id,
                 competition_name: comp.name,
+                overseas_country_iso2: comp.country_iso2,
+                overseas_country_id: comp.country_id,
             },
         ];
     }

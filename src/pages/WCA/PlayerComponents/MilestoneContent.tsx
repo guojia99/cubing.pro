@@ -1,4 +1,5 @@
 import { resultsTimeFormat } from '@/pages/WCA/utils/wca_results';
+import { getCountryDisplayName } from '@/pages/WCA/PlayerComponents/region/all_contiry';
 import { Tag, Typography } from 'antd';
 import React from 'react';
 import './MilestoneContent.less';
@@ -18,6 +19,10 @@ export const defaultMilestoneTypeOptions: { label: string; value: MilestoneType 
   { label: '领奖台', value: 'first_podium' },
   { label: '破纪录', value: 'record_breaker' },
   { label: '百次参赛', value: 'nth_competition' },
+  { label: '三阶 sub-10 平均', value: 'first_333_average_sub10' },
+  { label: '单届多领奖台', value: 'first_triple_podium_competition' },
+  { label: '单年高频参赛', value: 'busy_competition_year' },
+  { label: '单届多金', value: 'multi_gold_single_comp' },
 ];
 
 // 颜色映射：每种里程碑类型对应一个 Ant Design 预设颜色
@@ -32,6 +37,10 @@ export const MILESTONE_COLOR_MAP: Record<MilestoneType, string> = {
   first_podium: 'orange',
   record_breaker: 'red',
   nth_competition: 'lime',
+  first_333_average_sub10: 'magenta',
+  first_triple_podium_competition: 'orange',
+  busy_competition_year: 'processing',
+  multi_gold_single_comp: 'gold',
 };
 
 // 气泡颜色映射
@@ -47,6 +56,10 @@ export const BUBBLE_COLOR_MAP: Record<MilestoneType, { bg: string; border: strin
     first_podium: { bg: '#f8d7da', border: '#c92a2a', text: '#801b1b' },
     record_breaker: { bg: '#fee2e2', border: '#ef4444', text: '#b91c1c' },
     nth_competition: { bg: '#f6f6f6', border: '#ff0000', text: '#e2134e' },
+    first_333_average_sub10: { bg: '#fce7f3', border: '#db2777', text: '#831843' },
+    first_triple_podium_competition: { bg: '#ffedd5', border: '#ea580c', text: '#9a3412' },
+    busy_competition_year: { bg: '#e0f2fe', border: '#0284c7', text: '#0c4a6e' },
+    multi_gold_single_comp: { bg: '#fef9c3', border: '#ca8a04', text: '#713f12' },
   };
 
 interface MilestoneItemContentProps {
@@ -61,6 +74,14 @@ const MilestoneItemContent: React.FC<MilestoneItemContentProps> = ({ milestone, 
     border: '#d9d9d9',
     text: '#000',
   };
+
+  const overseasDestinationLabel =
+    milestone.type === 'first_overseas_competition'
+      ? getCountryDisplayName(
+          milestone.overseas_country_iso2,
+          milestone.overseas_country_id,
+        ).trim()
+      : '';
 
   return (
     <div
@@ -146,7 +167,17 @@ const MilestoneItemContent: React.FC<MilestoneItemContentProps> = ({ milestone, 
           </Tag>
         )}
 
-        {(milestone.old_best_time !== undefined || milestone.new_best_time !== undefined) && (
+        {overseasDestinationLabel ? (
+          <Tag color="purple" style={{ fontSize: 14 }}>
+            {intl.formatMessage(
+              { id: 'wca.milestone.overseasDestinationTag' },
+              { country: overseasDestinationLabel },
+            )}
+          </Tag>
+        ) : null}
+
+        {((milestone.old_best_time !== undefined || milestone.new_best_time !== undefined) ||
+          ((milestone.best_is_average || milestone.best_is_single) && milestone.result !== undefined)) && (
           <>
             {milestone.best_is_single && (
               <Tag color="red">
@@ -194,7 +225,53 @@ const MilestoneItemContent: React.FC<MilestoneItemContentProps> = ({ milestone, 
             )}
           </>
         )}
+
+        {milestone.podium_count != null && milestone.podium_count >= 3 ? (
+          <Tag color="orange">
+            {intl.formatMessage({ id: 'wca.milestone.triplePodiumTag' }, { count: milestone.podium_count })}
+          </Tag>
+        ) : null}
+
+        {milestone.gold_count != null && milestone.gold_count >= 2 ? (
+          <Tag color="gold" style={{ color: '#000', fontWeight: 700 }}>
+            {intl.formatMessage({ id: 'wca.milestone.multiGoldTag' }, { count: milestone.gold_count })}
+          </Tag>
+        ) : null}
+
+        {milestone.busy_calendar_year != null && milestone.busy_year_comp_count != null ? (
+          <Tag color="processing">
+            {intl.formatMessage(
+              { id: 'wca.milestone.busyYearTag' },
+              { year: milestone.busy_calendar_year, count: milestone.busy_year_comp_count },
+            )}
+          </Tag>
+        ) : null}
       </div>
+
+      {milestone.prior_333_round_lines && milestone.prior_333_round_lines.length > 0 ? (
+        <div
+          style={{
+            marginTop: 10,
+            width: '100%',
+            maxHeight: 220,
+            overflowY: 'auto',
+            textAlign: isLeft ? 'right' : 'left',
+          }}
+        >
+          <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
+            {intl.formatMessage({ id: 'wca.milestone.prior333RoundsTitle' })}
+          </Text>
+          {milestone.prior_333_round_lines.map((line, i) => (
+            <Text
+              key={`${i}-${line.slice(0, 24)}`}
+              type="secondary"
+              style={{ fontSize: 12, display: 'block', lineHeight: 1.55 }}
+            >
+              {line}
+            </Text>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 };

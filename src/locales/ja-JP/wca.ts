@@ -159,6 +159,7 @@ export default {
   'wca.milestone.helpIntro':
     '各タイプの意味と生成条件の概要です。表示はデータと本ページのルールに依存します。',
   'wca.milestone.helpClose': '閉じる',
+  'wca.milestone.overseasDestinationTag': '開催地: {country}',
   'wca.milestone.help.first_competition': '開始日が最も早い、初めての WCA 大会。',
   'wca.milestone.help.first_overseas_competition':
     '成績の時系列で、WCA 登録国・地域以外で初めて参加した大会。初戦から海外の場合は本項目は出しません。',
@@ -174,6 +175,14 @@ export default {
   'wca.milestone.help.first_blindfolded_success': '各 BLD 種目で初めて有効なシングルまたは平均。',
   'wca.milestone.help.significant_improvement':
     '自己ベスト比でシングルまたは平均が、設定した改善閾値（既定 33%）以上一気に上がったとき。',
+  'wca.milestone.help.first_333_average_sub10':
+    '大会日とラウンド順で、3x3 平均が初めて 10.00 秒未満になった記録。それ以前の各 3x3 ラウンドを列挙（有効平均がないラウンドも含む）。',
+  'wca.milestone.help.first_triple_podium_competition':
+    '参加順で、決勝系ラウンドで少なくとも 3 種目で表彰台に入った最初の大会。',
+  'wca.milestone.help.busy_competition_year':
+    '1 暦年内の WCA 大会が 15 を超える年（16 回以上）。その年の最後の大会（開始日）に 1 件生成し、年間回数を表示。',
+  'wca.milestone.help.multi_gold_single_comp':
+    '同じ大会の決勝系ラウンドで少なくとも 2 種目で金メダル。該当する大会ごとに 1 件。',
 
   // Milestone types (for filter)
   'wca.milestone.type.first_competition': '初大会',
@@ -186,6 +195,10 @@ export default {
   'wca.milestone.type.first_podium': '初表彰台',
   'wca.milestone.type.record_breaker': '記録更新',
   'wca.milestone.type.nth_competition': 'N回目の大会',
+  'wca.milestone.type.first_333_average_sub10': '3x3 平均 sub-10',
+  'wca.milestone.type.first_triple_podium_competition': '1大会複数表彰台',
+  'wca.milestone.type.busy_competition_year': '多出場の年',
+  'wca.milestone.type.multi_gold_single_comp': '1大会複数金',
 
   // Milestone 動態描述 ({param} プレースホルダー)
   'wca.milestone.desc.first_competition': '初大会！',
@@ -204,6 +217,16 @@ export default {
   'wca.milestone.desc.podium_other': '{event}で初表彰台 ({result})',
   'wca.milestone.desc.record_single': '{event} シングル{time}で{record}記録更新',
   'wca.milestone.desc.record_avg': '{event} 平均{time}で{record}記録更新',
+  'wca.milestone.desc.first_333_average_sub10': '初の 3x3 平均 sub-10：{time}',
+  'wca.milestone.desc.first_triple_podium_competition': '初めて1大会で{count}種目が表彰台',
+  'wca.milestone.desc.busy_competition_year': '{year}年にWCA大会{count}回参加',
+  'wca.milestone.desc.multi_gold_single_comp': '1大会で金メダル{count}個',
+  'wca.milestone.line333Round': '{date} · {comp} · {round} · 平均 {avg}',
+  'wca.milestone.roundAvgMissing': '（平均なし）',
+  'wca.milestone.prior333RoundsTitle': 'sub-10 達成前の 3x3 ラウンド',
+  'wca.milestone.busyYearTag': '{year}年 {count}大会',
+  'wca.milestone.triplePodiumTag': '表彰台 {count}種目',
+  'wca.milestone.multiGoldTag': '金{count}',
 
   // ResultDetailWithRankingTimers
   'wca.chart.rankCurve': '成績順位曲線',
