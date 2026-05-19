@@ -154,11 +154,33 @@ export default {
   'wca.milestone.single': 'Single',
   'wca.milestone.average': 'Average',
   'wca.milestone.result': 'Result',
+  'wca.milestone.helpTitle': 'About milestones',
+  'wca.milestone.helpAria': 'Open milestone guide',
+  'wca.milestone.helpIntro':
+    'Brief meaning and when each milestone is generated, based on current data and this page’s rules.',
+  'wca.milestone.helpClose': 'OK',
+  'wca.milestone.help.first_competition': 'Your first WCA competition by start date.',
+  'wca.milestone.help.first_overseas_competition':
+    'First time you compete outside your WCA country/region (result timeline order). Omitted if your debut was already abroad.',
+  'wca.milestone.help.competing_anniversary':
+    'First competition strictly after each 10 / 15 / 20… calendar-year anniversary of your debut; if the same competition would repeat the next tier, it is skipped.',
+  'wca.milestone.help.comeback': 'Two consecutive competitions whose start dates are about ≥5 years apart.',
+  'wca.milestone.help.nth_competition': 'When your cumulative count reaches 100, 200, 300… WCA competitions.',
+  'wca.milestone.help.grand_slam':
+    'Uses this page’s WCA event order: most events need a first valid single and average; Feet (333ft) is skipped; Multi-BLD (333mbf) only needs a single. Created once all are met; days span from the earliest valid result to the last requirement (inclusive).',
+  'wca.milestone.help.record_breaker': 'A result flagged as NR / AsR / CR / WR, etc.',
+  'wca.milestone.help.first_podium':
+    'First final-round podium or first gold per event, following this page’s round rules.',
+  'wca.milestone.help.first_blindfolded_success': 'First valid single or average in each blindfold event.',
+  'wca.milestone.help.significant_improvement':
+    'Single or average improves your previous PB by at least the current improvement threshold (default 33%).',
 
   // Milestone types (for filter)
   'wca.milestone.type.first_competition': 'First Competition',
+  'wca.milestone.type.first_overseas_competition': 'First Competition Abroad',
+  'wca.milestone.type.competing_anniversary': 'Competing Anniversary',
   'wca.milestone.type.significant_improvement': 'Significant Improvement',
-  'wca.milestone.type.grand_slam': 'Grand Slam',
+  'wca.milestone.type.grand_slam': 'All events completed',
   'wca.milestone.type.comeback': 'Comeback',
   'wca.milestone.type.first_blindfolded_success': 'First BLD Success',
   'wca.milestone.type.first_podium': 'First Podium',
@@ -167,8 +189,11 @@ export default {
 
   // Milestone dynamic descriptions (use {param} placeholders)
   'wca.milestone.desc.first_competition': 'First competition!',
+  'wca.milestone.desc.first_overseas_competition': 'First overseas competition',
+  'wca.milestone.desc.competing_anniversary': '{years} years competing',
   'wca.milestone.desc.nth_competition': '{n}th WCA competition!',
-  'wca.milestone.desc.grand_slam': 'Grand Slam achieved in {days} days!',
+  'wca.milestone.desc.grand_slam':
+    'All official events met! {days} days from your first valid result to the last requirement.',
   'wca.milestone.desc.improvement_both': '{event} improved both single ({singlePercent}%) and average ({avgPercent}%) PBs',
   'wca.milestone.desc.improvement_single': '{event} improved single PB by {percent}%',
   'wca.milestone.desc.improvement_avg': '{event} improved average PB by {percent}%',

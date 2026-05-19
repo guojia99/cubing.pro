@@ -162,6 +162,8 @@ export default defineConfig({
   ],
   mfsu: {
     strategy: 'normal',
+    // flag-icons 通过深层路径引入 CSS，在 MF 容器里常无法解析，排除后由主应用正常打包
+    exclude: ['flag-icons'],
   },
   esbuildMinifyIIFE: true,
   requestRecord: {},

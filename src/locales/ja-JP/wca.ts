@@ -154,11 +154,33 @@ export default {
   'wca.milestone.single': 'シングル',
   'wca.milestone.average': '平均',
   'wca.milestone.result': '記録',
+  'wca.milestone.helpTitle': 'マイルストーン説明',
+  'wca.milestone.helpAria': '説明を開く',
+  'wca.milestone.helpIntro':
+    '各タイプの意味と生成条件の概要です。表示はデータと本ページのルールに依存します。',
+  'wca.milestone.helpClose': '閉じる',
+  'wca.milestone.help.first_competition': '開始日が最も早い、初めての WCA 大会。',
+  'wca.milestone.help.first_overseas_competition':
+    '成績の時系列で、WCA 登録国・地域以外で初めて参加した大会。初戦から海外の場合は本項目は出しません。',
+  'wca.milestone.help.competing_anniversary':
+    '初戦から 10 / 15 / 20… 年の各記念日（暦）より後の最初の大会。次の段と同じ大会なら重複しません。',
+  'wca.milestone.help.comeback': '参加順で隣り合う 2 大会の開始日がおおよそ 5 年以上離れている場合。',
+  'wca.milestone.help.nth_competition': '累計 100、200、300… 回目の WCA 大会。',
+  'wca.milestone.help.grand_slam':
+    '本ページの公式種目順に基づき、多くの種目は初めての有効シングルと平均が必要。足BLD（333ft）は対象外、3x3x3 複数BLD（333mbf）はシングルのみ。すべて達成後に表示。日数は最も早い有効記録から最後の条件達成まで（両端含む）。',
+  'wca.milestone.help.record_breaker': 'NR / AsR / CR / WR などの記録フラグが付いた成績。',
+  'wca.milestone.help.first_podium':
+    '決勝系ラウンドで、種目ごとに初の表彰台または初の金メダル（本ページのラウンド条件に準拠）。',
+  'wca.milestone.help.first_blindfolded_success': '各 BLD 種目で初めて有効なシングルまたは平均。',
+  'wca.milestone.help.significant_improvement':
+    '自己ベスト比でシングルまたは平均が、設定した改善閾値（既定 33%）以上一気に上がったとき。',
 
   // Milestone types (for filter)
   'wca.milestone.type.first_competition': '初大会',
+  'wca.milestone.type.first_overseas_competition': '初の海外大会',
+  'wca.milestone.type.competing_anniversary': '参加記念',
   'wca.milestone.type.significant_improvement': '大幅改善',
-  'wca.milestone.type.grand_slam': 'グランドスラム',
+  'wca.milestone.type.grand_slam': '全種目達成',
   'wca.milestone.type.comeback': '復帰',
   'wca.milestone.type.first_blindfolded_success': '初BLD成功',
   'wca.milestone.type.first_podium': '初表彰台',
@@ -167,8 +189,10 @@ export default {
 
   // Milestone 動態描述 ({param} プレースホルダー)
   'wca.milestone.desc.first_competition': '初大会！',
+  'wca.milestone.desc.first_overseas_competition': '初の海外参戦',
+  'wca.milestone.desc.competing_anniversary': '参加満{years}周年',
   'wca.milestone.desc.nth_competition': '{n}回目のWCA大会！',
-  'wca.milestone.desc.grand_slam': 'グランドスラム達成！{days}日かかりました',
+  'wca.milestone.desc.grand_slam': '全種目達成！初の有効記録から最後の条件達成まで {days} 日',
   'wca.milestone.desc.improvement_both': '{event} シングル({singlePercent}%)と平均({avgPercent}%)の両方で自己ベスト更新',
   'wca.milestone.desc.improvement_single': '{event} シングル自己ベストを{percent}%更新',
   'wca.milestone.desc.improvement_avg': '{event} 平均自己ベストを{percent}%更新',

@@ -1,9 +1,11 @@
+import { QuestionCircleOutlined } from '@ant-design/icons';
 import {
   Badge,
   Button,
   Card,
   Form,
   InputNumber,
+  Modal,
   Select,
   SelectProps,
   Slider,
@@ -12,7 +14,7 @@ import {
   Timeline,
   Typography,
 } from 'antd';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from '@@/plugin-locale';
 
 import 'antd/dist/reset.css';
@@ -32,6 +34,12 @@ import './Milestone.less';
 
 const { Text } = Typography;
 type TagRender = SelectProps['tagRender'];
+
+const MILESTONE_HELP_ORDER: MilestoneType[] = (
+  Object.entries(MILESTONE_TYPE_PRIORITY) as [MilestoneType, number][]
+)
+  .sort((a, b) => a[1] - b[1])
+  .map(([k]) => k);
 
 const TIMELINE_ZOOM_MIN = 0.5;
 const TIMELINE_ZOOM_MAX = 1.75;
@@ -113,6 +121,7 @@ const MilestoneTimelines: React.FC<MilestoneTimelineProps> = ({
     { label: string; value: MilestoneType }[]
   >([]);
   const [improvementNumber, setImprovementNumber] = useState(33);
+  const [helpOpen, setHelpOpen] = useState(false);
   /** 仅作用于 Card 内时间轴区域；默认 1 */
   const [timelineZoom, setTimelineZoom] = useState(TIMELINE_ZOOM_DEFAULT);
   const timelineZoomRef = useRef(timelineZoom);
@@ -229,6 +238,25 @@ const MilestoneTimelines: React.FC<MilestoneTimelineProps> = ({
     setMilestoneTypeOptions(mOpt);
   }, [excludedTypes, ascending, improvementNumber, intl, wcaProfile, wcaResults, comps]);
 
+  const helpModalBody = useMemo(
+    () => (
+      <div style={{ maxHeight: 'min(70vh, 520px)', overflowY: 'auto', paddingRight: 4 }}>
+        <Text type="secondary" style={{ display: 'block', marginBottom: 16 }}>
+          {intl.formatMessage({ id: 'wca.milestone.helpIntro' })}
+        </Text>
+        {MILESTONE_HELP_ORDER.map((type) => (
+          <div key={type} style={{ marginBottom: 14 }}>
+            <Text strong>{intl.formatMessage({ id: `wca.milestone.type.${type}` })}</Text>
+            <Text type="secondary" style={{ display: 'block', marginTop: 4 }}>
+              {intl.formatMessage({ id: `wca.milestone.help.${type}` })}
+            </Text>
+          </div>
+        ))}
+      </div>
+    ),
+    [intl],
+  );
+
   const tagRender: TagRender = (props) => {
     const { label, value, closable, onClose } = props;
 
@@ -251,21 +279,40 @@ const MilestoneTimelines: React.FC<MilestoneTimelineProps> = ({
   };
 
   return (
-    <Card
+    <>
+      <Card
       title={
         <div style={{ paddingTop: 16, paddingBottom: 16 }}>
-          <Space>
-            <Text strong>{intl.formatMessage({ id: 'wca.milestone.title' })}</Text>
-            <Text type="secondary">
-              {intl.formatMessage({ id: 'wca.milestone.count' }, { count: filteredMilestones.length })}
-            </Text>
-          </Space>
-
-          <Button size="small" onClick={() => setAscending(!ascending)} style={{ float: 'right' }}>
-            {ascending
-              ? intl.formatMessage({ id: 'wca.milestone.descOrder' })
-              : intl.formatMessage({ id: 'wca.milestone.ascOrder' })}
-          </Button>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 8,
+              flexWrap: 'wrap',
+            }}
+          >
+            <Space wrap>
+              <Text strong>{intl.formatMessage({ id: 'wca.milestone.title' })}</Text>
+              <Text type="secondary">
+                {intl.formatMessage({ id: 'wca.milestone.count' }, { count: filteredMilestones.length })}
+              </Text>
+            </Space>
+            <Space size={4} wrap>
+              <Button
+                type="text"
+                size="small"
+                icon={<QuestionCircleOutlined />}
+                aria-label={intl.formatMessage({ id: 'wca.milestone.helpAria' })}
+                onClick={() => setHelpOpen(true)}
+              />
+              <Button size="small" onClick={() => setAscending(!ascending)}>
+                {ascending
+                  ? intl.formatMessage({ id: 'wca.milestone.descOrder' })
+                  : intl.formatMessage({ id: 'wca.milestone.ascOrder' })}
+              </Button>
+            </Space>
+          </div>
 
           <div style={{ marginTop: 16 }}>
             <Form.Item label={intl.formatMessage({ id: 'wca.milestone.excludeLabel' })}>
@@ -387,6 +434,21 @@ const MilestoneTimelines: React.FC<MilestoneTimelineProps> = ({
         </div>
       </div>
     </Card>
+    <Modal
+      title={intl.formatMessage({ id: 'wca.milestone.helpTitle' })}
+      open={helpOpen}
+      onCancel={() => setHelpOpen(false)}
+      footer={
+        <Button type="primary" onClick={() => setHelpOpen(false)}>
+          {intl.formatMessage({ id: 'wca.milestone.helpClose' })}
+        </Button>
+      }
+      width={560}
+      destroyOnClose
+    >
+      {helpModalBody}
+    </Modal>
+    </>
   );
 };
 

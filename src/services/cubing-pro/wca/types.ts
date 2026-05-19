@@ -224,6 +224,11 @@ export interface WCACompetition {
   country_iso2: string;
 
   /**
+   * WCA 国家 ID（如 China、USA），与选手 profile 的 countryId 同源；部分数据源可能缺失
+   */
+  country_id?: string;
+
+  /**
    * 比赛项目 ID 列表
    */
   event_ids: string[];

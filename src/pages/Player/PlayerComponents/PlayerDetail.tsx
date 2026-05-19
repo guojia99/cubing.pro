@@ -203,7 +203,7 @@ const PlayerDetail: React.FC<PlayerDetailProps> = ({ player }) => {
       }
     }
     if (has) {
-      tags.push(<Tag color="red">大满贯</Tag>);
+      tags.push(<Tag color="red">全项目达成</Tag>);
     }
   }
 
