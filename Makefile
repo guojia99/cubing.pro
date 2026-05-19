@@ -6,7 +6,7 @@ start:
 build:
 	rm -rf dist.zip dist/
 	BUILD_TIMESTAMP=$$(date +%s) npm run build
-	zip -r -q dist.zip dist/
+	#zip -r -q dist.zip dist/
 	#rm -rf dist
 # 	cp -r HowToCook dist/
 

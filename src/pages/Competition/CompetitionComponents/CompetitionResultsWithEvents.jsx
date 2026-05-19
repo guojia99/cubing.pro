@@ -1,0 +1,81 @@
+import { CubesCn } from '@/components/CubeIcon/cube';
+import { CubeIcon } from '@/components/CubeIcon/cube_icon';
+import { sortResults } from '@/components/Data/types/result';
+import { resultsToMap } from '@/components/Data/cube_result/result_detail';
+import { ResultsTable } from '@/components/Data/cube_result/result_tables';
+import { useNavigate } from '@@/exports';
+import { Card, Divider, Space } from 'antd';
+import React, { useEffect } from 'react';
+import { RouteMaps } from "@/components/Data/cube_result/event_route";
+const CompetitionResultsWithEvents = ({ comp, results, events, records, }) => {
+    useEffect(() => {
+        // 获取查询参数中的 player_name_key
+        const searchParams = new URLSearchParams(location.search);
+        const playerNameKey = searchParams.get('events_name_key');
+        if (playerNameKey) {
+            const element = document.getElementById(playerNameKey);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    }, [location.search]);
+    const navigate = useNavigate();
+    if (!events || events.length === 0) {
+        return <></>;
+    }
+    let body = [];
+    let resultData = results;
+    let resultMap = resultsToMap(resultData);
+    events.forEach((event) => {
+        const results = resultMap.withEvent.get(event.id);
+        if (results === undefined || results.length === 0) {
+            return;
+        }
+        // todo
+        // @ts-ignore
+        const resultWithRoundMap = results.reduce((group, item) => {
+            if (!group[item.RoundNumber]) {
+                group[item.RoundNumber] = [];
+            }
+            group[item.RoundNumber].push(item);
+            return group;
+        }, {});
+        const handleClick = () => {
+            const searchParams = new URLSearchParams(location.search);
+            searchParams.set('events_name_key', event.id);
+            navigate(`${location.pathname}?${searchParams.toString()}`);
+        };
+        let tables = [];
+        for (let i = 1; i < 255; i++) {
+            let data = resultWithRoundMap[i];
+            if (data === null || data === undefined) {
+                break;
+            }
+            data = data;
+            data = sortResults(data);
+            let key = ['Rank', 'PersonName', 'Best', 'Average', 'Result'];
+            if (RouteMaps.get(data[0].EventRoute)?.repeatedly) {
+                key = ['Rank', 'PersonName', 'Best', "Result_with_repeatedly"];
+            }
+            tables.push(<Card title={data[0].Round} size="small">
+          {ResultsTable(data, key, records)}
+        </Card>);
+        }
+        body.push(<>
+        <Divider orientation="left">
+          <h4>
+            <strong onClick={handleClick} id={event.id} style={{ cursor: 'pointer' }}>
+              {CubeIcon(event.id, event.id + 'icon', {})} {CubesCn(event.id)}
+            </strong>
+          </h4>
+        </Divider>
+        <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
+          {tables}
+        </Space>
+        <div style={{ marginBottom: "50px" }}></div>
+      </>);
+    });
+    return <>{body}</>;
+};
+export default CompetitionResultsWithEvents;
+//# sourceMappingURL=CompetitionResultsWithEvents.jsx.map

@@ -108,15 +108,17 @@ const CompetitionTable: React.FC<WCACompetitionTableProps> = ({ competitions, wc
         if (findName){
           cpName = findName.name
         }
-        return <Button
-          type="link"
-          size="small"
-          href={record.website}
-          target="_blank"
-          style={{ padding: 0, height: 'auto', lineHeight: 'inherit' }}
-        >
-          {cpName}
-        </Button>
+        return (
+          <Button
+            type="link"
+            size="small"
+            href={`https://www.worldcubeassociation.org/competitions/${record.id}`}
+            target="_blank"
+            style={{ padding: 0, height: 'auto', lineHeight: 'inherit' }}
+          >
+            {cpName}
+          </Button>
+        );
 
       }
     },

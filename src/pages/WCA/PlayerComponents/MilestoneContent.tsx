@@ -9,8 +9,10 @@ const { Text } = Typography;
 
 export const defaultMilestoneTypeOptions: { label: string; value: MilestoneType }[] = [
   { label: '首次比赛', value: 'first_competition' },
+  { label: '首次出国赛', value: 'first_overseas_competition' },
+  { label: '参赛周年', value: 'competing_anniversary' },
   { label: '巨大进步', value: 'significant_improvement' },
-  { label: '大满贯', value: 'grand_slam' },
+  { label: '全项目达成', value: 'grand_slam' },
   { label: '回归', value: 'comeback' },
   { label: '盲拧首成', value: 'first_blindfolded_success' },
   { label: '领奖台', value: 'first_podium' },
@@ -21,6 +23,8 @@ export const defaultMilestoneTypeOptions: { label: string; value: MilestoneType 
 // 颜色映射：每种里程碑类型对应一个 Ant Design 预设颜色
 export const MILESTONE_COLOR_MAP: Record<MilestoneType, string> = {
   first_competition: 'blue',
+  first_overseas_competition: 'geekblue',
+  competing_anniversary: 'cyan',
   significant_improvement: 'green',
   grand_slam: 'gold',
   comeback: 'purple',
@@ -34,6 +38,8 @@ export const MILESTONE_COLOR_MAP: Record<MilestoneType, string> = {
 export const BUBBLE_COLOR_MAP: Record<MilestoneType, { bg: string; border: string; text: string }> =
   {
     first_competition: { bg: '#dbeafe', border: '#3b82f6', text: '#1e40af' },
+    first_overseas_competition: { bg: '#e0e7ff', border: '#6366f1', text: '#312e81' },
+    competing_anniversary: { bg: '#cffafe', border: '#06b6d4', text: '#155e75' },
     significant_improvement: { bg: '#dcfce7', border: '#22c55e', text: '#166534' },
     grand_slam: { bg: '#fef9c3', border: '#eab308', text: '#854d0e' },
     comeback: { bg: '#e9d5ff', border: '#a855f7', text: '#7e22ce' },

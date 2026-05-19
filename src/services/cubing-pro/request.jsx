@@ -1,0 +1,70 @@
+import axios from "axios";
+import { WarnToast } from "@/components/Alert/toast";
+const dev = true;
+export function getAPIUrl() {
+    if (dev) {
+        return "https://cubing.pro/v3/cube-api";
+    }
+    const hostname = window.location.hostname;
+    // 本地测试
+    if (hostname === "localhost" || hostname === "127.0.0.1" || hostname === '0.0.0.0') {
+        return "http://127.0.0.1:20000/v3/cube-api";
+    }
+    // // 内网测试
+    // if (/^192\.168/.test(hostname) || /^10./.test(hostname)) {
+    //   return window.location.protocol + "//" + hostname + ":20000/v3/cube-api"
+    // }
+    // 正式网络
+    return window.location.protocol + "//" + hostname + ":" + window.location.port + "/v3/cube-api";
+}
+export function isLocal() {
+    const hostname = window.location.hostname;
+    // 本地测试
+    if (hostname === "localhost" || hostname === "127.0.0.1" || hostname === '0.0.0.0') {
+        return true;
+    }
+    return /^192\.168/.test(hostname) || /^10./.test(hostname);
+}
+/** 优先使用业务文案（如改名冷却提示），避免只显示泛化的 message（如「无权限」）。 */
+export function getApiErrorDisplayMessage(body) {
+    if (body === null || typeof body !== 'object')
+        return undefined;
+    const d = body;
+    if (typeof d.data === 'string' && d.data.trim())
+        return d.data.trim();
+    if (typeof d.error === 'string' && d.error.trim())
+        return d.error.trim();
+    if (typeof d.message === 'string' && d.message.trim())
+        return d.message.trim();
+    return undefined;
+}
+export const Request = axios.create({
+    baseURL: getAPIUrl(),
+    timeout: 900000,
+});
+Request.defaults.timeout = 900000;
+Request.interceptors.response.use((response) => {
+    return response;
+}, (error) => {
+    const resp = error.response;
+    if (resp === undefined) {
+        return Promise.reject(error);
+    }
+    console.log(resp);
+    const msg = resp.data;
+    const url = error.config?.url ?? '';
+    const skipGlobalToast = url.includes('/auth/user/detail');
+    if (msg !== undefined && !skipGlobalToast) {
+        const display = getApiErrorDisplayMessage(msg) ?? msg.message;
+        WarnToast(<>错误: {display}{msg.code != null ? ` (${msg.code})` : ''}</>);
+    }
+    else {
+        // const url = error.config?.url
+        if (isLocal()) {
+            // message.warning("错误: " + url + "| (" + msg + ")").then()
+            // WarnToast(<>未知错误: {url} ({status})</>)
+        }
+    }
+    return Promise.reject(error);
+});
+//# sourceMappingURL=request.jsx.map

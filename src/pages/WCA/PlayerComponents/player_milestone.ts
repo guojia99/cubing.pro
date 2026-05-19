@@ -12,24 +12,28 @@ export type FormatMessageFn = (
 
 export type MilestoneType =
   | 'first_competition'
+  | 'first_overseas_competition'
+  | 'competing_anniversary'
   | 'comeback'
   | 'nth_competition'
   | 'grand_slam'
   | 'record_breaker'
   | 'first_podium'
   | 'first_blindfolded_success'
-  | 'significant_improvement'
+  | 'significant_improvement';
 
 
-export  const MILESTONE_TYPE_PRIORITY: Record<MilestoneType, number> = {
+export const MILESTONE_TYPE_PRIORITY: Record<MilestoneType, number> = {
   first_competition: 0,
-  comeback: 1,
-  nth_competition: 2,
-  grand_slam: 3,
-  record_breaker: 4,
-  first_podium: 5,
-  first_blindfolded_success: 6,
-  significant_improvement: 7,
+  first_overseas_competition: 1,
+  competing_anniversary: 2,
+  comeback: 3,
+  nth_competition: 4,
+  grand_slam: 5,
+  record_breaker: 6,
+  first_podium: 7,
+  first_blindfolded_success: 8,
+  significant_improvement: 9,
 };
 
 export interface Milestone {
@@ -59,6 +63,8 @@ export interface Milestone {
   record_type?: 'NR' | 'AsR' | 'WR' | 'CR';
   record_value?: number;
   nth_competition_count?: number; // e.g., 100, 200, 300
+  /** 参赛 N 周年（如 10、15、20） */
+  anniversary_years?: number;
 }
 
 export function isValidTime(time: number): boolean {
@@ -98,6 +104,103 @@ export function getCompetitionDateFromResult(
 ): string | undefined {
   const comp = compMap.get(result.competition_id);
   return comp?.start_date;
+}
+
+/** 首秀日 YYYY-MM-DD 起算 + N 个日历年（UTC，避免本地时区偏移一天） */
+export function addCalendarYears(startDate: string, years: number): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(startDate);
+  if (!m) return startDate;
+  const y = Number(m[1]);
+  const mo = Number(m[2]);
+  const d = Number(m[3]);
+  const base = new Date(Date.UTC(y, mo - 1, d));
+  base.setUTCFullYear(base.getUTCFullYear() + years);
+  return base.toISOString().slice(0, 10);
+}
+
+/** 比赛举办地与选手 WCA 注册地是否一致（优先 country_id，缺失时比 country_iso2） */
+export function competitionCountryMatchesProfile(
+  comp: WCACompetition,
+  profile: WcaProfile,
+): boolean {
+  const pid = (profile.countryId || '').trim();
+  const cid = (comp.country_id || '').trim();
+  if (pid && cid) return cid === pid;
+  const isoP = (profile.country_iso2 || '').toUpperCase();
+  const isoC = (comp.country_iso2 || '').toUpperCase();
+  if (!isoP || !isoC) return true;
+  return isoC === isoP;
+}
+
+/** 按成绩时间线首次出现的比赛 ID 顺序（与 sortResultsByCompDate 一致时需传入已排序成绩） */
+export function createFirstOverseasCompetitionMilestone(
+  sortedResults: WCAResult[],
+  compMap: Map<string, WCACompetition>,
+  wcaProfile: WcaProfile,
+  formatMessage: FormatMessageFn,
+): Milestone[] {
+  const visitOrder: string[] = [];
+  const seen = new Set<string>();
+  for (const r of sortedResults) {
+    if (seen.has(r.competition_id)) continue;
+    seen.add(r.competition_id);
+    visitOrder.push(r.competition_id);
+  }
+
+  let firstCompId: string | undefined;
+  for (const compId of visitOrder) {
+    const comp = compMap.get(compId);
+    if (!comp) continue;
+    if (firstCompId === undefined) firstCompId = compId;
+    if (competitionCountryMatchesProfile(comp, wcaProfile)) continue;
+
+    if (compId === firstCompId) return [];
+
+    return [
+      {
+        type: 'first_overseas_competition',
+        description: formatMessage({ id: 'wca.milestone.desc.first_overseas_competition' }),
+        date: comp.start_date,
+        competition_id: comp.id,
+        competition_name: comp.name,
+      },
+    ];
+  }
+  return [];
+}
+
+/**
+ * 参赛满 10 / 15 / 20… 周年：首秀日起满 N 年后的「首场」比赛（start_date 严格晚于 N 周年日），
+ * 若与上一档周年落在同一场比赛则不重复生成。
+ */
+export function createCompetingAnniversaryMilestones(
+  sortedComps: WCACompetition[],
+  formatMessage: FormatMessageFn,
+): Milestone[] {
+  if (sortedComps.length === 0) return [];
+
+  const firstDate = sortedComps[0].start_date;
+  const milestones: Milestone[] = [];
+  let lastEmittedCompId: string | null = null;
+
+  for (let n = 10; n <= 100; n += 5) {
+    const threshold = addCalendarYears(firstDate, n);
+    const hit = sortedComps.find((c) => c.start_date > threshold);
+    if (!hit) break;
+    if (lastEmittedCompId !== null && hit.id === lastEmittedCompId) continue;
+
+    milestones.push({
+      type: 'competing_anniversary',
+      description: formatMessage({ id: 'wca.milestone.desc.competing_anniversary' }, { years: n }),
+      anniversary_years: n,
+      date: hit.start_date,
+      competition_id: hit.id,
+      competition_name: hit.name,
+    });
+    lastEmittedCompId = hit.id;
+  }
+
+  return milestones;
 }
 
 export function getCompName(name: string): string {
@@ -543,7 +646,7 @@ export function createComebackMilestone(
     const prev = new Date(sortedComps[i - 1].start_date);
     const curr = new Date(sortedComps[i].start_date);
     const gapYears = (curr.getTime() - prev.getTime()) / (1000 * 60 * 60 * 24 * 365.25);
-    if (gapYears >= 3) {
+    if (gapYears >= 5) {
       return [
         {
           type: 'comeback',
@@ -714,6 +817,14 @@ export function GetMilestones(
   // 1. 首次参赛
   milestones.push(createFirstCompetitionMilestone(sortedComps[0], formatMessage));
 
+  // 1b. 首次出国参赛（按成绩中比赛出现顺序；首秀即境外则不单独展示）
+  milestones.push(
+    ...createFirstOverseasCompetitionMilestone(sortedResults, compMap, wcaProfile, formatMessage),
+  );
+
+  // 1c. 参赛 10 / 15 / 20… 周年
+  milestones.push(...createCompetingAnniversaryMilestones(sortedComps, formatMessage));
+
   // 2. 百次参赛
   milestones.push(...createNthCompetitionMilestones(sortedComps, formatMessage));
 
@@ -722,7 +833,7 @@ export function GetMilestones(
     ...createSignificantImprovementMilestones(wcaResultMap, compMap, improvementNumber, formatMessage),
   );
 
-  // 4. 大满贯
+  // 4. 全项目达成（原大满贯：全官方项目序列内按要求集齐首次成绩）
   milestones.push(...createGrandSlamMilestone(wcaResults, compMap, formatMessage));
 
   // 5. 盲拧有效成绩

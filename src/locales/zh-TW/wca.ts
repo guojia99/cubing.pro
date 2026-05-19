@@ -154,11 +154,31 @@ export default {
   'wca.milestone.single': '單次',
   'wca.milestone.average': '平均',
   'wca.milestone.result': '成績',
+  'wca.milestone.helpTitle': '里程碑說明',
+  'wca.milestone.helpAria': '開啟里程碑說明',
+  'wca.milestone.helpIntro': '以下為各類型意義與判定條件簡述；是否出現以目前資料與本頁規則為準。',
+  'wca.milestone.helpClose': '知道了',
+  'wca.milestone.help.first_competition': '依開賽日期，您參加的第一場 WCA 比賽。',
+  'wca.milestone.help.first_overseas_competition':
+    '依成績時間線，第一次在「非常住註冊國家／地區」舉辦地參賽；若首秀已在境外則不單獨產生本條。',
+  'wca.milestone.help.competing_anniversary':
+    '自首場起滿 10、15、20… 週年（依日曆）之後的第一場；若與上一檔位落在同一場比賽則不再重複。',
+  'wca.milestone.help.comeback': '依參賽順序，相鄰兩場開賽日間隔約 ≥5 年。',
+  'wca.milestone.help.nth_competition': '累計第 100、200、300… 場 WCA 比賽節點。',
+  'wca.milestone.help.grand_slam':
+    '依本頁採用的 WCA 專案順序：多數專案需首次有效單次與平均；腳擰（333ft）不參與判定，三階多次盲擰僅需單次。全部滿足後生成，天數為從最早一場有效成績到最後一項達成（含首尾日）。',
+  'wca.milestone.help.record_breaker': '單場成績被標記為 NR / AsR / CR / WR 等紀錄。',
+  'wca.milestone.help.first_podium': '決賽類輪次中，依專案首次前三或首次金牌。',
+  'wca.milestone.help.first_blindfolded_success': '各盲擰專案首次有效單次或平均。',
+  'wca.milestone.help.significant_improvement':
+    '相對個人歷史 PB，單次或平均一次性提升達到目前「進步閾值」（預設 33%）。',
 
   // Milestone types (for filter)
   'wca.milestone.type.first_competition': '首次比賽',
+  'wca.milestone.type.first_overseas_competition': '首次出國賽',
+  'wca.milestone.type.competing_anniversary': '參賽週年',
   'wca.milestone.type.significant_improvement': '巨大進步',
-  'wca.milestone.type.grand_slam': '大滿貫',
+  'wca.milestone.type.grand_slam': '全項目達成',
   'wca.milestone.type.comeback': '回歸',
   'wca.milestone.type.first_blindfolded_success': '盲擰首成',
   'wca.milestone.type.first_podium': '領獎台',
@@ -167,8 +187,10 @@ export default {
 
   // Milestone 動態描述 (使用 {param} 占位符)
   'wca.milestone.desc.first_competition': '第一次參加比賽！',
+  'wca.milestone.desc.first_overseas_competition': '首次出國參賽',
+  'wca.milestone.desc.competing_anniversary': '參賽滿{years}週年',
   'wca.milestone.desc.nth_competition': '第 {n} 場 WCA 比賽！',
-  'wca.milestone.desc.grand_slam': '達成了大滿貫！耗時 {days} 天',
+  'wca.milestone.desc.grand_slam': '全項目達成！從首次有效成績到最後一項完成共 {days} 天',
   'wca.milestone.desc.improvement_both': '{event} 同時刷新了單次({singlePercent}%)和平均({avgPercent}%)歷史最佳成績',
   'wca.milestone.desc.improvement_single': '{event} 刷新({percent}%)了自己的歷史單次',
   'wca.milestone.desc.improvement_avg': '{event} 刷新({percent}%)了自己的歷史平均',
