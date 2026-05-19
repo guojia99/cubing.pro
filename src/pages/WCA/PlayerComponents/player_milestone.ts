@@ -1,5 +1,5 @@
 import { CubesCn } from '@/components/CubeIcon/cube';
-import { eventOrder } from '@/pages/WCA/utils/events';
+import { eventOrder, roundNameMap } from '@/pages/WCA/utils/events';
 import { resultsTimeFormat } from '@/pages/WCA/utils/wca_results';
 import { findCubingCompetitionByIdentifier } from '@/services/cubing-pro/cubing_china/cubing';
 import { WCACompetition, WcaProfile, WCAResult } from '@/services/cubing-pro/wca/types';
@@ -20,7 +20,11 @@ export type MilestoneType =
   | 'record_breaker'
   | 'first_podium'
   | 'first_blindfolded_success'
-  | 'significant_improvement';
+  | 'significant_improvement'
+  | 'first_333_average_sub10'
+  | 'first_triple_podium_competition'
+  | 'busy_competition_year'
+  | 'multi_gold_single_comp';
 
 
 export const MILESTONE_TYPE_PRIORITY: Record<MilestoneType, number> = {
@@ -34,6 +38,10 @@ export const MILESTONE_TYPE_PRIORITY: Record<MilestoneType, number> = {
   first_podium: 7,
   first_blindfolded_success: 8,
   significant_improvement: 9,
+  first_333_average_sub10: 10,
+  first_triple_podium_competition: 11,
+  busy_competition_year: 12,
+  multi_gold_single_comp: 13,
 };
 
 export interface Milestone {
@@ -65,6 +73,19 @@ export interface Milestone {
   nth_competition_count?: number; // e.g., 100, 200, 300
   /** 参赛 N 周年（如 10、15、20） */
   anniversary_years?: number;
+  /** 首次出国赛：比赛举办地国家/地区（用于标签展示） */
+  overseas_country_iso2?: string;
+  overseas_country_id?: string;
+  /** 首次三阶平均 sub-10 之前，按时间线排列的各轮三阶成绩说明（多行） */
+  prior_333_round_lines?: string[];
+  /** 单届领奖台项目数（≥3） */
+  podium_count?: number;
+  /** 单届金牌项目数（≥2） */
+  gold_count?: number;
+  /** 高频参赛自然年 */
+  busy_calendar_year?: number;
+  /** 该自然年参赛场数（>15 即至少 16 场） */
+  busy_year_comp_count?: number;
 }
 
 export function isValidTime(time: number): boolean {
@@ -89,6 +110,215 @@ export function sortResultsByCompDate(
     if (!compA || !compB) return 0;
     return compA.start_date.localeCompare(compB.start_date) || a.event_id.localeCompare(b.event_id);
   });
+}
+
+/** 同一比赛内轮次先后（数值小 = 时间更早） */
+const ROUND_CHRONOLOGICAL: Record<string, number> = {
+  '0': 1,
+  h: 1,
+  '1': 2,
+  d: 2,
+  '2': 3,
+  e: 3,
+  '3': 4,
+  g: 4,
+  f: 6,
+  c: 6,
+  b: 6,
+};
+
+function compare333ResultChronological(
+  a: WCAResult,
+  b: WCAResult,
+  compMap: Map<string, WCACompetition>,
+): number {
+  const ca = compMap.get(a.competition_id);
+  const cb = compMap.get(b.competition_id);
+  const da = ca?.start_date ?? '';
+  const db = cb?.start_date ?? '';
+  if (da !== db) return da.localeCompare(db);
+  const oa = ROUND_CHRONOLOGICAL[a.round_type_id] ?? 99;
+  const ob = ROUND_CHRONOLOGICAL[b.round_type_id] ?? 99;
+  if (oa !== ob) return oa - ob;
+  return a.round_id - b.round_id;
+}
+
+function isFinalRoundForPodium(roundTypeId: string): boolean {
+  return roundTypeId === 'f' || roundTypeId === 'c' || roundTypeId === 'b';
+}
+
+/** 三阶平均 sub-10：WCA 存百分之一秒，严格小于 10.00s → average < 1000 */
+const SUB10_333_AVERAGE_THRESHOLD_CS = 1000;
+
+/**
+ * 首次三阶平均 sub-10；列出此前按时间线排序的各场三阶轮次（含平均 DNF 的轮次）。
+ */
+export function createFirst333AverageSub10Milestone(
+  results: WCAResult[],
+  compMap: Map<string, WCACompetition>,
+  formatMessage: FormatMessageFn,
+): Milestone[] {
+  const r333 = results.filter((r) => r.event_id === '333');
+  if (r333.length === 0) return [];
+
+  const sorted = [...r333].sort((a, b) => compare333ResultChronological(a, b, compMap));
+  const idx = sorted.findIndex(
+    (r) => r.average > 0 && r.average < SUB10_333_AVERAGE_THRESHOLD_CS,
+  );
+  if (idx < 0) return [];
+
+  const hit = sorted[idx];
+  const comp = compMap.get(hit.competition_id);
+  if (!comp) return [];
+
+  const priorLines: string[] = [];
+  for (let i = 0; i < idx; i++) {
+    const res = sorted[i];
+    const c = compMap.get(res.competition_id);
+    if (!c) continue;
+    const roundLabel = roundNameMap[res.round_type_id] ?? res.round_type_id;
+    const avgStr =
+      res.average > 0
+        ? resultsTimeFormat(res.average, '333', true)
+        : formatMessage({ id: 'wca.milestone.roundAvgMissing' });
+    priorLines.push(
+      formatMessage(
+        { id: 'wca.milestone.line333Round' },
+        {
+          date: c.start_date,
+          comp: getCompName(c.name),
+          round: roundLabel,
+          avg: avgStr,
+        },
+      ),
+    );
+  }
+
+  return [
+    {
+      type: 'first_333_average_sub10',
+      description: formatMessage(
+        { id: 'wca.milestone.desc.first_333_average_sub10' },
+        { time: resultsTimeFormat(hit.average, '333', true) },
+      ),
+      date: comp.start_date,
+      competition_id: comp.id,
+      competition_name: comp.name,
+      event_id: '333',
+      result: hit.average,
+      best_is_average: true,
+      round_type_id: hit.round_type_id,
+      prior_333_round_lines: priorLines,
+    },
+  ];
+}
+
+/**
+ * 按参赛顺序，首场「单届决赛类轮次中 ≥3 个不同项目领奖台」的比赛。
+ */
+export function createFirstTriplePodiumCompetitionMilestone(
+  results: WCAResult[],
+  sortedComps: WCACompetition[],
+  formatMessage: FormatMessageFn,
+): Milestone[] {
+  for (const comp of sortedComps) {
+    const eventsPodium = new Set<string>();
+    for (const res of results) {
+      if (res.competition_id !== comp.id) continue;
+      if (!isFinalRoundForPodium(res.round_type_id)) continue;
+      if (res.best <= 0) continue;
+      if (res.pos < 1 || res.pos > 3) continue;
+      eventsPodium.add(res.event_id);
+    }
+    const count = eventsPodium.size;
+    if (count >= 3) {
+      return [
+        {
+          type: 'first_triple_podium_competition',
+          description: formatMessage(
+            { id: 'wca.milestone.desc.first_triple_podium_competition' },
+            { count },
+          ),
+          date: comp.start_date,
+          competition_id: comp.id,
+          competition_name: comp.name,
+          podium_count: count,
+        },
+      ];
+    }
+  }
+  return [];
+}
+
+/**
+ * 单自然年参赛超过 15 场（至少 16 场）：每年在当年最后一场（按 start_date）输出一条，带当年场数。
+ */
+export function createBusyYearMilestones(
+  sortedComps: WCACompetition[],
+  formatMessage: FormatMessageFn,
+): Milestone[] {
+  const byYear = new Map<number, WCACompetition[]>();
+  for (const c of sortedComps) {
+    const y = parseInt(c.start_date.slice(0, 4), 10);
+    if (!Number.isFinite(y)) continue;
+    if (!byYear.has(y)) byYear.set(y, []);
+    byYear.get(y)!.push(c);
+  }
+
+  const milestones: Milestone[] = [];
+  for (const [year, list] of byYear) {
+    if (list.length <= 15) continue;
+    const last = list.reduce((a, b) => (a.start_date > b.start_date ? a : b));
+    milestones.push({
+      type: 'busy_competition_year',
+      description: formatMessage(
+        { id: 'wca.milestone.desc.busy_competition_year' },
+        { year, count: list.length },
+      ),
+      date: last.start_date,
+      competition_id: last.id,
+      competition_name: last.name,
+      busy_calendar_year: year,
+      busy_year_comp_count: list.length,
+    });
+  }
+  milestones.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+  return milestones;
+}
+
+/**
+ * 单届决赛类轮次获得两枚及以上金牌（不同项目）：每场符合条件各输出一条。
+ */
+export function createMultiGoldCompetitionMilestones(
+  results: WCAResult[],
+  sortedComps: WCACompetition[],
+  formatMessage: FormatMessageFn,
+): Milestone[] {
+  const goldByComp = new Map<string, Set<string>>();
+  for (const res of results) {
+    if (!isFinalRoundForPodium(res.round_type_id)) continue;
+    if (res.pos !== 1) continue;
+    if (res.best <= 0) continue;
+    if (!goldByComp.has(res.competition_id)) goldByComp.set(res.competition_id, new Set());
+    goldByComp.get(res.competition_id)!.add(res.event_id);
+  }
+
+  const milestones: Milestone[] = [];
+  for (const comp of sortedComps) {
+    const goldEvents = goldByComp.get(comp.id);
+    if (!goldEvents) continue;
+    const n = goldEvents.size;
+    if (n < 2) continue;
+    milestones.push({
+      type: 'multi_gold_single_comp',
+      description: formatMessage({ id: 'wca.milestone.desc.multi_gold_single_comp' }, { count: n }),
+      date: comp.start_date,
+      competition_id: comp.id,
+      competition_name: comp.name,
+      gold_count: n,
+    });
+  }
+  return milestones;
 }
 
 /**
@@ -118,11 +348,49 @@ export function addCalendarYears(startDate: string, years: number): string {
   return base.toISOString().slice(0, 10);
 }
 
-/** 比赛举办地与选手 WCA 注册地是否一致（优先 country_id，缺失时比 country_iso2） */
+/** 中国大陆、香港、澳门、台湾在「是否出国赛」判定中视为同一地区（iso2 / WCA country_id） */
+const GREATER_CHINA_ISO2 = new Set(['CN', 'HK', 'MO', 'TW']);
+
+function regionKeyForOverseasCompare(countryId: string, iso2: string): string | null {
+  const iso = (iso2 || '').trim().toUpperCase();
+  if (GREATER_CHINA_ISO2.has(iso)) return '__GREATER_CHINA__';
+
+  const raw = (countryId || '').trim();
+  if (!raw && !iso) return null;
+
+  const firstSeg = raw.split(',')[0]?.trim() ?? raw;
+  const compact = firstSeg.toLowerCase().replace(/[\s_-]+/g, '');
+  if (
+    compact === 'china' ||
+    compact === 'hongkong' ||
+    compact === 'macau' ||
+    compact === 'macao' ||
+    compact === 'taiwan' ||
+    compact === 'chinesetaipei'
+  ) {
+    return '__GREATER_CHINA__';
+  }
+
+  if (iso) return `iso:${iso}`;
+  if (raw) return `id:${raw}`;
+  return null;
+}
+
+/**
+ * 比赛举办地与选手 WCA 注册地是否一致（优先 country_id，缺失时比 country_iso2）。
+ * 中国内地、香港、澳门、台湾之间互不算「出国」；文案仍沿用现有里程碑描述。
+ */
 export function competitionCountryMatchesProfile(
   comp: WCACompetition,
   profile: WcaProfile,
 ): boolean {
+  const keyC = regionKeyForOverseasCompare(comp.country_id || '', comp.country_iso2 || '');
+  const keyP = regionKeyForOverseasCompare(profile.countryId || '', profile.country_iso2 || '');
+
+  if (keyP !== null && keyC !== null) {
+    return keyP === keyC;
+  }
+
   const pid = (profile.countryId || '').trim();
   const cid = (comp.country_id || '').trim();
   if (pid && cid) return cid === pid;
@@ -163,6 +431,8 @@ export function createFirstOverseasCompetitionMilestone(
         date: comp.start_date,
         competition_id: comp.id,
         competition_name: comp.name,
+        overseas_country_iso2: comp.country_iso2,
+        overseas_country_id: comp.country_id,
       },
     ];
   }
@@ -247,7 +517,7 @@ export function createSignificantImprovementMilestones(
     if (results.length < 2 || eventId === '333mbf') {
       continue;
     }
-    const history = results.reverse()
+    const history = [...results].reverse();
 
 
     let currentBestSingle = history[0].best;
@@ -465,8 +735,6 @@ export function createGrandSlamMilestone(
     if (eventId === '333mbf') return !!rec.single;
     return !!rec.single && !!rec.average;
   });
-
-  console.log(allCompleted, earliestDate, firstAchieved)
 
   if (!allCompleted || !earliestDate) return [];
 
@@ -847,6 +1115,22 @@ export function GetMilestones(
 
   // 8. 记录
   milestones.push(...createRecordBreakerMilestones(sortedResults, compMap, formatMessage));
+
+  // 9. 首次三阶平均 sub-10（附此前各轮次）
+  milestones.push(...createFirst333AverageSub10Milestone(wcaResults, compMap, formatMessage));
+
+  // 10. 首次单届 ≥3 领奖台
+  milestones.push(
+    ...createFirstTriplePodiumCompetitionMilestone(wcaResults, sortedComps, formatMessage),
+  );
+
+  // 11. 单年高频参赛（>15 场，当年最后一场）
+  milestones.push(...createBusyYearMilestones(sortedComps, formatMessage));
+
+  // 12. 单届多金（每场符合各一条）
+  milestones.push(
+    ...createMultiGoldCompetitionMilestones(wcaResults, sortedComps, formatMessage),
+  );
 
   return milestones;
 }

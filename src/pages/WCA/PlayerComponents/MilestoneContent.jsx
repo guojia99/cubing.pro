@@ -1,4 +1,5 @@
 import { resultsTimeFormat } from '@/pages/WCA/utils/wca_results';
+import { getCountryDisplayName } from '@/pages/WCA/PlayerComponents/region/all_contiry';
 import { Tag, Typography } from 'antd';
 import React from 'react';
 import './MilestoneContent.less';
@@ -50,6 +51,9 @@ const MilestoneItemContent = ({ milestone, isLeft }) => {
         border: '#d9d9d9',
         text: '#000',
     };
+    const overseasDestinationLabel = milestone.type === 'first_overseas_competition'
+        ? (getCountryDisplayName(milestone.overseas_country_iso2, milestone.overseas_country_id) || '').trim()
+        : '';
     return (<div className="milestone-item-bubble" style={{
             backgroundColor: bubbleStyle.bg,
             border: `1px solid ${bubbleStyle.border}`,
@@ -113,6 +117,10 @@ const MilestoneItemContent = ({ milestone, isLeft }) => {
         {(milestone.competition_id || milestone.competition_name) && (<Tag color="cyan" style={{ fontSize: 14 }}>
             {getCompName(milestone.competition_id || milestone.competition_name || '')}
           </Tag>)}
+
+        {overseasDestinationLabel ? (<Tag color="purple" style={{ fontSize: 14 }}>
+            {intl.formatMessage({ id: 'wca.milestone.overseasDestinationTag' }, { country: overseasDestinationLabel })}
+          </Tag>) : null}
 
         {(milestone.old_best_time !== undefined || milestone.new_best_time !== undefined) && (<>
             {milestone.best_is_single && (<Tag color="red">
