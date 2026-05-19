@@ -259,17 +259,8 @@ const MilestoneItemContent: React.FC<MilestoneItemContentProps> = ({ milestone, 
           }}
         >
           <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
-            {intl.formatMessage({ id: 'wca.milestone.prior333RoundsTitle' })}
+            {intl.formatMessage({ id: 'wca.milestone.prior333RoundsTitle' })}: {milestone.prior_333_round_lines.length}
           </Text>
-          {milestone.prior_333_round_lines.map((line, i) => (
-            <Text
-              key={`${i}-${line.slice(0, 24)}`}
-              type="secondary"
-              style={{ fontSize: 12, display: 'block', lineHeight: 1.55 }}
-            >
-              {line}
-            </Text>
-          ))}
         </div>
       ) : null}
     </div>
