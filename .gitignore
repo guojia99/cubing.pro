@@ -65,3 +65,6 @@ node_modules
 .venv-iba/
 
 scripts/myca_participant_monitor_config.json
+
+src/.umi-production
+src/.umi
