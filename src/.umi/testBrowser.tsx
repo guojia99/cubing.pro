@@ -11,7 +11,7 @@ import type { Location } from 'history';
 
 
 import '/Users/guojia/worker/code/cube/cubingPro/cubing.pro/src/global.less';
-import '/Users/guojia/worker/code/cube/cubingPro/cubing.pro/src/global.jsx';
+import '/Users/guojia/worker/code/cube/cubingPro/cubing.pro/src/global.tsx';
 import 'antd/dist/reset.css';
 const publicPath = '/';
 const runtimePublicPath = false;

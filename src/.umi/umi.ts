@@ -3,7 +3,7 @@
 // DO NOT CHANGE IT MANUALLY!
 import './core/polyfill';
 import '/Users/guojia/worker/code/cube/cubingPro/cubing.pro/src/global.less';
-import '/Users/guojia/worker/code/cube/cubingPro/cubing.pro/src/global.jsx';
+import '/Users/guojia/worker/code/cube/cubingPro/cubing.pro/src/global.tsx';
 import 'antd/dist/reset.css';
 import { renderClient } from '/Users/guojia/worker/code/cube/cubingPro/cubing.pro/node_modules/@umijs/renderer-react';
 import { getRoutes } from './core/route';

@@ -34,6 +34,7 @@
     "tips:parse": "python3 scripts/parse_tips.py",
     "parse:all": "npm run recipes:parse && npm run tips:parse",
     "build:lit-cities-aliases": "node scripts/build-lit-cities-aliases.mjs",
+    "clean:ts-emit": "python3 scripts/clean_ts_emit_artifacts.py",
     "test": "jest",
     "test:coverage": "npm run jest -- --coverage",
     "test:update": "npm run jest -- -u",

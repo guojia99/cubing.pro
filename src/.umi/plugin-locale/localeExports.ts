@@ -46,17 +46,13 @@ export const event = new EventEmitter();
 export const LANG_CHANGE_EVENT = Symbol('LANG_CHANGE');
 
 import enUS0 from 'antd/es/locale/en_US';
-import lang_enUS0 from "/Users/guojia/worker/code/cube/cubingPro/cubing.pro/src/locales/en-US.js";
-import lang_enUS1 from "/Users/guojia/worker/code/cube/cubingPro/cubing.pro/src/locales/en-US.ts";
+import lang_enUS0 from "/Users/guojia/worker/code/cube/cubingPro/cubing.pro/src/locales/en-US.ts";
 import jaJP0 from 'antd/es/locale/ja_JP';
-import lang_jaJP0 from "/Users/guojia/worker/code/cube/cubingPro/cubing.pro/src/locales/ja-JP.js";
-import lang_jaJP1 from "/Users/guojia/worker/code/cube/cubingPro/cubing.pro/src/locales/ja-JP.ts";
+import lang_jaJP0 from "/Users/guojia/worker/code/cube/cubingPro/cubing.pro/src/locales/ja-JP.ts";
 import zhCN0 from 'antd/es/locale/zh_CN';
-import lang_zhCN0 from "/Users/guojia/worker/code/cube/cubingPro/cubing.pro/src/locales/zh-CN.js";
-import lang_zhCN1 from "/Users/guojia/worker/code/cube/cubingPro/cubing.pro/src/locales/zh-CN.ts";
+import lang_zhCN0 from "/Users/guojia/worker/code/cube/cubingPro/cubing.pro/src/locales/zh-CN.ts";
 import zhTW0 from 'antd/es/locale/zh_TW';
-import lang_zhTW0 from "/Users/guojia/worker/code/cube/cubingPro/cubing.pro/src/locales/zh-TW.js";
-import lang_zhTW1 from "/Users/guojia/worker/code/cube/cubingPro/cubing.pro/src/locales/zh-TW.ts";
+import lang_zhTW0 from "/Users/guojia/worker/code/cube/cubingPro/cubing.pro/src/locales/zh-TW.ts";
 
 const flattenMessages=(
   nestedMessages: Record<string, any>,
@@ -80,7 +76,7 @@ const flattenMessages=(
 export const localeInfo: {[key: string]: any} = {
   'en-US': {
     messages: {
-      ...flattenMessages(lang_enUS0),...flattenMessages(lang_enUS1),
+      ...flattenMessages(lang_enUS0),
     },
     locale: 'en-US',
     antd: {
@@ -90,7 +86,7 @@ export const localeInfo: {[key: string]: any} = {
   },
   'ja-JP': {
     messages: {
-      ...flattenMessages(lang_jaJP0),...flattenMessages(lang_jaJP1),
+      ...flattenMessages(lang_jaJP0),
     },
     locale: 'ja-JP',
     antd: {
@@ -100,7 +96,7 @@ export const localeInfo: {[key: string]: any} = {
   },
   'zh-CN': {
     messages: {
-      ...flattenMessages(lang_zhCN0),...flattenMessages(lang_zhCN1),
+      ...flattenMessages(lang_zhCN0),
     },
     locale: 'zh-CN',
     antd: {
@@ -110,7 +106,7 @@ export const localeInfo: {[key: string]: any} = {
   },
   'zh-TW': {
     messages: {
-      ...flattenMessages(lang_zhTW0),...flattenMessages(lang_zhTW1),
+      ...flattenMessages(lang_zhTW0),
     },
     locale: 'zh-TW',
     antd: {
