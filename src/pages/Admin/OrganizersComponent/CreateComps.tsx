@@ -1,5 +1,5 @@
 import BackButton from '@/components/Buttons/back_button';
-import {Alert, Card, Col, DatePicker, Form, Input, InputNumber, Row} from 'antd';
+import { Alert, Card, Col, DatePicker, Form, Input, InputNumber, Row } from 'antd';
 import React from 'react';
 
 import { CubesCn } from '@/components/CubeIcon/cube';
@@ -507,7 +507,7 @@ const CreateCompsPage: React.FC = () => {
           content: (
             <>
               <p>你确定要提交比赛信息吗？</p>
-              <Alert message={"生成打乱可能要等待 2 ~ 20秒"} showIcon={true} type={"warning"}  />
+              <Alert message={'生成打乱可能要等待 2 ~ 20秒'} showIcon={true} type={'warning'} />
             </>
           ),
           onOk: async () => {
@@ -554,7 +554,7 @@ const CreateCompsPage: React.FC = () => {
               .then((value) => {
                 console.log(value);
                 message.success('创建成功');
-                window.location.href = '/admin/organizers/Comps';
+                window.location.href = '/admin/organizers/comps';
               })
               .catch((values) => {
                 message.error('创建失败: ' + values);

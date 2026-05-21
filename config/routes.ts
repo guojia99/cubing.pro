@@ -59,7 +59,11 @@ export default [
   { path: '/welcome', component: './Welcome' },
   { path: '/buy-coffee', name: 'buyCoffee', component: './BuyCoffee' },
   { path: '/changelog', name: 'Changelog', component: './Changelog' },
-  { path: '/external-links', name: 'ExternalLinks', component: './ExternalLinks/ExternalLinksPage' },
+  {
+    path: '/external-links',
+    name: 'ExternalLinks',
+    component: './ExternalLinks/ExternalLinksPage',
+  },
   { path: '/advertisement', component: './Advertisement', hidden: true },
   { path: '/', redirect: '/welcome' },
   { path: '*', component: './404' },
@@ -70,7 +74,7 @@ export default [
   // 用户相关
   { path: '/login', component: './Admin/Login', hidden: true }, // WCA 登录
   { path: '/auth/callback', component: './Admin/AuthCallback', hidden: true }, // WCA 回调（接收 token 后跳转）
-  { path: '/old_login', component: './Admin/OldLogin', hidden: true }, // 旧版账号密码登录（已隐藏）
+  { path: '/old-login', component: './Admin/OldLogin', hidden: true }, // 旧版账号密码登录（已隐藏）
   { path: '/user/profile', component: './Admin/Profile' }, // 个人中心
   // {path: '/user',  component: './Admin/UserInfo'}, // 用户个人信息
   // {path: '/user/settings', component: './Admin/Settings'}, // 个人设置
@@ -79,8 +83,8 @@ export default [
 
   // 主办相关
   { path: 'admin/organizers', component: './Admin/Organizers' },
-  { path: 'admin/organizers/Comps', component: './Admin/OrganizersComponent/OrganizersComps' }, // 比赛页面
-  { path: 'admin/organizers/Comps/create', component: './Admin/OrganizersComponent/CreateComps' }, // 创建比赛页面
+  { path: 'admin/organizers/comps', component: './Admin/OrganizersComponent/OrganizersComps' }, // 比赛页面
+  { path: 'admin/organizers/comps/create', component: './Admin/OrganizersComponent/CreateComps' }, // 创建比赛页面
 
   { path: 'admin/organizers/details', component: './Admin/OrganizersComponent/OrganizersDetails' }, // 详情
   { path: 'admin/organizers/group', component: './Admin/OrganizersComponent/OrganizersGroup' }, // 群组
@@ -95,7 +99,7 @@ export default [
   { path: 'admin/users', component: './Admin/AdminComponent/Users' },
   { path: 'admin/manage/organizers', component: './Admin/AdminComponent/AdminOrganizers' },
   { path: 'admin/manage/groups', component: './Admin/AdminComponent/AdminCompetitionGroups' },
-  { path: 'admin/diy_ranking', component: './Admin/AdminComponent/DiyRanking' },
+  { path: 'admin/diy-ranking', component: './Admin/AdminComponent/DiyRanking' },
   { path: 'admin/acknowledgments', component: './Admin/AdminComponent/AdminAcknowledgments' },
   { path: 'admin/other-links', component: './Admin/AdminComponent/AdminExternalLinks' },
 
@@ -123,7 +127,11 @@ export default [
         component: './Recipes/RecipeDetail',
         hideInMenu: true,
       },
-      { path: 'kitchen-skills', name: 'KitchenSkills', component: './KitchenSkills/KitchenSkillList' },
+      {
+        path: 'kitchen-skills',
+        name: 'KitchenSkills',
+        component: './KitchenSkills/KitchenSkillList',
+      },
       {
         path: 'kitchen-skills/:category/:id',
         name: 'KitchenSkillDetail',
@@ -147,19 +155,19 @@ export default [
     name: 'Tools',
     routes: [
       { path: 'bld-d', component: './Tools/Bld/BldMeor', name: 'bld' },
-      { path: 'bld_pingyin', component: './Tools/Bld/BldPingYin', name: 'bld_pingyin' },
+      { path: 'bld-pingyin', component: './Tools/Bld/BldPingYin', name: 'bld_pingyin' },
       {
         path: 'associative-words',
         component: './Tools/Bld/Bld_Associative_Words',
         name: 'associative-words',
       },
       { path: 'mbld-d', component: './Tools/Bld/MBld', name: 'mbld' },
-      { path: 'teamMatch', component: './Tools/TeamMatch/TeamMatch', name: 'TeamMatch' },
+      { path: 'team-match', component: './Tools/TeamMatch/TeamMatch', name: 'TeamMatch' },
     ],
   },
 
   {
-    path: 'draw_tools',
+    path: 'draw-tools',
     name: 'DrawTools',
     routes: [
       { path: 'sq1-d', component: './Tools/Draws/SQ1Draw', name: 'sq1' },
@@ -175,7 +183,7 @@ export default [
     path: 'wca',
     name: 'WCA',
     routes: [
-      { path: 'wca_comps', component: './Tools/Comps/WCAComps', name: 'wca_comps' },
+      { path: 'wca-comps', component: './Tools/Comps/WCAComps', name: 'wca_comps' },
       { path: 'player/:wcaId', component: './WCA/Player' },
       { path: 'players', component: './WCA/Players', name: 'Players' },
       {
@@ -192,7 +200,7 @@ export default [
   { path: 'player/:id', component: './Player/Player' },
   {
     name: 'groupCompetitions',
-    path: 'groupCompetitions',
+    path: 'group-competitions',
     routes: [
       { name: 'Static', path: 'static', component: './Static/Static' },
       { name: 'Records', path: 'records', component: './Static/Record' },

@@ -4,14 +4,19 @@ import { Comp } from '@/components/Data/types/comps';
 import { rowClassNameWithStyleLines } from '@/components/Table/table_style';
 import { Auth, checkAuth } from '@/pages/Admin/AuthComponents/AuthComponents';
 import { apiAdminDeleteComp, apiApprovalComp } from '@/services/cubing-pro/auth/admin';
-import {apiEndComp, apiGetComps, apiMeOrganizers, apiUpdateCompName} from '@/services/cubing-pro/auth/organizers';
+import {
+  apiEndComp,
+  apiGetComps,
+  apiMeOrganizers,
+  apiUpdateCompName,
+} from '@/services/cubing-pro/auth/organizers';
 import { OrganizersAPI } from '@/services/cubing-pro/auth/typings';
 import { CompsAPI } from '@/services/cubing-pro/comps/typings';
 import { history } from '@@/core/history';
 import { ProTable } from '@ant-design/pro-table';
 import { ProColumns } from '@ant-design/pro-table/es/typing';
 import { Link } from '@umijs/max';
-import {Button, Modal, Select, message, Input} from 'antd';
+import { Button, Modal, Select, message, Input } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 
 const OrganizersComps: React.FC = () => {
@@ -48,8 +53,6 @@ const OrganizersComps: React.FC = () => {
       width: 150,
       render: (value: any, result: Comp) => {
         let buttons: JSX.Element[] = [];
-
-
 
         const showUpdateNameModal = () => {
           let newName = result.Name;
@@ -93,8 +96,6 @@ const OrganizersComps: React.FC = () => {
           </Button>,
         );
 
-
-
         if (!result.IsDone && result.Status === 'Running') {
           // buttons.push(
           //   <Button
@@ -111,7 +112,9 @@ const OrganizersComps: React.FC = () => {
               size={'small'}
               autoInsertSpace={false}
               onClick={() => {
-                history.replace({ pathname: '/admin/organizers/' + curOrg?.id + '/comp/' + result.id + '/result' });
+                history.replace({
+                  pathname: '/admin/organizers/' + curOrg?.id + '/comp/' + result.id + '/result',
+                });
               }}
             >
               录入
@@ -119,17 +122,19 @@ const OrganizersComps: React.FC = () => {
           );
 
           const handleEnd = async () => {
-            if (!curOrg){
-              return
+            if (!curOrg) {
+              return;
             }
-            apiEndComp(curOrg.id, result.id).then(() => {
-              // @ts-ignore
-              actionRef.current?.reload();
-              message.success("结束")
-            }).catch((e) => {
-              message.error(e)
-            })
-          }
+            apiEndComp(curOrg.id, result.id)
+              .then(() => {
+                // @ts-ignore
+                actionRef.current?.reload();
+                message.success('结束');
+              })
+              .catch((e) => {
+                message.error(e);
+              });
+          };
 
           const showEnd = () => {
             Modal.warning({
@@ -138,8 +143,8 @@ const OrganizersComps: React.FC = () => {
               okText: '确认结束',
               cancelText: '取消',
               onOk: handleEnd, // 点击确认后执行结束操作
-            })
-          }
+            });
+          };
           buttons.push(
             <Button
               style={{ backgroundColor: '#ff3bac', fontWeight: 700, color: '#ffc', border: 'none' }}
@@ -154,13 +159,15 @@ const OrganizersComps: React.FC = () => {
 
         if (adminUser !== null && result.Status === 'Reviewing') {
           const handleApproval = async () => {
-            apiApprovalComp(result.id).then(() => {
-              // @ts-ignore
-              actionRef.current?.reload();
-              message.success("审批通过")
-            }).catch((e) => {
-              message.error(e)
-            })
+            apiApprovalComp(result.id)
+              .then(() => {
+                // @ts-ignore
+                actionRef.current?.reload();
+                message.success('审批通过');
+              })
+              .catch((e) => {
+                message.error(e);
+              });
           };
 
           const showConfirm = () => {
@@ -196,9 +203,7 @@ const OrganizersComps: React.FC = () => {
                   <p style={{ marginBottom: 12, color: '#cf1322' }}>
                     此操作将永久删除该比赛及其全部成绩（含预录入）、站点纪录、报名与赞助关联等数据，且不可恢复。
                   </p>
-                  <p style={{ marginBottom: 8 }}>
-                    请输入比赛名称「{result.Name}」以确认：
-                  </p>
+                  <p style={{ marginBottom: 8 }}>请输入比赛名称「{result.Name}」以确认：</p>
                   <Input
                     placeholder="输入比赛全称"
                     onChange={(e) => {
@@ -255,7 +260,7 @@ const OrganizersComps: React.FC = () => {
     <>
       <div style={{ marginBottom: 30 }}>
         {BackButton('返回上层')}
-        <Link to={'/admin/organizers/Comps/create'} style={{ marginRight: 20, marginLeft: 20 }}>
+        <Link to={'/admin/organizers/comps/create'} style={{ marginRight: 20, marginLeft: 20 }}>
           <Button type="default" className="create-comp-btn">
             创建比赛
           </Button>
