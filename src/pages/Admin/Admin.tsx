@@ -172,7 +172,7 @@ const Admin: React.FC = () => {
         {
           title: '榜单管理',
           description: '榜单管理',
-          to: '/admin/diy_ranking',
+          to: '/admin/diy-ranking',
           avatar: <UnorderedListOutlined style={{ fontSize: 40 }} />,
         },
       ],

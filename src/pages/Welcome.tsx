@@ -234,20 +234,20 @@ const Welcome: React.FC = () => {
         childrens={[
           {
             index: 1,
-            href: './groupCompetitions/competitions',
+            href: './group-competitions/competitions',
             title: intl.formatMessage({ id: 'home.welcome.competitions.title' }),
             desc: intl.formatMessage({ id: 'home.welcome.competitions.desc' }),
           },
           {
             index: 2,
-            href: './groupCompetitions/static',
+            href: './group-competitions/static',
             title: intl.formatMessage({ id: 'home.welcome.static.title' }),
             desc: intl.formatMessage({ id: 'home.welcome.static.desc' }),
           },
           {
             index: 3,
             title: intl.formatMessage({ id: 'home.welcome.players.title' }),
-            href: './groupCompetitions/players',
+            href: './group-competitions/players',
             desc: intl.formatMessage({ id: 'home.welcome.players.desc' }),
           },
         ]}
@@ -275,7 +275,7 @@ const Welcome: React.FC = () => {
           },
           {
             index: 3,
-            href: '/wca/wca_comps',
+            href: '/wca/wca-comps',
             title: intl.formatMessage({ id: 'home.welcome.wca.comps.title' }),
             desc: intl.formatMessage({ id: 'home.welcome.wca.comps.desc' }),
             internal: true,
@@ -324,25 +324,25 @@ const Welcome: React.FC = () => {
           },
           {
             index: 1,
-            href: './draw_tools/sq1-d',
+            href: './draw-tools/sq1-d',
             title: intl.formatMessage({ id: 'home.welcome.draw.sq.title' }),
             desc: intl.formatMessage({ id: 'home.welcome.draw.sq.desc' }),
           },
           {
             index: 2,
-            href: './draw_tools/minx-d',
+            href: './draw-tools/minx-d',
             title: intl.formatMessage({ id: 'home.welcome.draw.minx.title' }),
             desc: intl.formatMessage({ id: 'home.welcome.draw.minx.desc' }),
           },
           {
             index: 3,
-            href: './draw_tools/sk-d',
+            href: './draw-tools/sk-d',
             title: intl.formatMessage({ id: 'home.welcome.draw.sk.title' }),
             desc: intl.formatMessage({ id: 'home.welcome.draw.sk.desc' }),
           },
           {
             index: 4,
-            href: './draw_tools/py-d',
+            href: './draw-tools/py-d',
             title: intl.formatMessage({ id: 'home.welcome.draw.py.title' }),
             desc: intl.formatMessage({ id: 'home.welcome.draw.py.desc' }),
           },
@@ -371,7 +371,6 @@ const Welcome: React.FC = () => {
           },
         ]}
       />
-
     </PageContainer>
   );
 };
