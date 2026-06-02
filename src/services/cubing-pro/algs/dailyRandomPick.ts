@@ -9,6 +9,8 @@ export interface PickedOption {
   cube: string;
   className: string;
   image: string;
+  /** 第一条库公式，供 VisualCube 渲染；旧缓存可能无此字段 */
+  alg?: string;
 }
 
 export interface DailyPickState {

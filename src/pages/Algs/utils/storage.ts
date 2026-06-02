@@ -73,94 +73,89 @@ export function setAlgsSelection(key: AlgsSelectionKey, value: AlgsSelectionValu
   }
 }
 
-const CUBE333_VIEW_MODE_KEY = 'algs_cube333_view_mode';
+const USE_VISUAL_CUBE_RENDERER_KEY = 'algs_use_visualcube_renderer';
 
-export type Cube333ViewMode = '2d' | '3d';
-
-export function getCube333ViewMode(): Cube333ViewMode {
+/** 333 / 222 / 333oh 是否用 VisualCube 渲染公式图（开发者可切回后端 SVG） */
+export function getUseVisualCubeRenderer(): boolean {
   try {
-    const v = localStorage.getItem(CUBE333_VIEW_MODE_KEY);
-    if (v === '3d' || v === '2d') return v;
+    const v = localStorage.getItem(USE_VISUAL_CUBE_RENDERER_KEY);
+    if (v === '0' || v === 'false') return false;
+    if (v === '1' || v === 'true') return true;
   } catch {
     // ignore
   }
-  return '2d';
+  return true;
 }
 
-export function setCube333ViewMode(mode: Cube333ViewMode): void {
+export function setUseVisualCubeRenderer(enabled: boolean): void {
   try {
-    localStorage.setItem(CUBE333_VIEW_MODE_KEY, mode);
-  } catch {
-    // ignore
-  }
-}
-
-const TWISTY_PANEL_TONE_KEY = 'algs_twisty_panel_tone';
-
-/**
- * 全局：公式演示区「背景颜色」（外层容器 CSS，非魔方贴纸）。
- * 默认淡黄色（cream）。
- */
-export type TwistyPanelTone = 'cream' | 'lightBlue' | 'white' | 'neutral';
-
-export function getTwistyPanelTone(): TwistyPanelTone {
-  try {
-    const v = localStorage.getItem(TWISTY_PANEL_TONE_KEY);
-    if (v === 'cream' || v === 'lightBlue' || v === 'white' || v === 'neutral') return v;
-    // 旧版 default / yellow → 淡黄色
-    if (v === 'default' || v === 'yellow') return 'cream';
-    if (v === 'blue') return 'lightBlue';
-  } catch {
-    // ignore
-  }
-  return 'cream';
-}
-
-export function setTwistyPanelTone(tone: TwistyPanelTone): void {
-  try {
-    localStorage.setItem(TWISTY_PANEL_TONE_KEY, tone);
+    localStorage.setItem(USE_VISUAL_CUBE_RENDERER_KEY, enabled ? '1' : '0');
   } catch {
     // ignore
   }
 }
 
-const TWISTY_BOTTOM_FACE_BY_REPO_KEY = 'algs_twisty_bottom_face_by_repo';
+const COLUMNS_PER_ROW_BY_REPO_KEY = 'algs_columns_per_row_by_repo';
+const DEFAULT_COLUMNS_PER_ROW = 4;
+const MIN_COLUMNS_PER_ROW = 1;
+const MAX_COLUMNS_PER_ROW = 8;
 
-/** 按公式库（cube + classId，如 333+PLL / 333+OLL）保存：底面中心颜色（魔方视角） */
-export type CubeBottomFaceColor = 'yellow' | 'white' | 'red' | 'orange' | 'green' | 'blue';
-
-function repoTwistyKey(cube: string, classId: string): string {
+function repoLayoutKey(cube: string, classId: string): string {
   return `${encodeURIComponent(cube)}::${encodeURIComponent(classId)}`;
 }
 
-export function getTwistyBottomFaceColor(cube: string, classId: string): CubeBottomFaceColor {
+function clampColumnsPerRow(n: number): number {
+  return Math.max(MIN_COLUMNS_PER_ROW, Math.min(MAX_COLUMNS_PER_ROW, Math.round(n)));
+}
+
+/** 按公式库（cube + classId）保存：详情页每行展示的公式卡片数量 */
+export function getColumnsPerRow(cube: string, classId: string): number {
   try {
-    const raw = localStorage.getItem(TWISTY_BOTTOM_FACE_BY_REPO_KEY);
-    if (!raw) return 'yellow';
-    const map = JSON.parse(raw) as Record<string, CubeBottomFaceColor>;
-    const v = map[repoTwistyKey(cube, classId)];
-    if (
-      v === 'yellow' ||
-      v === 'white' ||
-      v === 'red' ||
-      v === 'orange' ||
-      v === 'green' ||
-      v === 'blue'
-    ) {
-      return v;
+    const raw = localStorage.getItem(COLUMNS_PER_ROW_BY_REPO_KEY);
+    if (!raw) return DEFAULT_COLUMNS_PER_ROW;
+    const map = JSON.parse(raw) as Record<string, number>;
+    const v = map[repoLayoutKey(cube, classId)];
+    if (typeof v === 'number' && !Number.isNaN(v)) {
+      return clampColumnsPerRow(v);
     }
   } catch {
     // ignore
   }
-  return 'yellow';
+  return DEFAULT_COLUMNS_PER_ROW;
 }
 
-export function setTwistyBottomFaceColor(cube: string, classId: string, color: CubeBottomFaceColor): void {
+export function setColumnsPerRow(cube: string, classId: string, columns: number): void {
   try {
-    const raw = localStorage.getItem(TWISTY_BOTTOM_FACE_BY_REPO_KEY);
-    const map: Record<string, CubeBottomFaceColor> = raw ? JSON.parse(raw) : {};
-    map[repoTwistyKey(cube, classId)] = color;
-    localStorage.setItem(TWISTY_BOTTOM_FACE_BY_REPO_KEY, JSON.stringify(map));
+    const raw = localStorage.getItem(COLUMNS_PER_ROW_BY_REPO_KEY);
+    const map: Record<string, number> = raw ? JSON.parse(raw) : {};
+    map[repoLayoutKey(cube, classId)] = clampColumnsPerRow(columns);
+    localStorage.setItem(COLUMNS_PER_ROW_BY_REPO_KEY, JSON.stringify(map));
+  } catch {
+    // ignore
+  }
+}
+
+const HIDE_ALT_FORMULAS_BY_REPO_KEY = 'algs_hide_alt_formulas_by_repo';
+
+/** 单行布局时是否隐藏备选公式（按公式库） */
+export function getHideAltFormulas(cube: string, classId: string): boolean {
+  try {
+    const raw = localStorage.getItem(HIDE_ALT_FORMULAS_BY_REPO_KEY);
+    if (!raw) return false;
+    const map = JSON.parse(raw) as Record<string, boolean>;
+    return map[repoLayoutKey(cube, classId)] === true;
+  } catch {
+    // ignore
+  }
+  return false;
+}
+
+export function setHideAltFormulas(cube: string, classId: string, hide: boolean): void {
+  try {
+    const raw = localStorage.getItem(HIDE_ALT_FORMULAS_BY_REPO_KEY);
+    const map: Record<string, boolean> = raw ? JSON.parse(raw) : {};
+    map[repoLayoutKey(cube, classId)] = hide;
+    localStorage.setItem(HIDE_ALT_FORMULAS_BY_REPO_KEY, JSON.stringify(map));
   } catch {
     // ignore
   }

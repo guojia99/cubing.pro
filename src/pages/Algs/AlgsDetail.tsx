@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Card, Col, Collapse, Drawer, Modal, Progress, Row, Slider, Spin, Statistic } from 'antd';
+import { Button, Card, Col, Collapse, Drawer, Modal, Progress, Row, Slider, Spin, Statistic, Switch } from 'antd';
 import { ArrowLeftOutlined, BarChartOutlined, FilePdfOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import { useIntl } from '@@/plugin-locale';
 import { useNavigate, useParams } from '@@/exports';
@@ -8,6 +8,7 @@ import type { AlgorithmClass, Algorithm } from '@/services/cubing-pro/algs/typin
 import { exportAlgsPdf } from './utils/pdfExport';
 import AlgsModal from './components/AlgsModal';
 import AlgsFormulaCard from './components/AlgsFormulaCard';
+import AlgsFormulaCardWide from './components/AlgsFormulaCardWide';
 import AlgsFilterPanel from './components/AlgsFilterPanel';
 import AlgsFloatButtons from './components/AlgsFloatButtons';
 import FormulaRandomPickModal from './components/FormulaRandomPickModal';
@@ -16,7 +17,17 @@ import FormulaProficiencyCard from './components/FormulaProficiencyCard';
 import PracticeHistoryStatsCard from './components/PracticeHistoryStatsCard';
 import UsageInstructionsModal from './components/UsageInstructionsModal';
 import FormulaPracticeModal from './components/FormulaPracticeModal';
-import { getFormulaFontSize, setFormulaFontSize } from './utils/storage';
+import {
+  getFormulaFontSize,
+  setFormulaFontSize,
+  getUseVisualCubeRenderer,
+  setUseVisualCubeRenderer,
+  getColumnsPerRow,
+  setColumnsPerRow,
+  getHideAltFormulas,
+  setHideAltFormulas,
+} from './utils/storage';
+import { isVisualCubeCube } from './utils/visualCubeCube';
 import { SET_CARD_COLORS } from './constants';
 import './index.less';
 
@@ -49,6 +60,17 @@ const AlgsDetail: React.FC = () => {
   const [unskilledRefreshKey, setUnskilledRefreshKey] = useState(0);
   const [usageInstructionsOpen, setUsageInstructionsOpen] = useState(false);
   const [formulaPracticeOpen, setFormulaPracticeOpen] = useState(false);
+  const [useVisualCube, setUseVisualCube] = useState(() => getUseVisualCubeRenderer());
+  const [columnsPerRow, setColumnsPerRowState] = useState(4);
+  const [hideAltFormulas, setHideAltFormulasState] = useState(false);
+
+  useEffect(() => {
+    if (!cube || !classId) return;
+    const dc = decodeURIComponent(cube);
+    const cl = decodeURIComponent(classId);
+    setColumnsPerRowState(getColumnsPerRow(dc, cl));
+    setHideAltFormulasState(getHideAltFormulas(dc, cl));
+  }, [cube, classId]);
 
   useEffect(() => {
     if (!cube || !classId) return;
@@ -206,6 +228,52 @@ const AlgsDetail: React.FC = () => {
               style={{ flex: 1, maxWidth: 180 }}
             />
           </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 200 }}>
+            <span style={{ fontSize: 12, color: 'var(--ant-color-text-secondary)', whiteSpace: 'nowrap' }}>
+              {intl.formatMessage({ id: 'algs.detail.columnsPerRow' })}: {columnsPerRow}
+            </span>
+            <Slider
+              min={1}
+              max={8}
+              value={columnsPerRow}
+              onChange={(v) => {
+                const n = typeof v === 'number' ? v : v[0];
+                setColumnsPerRowState(n);
+                setColumnsPerRow(dcube, dclassId, n);
+              }}
+              style={{ flex: 1, maxWidth: 180 }}
+            />
+          </div>
+          {columnsPerRow === 1 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Switch
+                size="small"
+                checked={hideAltFormulas}
+                onChange={(checked) => {
+                  setHideAltFormulasState(checked);
+                  setHideAltFormulas(dcube, dclassId, checked);
+                }}
+              />
+              <span style={{ fontSize: 12, color: 'var(--ant-color-text-secondary)', whiteSpace: 'nowrap' }}>
+                {intl.formatMessage({ id: 'algs.detail.hideAltFormulas' })}
+              </span>
+            </div>
+          )}
+          {isVisualCubeCube(dcube) && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Switch
+                size="small"
+                checked={useVisualCube}
+                onChange={(checked) => {
+                  setUseVisualCube(checked);
+                  setUseVisualCubeRenderer(checked);
+                }}
+              />
+              <span style={{ fontSize: 12, color: 'var(--ant-color-text-secondary)', whiteSpace: 'nowrap' }}>
+                {intl.formatMessage({ id: 'algs.detail.useVisualCube' })}
+              </span>
+            </div>
+          )}
         </div>
       </Card>
 
@@ -398,7 +466,7 @@ const AlgsDetail: React.FC = () => {
         placement="right"
         onClose={() => setFilterDrawerOpen(false)}
         open={filterDrawerOpen}
-        width={320}
+        width={180}
       >
         <AlgsFilterPanel {...filterPanelProps} compact />
       </Drawer>
@@ -407,12 +475,20 @@ const AlgsDetail: React.FC = () => {
         {groupedAlgs.map((block) => (
           <div key={`${block.setName}-${block.groupName}`} data-algs-group-card>
             <Card size="small" title={`${block.setName} - ${block.groupName}`} style={{ marginBottom: 0 }}>
-            <Row gutter={[12, 12]}>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: `repeat(${columnsPerRow}, minmax(0, 1fr))`,
+                gap: 12,
+              }}
+            >
               {block.algs.map((item) => {
                 const idx = globalIdxCounter++;
-                return (
-                  <Col key={`${item.setName}-${item.groupName}-${item.alg.name}`} xs={12} sm={8} md={6} lg={6} xl={4} xxl={4}>
-                    <AlgsFormulaCard
+                const cardKey = `${item.setName}-${item.groupName}-${item.alg.name}`;
+                if (columnsPerRow === 1) {
+                  return (
+                    <AlgsFormulaCardWide
+                      key={cardKey}
                       cube={dcube}
                       classId={dclassId}
                       setName={item.setName}
@@ -420,12 +496,28 @@ const AlgsDetail: React.FC = () => {
                       alg={item.alg}
                       setColorIndex={block.setColorIndex}
                       formulaFontSize={formulaFontSize}
-                      onClick={() => openModal(idx)}
+                      useVisualCube={useVisualCube}
+                      hideAltFormulas={hideAltFormulas}
+                      onOpenModal={() => openModal(idx)}
                     />
-                  </Col>
+                  );
+                }
+                return (
+                  <AlgsFormulaCard
+                    key={cardKey}
+                    cube={dcube}
+                    classId={dclassId}
+                    setName={item.setName}
+                    groupName={item.groupName}
+                    alg={item.alg}
+                    setColorIndex={block.setColorIndex}
+                    formulaFontSize={formulaFontSize}
+                    useVisualCube={useVisualCube}
+                    onClick={() => openModal(idx)}
+                  />
                 );
               })}
-            </Row>
+            </div>
             </Card>
           </div>
         ))}
@@ -446,6 +538,7 @@ const AlgsDetail: React.FC = () => {
           classId={dclassId}
           items={modalState.algs}
           currentIndex={modalState.index}
+          useVisualCube={useVisualCube}
           onNavigate={(i) => setModalState((prev) => (prev ? { ...prev, index: i } : null))}
         />
       )}

@@ -1,6 +1,8 @@
 export interface OutputClass {
   name: string;
   image: string;
+  /** 该分类下第一条库公式，供列表 VisualCube 渲染 */
+  alg: string;
 }
 
 export interface AlgorithmGroupsResponse {

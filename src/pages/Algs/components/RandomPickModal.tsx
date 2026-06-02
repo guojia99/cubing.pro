@@ -11,7 +11,7 @@ import {
   saveDailyPick,
 } from '@/services/cubing-pro/algs/dailyRandomPick';
 import { isLocal } from '@/services/cubing-pro/request';
-import SvgRenderer from './SvgRenderer';
+import AlgsCubeDiagram from './AlgsCubeDiagram';
 import { SET_CARD_COLORS } from '../constants';
 import './RandomPickModal.less';
 
@@ -24,6 +24,7 @@ interface RandomPickModalProps {
   onClose: () => void;
   classMap: Record<string, OutputClass[]>;
   cubeKeys: string[];
+  useVisualCube?: boolean;
 }
 
 function collectOptions(
@@ -41,6 +42,7 @@ function collectOptions(
           cube,
           className: cls.name,
           image: cls.image,
+          alg: cls.alg,
         });
       }
     });
@@ -62,6 +64,7 @@ const RandomPickModal: React.FC<RandomPickModalProps> = ({
   onClose,
   classMap,
   cubeKeys,
+  useVisualCube = true,
 }) => {
   const intl = useIntl();
   const navigate = useNavigate();
@@ -350,8 +353,14 @@ const RandomPickModal: React.FC<RandomPickModalProps> = ({
                   className="random-pick-option-card"
                   onClick={() => handleOptionClick(opt)}
                 >
-                  <SvgRenderer
-                    svg={opt.image}
+                  <AlgsCubeDiagram
+                    cube={opt.cube}
+                    classId={opt.className}
+                    setName=""
+                    groupName=""
+                    imageSvg={opt.image}
+                    formula={opt.alg}
+                    useVisualCube={useVisualCube}
                     maxWidth={120}
                     maxHeight={160}
                     style={{ marginBottom: 8 }}
