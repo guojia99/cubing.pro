@@ -50,11 +50,11 @@ const AlgsPracticeToolsPanel: React.FC<AlgsPracticeToolsPanelProps> = ({
       >
         {showRandomPick && (
           <FormulaRandomPickCard
-            key={formulaRandomRefreshKey}
             embedded
             cube={cube}
             classId={classId}
             flatAlgs={flatAlgs}
+            refreshKey={formulaRandomRefreshKey}
             onOpenRandom={onOpenRandom}
             onOpenHistory={onOpenHistory}
             onPickFormula={onPickFormula}
@@ -65,7 +65,6 @@ const AlgsPracticeToolsPanel: React.FC<AlgsPracticeToolsPanelProps> = ({
           <BatchCustomFormulaStartCard embedded onStart={onOpenBatchCustom} />
         )}
         <FormulaProficiencyCard
-          key={unskilledRefreshKey}
           embedded
           cube={cube}
           classId={classId}
@@ -74,7 +73,6 @@ const AlgsPracticeToolsPanel: React.FC<AlgsPracticeToolsPanelProps> = ({
           refreshKey={unskilledRefreshKey}
         />
         <PracticeHistoryStatsCard
-          key={unskilledRefreshKey}
           embedded
           cube={cube}
           classId={classId}
