@@ -24,6 +24,11 @@ export function setFormulaFontSize(size: number): void {
 
 export type AlgsSelectionKey = string;
 
+export type AlgsSelectionValue = {
+  source: 'library' | 'custom';
+  index: number;
+};
+
 export function buildAlgsKey(
   cube: string,
   classId: string,
@@ -34,23 +39,34 @@ export function buildAlgsKey(
   return `${cube}-${classId}-${set}-${group}-${algName}`.replace(/\s+/g, '_');
 }
 
-export function getAlgsSelection(key: AlgsSelectionKey): number | null {
+export function getAlgsSelection(key: AlgsSelectionKey): AlgsSelectionValue | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
-    const data: Record<string, number> = JSON.parse(raw);
+    const data: Record<string, unknown> = JSON.parse(raw);
     const val = data[key];
-    return typeof val === 'number' ? val : null;
+    if (val === null || val === undefined) return null;
+    if (typeof val === 'number') return { source: 'library', index: val };
+    if (typeof val === 'object' && val !== null) {
+      const obj = val as Record<string, unknown>;
+      if (typeof obj.source === 'string' && typeof obj.index === 'number') {
+        return {
+          source: obj.source === 'custom' ? 'custom' : 'library',
+          index: obj.index,
+        };
+      }
+    }
+    return null;
   } catch {
     return null;
   }
 }
 
-export function setAlgsSelection(key: AlgsSelectionKey, index: number): void {
+export function setAlgsSelection(key: AlgsSelectionKey, value: AlgsSelectionValue): void {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    const data: Record<string, number> = raw ? JSON.parse(raw) : {};
-    data[key] = index;
+    const data: Record<string, unknown> = raw ? JSON.parse(raw) : {};
+    data[key] = value;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch {
     // ignore
