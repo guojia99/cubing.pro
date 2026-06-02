@@ -9,16 +9,18 @@ const PREFIX_SELECTION = 'algs:formula_practice_selection:';
 const PREFIX_RANDOM_PICK = 'algs:formula_random_pick:';
 const PREFIX_HISTORY = 'algs:formula_practice_history:';
 const KEY_DAILY_PICK = 'algs:daily_random_pick';
+const KEY_CUSTOM_FORMULAS = 'algs_custom_formulas';
 
 export interface PracticeConfigExport {
   version: 1;
-  exportedAt: string; // ISO string
+  exportedAt: string;
   proficiency: Record<string, unknown>;
   config: Record<string, unknown>;
   selection: Record<string, unknown>;
   formulaRandomPick: Record<string, Array<{ setName: string; groupName: string; algName: string }>>;
   formulaPracticeHistory: Record<string, unknown>;
   dailyRandomPick?: unknown;
+  customFormulas?: Record<string, string[]>;
 }
 
 function collectByPrefix(prefix: string): Record<string, unknown> {
@@ -91,6 +93,16 @@ export function exportPracticeConfig(): PracticeConfigExport {
     // ignore
   }
 
+  let customFormulas: Record<string, string[]> | undefined = undefined;
+  try {
+    const raw = localStorage.getItem(KEY_CUSTOM_FORMULAS);
+    if (raw) {
+      customFormulas = JSON.parse(raw) as Record<string, string[]>;
+    }
+  } catch {
+    // ignore
+  }
+
   return {
     version: 1,
     exportedAt: new Date().toISOString(),
@@ -100,6 +112,7 @@ export function exportPracticeConfig(): PracticeConfigExport {
     formulaRandomPick,
     formulaPracticeHistory,
     dailyRandomPick,
+    customFormulas,
   };
 }
 
@@ -187,6 +200,14 @@ export function importPracticeConfig(jsonStr: string): { success: boolean; messa
     if (data.dailyRandomPick != null && typeof data.dailyRandomPick === 'object') {
       try {
         localStorage.setItem(KEY_DAILY_PICK, JSON.stringify(data.dailyRandomPick));
+      } catch {
+        // ignore
+      }
+    }
+
+    if (data.customFormulas != null && typeof data.customFormulas === 'object' && !Array.isArray(data.customFormulas)) {
+      try {
+        localStorage.setItem(KEY_CUSTOM_FORMULAS, JSON.stringify(data.customFormulas));
       } catch {
         // ignore
       }

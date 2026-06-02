@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, Tag } from 'antd';
 import type { Algorithm } from '@/services/cubing-pro/algs/typings';
 import { getAlgsSelection, buildAlgsKey } from '../utils/storage';
+import { getCustomAlgs } from '@/services/cubing-pro/algs/customAlgs';
 import SvgRenderer from './SvgRenderer';
 import { SET_CARD_COLORS } from '../constants';
 
@@ -29,9 +30,15 @@ const AlgsFormulaCard: React.FC<AlgsFormulaCardProps> = ({
   onClick,
 }) => {
   const storageKey = buildAlgsKey(cube, classId, setName, groupName, alg.name);
-  const savedIndex = getAlgsSelection(storageKey);
-  const showIndex = savedIndex ?? 0;
-  const displayAlg = alg.algs[showIndex] ?? alg.algs[0] ?? '';
+  const selection = getAlgsSelection(storageKey);
+  let displayAlg = '';
+  if (selection?.source === 'custom') {
+    const customs = getCustomAlgs(storageKey);
+    displayAlg = customs[selection.index] ?? customs[0] ?? '';
+  } else {
+    const idx = selection?.index ?? 0;
+    displayAlg = alg.algs[idx] ?? alg.algs[0] ?? '';
+  }
   const colors = SET_CARD_COLORS[setColorIndex % SET_CARD_COLORS.length];
 
   return (
