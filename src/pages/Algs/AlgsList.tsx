@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Card, Col, Divider, Empty, Row, Select, Spin, message } from 'antd';
+import { Button, Card, Col, Divider, Empty, Row, Select, Spin, Switch, message } from 'antd';
 import { DownloadOutlined, UploadOutlined } from '@ant-design/icons';
 import { useIntl } from '@@/plugin-locale';
 import { useModel, useNavigate } from '@@/exports';
@@ -12,7 +12,10 @@ import {
 import { USER_KV_KEYS, assertPayloadWithinLimit } from '@/services/cubing-pro/user/user_kv';
 import type { AlgorithmGroupsResponse, OutputClass } from '@/services/cubing-pro/algs/typings';
 import SvgRenderer from './components/SvgRenderer';
+import AlgsCubeDiagram from './components/AlgsCubeDiagram';
 import RandomPickModal from './components/RandomPickModal';
+import { getUseVisualCubeRenderer, setUseVisualCubeRenderer } from './utils/storage';
+import { isVisualCubeCube } from './utils/visualCubeCube';
 import { ALGS_COLORS } from './constants';
 import './index.less';
 
@@ -37,6 +40,7 @@ const AlgsList: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [filterCube, setFilterCube] = useState<string>('');
   const [randomPickModalOpen, setRandomPickModalOpen] = useState(false);
+  const [useVisualCube, setUseVisualCube] = useState(() => getUseVisualCubeRenderer());
 
   const handleExport = () => {
     const config = exportPracticeConfig();
@@ -88,6 +92,7 @@ const AlgsList: React.FC = () => {
   const classMap = data?.ClassMap ?? {};
 
   const filteredCubes = filterCube ? [filterCube] : cubeKeys;
+  const showVisualCubeSwitch = filteredCubes.some((c) => isVisualCubeCube(c));
 
   const handleCardClick = (cube: string, cls: OutputClass) => {
     navigate(`/algs/${encodeURIComponent(cube)}/${encodeURIComponent(cls.name)}`);
@@ -161,6 +166,21 @@ const AlgsList: React.FC = () => {
           style={{ display: 'none' }}
           onChange={handleFileChange}
         />
+        {showVisualCubeSwitch && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Switch
+              size="small"
+              checked={useVisualCube}
+              onChange={(checked) => {
+                setUseVisualCube(checked);
+                setUseVisualCubeRenderer(checked);
+              }}
+            />
+            <span style={{ fontSize: 12, color: 'var(--ant-color-text-secondary)', whiteSpace: 'nowrap' }}>
+              {intl.formatMessage({ id: 'algs.detail.useVisualCube' })}
+            </span>
+          </div>
+        )}
       </div>
 
       <Row gutter={[16, 16]} style={{ marginBottom: 32 }}>
@@ -202,6 +222,7 @@ const AlgsList: React.FC = () => {
           onClose={() => setRandomPickModalOpen(false)}
           classMap={classMap}
           cubeKeys={filteredCubes}
+          useVisualCube={useVisualCube}
         />
         {filteredCubes
           .filter((cube) => (classMap[cube] ?? []).length > 0)
@@ -237,8 +258,14 @@ const AlgsList: React.FC = () => {
                       bodyStyle={{ padding: 20 }}
                     >
                       <div style={{ textAlign: 'center' }}>
-                        <SvgRenderer
-                          svg={cls.image}
+                        <AlgsCubeDiagram
+                          cube={cube}
+                          classId={cls.name}
+                          setName=""
+                          groupName=""
+                          imageSvg={cls.image}
+                          formula={cls.alg}
+                          useVisualCube={useVisualCube}
                           maxWidth={180}
                           maxHeight={260}
                           style={{ marginTop: 24, marginBottom: 28 }}

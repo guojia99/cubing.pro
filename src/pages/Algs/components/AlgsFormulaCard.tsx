@@ -3,7 +3,7 @@ import { Card, Tag } from 'antd';
 import type { Algorithm } from '@/services/cubing-pro/algs/typings';
 import { getAlgsSelection, buildAlgsKey } from '../utils/storage';
 import { getCustomAlgs } from '@/services/cubing-pro/algs/customAlgs';
-import SvgRenderer from './SvgRenderer';
+import AlgsCubeDiagram from './AlgsCubeDiagram';
 import { SET_CARD_COLORS } from '../constants';
 
 const CARD_MIN_HEIGHT = 180;
@@ -16,6 +16,7 @@ export interface AlgsFormulaCardProps {
   alg: Algorithm;
   setColorIndex?: number;
   formulaFontSize?: number;
+  useVisualCube?: boolean;
   onClick: () => void;
 }
 
@@ -27,6 +28,7 @@ const AlgsFormulaCard: React.FC<AlgsFormulaCardProps> = ({
   alg,
   setColorIndex = 0,
   formulaFontSize = 12,
+  useVisualCube = true,
   onClick,
 }) => {
   const storageKey = buildAlgsKey(cube, classId, setName, groupName, alg.name);
@@ -39,6 +41,9 @@ const AlgsFormulaCard: React.FC<AlgsFormulaCardProps> = ({
     const idx = selection?.index ?? 0;
     displayAlg = alg.algs[idx] ?? alg.algs[0] ?? '';
   }
+  const scrambleIdx = selection?.source === 'custom' ? 0 : (selection?.index ?? 0);
+  const displayScramble =
+    selection?.source === 'custom' ? '' : (alg.scrambles?.[scrambleIdx] ?? alg.scrambles?.[0] ?? '');
   const colors = SET_CARD_COLORS[setColorIndex % SET_CARD_COLORS.length];
 
   return (
@@ -56,10 +61,17 @@ const AlgsFormulaCard: React.FC<AlgsFormulaCardProps> = ({
       bodyStyle={{ padding: 16, display: 'flex', flexDirection: 'column', boxSizing: 'border-box', minWidth: 0, overflow: 'hidden' }}
     >
         <div style={{ textAlign: 'center', flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
-        <SvgRenderer
-          svg={alg.image}
+        <AlgsCubeDiagram
+          cube={cube}
+          classId={classId}
+          setName={setName}
+          groupName={groupName}
+          imageSvg={alg.image}
+          scramble={displayScramble}
+          formula={displayAlg}
+          useVisualCube={useVisualCube}
           maxWidth={180}
-          maxHeight={320}
+          maxHeight={180}
           style={{ marginTop: 12, marginBottom: 16 }}
         />
         <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 8, color: 'var(--ant-color-text)' }}>
