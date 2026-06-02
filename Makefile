@@ -1,11 +1,18 @@
+NPM_REGISTRY ?= https://registry.npmjs.org/
+# 覆盖 /root/.npmrc 等全局 Nexus 配置，避免 E401
+NPM_INSTALL = NPM_CONFIG_REGISTRY=$(NPM_REGISTRY) npm
+
 all: start
 
 start:
-	npm run start
+	$(NPM_INSTALL) run start
 
-build:
+install:
+	$(NPM_INSTALL) ci --no-audit --fund=false
+
+build: install
 	rm -rf dist.zip dist/
-	BUILD_TIMESTAMP=$$(date +%s) npm run build
+	BUILD_TIMESTAMP=$$(date +%s) $(NPM_INSTALL) run build
 	#zip -r -q dist.zip dist/
 	#rm -rf dist
 # 	cp -r HowToCook dist/

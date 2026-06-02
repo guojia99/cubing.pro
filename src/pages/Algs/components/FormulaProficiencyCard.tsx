@@ -47,10 +47,6 @@ const FormulaProficiencyCard: React.FC<FormulaProficiencyCardProps> = ({
     setProficiencyMap(getFormulaProficiency(cube, classId));
   }, [cube, classId, refreshKey]);
 
-  const refreshProficiency = useCallback(() => {
-    setProficiencyMap(getFormulaProficiency(cube, classId));
-  }, [cube, classId]);
-
   const handleProficiencyChange = useCallback(
     (formulaKey: string, level: ProficiencyLevel) => {
       setFormulaProficiency(cube, classId, formulaKey, level);
@@ -187,6 +183,7 @@ const FormulaProficiencyCard: React.FC<FormulaProficiencyCardProps> = ({
       <Modal
         open={modalOpen}
         onCancel={() => setModalOpen(false)}
+        destroyOnClose
         title={intl.formatMessage({ id: 'algs.proficiencyCard.modalTitle' })}
         footer={null}
         width={760}

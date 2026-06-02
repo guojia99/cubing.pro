@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Card } from 'antd';
 import { HistoryOutlined } from '@ant-design/icons';
 import { useIntl } from '@@/plugin-locale';
@@ -33,6 +33,8 @@ interface FormulaRandomPickCardProps {
   onOpenHistory: () => void;
   onPickFormula: (index: number) => void;
   embedded?: boolean;
+  /** 随机记录更新后递增，用于刷新预览（勿用 React key 强制 remount） */
+  refreshKey?: number;
 }
 
 const FormulaRandomPickCard: React.FC<FormulaRandomPickCardProps> = ({
@@ -43,9 +45,14 @@ const FormulaRandomPickCard: React.FC<FormulaRandomPickCardProps> = ({
   onOpenHistory,
   onPickFormula,
   embedded = false,
+  refreshKey = 0,
 }) => {
   const intl = useIntl();
-  const history = useMemo(() => getFormulaPickHistory(cube, classId), [cube, classId]);
+  const [history, setHistory] = useState(() => getFormulaPickHistory(cube, classId));
+
+  useEffect(() => {
+    setHistory(getFormulaPickHistory(cube, classId));
+  }, [cube, classId, refreshKey]);
   const latestPick = history[0];
 
   const findIndex = (setName: string, groupName: string, algName: string) =>
