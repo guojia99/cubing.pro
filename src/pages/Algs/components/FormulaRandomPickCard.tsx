@@ -6,6 +6,7 @@ import type { Algorithm } from '@/services/cubing-pro/algs/typings';
 import { getFormulaPickHistory } from '@/services/cubing-pro/algs/formulaRandomPick';
 import SvgRenderer from './SvgRenderer';
 import { ALGS_COLORS } from '../constants';
+import '../index.less';
 
 const RANDOM_PICK_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
   <circle cx="50" cy="50" r="44" fill="rgba(230,240,255,0.8)" stroke="rgba(100,149,237,0.5)" stroke-width="3"/>
@@ -31,6 +32,7 @@ interface FormulaRandomPickCardProps {
   onOpenRandom: () => void;
   onOpenHistory: () => void;
   onPickFormula: (index: number) => void;
+  embedded?: boolean;
 }
 
 const FormulaRandomPickCard: React.FC<FormulaRandomPickCardProps> = ({
@@ -40,6 +42,7 @@ const FormulaRandomPickCard: React.FC<FormulaRandomPickCardProps> = ({
   onOpenRandom,
   onOpenHistory,
   onPickFormula,
+  embedded = false,
 }) => {
   const intl = useIntl();
   const history = useMemo(() => getFormulaPickHistory(cube, classId), [cube, classId]);
@@ -61,6 +64,58 @@ const FormulaRandomPickCard: React.FC<FormulaRandomPickCardProps> = ({
     }
   };
 
+  const preview = latestPick ? (
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={handleLatestClick}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') handleLatestClick();
+      }}
+      className="algs-practice-tool-random-preview"
+    >
+      <SvgRenderer svg={latestPick.image} maxWidth={48} maxHeight={64} style={{ flexShrink: 0 }} />
+      <div style={{ minWidth: 0, flex: 1, textAlign: embedded ? 'center' : 'left' }}>
+        <div style={{ fontWeight: 600, fontSize: 14, color: 'var(--ant-color-text)' }}>
+          {latestPick.algName}
+        </div>
+        <div style={{ fontSize: 12, color: 'var(--ant-color-text-tertiary)' }}>
+          {latestPick.setName} · {latestPick.groupName}
+        </div>
+      </div>
+    </div>
+  ) : (
+    <div className="algs-practice-tool-random-empty">
+      <SvgRenderer svg={RANDOM_PICK_ICON_SVG} maxWidth={48} maxHeight={48} style={{ opacity: 0.6 }} />
+      <span>{intl.formatMessage({ id: 'algs.formulaRandom.noPickYet' })}</span>
+    </div>
+  );
+
+  const actions = (
+    <div className={embedded ? 'algs-practice-tool-cell-actions' : undefined} style={embedded ? undefined : { display: 'flex', gap: 8, flexShrink: 0 }}>
+      <Button type="primary" block={embedded} onClick={onOpenRandom}>
+        {intl.formatMessage({ id: 'algs.formulaRandom.random' })}
+      </Button>
+      <Button icon={<HistoryOutlined />} block={embedded} onClick={onOpenHistory}>
+        {intl.formatMessage({ id: 'algs.formulaRandom.history' })}
+      </Button>
+    </div>
+  );
+
+  if (embedded) {
+    return (
+      <div className="algs-practice-tool-cell algs-practice-tool-cell--random">
+        <div className="algs-practice-tool-cell-header">
+          <span className="algs-practice-tool-cell-title">
+            {intl.formatMessage({ id: 'algs.detail.randomPickCard' })}
+          </span>
+        </div>
+        <div className="algs-practice-tool-cell-body">{preview}</div>
+        {actions}
+      </div>
+    );
+  }
+
   return (
     <Card
       size="small"
@@ -72,80 +127,8 @@ const FormulaRandomPickCard: React.FC<FormulaRandomPickCardProps> = ({
       bodyStyle={{ padding: 16 }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-            flex: 1,
-            minWidth: 200,
-          }}
-        >
-          {latestPick ? (
-            <div
-              onClick={handleLatestClick}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 12,
-                cursor: 'pointer',
-                flex: 1,
-                padding: 8,
-                borderRadius: 8,
-                background: 'var(--ant-color-fill-quaternary)',
-                transition: 'background 0.2s',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'var(--ant-color-primary-bg)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'var(--ant-color-fill-quaternary)';
-              }}
-            >
-              <SvgRenderer
-                svg={latestPick.image}
-                maxWidth={48}
-                maxHeight={64}
-                style={{ flexShrink: 0 }}
-              />
-              <div style={{ minWidth: 0, flex: 1 }}>
-                <div style={{ fontWeight: 600, fontSize: 14, color: 'var(--ant-color-text)' }}>
-                  {latestPick.algName}
-                </div>
-                <div style={{ fontSize: 12, color: 'var(--ant-color-text-tertiary)' }}>
-                  {latestPick.setName} · {latestPick.groupName}
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 12,
-                flex: 1,
-                color: 'var(--ant-color-text-tertiary)',
-                fontSize: 14,
-              }}
-            >
-              <SvgRenderer
-                svg={RANDOM_PICK_ICON_SVG}
-                maxWidth={48}
-                maxHeight={48}
-                style={{ opacity: 0.6 }}
-              />
-              <span>{intl.formatMessage({ id: 'algs.formulaRandom.noPickYet' })}</span>
-            </div>
-          )}
-        </div>
-        <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-          <Button type="primary" onClick={onOpenRandom}>
-            {intl.formatMessage({ id: 'algs.formulaRandom.random' })}
-          </Button>
-          <Button icon={<HistoryOutlined />} onClick={onOpenHistory}>
-            {intl.formatMessage({ id: 'algs.formulaRandom.history' })}
-          </Button>
-        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 200 }}>{preview}</div>
+        {actions}
       </div>
     </Card>
   );

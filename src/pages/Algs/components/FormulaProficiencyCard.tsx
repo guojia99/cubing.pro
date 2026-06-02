@@ -12,6 +12,7 @@ import { buildFormulaKey } from '@/services/cubing-pro/algs/formulaPracticeSelec
 import SvgRenderer from './SvgRenderer';
 import ProficiencySelect from './ProficiencySelect';
 import { ALGS_COLORS } from '../constants';
+import '../index.less';
 
 export interface FormulaItem {
   alg: Algorithm;
@@ -25,6 +26,7 @@ interface FormulaProficiencyCardProps {
   flatAlgs: FormulaItem[];
   onOpenFormulaPractice?: () => void;
   refreshKey?: number;
+  embedded?: boolean;
 }
 
 const FormulaProficiencyCard: React.FC<FormulaProficiencyCardProps> = ({
@@ -33,6 +35,7 @@ const FormulaProficiencyCard: React.FC<FormulaProficiencyCardProps> = ({
   flatAlgs,
   onOpenFormulaPractice,
   refreshKey = 0,
+  embedded = false,
 }) => {
   const intl = useIntl();
   const [modalOpen, setModalOpen] = useState(false);
@@ -134,47 +137,52 @@ const FormulaProficiencyCard: React.FC<FormulaProficiencyCardProps> = ({
     }));
   }, [groupedBySetAndGroup, proficiencyMap, intl, handleProficiencyChange]);
 
+  const summary = (
+    <>
+      <div className="algs-practice-tool-cell-header">
+        <FlagOutlined className="algs-practice-tool-cell-icon" />
+        <span className="algs-practice-tool-cell-title">
+          {intl.formatMessage({ id: 'algs.proficiencyCard.title' })}
+          {markedCount > 0 && (
+            <span className="algs-practice-tool-cell-badge"> ({markedCount})</span>
+          )}
+        </span>
+      </div>
+      <p className="algs-practice-tool-cell-desc">{intl.formatMessage({ id: 'algs.proficiencyCard.desc' })}</p>
+      {onOpenFormulaPractice && (
+        <p className="algs-practice-tool-cell-hint">
+          {intl.formatMessage({ id: 'algs.proficiencyCard.practiceHint' })}
+        </p>
+      )}
+    </>
+  );
+
   return (
     <>
-      <Card
-        size="small"
-        style={{
-          borderRadius: 12,
-          backgroundColor: ALGS_COLORS.cardBg,
-          borderColor: ALGS_COLORS.cardBorder,
-        }}
-        bodyStyle={{ padding: 16 }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: 12,
-            cursor: 'pointer',
-          }}
+      {embedded ? (
+        <button
+          type="button"
+          className="algs-practice-tool-cell algs-practice-tool-cell--proficiency"
           onClick={() => setModalOpen(true)}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--ant-color-text)' }}>
-            <FlagOutlined style={{ color: 'rgba(100,149,237,0.8)' }} />
-            <span style={{ fontWeight: 500 }}>{intl.formatMessage({ id: 'algs.proficiencyCard.title' })}</span>
-            {markedCount > 0 && (
-              <span style={{ fontSize: 12, color: 'var(--ant-color-text-tertiary)' }}>
-                ({markedCount})
-              </span>
-            )}
-          </div>
-        </div>
-        <div style={{ marginTop: 8, fontSize: 12, color: 'var(--ant-color-text-tertiary)' }}>
-          {intl.formatMessage({ id: 'algs.proficiencyCard.desc' })}
-        </div>
-        {onOpenFormulaPractice && (
-          <div style={{ marginTop: 6, fontSize: 11, color: 'rgba(100,149,237,0.9)' }}>
-            {intl.formatMessage({ id: 'algs.proficiencyCard.practiceHint' })}
-          </div>
-        )}
-      </Card>
+          {summary}
+        </button>
+      ) : (
+        <Card
+          size="small"
+          style={{
+            borderRadius: 12,
+            backgroundColor: ALGS_COLORS.cardBg,
+            borderColor: ALGS_COLORS.cardBorder,
+            cursor: 'pointer',
+            height: '100%',
+          }}
+          bodyStyle={{ padding: 16, height: '100%', boxSizing: 'border-box' }}
+          onClick={() => setModalOpen(true)}
+        >
+          {summary}
+        </Card>
+      )}
 
       <Modal
         open={modalOpen}

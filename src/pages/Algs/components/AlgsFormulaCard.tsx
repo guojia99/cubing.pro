@@ -5,6 +5,7 @@ import { getAlgsSelection, buildAlgsKey } from '../utils/storage';
 import { getCustomAlgs } from '@/services/cubing-pro/algs/customAlgs';
 import AlgsCubeDiagram from './AlgsCubeDiagram';
 import { SET_CARD_COLORS } from '../constants';
+import { getFormulaFontFamilyCSSValue, type FormulaFontFamilyId } from '../utils/formulaFontFamily';
 
 const CARD_MIN_HEIGHT = 180;
 
@@ -16,6 +17,7 @@ export interface AlgsFormulaCardProps {
   alg: Algorithm;
   setColorIndex?: number;
   formulaFontSize?: number;
+  formulaFontFamily?: FormulaFontFamilyId;
   useVisualCube?: boolean;
   onClick: () => void;
 }
@@ -28,6 +30,7 @@ const AlgsFormulaCard: React.FC<AlgsFormulaCardProps> = ({
   alg,
   setColorIndex = 0,
   formulaFontSize = 12,
+  formulaFontFamily,
   useVisualCube = true,
   onClick,
 }) => {
@@ -45,6 +48,7 @@ const AlgsFormulaCard: React.FC<AlgsFormulaCardProps> = ({
   const displayScramble =
     selection?.source === 'custom' ? '' : (alg.scrambles?.[scrambleIdx] ?? alg.scrambles?.[0] ?? '');
   const colors = SET_CARD_COLORS[setColorIndex % SET_CARD_COLORS.length];
+  const formulaFontCss = getFormulaFontFamilyCSSValue(formulaFontFamily);
 
   return (
     <Card
@@ -58,29 +62,30 @@ const AlgsFormulaCard: React.FC<AlgsFormulaCardProps> = ({
         animation: 'algsFloat 10s ease-in-out infinite',
         minHeight: CARD_MIN_HEIGHT,
       }}
-      bodyStyle={{ padding: 16, display: 'flex', flexDirection: 'column', boxSizing: 'border-box', minWidth: 0, overflow: 'hidden' }}
+      bodyStyle={{ padding: 16, display: 'flex', flexDirection: 'column', boxSizing: 'border-box', minWidth: 0 }}
     >
-        <div style={{ textAlign: 'center', flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
-        <AlgsCubeDiagram
-          cube={cube}
-          classId={classId}
-          setName={setName}
-          groupName={groupName}
-          imageSvg={alg.image}
-          scramble={displayScramble}
-          formula={displayAlg}
-          useVisualCube={useVisualCube}
-          maxWidth={180}
-          maxHeight={180}
-          style={{ marginTop: 12, marginBottom: 16 }}
-        />
+        <div style={{ textAlign: 'center', flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+        <div className="algs-formula-card-diagram" style={{ marginTop: 12, marginBottom: 16 }}>
+          <AlgsCubeDiagram
+            cube={cube}
+            classId={classId}
+            setName={setName}
+            groupName={groupName}
+            imageSvg={alg.image}
+            scramble={displayScramble}
+            formula={displayAlg}
+            useVisualCube={useVisualCube}
+            maxWidth={180}
+            maxHeight={180}
+          />
+        </div>
         <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 8, color: 'var(--ant-color-text)' }}>
           {alg.name}
         </div>
         <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
           <Tag
             style={{
-              fontFamily: 'monospace',
+              fontFamily: formulaFontCss,
               fontSize: formulaFontSize,
               maxWidth: '100%',
               lineHeight: 1.4,

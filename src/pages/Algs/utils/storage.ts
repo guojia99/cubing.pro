@@ -160,3 +160,30 @@ export function setHideAltFormulas(cube: string, classId: string, hide: boolean)
     // ignore
   }
 }
+
+const HIDDEN_FORMULAS_BY_REPO_KEY = 'algs_hidden_formulas_by_repo';
+
+/** 按公式库保存已隐藏的公式 key（set:group:name），未在列表中的公式默认显示 */
+export function getHiddenFormulaKeys(cube: string, classId: string): string[] {
+  try {
+    const raw = localStorage.getItem(HIDDEN_FORMULAS_BY_REPO_KEY);
+    if (!raw) return [];
+    const map = JSON.parse(raw) as Record<string, string[]>;
+    const list = map[repoLayoutKey(cube, classId)];
+    return Array.isArray(list) ? list : [];
+  } catch {
+    // ignore
+  }
+  return [];
+}
+
+export function setHiddenFormulaKeys(cube: string, classId: string, keys: string[]): void {
+  try {
+    const raw = localStorage.getItem(HIDDEN_FORMULAS_BY_REPO_KEY);
+    const map: Record<string, string[]> = raw ? JSON.parse(raw) : {};
+    map[repoLayoutKey(cube, classId)] = keys;
+    localStorage.setItem(HIDDEN_FORMULAS_BY_REPO_KEY, JSON.stringify(map));
+  } catch {
+    // ignore
+  }
+}
