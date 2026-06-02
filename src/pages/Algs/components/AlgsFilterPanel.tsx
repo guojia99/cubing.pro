@@ -1,22 +1,27 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Button, Card } from 'antd';
 import { useIntl } from '@@/plugin-locale';
 import type { AlgorithmClass } from '@/services/cubing-pro/algs/typings';
-
-function buildGroupKey(setName: string, groupName: string): string {
-  return `${setName}:${groupName}`;
-}
+import { buildFormulaKey, buildGroupKey } from '@/services/cubing-pro/algs/formulaPracticeSelection';
+import { collectVisibleFormulaKeys } from '../utils/algsFormulaFilter';
+import '../index.less';
 
 export interface AlgsFilterPanelProps {
   data: AlgorithmClass;
   selectedSets: string[];
   selectedGroups: string[];
+  hiddenFormulaKeys: string[];
   onSetToggle: (name: string) => void;
   onGroupToggle: (key: string) => void;
+  onFormulaToggle: (key: string) => void;
   onSetSelectAll: () => void;
   onSetDeselectAll: () => void;
   onGroupSelectAll: () => void;
   onGroupDeselectAll: () => void;
+  onFormulaSelectAll: () => void;
+  onFormulaDeselectAll: () => void;
+  /** 抽屉内使用更宽的公式名网格 */
+  drawerMode?: boolean;
   compact?: boolean;
 }
 
@@ -24,22 +29,35 @@ const AlgsFilterPanel: React.FC<AlgsFilterPanelProps> = ({
   data,
   selectedSets,
   selectedGroups,
+  hiddenFormulaKeys,
   onSetToggle,
   onGroupToggle,
+  onFormulaToggle,
   onSetSelectAll,
   onSetDeselectAll,
   onGroupSelectAll,
   onGroupDeselectAll,
+  onFormulaSelectAll,
+  onFormulaDeselectAll,
+  drawerMode = false,
   compact = false,
 }) => {
   const intl = useIntl();
   const sets = data.sets ?? [];
   const setKeys = data.setKeys ?? [];
+  const hiddenSet = useMemo(() => new Set(hiddenFormulaKeys), [hiddenFormulaKeys]);
+
+  const scopeFormulaKeys = useMemo(
+    () => collectVisibleFormulaKeys(data, selectedSets, selectedGroups),
+    [data, selectedSets, selectedGroups],
+  );
+
+  const visibleFormulaCount = scopeFormulaKeys.filter((k) => !hiddenSet.has(k)).length;
 
   return (
-    <>
+    <div className={drawerMode ? 'algs-filter-panel-drawer' : undefined}>
       <Card size="small" style={{ marginBottom: compact ? 12 : 16 }}>
-        <div style={{ marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
           <span style={{ fontSize: 12, color: 'var(--ant-color-text-secondary)' }}>
             {intl.formatMessage({ id: 'algs.detail.set' })}
           </span>
@@ -70,8 +88,8 @@ const AlgsFilterPanel: React.FC<AlgsFilterPanelProps> = ({
         </div>
       </Card>
 
-      <Card size="small" style={{ marginBottom: 0 }}>
-        <div style={{ marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+      <Card size="small" style={{ marginBottom: compact ? 12 : 16 }}>
+        <div style={{ marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
           <span style={{ fontSize: 12, color: 'var(--ant-color-text-secondary)' }}>
             {intl.formatMessage({ id: 'algs.detail.group' })}
           </span>
@@ -123,7 +141,105 @@ const AlgsFilterPanel: React.FC<AlgsFilterPanelProps> = ({
             })}
         </div>
       </Card>
-    </>
+
+      <Card size="small" style={{ marginBottom: 0 }}>
+        <div style={{ marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <span style={{ fontSize: 12, color: 'var(--ant-color-text-secondary)' }}>
+            {intl.formatMessage({ id: 'algs.detail.formulaFilter' })}
+            {scopeFormulaKeys.length > 0 && (
+              <span style={{ marginLeft: 6, color: 'var(--ant-color-text-tertiary)' }}>
+                ({visibleFormulaCount}/{scopeFormulaKeys.length})
+              </span>
+            )}
+          </span>
+          <Button size="small" onClick={onFormulaSelectAll} disabled={scopeFormulaKeys.length === 0}>
+            {intl.formatMessage({ id: 'algs.detail.selectAll' })}
+          </Button>
+          <Button size="small" onClick={onFormulaDeselectAll} disabled={scopeFormulaKeys.length === 0}>
+            {intl.formatMessage({ id: 'algs.detail.deselectAll' })}
+          </Button>
+        </div>
+        <p style={{ margin: '0 0 10px', fontSize: 12, color: 'var(--ant-color-text-tertiary)' }}>
+          {intl.formatMessage({ id: 'algs.detail.formulaFilterHint' })}
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14, maxHeight: drawerMode ? 'calc(100vh - 280px)' : 420, overflowY: 'auto' }}>
+          {setKeys
+            .filter((setName) => selectedSets.includes(setName))
+            .map((setName) => {
+              const set = sets.find((s) => s.name === setName);
+              const groupKeys = set?.groups_keys ?? [];
+              const groups = set?.groups ?? [];
+              const visibleGroups = groupKeys.filter((gName) =>
+                selectedGroups.includes(buildGroupKey(setName, gName)),
+              );
+              if (visibleGroups.length === 0) return null;
+              return (
+                <div key={setName}>
+                  <div
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 600,
+                      color: 'var(--ant-color-text-secondary)',
+                      marginBottom: 8,
+                    }}
+                  >
+                    {setName}
+                  </div>
+                  {visibleGroups.map((gName) => {
+                    const gi = groupKeys.indexOf(gName);
+                    const algs = groups[gi]?.algs ?? [];
+                    if (algs.length === 0) return null;
+                    return (
+                      <div key={buildGroupKey(setName, gName)} style={{ marginBottom: 10 }}>
+                        <div
+                          style={{
+                            fontSize: 11,
+                            color: 'var(--ant-color-text-tertiary)',
+                            marginBottom: 6,
+                          }}
+                        >
+                          {gName}
+                        </div>
+                        <div
+                          className={
+                            drawerMode ? 'algs-filter-formula-grid algs-filter-formula-grid--drawer' : 'algs-filter-formula-grid'
+                          }
+                        >
+                          {algs.map((alg) => {
+                            const fKey = buildFormulaKey(setName, gName, alg.name);
+                            const visible = !hiddenSet.has(fKey);
+                            return (
+                              <Button
+                                key={fKey}
+                                type={visible ? 'primary' : 'default'}
+                                size="small"
+                                title={alg.name}
+                                onClick={() => onFormulaToggle(fKey)}
+                                className="algs-filter-formula-btn"
+                                style={{
+                                  borderRadius: 12,
+                                  ...(visible
+                                    ? {
+                                        backgroundColor: 'rgba(100, 149, 237, 0.85)',
+                                        borderColor: 'rgba(100, 149, 237, 0.85)',
+                                      }
+                                    : {}),
+                                }}
+                              >
+                                {alg.name}
+                              </Button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })}
+        </div>
+      </Card>
+    </div>
   );
 };
 

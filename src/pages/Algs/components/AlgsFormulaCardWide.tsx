@@ -10,6 +10,7 @@ import {
 import { getCustomAlgs } from '@/services/cubing-pro/algs/customAlgs';
 import AlgsCubeDiagram from './AlgsCubeDiagram';
 import { SET_CARD_COLORS } from '../constants';
+import { getFormulaFontFamilyCSSValue, type FormulaFontFamilyId } from '../utils/formulaFontFamily';
 import '../index.less';
 
 const MAX_ALT_FORMULAS = 3;
@@ -22,6 +23,7 @@ export interface AlgsFormulaCardWideProps {
   alg: Algorithm;
   setColorIndex?: number;
   formulaFontSize?: number;
+  formulaFontFamily?: FormulaFontFamilyId;
   useVisualCube?: boolean;
   hideAltFormulas?: boolean;
   onOpenModal: () => void;
@@ -35,6 +37,7 @@ const AlgsFormulaCardWide: React.FC<AlgsFormulaCardWideProps> = ({
   alg,
   setColorIndex = 0,
   formulaFontSize = 12,
+  formulaFontFamily,
   useVisualCube = true,
   hideAltFormulas = false,
   onOpenModal,
@@ -86,6 +89,7 @@ const AlgsFormulaCardWide: React.FC<AlgsFormulaCardWideProps> = ({
   );
 
   const colors = SET_CARD_COLORS[setColorIndex % SET_CARD_COLORS.length];
+  const formulaFontCss = getFormulaFontFamilyCSSValue(formulaFontFamily);
 
   return (
     <Card
@@ -104,18 +108,20 @@ const AlgsFormulaCardWide: React.FC<AlgsFormulaCardWideProps> = ({
           className="algs-formula-card-wide-left"
           onClick={onOpenModal}
         >
-          <AlgsCubeDiagram
-            cube={cube}
-            classId={classId}
-            setName={setName}
-            groupName={groupName}
-            imageSvg={alg.image}
-            scramble={displayScramble}
-            formula={displayFormula}
-            useVisualCube={useVisualCube}
-            maxWidth={200}
-            maxHeight={220}
-          />
+          <div className="algs-formula-card-diagram" style={{ maxWidth: 200 }}>
+            <AlgsCubeDiagram
+              cube={cube}
+              classId={classId}
+              setName={setName}
+              groupName={groupName}
+              imageSvg={alg.image}
+              scramble={displayScramble}
+              formula={displayFormula}
+              useVisualCube={useVisualCube}
+              maxWidth={200}
+              maxHeight={220}
+            />
+          </div>
           <div className="algs-formula-card-wide-name">{alg.name}</div>
         </button>
 
@@ -128,7 +134,7 @@ const AlgsFormulaCardWide: React.FC<AlgsFormulaCardWideProps> = ({
                 className={`algs-formula-card-wide-formula${
                   row.selected ? ' is-selected' : ' is-alt'
                 }`}
-                style={{ fontSize: formulaFontSize }}
+                style={{ fontSize: formulaFontSize, fontFamily: formulaFontCss }}
                 onClick={() => updateSelection(activeSource, row.index)}
               >
                 {row.text}

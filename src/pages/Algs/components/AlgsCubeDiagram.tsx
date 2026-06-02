@@ -48,7 +48,7 @@ const AlgsCubeDiagram: React.FC<AlgsCubeDiagramProps> = ({
         width={w}
         height={h}
         className={className}
-        style={{ marginLeft: 'auto', marginRight: 'auto', ...style }}
+        style={{ width: '100%', minWidth: 0, ...style }}
       />
     );
   }

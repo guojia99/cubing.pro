@@ -69,10 +69,12 @@ const AlgsVisualCube: React.FC<AlgsVisualCubeProps> = ({
       const img = el.querySelector('img');
       if (!img) return;
       img.style.display = 'block';
-      img.style.marginLeft = 'auto';
-      img.style.marginRight = 'auto';
-      img.style.maxWidth = '100%';
+      img.style.margin = '0 auto';
+      img.style.width = '100%';
       img.style.height = 'auto';
+      img.style.maxWidth = '100%';
+      img.style.objectFit = 'contain';
+      img.style.boxSizing = 'border-box';
     };
 
     try {
@@ -88,26 +90,33 @@ const AlgsVisualCube: React.FC<AlgsVisualCubeProps> = ({
 
   return (
     <div
-      className={className}
+      className={`algs-visual-cube${className ? ` ${className}` : ''}`}
       style={{
         width: '100%',
+        maxWidth: renderWidth,
+        minWidth: 0,
+        marginLeft: 'auto',
+        marginRight: 'auto',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         lineHeight: 0,
+        ...(view === 'plan' ? { aspectRatio: '1' } : { minHeight: renderHeight }),
         ...style,
       }}
     >
       <div
         ref={containerRef}
+        className="algs-visual-cube-inner"
         style={{
+          width: '100%',
+          maxWidth: '100%',
+          height: view === 'plan' ? '100%' : undefined,
+          minHeight: view === 'plan' ? undefined : renderHeight,
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
           lineHeight: 0,
-          maxWidth: '100%',
-          width: renderWidth,
-          minHeight: renderHeight,
         }}
       />
     </div>

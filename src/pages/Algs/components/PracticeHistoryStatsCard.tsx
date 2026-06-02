@@ -18,6 +18,7 @@ import {
   type ProficiencyLevel,
 } from '@/services/cubing-pro/algs/formulaPracticeProficiency';
 import { ALGS_COLORS } from '../constants';
+import '../index.less';
 
 const PROFICIENCY_DISPLAY: { value: ProficiencyLevel; icon: React.ReactNode; color: string }[] = [
   { value: 'mastered', icon: <CheckCircleOutlined />, color: '#52c41a' },
@@ -31,6 +32,7 @@ interface PracticeHistoryStatsCardProps {
   cube: string;
   classId: string;
   refreshKey?: number;
+  embedded?: boolean;
 }
 
 export interface FormulaStatsItem {
@@ -46,6 +48,7 @@ const PracticeHistoryStatsCard: React.FC<PracticeHistoryStatsCardProps> = ({
   cube,
   classId,
   refreshKey = 0,
+  embedded = false,
 }) => {
   const intl = useIntl();
   const [modalOpen, setModalOpen] = useState(false);
@@ -153,42 +156,49 @@ const PracticeHistoryStatsCard: React.FC<PracticeHistoryStatsCardProps> = ({
     },
   ];
 
+  const summary = (
+    <>
+      <div className="algs-practice-tool-cell-header">
+        <BarChartOutlined className="algs-practice-tool-cell-icon" />
+        <span className="algs-practice-tool-cell-title">
+          {intl.formatMessage({ id: 'algs.practiceHistoryStats.title' })}
+          {stats.total > 0 && (
+            <span className="algs-practice-tool-cell-badge"> ({stats.total})</span>
+          )}
+        </span>
+      </div>
+      <p className="algs-practice-tool-cell-desc">
+        {intl.formatMessage({ id: 'algs.practiceHistoryStats.desc' })}
+      </p>
+    </>
+  );
+
   return (
     <>
-      <Card
-        size="small"
-        style={{
-          borderRadius: 12,
-          backgroundColor: ALGS_COLORS.cardBg,
-          borderColor: ALGS_COLORS.cardBorder,
-        }}
-        bodyStyle={{ padding: 16 }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: 12,
-            cursor: 'pointer',
-          }}
+      {embedded ? (
+        <button
+          type="button"
+          className="algs-practice-tool-cell algs-practice-tool-cell--history"
           onClick={() => setModalOpen(true)}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--ant-color-text)' }}>
-            <BarChartOutlined style={{ color: 'rgba(100,149,237,0.8)' }} />
-            <span style={{ fontWeight: 500 }}>
-              {intl.formatMessage({ id: 'algs.practiceHistoryStats.title' })}
-            </span>
-            {stats.total > 0 && (
-              <span style={{ fontSize: 12, color: 'var(--ant-color-text-tertiary)' }}>({stats.total})</span>
-            )}
-          </div>
-        </div>
-        <div style={{ marginTop: 8, fontSize: 12, color: 'var(--ant-color-text-tertiary)' }}>
-          {intl.formatMessage({ id: 'algs.practiceHistoryStats.desc' })}
-        </div>
-      </Card>
+          {summary}
+        </button>
+      ) : (
+        <Card
+          size="small"
+          style={{
+            borderRadius: 12,
+            backgroundColor: ALGS_COLORS.cardBg,
+            borderColor: ALGS_COLORS.cardBorder,
+            cursor: 'pointer',
+            height: '100%',
+          }}
+          bodyStyle={{ padding: 16, height: '100%', boxSizing: 'border-box' }}
+          onClick={() => setModalOpen(true)}
+        >
+          {summary}
+        </Card>
+      )}
 
       <Modal
         open={modalOpen}

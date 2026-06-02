@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Card, Col, Collapse, Drawer, Modal, Progress, Row, Slider, Spin, Statistic, Switch } from 'antd';
-import { ArrowLeftOutlined, BarChartOutlined, FilePdfOutlined, PlayCircleOutlined } from '@ant-design/icons';
+import { Button, Card, Collapse, Drawer, Modal, Progress, Spin, Statistic } from 'antd';
+import { ArrowLeftOutlined, BarChartOutlined, FilePdfOutlined } from '@ant-design/icons';
 import { useIntl } from '@@/plugin-locale';
 import { useNavigate, useParams } from '@@/exports';
 import { getAlgCubeClass } from '@/services/cubing-pro/algs/algs';
+import { buildFormulaKey, buildGroupKey } from '@/services/cubing-pro/algs/formulaPracticeSelection';
 import type { AlgorithmClass, Algorithm } from '@/services/cubing-pro/algs/typings';
 import { exportAlgsPdf } from './utils/pdfExport';
 import AlgsModal from './components/AlgsModal';
@@ -11,12 +12,17 @@ import AlgsFormulaCard from './components/AlgsFormulaCard';
 import AlgsFormulaCardWide from './components/AlgsFormulaCardWide';
 import AlgsFilterPanel from './components/AlgsFilterPanel';
 import AlgsFloatButtons from './components/AlgsFloatButtons';
+import AlgsPageSettingsPanel from './components/AlgsPageSettingsPanel';
 import FormulaRandomPickModal from './components/FormulaRandomPickModal';
-import FormulaRandomPickCard from './components/FormulaRandomPickCard';
-import FormulaProficiencyCard from './components/FormulaProficiencyCard';
-import PracticeHistoryStatsCard from './components/PracticeHistoryStatsCard';
+import AlgsPracticeToolsPanel from './components/AlgsPracticeToolsPanel';
 import UsageInstructionsModal from './components/UsageInstructionsModal';
 import FormulaPracticeModal from './components/FormulaPracticeModal';
+import BatchCustomFormulaModal from './components/BatchCustomFormulaModal';
+import {
+  getFormulaFontFamily,
+  setFormulaFontFamily,
+  type FormulaFontFamilyId,
+} from './utils/formulaFontFamily';
 import {
   getFormulaFontSize,
   setFormulaFontSize,
@@ -26,14 +32,13 @@ import {
   setColumnsPerRow,
   getHideAltFormulas,
   setHideAltFormulas,
+  getHiddenFormulaKeys,
+  setHiddenFormulaKeys,
 } from './utils/storage';
+import { collectVisibleFormulaKeys } from './utils/algsFormulaFilter';
 import { isVisualCubeCube } from './utils/visualCubeCube';
 import { SET_CARD_COLORS } from './constants';
 import './index.less';
-
-function buildGroupKey(setName: string, groupName: string): string {
-  return `${setName}:${groupName}`;
-}
 
 const AlgsDetail: React.FC = () => {
   const intl = useIntl();
@@ -45,8 +50,14 @@ const AlgsDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedSets, setSelectedSets] = useState<string[]>([]);
   const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
+  const [hiddenFormulaKeys, setHiddenFormulaKeysState] = useState<string[]>([]);
+  const [filterPanelExpanded, setFilterPanelExpanded] = useState<string[]>([]);
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
+  const [pageSettingsOpen, setPageSettingsOpen] = useState(false);
   const [formulaFontSize, setFormulaFontSizeState] = useState(() => getFormulaFontSize());
+  const [formulaFontFamily, setFormulaFontFamilyState] = useState<FormulaFontFamilyId>(() =>
+    getFormulaFontFamily(),
+  );
   const [statModalOpen, setStatModalOpen] = useState(false);
   const [modalState, setModalState] = useState<{
     algs: Array<{ alg: Algorithm; setName: string; groupName: string }>;
@@ -60,6 +71,7 @@ const AlgsDetail: React.FC = () => {
   const [unskilledRefreshKey, setUnskilledRefreshKey] = useState(0);
   const [usageInstructionsOpen, setUsageInstructionsOpen] = useState(false);
   const [formulaPracticeOpen, setFormulaPracticeOpen] = useState(false);
+  const [batchCustomOpen, setBatchCustomOpen] = useState(false);
   const [useVisualCube, setUseVisualCube] = useState(() => getUseVisualCubeRenderer());
   const [columnsPerRow, setColumnsPerRowState] = useState(4);
   const [hideAltFormulas, setHideAltFormulasState] = useState(false);
@@ -85,6 +97,13 @@ const AlgsDetail: React.FC = () => {
           (s.groups_keys ?? []).forEach((g) => allGroups.push(buildGroupKey(s.name, g)));
         });
         setSelectedGroups(allGroups);
+        const dc = decodeURIComponent(cube);
+        const cl = decodeURIComponent(classId);
+        const savedHidden = getHiddenFormulaKeys(dc, cl);
+        const validKeys = new Set(
+          collectVisibleFormulaKeys(d, keys, allGroups),
+        );
+        setHiddenFormulaKeysState(savedHidden.filter((k) => validKeys.has(k)));
       })
       .finally(() => setLoading(false));
   }, [cube, classId]);
@@ -107,6 +126,42 @@ const AlgsDetail: React.FC = () => {
   const handleSetDeselectAll = () => setSelectedSets([]);
   const handleGroupSelectAll = () => setSelectedGroups([...allGroupKeys]);
   const handleGroupDeselectAll = () => setSelectedGroups([]);
+
+  const persistHiddenFormulas = (keys: string[]) => {
+    if (!cube || !classId) return;
+    setHiddenFormulaKeys(decodeURIComponent(cube), decodeURIComponent(classId), keys);
+  };
+
+  const handleFormulaToggle = (key: string) => {
+    setHiddenFormulaKeysState((prev) => {
+      const next = prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key];
+      persistHiddenFormulas(next);
+      return next;
+    });
+  };
+
+  const handleFormulaSelectAll = () => {
+    if (!data) return;
+    const scope = collectVisibleFormulaKeys(data, selectedSets, selectedGroups);
+    setHiddenFormulaKeysState((prev) => {
+      const scopeSet = new Set(scope);
+      const next = prev.filter((k) => !scopeSet.has(k));
+      persistHiddenFormulas(next);
+      return next;
+    });
+  };
+
+  const handleFormulaDeselectAll = () => {
+    if (!data) return;
+    const scope = collectVisibleFormulaKeys(data, selectedSets, selectedGroups);
+    setHiddenFormulaKeysState((prev) => {
+      const next = [...new Set([...prev, ...scope])];
+      persistHiddenFormulas(next);
+      return next;
+    });
+  };
+
+  const hiddenFormulaSet = new Set(hiddenFormulaKeys);
 
   const handleExportPdf = async () => {
     if (!data || !cube || !classId || !contentRef.current) return;
@@ -155,7 +210,12 @@ const AlgsDetail: React.FC = () => {
       const key = buildGroupKey(set.name, gName);
       if (!selectedGroups.includes(key)) return;
       const group = groups[gi];
-      const items = (group?.algs ?? []).map((alg) => ({ alg, setName: set.name, groupName: gName }));
+      const items = (group?.algs ?? [])
+        .map((alg) => ({ alg, setName: set.name, groupName: gName }))
+        .filter(
+          (item) =>
+            !hiddenFormulaSet.has(buildFormulaKey(item.setName, item.groupName, item.alg.name)),
+        );
       if (items.length > 0) {
         groupedAlgs.push({
           setName: set.name,
@@ -184,12 +244,16 @@ const AlgsDetail: React.FC = () => {
     data,
     selectedSets,
     selectedGroups,
+    hiddenFormulaKeys,
     onSetToggle: handleSetToggle,
     onGroupToggle: handleGroupToggle,
+    onFormulaToggle: handleFormulaToggle,
     onSetSelectAll: handleSetSelectAll,
     onSetDeselectAll: handleSetDeselectAll,
     onGroupSelectAll: handleGroupSelectAll,
     onGroupDeselectAll: handleGroupDeselectAll,
+    onFormulaSelectAll: handleFormulaSelectAll,
+    onFormulaDeselectAll: handleFormulaDeselectAll,
   };
 
   return (
@@ -204,78 +268,14 @@ const AlgsDetail: React.FC = () => {
           {intl.formatMessage({ id: 'algs.detail.back' })}
         </Button>
       </div>
-      <Card size="small" style={{ marginBottom: 16 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-          <Button size="small" type="primary" icon={<FilePdfOutlined />} loading={exporting} onClick={handleExportPdf}>
-            {intl.formatMessage({ id: 'algs.detail.exportPdf' })}
-          </Button>
-          <Button size="small" icon={<BarChartOutlined />} onClick={() => setStatModalOpen(true)}>
-            {intl.formatMessage({ id: 'algs.detail.statistics' })}
-          </Button>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 200 }}>
-            <span style={{ fontSize: 12, color: 'var(--ant-color-text-secondary)', whiteSpace: 'nowrap' }}>
-              {intl.formatMessage({ id: 'algs.detail.formulaFontSize' })}: {formulaFontSize}
-            </span>
-            <Slider
-              min={8}
-              max={32}
-              value={formulaFontSize}
-              onChange={(v) => {
-                const n = typeof v === 'number' ? v : v[0];
-                setFormulaFontSizeState(n);
-                setFormulaFontSize(n);
-              }}
-              style={{ flex: 1, maxWidth: 180 }}
-            />
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 200 }}>
-            <span style={{ fontSize: 12, color: 'var(--ant-color-text-secondary)', whiteSpace: 'nowrap' }}>
-              {intl.formatMessage({ id: 'algs.detail.columnsPerRow' })}: {columnsPerRow}
-            </span>
-            <Slider
-              min={1}
-              max={8}
-              value={columnsPerRow}
-              onChange={(v) => {
-                const n = typeof v === 'number' ? v : v[0];
-                setColumnsPerRowState(n);
-                setColumnsPerRow(dcube, dclassId, n);
-              }}
-              style={{ flex: 1, maxWidth: 180 }}
-            />
-          </div>
-          {columnsPerRow === 1 && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Switch
-                size="small"
-                checked={hideAltFormulas}
-                onChange={(checked) => {
-                  setHideAltFormulasState(checked);
-                  setHideAltFormulas(dcube, dclassId, checked);
-                }}
-              />
-              <span style={{ fontSize: 12, color: 'var(--ant-color-text-secondary)', whiteSpace: 'nowrap' }}>
-                {intl.formatMessage({ id: 'algs.detail.hideAltFormulas' })}
-              </span>
-            </div>
-          )}
-          {isVisualCubeCube(dcube) && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Switch
-                size="small"
-                checked={useVisualCube}
-                onChange={(checked) => {
-                  setUseVisualCube(checked);
-                  setUseVisualCubeRenderer(checked);
-                }}
-              />
-              <span style={{ fontSize: 12, color: 'var(--ant-color-text-secondary)', whiteSpace: 'nowrap' }}>
-                {intl.formatMessage({ id: 'algs.detail.useVisualCube' })}
-              </span>
-            </div>
-          )}
-        </div>
-      </Card>
+      <div style={{ marginBottom: 16, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <Button size="small" type="primary" icon={<FilePdfOutlined />} loading={exporting} onClick={handleExportPdf}>
+          {intl.formatMessage({ id: 'algs.detail.exportPdf' })}
+        </Button>
+        <Button size="small" icon={<BarChartOutlined />} onClick={() => setStatModalOpen(true)}>
+          {intl.formatMessage({ id: 'algs.detail.statistics' })}
+        </Button>
+      </div>
 
       <Modal
         title={intl.formatMessage({ id: 'algs.detail.statistics' })}
@@ -354,85 +354,40 @@ const AlgsDetail: React.FC = () => {
         </div>
       </Modal>
 
-      <div style={{ marginBottom: 16 }}>
-        <AlgsFilterPanel {...filterPanelProps} />
-      </div>
+      <Collapse
+        style={{ marginBottom: 16 }}
+        activeKey={filterPanelExpanded}
+        onChange={(keys) => setFilterPanelExpanded(keys as string[])}
+        items={[
+          {
+            key: 'filter',
+            label: intl.formatMessage({ id: 'algs.detail.filterPanel' }),
+            children: <AlgsFilterPanel {...filterPanelProps} />,
+          },
+        ]}
+      />
 
-      <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
-        {flatAlgs.length >= 8 && (
-          <Col xs={24} sm={12} md={8} lg={6}>
-            <FormulaRandomPickCard
-              key={formulaRandomRefreshKey}
-              cube={dcube}
-              classId={dclassId}
-              flatAlgs={flatAlgs}
-              onOpenRandom={() => {
-                setFormulaRandomModalMode('random');
-                setFormulaRandomModalOpen(true);
-              }}
-              onOpenHistory={() => {
-                setFormulaRandomModalMode('history');
-                setFormulaRandomModalOpen(true);
-              }}
-              onPickFormula={openModal}
-            />
-          </Col>
-        )}
-        {flatAlgs.length > 0 && (
-          <Col xs={24} sm={12} md={8} lg={6}>
-            <Card
-              size="small"
-              style={{
-                borderRadius: 12,
-                backgroundColor: 'rgba(0, 185, 204, 0.25)',
-                borderColor: 'rgba(0, 185, 204, 0.5)',
-                cursor: 'pointer',
-              }}
-              bodyStyle={{ padding: 16 }}
-              onClick={() => setFormulaPracticeOpen(true)}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  color: 'var(--ant-color-text)',
-                }}
-              >
-                <PlayCircleOutlined style={{ color: 'rgba(0, 150, 170, 0.9)', fontSize: 18 }} />
-                <span style={{ fontWeight: 500 }}>
-                  {intl.formatMessage({ id: 'algs.formulaPractice.start' })}
-                </span>
-              </div>
-              <div style={{ marginTop: 8, fontSize: 12, color: 'var(--ant-color-text-tertiary)' }}>
-                {intl.formatMessage({ id: 'algs.formulaPractice.title' })}
-              </div>
-            </Card>
-          </Col>
-        )}
-        {flatAlgs.length > 0 && (
-          <Col xs={24} sm={12} md={8} lg={6}>
-            <FormulaProficiencyCard
-              key={unskilledRefreshKey}
-              cube={dcube}
-              classId={dclassId}
-              flatAlgs={flatAlgs}
-              onOpenFormulaPractice={() => setFormulaPracticeOpen(true)}
-              refreshKey={unskilledRefreshKey}
-            />
-          </Col>
-        )}
-        {flatAlgs.length > 0 && (
-          <Col xs={24} sm={12} md={8} lg={6}>
-            <PracticeHistoryStatsCard
-              key={unskilledRefreshKey}
-              cube={dcube}
-              classId={dclassId}
-              refreshKey={unskilledRefreshKey}
-            />
-          </Col>
-        )}
-      </Row>
+      {flatAlgs.length > 0 && (
+        <AlgsPracticeToolsPanel
+          cube={dcube}
+          classId={dclassId}
+          flatAlgs={flatAlgs}
+          showRandomPick={flatAlgs.length >= 8}
+          formulaRandomRefreshKey={formulaRandomRefreshKey}
+          unskilledRefreshKey={unskilledRefreshKey}
+          onOpenRandom={() => {
+            setFormulaRandomModalMode('random');
+            setFormulaRandomModalOpen(true);
+          }}
+          onOpenHistory={() => {
+            setFormulaRandomModalMode('history');
+            setFormulaRandomModalOpen(true);
+          }}
+          onPickFormula={openModal}
+          onOpenFormulaPractice={() => setFormulaPracticeOpen(true)}
+          onOpenBatchCustom={() => setBatchCustomOpen(true)}
+        />
+      )}
 
       <FormulaRandomPickModal
         open={formulaRandomModalOpen}
@@ -461,14 +416,64 @@ const AlgsDetail: React.FC = () => {
         flatAlgs={flatAlgs}
       />
 
+      <BatchCustomFormulaModal
+        open={batchCustomOpen}
+        onClose={() => setBatchCustomOpen(false)}
+        cube={dcube}
+        classId={dclassId}
+        flatAlgs={flatAlgs}
+        useVisualCube={useVisualCube}
+        formulaFontFamily={formulaFontFamily}
+      />
+
       <Drawer
         title={intl.formatMessage({ id: 'algs.detail.filterDrawer' })}
         placement="right"
         onClose={() => setFilterDrawerOpen(false)}
         open={filterDrawerOpen}
-        width={180}
+        width={520}
+        styles={{ body: { paddingTop: 12 } }}
       >
-        <AlgsFilterPanel {...filterPanelProps} compact />
+        <AlgsFilterPanel {...filterPanelProps} compact drawerMode />
+      </Drawer>
+
+      <Drawer
+        title={intl.formatMessage({ id: 'algs.detail.pageSettings' })}
+        placement="right"
+        onClose={() => setPageSettingsOpen(false)}
+        open={pageSettingsOpen}
+        width={360}
+        styles={{ body: { paddingTop: 8 } }}
+      >
+        <AlgsPageSettingsPanel
+          formulaFontSize={formulaFontSize}
+          onFormulaFontSizeChange={(n) => {
+            setFormulaFontSizeState(n);
+            setFormulaFontSize(n);
+          }}
+          formulaFontFamily={formulaFontFamily}
+          onFormulaFontFamilyChange={(id) => {
+            setFormulaFontFamilyState(id);
+            setFormulaFontFamily(id);
+          }}
+          columnsPerRow={columnsPerRow}
+          onColumnsPerRowChange={(n) => {
+            setColumnsPerRowState(n);
+            setColumnsPerRow(dcube, dclassId, n);
+          }}
+          showVisualCubeSwitch={isVisualCubeCube(dcube)}
+          useVisualCube={useVisualCube}
+          onUseVisualCubeChange={(checked) => {
+            setUseVisualCube(checked);
+            setUseVisualCubeRenderer(checked);
+          }}
+          showHideAltFormulas={columnsPerRow === 1}
+          hideAltFormulas={hideAltFormulas}
+          onHideAltFormulasChange={(checked) => {
+            setHideAltFormulasState(checked);
+            setHideAltFormulas(dcube, dclassId, checked);
+          }}
+        />
       </Drawer>
 
       <div ref={contentRef} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -496,6 +501,7 @@ const AlgsDetail: React.FC = () => {
                       alg={item.alg}
                       setColorIndex={block.setColorIndex}
                       formulaFontSize={formulaFontSize}
+                      formulaFontFamily={formulaFontFamily}
                       useVisualCube={useVisualCube}
                       hideAltFormulas={hideAltFormulas}
                       onOpenModal={() => openModal(idx)}
@@ -512,6 +518,7 @@ const AlgsDetail: React.FC = () => {
                     alg={item.alg}
                     setColorIndex={block.setColorIndex}
                     formulaFontSize={formulaFontSize}
+                    formulaFontFamily={formulaFontFamily}
                     useVisualCube={useVisualCube}
                     onClick={() => openModal(idx)}
                   />
@@ -526,6 +533,7 @@ const AlgsDetail: React.FC = () => {
       <AlgsFloatButtons
         onScrollTop={handleScrollTop}
         onOpenFilter={() => setFilterDrawerOpen(true)}
+        onOpenPageSettings={() => setPageSettingsOpen(true)}
         onOpenUsageInstructions={() => setUsageInstructionsOpen(true)}
         onOpenFormulaPractice={flatAlgs.length > 0 ? () => setFormulaPracticeOpen(true) : undefined}
       />
@@ -539,6 +547,7 @@ const AlgsDetail: React.FC = () => {
           items={modalState.algs}
           currentIndex={modalState.index}
           useVisualCube={useVisualCube}
+          formulaFontFamily={formulaFontFamily}
           onNavigate={(i) => setModalState((prev) => (prev ? { ...prev, index: i } : null))}
         />
       )}

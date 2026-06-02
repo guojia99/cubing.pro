@@ -18,6 +18,7 @@ import { buildFormulaKey } from '@/services/cubing-pro/algs/formulaPracticeSelec
 import { getCustomAlgs, saveCustomAlgs } from '@/services/cubing-pro/algs/customAlgs';
 import AlgsCubeDiagram from './AlgsCubeDiagram';
 import ProficiencySelect from './ProficiencySelect';
+import { getFormulaFontFamilyCSSValue, type FormulaFontFamilyId } from '../utils/formulaFontFamily';
 
 export interface AlgsModalItem {
   alg: Algorithm;
@@ -34,6 +35,7 @@ export interface AlgsModalProps {
   currentIndex: number;
   onNavigate?: (index: number) => void;
   useVisualCube?: boolean;
+  formulaFontFamily?: FormulaFontFamilyId;
 }
 
 const AlgsModal: React.FC<AlgsModalProps> = ({
@@ -45,9 +47,11 @@ const AlgsModal: React.FC<AlgsModalProps> = ({
   currentIndex,
   onNavigate,
   useVisualCube = true,
+  formulaFontFamily,
 }) => {
   const intl = useIntl();
   const { token } = theme.useToken();
+  const formulaFontCss = getFormulaFontFamilyCSSValue(formulaFontFamily);
   const item = items[currentIndex];
   const formulaKey = item ? buildFormulaKey(item.setName, item.groupName, item.alg.name) : '';
   const [proficiency, setProficiency] = useState<ProficiencyLevel>(() =>
@@ -189,7 +193,7 @@ const AlgsModal: React.FC<AlgsModalProps> = ({
               style={{
                 padding: 12,
                 borderRadius: 8,
-                fontFamily: 'monospace',
+                fontFamily: formulaFontCss,
                 fontSize: 14,
                 color: 'var(--ant-color-text)',
                 background: 'rgba(0, 0, 0, 0.04)',
@@ -239,7 +243,7 @@ const AlgsModal: React.FC<AlgsModalProps> = ({
                         selectedIndex === idx ? 'rgb(82, 196, 26)' : token.colorPrimaryBorder
                       }`,
                       borderRadius: 8,
-                      fontFamily: 'monospace',
+                      fontFamily: formulaFontCss,
                       fontSize: 16,
                       color: 'var(--ant-color-text)',
                       cursor: hasMultiple ? 'pointer' : 'default',
@@ -276,7 +280,7 @@ const AlgsModal: React.FC<AlgsModalProps> = ({
                             selectedIndex === idx ? 'rgb(82, 196, 26)' : token.colorPrimaryBorder
                           }`,
                           borderRadius: 8,
-                          fontFamily: 'monospace',
+                          fontFamily: formulaFontCss,
                           fontSize: 16,
                           color: 'var(--ant-color-text)',
                           cursor: customAlgs.length > 1 ? 'pointer' : 'default',
@@ -318,7 +322,7 @@ const AlgsModal: React.FC<AlgsModalProps> = ({
                 value={customInputValue}
                 onChange={(e) => setCustomInputValue(e.target.value)}
                 onPressEnter={handleAddCustom}
-                style={{ flex: 1, fontFamily: 'monospace' }}
+                style={{ flex: 1, fontFamily: formulaFontCss }}
               />
               <Button size="small" icon={<PlusOutlined />} onClick={handleAddCustom}>
                 {intl.formatMessage({ id: 'algs.modal.addCustom' })}

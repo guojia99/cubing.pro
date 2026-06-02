@@ -1,11 +1,18 @@
 import React from 'react';
 import { FloatButton } from 'antd';
-import { FilterOutlined, PlayCircleOutlined, QuestionCircleOutlined, VerticalAlignTopOutlined } from '@ant-design/icons';
+import {
+  FilterOutlined,
+  PlayCircleOutlined,
+  QuestionCircleOutlined,
+  SettingOutlined,
+  VerticalAlignTopOutlined,
+} from '@ant-design/icons';
 import { useIntl } from '@@/plugin-locale';
 
 export interface AlgsFloatButtonsProps {
   onScrollTop: () => void;
   onOpenFilter: () => void;
+  onOpenPageSettings: () => void;
   onOpenUsageInstructions?: () => void;
   onOpenFormulaPractice?: () => void;
 }
@@ -13,6 +20,7 @@ export interface AlgsFloatButtonsProps {
 const AlgsFloatButtons: React.FC<AlgsFloatButtonsProps> = ({
   onScrollTop,
   onOpenFilter,
+  onOpenPageSettings,
   onOpenUsageInstructions,
   onOpenFormulaPractice,
 }) => {
@@ -29,6 +37,11 @@ const AlgsFloatButtons: React.FC<AlgsFloatButtonsProps> = ({
         icon={<FilterOutlined />}
         tooltip={intl.formatMessage({ id: 'algs.detail.filterDrawer' })}
         onClick={onOpenFilter}
+      />
+      <FloatButton
+        icon={<SettingOutlined />}
+        tooltip={intl.formatMessage({ id: 'algs.detail.pageSettings' })}
+        onClick={onOpenPageSettings}
       />
       {onOpenFormulaPractice && (
         <FloatButton
