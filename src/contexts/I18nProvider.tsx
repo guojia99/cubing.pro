@@ -22,6 +22,7 @@ type I18nContextValue = {
   locale: Locale;
   setLocale: (locale: Locale) => void;
   t: (key: MessageKey) => string;
+  tf: (key: MessageKey, params: Record<string, string | number>) => string;
 };
 
 const I18nContext = createContext<I18nContextValue | null>(null);
@@ -50,9 +51,20 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     [locale],
   );
 
+  const tf = useCallback(
+    (key: MessageKey, params: Record<string, string | number>) => {
+      let text = translate(locale, key);
+      for (const [name, value] of Object.entries(params)) {
+        text = text.replaceAll(`{${name}}`, String(value));
+      }
+      return text;
+    },
+    [locale],
+  );
+
   const value = useMemo(
-    () => ({ locale, setLocale, t }),
-    [locale, setLocale, t],
+    () => ({ locale, setLocale, t, tf }),
+    [locale, setLocale, t, tf],
   );
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;

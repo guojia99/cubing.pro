@@ -99,4 +99,5 @@ AlgsDetail.tsx
 ## 8. 限制与待办
 
 - 未登录时每日抽题不跨设备同步（仅 localStorage）
-- VisualCube 渲染依赖外部服务 `visualcubeplus.com`
+- VisualCube 渲染使用内置 `sr-visualizer`（客户端本地生成，非外链）
+- 交互色规范见 [design/colors.md](../../design/colors.md)（正常 / 夜晚两套语义 token）

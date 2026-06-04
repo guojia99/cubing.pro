@@ -1,0 +1,102 @@
+.formula-random-pick-modal .random-pick-content {
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.formula-random-pick-modal .random-pick-btn,
+.formula-random-pick-modal .random-pick-again-btn {
+  position: relative;
+  z-index: 2;
+}
+
+.formula-random-pick-modal .random-pick-hint {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.6);
+  margin-bottom: 16px;
+}
+
+.formula-random-pick-modal .random-pick-result-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.formula-random-pick-modal .random-pick-option-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.formula-random-pick-modal .random-pick-click-hint {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.55);
+  margin-bottom: 12px;
+}
+
+.formula-random-pick-modal .random-pick-again-btn {
+  border-radius: 8px;
+}
+
+.formula-random-history-modal .formula-random-history-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.formula-random-history-modal .formula-random-history-empty {
+  text-align: center;
+  opacity: 0.55;
+  padding: 24px;
+}
+
+.formula-random-history-modal .formula-random-history-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.formula-random-history-modal .formula-random-history-item:hover {
+  background: rgba(100, 149, 237, 0.1);
+}
+
+.formula-random-history-modal .formula-random-history-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.formula-random-history-modal .formula-random-history-item-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.formula-random-history-modal .formula-random-history-item-meta {
+  font-size: 12px;
+  opacity: 0.55;
+  margin-top: 2px;
+}
+
+.formula-random-result-card.formula-random-option-card {
+  margin: 0 auto 12px;
+  cursor: pointer;
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(230, 240, 255, 0.55);
+  border: 2px solid rgba(100, 149, 237, 0.35);
+  transition: all 0.25s ease;
+}
+
+.formula-random-result-card.formula-random-option-card:hover {
+  border-color: rgba(100, 149, 237, 0.7);
+  background: rgba(230, 240, 255, 0.85);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(100, 149, 237, 0.2);
+}
+
+.formula-random-option-meta {
+  font-size: 12px;
+  opacity: 0.55;
+  margin-top: 4px;
+}

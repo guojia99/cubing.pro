@@ -21,6 +21,8 @@ const config = defineConfig({
           900: { value: "#0c3a4d" },
           950: { value: "#082533" },
         },
+        /** 页面主背景 — 淡白 */
+        canvas: { value: "#fafafa" },
         ocean: {
           50: { value: "#eef9fb" },
           100: { value: "#d4f0f5" },
@@ -38,9 +40,15 @@ const config = defineConfig({
     semanticTokens: {
       colors: {
         bg: {
-          DEFAULT: { value: { _light: "{colors.ocean.50}", _dark: "{colors.brand.950}" } },
-          muted: { value: { _light: "{colors.white}", _dark: "{colors.brand.900}" } },
-          elevated: { value: { _light: "{colors.white}", _dark: "{colors.brand.900}" } },
+          DEFAULT: {
+            value: { _light: "{colors.canvas}", _dark: "{colors.brand.950}" },
+          },
+          muted: {
+            value: { _light: "{colors.white}", _dark: "{colors.brand.900}" },
+          },
+          elevated: {
+            value: { _light: "{colors.white}", _dark: "{colors.brand.900}" },
+          },
         },
         fg: {
           DEFAULT: { value: { _light: "{colors.brand.900}", _dark: "{colors.ocean.50}" } },
@@ -53,6 +61,37 @@ const config = defineConfig({
         },
         border: {
           DEFAULT: { value: { _light: "{colors.brand.200}", _dark: "{colors.brand.800}" } },
+        },
+        /** 分段切换（公式库 / 自定义等） */
+        segment: {
+          track: {
+            value: { _light: "{colors.brand.100}", _dark: "{colors.brand.900}" },
+          },
+          indicator: {
+            value: { _light: "{colors.brand.600}", _dark: "{colors.brand.500}" },
+          },
+          fg: {
+            DEFAULT: {
+              value: { _light: "{colors.brand.800}", _dark: "{colors.ocean.200}" },
+            },
+            selected: {
+              value: { _light: "{colors.white}", _dark: "{colors.brand.950}" },
+            },
+          },
+        },
+        /** 公式列表选中行 */
+        formula: {
+          selected: {
+            bg: {
+              value: { _light: "#ecfdf5", _dark: "rgba(16, 185, 129, 0.12)" },
+            },
+            border: {
+              value: { _light: "{colors.green.400}", _dark: "{colors.green.400}" },
+            },
+            fg: {
+              value: { _light: "{colors.green.700}", _dark: "{colors.green.300}" },
+            },
+          },
         },
       },
     },
