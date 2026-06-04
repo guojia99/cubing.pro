@@ -18,7 +18,8 @@
     "next": "^15.3.4",
     "next-themes": "^0.4.6",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "sr-visualizer": "^1.0.13"
   },
   "devDependencies": {
     "@types/node": "^22.15.30",

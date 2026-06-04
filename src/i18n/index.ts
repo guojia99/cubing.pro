@@ -23,6 +23,18 @@ export function translate(locale: Locale, key: MessageKey): string {
   return catalogs[locale][key] ?? catalogs["zh-CN"][key] ?? key;
 }
 
+export function translateWithParams(
+  locale: Locale,
+  key: MessageKey,
+  params: Record<string, string | number>,
+): string {
+  let text = translate(locale, key);
+  for (const [name, value] of Object.entries(params)) {
+    text = text.replace(new RegExp(`\\{${name}\\}`, "g"), String(value));
+  }
+  return text;
+}
+
 export function readStoredLocale(): Locale {
   if (typeof window === "undefined") return "zh-CN";
   const raw = localStorage.getItem(LOCALE_STORAGE_KEY);

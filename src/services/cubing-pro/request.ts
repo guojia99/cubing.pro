@@ -26,6 +26,8 @@ function isCubingProHost(hostname: string) {
  * - 其他静态预览 / CDN：NEXT_PUBLIC_API_BASE 完整 URL
  */
 export function getAPIUrl() {
+  return "http://0.0.0.0:20000/v3/cube-api"
+
   if (typeof window === "undefined") {
     return REMOTE_API_BASE;
   }

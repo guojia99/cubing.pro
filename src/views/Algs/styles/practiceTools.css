@@ -1,0 +1,212 @@
+.algs-practice-tools-panel {
+  border: 1px solid var(--algs-practice-border, rgba(34, 168, 203, 0.25));
+}
+
+.algs-practice-tools-panel .chakra-card__header {
+  border-bottom: 1px solid var(--algs-practice-border, rgba(34, 168, 203, 0.25));
+}
+
+.algs-practice-tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  align-items: stretch;
+  padding-top: 8px;
+}
+
+@media (max-width: 575px) {
+  .algs-practice-tools-grid,
+  .algs-practice-tools-grid--no-random {
+    grid-template-columns: 1fr;
+  }
+}
+
+.algs-practice-tool-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  min-height: 148px;
+  height: 100%;
+  padding: 16px;
+  margin: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid var(--algs-practice-border, rgba(0, 0, 0, 0.12)) !important;
+  border-radius: 10px;
+  background: var(--algs-practice-cell-bg, #fff);
+  box-sizing: border-box;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.02);
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.algs-practice-tool-cell:hover {
+  border-color: rgba(34, 168, 203, 0.65) !important;
+  background: rgba(34, 168, 203, 0.08);
+  box-shadow:
+    0 2px 8px rgba(34, 168, 203, 0.12),
+    inset 0 0 0 1px rgba(34, 168, 203, 0.08);
+}
+
+.algs-practice-tool-cell--random {
+  border-color: rgba(100, 149, 237, 0.55) !important;
+  background: rgba(230, 240, 255, 0.45);
+  cursor: default;
+}
+
+.algs-practice-tool-cell--random:hover {
+  border-color: rgba(100, 149, 237, 0.75) !important;
+  background: rgba(230, 240, 255, 0.65);
+}
+
+.algs-practice-tool-cell--practice {
+  border-color: rgba(0, 185, 204, 0.55) !important;
+  background: rgba(0, 185, 204, 0.1);
+}
+
+.algs-practice-tool-cell--practice:hover {
+  border-color: rgba(0, 160, 180, 0.85) !important;
+  background: rgba(0, 185, 204, 0.18);
+}
+
+.algs-practice-tool-cell--proficiency {
+  border-color: rgba(82, 196, 26, 0.45) !important;
+  background: rgba(82, 196, 26, 0.06);
+}
+
+.algs-practice-tool-cell--proficiency:hover {
+  border-color: rgba(82, 196, 26, 0.75) !important;
+  background: rgba(82, 196, 26, 0.12);
+}
+
+.algs-practice-tool-cell--history {
+  border-color: rgba(250, 173, 20, 0.5) !important;
+  background: rgba(250, 173, 20, 0.06);
+}
+
+.algs-practice-tool-cell--history:hover {
+  border-color: rgba(250, 173, 20, 0.8) !important;
+  background: rgba(250, 173, 20, 0.12);
+}
+
+.algs-practice-tool-cell--batch {
+  border-color: rgba(114, 46, 209, 0.5) !important;
+  background: rgba(114, 46, 209, 0.08);
+}
+
+.algs-practice-tool-cell--batch:hover {
+  border-color: rgba(114, 46, 209, 0.8) !important;
+  background: rgba(114, 46, 209, 0.14);
+}
+
+.algs-practice-tool-cell-icon--batch {
+  color: rgba(114, 46, 209, 0.85);
+}
+
+.algs-practice-tool-cell-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+
+.algs-practice-tool-cell-icon {
+  font-size: 18px;
+  color: rgba(100, 149, 237, 0.85);
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.algs-practice-tool-cell-icon--practice {
+  color: rgba(0, 150, 170, 0.95);
+}
+
+.algs-practice-tool-cell-title {
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.algs-practice-tool-cell-badge {
+  font-weight: 400;
+  font-size: 12px;
+  opacity: 0.65;
+}
+
+.algs-practice-tool-cell-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  margin-bottom: 10px;
+}
+
+.algs-practice-tool-cell-desc,
+.algs-practice-tool-cell-hint {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+
+.algs-practice-tool-cell-hint {
+  margin-top: 6px;
+  font-size: 11px;
+  color: rgba(100, 149, 237, 0.9);
+  opacity: 1;
+}
+
+.algs-practice-tool-cell-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+  margin-top: auto;
+  position: relative;
+  z-index: 1;
+}
+
+.algs-practice-tool-random-preview,
+.algs-practice-tool-random-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px dashed rgba(0, 0, 0, 0.12);
+  background: var(--algs-practice-cell-bg, #fff);
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.algs-practice-tool-random-preview {
+  cursor: pointer;
+  border: none;
+  font: inherit;
+  color: inherit;
+}
+
+.algs-practice-tool-random-preview:hover {
+  background: rgba(34, 168, 203, 0.08);
+}
+
+.algs-practice-tool-random-empty {
+  font-size: 13px;
+  opacity: 0.65;
+}
