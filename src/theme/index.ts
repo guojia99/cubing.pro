@@ -93,6 +93,43 @@ const config = defineConfig({
             },
           },
         },
+        /** 公式库列表 / 练习工具卡片 */
+        algs: {
+          card: {
+            bg: {
+              value: {
+                _light: "rgba(238, 249, 251, 0.55)",
+                _dark: "{colors.brand.900}",
+              },
+            },
+            border: {
+              value: {
+                _light: "rgba(34, 168, 203, 0.35)",
+                _dark: "{colors.brand.700}",
+              },
+            },
+            diagram: {
+              value: {
+                _light: "rgba(255, 255, 255, 0.65)",
+                _dark: "{colors.brand.950}",
+              },
+            },
+            hoverBorder: {
+              value: {
+                _light: "{colors.brand.500}",
+                _dark: "{colors.brand.400}",
+              },
+            },
+          },
+          section: {
+            bg: {
+              value: {
+                _light: "{colors.canvas}",
+                _dark: "{colors.brand.900}",
+              },
+            },
+          },
+        },
       },
     },
   },

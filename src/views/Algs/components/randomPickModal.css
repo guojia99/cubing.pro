@@ -1,0 +1,90 @@
+.random-pick-modal-content {
+  text-align: center;
+}
+
+.random-pick-hint {
+  font-size: 14px;
+  color: var(--chakra-colors-fg-muted);
+  margin-bottom: 16px;
+}
+
+.random-pick-btn {
+  min-width: 140px;
+  border-radius: 20px;
+}
+
+.random-pick-result-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.random-pick-options {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.random-pick-option-card {
+  cursor: pointer;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--chakra-colors-algs-card-bg);
+  border: 2px solid var(--chakra-colors-algs-card-border);
+  min-width: 140px;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.random-pick-option-card:hover {
+  border-color: var(--chakra-colors-algs-card-hover-border);
+  transform: translateY(-2px);
+  box-shadow: var(--chakra-shadows-md);
+}
+
+.random-pick-option-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.random-pick-option-cube {
+  font-size: 12px;
+  color: var(--chakra-colors-fg-muted);
+  margin-top: 4px;
+}
+
+.random-pick-click-hint {
+  font-size: 13px;
+  color: var(--chakra-colors-fg-muted);
+  margin-bottom: 12px;
+}
+
+.random-pick-limit-hint {
+  font-size: 12px;
+  color: var(--chakra-colors-fg-muted);
+}
+
+.random-pick-countdown {
+  font-size: 64px;
+  font-weight: 700;
+  animation: randomPickCountdown 1s ease-out;
+}
+
+@keyframes randomPickCountdown {
+  0% {
+    transform: scale(1.5);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

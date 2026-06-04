@@ -1,10 +1,14 @@
+/** Chakra 语义 token 路径，随深浅色自动切换 */
 export const ALGS_COLORS = {
-  primary: 'rgba(34, 168, 203, 0.55)',
-  primaryHover: 'rgba(34, 168, 203, 0.75)',
-  cardBg: 'rgba(238, 249, 251, 0.55)',
-  cardBorder: 'rgba(34, 168, 203, 0.35)',
-  buttonBg: 'rgba(34, 168, 203, 0.55)',
-  watermark: 'rgba(34, 168, 203, 0.15)',
+  primary: "rgba(34, 168, 203, 0.55)",
+  primaryHover: "rgba(34, 168, 203, 0.75)",
+  cardBg: "algs.card.bg",
+  cardBorder: "algs.card.border",
+  cardDiagramBg: "algs.card.diagram",
+  cardHoverBorder: "algs.card.hoverBorder",
+  sectionBg: "algs.section.bg",
+  buttonBg: "rgba(34, 168, 203, 0.55)",
+  watermark: "rgba(34, 168, 203, 0.15)",
 } as const;
 
 export const SET_CARD_COLORS = [

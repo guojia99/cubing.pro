@@ -1,51 +1,169 @@
 "use client";
 
 import {
-  Badge,
   Box,
   Button,
   Card,
   Flex,
   Grid,
   Heading,
-  HStack,
-  Input,
-  Separator,
+  NativeSelect,
   Skeleton,
-  Switch, // kept for namespace
   Text,
   VStack,
 } from "@chakra-ui/react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type ReactNode,
+} from "react";
 import { useRouter } from "next/navigation";
 
+import { UserCloudKvPanel } from "@/components/UserData/UserCloudKvPanel";
+import { toaster } from "@/components/ui/toaster";
+import { useAuth } from "@/contexts/AuthProvider";
 import { useI18n } from "@/contexts/I18nProvider";
+import {
+  exportPracticeConfig,
+  importPracticeConfig,
+} from "@/services/cubing-pro/algs/practiceConfigExport";
 import {
   getAlgCubeMap,
   type AlgCubeMap,
   type AlgListItem,
 } from "@/services/cubing-pro/algs/algs";
-import AlgsCubeDiagram from "./components/AlgsCubeDiagram";
 import {
-  getUseVisualCubeRenderer,
-  setUseVisualCubeRenderer,
-} from "./utils/storage";
-import { isVisualCubeCube } from "./utils/visualCubeCube";
+  USER_KV_KEYS,
+  assertPayloadWithinLimit,
+} from "@/services/cubing-pro/user/user_kv";
+
+import AlgsCubeDiagram from "./components/AlgsCubeDiagram";
+import RandomPickModal, { RANDOM_PICK_ICON_SVG } from "./components/RandomPickModal";
+import SvgRenderer from "./components/SvgRenderer";
 import { ALGS_COLORS } from "./utils/constants";
-import { exportPracticeConfig } from "@/services/cubing-pro/algs/practiceConfigExport";
+
+function AlgsSetCard({
+  cube,
+  item,
+  onClick,
+}: {
+  cube: string;
+  item: AlgListItem;
+  onClick: () => void;
+}) {
+  return (
+    <Card.Root
+      borderRadius="xl"
+      cursor="pointer"
+      className="algs-card-float"
+      bg={ALGS_COLORS.cardBg}
+      borderColor={ALGS_COLORS.cardBorder}
+      borderWidth="1px"
+      _hover={{
+        transform: "translateY(-4px)",
+        boxShadow: "lg",
+        borderColor: ALGS_COLORS.cardHoverBorder,
+      }}
+      transition="all 0.2s ease"
+      overflow="hidden"
+      onClick={onClick}
+    >
+      <Card.Body p="3">
+        <VStack gap="2" align="stretch">
+          <Flex
+            justify="center"
+            align="center"
+            minH="130px"
+            borderRadius="lg"
+            bg={ALGS_COLORS.cardDiagramBg}
+            overflow="hidden"
+          >
+            <AlgsCubeDiagram
+              cube={cube}
+              classId={item.name}
+              setName=""
+              groupName=""
+              imageSvg={item.image}
+              scramble=""
+              formula={item.alg}
+              useVisualCube
+              maxWidth={130}
+              maxHeight={130}
+            />
+          </Flex>
+          <Text
+            fontWeight="semibold"
+            fontSize="sm"
+            lineClamp={2}
+            textAlign="center"
+            color="fg"
+            minH="2.5em"
+          >
+            {item.name}
+          </Text>
+        </VStack>
+      </Card.Body>
+    </Card.Root>
+  );
+}
+
+function ToolMiniCard({
+  title,
+  children,
+  onClick,
+  interactive,
+}: {
+  title: string;
+  children: ReactNode;
+  onClick?: () => void;
+  interactive?: boolean;
+}) {
+  return (
+    <Card.Root
+      borderRadius="xl"
+      bg={ALGS_COLORS.cardBg}
+      borderColor={ALGS_COLORS.cardBorder}
+      borderWidth="1px"
+      h="full"
+      cursor={interactive ? "pointer" : undefined}
+      className={interactive ? "algs-card-float" : undefined}
+      _hover={
+        interactive
+          ? {
+              transform: "translateY(-4px)",
+              boxShadow: "lg",
+              borderColor: ALGS_COLORS.cardHoverBorder,
+            }
+          : undefined
+      }
+      transition="all 0.2s ease"
+      onClick={onClick}
+    >
+      <Card.Body p="4" display="flex" flexDirection="column" gap="3" h="full">
+        <Text fontWeight="semibold" fontSize="sm" color="fg">
+          {title}
+        </Text>
+        <Box flex="1">{children}</Box>
+      </Card.Body>
+    </Card.Root>
+  );
+}
 
 export function AlgsListView() {
-  const { t } = useI18n();
+  const { t, tf } = useI18n();
   const router = useRouter();
+  const { currentUser } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const loggedIn = !!currentUser?.id;
+
   const [data, setData] = useState<AlgCubeMap | null>(null);
   const [error, setError] = useState(false);
-  const [search, setSearch] = useState("");
-  const [selectedCube, setSelectedCube] = useState<string | null>(null);
-  const [useVisualCube, setUseVisualCube] = useState(true);
-
-  useEffect(() => {
-    setUseVisualCube(getUseVisualCubeRenderer());
-  }, []);
+  const [filterCube, setFilterCube] = useState("");
+  const [randomPickModalOpen, setRandomPickModalOpen] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -61,38 +179,19 @@ export function AlgsListView() {
     };
   }, []);
 
-  const handleToggleVisualCube = useCallback(() => {
-    const next = !useVisualCube;
-    setUseVisualCube(next);
-    setUseVisualCubeRenderer(next);
-  }, [useVisualCube]);
+  const cubeKeys = data?.CubeKeys ?? [];
+  const classMap = data?.ClassMap ?? {};
 
-  const visibleCubes = useMemo(() => {
-    if (!data) return [];
-    let cubes = data.CubeKeys;
-    if (selectedCube) {
-      cubes = cubes.filter((c) => c === selectedCube);
-    }
-    return cubes;
-  }, [data, selectedCube]);
+  const filteredCubes = useMemo(
+    () => (filterCube ? [filterCube] : cubeKeys),
+    [filterCube, cubeKeys],
+  );
 
-  const filteredMap = useMemo(() => {
-    if (!data) return {} as Record<string, AlgListItem[]>;
-    const map: Record<string, AlgListItem[]> = {};
-    for (const cube of visibleCubes) {
-      let items = data.ClassMap[cube] ?? [];
-      if (search.trim()) {
-        const q = search.toLowerCase();
-        items = items.filter((item) =>
-          item.name.toLowerCase().includes(q),
-        );
-      }
-      if (items.length > 0) {
-        map[cube] = items;
-      }
-    }
-    return map;
-  }, [data, visibleCubes, search]);
+  const cubesWithItems = useMemo(
+    () =>
+      filteredCubes.filter((cube) => (classMap[cube] ?? []).length > 0),
+    [filteredCubes, classMap],
+  );
 
   const handleCardClick = useCallback(
     (cube: string, name: string) => {
@@ -102,23 +201,47 @@ export function AlgsListView() {
   );
 
   const handleExport = useCallback(() => {
-    if (!data) return;
-    const allKeys: string[] = [];
-    for (const cube of data.CubeKeys) {
-      const items = data.ClassMap[cube] ?? [];
-      for (const item of items) {
-        allKeys.push(`${cube}_${item.name}`);
-      }
-    }
-    const json = exportPracticeConfig("__all__", "__all__", allKeys);
-    const blob = new Blob([json], { type: "application/json" });
+    const config = exportPracticeConfig();
+    const blob = new Blob([JSON.stringify(config, null, 2)], {
+      type: "application/json",
+    });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "cubing-practice-config.json";
+    a.download = `practice-config-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
-  }, [data]);
+    toaster.create({ title: t("algs.practiceConfig.exportSuccess"), type: "success" });
+  }, [t]);
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const text = reader.result as string;
+      const result = importPracticeConfig(text);
+      if (result.success) {
+        toaster.create({
+          title: t("algs.practiceConfig.importSuccess"),
+          type: "success",
+        });
+      } else {
+        toaster.create({
+          title: tf("algs.practiceConfig.importFailed", {
+            msg: result.message ?? "",
+          }),
+          type: "error",
+        });
+      }
+    };
+    reader.readAsText(file, "UTF-8");
+    e.target.value = "";
+  };
 
   if (error) {
     return (
@@ -130,93 +253,37 @@ export function AlgsListView() {
 
   return (
     <VStack align="stretch" gap="6">
-      <Flex justify="space-between" align="center" flexWrap="wrap" gap="4">
-        <Heading size="xl" color="teal.600">
-          {t("algs.title")}
-        </Heading>
-        <HStack gap="3">
-          <Text fontSize="sm" color="fg.muted">
-            VisualCube
-          </Text>
-          <Switch.Root
-            size="sm"
-            checked={useVisualCube}
-            onCheckedChange={handleToggleVisualCube}
-            colorPalette="teal"
+      <Heading size="xl" color="fg">
+        {t("algs.title")}
+      </Heading>
+
+      <Flex align="center" gap="3" flexWrap="wrap">
+        <NativeSelect.Root maxW={{ base: "full", md: "220px" }} size="sm">
+          <NativeSelect.Field
+            value={filterCube}
+            onChange={(e) => setFilterCube(e.target.value)}
           >
-            <Switch.Control>
-              <Switch.Thumb />
-            </Switch.Control>
-          </Switch.Root>
-        </HStack>
+            <option value="">{t("algs.filter.all")}</option>
+            {cubeKeys.map((cube) => (
+              <option key={cube} value={cube}>
+                {cube}
+              </option>
+            ))}
+          </NativeSelect.Field>
+        </NativeSelect.Root>
       </Flex>
 
-      <Flex
-        direction={{ base: "column", md: "row" }}
-        gap="3"
-        align={{ base: "stretch", md: "center" }}
-        flexWrap="wrap"
-      >
-        <Input
-          placeholder={t("algs.search")}
-          maxW={{ base: "full", md: "280px" }}
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          borderColor="teal.300"
-          _focus={{ borderColor: "teal.500", boxShadow: "0 0 0 1px var(--chakra-colors-teal-500)" }}
-          size="sm"
-          borderRadius="lg"
-        />
-        <HStack gap="2" flexWrap="wrap">
-          <Badge
-            as="button"
-            cursor="pointer"
-            onClick={() => setSelectedCube(null)}
-            variant={selectedCube === null ? "solid" : "outline"}
-            colorPalette="teal"
-            borderRadius="full"
-            px="3"
-            py="1"
-            fontSize="sm"
-            _hover={{ opacity: 0.85 }}
-          >
-            {t("algs.allCubes")}
-          </Badge>
-          {data?.CubeKeys.map((cube) => (
-            <Badge
-              key={cube}
-              as="button"
-              cursor="pointer"
-              onClick={() =>
-                setSelectedCube(selectedCube === cube ? null : cube)
-              }
-              variant={selectedCube === cube ? "solid" : "outline"}
-              colorPalette="teal"
-              borderRadius="full"
-              px="3"
-              py="1"
-              fontSize="sm"
-              _hover={{ opacity: 0.85 }}
-            >
-              {cube}
-            </Badge>
-          ))}
-        </HStack>
-        <Button
-          size="sm"
-          variant="outline"
-          colorPalette="teal"
-          borderRadius="lg"
-          onClick={handleExport}
-          ml="auto"
-        >
-          {t("algs.practiceConfig.export")}
-        </Button>
-      </Flex>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".json,application/json"
+        hidden
+        onChange={handleFileChange}
+      />
 
       {!data && (
         <Grid templateColumns="repeat(auto-fill, minmax(200px, 1fr))" gap="4">
-          {Array.from({ length: 12 }).map((_, i) => (
+          {Array.from({ length: 8 }).map((_, i) => (
             <Card.Root key={i} borderRadius="xl">
               <Card.Body p="4">
                 <Skeleton height="120px" mb="3" borderRadius="lg" />
@@ -229,143 +296,153 @@ export function AlgsListView() {
 
       {data && (
         <>
-          <Grid
-            templateColumns="repeat(auto-fill, minmax(180px, 1fr))"
-            gap="4"
+          <Card.Root
+            borderRadius="xl"
+            borderColor={ALGS_COLORS.cardBorder}
+            borderWidth="1px"
+            bg={ALGS_COLORS.sectionBg}
           >
-            <Card.Root
-              borderRadius="xl"
-              cursor="pointer"
-              className="algs-card-float"
-              bg="linear-gradient(135deg, rgba(34,168,203,0.12) 0%, rgba(45,148,176,0.08) 100%)"
-              borderColor={ALGS_COLORS.cardBorder}
-              borderWidth="1px"
-              _hover={{
-                transform: "translateY(-4px)",
-                boxShadow: "lg",
-                borderColor: "teal.400",
-              }}
-              transition="all 0.2s ease"
-              overflow="hidden"
-            >
-              <Card.Body p="4">
-                <VStack gap="3" align="center" justify="center" minH="140px">
-                  <Text fontSize="4xl" lineHeight="1">
-                    🎲
-                  </Text>
-                  <Text
-                    fontWeight="bold"
-                    fontSize="md"
-                    color="teal.600"
-                    textAlign="center"
-                  >
-                    Random Pick
-                  </Text>
-                </VStack>
-              </Card.Body>
-            </Card.Root>
+            <Card.Header pb={2}>
+              <Heading size="md" color="fg">
+                {t("algs.list.toolsSection")}
+              </Heading>
+            </Card.Header>
+            <Card.Body pt={0}>
+              <Grid
+                templateColumns={{
+                  base: "1fr",
+                  sm: "repeat(2, 1fr)",
+                  lg: "repeat(3, 1fr)",
+                }}
+                gap="4"
+              >
+                <ToolMiniCard
+                  title={t("algs.randomPick.title")}
+                  interactive
+                  onClick={() => setRandomPickModalOpen(true)}
+                >
+                  <VStack gap="2" justify="center" minH="100px">
+                    <SvgRenderer
+                      svg={RANDOM_PICK_ICON_SVG}
+                      maxWidth={72}
+                      maxHeight={72}
+                    />
+                    <Text fontSize="xs" color="fg.muted" textAlign="center">
+                      {t("algs.randomPick.hintStart")}
+                    </Text>
+                  </VStack>
+                </ToolMiniCard>
 
-            {visibleCubes.map((cube) => {
-              const items = filteredMap[cube];
-              if (!items) return null;
-              return items.map((item) => (
+                <ToolMiniCard title={t("algs.list.importExportTitle")}>
+                  <VStack gap="2" justify="center" h="full">
+                    <Text fontSize="xs" color="fg.muted" textAlign="center">
+                      {t("algs.list.importExportDesc")}
+                    </Text>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      colorPalette="brand"
+                      w="full"
+                      onClick={handleExport}
+                    >
+                      {t("algs.practiceConfig.export")}
+                    </Button>
+                    <Button
+                      size="sm"
+                      colorPalette="brand"
+                      w="full"
+                      onClick={handleImportClick}
+                    >
+                      {t("algs.practiceConfig.import")}
+                    </Button>
+                  </VStack>
+                </ToolMiniCard>
+
+                <ToolMiniCard title={t("algs.cloud.title")}>
+                  {loggedIn ? (
+                    <UserCloudKvPanel
+                      embedded
+                      kvKey={USER_KV_KEYS.algorithm_config}
+                      description={t("algs.cloud.desc")}
+                      uploadButtonText={t("algs.cloud.upload")}
+                      syncButtonText={t("algs.cloud.sync")}
+                      uploadOkText={t("algs.cloud.uploadOk")}
+                      syncOkText={t("algs.cloud.syncOk")}
+                      getPayloadForUpload={() => {
+                        const raw = JSON.stringify(exportPracticeConfig(), null, 2);
+                        assertPayloadWithinLimit(raw);
+                        return raw;
+                      }}
+                      applyCloudPayload={(raw) => {
+                        const result = importPracticeConfig(raw);
+                        if (!result.success) {
+                          throw new Error(result.message ?? "import failed");
+                        }
+                      }}
+                    />
+                  ) : (
+                    <Text fontSize="xs" color="fg.muted">
+                      {t("algs.cloud.loginHint")}
+                    </Text>
+                  )}
+                </ToolMiniCard>
+              </Grid>
+            </Card.Body>
+          </Card.Root>
+
+          {cubesWithItems.length === 0 ? (
+            <Box textAlign="center" py="12">
+              <Text color="fg.muted">{t("algs.empty")}</Text>
+            </Box>
+          ) : (
+            cubesWithItems.map((cube) => {
+              const items = classMap[cube] ?? [];
+              return (
                 <Card.Root
-                  key={`${cube}/${item.name}`}
+                  key={cube}
                   borderRadius="xl"
-                  cursor="pointer"
-                  className="algs-card-float"
-                  bg={ALGS_COLORS.cardBg}
                   borderColor={ALGS_COLORS.cardBorder}
                   borderWidth="1px"
-                  _hover={{
-                    transform: "translateY(-4px)",
-                    boxShadow: "lg",
-                    borderColor: "teal.400",
-                  }}
-                  transition="all 0.2s ease"
-                  overflow="hidden"
-                  onClick={() => handleCardClick(cube, item.name)}
+                  bg={ALGS_COLORS.sectionBg}
                 >
-                  <Card.Body p="3">
-                    <VStack gap="2" align="stretch">
-                      <Flex
-                        justify="center"
-                        align="center"
-                        minH="130px"
-                        borderRadius="lg"
-                        bg="whiteAlpha.600"
-                        overflow="hidden"
-                      >
-                        {isVisualCubeCube(cube) ? (
-                          <AlgsCubeDiagram
-                            cube={cube}
-                            classId={item.name}
-                            setName=""
-                            groupName=""
-                            imageSvg={item.image}
-                            scramble=""
-                            formula={item.alg}
-                            useVisualCube={useVisualCube}
-                            maxWidth={130}
-                            maxHeight={130}
-                          />
-                        ) : item.image ? (
-                          <AlgsCubeDiagram
-                            cube={cube}
-                            classId={item.name}
-                            setName=""
-                            groupName=""
-                            imageSvg={item.image}
-                            useVisualCube={false}
-                            maxWidth={130}
-                            maxHeight={130}
-                          />
-                        ) : (
-                          <Text fontSize="3xl" color="teal.300">
-                            ◇
-                          </Text>
-                        )}
-                      </Flex>
-                      <Text
-                        fontWeight="semibold"
-                        fontSize="sm"
-                        lineClamp={2}
-                        textAlign="center"
-                        color="gray.700"
-                        minH="2.5em"
-                      >
-                        {item.name}
-                      </Text>
-                    </VStack>
+                  <Card.Header pb={2}>
+                    <Heading size="md" color="fg">
+                      {cube}
+                    </Heading>
+                  </Card.Header>
+                  <Card.Body pt={0}>
+                    <Grid
+                      templateColumns="repeat(auto-fill, minmax(180px, 1fr))"
+                      gap="4"
+                    >
+                      {items.map((item) => (
+                        <AlgsSetCard
+                          key={`${cube}/${item.name}`}
+                          cube={cube}
+                          item={item}
+                          onClick={() => handleCardClick(cube, item.name)}
+                        />
+                      ))}
+                    </Grid>
                   </Card.Body>
                 </Card.Root>
-              ));
-            })}
-          </Grid>
-
-          {!selectedCube &&
-            data.CubeKeys.length > 1 &&
-            visibleCubes.map((cube, idx) => {
-              const items = filteredMap[cube];
-              if (!items || items.length === 0) return null;
-              return (
-                <Box key={`sep-${cube}`}>
-                  {idx > 0 && <Separator />}
-                </Box>
               );
-            })}
-        </>
-      )}
+            })
+          )}
 
-      {data && Object.keys(filteredMap).length === 0 && (
-        <Box textAlign="center" py="12">
-          <Text color="fg.muted">{t("algs.noData")}</Text>
-        </Box>
+          <RandomPickModal
+            open={randomPickModalOpen}
+            onClose={() => setRandomPickModalOpen(false)}
+            classMap={classMap}
+            cubeKeys={filteredCubes}
+          />
+        </>
       )}
 
       <style jsx global>{`
         @keyframes algsCardFloat {
-          0%, 100% {
+          0%,
+          100% {
             transform: translateY(0);
           }
           50% {

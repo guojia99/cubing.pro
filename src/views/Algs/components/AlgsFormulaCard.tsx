@@ -6,8 +6,12 @@ import type { AlgItem } from "@/services/cubing-pro/algs/algs";
 import { getCustomAlgs } from "@/services/cubing-pro/algs/customAlgs";
 import { getAlgsSelection, buildAlgsKey } from "../utils/storage";
 import { getFormulaFontFamilyCSSValue, type FormulaFontFamilyId } from "../utils/formulaFontFamily";
+import { getAlgDisplayName } from "../utils/algDisplayName";
+import { useI18n } from "@/contexts/I18nProvider";
 import AlgsCubeDiagram from "./AlgsCubeDiagram";
+import FormulaNameTag from "./FormulaNameTag";
 import { SET_CARD_COLORS } from "../utils/constants";
+import { getDiagramDimensions } from "../utils/diagramDisplay";
 
 interface AlgsFormulaCardProps {
   cube: string;
@@ -19,6 +23,8 @@ interface AlgsFormulaCardProps {
   formulaFontSize?: number;
   formulaFontFamily?: FormulaFontFamilyId;
   useVisualCube?: boolean;
+  diagramSize?: number;
+  hideFormulaDiagram?: boolean;
   onClick: () => void;
 }
 
@@ -32,8 +38,11 @@ export default function AlgsFormulaCard({
   formulaFontSize = 14,
   formulaFontFamily,
   useVisualCube = true,
+  diagramSize = 160,
+  hideFormulaDiagram = false,
   onClick,
 }: AlgsFormulaCardProps) {
+  const { locale } = useI18n();
   const storageKey = buildAlgsKey(cube, classId, setName, groupName, alg.name);
   const selection = getAlgsSelection(storageKey);
   const customFormulas = useMemo(() => getCustomAlgs(storageKey), [storageKey]);
@@ -52,16 +61,19 @@ export default function AlgsFormulaCard({
 
   const colors = SET_CARD_COLORS[setColorIndex % SET_CARD_COLORS.length];
   const fontCss = getFormulaFontFamilyCSSValue(formulaFontFamily);
+  const diagramDims = getDiagramDimensions(diagramSize, "square");
+  const displayName = getAlgDisplayName(alg, locale);
 
   return (
     <Card.Root
+      position="relative"
       cursor="pointer"
       onClick={onClick}
       variant="outline"
       borderRadius="xl"
       bg={colors.bg}
       borderColor={colors.border}
-      minH="200px"
+      minH={hideFormulaDiagram ? "120px" : "200px"}
       transition="all 0.2s"
       _hover={{
         transform: "translateY(-3px)",
@@ -70,24 +82,32 @@ export default function AlgsFormulaCard({
       }}
       css={{ animation: "algsFloat 10s ease-in-out infinite" }}
     >
-      <Card.Body p={3} display="flex" flexDirection="column" alignItems="center" minW={0}>
-        <Box mt={2} mb={3} w="100%" maxW="160px">
-          <AlgsCubeDiagram
-            cube={cube}
-            classId={classId}
-            setName={setName}
-            groupName={groupName}
-            imageSvg={alg.image}
-            scramble={displayScramble}
-            formula={displayAlg}
-            useVisualCube={useVisualCube}
-            maxWidth={160}
-            maxHeight={160}
-          />
-        </Box>
-        <Text fontWeight="bold" fontSize="sm" color="fg" mb={2} textAlign="center" lineClamp={1}>
-          {alg.name}
-        </Text>
+      <FormulaNameTag name={displayName} />
+      <Card.Body
+        pt={10}
+        px={3}
+        pb={3}
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        minW={0}
+      >
+        {!hideFormulaDiagram && (
+          <Box mb={3} w="100%" maxW={`${diagramDims.maxWidth}px`}>
+            <AlgsCubeDiagram
+              cube={cube}
+              classId={classId}
+              setName={setName}
+              groupName={groupName}
+              imageSvg={alg.image}
+              scramble={displayScramble}
+              formula={displayAlg}
+              useVisualCube={useVisualCube}
+              maxWidth={diagramDims.maxWidth}
+              maxHeight={diagramDims.maxHeight}
+            />
+          </Box>
+        )}
         <Flex flex={1} alignItems="flex-end" justifyContent="center" w="100%">
           <Box
             fontFamily={fontCss}
