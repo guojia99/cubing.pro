@@ -1,6 +1,13 @@
+import {
+  clampDiagramSize,
+  DEFAULT_DIAGRAM_SIZE,
+} from "./diagramDisplay";
+
 const STORAGE_KEY = 'algs_user_selection';
 const FONT_SIZE_KEY = 'algs_formula_font_size';
 const DEFAULT_FONT_SIZE = 14;
+const DIAGRAM_SIZE_KEY = 'algs_diagram_max_size';
+const HIDE_DIAGRAM_KEY = 'algs_hide_formula_diagram';
 
 export function getFormulaFontSize(): number {
   try {
@@ -77,6 +84,37 @@ export function getUseVisualCubeRenderer(): boolean {
 export function setUseVisualCubeRenderer(enabled: boolean): void {
   try {
     localStorage.setItem(USE_VC_KEY, enabled ? '1' : '0');
+  } catch {}
+}
+
+export function getDiagramSize(): number {
+  try {
+    const raw = localStorage.getItem(DIAGRAM_SIZE_KEY);
+    if (!raw) return DEFAULT_DIAGRAM_SIZE;
+    const n = parseInt(raw, 10);
+    return Number.isNaN(n) ? DEFAULT_DIAGRAM_SIZE : clampDiagramSize(n);
+  } catch {
+    return DEFAULT_DIAGRAM_SIZE;
+  }
+}
+
+export function setDiagramSize(size: number): void {
+  try {
+    localStorage.setItem(DIAGRAM_SIZE_KEY, String(clampDiagramSize(size)));
+  } catch {}
+}
+
+export function getHideFormulaDiagram(): boolean {
+  try {
+    const v = localStorage.getItem(HIDE_DIAGRAM_KEY);
+    return v === '1' || v === 'true';
+  } catch {}
+  return false;
+}
+
+export function setHideFormulaDiagram(hide: boolean): void {
+  try {
+    localStorage.setItem(HIDE_DIAGRAM_KEY, hide ? '1' : '0');
   } catch {}
 }
 

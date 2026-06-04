@@ -61,6 +61,12 @@ import {
   setUseVisualCubeRenderer as persistUseVisualCubeRenderer,
   getFormulaFontSize,
   setFormulaFontSize as persistFormulaFontSize,
+  getDiagramSize,
+  setDiagramSize as persistDiagramSize,
+  getHideFormulaDiagram,
+  setHideFormulaDiagram as persistHideFormulaDiagram,
+  getAlgsSelection,
+  buildAlgsKey,
 } from "./utils/storage";
 import {
   getFormulaFontFamily,
@@ -70,6 +76,7 @@ import {
 import { useReleaseOverlayOnUnmount } from "@/lib/overlayCleanup";
 import { isVisualCubeCube } from "./utils/visualCubeCube";
 import { SET_CARD_COLORS } from "./utils/constants";
+import { getAlgDisplayName } from "./utils/algDisplayName";
 
 interface ModalState {
   items: FormulaItem[];
@@ -82,7 +89,7 @@ interface Props {
 }
 
 export function AlgsDetailView({ cube, classId }: Props) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
 
   const [data, setData] = useState<AlgClassDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -99,6 +106,10 @@ export function AlgsDetailView({ cube, classId }: Props) {
   const [useVisualCube, setVisualCubeState] = useState(() => getUseVisualCubeRenderer());
   const [columnsPerRow, setColumnsState] = useState(() => getColumnsPerRow(cube, classId));
   const [hideAltFormulas, setHideAltState] = useState(() => getHideAltFormulas(cube, classId));
+  const [diagramSize, setDiagramSizeState] = useState(() => getDiagramSize());
+  const [hideFormulaDiagram, setHideFormulaDiagramState] = useState(() =>
+    getHideFormulaDiagram(),
+  );
 
   const [statModalOpen, setStatModalOpen] = useState(false);
   const [modalState, setModalState] = useState<ModalState | null>(null);
@@ -115,6 +126,11 @@ export function AlgsDetailView({ cube, classId }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useReleaseOverlayOnUnmount();
+
+  useEffect(() => {
+    setColumnsState(getColumnsPerRow(cube, classId));
+    setHideAltState(getHideAltFormulas(cube, classId));
+  }, [cube, classId]);
 
   useEffect(() => {
     let cancelled = false;
@@ -196,6 +212,36 @@ export function AlgsDetailView({ cube, classId }: Props) {
     });
     return items;
   }, [visibleGroups]);
+
+  const settingsPreview = useMemo(() => {
+    const first = allModalItems[0];
+    if (!first) {
+      return {
+        formula: "",
+        name: "",
+        imageSvg: "",
+        scramble: "",
+        setName: "",
+        groupName: "",
+      };
+    }
+    const sel = getAlgsSelection(
+      buildAlgsKey(cube, classId, first.setName, first.groupName, first.alg.name),
+    );
+    const formulas = first.alg.algs;
+    const idx = sel?.source === "library" ? (sel.index ?? 0) : 0;
+    const formula = formulas[idx] ?? formulas[0] ?? "";
+    const scramble =
+      first.alg.scrambles?.[idx] ?? first.alg.scrambles?.[0] ?? "";
+    return {
+      formula,
+      name: getAlgDisplayName(first.alg, locale),
+      imageSvg: first.alg.image ?? "",
+      scramble,
+      setName: first.setName,
+      groupName: first.groupName,
+    };
+  }, [allModalItems, cube, classId, locale]);
 
   const totalFormulas = useMemo(
     () => visibleGroups.reduce((s, g) => s + g.algs.length, 0),
@@ -321,6 +367,16 @@ export function AlgsDetailView({ cube, classId }: Props) {
     },
     [cube, classId],
   );
+
+  const handleDiagramSizeChange = useCallback((n: number) => {
+    persistDiagramSize(n);
+    setDiagramSizeState(n);
+  }, []);
+
+  const handleHideFormulaDiagramChange = useCallback((b: boolean) => {
+    persistHideFormulaDiagram(b);
+    setHideFormulaDiagramState(b);
+  }, []);
 
   const handleScrollTop = useCallback(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -587,6 +643,8 @@ export function AlgsDetailView({ cube, classId }: Props) {
                             formulaFontSize={formulaFontSize}
                             formulaFontFamily={formulaFontFamily}
                             useVisualCube={useVisualCube}
+                            diagramSize={diagramSize}
+                            hideFormulaDiagram={hideFormulaDiagram}
                             hideAltFormulas={hideAltFormulas}
                             onOpenModal={() =>
                               handleOpenModal(
@@ -611,6 +669,8 @@ export function AlgsDetailView({ cube, classId }: Props) {
                           formulaFontSize={formulaFontSize}
                           formulaFontFamily={formulaFontFamily}
                           useVisualCube={useVisualCube}
+                          diagramSize={diagramSize}
+                          hideFormulaDiagram={hideFormulaDiagram}
                           onClick={() =>
                             handleOpenModal(
                               group.setName,
@@ -629,17 +689,19 @@ export function AlgsDetailView({ cube, classId }: Props) {
         })}
       </VStack>
 
-      <AlgsFloatButtons
-        onScrollTop={handleScrollTop}
-        onOpenFilter={() => setFilterDrawerOpen(true)}
-        onOpenPageSettings={() => setPageSettingsOpen(true)}
-        onOpenUsageInstructions={() => setUsageInstructionsOpen(true)}
-        onOpenFormulaPractice={
-          allModalItems.length > 0
-            ? () => setFormulaPracticeOpen(true)
-            : undefined
-        }
-      />
+      {!pageSettingsOpen && !filterDrawerOpen && (
+        <AlgsFloatButtons
+          onScrollTop={handleScrollTop}
+          onOpenFilter={() => setFilterDrawerOpen(true)}
+          onOpenPageSettings={() => setPageSettingsOpen(true)}
+          onOpenUsageInstructions={() => setUsageInstructionsOpen(true)}
+          onOpenFormulaPractice={
+            allModalItems.length > 0
+              ? () => setFormulaPracticeOpen(true)
+              : undefined
+          }
+        />
+      )}
 
       <FormulaRandomPickModal
         open={formulaRandomModalOpen}
@@ -737,18 +799,30 @@ export function AlgsDetailView({ cube, classId }: Props) {
             </Drawer.Header>
             <Drawer.Body>
               <AlgsPageSettingsPanel
+                cube={cube}
+                classId={classId}
                 formulaFontSize={formulaFontSize}
                 onFormulaFontSizeChange={handleFontSizeChange}
                 formulaFontFamily={formulaFontFamily}
                 onFormulaFontFamilyChange={handleFontFamilyChange}
                 columnsPerRow={columnsPerRow}
                 onColumnsPerRowChange={handleColumnsChange}
+                diagramSize={diagramSize}
+                onDiagramSizeChange={handleDiagramSizeChange}
+                hideFormulaDiagram={hideFormulaDiagram}
+                onHideFormulaDiagramChange={handleHideFormulaDiagramChange}
                 showVisualCubeSwitch={showVisualCubeSwitch}
                 useVisualCube={useVisualCube}
                 onUseVisualCubeChange={handleVisualCubeChange}
                 showHideAltFormulas={showHideAltFormulas}
                 hideAltFormulas={hideAltFormulas}
                 onHideAltFormulasChange={handleHideAltFormulasChange}
+                previewFormula={settingsPreview.formula}
+                previewName={settingsPreview.name}
+                previewImageSvg={settingsPreview.imageSvg}
+                previewScramble={settingsPreview.scramble}
+                previewSetName={settingsPreview.setName}
+                previewGroupName={settingsPreview.groupName}
               />
             </Drawer.Body>
           </Drawer.Content>
@@ -1014,6 +1088,8 @@ export function AlgsDetailView({ cube, classId }: Props) {
         onNavigate={handleModalNavigate}
         useVisualCube={useVisualCube}
         formulaFontFamily={formulaFontFamily}
+        diagramSize={diagramSize}
+        hideFormulaDiagram={hideFormulaDiagram}
       />
 
       <style>{`

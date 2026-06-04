@@ -42,6 +42,8 @@ import {
   getFormulaFontFamilyCSSValue,
   type FormulaFontFamilyId,
 } from "../utils/formulaFontFamily";
+import { getAlgDisplayName } from "../utils/algDisplayName";
+import { getDiagramDimensions } from "../utils/diagramDisplay";
 import "./algsModal.css";
 
 interface AlgsModalItem {
@@ -60,6 +62,8 @@ interface AlgsModalProps {
   onNavigate?: (index: number) => void;
   useVisualCube?: boolean;
   formulaFontFamily?: FormulaFontFamilyId;
+  diagramSize?: number;
+  hideFormulaDiagram?: boolean;
 }
 
 export default function AlgsModal({
@@ -72,8 +76,10 @@ export default function AlgsModal({
   onNavigate,
   useVisualCube = true,
   formulaFontFamily,
+  diagramSize = 180,
+  hideFormulaDiagram = false,
 }: AlgsModalProps) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
 
   const item = items[currentIndex];
   const alg = item?.alg;
@@ -220,6 +226,7 @@ export default function AlgsModal({
   }, [onNavigate, currentIndex, items.length]);
 
   const fontCss = getFormulaFontFamilyCSSValue(formulaFontFamily);
+  const diagramDims = getDiagramDimensions(diagramSize, "square");
 
   const hasPrev = currentIndex > 0;
   const hasNext = currentIndex < items.length - 1;
@@ -255,7 +262,7 @@ export default function AlgsModal({
             py={3}
           >
             <Dialog.Title fontSize="md" fontWeight="bold" truncate>
-              {alg?.name ?? ""}
+              {alg ? getAlgDisplayName(alg, locale) : ""}
             </Dialog.Title>
             <Dialog.CloseTrigger asChild>
               <CloseButton size="sm" />
@@ -274,20 +281,22 @@ export default function AlgsModal({
           >
             {!alg ? null : (
               <VStack gap={4} align="stretch" flex="1" minH={0}>
-                <Box flexShrink={0} display="flex" justifyContent="center">
-                  <AlgsCubeDiagram
-                    cube={cube}
-                    classId={classId}
-                    setName={setName}
-                    groupName={groupName}
-                    imageSvg={alg.image}
-                    scramble={displayScramble}
-                    formula={displayFormula}
-                    useVisualCube={useVisualCube}
-                    maxWidth={180}
-                    maxHeight={180}
-                  />
-                </Box>
+                {!hideFormulaDiagram && (
+                  <Box flexShrink={0} display="flex" justifyContent="center">
+                    <AlgsCubeDiagram
+                      cube={cube}
+                      classId={classId}
+                      setName={setName}
+                      groupName={groupName}
+                      imageSvg={alg.image}
+                      scramble={displayScramble}
+                      formula={displayFormula}
+                      useVisualCube={useVisualCube}
+                      maxWidth={diagramDims.maxWidth}
+                      maxHeight={diagramDims.maxHeight}
+                    />
+                  </Box>
+                )}
 
                 {displayScramble && (
                   <Box
