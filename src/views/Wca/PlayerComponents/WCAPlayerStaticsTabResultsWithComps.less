@@ -1,0 +1,58 @@
+/* 成绩 Tab「按比赛」：深色/浅色均跟 Ant Design token，禁止硬编码浅色大块底 */
+
+.wca-by-comp-root {
+  :global(.ant-card.wca-by-comp-comp-card) {
+    background: var(--ant-color-bg-elevated) !important;
+  }
+
+  :global(.ant-card.wca-by-comp-comp-card .ant-card-head) {
+    background: var(--ant-color-primary-bg) !important;
+    color: var(--ant-color-text);
+    border-bottom: 1px solid var(--ant-color-primary-border) !important;
+  }
+
+  :global(.ant-card.wca-by-comp-comp-card .ant-card-body) {
+    background: var(--ant-color-bg-elevated) !important;
+  }
+
+  .wca-by-comp-table {
+    :global(.ant-table),
+    :global(.ant-table-container) {
+      background: transparent !important;
+    }
+
+    :global(.ant-table-thead > tr > th) {
+      background: var(--ant-color-fill-tertiary) !important;
+      color: var(--ant-color-text) !important;
+      border-bottom-color: var(--ant-color-border-secondary) !important;
+    }
+
+    :global(.ant-table-tbody > tr > td) {
+      background: var(--ant-color-bg-container) !important;
+      color: var(--ant-color-text);
+    }
+
+    :global(.ant-table-tbody > tr:hover > td) {
+      background: var(--ant-color-fill-tertiary) !important;
+    }
+
+    :global(.ant-table-cell-fix-left) {
+      background: var(--ant-color-bg-container) !important;
+    }
+  }
+}
+
+/* PR Streak：仅用 success 语义色 token，不写死黄绿底 */
+.wca-pr-streak-card {
+  background: var(--ant-color-success-bg) !important;
+  border-color: var(--ant-color-success-border) !important;
+
+  :global(.ant-card-head) {
+    color: var(--ant-color-success);
+    border-bottom-color: var(--ant-color-success-border) !important;
+  }
+
+  :global(.ant-card-body) {
+    color: var(--ant-color-text);
+  }
+}

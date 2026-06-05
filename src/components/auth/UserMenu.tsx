@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 
 import { useAuth } from "@/contexts/AuthProvider";
+import { navMenuContentProps, navMenuItemProps } from "@/components/layout/navStyles";
 import { useI18n } from "@/contexts/I18nProvider";
 import { Auth, hasAuth, isLoggedIn } from "@/lib/auth";
 import { wcaPersonUrl } from "@/lib/avatar";
@@ -71,7 +72,7 @@ export function UserMenu({ children }: { children: ReactNode }) {
       <Menu.Trigger asChild>{children}</Menu.Trigger>
       <Portal>
         <Menu.Positioner>
-          <Menu.Content minW="48">
+          <Menu.Content {...navMenuContentProps("48")}>
             {items.map((item) =>
               item.divider ? (
                 <Menu.Separator key={item.key} />
@@ -80,6 +81,7 @@ export function UserMenu({ children }: { children: ReactNode }) {
                   key={item.key}
                   value={item.key}
                   onClick={() => void handleSelect(item.key)}
+                  {...navMenuItemProps}
                 >
                   {item.label}
                 </Menu.Item>

@@ -1,14 +1,9 @@
-import { Auth, hasAuth, isLoggedIn } from "@/lib/auth";
 import type { MessageKey } from "@/i18n";
-import type { CurrentUserData } from "@/services/cubing-pro/auth/types";
 
 export interface NavLinkDef {
   labelKey: MessageKey;
-  href: string;
-  /** Require login */
-  login?: boolean;
-  /** Require any of these auth bits */
-  auth?: Auth[];
+  href?: string;
+  children?: NavLinkDef[];
 }
 
 export interface NavGroupDef {
@@ -48,23 +43,23 @@ export const MAIN_NAV: NavGroupDef[] = [
     labelKey: "nav.tools",
     children: [
       { labelKey: "nav.tools.teamMatch", href: "/tools/team-match" },
-      { labelKey: "nav.tools.bldD", href: "/tools/bld-d" },
-      { labelKey: "nav.tools.bldPingyin", href: "/tools/bld-pingyin" },
-      { labelKey: "nav.tools.associative", href: "/tools/associative-words" },
-      { labelKey: "nav.tools.mbld", href: "/tools/mbld-d" },
-      { labelKey: "nav.tools.sq1", href: "/draw-tools/sq1-d" },
-      { labelKey: "nav.tools.minx", href: "/draw-tools/minx-d" },
-      { labelKey: "nav.tools.sk", href: "/draw-tools/sk-d" },
-      { labelKey: "nav.tools.py", href: "/draw-tools/py-d" },
-    ],
-  },
-  {
-    id: "other",
-    labelKey: "nav.other",
-    children: [
-      { labelKey: "nav.other.recipes", href: "/other/recipes" },
-      { labelKey: "nav.other.kitchen", href: "/other/kitchen-skills" },
-      { labelKey: "nav.other.cocktails", href: "/other/cocktails" },
+      {
+        labelKey: "nav.tools.draw",
+        children: [
+          { labelKey: "nav.tools.sq1", href: "/draw-tools/sq1-d" },
+          { labelKey: "nav.tools.minx", href: "/draw-tools/minx-d" },
+          { labelKey: "nav.tools.sk", href: "/draw-tools/sk-d" },
+          { labelKey: "nav.tools.py", href: "/draw-tools/py-d" },
+        ],
+      },
+      {
+        labelKey: "nav.other",
+        children: [
+          { labelKey: "nav.other.recipes", href: "/other/recipes" },
+          { labelKey: "nav.other.kitchen", href: "/other/kitchen-skills" },
+          { labelKey: "nav.other.cocktails", href: "/other/cocktails" },
+        ],
+      },
     ],
   },
   {
@@ -79,47 +74,20 @@ export const MAIN_NAV: NavGroupDef[] = [
   },
 ];
 
-const ADMIN_NAV_ITEMS: NavLinkDef[] = [
-  {
-    labelKey: "nav.admin.profile",
-    href: "/user/profile",
-    login: true,
-  },
-  {
-    labelKey: "nav.admin.organizers",
-    href: "/admin/organizers",
-    auth: [Auth.AuthOrganizers],
-  },
-  {
-    labelKey: "nav.admin.admins",
-    href: "/admin/admins",
-    auth: [Auth.AuthAdmin, Auth.AuthSuperAdmin],
-  },
-];
-
-function canSeeNavItem(user: CurrentUserData | null, item: NavLinkDef): boolean {
-  if (item.login && !isLoggedIn(user?.id)) return false;
-  if (item.auth?.length) {
-    if (!isLoggedIn(user?.id)) return false;
-    const auth = user?.Auth ?? 0;
-    return item.auth.some((a) => hasAuth(auth, a));
+export function isNavLinkActive(pathname: string, item: NavLinkDef): boolean {
+  if (item.href) {
+    return pathname === item.href || pathname.startsWith(`${item.href}/`);
   }
-  return true;
+  return item.children?.some((child) => isNavLinkActive(pathname, child)) ?? false;
 }
 
-export function buildAdminNavGroup(
-  user: CurrentUserData | null,
-): NavGroupDef | null {
-  const children = ADMIN_NAV_ITEMS.filter((item) => canSeeNavItem(user, item));
-  if (!children.length) return null;
-  return {
-    id: "admin",
-    labelKey: "nav.admin",
-    children,
-  };
+export function isNavGroupActive(pathname: string, group: NavGroupDef): boolean {
+  if (group.href) {
+    return pathname === group.href || pathname.startsWith(`${group.href}/`);
+  }
+  return group.children?.some((item) => isNavLinkActive(pathname, item)) ?? false;
 }
 
-export function buildMainNav(user: CurrentUserData | null): NavGroupDef[] {
-  const admin = buildAdminNavGroup(user);
-  return admin ? [...MAIN_NAV, admin] : MAIN_NAV;
+export function buildMainNav(): NavGroupDef[] {
+  return MAIN_NAV;
 }

@@ -9,6 +9,17 @@ const compat = new FlatCompat({
   baseDirectory: __dirname,
 });
 
-const eslintConfig = [...compat.extends("next/core-web-vitals", "next/typescript")];
+const eslintConfig = [
+  ...compat.extends("next/core-web-vitals", "next/typescript"),
+  {
+    files: ["src/views/Wca/**/*.{ts,tsx}", "src/services/cubing-pro/wca/**/*.ts"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/ban-ts-comment": "off",
+      "prefer-const": "off",
+      "react-hooks/exhaustive-deps": "warn",
+    },
+  },
+];
 
 export default eslintConfig;

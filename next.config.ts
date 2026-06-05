@@ -8,8 +8,13 @@ const CUBE_API_UPSTREAM =
 const PUBLIC_API_BASE =
   process.env.NEXT_PUBLIC_API_BASE ?? "https://cubing.pro/v3/cube-api";
 
+/** 仅静态导出构建启用 output: export；next dev 需支持任意 /wca/player/:id */
+const staticExport =
+  process.env.NEXT_OUTPUT_EXPORT === "1" ||
+  process.env.NEXT_OUTPUT_EXPORT === "true";
+
 const nextConfig: NextConfig = {
-  output: "export",
+  ...(staticExport ? { output: "export" as const } : {}),
   trailingSlash: true,
   images: {
     unoptimized: true,
@@ -19,7 +24,7 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_API_BASE: PUBLIC_API_BASE,
   },
   experimental: {
-    optimizePackageImports: ["@chakra-ui/react"],
+    optimizePackageImports: ["@chakra-ui/react", "react-icons"],
   },
   async rewrites() {
     // 仅 next dev / next start 生效；output: export 产物不经过 rewrites
