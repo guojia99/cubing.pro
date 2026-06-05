@@ -1,5 +1,11 @@
+import fs from "node:fs";
+import path from "node:path";
+
 import { APP_ROUTES } from "@/config/routes";
 import type { AlgCubeMap } from "@/services/cubing-pro/algs/algs";
+import type { Cocktail } from "@/views/Cocktails/types";
+import type { KitchenTipsData } from "@/views/KitchenSkills/types";
+import type { RecipesData } from "@/views/Recipes/types";
 
 function getBuildTimeApiBase(): string {
   return (
@@ -89,14 +95,52 @@ export function getWcaPlayerStaticParams(): { wcaId: string }[] {
   return [];
 }
 
-/** catch-all 静态导出参数：固定路由 + 公式详情 */
+function readPublicJson<T>(filename: string): T | null {
+  try {
+    const filePath = path.join(process.cwd(), "public", filename);
+    return JSON.parse(fs.readFileSync(filePath, "utf-8")) as T;
+  } catch {
+    return null;
+  }
+}
+
+export function getRecipeDetailStaticParams(): { path: string[] }[] {
+  const data = readPublicJson<RecipesData>("recipes.json");
+  if (!data?.recipes) return [];
+  return data.recipes.map((r) => ({
+    path: ["other", "recipes", encodeURIComponent(r.category), encodeURIComponent(r.id)],
+  }));
+}
+
+export function getKitchenSkillDetailStaticParams(): { path: string[] }[] {
+  const data = readPublicJson<KitchenTipsData>("tips.json");
+  if (!data?.tips) return [];
+  return data.tips.map((t) => ({
+    path: ["other", "kitchen-skills", encodeURIComponent(t.category), encodeURIComponent(t.id)],
+  }));
+}
+
+export function getCocktailDetailStaticParams(): { path: string[] }[] {
+  const data = readPublicJson<Cocktail[]>("iba/cocktails.json");
+  if (!Array.isArray(data)) return [];
+  return data.map((c) => ({
+    path: ["other", "cocktails", encodeURIComponent(c.slug)],
+  }));
+}
+
+/** catch-all 静态导出参数：固定路由 + 公式/菜谱/技巧/鸡尾酒详情 */
 export async function getAllCatchAllStaticParams(): Promise<{ path: string[] }[]> {
   const staticPaths = getCatchAllStaticParams();
+  const foodPaths = [
+    ...getRecipeDetailStaticParams(),
+    ...getKitchenSkillDetailStaticParams(),
+    ...getCocktailDetailStaticParams(),
+  ];
   const map = await fetchAlgCubeMapForBuild();
 
   if (!map) {
-    return staticPaths;
+    return [...staticPaths, ...foodPaths];
   }
 
-  return [...staticPaths, ...getAlgsDetailStaticParamsFromMap(map)];
+  return [...staticPaths, ...foodPaths, ...getAlgsDetailStaticParamsFromMap(map)];
 }
