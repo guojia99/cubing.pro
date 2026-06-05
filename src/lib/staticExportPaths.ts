@@ -61,6 +61,34 @@ async function fetchAlgCubeMapForBuild(): Promise<AlgCubeMap | null> {
   }
 }
 
+/**
+ * WCA 选手页 `/wca/player/:wcaId` — 静态导出时预生成的 ID 列表。
+ * 构建可设 `WCA_STATIC_PLAYER_IDS=2018SHEN07,2019COMP01`；未设置则不预生成（依赖站内跳转 + 服务器 fallback）。
+ */
+/** 静态导出占位页：配合服务器 fallback，客户端从 URL 读取真实 wcaId */
+export const WCA_PLAYER_EXPORT_PLACEHOLDER = "__dynamic__";
+
+export function getWcaPlayerStaticParams(): { wcaId: string }[] {
+  const raw = process.env.WCA_STATIC_PLAYER_IDS?.trim();
+  if (raw) {
+    const ids = raw
+      .split(",")
+      .map((id) => id.trim().toUpperCase())
+      .filter((id) => id.length === 10)
+      .map((wcaId) => ({ wcaId }));
+    if (ids.length > 0) return ids;
+  }
+
+  const staticExport =
+    process.env.NEXT_OUTPUT_EXPORT === "1" ||
+    process.env.NEXT_OUTPUT_EXPORT === "true";
+  if (staticExport) {
+    return [{ wcaId: WCA_PLAYER_EXPORT_PLACEHOLDER }];
+  }
+
+  return [];
+}
+
 /** catch-all 静态导出参数：固定路由 + 公式详情 */
 export async function getAllCatchAllStaticParams(): Promise<{ path: string[] }[]> {
   const staticPaths = getCatchAllStaticParams();

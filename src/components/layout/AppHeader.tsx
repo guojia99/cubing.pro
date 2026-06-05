@@ -17,11 +17,172 @@ import { useEffect, useMemo, useState } from "react";
 
 import { BrandLogo } from "@/components/layout/BrandLogo";
 import { HeaderUserActions } from "@/components/layout/HeaderUserActions";
+import { NAV_FONT_SIZE, navMenuContentProps, navMenuItemProps } from "@/components/layout/navStyles";
 import { LanguageSelect } from "@/components/i18n/LanguageSelect";
 import { ColorModeButton } from "@/components/ui/color-mode";
-import { useAuth } from "@/contexts/AuthProvider";
 import { useI18n } from "@/contexts/I18nProvider";
-import { buildMainNav, type NavGroupDef } from "@/lib/navigation";
+import { buildMainNav, isNavGroupActive, isNavLinkActive, type NavGroupDef, type NavLinkDef } from "@/lib/navigation";
+
+/** 顶栏选中态：与 segment 一致，避免 solid + 缺失 brand.contrast 导致深底深蓝字 */
+function navItemButtonProps(active: boolean) {
+  if (!active) {
+    return { variant: "ghost" as const, colorPalette: "brand" as const };
+  }
+  return {
+    variant: "solid" as const,
+    colorPalette: "brand" as const,
+    bg: "segment.indicator",
+    color: "segment.fg.selected",
+    _hover: { bg: "segment.indicator", color: "segment.fg.selected" },
+    _expanded: { bg: "segment.indicator", color: "segment.fg.selected" },
+    _open: { bg: "segment.indicator", color: "segment.fg.selected" },
+  };
+}
+
+function NavDropdownItems({ items }: { items: NavLinkDef[] }) {
+  const { t } = useI18n();
+
+  return items.map((item, index) => {
+    if (item.children?.length) {
+      const showDivider = index > 0;
+
+      return (
+        <Box key={item.labelKey} pt={showDivider ? "2" : undefined}>
+          {showDivider ? <Menu.Separator mb="2" /> : null}
+          <Box
+            mx="1"
+            mb="1"
+            borderColor="border"
+            borderRadius="md"
+            overflow="hidden"
+            bg="bg.muted"
+          >
+            <Menu.ItemGroup>
+              <Menu.ItemGroupLabel
+                px="3"
+                py="2"
+                fontSize={NAV_FONT_SIZE}
+                fontWeight="bold"
+                color="fg.muted"
+                letterSpacing="0.06em"
+                textTransform="uppercase"
+                borderBottomWidth="1px"
+                borderColor="border"
+                bg="bg.subtle"
+              >
+                {t(item.labelKey)}
+              </Menu.ItemGroupLabel>
+              {item.children.map((child) =>
+                child.href ? (
+                  <Menu.Item
+                    key={child.href}
+                    value={child.href}
+                    asChild
+                    bg="transparent"
+                    _hover={{ bg: "bg.subtle" }}
+                    {...navMenuItemProps}
+                  >
+                    <NextLink href={child.href}>{t(child.labelKey)}</NextLink>
+                  </Menu.Item>
+                ) : null,
+              )}
+            </Menu.ItemGroup>
+          </Box>
+        </Box>
+      );
+    }
+
+    if (!item.href) return null;
+
+    return (
+      <Menu.Item key={item.href} value={item.href} asChild {...navMenuItemProps}>
+        <NextLink href={item.href}>{t(item.labelKey)}</NextLink>
+      </Menu.Item>
+    );
+  });
+}
+
+function MobileNavLinks({
+  items,
+  pathname,
+  onClose,
+  nested = false,
+}: {
+  items: NavLinkDef[];
+  pathname: string;
+  onClose: () => void;
+  nested?: boolean;
+}) {
+  const { t } = useI18n();
+
+  return items.map((item, index) => {
+    if (item.children?.length) {
+      const showDivider = !nested && index > 0;
+
+      return (
+        <Box
+          key={item.labelKey}
+          mt={showDivider ? "3" : nested ? "2" : undefined}
+          pt={showDivider ? "3" : undefined}
+          borderTopWidth={showDivider ? "1px" : undefined}
+          borderColor="border"
+          pl={nested ? "2" : undefined}
+        >
+          <Box
+            borderWidth={nested ? undefined : "1px"}
+            borderColor="border"
+            borderRadius="md"
+            bg="bg.muted"
+            px="2"
+            py="2"
+          >
+            <Text
+              fontSize={NAV_FONT_SIZE}
+              fontWeight="bold"
+              color="fg.muted"
+              mb="2"
+              px="1"
+              letterSpacing="0.06em"
+              textTransform="uppercase"
+              borderBottomWidth="1px"
+              borderColor="border"
+              pb="2"
+            >
+              {t(item.labelKey)}
+            </Text>
+            <MobileNavLinks
+              items={item.children}
+              pathname={pathname}
+              onClose={onClose}
+              nested
+            />
+          </Box>
+        </Box>
+      );
+    }
+
+    if (!item.href) return null;
+
+    const active = isNavLinkActive(pathname, item);
+
+    return (
+      <Button
+        key={item.href}
+        asChild
+        w="full"
+        justifyContent="flex-start"
+        size="sm"
+        fontSize={NAV_FONT_SIZE}
+        mb="1"
+        {...navItemButtonProps(active)}
+        pl={nested ? "2" : undefined}
+        onClick={onClose}
+      >
+        <NextLink href={item.href}>{t(item.labelKey)}</NextLink>
+      </Button>
+    );
+  });
+}
 
 function NavMenuGroup({ group }: { group: NavGroupDef }) {
   const pathname = usePathname() ?? "";
@@ -29,47 +190,45 @@ function NavMenuGroup({ group }: { group: NavGroupDef }) {
 
   if (!group.children?.length) {
     if (!group.href) return null;
-    const active =
-      pathname === group.href || pathname.startsWith(`${group.href}/`);
+    const active = isNavGroupActive(pathname, group);
     return (
       <Button
         asChild
         size="sm"
-        variant={active ? "solid" : "ghost"}
-        colorPalette="brand"
+        fontSize={NAV_FONT_SIZE}
+        flexShrink={0}
+        whiteSpace="nowrap"
+        px="2.5"
+        {...navItemButtonProps(active)}
       >
         <NextLink href={group.href}>{t(group.labelKey)}</NextLink>
       </Button>
     );
   }
 
-  const childActive = group.children.some(
-    (item) =>
-      pathname === item.href || pathname.startsWith(`${item.href}/`),
-  );
+  const childActive = isNavGroupActive(pathname, group);
 
   return (
     <Menu.Root positioning={{ placement: "bottom-start" }}>
       <Menu.Trigger asChild>
         <Button
           size="sm"
-          variant={childActive ? "solid" : "ghost"}
-          colorPalette="brand"
+          fontSize={NAV_FONT_SIZE}
+          flexShrink={0}
+          whiteSpace="nowrap"
+          px="2.5"
+          {...navItemButtonProps(childActive)}
         >
           {t(group.labelKey)}
-          <Box as="span" ml="1" fontSize="xs" aria-hidden>
+          <Box as="span" ml="1" fontSize="10px" aria-hidden>
             ▾
           </Box>
         </Button>
       </Menu.Trigger>
       <Portal>
         <Menu.Positioner>
-          <Menu.Content minW="44">
-            {group.children.map((item) => (
-              <Menu.Item key={item.href} value={item.href} asChild>
-                <NextLink href={item.href}>{t(item.labelKey)}</NextLink>
-              </Menu.Item>
-            ))}
+          <Menu.Content {...navMenuContentProps("44")}>
+            <NavDropdownItems items={group.children} />
           </Menu.Content>
         </Menu.Positioner>
       </Portal>
@@ -135,13 +294,13 @@ function MobileNav({
           borderBottomWidth="1px"
           borderColor="border"
         >
-          <Text fontWeight="bold" fontSize="lg">
+          <Text fontWeight="bold" fontSize={NAV_FONT_SIZE}>
             {t("nav.menu")}
           </Text>
           <IconButton
             aria-label={t("nav.close")}
             variant="ghost"
-            size="sm"
+            size="xs"
             onClick={onClose}
           >
             ✕
@@ -155,21 +314,17 @@ function MobileNav({
                   asChild
                   w="full"
                   justifyContent="flex-start"
-                  variant={
-                    pathname === group.href ||
-                    pathname.startsWith(`${group.href}/`)
-                      ? "solid"
-                      : "ghost"
-                  }
-                  colorPalette="brand"
+                  size="sm"
+                  fontSize={NAV_FONT_SIZE}
                   mb="2"
+                  {...navItemButtonProps(isNavGroupActive(pathname, group))}
                   onClick={onClose}
                 >
                   <NextLink href={group.href}>{t(group.labelKey)}</NextLink>
                 </Button>
               ) : (
                 <Text
-                  fontSize="xs"
+                  fontSize={NAV_FONT_SIZE}
                   fontWeight="semibold"
                   color="fg.muted"
                   mb="2"
@@ -178,26 +333,13 @@ function MobileNav({
                   {t(group.labelKey)}
                 </Text>
               )}
-              {group.children?.map((item) => {
-                const active =
-                  pathname === item.href ||
-                  pathname.startsWith(`${item.href}/`);
-                return (
-                  <Button
-                    key={item.href}
-                    asChild
-                    w="full"
-                    justifyContent="flex-start"
-                    size="sm"
-                    variant={active ? "subtle" : "ghost"}
-                    colorPalette="brand"
-                    mb="1"
-                    onClick={onClose}
-                  >
-                    <NextLink href={item.href}>{t(item.labelKey)}</NextLink>
-                  </Button>
-                );
-              })}
+              {group.children ? (
+                <MobileNavLinks
+                  items={group.children}
+                  pathname={pathname}
+                  onClose={onClose}
+                />
+              ) : null}
             </Box>
           ))}
         </Box>
@@ -208,13 +350,9 @@ function MobileNav({
 
 export function AppHeader() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { currentUser } = useAuth();
   const { t } = useI18n();
 
-  const nav = useMemo(
-    () => buildMainNav(currentUser),
-    [currentUser],
-  );
+  const nav = useMemo(() => buildMainNav(), []);
 
   return (
     <>
@@ -222,6 +360,7 @@ export function AppHeader() {
         as="header"
         position="sticky"
         top="0"
+        fontSize={NAV_FONT_SIZE}
         zIndex="sticky"
         borderBottomWidth="1px"
         borderColor="border"
@@ -229,21 +368,35 @@ export function AppHeader() {
         backdropFilter="blur(12px)"
       >
         <Container maxW="container.xl" py="3">
-          <Flex align="center" justify="space-between" gap="4">
+          <Flex align="center" justify="space-between" gap="2" minW="0">
             <BrandLogo />
 
-            <HStack
-              gap="1"
-              display={{ base: "none", lg: "flex" }}
-              flexWrap="wrap"
-              justify="center"
+            <Box
+              as="nav"
+              aria-label={t("nav.menu")}
+              display={{ base: "none", lg: "block" }}
               flex="1"
-              px="4"
+              minW="0"
+              px="2"
+              overflowX="auto"
+              css={{
+                WebkitOverflowScrolling: "touch",
+                scrollbarWidth: "none",
+                "&::-webkit-scrollbar": { display: "none" },
+              }}
             >
-              {nav.map((group) => (
-                <NavMenuGroup key={group.id} group={group} />
-              ))}
-            </HStack>
+              <HStack
+                gap="0.5"
+                flexWrap="nowrap"
+                justify="center"
+                w="max-content"
+                mx="auto"
+              >
+                {nav.map((group) => (
+                  <NavMenuGroup key={group.id} group={group} />
+                ))}
+              </HStack>
+            </Box>
 
             <HStack gap="2" flexShrink={0}>
               <LanguageSelect />
@@ -252,7 +405,7 @@ export function AppHeader() {
               <IconButton
                 aria-label={t("nav.open")}
                 variant="outline"
-                size="sm"
+                size="xs"
                 display={{ base: "inline-flex", lg: "none" }}
                 onClick={() => setMobileOpen(true)}
               >

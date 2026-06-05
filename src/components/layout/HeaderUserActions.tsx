@@ -4,6 +4,7 @@ import { Avatar, Button, HStack, Skeleton, Text } from "@chakra-ui/react";
 import NextLink from "next/link";
 
 import { UserMenu } from "@/components/auth/UserMenu";
+import { NAV_FONT_SIZE } from "@/components/layout/navStyles";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useI18n } from "@/contexts/I18nProvider";
 import { resolveAvatarUrl } from "@/lib/avatar";
@@ -19,7 +20,7 @@ export function HeaderUserActions() {
 
   if (!isLoggedIn(currentUser?.id)) {
     return (
-      <Button asChild size="sm" colorPalette="brand" variant="solid">
+      <Button asChild size="sm" fontSize={NAV_FONT_SIZE} colorPalette="brand" variant="solid">
         <NextLink href="/login">{t("user.login")}</NextLink>
       </Button>
     );
@@ -39,9 +40,9 @@ export function HeaderUserActions() {
       >
         <Text
           fontWeight="semibold"
-          fontSize="sm"
+          fontSize={NAV_FONT_SIZE}
           lineClamp={1}
-          display={{ base: "none", sm: "block" }}
+          display={{ base: "none", xl: "block" }}
           maxW="32"
         >
           {currentUser?.Name}

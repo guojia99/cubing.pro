@@ -1,0 +1,56 @@
+/* 里程碑时间轴区域：最低高度 + 双指缩放时 touchmove 需 preventDefault，故用非 passive 监听 */
+.milestone-scale-hint {
+  margin: 0 0 8px;
+  padding: 0 2px;
+  line-height: 1.5;
+}
+
+.milestone-scale-viewport {
+  width: 100%;
+  max-width: 100%;
+  min-height: 450px;
+  /* 顶部留白：避免首条气泡贴提示文案或被裁切；左右留白：左侧气泡不要紧贴视口 */
+  padding: 24px 12px 16px;
+  box-sizing: border-box;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-x pan-y;
+}
+
+/* antd 6 Timeline 基于 Steps：alternate 为 layout-alternate，左右为 placement-start / placement-end */
+.milestone-timeline-wrapper {
+  width: 100%;
+  overflow: visible;
+  transform-origin: top center;
+
+  .ant-timeline.ant-timeline-layout-alternate {
+    /* 轴线右侧：气泡靠左（贴中线） */
+    .ant-timeline-item-placement-start .ant-timeline-item-content {
+      display: flex !important;
+      flex-direction: column;
+      align-items: flex-start !important;
+      min-width: 0 !important;
+      box-sizing: border-box;
+    }
+    /* 轴线左侧：气泡靠右（贴中线） */
+    .ant-timeline-item-placement-end .ant-timeline-item-content {
+      display: flex !important;
+      flex-direction: column;
+      align-items: flex-end !important;
+      min-width: 0 !important;
+      box-sizing: border-box;
+    }
+  }
+
+  .ant-timeline-item-content {
+    min-width: 0;
+  }
+}
+
+/* 里程碑筛选区域 - 手机端适配 */
+@media (max-width: 1199px) {
+  .ant-card .ant-form-item-control-input .ant-select {
+    max-width: 100% !important;
+  }
+}

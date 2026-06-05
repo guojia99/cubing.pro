@@ -62,6 +62,33 @@ const config = defineConfig({
         border: {
           DEFAULT: { value: { _light: "{colors.brand.200}", _dark: "{colors.brand.800}" } },
         },
+        /** colorPalette="brand" 的 Button / Badge 等（solid 背景 + 对比文字） */
+        brand: {
+          contrast: {
+            value: { _light: "{colors.white}", _dark: "{colors.brand.950}" },
+          },
+          fg: {
+            value: { _light: "{colors.brand.800}", _dark: "{colors.ocean.200}" },
+          },
+          subtle: {
+            value: { _light: "{colors.brand.50}", _dark: "{colors.brand.900}" },
+          },
+          muted: {
+            value: { _light: "{colors.brand.100}", _dark: "{colors.brand.800}" },
+          },
+          emphasized: {
+            value: { _light: "{colors.brand.200}", _dark: "{colors.brand.700}" },
+          },
+          solid: {
+            value: { _light: "{colors.brand.600}", _dark: "{colors.brand.500}" },
+          },
+          focusRing: {
+            value: { _light: "{colors.brand.500}", _dark: "{colors.brand.400}" },
+          },
+          border: {
+            value: { _light: "{colors.brand.500}", _dark: "{colors.brand.400}" },
+          },
+        },
         /** 分段切换（公式库 / 自定义等） */
         segment: {
           track: {
@@ -90,6 +117,37 @@ const config = defineConfig({
             },
             fg: {
               value: { _light: "{colors.green.700}", _dark: "{colors.green.300}" },
+            },
+          },
+        },
+        /** 欢迎页 / 赞助模块 */
+        welcome: {
+          coffee: {
+            pageBg: {
+              value: {
+                _light: "linear-gradient(180deg, #fff9f0 0%, #ffffff 100%)",
+                _dark: "linear-gradient(180deg, {colors.brand.900} 0%, {colors.brand.950} 100%)",
+              },
+            },
+            wechatQr: {
+              value: {
+                _light: "#f0f9f0",
+                _dark: "rgba(34, 197, 94, 0.12)",
+              },
+            },
+            alipayQr: {
+              value: {
+                _light: "#e6f7ff",
+                _dark: "rgba(34, 168, 203, 0.15)",
+              },
+            },
+          },
+          ad: {
+            contactBg: {
+              value: {
+                _light: "linear-gradient(135deg, {colors.white} 0%, {colors.brand.50} 100%)",
+                _dark: "linear-gradient(135deg, {colors.brand.900} 0%, {colors.brand.950} 100%)",
+              },
             },
           },
         },

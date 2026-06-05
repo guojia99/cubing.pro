@@ -1,0 +1,11 @@
+.changelog-item-markdown p {
+  margin: 0;
+  display: inline;
+}
+
+.changelog-item-markdown code {
+  background: var(--chakra-colors-bg-muted);
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 0.9em;
+}

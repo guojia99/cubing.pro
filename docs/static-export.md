@@ -20,7 +20,9 @@ npm run build:static
 ## 路由
 
 - 构建时会为**无** `:param` 的路由生成 HTML（见 `src/lib/staticExportPaths.ts`）。
-- 含动态段的路由（如 `/wca/player/:wcaId`）在**站内 Link 跳转**正常；**直接打开或刷新**需在服务器配置 fallback。
+- `/wca/player/:wcaId` 使用独立动态路由 `app/(main)/wca/player/[wcaId]/page.tsx`。
+- 静态构建可通过环境变量预生成部分选手页：`WCA_STATIC_PLAYER_IDS=2018SHEN07,2019COMP01 npm run build:static`
+- 未预生成的 WCA ID：**站内 Link 跳转**在客户端正常；**直接打开或刷新**需在服务器配置 fallback（见下）。
 
 ### Nginx 示例（部署在 cubing.pro）
 
