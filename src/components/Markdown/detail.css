@@ -1,0 +1,37 @@
+.markdown-detail-layout {
+  display: flex;
+  gap: 24px;
+}
+
+.markdown-detail-anchor {
+  width: 200px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 80px;
+  align-self: flex-start;
+}
+
+@media (max-width: 768px) {
+  .markdown-detail-anchor {
+    display: none;
+  }
+}
+
+.markdown-detail-anchor-link {
+  display: block;
+  font-size: 14px;
+  line-height: 1.5;
+  padding: 4px 0;
+  color: var(--chakra-colors-fg-muted);
+  text-decoration: none;
+}
+
+.markdown-detail-anchor-link:hover {
+  color: var(--chakra-colors-accent);
+}
+
+.markdown-detail-content img {
+  max-width: 100%;
+  border-radius: 8px;
+  cursor: pointer;
+}

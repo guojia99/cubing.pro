@@ -18,6 +18,12 @@ import { PyDrawView } from "@/views/DrawTools/PyDrawView";
 import { SkDrawView } from "@/views/DrawTools/SkDrawView";
 import { SQ1DrawView } from "@/views/DrawTools/SQ1DrawView";
 import { ChangelogPageView } from "@/views/Changelog/ChangelogPageView";
+import { CocktailDetailView } from "@/views/Cocktails/CocktailDetailView";
+import { CocktailListView } from "@/views/Cocktails/CocktailListView";
+import { KitchenSkillDetailView } from "@/views/KitchenSkills/KitchenSkillDetailView";
+import { KitchenSkillListView } from "@/views/KitchenSkills/KitchenSkillListView";
+import { RecipeDetailView } from "@/views/Recipes/RecipeDetailView";
+import { RecipeListView } from "@/views/Recipes/RecipeListView";
 import { WcaPlayersSearchView } from "@/views/Wca/WcaPlayersSearchView";
 
 export const dynamic = "force-static";
@@ -69,6 +75,27 @@ function CatchAllContent({ routeId, path }: { routeId: string; path: string[] })
       return <ChangelogPageView />;
     case "wca-players":
       return <WcaPlayersSearchView />;
+    case "recipes":
+      return <RecipeListView />;
+    case "recipe-detail":
+      if (path.length >= 4) {
+        return <RecipeDetailView category={path[2]} id={path.slice(3).join("/")} />;
+      }
+      return null;
+    case "kitchen-skills":
+      return <KitchenSkillListView />;
+    case "kitchen-skill-detail":
+      if (path.length >= 4) {
+        return <KitchenSkillDetailView category={path[2]} id={path.slice(3).join("/")} />;
+      }
+      return null;
+    case "cocktails":
+      return <CocktailListView />;
+    case "cocktail-detail":
+      if (path.length >= 3) {
+        return <CocktailDetailView slug={path.slice(2).join("/")} />;
+      }
+      return null;
     case "algs-detail":
       if (path.length >= 3) {
         const cube = path[1];

@@ -1,0 +1,108 @@
+.food-list-page .food-tonight-layout {
+  display: flex;
+  gap: 24px;
+  min-height: 400px;
+}
+
+@media (min-width: 769px) {
+  .food-list-page .food-tonight-receipt-wrap {
+    width: 320px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 80px;
+    align-self: flex-start;
+    max-height: calc(100vh - 120px);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .food-list-page .food-tonight-receipt-inner {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .food-list-page .food-tonight-receipt-toggle {
+    display: none;
+  }
+
+  .food-list-page .food-tonight-items {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .food-list-page .food-tonight-layout {
+    flex-direction: column;
+  }
+
+  .food-list-page .food-tonight-receipt-wrap {
+    order: 1;
+    border-radius: 8px;
+    border: 1px solid var(--chakra-colors-border);
+    overflow: hidden;
+  }
+
+  .food-list-page .food-tonight-receipt-wrap.collapsed .food-tonight-receipt-inner {
+    display: none;
+  }
+
+  .food-list-page .food-tonight-receipt-toggle {
+    width: 100%;
+    margin: 0;
+    border-radius: 0;
+  }
+
+  .food-list-page .food-tonight-items {
+    order: 2;
+  }
+}
+
+.food-grid-responsive {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  align-items: stretch;
+}
+
+@media (max-width: 576px) {
+  .food-grid-responsive {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+@media (min-width: 768px) {
+  .food-grid-responsive {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1200px) {
+  .food-grid-responsive {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1600px) {
+  .food-grid-responsive {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.food-card-wrapper {
+  display: flex;
+  min-width: 0;
+  height: 100%;
+}
+
+.food-card-wrapper .food-card {
+  width: 100%;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.food-card-wrapper .food-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--chakra-shadows-lg);
+}
