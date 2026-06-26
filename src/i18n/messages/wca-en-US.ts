@@ -91,6 +91,27 @@ export const wcaMessagesEnUS = {
   "wca.competition.name": "Competition",
   "wca.competition.events": "Events",
   "wca.competition.city": "City",
+  "wca.comps.title": "WCA Competitions",
+  "wca.comps.subtitle": "Upcoming and ongoing official WCA competitions, filter by country and events",
+  "wca.comps.countryScope": "Country scope",
+  "wca.comps.scopeNearby": "Nearby",
+  "wca.comps.scopeAll": "All countries",
+  "wca.comps.viewCard": "Cards",
+  "wca.comps.viewTable": "Table",
+  "wca.comps.refresh": "Refresh",
+  "wca.comps.empty": "No competitions",
+  "wca.comps.loadError": "Failed to load competitions",
+  "wca.comps.resultCount": "{count} competition(s)",
+  "wca.comps.filteredByEvents": "Filtered by {count} event(s)",
+  "wca.comps.venue": "Venue",
+  "wca.comps.compDates": "Dates",
+  "wca.comps.days": "{count} day(s)",
+  "wca.comps.registrationStatus": "Registration",
+  "wca.comps.registrationWindow": "Registration (Beijing time)",
+  "wca.comps.registration.notStarted": "Not open yet",
+  "wca.comps.registration.open": "Open",
+  "wca.comps.registration.closed": "Closed",
+  "wca.comps.registration.unknown": "Unavailable",
   "wca.results.noHistory": "No result history",
   "wca.results.noCompetitionResults": "No competition results",
   "wca.results.noValidData": "No valid competition data",
@@ -319,6 +340,30 @@ export const wcaMessagesEnUS = {
   "wca.proportion.chartY": "Time (sec)",
   "wca.proportion.algorithmBtn": "How it works",
   "wca.proportion.algorithmModalTitle": "Model & algorithm",
+  "wca.proportion.algorithmMd": `## Algorithm
+
+- **Per-competitor representation**
+  - Single-attempt times across rounds and competitions come from **Attempts**. The “most recent data” requirement is handled upstream by taking the latest **Results** per person per event.
+  - For each competitor and each event, collect all Attempt values **> 0** across every Result for that event, then take the **median** as the representative time for that event.
+
+- **Ratio model**
+  - For competitor p and event j, let the median time be T_pj. Let the anchor event be a = events[0]. Define r_pj = T_pj / T_pa (r_pa = 1).
+  - Among similarly strong top players, the distribution of r should be tight; we take the **median of r** within each segment as the scale of j relative to a for that segment.
+  - This is akin to an **additive** difference in log space approximating a **multiplicative** ratio, which fits time structures that grow multiplicatively (e.g. big cubes).
+
+- **Segmentation (pooling similar levels)**
+  - Sort all players by T_pa (anchor median) ascending. **Equal-count bins** (about sqrt(N) bins, clamped to [1, 30]) keep players with similar anchor level in the same bin.
+  - In each bin, for every non-anchor event, take the **median of {r_pj}** to get that segment’s ratio, and record anchor range and count.
+  - If the sample is very small (roughly fewer than 5 people overall), fall back to a **single segment** and global ratios only, to avoid overfitting noise.
+
+- **Smooth curve (between segments)**
+  - Each segment has a median anchor range [AnchorMin, AnchorMax] with integer centisecond bounds from min/max anchor times in the bin.
+  - For each non-anchor event, segment-level ratios form a step function at segment-center anchors; to get a continuous reference curve, we **linearly interpolate ratios** between **segment centers** in one dimension.
+  - Below the lowest or above the highest center, **constant extrapolation** uses the nearest segment’s ratio (avoids unbounded linear tails).
+
+- **Prediction**
+  - Given anchor time t_a (centiseconds), obtain interpolated ratio_j(t_a) for each j ≠ a, then t_j = t_a × ratio_j.
+  - Example: in **bigcube** the backend anchor is 444. If t_a = 1900 (19.00s), then 555 ≈ 1900 × ratio_555 in centiseconds—convert to seconds for display.`,
   "wca.successRate.solved": "Solved",
   "wca.successRate.attempted": "Attempted",
   "wca.successRate.percentage": "Success Rate",

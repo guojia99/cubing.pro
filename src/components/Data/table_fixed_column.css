@@ -1,0 +1,9 @@
+/* 固定首列：与主题表面色一致（避免 #fff 回退在深色下整块发白） */
+/* 站内选手「最佳记录」等斑马纹由 table_style.css 的 .lightitem/.darkitem 统一控制首列，此处不再覆盖 player 表 */
+.cube-results-table .ant-table-cell-fix-left,
+.cube-comps-table .ant-table-cell-fix-left,
+.cube-records-table .ant-table-cell-fix-left,
+.cube-player-sor-table .ant-table-cell-fix-left,
+.cube-player-nemesis-table .ant-table-cell-fix-left {
+  background: var(--ant-color-bg-elevated) !important;
+}

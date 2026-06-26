@@ -18,10 +18,15 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@emotion/react": "^11.14.0",
+    "@wangeditor/editor": "^5.1.23",
+    "@wangeditor/editor-for-react": "^1.0.6",
     "antd": "^6.4.3",
     "axios": "^1.17.0",
+    "cstimer_module": "^0.1.5",
+    "cubing": "^0.63.3",
     "echarts": "^6.1.0",
     "echarts-for-react": "^3.0.6",
+    "file-saver": "^2.0.5",
     "flag-icons": "^7.5.0",
     "html2canvas": "^1.4.1",
     "next": "^15.3.4",
@@ -32,9 +37,11 @@
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
     "sr-visualizer": "^1.0.13",
-    "uuid": "^14.0.0"
+    "uuid": "^14.0.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@types/file-saver": "^2.0.7",
     "@types/node": "^22.15.30",
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.5",

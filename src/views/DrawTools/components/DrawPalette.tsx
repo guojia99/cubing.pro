@@ -65,11 +65,7 @@ function defaultColorForKey(key: string): string {
   return key.includes("fonts") ? "#000" : "#777";
 }
 
-const FILE_DOWNLOAD_ICON_SIZE = "1.35rem";
-/** 浅蓝 — PNG */
-const PNG_DOWNLOAD_ICON_COLOR = "#5DADE2";
-/** 浅紫 — JPG */
-const JPG_DOWNLOAD_ICON_COLOR = "#B794F6";
+const FILE_DOWNLOAD_ICON_SIZE = "1.1rem";
 
 function DownloadIcon() {
   return (
@@ -195,30 +191,41 @@ export function DrawPalette({
     <Flex direction={{ base: "column", lg: "row" }} gap="6" align="stretch">
       <Card.Root flex="1">
         <Card.Body>
-          <Flex gap="2" align="center" flexWrap="wrap" mb="4">
+          <Flex gap="1.5" align="center" flexWrap="wrap" mb="4">
             <Input
               value={downloadName}
               onChange={(e) => setDownloadName(e.target.value)}
               placeholder={t("draws.palette.input")}
-              maxW="44"
-              size="sm"
+              maxW="40"
+              size="xs"
+              fontSize="xs"
             />
-            <IconButton aria-label="Download SVG" variant="ghost" onClick={handleSvgDownload}>
+            <IconButton
+              aria-label="Download SVG"
+              variant="outline"
+              size="xs"
+              colorPalette="gray"
+              onClick={handleSvgDownload}
+            >
               <DownloadIcon />
             </IconButton>
             <IconButton
               aria-label="Download JPG"
-              variant="ghost"
+              variant="outline"
+              size="xs"
+              colorPalette="gray"
               onClick={() => void handleImageDownload("jpeg")}
             >
-              <BiSolidFileJpg size={FILE_DOWNLOAD_ICON_SIZE} color={JPG_DOWNLOAD_ICON_COLOR} />
+              <BiSolidFileJpg size={FILE_DOWNLOAD_ICON_SIZE} />
             </IconButton>
             <IconButton
               aria-label="Download PNG"
-              variant="ghost"
+              variant="outline"
+              size="xs"
+              colorPalette="gray"
               onClick={() => void handleImageDownload("png")}
             >
-              <BiSolidFilePng size={FILE_DOWNLOAD_ICON_SIZE} color={PNG_DOWNLOAD_ICON_COLOR} />
+              <BiSolidFilePng size={FILE_DOWNLOAD_ICON_SIZE} />
             </IconButton>
           </Flex>
 

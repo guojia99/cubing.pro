@@ -2,11 +2,9 @@
 
 import {
   Box,
-  Button,
   Flex,
   Grid,
   Input,
-  NativeSelect,
   Slider,
   Switch,
   Text,
@@ -15,6 +13,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { toaster } from "@/components/ui/toaster";
 import { useI18n } from "@/contexts/I18nProvider";
+import {
+  DrawActionButton,
+  DrawControlField,
+  DrawMutedButton,
+  DrawSelect,
+} from "@/views/DrawTools/components/DrawControls";
 import { DrawNavTabs } from "@/views/DrawTools/components/DrawNavTabs";
 import { DrawPalette } from "@/views/DrawTools/components/DrawPalette";
 import type { PathSvg } from "@/views/DrawTools/types";
@@ -305,8 +309,8 @@ function SimpleSq1Draw() {
       strokeWidthNum={0.2}
       buttons={
         <Box>
-          <Box textAlign="center" w="50%" mx="auto" mb="4">
-            <Text fontSize="sm" fontWeight="medium" mb="2">
+          <Box textAlign="center" w={{ base: "full", sm: "50%" }} mx="auto" mb="4" minW="0">
+            <Text fontSize="xs" fontWeight="medium" color="fg.muted" mb="2">
               {t("draws.sq1.Rotate")}
             </Text>
             <Slider.Root
@@ -325,75 +329,59 @@ function SimpleSq1Draw() {
             </Slider.Root>
           </Box>
 
-          <Flex justify="center" gap="4" flexWrap="wrap" mb="5">
-            <Flex align="center" gap="2">
-              <Text fontSize="sm" whiteSpace="nowrap">
-                {t("draws.sq1.Central_axis")}
-              </Text>
-              <NativeSelect.Root w="100px" size="sm">
-                <NativeSelect.Field
-                  value={axisLine}
-                  onChange={(e) => resetLineReg(Number(e.target.value))}
-                >
-                  <option value="0">{t("draws.sq1.None")}</option>
-                  <option value="30">{t("draws.sq1.Positive_15")}</option>
-                  <option value="-30">{t("draws.sq1.Negative_15")}</option>
-                </NativeSelect.Field>
-              </NativeSelect.Root>
-            </Flex>
+          <Grid
+            templateColumns={{ base: "1fr", sm: "repeat(2, minmax(0, 1fr))" }}
+            gap="3"
+            mb="4"
+            maxW="480px"
+            mx="auto"
+          >
+            <DrawControlField label={t("draws.sq1.Central_axis")}>
+              <DrawSelect
+                value={axisLine}
+                onChange={(v) => resetLineReg(Number(v))}
+                w={{ base: "full", sm: "108px" }}
+              >
+                <option value="0">{t("draws.sq1.None")}</option>
+                <option value="30">{t("draws.sq1.Positive_15")}</option>
+                <option value="-30">{t("draws.sq1.Negative_15")}</option>
+              </DrawSelect>
+            </DrawControlField>
 
-            <Flex align="center" gap="2">
-              <Text fontSize="sm" whiteSpace="nowrap">
-                {t("draws.sq1.Default")}
-              </Text>
-              <NativeSelect.Root w="150px" size="sm">
-                <NativeSelect.Field
-                  value={defaultVal}
-                  onChange={(e) => setDefault(e.target.value)}
-                >
-                  {cpsOpt.map((opt) => (
-                    <option key={opt.value || "none"} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </NativeSelect.Field>
-              </NativeSelect.Root>
-            </Flex>
-          </Flex>
+            <DrawControlField label={t("draws.sq1.Default")}>
+              <DrawSelect
+                value={defaultVal}
+                onChange={setDefault}
+                w={{ base: "full", sm: "148px" }}
+              >
+                {cpsOpt.map((opt) => (
+                  <option key={opt.value || "none"} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </DrawSelect>
+            </DrawControlField>
+          </Grid>
 
-          <Flex gap="2" flexWrap="wrap" justify="center">
-            <Button
-              onClick={reset}
-              ml="2"
-              disabled={cubes.length === 0}
-              size="sm"
-            >
+          <Flex gap="1.5" flexWrap="wrap" justify="center">
+            <DrawMutedButton onClick={reset} disabled={cubes.length === 0}>
               {t("draws.reset")}
-            </Button>
-            <Button
-              onClick={removeHandler}
-              ml="2"
-              disabled={cubes.length === 0}
-              size="sm"
-            >
+            </DrawMutedButton>
+            <DrawMutedButton onClick={removeHandler} disabled={cubes.length === 0}>
               {t("draws.delete")}
-            </Button>
-            <Button
+            </DrawMutedButton>
+            <DrawActionButton
               onClick={addCorner}
-              ml="2"
               disabled={!(corner < 6 && reg + 60 <= 360)}
-              size="sm"
             >
               {t("draws.sq1.add_corner")}
-            </Button>
-            <Button
+            </DrawActionButton>
+            <DrawActionButton
               onClick={addEdge}
-              ml="2"
               disabled={!(edge < 8 && reg + 30 <= 360)}
-              size="sm"
             >
               {t("draws.sq1.add_edge")}
-            </Button>
+            </DrawActionButton>
           </Flex>
         </Box>
       }
@@ -667,8 +655,10 @@ function DoubleSq1Draw() {
       strokeWidthNum={0.2}
       buttons={
         <>
-          <Flex gap="4" align="center" mb="4">
-            <Text fontWeight="bold">文字</Text>
+          <Flex gap="3" align="center" mb="4">
+            <Text fontSize="xs" fontWeight="semibold" color="fg.muted">
+              文字
+            </Text>
             <Switch.Root
               checked={useFont}
               onCheckedChange={(e) => handleSetFontSwitch(e.checked === true)}
@@ -680,41 +670,36 @@ function DoubleSq1Draw() {
             </Switch.Root>
           </Flex>
 
-          <Flex gap="4" flexWrap="wrap" align="flex-end" mb="4">
-            <Flex align="center" gap="2">
-              <Text fontWeight="bold" whiteSpace="nowrap">
-                顶层
-              </Text>
-              <NativeSelect.Root w="150px" size="sm">
-                <NativeSelect.Field
-                  value={topPreset}
-                  onChange={(e) => handleUpdateTopOpt(e.target.value)}
-                >
-                  {topCspOption.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </NativeSelect.Field>
-              </NativeSelect.Root>
-            </Flex>
+          <Grid
+            templateColumns={{ base: "1fr", md: "repeat(3, minmax(0, 1fr))" }}
+            gap="3"
+            alignItems="end"
+            mb="4"
+          >
+            <DrawControlField label="顶层">
+              <DrawSelect value={topPreset} onChange={handleUpdateTopOpt}>
+                {topCspOption.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </DrawSelect>
+            </DrawControlField>
 
-            <Flex align="center" gap="2">
-              <Text whiteSpace="nowrap">中轴线</Text>
-              <NativeSelect.Root w="100px" size="sm">
-                <NativeSelect.Field
-                  value={topAxisLine}
-                  onChange={(e) => resetLineReg(Number(e.target.value), true)}
-                >
-                  <option value="0">{t("draws.sq1.None")}</option>
-                  <option value="30">{t("draws.sq1.Positive_15")}</option>
-                  <option value="-30">{t("draws.sq1.Negative_15")}</option>
-                </NativeSelect.Field>
-              </NativeSelect.Root>
-            </Flex>
+            <DrawControlField label="中轴线">
+              <DrawSelect
+                value={topAxisLine}
+                onChange={(v) => resetLineReg(Number(v), true)}
+                w={{ base: "full", sm: "108px" }}
+              >
+                <option value="0">{t("draws.sq1.None")}</option>
+                <option value="30">{t("draws.sq1.Positive_15")}</option>
+                <option value="-30">{t("draws.sq1.Negative_15")}</option>
+              </DrawSelect>
+            </DrawControlField>
 
-            <Box textAlign="center" flex="1" minW="200px">
-              <Text fontSize="sm" mb="2">
+            <Box minW="0">
+              <Text fontSize="xs" fontWeight="medium" color="fg.muted" mb="1.5">
                 {t("draws.sq1.Rotate")}
               </Text>
               <Slider.Root
@@ -734,11 +719,11 @@ function DoubleSq1Draw() {
                 </Slider.Control>
               </Slider.Root>
             </Box>
-          </Flex>
+          </Grid>
 
           {useFont && fontsTop.length > 0 ? (
             <Box mb="4">
-              <Text fontWeight="bold" mb="2">
+              <Text fontSize="xs" fontWeight="semibold" color="fg.muted" mb="2">
                 顶层文字
               </Text>
               <Grid templateColumns="repeat(3, 1fr)" gap="2">
@@ -756,41 +741,37 @@ function DoubleSq1Draw() {
             </Box>
           ) : null}
 
-          <Flex gap="4" flexWrap="wrap" align="flex-end" mt="4" mb="4">
-            <Flex align="center" gap="2">
-              <Text fontWeight="bold" whiteSpace="nowrap">
-                底层
-              </Text>
-              <NativeSelect.Root w="150px" size="sm">
-                <NativeSelect.Field
-                  value={downDefaultVal}
-                  onChange={(e) => handleUpdateDownOpt(e.target.value)}
-                >
-                  {downCspOption.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </NativeSelect.Field>
-              </NativeSelect.Root>
-            </Flex>
+          <Grid
+            templateColumns={{ base: "1fr", md: "repeat(3, minmax(0, 1fr))" }}
+            gap="3"
+            alignItems="end"
+            mt="4"
+            mb="4"
+          >
+            <DrawControlField label="底层">
+              <DrawSelect value={downDefaultVal} onChange={handleUpdateDownOpt}>
+                {downCspOption.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </DrawSelect>
+            </DrawControlField>
 
-            <Flex align="center" gap="2">
-              <Text whiteSpace="nowrap">中轴线</Text>
-              <NativeSelect.Root w="100px" size="sm">
-                <NativeSelect.Field
-                  value={downAxisLine}
-                  onChange={(e) => resetLineReg(Number(e.target.value), false)}
-                >
-                  <option value="0">{t("draws.sq1.None")}</option>
-                  <option value="30">{t("draws.sq1.Positive_15")}</option>
-                  <option value="-30">{t("draws.sq1.Negative_15")}</option>
-                </NativeSelect.Field>
-              </NativeSelect.Root>
-            </Flex>
+            <DrawControlField label="中轴线">
+              <DrawSelect
+                value={downAxisLine}
+                onChange={(v) => resetLineReg(Number(v), false)}
+                w={{ base: "full", sm: "108px" }}
+              >
+                <option value="0">{t("draws.sq1.None")}</option>
+                <option value="30">{t("draws.sq1.Positive_15")}</option>
+                <option value="-30">{t("draws.sq1.Negative_15")}</option>
+              </DrawSelect>
+            </DrawControlField>
 
-            <Box textAlign="center" flex="1" minW="200px">
-              <Text fontSize="sm" mb="2">
+            <Box minW="0">
+              <Text fontSize="xs" fontWeight="medium" color="fg.muted" mb="1.5">
                 {t("draws.sq1.Rotate")}
               </Text>
               <Slider.Root
@@ -810,11 +791,11 @@ function DoubleSq1Draw() {
                 </Slider.Control>
               </Slider.Root>
             </Box>
-          </Flex>
+          </Grid>
 
           {useFont && fontsDown.length > 0 ? (
             <Box>
-              <Text fontWeight="bold" mb="2">
+              <Text fontSize="xs" fontWeight="semibold" color="fg.muted" mb="2">
                 底层文字
               </Text>
               <Grid templateColumns="repeat(3, 1fr)" gap="2">

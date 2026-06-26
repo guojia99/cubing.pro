@@ -1,0 +1,86 @@
+.success-rate-rank {
+  padding: 16px;
+  max-width: 1000px;
+  margin: 0 auto;
+  box-sizing: border-box;
+
+  @media (min-width: 1080px) {
+    max-width: none;
+  }
+
+  .filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 0;
+
+    .filter-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      .filter-label {
+        white-space: nowrap;
+        font-size: 12px;
+      }
+
+      .filter-select.ant-select {
+        min-width: 100px;
+      }
+
+      &.filter-item-min-attempted {
+        flex-wrap: wrap;
+        gap: 8px;
+        .filter-input-number {
+          flex-shrink: 0;
+        }
+        .filter-presets {
+          flex-wrap: wrap;
+        }
+      }
+    }
+  }
+
+  .table-wrapper {
+    font-size: 12px;
+    width: 100%;
+  }
+}
+
+@media (max-width: 1079px) {
+  .success-rate-rank {
+    padding: 12px 8px;
+
+    .stats-rank-filter-card .filter-row .filter-item.filter-item-min-attempted .filter-presets {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .table-wrapper {
+      width: 100%;
+      font-size: 11px;
+    }
+
+    .ant-table-cell {
+      padding: 6px 4px !important;
+    }
+
+    .ant-pagination {
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 8px 0;
+
+      .ant-pagination-options {
+        margin-left: 0;
+        margin-top: 6px;
+      }
+
+      .ant-pagination-item,
+      .ant-pagination-prev,
+      .ant-pagination-next {
+        min-width: 28px;
+      }
+    }
+  }
+}

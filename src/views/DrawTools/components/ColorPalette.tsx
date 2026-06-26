@@ -2,7 +2,6 @@
 
 import {
   Box,
-  Button,
   Flex,
   Input,
   Popover,
@@ -13,6 +12,7 @@ import {
 import { useCallback, useEffect, useState } from "react";
 
 import { useI18n } from "@/contexts/I18nProvider";
+import { DrawMutedButton } from "@/views/DrawTools/components/DrawControls";
 
 export interface ColorPaletteProps {
   selectedColor?: string;
@@ -77,8 +77,8 @@ export function ColorPalette({
     return (
       <Box
         key={color}
-        w="8"
-        h="8"
+        w="7"
+        h="7"
         borderRadius="md"
         borderWidth="2px"
         borderColor={isSelected ? "fg" : "border"}
@@ -127,27 +127,27 @@ export function ColorPalette({
         </Box>
       ) : null}
 
-      <Popover.Root>
+      <Popover.Root positioning={{ placement: "bottom-start", strategy: "fixed" }}>
         <Popover.Trigger asChild>
-          <Button size="sm" variant="outline">
+          <DrawMutedButton w="full">
             {t("draws.color.select_custom_color")}
-          </Button>
+          </DrawMutedButton>
         </Popover.Trigger>
         <Portal>
           <Popover.Positioner>
-            <Popover.Content p="3" w="auto">
+            <Popover.Content p="3" w="auto" maxW="calc(100vw - 2rem)">
               <Flex direction="column" gap="2">
                 <Input
                   type="color"
                   value={customColor}
                   onChange={(e) => setCustomColor(e.target.value)}
                   p="0"
-                  h="10"
+                  h="8"
                   cursor="pointer"
                 />
-                <Button size="sm" onClick={applyCustomColor}>
+                <DrawMutedButton onClick={applyCustomColor}>
                   {t("draws.color.select_color")}
-                </Button>
+                </DrawMutedButton>
               </Flex>
             </Popover.Content>
           </Popover.Positioner>
@@ -156,9 +156,9 @@ export function ColorPalette({
 
       <Separator borderColor="border" />
 
-      <Button size="sm" variant="outline" onClick={resetColors}>
+      <DrawMutedButton w="full" onClick={resetColors}>
         {t("draws.color.reset_color")}
-      </Button>
+      </DrawMutedButton>
     </Flex>
   );
 }

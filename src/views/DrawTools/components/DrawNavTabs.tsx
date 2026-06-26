@@ -34,9 +34,9 @@ export function DrawNavTabs({
       lazyMount
       unmountOnExit
     >
-      <Tabs.List flexWrap="wrap">
+      <Tabs.List flexWrap="wrap" gap="1">
         {items.map((item) => (
-          <Tabs.Trigger key={item.key} value={item.key}>
+          <Tabs.Trigger key={item.key} value={item.key} fontSize="xs" px="3" py="1.5" minH="28px">
             {item.label}
           </Tabs.Trigger>
         ))}

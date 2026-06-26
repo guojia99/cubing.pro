@@ -22,6 +22,7 @@ const DEDICATED_PATHS = new Set([
   "settings",
   "auth/callback",
   "user/profile",
+  "competition",
 ]);
 
 function patternToPathSegments(pattern: string): string[] {
