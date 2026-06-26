@@ -67,6 +67,25 @@ export function getApiErrorDisplayMessage(body: unknown): string | undefined {
   return undefined;
 }
 
+export type ApiRequestConfig = {
+  signal?: AbortSignal;
+};
+
+/** useEffect cleanup 中 abort 后，可用来忽略 CanceledError */
+export function isRequestCanceled(error: unknown): boolean {
+  if (axios.isCancel(error)) return true;
+  if (error instanceof Error && error.name === "CanceledError") return true;
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    (error as { code?: string }).code === "ERR_CANCELED"
+  ) {
+    return true;
+  }
+  return false;
+}
+
 export const Request = axios.create({
   timeout: 900_000,
 });

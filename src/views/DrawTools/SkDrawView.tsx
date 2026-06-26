@@ -1,9 +1,10 @@
 "use client";
 
-import { Box, Button, Grid, Heading } from "@chakra-ui/react";
+import { Box, Grid, Heading } from "@chakra-ui/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useI18n } from "@/contexts/I18nProvider";
+import { DrawToggleButton } from "@/views/DrawTools/components/DrawControls";
 import { DrawNavTabs } from "@/views/DrawTools/components/DrawNavTabs";
 import { DrawPalette } from "@/views/DrawTools/components/DrawPalette";
 import type { PathSvg } from "@/views/DrawTools/types";
@@ -379,39 +380,38 @@ function SK3DDraw() {
   const { t } = useI18n();
   const [skPointsM, setSkPointsM] = useState<PathSvg[]>([]);
   const [skLinePointsM, setSkLinePointsM] = useState<PathSvg[]>([]);
-  const [skLineSelectMap, setSkLineSelectMap] = useState<Map<number, number>>(
-    () => new Map(),
-  );
 
   const lineMap = useMemo(
     () => new Map(lineDefs.map((item) => [item.key, item])),
     [],
   );
 
+  const selectedLineKeys = useMemo(() => {
+    const keys = new Set<number>();
+    for (const point of skLinePointsM) {
+      const match = point.key.match(/^sk_3d_line(\d+)$/);
+      if (match) keys.add(Number(match[1]));
+    }
+    return keys;
+  }, [skLinePointsM]);
+
   const selectLine = useCallback(
     (k: number) => {
-      setSkLineSelectMap((prev) => {
-        const next = new Map(prev);
-        if (next.has(k)) {
-          next.delete(k);
-          setSkLinePointsM((points) =>
-            points.filter((e) => e.key !== `sk_3d_line${k}`),
-          );
-        } else {
-          const svg = lineMap.get(k);
-          if (svg) {
-            next.set(k, k);
-            setSkLinePointsM((points) => [
-              ...points,
-              {
-                d: svg.d,
-                transformStr: svg.transform,
-                key: `sk_3d_line${svg.key}`,
-              },
-            ]);
-          }
+      const lineKey = `sk_3d_line${k}`;
+      setSkLinePointsM((points) => {
+        if (points.some((e) => e.key === lineKey)) {
+          return points.filter((e) => e.key !== lineKey);
         }
-        return next;
+        const svg = lineMap.get(k);
+        if (!svg) return points;
+        return [
+          ...points,
+          {
+            d: svg.d,
+            transformStr: svg.transform,
+            key: lineKey,
+          },
+        ];
       });
     },
     [lineMap],
@@ -440,7 +440,7 @@ function SK3DDraw() {
       strokeWidthNum={0.2}
       buttons={
         <Box textAlign="center">
-          <Heading as="h2" size="md" mb="4">
+          <Heading as="h2" size="sm" mb="3" fontWeight="semibold">
             {t("draws.flank")}
           </Heading>
           <Grid
@@ -449,19 +449,18 @@ function SK3DDraw() {
               sm: "repeat(4, 1fr)",
               md: "repeat(6, 1fr)",
             }}
-            gap="2"
+            gap="1.5"
           >
             {lineDefs.map((btn) => (
-              <Button
+              <DrawToggleButton
                 key={btn.key}
-                size="sm"
                 w="full"
-                variant={skLineSelectMap.has(btn.key) ? "solid" : "outline"}
+                selected={selectedLineKeys.has(btn.key)}
                 onClick={() => selectLine(btn.key)}
               >
                 {t(btn.labelKey)}
                 {btn.suffix}
-              </Button>
+              </DrawToggleButton>
             ))}
           </Grid>
         </Box>

@@ -24,7 +24,14 @@ import { KitchenSkillDetailView } from "@/views/KitchenSkills/KitchenSkillDetail
 import { KitchenSkillListView } from "@/views/KitchenSkills/KitchenSkillListView";
 import { RecipeDetailView } from "@/views/Recipes/RecipeDetailView";
 import { RecipeListView } from "@/views/Recipes/RecipeListView";
+import { ProportionEstimationView } from "@/views/Wca/ProportionEstimation";
+import { WcaCompsView } from "@/views/Wca/WcaComps/WcaCompsView";
 import { WcaPlayersSearchView } from "@/views/Wca/WcaPlayersSearchView";
+import { WcaStatisticsView } from "@/views/Wca/Statistics";
+import { GcCompetitionsView } from "@/views/GroupCompetitions/Competitions/GcCompetitionsView";
+import { GcEventsView } from "@/views/GroupCompetitions/Events/GcEventsView";
+import { GcPktimerView } from "@/views/GroupCompetitions/Pktimer/GcPktimerView";
+import { GcPlayersView } from "@/views/GroupCompetitions/Players/GcPlayersView";
 
 export const dynamic = "force-static";
 
@@ -73,8 +80,22 @@ function CatchAllContent({ routeId, path }: { routeId: string; path: string[] })
       return <PyDrawView />;
     case "changelog":
       return <ChangelogPageView />;
+    case "wca-comps":
+      return <WcaCompsView />;
     case "wca-players":
       return <WcaPlayersSearchView />;
+    case "wca-statistics":
+      return <WcaStatisticsView />;
+    case "wca-proportion-estimation":
+      return <ProportionEstimationView />;
+    case "gc-events":
+      return <GcEventsView />;
+    case "gc-competitions":
+      return <GcCompetitionsView />;
+    case "gc-players":
+      return <GcPlayersView />;
+    case "gc-pktimer":
+      return <GcPktimerView />;
     case "recipes":
       return <RecipeListView />;
     case "recipe-detail":

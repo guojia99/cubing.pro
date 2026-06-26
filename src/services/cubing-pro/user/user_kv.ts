@@ -7,6 +7,7 @@ export const USER_KV_KEYS = {
   algorithm_config: "algorithm_config",
   website_ui_config: "website_ui_config",
   websize_ui_config: "websize_ui_config",
+  group_timer_ui_config: "group_timer_ui_config",
 } as const;
 
 export type UserKvRecord = {

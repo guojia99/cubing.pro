@@ -91,6 +91,27 @@ export const wcaMessagesZhCN = {
   "wca.competition.name": "比赛名称",
   "wca.competition.events": "项目",
   "wca.competition.city": "城市",
+  "wca.comps.title": "WCA 赛事列表",
+  "wca.comps.subtitle": "查询即将举行或进行中的 WCA 官方赛事，支持按国家与项目筛选",
+  "wca.comps.countryScope": "国家范围",
+  "wca.comps.scopeNearby": "附近国家",
+  "wca.comps.scopeAll": "全部国家",
+  "wca.comps.viewCard": "卡片",
+  "wca.comps.viewTable": "表格",
+  "wca.comps.refresh": "刷新",
+  "wca.comps.empty": "暂无比赛",
+  "wca.comps.loadError": "加载赛事失败，请稍后重试",
+  "wca.comps.resultCount": "共 {count} 场赛事",
+  "wca.comps.filteredByEvents": "已按 {count} 个项目筛选",
+  "wca.comps.venue": "比赛地点",
+  "wca.comps.compDates": "比赛日期",
+  "wca.comps.days": "{count} 天",
+  "wca.comps.registrationStatus": "报名状态",
+  "wca.comps.registrationWindow": "报名时间（北京时间）",
+  "wca.comps.registration.notStarted": "未开始报名",
+  "wca.comps.registration.open": "可报名",
+  "wca.comps.registration.closed": "报名已结束",
+  "wca.comps.registration.unknown": "不可报名",
   "wca.results.noHistory": "暂无历史成绩",
   "wca.results.noCompetitionResults": "暂无比赛成绩",
   "wca.results.noValidData": "暂无有效比赛数据",
@@ -319,6 +340,30 @@ export const wcaMessagesZhCN = {
   "wca.proportion.chartY": "成绩（秒）",
   "wca.proportion.algorithmBtn": "算法说明",
   "wca.proportion.algorithmModalTitle": "算法说明",
+  "wca.proportion.algorithmMd": `## 算法
+
+- **个体表征**
+  - 同一选手在不同轮次、不同赛事上的单次成绩来自 Attempts。要求「最近的数据」已在采集层通过每人每项目取最近若干条 Result 满足。
+  - 对每位选手、每个项目，收集该选手在该项目所有 Result 上、全部 Attempts 中 **>0** 的值，取**中位数**作为该项目上的代表时间。
+
+- **比例模型**
+  - 对选手 p、项目 j，记中位数时间为 T_pj，锚点项目 a=events[0]。定义比例 r_pj = T_pj / T_pa（j=a 时为 1）。
+  - 在「水平相近的顶尖选手」中，r 的分布应较集中；取群体在段内的 **r 的中位数** 作为该段上 j 相对 a 的标度关系。
+  - 这等价于在 log 域用「加性」差异近似乘性比例，对大魔方等近似乘性增长的时间结构较自然。
+
+- **分段（相近成绩归并）**
+  - 全体选手按 T_pa（锚点中位数）升序排列。将选手按**等人数分箱**（分箱数约 sqrt(N)，并限制在 [1, 30]），使每一档内选手锚点水平接近，从而「相近成绩拟合到一起」。
+  - 每箱内对除锚点外的每个项目，计算 {r_pj} 的**中位数**得到该段的 Ratio，并记录箱内锚点时间与人数。
+  - 样本过少（全程不足约 5 人）时退化为**单一段**，仅用全局比例，避免过拟合噪声。
+
+- **光滑曲线（分段间的插值）**
+  - 每个分段有中位锚点区间 [AnchorMin, AnchorMax]，取段内锚点的最小、最大作为边界（整数厘秒）。
+  - 对每个非锚点项目，在各段中心锚点（段内锚点中位数）处有一条阶梯式的「段比例」；为得到连续参考曲线，在**段中心**之间对**比例**做一维**线性插值**；
+  - 低于最低段中心或高于最高段中心时，**常数外推**为最近一段的比例（避免无依据的线性外推爆炸）。
+
+- **预测用法**
+  - 给定锚点成绩 t_a（厘秒），先对各项目 j≠a 得到插值后的 ratio_j(t_a)，再估计 t_j = t_a × ratio_j。
+  - 示例：bigcube 锚点为 444，若 t_a=1900（19.00s），则 555≈1900×ratio_555 厘秒，换算为秒即用户直觉数值。`,
   "wca.successRate.solved": "复原数",
   "wca.successRate.attempted": "尝试数",
   "wca.successRate.percentage": "成功率",

@@ -1,0 +1,104 @@
+.all-events-achievement-rank {
+  padding: 16px;
+  max-width: 1000px;
+  margin: 0 auto;
+  box-sizing: border-box;
+
+  @media (min-width: 1080px) {
+    max-width: none;
+  }
+
+  .filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 0;
+
+    .filter-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      .filter-label {
+        white-space: nowrap;
+        font-size: 12px;
+      }
+
+      .filter-select.ant-select {
+        min-width: 100px;
+      }
+
+      &.filter-item-switch {
+        .ant-switch {
+          margin-left: 4px;
+        }
+      }
+
+      .filter-select-lack {
+        min-width: 90px;
+      }
+    }
+  }
+
+  .table-wrapper {
+    font-size: 12px;
+    width: 100%;
+  }
+
+  .competition-tag {
+    font-size: 12px;
+    line-height: 18px;
+    padding: 0 6px;
+    margin: 0;
+  }
+
+  .missing-events-cell {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    line-height: 1.4;
+
+    .missing-event-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 6px;
+      background: rgba(24, 144, 255, 0.08);
+      border-radius: 4px;
+      font-size: 11px;
+    }
+  }
+}
+
+@media (max-width: 1079px) {
+  .all-events-achievement-rank {
+    padding: 12px 8px;
+
+    .table-wrapper {
+      width: 100%;
+      font-size: 11px;
+    }
+
+    .ant-table-cell {
+      padding: 6px 4px !important;
+    }
+
+    .ant-pagination {
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 8px 0;
+
+      .ant-pagination-options {
+        margin-left: 0;
+        margin-top: 6px;
+      }
+
+      .ant-pagination-item,
+      .ant-pagination-prev,
+      .ant-pagination-next {
+        min-width: 28px;
+      }
+    }
+  }
+}
