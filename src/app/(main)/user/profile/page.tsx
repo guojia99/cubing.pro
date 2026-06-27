@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { ExportPathMarker } from "@/components/routing/ExportPathMarker";
 import { ProfilePage } from "@/views/admin/ProfilePage";
 
 export const metadata: Metadata = {
@@ -7,5 +8,10 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <ProfilePage />;
+  return (
+    <>
+      <ExportPathMarker path="/user/profile" />
+      <ProfilePage />
+    </>
+  );
 }

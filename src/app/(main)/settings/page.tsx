@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { ExportPathMarker } from "@/components/routing/ExportPathMarker";
 import { SettingsPage } from "@/views/SettingsPage";
 
 export const metadata: Metadata = {
@@ -7,5 +8,10 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <SettingsPage />;
+  return (
+    <>
+      <ExportPathMarker path="/settings" />
+      <SettingsPage />
+    </>
+  );
 }

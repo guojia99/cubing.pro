@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { matchRoute } from "@/config/routes";
+import { ExportPathMarker } from "@/components/routing/ExportPathMarker";
 import { getOrganizersResultStaticParams } from "@/lib/staticExportPaths";
 import { OrganizersResultsPageView } from "@/views/admin/OrganizersResultsPageView";
 
@@ -29,8 +30,13 @@ export default async function OrganizersResultPage({ params }: OrganizersResultP
   const { orgId, compId } = await params;
 
   return (
-    <Suspense fallback={null}>
-      <OrganizersResultsPageView orgId={orgId} compId={compId} />
-    </Suspense>
+    <>
+      <ExportPathMarker
+        path={`/admin/organizers/${orgId}/comp/${compId}/result`}
+      />
+      <Suspense fallback={null}>
+        <OrganizersResultsPageView orgId={orgId} compId={compId} />
+      </Suspense>
+    </>
   );
 }

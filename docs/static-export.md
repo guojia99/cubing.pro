@@ -32,6 +32,8 @@ location / {
 }
 ```
 
+**不要**使用 `try_files ... /index.html` 把所有路径都回退到根页面——否则直接打开 `/algs/222/EG` 等子路由会先拿到欢迎页 HTML。应用内已加入 `StaticExportRouteSync`：若检测到 `meta[name=x-export-path]` 与浏览器 URL 不一致，会尝试客户端导航到真实路由；**仍需**保证 `dist/algs/.../index.html` 与 `index.txt` 等静态文件可被访问。
+
 若需动态 URL 回退到壳页面，可对未匹配路径回退到 `welcome` 或专用 SPA 入口（按运维策略配置）。
 
 ## 开发

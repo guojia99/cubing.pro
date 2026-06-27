@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { matchRoute } from "@/config/routes";
+import { ExportPathMarker } from "@/components/routing/ExportPathMarker";
 import { getWcaPlayerStaticParams } from "@/lib/staticExportPaths";
 import { WcaPlayerView } from "@/views/Wca/WcaPlayerView";
 
@@ -28,10 +29,15 @@ export async function generateMetadata({
   };
 }
 
-export default function WcaPlayerPage() {
+export default async function WcaPlayerPage({ params }: WcaPlayerPageProps) {
+  const { wcaId } = await params;
+
   return (
-    <Suspense fallback={null}>
-      <WcaPlayerView />
-    </Suspense>
+    <>
+      <ExportPathMarker path={`/wca/player/${wcaId}`} />
+      <Suspense fallback={null}>
+        <WcaPlayerView />
+      </Suspense>
+    </>
   );
 }

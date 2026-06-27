@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 import { PlaceholderPage } from "@/components/pages/PlaceholderPage";
+import { ExportPathMarker } from "@/components/routing/ExportPathMarker";
 import { matchRoute } from "@/config/routes";
 import { getAllCatchAllStaticParams } from "@/lib/staticExportPaths";
 import { AlgsListView } from "@/views/Algs/AlgsListView";
@@ -193,8 +194,18 @@ export default async function CatchAllPage({ params }: CatchAllPageProps) {
   const rendered = CatchAllContent({ routeId: route.id, path });
 
   if (rendered) {
-    return <Suspense fallback={null}>{rendered}</Suspense>;
+    return (
+      <>
+        <ExportPathMarker path={pathname} />
+        <Suspense fallback={null}>{rendered}</Suspense>
+      </>
+    );
   }
 
-  return <PlaceholderPage route={route} />;
+  return (
+    <>
+      <ExportPathMarker path={pathname} />
+      <PlaceholderPage route={route} />
+    </>
+  );
 }
