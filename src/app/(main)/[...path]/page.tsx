@@ -48,8 +48,14 @@ import { GcPktimerView } from "@/views/GroupCompetitions/Pktimer/GcPktimerView";
 import { GcPlayersView } from "@/views/GroupCompetitions/Players/GcPlayersView";
 import { GcRecordsView } from "@/views/GroupCompetitions/Records/GcRecordsView";
 import { GcStaticView } from "@/views/GroupCompetitions/Static/GcStaticView";
+import { CompetitionView } from "@/views/Competition/CompetitionView";
+import { GcPlayerView } from "@/views/GroupCompetitions/Player/GcPlayerView";
+import { WcaPlayerView } from "@/views/Wca/WcaPlayerView";
 
 export const dynamic = "force-static";
+
+/** `build:static` 前由 scripts/prepare-static-export.mjs 改为 false */
+export const dynamicParams = true;
 
 export async function generateStaticParams() {
   return getAllCatchAllStaticParams();
@@ -109,11 +115,6 @@ function CatchAllContent({ routeId, path }: { routeId: string; path: string[] })
     case "admin-organizers-result":
       return <OrganizersResultsPageView />;
     case "admin-organizers-comp-result":
-      if (path.length >= 6) {
-        return (
-          <OrganizersResultsPageView orgId={path[2]} compId={path[4]} />
-        );
-      }
       return <OrganizersResultsPageView />;
     case "draw-sq1":
       return <SQ1DrawView />;
@@ -149,6 +150,12 @@ function CatchAllContent({ routeId, path }: { routeId: string; path: string[] })
       return <GcStaticView />;
     case "gc-records":
       return <GcRecordsView />;
+    case "competition-detail":
+      return <CompetitionView />;
+    case "player-detail":
+      return <GcPlayerView />;
+    case "wca-player":
+      return <WcaPlayerView />;
     case "recipes":
       return <RecipeListView />;
     case "recipe-detail":

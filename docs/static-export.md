@@ -19,10 +19,20 @@ npm run build:static
 
 ## 路由
 
+### 动态 ID 路由（不可枚举）
+
+`/competition/:id`、`/player/:id`、`/wca/player/:wcaId`、`/admin/organizers/:orgId/comp/:compId/result` 等路由的 ID 数量不可在构建时枚举（WCA 选手 30 万+），采用 **占位页 + 部署回退 + 客户端 URL 解析** 三件套：
+
+1. **构建**：`[...path]` catch-all 仅为每种动态路由生成一份 `__dynamic__` 占位 HTML（见 `getDynamicRoutePlaceholderParams`）。
+2. **部署**：未命中静态文件时，gateway 的 `dynamicRouteFallbacks` 回退到对应占位页（见 `cubing-pro/local/prod.yaml`）；无需 nginx。
+3. **运行时**：页面组件通过 `useRouteParam` 从 `window.location` 读取真实 ID；`StaticExportRouteSync` 将 Next 路由与浏览器 URL 对齐。
+
+`npm run dev` 不受静态导出限制，任意动态 URL 均可直接访问。
+
+### 固定与可枚举路由
+
 - 构建时会为**无** `:param` 的路由生成 HTML（见 `src/lib/staticExportPaths.ts`）。
-- `/wca/player/:wcaId` 使用独立动态路由 `app/(main)/wca/player/[wcaId]/page.tsx`。
-- 静态构建可通过环境变量预生成部分选手页：`WCA_STATIC_PLAYER_IDS=2018SHEN07,2019COMP01 npm run build:static`
-- 未预生成的 WCA ID：**站内 Link 跳转**在客户端正常；**直接打开或刷新**需在服务器配置 fallback（见下）。
+- `/algs/:cube/:class` 等可枚举详情页在构建时从 API / 本地 JSON 拉取全量路径。
 
 ### Nginx 示例（部署在 cubing.pro）
 
@@ -40,17 +50,26 @@ location / {
 
 Next 多页静态导出部署到主站时，**勿**使用遗留 Umi 单页模式（`indexPath` + `staticPath`、所有路由回退同一 `index.html`）。
 
-推荐 `etc/server.yaml`：
+推荐 `gateway` 配置（见 `cubing-pro/local/prod.yaml`）：
 
 ```yaml
 gateway:
-  staticRoot: "/build"   # build:static 产物目录（含 algs/、_next/ 等）
+  staticRoot: "/root/work/cubing.pro/dist"   # build:static 产物目录
   spa: false
+  dynamicRouteFallbacks:
+    - match: "^/competition/[^/]+/?$"
+      placeholder: "/competition/__dynamic__/index.html"
+    - match: "^/player/[^/]+/?$"
+      placeholder: "/player/__dynamic__/index.html"
+    - match: "^/wca/player/[^/]+/?$"
+      placeholder: "/wca/player/__dynamic__/index.html"
+    - match: "^/admin/organizers/[^/]+/comp/[^/]+/result/?$"
+      placeholder: "/admin/organizers/__dynamic__/comp/__dynamic__/result/index.html"
 ```
 
-或使用 `indexPath: "/build/index.html"` 且**不配置** `staticPath`，并设 `spa: false`。
+`dynamicRouteFallbacks` 由 gateway 在 `serveStaticSite` 中实现，无需 nginx。构建后 `post-static-export.mjs` 仍会生成 `nginx-dynamic-fallback.conf.snippet` 供其他环境参考。
 
-若使用 `staticSites` 按 Host 托管，`spa` 同样须为 `false`。
+若使用 `staticSites` 按 Host 托管，`spa` 同样须为 `false`（子项目若为 Vue/React 单页可单独设 `spa: true`）。
 
 ## 开发
 

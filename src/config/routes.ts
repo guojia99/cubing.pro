@@ -92,6 +92,35 @@ const patternToRegex = (pattern: string) => {
   return new RegExp(`^${escaped}$`);
 };
 
+/** 将路由模式中的 :param 与 pathname 匹配，提取动态段（静态导出占位页回退后由客户端读取） */
+export function extractRouteParams(
+  pattern: string,
+  pathname: string,
+): Record<string, string> | null {
+  const paramNames: string[] = [];
+  const regexSource = pattern
+    .replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+    .replace(/:([^/]+)/g, (_, name: string) => {
+      paramNames.push(name);
+      return "([^/]+)";
+    });
+
+  const normalized = pathname.replace(/\/$/, "") || "/";
+  const match = normalized.match(new RegExp(`^${regexSource}$`));
+  if (!match) return null;
+
+  const params: Record<string, string> = {};
+  paramNames.forEach((name, index) => {
+    const raw = match[index + 1] ?? "";
+    try {
+      params[name] = decodeURIComponent(raw);
+    } catch {
+      params[name] = raw;
+    }
+  });
+  return params;
+}
+
 export function matchRoute(pathname: string): AppRoute | undefined {
   const normalized = pathname.replace(/\/$/, "") || "/";
   return APP_ROUTES.find((route) => patternToRegex(route.pattern).test(normalized));
