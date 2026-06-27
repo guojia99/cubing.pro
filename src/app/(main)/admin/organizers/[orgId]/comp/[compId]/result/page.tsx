@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { matchRoute } from "@/config/routes";
+import { getOrganizersResultStaticParams } from "@/lib/staticExportPaths";
 import { OrganizersResultsPageView } from "@/views/admin/OrganizersResultsPageView";
 
 export const dynamic = "force-static";
@@ -9,7 +10,7 @@ export const dynamic = "force-static";
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
-  return [];
+  return getOrganizersResultStaticParams();
 }
 
 interface OrganizersResultPageProps {

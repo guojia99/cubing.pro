@@ -68,13 +68,52 @@ async function fetchAlgCubeMapForBuild(): Promise<AlgCubeMap | null> {
   }
 }
 
+/** 静态导出占位页：配合服务器 fallback，客户端从 URL 读取真实参数 */
+export const DYNAMIC_ROUTE_EXPORT_PLACEHOLDER = "__dynamic__";
+
+/** @deprecated 使用 DYNAMIC_ROUTE_EXPORT_PLACEHOLDER */
+export const WCA_PLAYER_EXPORT_PLACEHOLDER = DYNAMIC_ROUTE_EXPORT_PLACEHOLDER;
+
+function isStaticExportBuild(): boolean {
+  return (
+    process.env.NEXT_OUTPUT_EXPORT === "1" ||
+    process.env.NEXT_OUTPUT_EXPORT === "true"
+  );
+}
+
+/** `/competition/:id` 静态导出占位 */
+export function getCompetitionStaticParams(): { id: string }[] {
+  if (isStaticExportBuild()) {
+    return [{ id: DYNAMIC_ROUTE_EXPORT_PLACEHOLDER }];
+  }
+  return [];
+}
+
+/** `/player/:id` 静态导出占位 */
+export function getGcPlayerStaticParams(): { id: string }[] {
+  if (isStaticExportBuild()) {
+    return [{ id: DYNAMIC_ROUTE_EXPORT_PLACEHOLDER }];
+  }
+  return [];
+}
+
+/** `/admin/organizers/:orgId/comp/:compId/result` 静态导出占位 */
+export function getOrganizersResultStaticParams(): { orgId: string; compId: string }[] {
+  if (isStaticExportBuild()) {
+    return [
+      {
+        orgId: DYNAMIC_ROUTE_EXPORT_PLACEHOLDER,
+        compId: DYNAMIC_ROUTE_EXPORT_PLACEHOLDER,
+      },
+    ];
+  }
+  return [];
+}
+
 /**
  * WCA 选手页 `/wca/player/:wcaId` — 静态导出时预生成的 ID 列表。
- * 构建可设 `WCA_STATIC_PLAYER_IDS=2018SHEN07,2019COMP01`；未设置则不预生成（依赖站内跳转 + 服务器 fallback）。
+ * 构建可设 `WCA_STATIC_PLAYER_IDS=2018SHEN07,2019COMP01`；未设置则使用占位页。
  */
-/** 静态导出占位页：配合服务器 fallback，客户端从 URL 读取真实 wcaId */
-export const WCA_PLAYER_EXPORT_PLACEHOLDER = "__dynamic__";
-
 export function getWcaPlayerStaticParams(): { wcaId: string }[] {
   const raw = process.env.WCA_STATIC_PLAYER_IDS?.trim();
   if (raw) {
@@ -86,11 +125,8 @@ export function getWcaPlayerStaticParams(): { wcaId: string }[] {
     if (ids.length > 0) return ids;
   }
 
-  const staticExport =
-    process.env.NEXT_OUTPUT_EXPORT === "1" ||
-    process.env.NEXT_OUTPUT_EXPORT === "true";
-  if (staticExport) {
-    return [{ wcaId: WCA_PLAYER_EXPORT_PLACEHOLDER }];
+  if (isStaticExportBuild()) {
+    return [{ wcaId: DYNAMIC_ROUTE_EXPORT_PLACEHOLDER }];
   }
 
   return [];
