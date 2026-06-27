@@ -57,9 +57,15 @@ export async function refreshTokenInter() {
   }
 }
 
+let tokenRefreshTimer: ReturnType<typeof setInterval> | null = null;
+
 export function startTokenRefresh() {
   if (typeof window === "undefined") return;
-  window.setInterval(() => void refreshTokenInter(), REFRESH_INTERVAL);
+  if (tokenRefreshTimer) return;
+  tokenRefreshTimer = window.setInterval(
+    () => void refreshTokenInter(),
+    REFRESH_INTERVAL,
+  );
 }
 
 /** Parse ?token= from WCA callback URL before fetching current user */

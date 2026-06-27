@@ -7,7 +7,7 @@ import { useEffect, type ReactNode } from "react";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useI18n } from "@/contexts/I18nProvider";
 import { Auth, hasAnyAuth, isLoggedIn } from "@/lib/auth";
-import { getToken } from "@/services/cubing-pro/auth/token";
+import { getToken, removeToken } from "@/services/cubing-pro/auth/token";
 
 export function AdminGuard({
   children,
@@ -17,25 +17,23 @@ export function AdminGuard({
   required?: Auth[];
 }) {
   const { t } = useI18n();
-  const { currentUser, loading, refreshUser } = useAuth();
+  const { currentUser, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
     if (loading) return;
-    if (isLoggedIn(currentUser?.id) && hasAnyAuth(currentUser?.Auth ?? 0, required)) return;
+    if (isLoggedIn(currentUser?.id)) return;
     if (getToken()?.token) {
-      void refreshUser();
-      return;
+      removeToken();
     }
     router.replace(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
-  }, [currentUser, loading, refreshUser, required, router]);
+  }, [currentUser?.id, loading, router]);
 
   if (loading) {
     return <Spinner size="lg" color="brand.solid" />;
   }
 
   if (!currentUser || !isLoggedIn(currentUser.id)) {
-    if (getToken()?.token) return <Spinner size="lg" color="brand.solid" />;
     return <Text color="fg.muted">{t("auth.needLogin")}</Text>;
   }
 
