@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { Provider } from "@/components/ui/provider";
+import { PALETTE_STORAGE_KEY } from "@/lib/websiteUiConfig";
 
 export const metadata: Metadata = {
   title: {
@@ -10,6 +11,8 @@ export const metadata: Metadata = {
   description: "Cubing Pro v4.0.0 — 魔方社区与工具平台",
 };
 
+const palettePrehydrateScript = `(function(){try{var p=localStorage.getItem("${PALETTE_STORAGE_KEY}")||"haitian";document.documentElement.dataset.palette=p;}catch(e){}})();`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -17,6 +20,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: palettePrehydrateScript }} />
+      </head>
       <body suppressHydrationWarning>
         <Provider>{children}</Provider>
       </body>

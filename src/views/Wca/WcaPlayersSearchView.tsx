@@ -30,8 +30,8 @@ const inputStyle: React.CSSProperties = {
   fontSize: "18px",
   padding: "12px 16px",
   borderRadius: "8px",
-  border: "1px solid #d9d9d9",
-  boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+  border: "1px solid var(--border-default)",
+  boxShadow: "0 2px 8px color-mix(in srgb, var(--foreground) 8%, transparent)",
 };
 
 export function WcaPlayersSearchView() {

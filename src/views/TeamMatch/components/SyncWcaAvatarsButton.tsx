@@ -35,8 +35,12 @@ function PersonRow({
         minWidth: 0,
         padding: 12,
         borderRadius: 8,
-        background: highlight ? 'rgba(22, 119, 255, 0.06)' : 'rgba(0,0,0,0.02)',
-        border: highlight ? '1px solid rgba(22, 119, 255, 0.25)' : '1px solid #f0f0f0',
+        background: highlight
+          ? 'color-mix(in srgb, var(--accent) 6%, transparent)'
+          : 'color-mix(in srgb, var(--foreground) 2%, transparent)',
+        border: highlight
+          ? '1px solid color-mix(in srgb, var(--accent) 25%, transparent)'
+          : '1px solid var(--border-default)',
       }}
     >
       <Typography.Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 8 }}>
@@ -161,8 +165,8 @@ const SyncWcaAvatarsButton: React.FC<Props> = ({ session, dispatch }) => {
                 flex: 1,
                 padding: 12,
                 borderRadius: 8,
-                background: 'rgba(0,0,0,0.02)',
-                border: '1px dashed #d9d9d9',
+                background: 'color-mix(in srgb, var(--foreground) 2%, transparent)',
+                border: '1px dashed var(--border-strong)',
                 minHeight: 100,
                 display: 'flex',
                 alignItems: 'center',
@@ -188,8 +192,8 @@ const SyncWcaAvatarsButton: React.FC<Props> = ({ session, dispatch }) => {
                 flex: 1,
                 padding: 12,
                 borderRadius: 8,
-                background: 'rgba(0,0,0,0.02)',
-                border: '1px dashed #d9d9d9',
+                background: 'color-mix(in srgb, var(--foreground) 2%, transparent)',
+                border: '1px dashed var(--border-strong)',
                 minHeight: 100,
               }}
             />
@@ -203,7 +207,7 @@ const SyncWcaAvatarsButton: React.FC<Props> = ({ session, dispatch }) => {
           style={{
             maxHeight: 180,
             overflowY: 'auto',
-            border: '1px solid #f0f0f0',
+            border: '1px solid var(--border-default)',
             borderRadius: 8,
             padding: 8,
           }}
@@ -221,7 +225,7 @@ const SyncWcaAvatarsButton: React.FC<Props> = ({ session, dispatch }) => {
                   alignItems: 'center',
                   gap: 10,
                   padding: '6px 4px',
-                  borderBottom: i < history.length - 1 ? '1px solid #f5f5f5' : undefined,
+                  borderBottom: i < history.length - 1 ? '1px solid var(--border-default)' : undefined,
                 }}
               >
                 <Avatar src={row.avatar || undefined} size={36}>

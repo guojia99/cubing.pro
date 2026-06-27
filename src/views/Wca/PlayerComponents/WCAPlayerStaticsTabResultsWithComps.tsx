@@ -231,7 +231,7 @@ const WCAPlayerStaticsTabResultsWithComp: React.FC<WCAPlayerStaticsTabResultsWit
       width: 80,
       render: (pos) => (
         <span style={{
-          color: pos === 1 ? '#cf1322' : 'inherit'
+          color: pos === 1 ? 'var(--destructive)' : 'inherit'
         }}>
           {pos}
         </span>

@@ -18,22 +18,12 @@ import { isLocal } from "@/services/cubing-pro/request";
 
 import AlgsCubeDiagram from "./AlgsCubeDiagram";
 import RandomWheel, { type WheelSegment } from "./RandomWheel";
+import { RANDOM_PICK_ICON_SVG } from "../utils/randomPickIcon";
 import "./randomPickModal.css";
 
 const WHEEL_SEGMENT_COUNT = 12;
 const SPIN_DURATION_MIN = 5000;
 const SPIN_DURATION_MAX = 8000;
-
-const RANDOM_PICK_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
-  <circle cx="50" cy="50" r="44" fill="rgba(230,240,255,0.8)" stroke="rgba(100,149,237,0.5)" stroke-width="3"/>
-  <path d="M50 50 L50 10 L54 50 Z" fill="rgba(100,149,237,0.7)"/>
-  <path d="M50 50 L77 27 L54 50 Z" fill="rgba(100,149,237,0.5)"/>
-  <path d="M50 50 L77 73 L54 50 Z" fill="rgba(100,149,237,0.5)"/>
-  <path d="M50 50 L50 90 L54 50 Z" fill="rgba(100,149,237,0.5)"/>
-  <path d="M50 50 L23 73 L54 50 Z" fill="rgba(100,149,237,0.5)"/>
-  <path d="M50 50 L23 27 L54 50 Z" fill="rgba(100,149,237,0.5)"/>
-  <circle cx="50" cy="50" r="10" fill="rgba(100,149,237,0.9)"/>
-</svg>`;
 
 interface RandomPickModalProps {
   open: boolean;
@@ -364,5 +354,3 @@ export default function RandomPickModal({
     </Dialog.Root>
   );
 }
-
-export { RANDOM_PICK_ICON_SVG };

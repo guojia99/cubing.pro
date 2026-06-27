@@ -14,7 +14,7 @@ const PlayerResultsNemesis: React.FC<PlayerResultsNemesisProps> = ({ nemesis, pl
   if (!nemesis || nemesis.length === 0) {
     return (
       <>
-        <Divider style={{ borderColor: '#ff078f' }}>{player?.Name} 无宿敌!</Divider>
+        <Divider style={{ borderColor: "var(--destructive)" }}>{player?.Name} 无宿敌!</Divider>
       </>
     );
   }

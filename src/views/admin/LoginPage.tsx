@@ -56,8 +56,8 @@ export function LoginPage() {
         <Button
           size="lg"
           colorPalette="green"
-          bg="#029347"
-          _hover={{ bg: "#027a3c" }}
+          bg="signal.success"
+          _hover={{ bg: "accent.emphasis" }}
           onClick={handleWcaLogin}
         >
           {t("auth.loginButton")}

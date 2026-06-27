@@ -120,7 +120,7 @@ function UpdatePersonModal({
           style={{
             maxHeight: 300,
             overflowY: "auto",
-            border: "1px solid #e8e8e8",
+            border: "1px solid var(--border-default)",
             borderRadius: 4,
             padding: 8,
           }}

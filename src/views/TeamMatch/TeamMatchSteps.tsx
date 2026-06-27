@@ -225,7 +225,7 @@ const TeamMatchSteps: React.FC<TeamMatchStepsProps> = ({ liveUISettings, onLiveU
                   r.avatarDataUrl ? (
                     <img alt="" src={r.avatarDataUrl} style={{ width: 36, height: 36, borderRadius: 6, objectFit: 'cover' }} />
                   ) : (
-                    <span style={{ color: '#999' }}>—</span>
+                    <span style={{ color: 'var(--faint-foreground)' }}>—</span>
                   ),
               },
               {
@@ -520,7 +520,7 @@ const StepElimDraw: React.FC<StepDrawProps> = ({ session, dispatch }) => {
             const full = !t.disabled && t.playerIds.length === TEAM_PLAYERS;
             if (!full) {
               return (
-                <div key={t.id} style={{ padding: '6px 0', borderBottom: '1px solid #f0f0f0' }}>
+                <div key={t.id} style={{ padding: '6px 0', borderBottom: '1px solid var(--border-default)' }}>
                   <Typography.Text type="secondary">
                     {t.name}
                     {t.disabled ? '（已禁用，不可保送）' : '（未满编，不可保送）'}
@@ -529,7 +529,7 @@ const StepElimDraw: React.FC<StepDrawProps> = ({ session, dispatch }) => {
               );
             }
             return (
-              <div key={t.id} style={{ padding: '8px 0', borderBottom: '1px solid #f0f0f0' }}>
+              <div key={t.id} style={{ padding: '8px 0', borderBottom: '1px solid var(--border-default)' }}>
                 <Checkbox
                   checked={byeDraft.includes(t.id)}
                   disabled={!byeDraft.includes(t.id) && byeDraft.length >= MAX_ELIMINATION_BYE_TEAMS}
@@ -733,7 +733,7 @@ const StepDraw: React.FC<StepDrawProps> = ({ session, dispatch }) => {
                   <Typography.Text type="secondary" style={{ fontSize: 10, lineHeight: 1.3 }} ellipsis>
                     {formatTeamAverageSumLine(t, session)}
                   </Typography.Text>
-                  <span style={{ fontSize: 11, color: '#888' }}>#{i + 1}</span>
+                  <span style={{ fontSize: 11, color: 'var(--muted-foreground)' }}>#{i + 1}</span>
                 </>
               ) : (
                 <>轮空</>

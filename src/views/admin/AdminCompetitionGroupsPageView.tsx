@@ -226,7 +226,9 @@ export function AdminCompetitionGroupsPageView() {
           </Space>
 
           {!selectedOrgId ? (
-            <div style={{ color: "#999" }}>请先选择主办团队以查看与管理该团队下的比赛群组。</div>
+            <div style={{ color: "var(--faint-foreground)" }}>
+              请先选择主办团队以查看与管理该团队下的比赛群组。
+            </div>
           ) : (
             <>
               <div style={{ marginBottom: 8 }}>

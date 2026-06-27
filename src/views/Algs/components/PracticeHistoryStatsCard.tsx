@@ -39,11 +39,11 @@ const PROFICIENCY_DISPLAY: {
   icon: string;
   color: string;
 }[] = [
-  { value: "mastered", icon: "✓", color: "#52c41a" },
-  { value: "skilled", icon: "⚡", color: "#1890ff" },
-  { value: "average", icon: "−", color: "var(--chakra-colors-fg-muted, #888)" },
-  { value: "unskilled", icon: "!", color: "#faad14" },
-  { value: "unknown", icon: "✕", color: "#ff4d4f" },
+  { value: "mastered", icon: "✓", color: "var(--signal-success)" },
+  { value: "skilled", icon: "⚡", color: "var(--signal-info)" },
+  { value: "average", icon: "−", color: "var(--muted-foreground)" },
+  { value: "unskilled", icon: "!", color: "var(--signal-warning)" },
+  { value: "unknown", icon: "✕", color: "var(--destructive)" },
 ];
 
 interface PracticeHistoryStatsCardProps {

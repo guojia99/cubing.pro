@@ -20,13 +20,13 @@ const columns: ColumnsType<PlayersAPI.Player> = [
     dataIndex: "CubeID",
     key: "CubeID",
     width: 150,
-    render: (value: string, player) => PlayerLink(player.CubeID, value, "#000"),
+    render: (value: string, player) => PlayerLink(player.CubeID, value, "var(--foreground)"),
   },
   {
     title: "名称",
     dataIndex: "Name",
     key: "Name",
-    render: (_value, player) => PlayerLink(player.CubeID, player.Name, "rgb(29,177,236)"),
+    render: (_value, player) => PlayerLink(player.CubeID, player.Name, "var(--accent)"),
   },
   {
     title: "WcaID",

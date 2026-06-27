@@ -13,6 +13,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { toaster } from "@/components/ui/toaster";
 import { useI18n } from "@/contexts/I18nProvider";
+import { SQ1_STICKER_PALETTE } from "@/theme/domainColors";
 import {
   DrawActionButton,
   DrawControlField,
@@ -75,17 +76,7 @@ const edgeSvgs = [
 
 const rotatePoint = "35.01322 38.0901";
 
-const baseMinxColor = [
-  "#00000000",
-  "#033fff",
-  "#f3ff00",
-  "#d10707",
-  "#206606",
-  "#ff8806",
-  "#3d3d3d",
-  "#f5f3db",
-  "#777",
-];
+const baseMinxColor = [...SQ1_STICKER_PALETTE];
 
 type SelectOption = { value: string; label: string };
 

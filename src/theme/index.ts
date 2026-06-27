@@ -8,6 +8,7 @@ const config = defineConfig({
         body: { value: '"DM Sans", "PingFang SC", "Microsoft YaHei", sans-serif' },
       },
       colors: {
+        /** Legacy raw scales — internal / recipe reference only */
         brand: {
           50: { value: "#e8f7fc" },
           100: { value: "#c5ebf6" },
@@ -21,7 +22,6 @@ const config = defineConfig({
           900: { value: "#0c3a4d" },
           950: { value: "#082533" },
         },
-        /** 页面主背景 — 淡白 */
         canvas: { value: "#fafafa" },
         ocean: {
           50: { value: "#eef9fb" },
@@ -40,152 +40,109 @@ const config = defineConfig({
     semanticTokens: {
       colors: {
         bg: {
-          DEFAULT: {
-            value: { _light: "{colors.canvas}", _dark: "{colors.brand.950}" },
-          },
-          muted: {
-            value: { _light: "{colors.white}", _dark: "{colors.brand.900}" },
-          },
-          elevated: {
-            value: { _light: "{colors.white}", _dark: "{colors.brand.900}" },
+          DEFAULT: { value: "var(--background)" },
+          muted: { value: "var(--muted)" },
+          elevated: { value: "var(--card)" },
+          subtle: {
+            value: "color-mix(in srgb, var(--foreground) 4%, var(--card))",
           },
         },
         fg: {
-          DEFAULT: { value: { _light: "{colors.brand.900}", _dark: "{colors.ocean.50}" } },
-          muted: { value: { _light: "{colors.brand.700}", _dark: "{colors.ocean.200}" } },
+          DEFAULT: { value: "var(--foreground)" },
+          muted: { value: "var(--muted-foreground)" },
+          faint: { value: "var(--faint-foreground)" },
         },
         accent: {
-          DEFAULT: { value: "{colors.brand.500}" },
-          emphasis: { value: "{colors.brand.600}" },
-          subtle: { value: "{colors.brand.100}" },
+          DEFAULT: { value: "var(--accent)" },
+          fg: { value: "var(--accent-foreground)" },
+          soft: { value: "var(--accent-soft)" },
+          emphasis: {
+            value: "color-mix(in srgb, var(--accent) 88%, black)",
+          },
+          hover: {
+            value: "color-mix(in srgb, var(--accent) 88%, white)",
+          },
         },
         border: {
-          DEFAULT: { value: { _light: "{colors.brand.200}", _dark: "{colors.brand.800}" } },
+          DEFAULT: { value: "var(--border-default)" },
+          strong: { value: "var(--border-strong)" },
         },
-        /** colorPalette="brand" 的 Button / Badge 等（solid 背景 + 对比文字） */
+        signal: {
+          success: { value: "var(--signal-success)" },
+          warning: { value: "var(--signal-warning)" },
+          info: { value: "var(--signal-info)" },
+          destructive: { value: "var(--destructive)" },
+          destructiveFg: { value: "var(--destructive-foreground)" },
+        },
+        /** colorPalette="brand" Button / Badge recipe tokens */
         brand: {
-          contrast: {
-            value: { _light: "{colors.white}", _dark: "{colors.brand.950}" },
-          },
-          fg: {
-            value: { _light: "{colors.brand.800}", _dark: "{colors.ocean.200}" },
-          },
-          subtle: {
-            value: { _light: "{colors.brand.50}", _dark: "{colors.brand.900}" },
-          },
-          muted: {
-            value: { _light: "{colors.brand.100}", _dark: "{colors.brand.800}" },
-          },
-          emphasized: {
-            value: { _light: "{colors.brand.200}", _dark: "{colors.brand.700}" },
-          },
-          solid: {
-            value: { _light: "{colors.brand.600}", _dark: "{colors.brand.500}" },
-          },
-          focusRing: {
-            value: { _light: "{colors.brand.500}", _dark: "{colors.brand.400}" },
-          },
-          border: {
-            value: { _light: "{colors.brand.500}", _dark: "{colors.brand.400}" },
-          },
+          contrast: { value: "var(--accent-foreground)" },
+          fg: { value: "var(--foreground)" },
+          subtle: { value: "var(--accent-soft)" },
+          muted: { value: "var(--muted)" },
+          emphasized: { value: "var(--border-strong)" },
+          solid: { value: "var(--accent)" },
+          focusRing: { value: "var(--ring)" },
+          border: { value: "var(--accent)" },
         },
-        /** 分段切换（公式库 / 自定义等） */
+        /** Segment toggle (formula library etc.) */
         segment: {
-          track: {
-            value: { _light: "{colors.brand.100}", _dark: "{colors.brand.900}" },
-          },
-          indicator: {
-            value: { _light: "{colors.brand.600}", _dark: "{colors.brand.500}" },
-          },
+          track: { value: "var(--muted)" },
+          indicator: { value: "var(--accent)" },
           fg: {
-            DEFAULT: {
-              value: { _light: "{colors.brand.800}", _dark: "{colors.ocean.200}" },
-            },
-            selected: {
-              value: { _light: "{colors.white}", _dark: "{colors.brand.950}" },
-            },
+            DEFAULT: { value: "var(--muted-foreground)" },
+            selected: { value: "var(--accent-foreground)" },
           },
         },
-        /** 公式列表选中行 */
+        /** Formula list selected row */
         formula: {
           selected: {
             bg: {
-              value: { _light: "#ecfdf5", _dark: "rgba(16, 185, 129, 0.12)" },
+              value:
+                "color-mix(in srgb, var(--signal-success) 14%, transparent)",
             },
-            border: {
-              value: { _light: "{colors.green.400}", _dark: "{colors.green.400}" },
-            },
-            fg: {
-              value: { _light: "{colors.green.700}", _dark: "{colors.green.300}" },
-            },
+            border: { value: "var(--signal-success)" },
+            fg: { value: "var(--signal-success)" },
           },
         },
-        /** 欢迎页 / 赞助模块 */
+        /** Welcome / sponsorship modules */
         welcome: {
           coffee: {
             pageBg: {
-              value: {
-                _light: "linear-gradient(180deg, #fff9f0 0%, #ffffff 100%)",
-                _dark: "linear-gradient(180deg, {colors.brand.900} 0%, {colors.brand.950} 100%)",
-              },
+              value:
+                "linear-gradient(180deg, color-mix(in srgb, var(--signal-warning) 8%, var(--background)) 0%, var(--card) 100%)",
             },
             wechatQr: {
-              value: {
-                _light: "#f0f9f0",
-                _dark: "rgba(34, 197, 94, 0.12)",
-              },
+              value:
+                "color-mix(in srgb, var(--signal-success) 12%, var(--card))",
             },
             alipayQr: {
-              value: {
-                _light: "#e6f7ff",
-                _dark: "rgba(34, 168, 203, 0.15)",
-              },
+              value: "color-mix(in srgb, var(--accent) 12%, var(--card))",
             },
           },
           ad: {
             contactBg: {
-              value: {
-                _light: "linear-gradient(135deg, {colors.white} 0%, {colors.brand.50} 100%)",
-                _dark: "linear-gradient(135deg, {colors.brand.900} 0%, {colors.brand.950} 100%)",
-              },
+              value:
+                "linear-gradient(135deg, var(--card) 0%, color-mix(in srgb, var(--accent) 8%, var(--muted)) 100%)",
             },
           },
         },
-        /** 公式库列表 / 练习工具卡片 */
+        /** Formula library cards */
         algs: {
           card: {
             bg: {
-              value: {
-                _light: "rgba(238, 249, 251, 0.55)",
-                _dark: "{colors.brand.900}",
-              },
+              value: "color-mix(in srgb, var(--accent) 8%, var(--card))",
             },
             border: {
-              value: {
-                _light: "rgba(34, 168, 203, 0.35)",
-                _dark: "{colors.brand.700}",
-              },
+              value: "color-mix(in srgb, var(--accent) 35%, transparent)",
             },
             diagram: {
-              value: {
-                _light: "rgba(255, 255, 255, 0.65)",
-                _dark: "{colors.brand.950}",
-              },
+              value: "color-mix(in srgb, var(--card) 65%, transparent)",
             },
-            hoverBorder: {
-              value: {
-                _light: "{colors.brand.500}",
-                _dark: "{colors.brand.400}",
-              },
-            },
+            hoverBorder: { value: "var(--accent)" },
           },
           section: {
-            bg: {
-              value: {
-                _light: "{colors.canvas}",
-                _dark: "{colors.brand.900}",
-              },
-            },
+            bg: { value: "var(--background)" },
           },
         },
       },

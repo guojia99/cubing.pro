@@ -20,7 +20,7 @@ const actionBtnProps = {
   height: "36px",
   minW: "36px",
   borderRadius: "full",
-  bg: "rgba(255,255,255,0.92)",
+  bg: "color-mix(in srgb, var(--card) 92%, transparent)",
   boxShadow: "sm",
   variant: "ghost" as const,
   size: "sm" as const,
@@ -58,9 +58,9 @@ export function CardActionButtons({
         onClick={onFavoriteClick}
         {...actionBtnProps}
         right="12px"
-        color={isFavorite ? "#ff4d4f" : "fg.muted"}
+        color={isFavorite ? "signal.destructive" : "fg.muted"}
       >
-        <LuHeart size={18} fill={isFavorite ? "#ff4d4f" : "none"} />
+        <LuHeart size={18} fill={isFavorite ? "var(--destructive)" : "none"} />
       </IconButton>
     </>
   );

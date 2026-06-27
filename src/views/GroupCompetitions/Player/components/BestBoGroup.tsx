@@ -1,4 +1,9 @@
 import { resultTimeString } from '@/components/Data/types/result';
+import {
+  getChartSeriesColors,
+  getThemeColors,
+  mixCssColors,
+} from '@/theme/chartColors';
 import { Card, Col, Row, Typography } from 'antd';
 import React from 'react';
 import ReactECharts from 'echarts-for-react';
@@ -12,6 +17,7 @@ interface BOBoxProps {
 }
 
 export const BOBox: React.FC<BOBoxProps> = ({ count, data, backgroundColor }) => {
+  const theme = getThemeColors();
   const validData = data.filter((n) => n >= 0).sort((a, b) => a - b); // 从小到大
   const best = validData.slice(0, count);
   const average = best.length > 0 ? best.reduce((a, b) => a + b, 0) / best.length : 0;
@@ -23,7 +29,7 @@ export const BOBox: React.FC<BOBoxProps> = ({ count, data, backgroundColor }) =>
       style={{
         width: 160,
         borderRadius: 12,
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+        boxShadow: `0 4px 12px ${mixCssColors(theme.foreground, 'transparent', 10)}`,
         textAlign: 'center',
         background: backgroundColor,
         display: 'flex',
@@ -48,23 +54,20 @@ interface BOGroupProps {
 
 // 所有需要支持的 BO 数量
 const boList = [3, 5, 12, 50, 100, 200, 500, 1000];
-// 每个 BO 对应的淡色背景
-const boColors: Record<number, string> = {
-  3: '#e6f7ff', // 淡蓝
-  5: '#f9f0ff', // 淡紫
-  12: '#fffbe6', // 淡黄
-  50: '#e6fffb', // 淡青
-  100: '#f6ffed', // 淡绿
-  200: '#fff0f6', // 淡粉
-  500: '#fafafa', // 淡灰
-  1000: '#f0f5ff', // 淡靛
-};
 
-
-
+function buildBoPastelMap(counts: number[]): Record<number, string> {
+  const theme = getThemeColors();
+  const series = getChartSeriesColors(counts.length);
+  return Object.fromEntries(
+    counts.map((count, i) => [
+      count,
+      mixCssColors(series[i]!, theme.background, 92),
+    ]),
+  );
+}
 
 export const BOBestGroup: React.FC<BOGroupProps> = ({ data }) => {
-  // 过滤掉负数后的有效成绩
+  const boColors = buildBoPastelMap(boList);
   const validData = data.filter((n) => n >= 0);
   return (
     <Card style={{ marginTop: 24, marginBottom: 24 }}>
@@ -87,15 +90,8 @@ export const BOBestGroup: React.FC<BOGroupProps> = ({ data }) => {
 
 const boRecentList = [12, 25, 50, 75, 100];
 
-const boRecentColors: Record<number, string> = {
-  12: '#fffbe6',  // 淡黄
-  25: '#fff7e6',  // 淡橙（新加）
-  50: '#e6fffb',  // 淡青
-  75: '#f0f5e6',  // 淡橄榄绿（新加）
-  100: '#f6ffed', // 淡绿
-};
-
 export const BORecentGroup: React.FC<BOGroupProps> = ({data}) => {
+  const boRecentColors = buildBoPastelMap(boRecentList);
 
   const maxLen = data.length;
   const validData = data.filter((n) => n >= 0).slice(0, maxLen > 100 ? 100: maxLen)
@@ -128,6 +124,7 @@ interface ScoreRangeChartProps {
 }
 
 export const ScoreRangeChart: React.FC<ScoreRangeChartProps> = ({ data, ranges }) => {
+  const [barColor] = getChartSeriesColors(1);
   // 统计每个区间的个数
   const rangeCounts = ranges.map(([min, max]) =>
     data.filter((score) => score >= min && score < max).length
@@ -155,7 +152,7 @@ export const ScoreRangeChart: React.FC<ScoreRangeChartProps> = ({ data, ranges }
         data: rangeCounts,
         type: 'bar',
         itemStyle: {
-          color: '#73C0DE',
+          color: barColor,
         },
       },
     ],

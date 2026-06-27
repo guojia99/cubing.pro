@@ -57,7 +57,7 @@ export default function FormulaPracticeStartCard({
       bg={PRACTICE_COLORS.practice.bg}
       borderColor={PRACTICE_COLORS.practice.border}
       borderWidth="1px"
-      _hover={{ borderColor: "rgba(0, 160, 180, 0.85)" }}
+      _hover={{ borderColor: "signal.info" }}
     >
       <Card.Body p={4} h="full">
         {content}

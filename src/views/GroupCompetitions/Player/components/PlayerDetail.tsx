@@ -79,7 +79,7 @@ type BestTableRow = {
 };
 
 const rankRender = (dom: number) => {
-  const color = dom <= 1 ? '#cf1322' : 'var(--ant-color-text)';
+  const color = dom <= 1 ? 'var(--destructive)' : 'var(--foreground)';
   return (
     <h4 style={{ textAlign: 'center', color, margin: 0, fontWeight: 600 }}>{dom}</h4>
   );

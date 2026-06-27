@@ -10,16 +10,11 @@ import { Input, Modal, Select, Table, Spin, Space, Switch, Button, Tag } from 'a
 import { RightOutlined } from '@ant-design/icons';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useIntlMessage } from '@/hooks/useIntlMessage';
+import { getThemeColors, mixCssColors } from '@/theme/chartColors';
+import { MEDAL_COLORS, MEDAL_RGB } from '@/theme/domainColors';
 import './GrandSlamRank.css';
 
 const WORLD_KEY = '__world__';
-
-/** 奖牌对应的 RGB 色值 */
-const MEDAL_COLORS: Record<number, [number, number, number]> = {
-  1: [255, 215, 0],   // 金
-  2: [192, 192, 192], // 银
-  3: [205, 127, 50],  // 铜
-};
 
 /** 按锦标赛层级区分透明度：世界最深，洲际加透明度，国家再加透明度 */
 const TYPE_ALPHA: Record<string, number> = {
@@ -30,8 +25,9 @@ const TYPE_ALPHA: Record<string, number> = {
 
 /** 根据奖牌和锦标赛类型计算 Tag 背景色 */
 function getTagBgColor(rank: number, type: 'world' | 'continent' | 'country'): string {
-  const rgb = MEDAL_COLORS[rank];
-  if (!rgb) return 'rgba(0, 0, 0, 0.06)';
+  const theme = getThemeColors();
+  const rgb = MEDAL_RGB[rank];
+  if (!rgb) return mixCssColors(theme.foreground, 'transparent', 6);
   const alpha = TYPE_ALPHA[type] ?? 0.15;
   return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
 }
@@ -39,9 +35,9 @@ function getTagBgColor(rank: number, type: 'world' | 'continent' | 'country'): s
 /** 根据排名返回奖牌图标 */
 function getMedalIcon(rank: number): React.ReactNode {
   const sizeStyle = { fontSize: '1.35em' };
-  if (rank === 1) return <span style={{ ...sizeStyle, color: '#FFD700' }}>🥇</span>;
-  if (rank === 2) return <span style={{ ...sizeStyle, color: '#C0C0C0' }}>🥈</span>;
-  if (rank === 3) return <span style={{ ...sizeStyle, color: '#CD7F32' }}>🥉</span>;
+  if (rank === 1) return <span style={{ ...sizeStyle, color: MEDAL_COLORS.gold }}>🥇</span>;
+  if (rank === 2) return <span style={{ ...sizeStyle, color: MEDAL_COLORS.silver }}>🥈</span>;
+  if (rank === 3) return <span style={{ ...sizeStyle, color: MEDAL_COLORS.bronze }}>🥉</span>;
   return null;
 }
 
@@ -259,14 +255,22 @@ const GrandSlamRank: React.FC = () => {
       title: 'WR',
       key: 'hasWR',
       width: 56,
-      render: (_: unknown, record: AllEventChampionshipsPodium) =>
-        record.hasWR ? (
-          <Tag style={{ backgroundColor: 'rgba(139, 0, 0, 0.25)', borderColor: '#8B0000', color: '#8B0000' }}>
+      render: (_: unknown, record: AllEventChampionshipsPodium) => {
+        const theme = getThemeColors();
+        return record.hasWR ? (
+          <Tag
+            style={{
+              backgroundColor: mixCssColors(theme.destructive, 'transparent', 25),
+              borderColor: theme.destructive,
+              color: theme.destructive,
+            }}
+          >
             WR
           </Tag>
         ) : (
           '—'
-        ),
+        );
+      },
     },
     {
       title: intl.formatMessage({ id: 'wca.grandSlam.worldChampionship' }),

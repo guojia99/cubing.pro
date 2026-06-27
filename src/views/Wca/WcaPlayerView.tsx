@@ -114,7 +114,7 @@ export function WcaPlayerView() {
 
   if (is404) {
     return (
-      <div style={{ textAlign: "center", color: "#999", marginTop: 50 }}>
+      <div style={{ textAlign: "center", color: "var(--faint-foreground)", marginTop: 50 }}>
         {intl.formatMessage({ id: "wca.player.notFound" })}
       </div>
     );

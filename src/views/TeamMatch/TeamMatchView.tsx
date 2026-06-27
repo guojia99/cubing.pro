@@ -30,6 +30,7 @@ import {
 } from '@/views/TeamMatch/types';
 import { Button, Card, Flex, Input, InputNumber, Modal, Popconfirm, Select, message, Space, Steps, Typography } from 'antd';
 import React from 'react';
+import { DarkMode } from '@/components/ui/color-mode';
 import { useHideAppChrome } from '@/hooks/useHideAppChrome';
 import './TeamMatch.css';
 
@@ -76,7 +77,9 @@ function MatchNameField({ variant = 'default' }: { variant?: 'default' | 'dark' 
         </Typography.Text>
       )}
       {dark && (
-        <Typography.Text style={{ color: 'rgba(255,255,255,0.85)' }}>比赛名称</Typography.Text>
+        <Typography.Text style={{ color: 'color-mix(in srgb, var(--foreground) 85%, transparent)' }}>
+          比赛名称
+        </Typography.Text>
       )}
       <Input
         style={{
@@ -84,9 +87,9 @@ function MatchNameField({ variant = 'default' }: { variant?: 'default' | 'dark' 
           minWidth: 200,
           ...(dark
             ? {
-                background: 'rgba(255,255,255,0.08)',
-                color: '#fff',
-                borderColor: 'rgba(255,255,255,0.25)',
+                background: 'color-mix(in srgb, var(--foreground) 8%, transparent)',
+                color: 'var(--foreground)',
+                borderColor: 'color-mix(in srgb, var(--foreground) 25%, transparent)',
               }
             : {}),
         }}
@@ -211,6 +214,7 @@ function TeamMatchInner() {
       ? '请完成全部淘汰赛（已跳过季军赛）'
       : '请完成全部淘汰赛与铜牌战';
     return (
+      <DarkMode>
       <div className="tmFullscreen">
         <TeamMatchJsonToolbar {...jsonToolbarProps} variant="dark" />
         <div
@@ -224,7 +228,7 @@ function TeamMatchInner() {
           }}
         >
           <Space wrap align="center" size="middle">
-            <Typography.Text style={{ color: 'rgba(255,255,255,0.65)' }}>
+            <Typography.Text style={{ color: 'var(--muted-foreground)' }}>
               {step === WIZARD_STEP_PODIUM ? '领奖台' : '正赛'}
             </Typography.Text>
             <MatchNameField variant="dark" />
@@ -269,6 +273,7 @@ function TeamMatchInner() {
           />
         )}
       </div>
+      </DarkMode>
     );
   }
 
@@ -337,12 +342,12 @@ function TeamMatchInner() {
           gap="small"
           style={{
             width: '100%',
-            border: '1px solid rgba(0,0,0,0.06)',
+            border: '1px solid var(--border-default)',
             borderRadius: 8,
             overflow: 'hidden',
           }}
         >
-          <div style={{ padding: '8px 16px', background: 'rgba(0,0,0,0.02)' }}>
+          <div style={{ padding: '8px 16px', background: 'var(--muted)' }}>
             <Typography.Text strong>最近 {state.root.historyIds.length} 场</Typography.Text>
           </div>
           {state.root.historyIds.map((id) => {
@@ -357,7 +362,7 @@ function TeamMatchInner() {
                 gap="middle"
                 style={{
                   padding: '12px 16px',
-                  borderTop: '1px solid rgba(0,0,0,0.06)',
+                  borderTop: '1px solid var(--border-default)',
                 }}
               >
                 <div style={{ minWidth: 0, flex: 1 }}>

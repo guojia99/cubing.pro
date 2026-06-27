@@ -25,7 +25,7 @@ function PkArenaTeamBattlecry({ battlecry, settings, align = 'center' }: Props) 
         marginTop: 6,
         marginBottom: 0,
         textAlign: align,
-        color: 'rgba(252, 252, 252, 0.9)',
+        color: 'color-mix(in srgb, var(--foreground) 90%, transparent)',
       }}
     >
       {t}

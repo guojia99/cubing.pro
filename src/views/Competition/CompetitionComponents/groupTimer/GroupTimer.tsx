@@ -2052,11 +2052,23 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
               presets={[
                 {
                   label: '浅色',
-                  colors: ['#ffffff', '#f5f5f5', '#fafafa', '#fffbe6', '#e6f7ff'],
+                  colors: [
+                    'var(--card)',
+                    'var(--muted)',
+                    'var(--background)',
+                    'color-mix(in srgb, var(--signal-warning) 12%, var(--card))',
+                    'color-mix(in srgb, var(--signal-info) 12%, var(--card))',
+                  ],
                 },
                 {
                   label: '深色',
-                  colors: ['#141414', '#1f1f1f', '#000000', '#262626', '#001529'],
+                  colors: [
+                    'color-mix(in srgb, var(--foreground) 8%, var(--background))',
+                    'color-mix(in srgb, var(--foreground) 12%, var(--background))',
+                    'var(--foreground)',
+                    'color-mix(in srgb, var(--foreground) 16%, var(--background))',
+                    'color-mix(in srgb, var(--accent) 30%, var(--background))',
+                  ],
                 },
               ]}
             />

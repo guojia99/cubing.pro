@@ -153,7 +153,7 @@ export function EventSelector({
           maxHeight: "300px",
           overflowY: "auto",
           padding: "10px",
-          border: "1px solid #f0f0f0",
+          border: "1px solid var(--border-default)",
           borderRadius: "4px",
         }}
       >
@@ -185,7 +185,7 @@ export function EventSelector({
               display: "flex",
               justifyContent: "space-between",
               fontSize: "12px",
-              color: "#999",
+              color: "var(--faint-foreground)",
             }}
           >
             <span>40岁</span>

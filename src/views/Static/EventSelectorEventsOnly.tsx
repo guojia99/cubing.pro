@@ -112,7 +112,7 @@ const EventSelectorEventsOnly: React.FC<EventSelectorEventsOnlyProps> = ({ event
           maxHeight: '300px',
           overflowY: 'auto',
           padding: '10px',
-          border: '1px solid #f0f0f0',
+          border: '1px solid var(--border-default)',
           borderRadius: '4px',
         }}
       >

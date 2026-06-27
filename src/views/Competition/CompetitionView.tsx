@@ -34,7 +34,7 @@ const CompetitionResults = lazy(
 function TabContent({ loading, children }: { loading: boolean; children: React.ReactNode }) {
   if (loading) {
     return (
-      <div style={{ background: "#fafafa", padding: 24 }}>
+      <div style={{ background: "var(--muted)", padding: 24 }}>
         <Skeleton active />
       </div>
     );

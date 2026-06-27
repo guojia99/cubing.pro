@@ -34,6 +34,7 @@ import { apiEvents } from "@/services/cubing-pro/events/events";
 import { EventsAPI } from "@/services/cubing-pro/events/typings";
 import { PlayersAPI } from "@/services/cubing-pro/players/typings";
 import { isNumber } from "@/utils/types/numbers";
+import { ADMIN_LEGACY } from "@/theme/domainColors";
 import { CloseCircleOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import {
   Alert,
@@ -695,7 +696,7 @@ function OrganizersResultsContent({
                       </>
                     }
                   >
-                    <InfoCircleOutlined style={{ marginRight: 5, color: '#d5ad62' }} />
+                    <InfoCircleOutlined style={{ marginRight: 5, color: ADMIN_LEGACY.tooltipGold }} />
                   </Tooltip>
                   录入成绩
                 </span>
@@ -778,7 +779,7 @@ function OrganizersResultsContent({
                       </>
                     }
                   >
-                    <InfoCircleOutlined style={{ marginRight: 5, color: '#d5ad62' }} />
+                    <InfoCircleOutlined style={{ marginRight: 5, color: ADMIN_LEGACY.tooltipGold }} />
                   </Tooltip>
                   批量录入
                 </span>
@@ -974,9 +975,9 @@ function OrganizersResultsContent({
       width: 100,
       render: (f: boolean) => {
         if (f) {
-          return <Tag color="#52c41a">已审批</Tag>;
+          return <Tag color={ADMIN_LEGACY.successGreen}>已审批</Tag>;
         }
-        return <Tag color="#F4D95B">待审批</Tag>;
+        return <Tag color={ADMIN_LEGACY.pendingGold}>待审批</Tag>;
       },
     },
   ];
@@ -998,7 +999,7 @@ function OrganizersResultsContent({
         return;
       }
 
-      const color = ok ? "#a0d911" : "red";
+      const color = ok ? ADMIN_LEGACY.actionLime : ADMIN_LEGACY.errorRed;
 
       let progress = 0;
       let startSend = false;
@@ -1063,7 +1064,7 @@ function OrganizersResultsContent({
             <Button
               type="primary"
               onClick={onPreResultFinish(true)}
-              style={{ float: "right", backgroundColor: "#a0d911" }}
+              style={{ float: "right", backgroundColor: ADMIN_LEGACY.actionLime }}
             >
               通过
             </Button>

@@ -111,7 +111,7 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
               <div>
                 <strong>{cpName}</strong>
               </div>
-              <div style={{ fontSize: '12px', color: '#666' }}>{record.compDate}</div>
+              <div style={{ fontSize: '12px', color: 'var(--muted-foreground)' }}>{record.compDate}</div>
             </div>
           );
         }
@@ -143,7 +143,7 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
         <span
           style={{
             fontWeight: pos === 0 ? 'bold' : 'normal',
-            color: pos === 0 ? '#cf1322' : 'inherit', // 红色：Ant Design 的 error 主色
+            color: pos === 0 ? 'var(--destructive)' : 'inherit',
           }}
         >
           {pos}
@@ -275,7 +275,7 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
 
   if (dataSource.length === 0) {
     return (
-      <div style={{ color: '#999', fontStyle: 'italic' }}>
+      <div style={{ color: 'var(--faint-foreground)', fontStyle: 'italic' }}>
         {intl.formatMessage({ id: 'wca.results.noEventResults' }, { event: eventID })}
       </div>
     );

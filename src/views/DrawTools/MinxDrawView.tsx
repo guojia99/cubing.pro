@@ -3,26 +3,12 @@
 import { useEffect, useState } from "react";
 
 import { useI18n } from "@/contexts/I18nProvider";
+import { MEGAMINX_STICKER_PALETTE } from "@/theme/domainColors";
 import { DrawNavTabs } from "@/views/DrawTools/components/DrawNavTabs";
 import { DrawPalette } from "@/views/DrawTools/components/DrawPalette";
 import type { PathSvg } from "@/views/DrawTools/types";
 
-const baseMinxColor = [
-  "#00000000",
-  "#033fff",
-  "#f3ff00",
-  "#d10707",
-  "#b112d8",
-  "#206606",
-  "#ebf076",
-  "#4dd800",
-  "#ff8806",
-  "#f18886",
-  "#60a8f1",
-  "#3d3d3d",
-  "#f5f3db",
-  "#777",
-];
+const baseMinxColor = [...MEGAMINX_STICKER_PALETTE];
 
 const minxPoints = [
   "M1985 2690 L3488 1595 L3488 2541 L2894 2968 Z",

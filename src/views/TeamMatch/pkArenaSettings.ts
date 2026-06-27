@@ -1,3 +1,5 @@
+import { PK_BRACKET_WING, PK_TEAM_COLORS } from '@/theme/domainColors';
+
 /** 全屏对战动画可配置项（由 liveUiSettings 统一持久化） */
 export type PkArenaSettings = {
   /** 全屏对战：各队伍栏内底部动态波浪装饰 */
@@ -41,22 +43,22 @@ export function getDefaultPkArenaSettings(): PkArenaSettings {
   return {
     flagBackgroundEnabled: true,
     scale: 1,
-    backgroundColor: '#06060c',
-    backgroundColorEnd: '#10101c',
-    glowLeft: 'rgba(255, 77, 79, 0.42)',
-    glowRight: 'rgba(22, 119, 255, 0.45)',
-    stripLeft: 'rgba(255, 77, 79, 0.22)',
-    stripRight: 'rgba(22, 119, 255, 0.22)',
-    teamNameColor: '#ffffff',
+    backgroundColor: 'var(--background)',
+    backgroundColorEnd: 'var(--card)',
+    glowLeft: `color-mix(in srgb, ${PK_TEAM_COLORS.teamB} 42%, transparent)`,
+    glowRight: `color-mix(in srgb, ${PK_TEAM_COLORS.teamA} 45%, transparent)`,
+    stripLeft: `color-mix(in srgb, ${PK_TEAM_COLORS.teamB} 22%, transparent)`,
+    stripRight: `color-mix(in srgb, ${PK_TEAM_COLORS.teamA} 22%, transparent)`,
+    teamNameColor: 'var(--foreground)',
     teamNameFontPx: 30,
-    playerNameColor: '#f5f5f5',
+    playerNameColor: 'var(--foreground)',
     playerNameFontPx: 20,
-    pkTitleColor: '#ffffff',
+    pkTitleColor: 'var(--foreground)',
     pkTitleFontPx: 52,
     avatarSizePx: 80,
     diagonalStepPx: 36,
     buttonFontPx: 16,
-    barBg: 'rgba(0, 0, 0, 0.35)',
+    barBg: 'color-mix(in srgb, var(--background) 35%, transparent)',
     heroDetailAvatarPx: 300,
     heroDetailNameFontPx: 56,
     heroDetailPkScoreFontPx: 48,

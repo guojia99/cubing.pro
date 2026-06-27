@@ -57,7 +57,7 @@ function PkArenaHeroSlideOver({ open, anchor, onClose, settings, data }: Props) 
           tmPkArenaHeroPanelVisible: visible,
         })}
         style={{
-          background: `linear-gradient(200deg, ${settings.backgroundColorEnd}f2 0%, ${settings.backgroundColor} 55%, rgba(0,0,0,0.92) 100%)`,
+          background: `linear-gradient(200deg, color-mix(in srgb, ${settings.backgroundColorEnd} 95%, transparent) 0%, ${settings.backgroundColor} 55%, color-mix(in srgb, var(--background) 92%, black) 100%)`,
           borderColor: anchor === 'left' ? settings.stripLeft : settings.stripRight,
         }}
       >
@@ -66,7 +66,7 @@ function PkArenaHeroSlideOver({ open, anchor, onClose, settings, data }: Props) 
             <Typography.Text style={{ color: settings.teamNameColor, fontSize: teamPx }} strong>
               {data.teamName}
             </Typography.Text>
-            <Button type="text" size="small" onClick={onClose} style={{ color: 'rgba(255,255,255,0.85)' }}>
+            <Button type="text" size="small" onClick={onClose} style={{ color: 'color-mix(in srgb, var(--foreground) 85%, transparent)' }}>
               关闭
             </Button>
           </div>
@@ -106,20 +106,20 @@ function PkArenaHeroSlideOver({ open, anchor, onClose, settings, data }: Props) 
             {data.schoolName}
           </Typography.Text>
 
-          <Typography.Text className="tmPkArenaHeroWca" style={{ fontSize: Math.max(12, schoolPx - 2), color: 'rgba(230,230,235,0.88)' }}>
+          <Typography.Text className="tmPkArenaHeroWca" style={{ fontSize: Math.max(12, schoolPx - 2), color: 'color-mix(in srgb, var(--foreground) 88%, transparent)' }}>
             WCA ID：{data.wcaId?.trim() ? data.wcaId.trim() : '—'}
           </Typography.Text>
 
           {data.pkResultLine ? (
             <div className="tmPkArenaHeroScorePk">
-              <Typography.Text style={{ color: '#ffd666', fontSize: scorePkPx, fontWeight: 800 }}>
+              <Typography.Text style={{ color: 'var(--signal-warning)', fontSize: scorePkPx, fontWeight: 800 }}>
                 {data.pkResultLine}
               </Typography.Text>
             </div>
           ) : null}
 
           <div className="tmPkArenaHeroSeed">
-            <Typography.Text style={{ color: 'rgba(245,245,245,0.88)', fontSize: seedPx }}>种子：{data.seedScoresLine}</Typography.Text>
+            <Typography.Text style={{ color: 'color-mix(in srgb, var(--foreground) 88%, transparent)', fontSize: seedPx }}>种子：{data.seedScoresLine}</Typography.Text>
           </div>
 
           {(data.teamBattlecry || '').trim() ? (
@@ -127,7 +127,7 @@ function PkArenaHeroSlideOver({ open, anchor, onClose, settings, data }: Props) 
               <Typography.Text className="tmPkArenaHeroCryLabel" style={{ fontSize: cryPx }}>
                 队伍宣言
               </Typography.Text>
-              <Typography.Paragraph className="tmPkArenaHeroCryText" style={{ fontSize: cryPx, color: 'rgba(255,255,255,0.9)' }}>
+              <Typography.Paragraph className="tmPkArenaHeroCryText" style={{ fontSize: cryPx, color: 'color-mix(in srgb, var(--foreground) 90%, transparent)' }}>
                 {data.teamBattlecry.trim()}
               </Typography.Paragraph>
             </div>
@@ -138,7 +138,7 @@ function PkArenaHeroSlideOver({ open, anchor, onClose, settings, data }: Props) 
               <Typography.Text className="tmPkArenaHeroCryLabel" style={{ fontSize: cryPx }}>
                 个人宣言
               </Typography.Text>
-              <Typography.Paragraph className="tmPkArenaHeroCryText" style={{ fontSize: cryPx, color: 'rgba(255,255,255,0.9)' }}>
+              <Typography.Paragraph className="tmPkArenaHeroCryText" style={{ fontSize: cryPx, color: 'color-mix(in srgb, var(--foreground) 90%, transparent)' }}>
                 {data.playerBattlecry.trim()}
               </Typography.Paragraph>
             </div>

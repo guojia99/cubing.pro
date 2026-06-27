@@ -15,6 +15,7 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
 import { BiSolidFileJpg, BiSolidFilePng } from "react-icons/bi";
 
 import { useI18n } from "@/contexts/I18nProvider";
+import { DRAW_FONT_COLOR, DRAW_NEUTRAL_STICKER } from "@/theme/domainColors";
 import { ColorPalette } from "@/views/DrawTools/components/ColorPalette";
 import {
   buildRenderKey,
@@ -62,7 +63,7 @@ function buildTransform(elem: PathSvg): string {
 }
 
 function defaultColorForKey(key: string): string {
-  return key.includes("fonts") ? "#000" : "#777";
+  return key.includes("fonts") ? DRAW_FONT_COLOR : DRAW_NEUTRAL_STICKER;
 }
 
 const FILE_DOWNLOAD_ICON_SIZE = "1.1rem";

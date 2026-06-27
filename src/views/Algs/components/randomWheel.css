@@ -12,14 +12,17 @@
   height: 100%;
   border-radius: 50%;
   box-shadow:
-    0 0 0 6px rgba(100, 149, 237, 0.4),
-    inset 0 0 0 4px rgba(255, 255, 255, 0.9),
-    0 8px 24px rgba(0, 0, 0, 0.12);
+    0 0 0 6px color-mix(in srgb, var(--accent) 40%, transparent),
+    inset 0 0 0 4px color-mix(in srgb, var(--card) 90%, transparent),
+    0 8px 24px color-mix(in srgb, var(--foreground) 12%, transparent);
   overflow: hidden;
 }
 
 .random-wheel.random-wheel-placeholder {
-  background: conic-gradient(from 0deg, rgba(100, 149, 237, 0.6) 0deg 360deg);
+  background: conic-gradient(
+    from 0deg,
+    color-mix(in srgb, var(--accent) 60%, transparent) 0deg 360deg
+  );
   display: flex;
   align-items: center;
   justify-content: center;
@@ -28,8 +31,8 @@
 .random-wheel-placeholder-inner {
   font-size: 48px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.9);
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  color: var(--accent-foreground);
+  text-shadow: 0 2px 8px color-mix(in srgb, var(--foreground) 20%, transparent);
 }
 
 .random-wheel-svg {
@@ -41,8 +44,8 @@
 .random-wheel-label {
   font-size: 11px;
   font-weight: 600;
-  fill: rgba(0, 0, 0, 0.9);
-  text-shadow: 0 0 2px rgba(255, 255, 255, 0.8);
+  fill: var(--foreground);
+  text-shadow: 0 0 2px color-mix(in srgb, var(--card) 80%, transparent);
   pointer-events: none;
 }
 
@@ -55,7 +58,7 @@
   height: 0;
   border-left: 12px solid transparent;
   border-right: 12px solid transparent;
-  border-top: 20px solid rgba(100, 149, 237, 0.95);
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  border-top: 20px solid var(--accent);
+  filter: drop-shadow(0 2px 4px color-mix(in srgb, var(--foreground) 20%, transparent));
   z-index: 2;
 }

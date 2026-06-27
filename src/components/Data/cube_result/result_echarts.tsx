@@ -1,6 +1,12 @@
 import React from "react";
 import ReactECharts from "echarts-for-react";
 
+import {
+  getChartAxisStyle,
+  getChartSeriesColors,
+  getChartTooltipStyle,
+} from "@/theme/chartColors";
+
 type ScoreType = "best" | "average";
 
 interface ScoreData {
@@ -17,6 +23,9 @@ interface Props {
 }
 
 const ScoreLineChart: React.FC<Props> = ({ data, renderScore }) => {
+  const seriesColors = getChartSeriesColors(2);
+  const axisStyle = getChartAxisStyle();
+  const tooltipStyle = getChartTooltipStyle();
   const bestData = data.filter((item) => item.type === "best");
   const averageData = data.filter((item) => item.type === "average");
 
@@ -48,7 +57,7 @@ const ScoreLineChart: React.FC<Props> = ({ data, renderScore }) => {
         name: "Best",
         type: "line",
         data: formatSeriesData(bestData),
-        itemStyle: { color: "#5470C6" },
+        itemStyle: { color: seriesColors[0] },
         symbol: "circle",
         symbolSize: 8,
       },
@@ -59,7 +68,7 @@ const ScoreLineChart: React.FC<Props> = ({ data, renderScore }) => {
         name: "Average",
         type: "line",
         data: formatSeriesData(averageData),
-        itemStyle: { color: "#91CC75" },
+        itemStyle: { color: seriesColors[1] },
         symbol: "triangle",
         symbolSize: 8,
       });
@@ -75,6 +84,7 @@ const ScoreLineChart: React.FC<Props> = ({ data, renderScore }) => {
     },
     tooltip: {
       trigger: "axis",
+      ...tooltipStyle,
       formatter: (params: any[]) => {
         const idx = params[0].dataIndex;
         const round = bestData[idx]?.round || averageData[idx]?.round;
@@ -102,10 +112,12 @@ const ScoreLineChart: React.FC<Props> = ({ data, renderScore }) => {
       type: "category",
       data: xAxisData.map((x) => `#${x.value}`),
       name: "Index",
+      ...axisStyle,
     },
     yAxis: {
       type: "value",
       name: "成绩",
+      ...axisStyle,
     },
     series: getSeries(),
   };

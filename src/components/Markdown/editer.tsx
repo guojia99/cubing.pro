@@ -35,12 +35,12 @@ function MarkdownEditor({ value, onChange }: { value?: string; onChange?: (val: 
 
   return (
     <>
-      <div style={{ border: '1px solid #ccc', zIndex: 100 }}>
+      <div style={{ border: '1px solid var(--border-default)', zIndex: 100 }}>
         <Toolbar
           editor={editor}
           defaultConfig={toolbarConfig}
           mode="default"
-          style={{ borderBottom: '1px solid #ccc' }}
+          style={{ borderBottom: '1px solid var(--border-default)' }}
         />
         <Editor
           defaultConfig={editorConfig}

@@ -4,6 +4,12 @@ import { Tag, Typography } from 'antd';
 import React from 'react';
 import './MilestoneContent.css';
 import { useIntl } from '@/hooks/useIntlMessage';
+import {
+  getChartSeriesColors,
+  getThemeColors,
+  mixCssColors,
+} from '@/theme/chartColors';
+import { MEDAL_COLORS } from '@/theme/domainColors';
 import { Milestone, MilestoneType, getCompName } from './player_milestone';
 
 const { Text } = Typography;
@@ -43,24 +49,39 @@ export const MILESTONE_COLOR_MAP: Record<MilestoneType, string> = {
   multi_gold_single_comp: 'gold',
 };
 
-// 气泡颜色映射
-export const BUBBLE_COLOR_MAP: Record<MilestoneType, { bg: string; border: string; text: string }> =
-  {
-    first_competition: { bg: '#dbeafe', border: '#3b82f6', text: '#1e40af' },
-    first_overseas_competition: { bg: '#e0e7ff', border: '#6366f1', text: '#312e81' },
-    competing_anniversary: { bg: '#cffafe', border: '#06b6d4', text: '#155e75' },
-    significant_improvement: { bg: '#dcfce7', border: '#22c55e', text: '#166534' },
-    grand_slam: { bg: '#fef9c3', border: '#eab308', text: '#854d0e' },
-    comeback: { bg: '#e9d5ff', border: '#a855f7', text: '#7e22ce' },
-    first_blindfolded_success: { bg: '#ffedd5', border: '#f4bc94', text: '#c2410c' },
-    first_podium: { bg: '#f8d7da', border: '#c92a2a', text: '#801b1b' },
-    record_breaker: { bg: '#fee2e2', border: '#ef4444', text: '#b91c1c' },
-    nth_competition: { bg: '#f6f6f6', border: '#ff0000', text: '#e2134e' },
-    first_333_average_sub10: { bg: '#fce7f3', border: '#db2777', text: '#831843' },
-    first_triple_podium_competition: { bg: '#ffedd5', border: '#ea580c', text: '#9a3412' },
-    busy_competition_year: { bg: '#e0f2fe', border: '#0284c7', text: '#0c4a6e' },
-    multi_gold_single_comp: { bg: '#fef9c3', border: '#ca8a04', text: '#713f12' },
+function bubbleStyle(accent: string, background: string, text: string) {
+  return {
+    bg: mixCssColors(accent, background, 12),
+    border: accent,
+    text,
   };
+}
+
+// 气泡颜色映射（随主题派生）
+export function getBubbleColorMap(): Record<
+  MilestoneType,
+  { bg: string; border: string; text: string }
+> {
+  const c = getThemeColors();
+  const s = getChartSeriesColors(14);
+  const text = (color: string) => mixCssColors(color, c.foreground, 70);
+  return {
+    first_competition: bubbleStyle(s[0]!, c.background, text(s[0]!)),
+    first_overseas_competition: bubbleStyle(s[3]!, c.background, text(s[3]!)),
+    competing_anniversary: bubbleStyle(c.accent, c.background, text(c.accent)),
+    significant_improvement: bubbleStyle(c.signalSuccess, c.background, text(c.signalSuccess)),
+    grand_slam: bubbleStyle(c.signalWarning, c.background, text(c.signalWarning)),
+    comeback: bubbleStyle(s[3]!, c.background, text(s[3]!)),
+    first_blindfolded_success: bubbleStyle(c.signalWarning, c.background, text(c.signalWarning)),
+    first_podium: bubbleStyle(c.destructive, c.background, text(c.destructive)),
+    record_breaker: bubbleStyle(c.destructive, c.background, text(c.destructive)),
+    nth_competition: bubbleStyle(c.destructive, c.background, text(c.destructive)),
+    first_333_average_sub10: bubbleStyle(s[6]!, c.background, text(s[6]!)),
+    first_triple_podium_competition: bubbleStyle(c.signalWarning, c.background, text(c.signalWarning)),
+    busy_competition_year: bubbleStyle(c.signalInfo, c.background, text(c.signalInfo)),
+    multi_gold_single_comp: bubbleStyle(c.signalWarning, c.background, text(c.signalWarning)),
+  };
+}
 
 interface MilestoneItemContentProps {
   milestone: Milestone;
@@ -69,10 +90,12 @@ interface MilestoneItemContentProps {
 
 const MilestoneItemContent: React.FC<MilestoneItemContentProps> = ({ milestone, isLeft }) => {
   const intl = useIntl();
-  const bubbleStyle = BUBBLE_COLOR_MAP[milestone.type] || {
-    bg: '#f5f5f5',
-    border: '#d9d9d9',
-    text: '#000',
+  const theme = getThemeColors();
+  const bubbleStyleMap = getBubbleColorMap();
+  const bubbleStyleEntry = bubbleStyleMap[milestone.type] || {
+    bg: mixCssColors(theme.foreground, theme.background, 4),
+    border: theme.border,
+    text: theme.foreground,
   };
 
   const overseasDestinationLabel =
@@ -87,8 +110,8 @@ const MilestoneItemContent: React.FC<MilestoneItemContentProps> = ({ milestone, 
     <div
       className="milestone-item-bubble"
       style={{
-        backgroundColor: bubbleStyle.bg,
-        border: `1px solid ${bubbleStyle.border}`,
+        backgroundColor: bubbleStyleEntry.bg,
+        border: `1px solid ${bubbleStyleEntry.border}`,
         borderRadius: '12px',
         padding: '12px 16px',
         position: 'relative',
@@ -110,11 +133,11 @@ const MilestoneItemContent: React.FC<MilestoneItemContentProps> = ({ milestone, 
           height: 0,
           borderTop: '6px solid transparent',
           borderBottom: '6px solid transparent',
-          [isLeft ? 'borderLeft' : 'borderRight']: `8px solid ${bubbleStyle.border}`,
+          [isLeft ? 'borderLeft' : 'borderRight']: `8px solid ${bubbleStyleEntry.border}`,
         }}
       />
 
-      <Text style={{ color: bubbleStyle.text, fontWeight: 800, marginBottom: '6px' }}>
+      <Text style={{ color: bubbleStyleEntry.text, fontWeight: 800, marginBottom: '6px' }}>
         {milestone.description}
       </Text>
 
@@ -143,13 +166,13 @@ const MilestoneItemContent: React.FC<MilestoneItemContentProps> = ({ milestone, 
             <Tag
               color={
                 milestone.position === 1
-                  ? '#ffd700'
+                  ? MEDAL_COLORS.gold
                   : milestone.position === 2
-                  ? '#c0c0c0'
-                  : '#cd7f32'
+                  ? MEDAL_COLORS.silver
+                  : MEDAL_COLORS.bronze
               }
               style={{
-                color: milestone.position === 1 ? '#000' : '#fff',
+                color: milestone.position === 1 ? theme.foreground : theme.card,
                 fontWeight: 'bold',
               }}
             >
@@ -233,7 +256,7 @@ const MilestoneItemContent: React.FC<MilestoneItemContentProps> = ({ milestone, 
         ) : null}
 
         {milestone.gold_count != null && milestone.gold_count >= 2 ? (
-          <Tag color="gold" style={{ color: '#000', fontWeight: 700 }}>
+          <Tag color="gold" style={{ color: theme.foreground, fontWeight: 700 }}>
             {intl.formatMessage({ id: 'wca.milestone.multiGoldTag' }, { count: milestone.gold_count })}
           </Tag>
         ) : null}

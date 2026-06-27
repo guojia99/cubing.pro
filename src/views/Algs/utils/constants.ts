@@ -1,29 +1,70 @@
-/** Chakra 语义 token 路径，随深浅色自动切换 */
+/** Chakra semantic token paths — follow theme / palette automatically */
 export const ALGS_COLORS = {
-  primary: "rgba(34, 168, 203, 0.55)",
-  primaryHover: "rgba(34, 168, 203, 0.75)",
+  primary: "accent",
+  primaryHover: "accent.emphasis",
   cardBg: "algs.card.bg",
   cardBorder: "algs.card.border",
   cardDiagramBg: "algs.card.diagram",
   cardHoverBorder: "algs.card.hoverBorder",
   sectionBg: "algs.section.bg",
-  buttonBg: "rgba(34, 168, 203, 0.55)",
-  watermark: "rgba(34, 168, 203, 0.15)",
+  buttonBg: "accent.soft",
+  watermark: "accent.soft",
 } as const;
 
+/** Formula set group cards — accent-derived mixes (inline style safe) */
 export const SET_CARD_COLORS = [
-  { bg: 'rgba(34, 168, 203, 0.12)', border: 'rgba(34, 168, 203, 0.55)', accent: '#22a8cb' },
-  { bg: 'rgba(45, 148, 176, 0.12)', border: 'rgba(45, 148, 176, 0.55)', accent: '#2d94b0' },
-  { bg: 'rgba(74, 175, 201, 0.12)', border: 'rgba(74, 175, 201, 0.55)', accent: '#4aafc9' },
-  { bg: 'rgba(122, 201, 220, 0.12)', border: 'rgba(122, 201, 220, 0.55)', accent: '#7ac9dc' },
-  { bg: 'rgba(169, 224, 235, 0.12)', border: 'rgba(169, 224, 235, 0.55)', accent: '#a9e0eb' },
-  { bg: 'rgba(29, 95, 117, 0.12)', border: 'rgba(29, 95, 117, 0.55)', accent: '#1d5f75' },
+  {
+    bg: "color-mix(in srgb, var(--accent) 12%, transparent)",
+    border: "color-mix(in srgb, var(--accent) 55%, transparent)",
+    accent: "var(--accent)",
+  },
+  {
+    bg: "color-mix(in srgb, var(--accent) 10%, var(--card))",
+    border: "color-mix(in srgb, var(--accent) 45%, transparent)",
+    accent: "color-mix(in srgb, var(--accent) 88%, var(--foreground))",
+  },
+  {
+    bg: "color-mix(in srgb, var(--accent) 8%, var(--muted))",
+    border: "color-mix(in srgb, var(--accent) 40%, transparent)",
+    accent: "color-mix(in srgb, var(--accent) 70%, white)",
+  },
+  {
+    bg: "color-mix(in srgb, var(--foreground) 4%, var(--card))",
+    border: "color-mix(in srgb, var(--accent) 35%, transparent)",
+    accent: "var(--muted-foreground)",
+  },
+  {
+    bg: "color-mix(in srgb, var(--accent) 6%, var(--background))",
+    border: "color-mix(in srgb, var(--accent) 30%, transparent)",
+    accent: "var(--faint-foreground)",
+  },
+  {
+    bg: "color-mix(in srgb, var(--foreground) 6%, var(--card))",
+    border: "color-mix(in srgb, var(--foreground) 18%, transparent)",
+    accent: "var(--foreground)",
+  },
 ] as const;
 
+/** Practice tool panel accents — semantic signals + accent */
 export const PRACTICE_COLORS = {
-  random: { bg: 'rgba(34, 168, 203, 0.08)', border: 'rgba(34, 168, 203, 0.45)' },
-  practice: { bg: 'rgba(0, 185, 204, 0.08)', border: 'rgba(0, 185, 204, 0.45)' },
-  proficiency: { bg: 'rgba(45, 148, 176, 0.08)', border: 'rgba(45, 148, 176, 0.45)' },
-  history: { bg: 'rgba(250, 173, 20, 0.08)', border: 'rgba(250, 173, 20, 0.45)' },
-  batch: { bg: 'rgba(114, 46, 209, 0.08)', border: 'rgba(114, 46, 209, 0.45)' },
+  random: {
+    bg: "color-mix(in srgb, var(--accent) 8%, transparent)",
+    border: "color-mix(in srgb, var(--accent) 45%, transparent)",
+  },
+  practice: {
+    bg: "color-mix(in srgb, var(--signal-info) 8%, transparent)",
+    border: "color-mix(in srgb, var(--signal-info) 45%, transparent)",
+  },
+  proficiency: {
+    bg: "color-mix(in srgb, var(--accent) 6%, transparent)",
+    border: "color-mix(in srgb, var(--accent) 40%, transparent)",
+  },
+  history: {
+    bg: "color-mix(in srgb, var(--signal-warning) 8%, transparent)",
+    border: "color-mix(in srgb, var(--signal-warning) 45%, transparent)",
+  },
+  batch: {
+    bg: "color-mix(in srgb, var(--accent) 10%, var(--muted))",
+    border: "color-mix(in srgb, var(--accent) 50%, transparent)",
+  },
 } as const;

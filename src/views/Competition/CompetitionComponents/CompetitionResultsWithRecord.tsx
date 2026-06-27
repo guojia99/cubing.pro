@@ -23,7 +23,7 @@ const CompetitionResultsWithRecord: React.FC<CompetitionResultsWithRecordProps> 
   if (records === null || records === undefined || records.length === 0) {
     return (
       <>
-        <Divider style={{ borderColor: '#7cb305' }}>本场比赛无记录产生</Divider>
+        <Divider style={{ borderColor: "var(--signal-success)" }}>本场比赛无记录产生</Divider>
       </>
     );
   }

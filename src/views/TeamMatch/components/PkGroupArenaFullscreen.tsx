@@ -10,6 +10,7 @@ import type { PkPlayerResult, Team } from '@/views/TeamMatch/types';
 import { Button, Space, Typography } from 'antd';
 import classNames from 'classnames';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { DarkMode } from '@/components/ui/color-mode';
 import { useHideAppChrome } from '@/hooks/useHideAppChrome';
 import '../TeamMatch.css';
 
@@ -166,17 +167,18 @@ function PkGroupArenaFullscreen({
   const step = settings.diagonalStepPx;
   const av = settings.avatarSizePx;
   const metaFont = Math.max(11, Math.round(settings.playerNameFontPx * 0.52));
-  const metaColor = 'rgba(245, 245, 245, 0.78)';
+  const metaColor = 'color-mix(in srgb, var(--foreground) 78%, transparent)';
   const carouselInterval = Math.max(500, settings.heroCarouselIntervalMs);
 
   return (
+    <DarkMode>
     <div className="tmPkArenaFs tmPkArenaFsGroup">
       <div className="tmPkArenaFsBg" style={bgStyle} aria-hidden />
       <div
         className="tmPkArenaFsTopBar tmPkArenaFsGroupTopBar"
         style={{ background: settings.barBg }}
       >
-        <Typography.Text strong style={{ color: 'rgba(255,255,255,0.92)', fontSize: settings.buttonFontPx }}>
+        <Typography.Text strong style={{ color: 'color-mix(in srgb, var(--foreground) 92%, transparent)', fontSize: settings.buttonFontPx }}>
           预选赛 · 小组全屏
         </Typography.Text>
         <Space wrap>
@@ -323,6 +325,7 @@ function PkGroupArenaFullscreen({
         data={heroData}
       />
     </div>
+    </DarkMode>
   );
 }
 

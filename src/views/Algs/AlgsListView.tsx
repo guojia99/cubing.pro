@@ -42,7 +42,8 @@ import {
 } from "@/services/cubing-pro/user/user_kv";
 
 import AlgsCubeDiagram from "./components/AlgsCubeDiagram";
-import RandomPickModal, { RANDOM_PICK_ICON_SVG } from "./components/RandomPickModal";
+import RandomPickModal from "./components/RandomPickModal";
+import { RANDOM_PICK_ICON_SVG } from "./utils/randomPickIcon";
 import SvgRenderer from "./components/SvgRenderer";
 import { ALGS_COLORS } from "./utils/constants";
 
