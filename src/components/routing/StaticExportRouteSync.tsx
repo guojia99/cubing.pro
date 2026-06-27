@@ -5,6 +5,8 @@ import { useEffect, useRef } from "react";
 
 import { matchRoute } from "@/config/routes";
 
+const SYNC_ATTEMPT_KEY = "cubing-pro-export-route-sync";
+
 function normalizePathname(pathname: string): string {
   try {
     return decodeURIComponent(pathname.replace(/\/$/, "") || "/");
@@ -22,6 +24,22 @@ function readExportedPath(): string | null {
   const meta = document.querySelector('meta[name="x-export-path"]');
   const value = meta?.getAttribute("content")?.trim();
   return value ? normalizePathname(value) : null;
+}
+
+function hasSyncAttempted(browserPath: string): boolean {
+  try {
+    return sessionStorage.getItem(`${SYNC_ATTEMPT_KEY}:${browserPath}`) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function markSyncAttempted(browserPath: string): void {
+  try {
+    sessionStorage.setItem(`${SYNC_ATTEMPT_KEY}:${browserPath}`, "1");
+  } catch {
+    // ignore quota / private mode
+  }
 }
 
 /**
@@ -43,10 +61,14 @@ export function StaticExportRouteSync() {
     if (browserPath === exportedPath) return;
     if (isWelcomeEquivalent(browserPath, exportedPath)) return;
 
-    // 仅当 URL 能匹配到业务路由时再同步，避免无意义跳转
     if (!matchRoute(browserPath)) return;
 
+    // 网关 SPA 回退会导致整页重载；避免对同一路径反复 router.replace 形成刷新死循环
+    if (hasSyncAttempted(browserPath)) return;
+
     synced.current = true;
+    markSyncAttempted(browserPath);
+
     const target =
       window.location.pathname + window.location.search + window.location.hash;
     router.replace(target);
