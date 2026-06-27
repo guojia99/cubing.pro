@@ -1,4 +1,5 @@
 import { getDefaultPkArenaSettings, type PkArenaSettings } from '@/views/TeamMatch/pkArenaSettings';
+import { PK_BRACKET_WING } from '@/theme/domainColors';
 import type { CSSProperties } from 'react';
 
 /** 正赛对阵图区域可配置项 */
@@ -44,28 +45,28 @@ export function getDefaultBracketPageSettings(): BracketPageSettings {
     pageBg: 'transparent',
     scale: 1,
     hintFontPx: 12,
-    hintColor: 'rgba(255, 255, 255, 0.72)',
+    hintColor: 'color-mix(in srgb, var(--foreground) 72%, transparent)',
     wingTitleFontPx: 11,
-    wingTitleColor: 'rgba(255, 255, 255, 0.68)',
+    wingTitleColor: 'color-mix(in srgb, var(--foreground) 68%, transparent)',
     blockTitleFontPx: 13,
-    blockTitleColor: 'rgba(255, 255, 255, 0.88)',
+    blockTitleColor: 'color-mix(in srgb, var(--foreground) 88%, transparent)',
     teamLineFontPx: 15,
-    teamLineColor: 'rgba(255, 255, 255, 0.92)',
+    teamLineColor: 'color-mix(in srgb, var(--foreground) 92%, transparent)',
     vsFontPx: 13,
-    vsColor: 'rgba(255, 255, 255, 0.55)',
+    vsColor: 'color-mix(in srgb, var(--foreground) 55%, transparent)',
     matchIdFontPx: 13,
-    matchIdColor: 'rgba(255, 255, 255, 0.68)',
-    cardBg: 'rgba(255, 255, 255, 0.06)',
-    cardBorderColor: 'rgba(255, 255, 255, 0.14)',
-    clickableBorderColor: 'rgba(255, 255, 255, 0.88)',
-    leftWingBorder: '#1677ff',
-    rightWingBorder: '#fa8c16',
-    leftWingFill: 'linear-gradient(90deg, rgba(22, 119, 255, 0.12) 0%, transparent 70%)',
-    rightWingFill: 'linear-gradient(270deg, rgba(250, 140, 22, 0.12) 0%, transparent 70%)',
-    centerColumnBg: 'rgba(255, 255, 255, 0.03)',
-    centerColumnBorder: 'rgba(255, 255, 255, 0.12)',
+    matchIdColor: 'color-mix(in srgb, var(--foreground) 68%, transparent)',
+    cardBg: 'color-mix(in srgb, var(--foreground) 6%, transparent)',
+    cardBorderColor: 'color-mix(in srgb, var(--foreground) 14%, transparent)',
+    clickableBorderColor: 'color-mix(in srgb, var(--foreground) 88%, transparent)',
+    leftWingBorder: PK_BRACKET_WING.left,
+    rightWingBorder: PK_BRACKET_WING.right,
+    leftWingFill: `linear-gradient(90deg, color-mix(in srgb, ${PK_BRACKET_WING.left} 12%, transparent) 0%, transparent 70%)`,
+    rightWingFill: `linear-gradient(270deg, color-mix(in srgb, ${PK_BRACKET_WING.right} 12%, transparent) 0%, transparent 70%)`,
+    centerColumnBg: 'color-mix(in srgb, var(--foreground) 3%, transparent)',
+    centerColumnBorder: 'color-mix(in srgb, var(--foreground) 12%, transparent)',
     bronzeHintFontPx: 11,
-    bronzeHintColor: 'rgba(255, 255, 255, 0.62)',
+    bronzeHintColor: 'color-mix(in srgb, var(--foreground) 62%, transparent)',
   };
 }
 

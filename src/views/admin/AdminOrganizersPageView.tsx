@@ -171,7 +171,7 @@ function OrgMembersTableBlock({
         dataSource={rows}
       />
       <div style={{ marginTop: 10 }}>
-        <div style={{ marginBottom: 6, color: "rgba(0,0,0,0.45)", fontSize: 12 }}>
+        <div style={{ marginBottom: 6, color: "var(--muted-foreground)", fontSize: 12 }}>
           添加成员：在下方搜索并点选用户，将加入上表
         </div>
         <AdminUserSearchSelect
@@ -470,9 +470,9 @@ export function AdminOrganizersPageView() {
       width: 130,
       render: (_, r) =>
         r.LeaderID ? (
-          PlayerLink(r.LeaderID, r.LeaderID, "#000")
+          PlayerLink(r.LeaderID, r.LeaderID, "var(--foreground)")
         ) : (
-          <span style={{ color: "#999" }}>—</span>
+          <span style={{ color: "var(--faint-foreground)" }}>—</span>
         ),
     },
     { title: "联系邮箱", dataIndex: "Email", ellipsis: true },

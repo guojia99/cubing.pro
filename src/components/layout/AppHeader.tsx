@@ -19,7 +19,7 @@ import { BrandLogo } from "@/components/layout/BrandLogo";
 import { HeaderUserActions } from "@/components/layout/HeaderUserActions";
 import { NAV_FONT_SIZE, navMenuContentProps, navMenuItemProps } from "@/components/layout/navStyles";
 import { LanguageSelect } from "@/components/i18n/LanguageSelect";
-import { ColorModeButton } from "@/components/ui/color-mode";
+import { AppearanceMenu } from "@/components/ui/AppearanceMenu";
 import { useI18n } from "@/contexts/I18nProvider";
 import { buildMainNav, isNavGroupActive, isNavLinkActive, type NavGroupDef, type NavLinkDef } from "@/lib/navigation";
 
@@ -401,7 +401,7 @@ export function AppHeader() {
 
             <HStack gap="2" flexShrink={0}>
               <LanguageSelect />
-              <ColorModeButton />
+              <AppearanceMenu />
               <HeaderUserActions />
               <IconButton
                 aria-label={t("nav.open")}

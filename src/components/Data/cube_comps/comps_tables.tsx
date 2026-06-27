@@ -9,6 +9,7 @@ import { Fragment } from "react";
 
 import { CubeIcon } from "@/components/CubeIcon/cube_icon";
 import type { Comp } from "@/components/Data/types/comps";
+import { getThemeColors } from "@/theme/chartColors";
 import { parseDateTime } from "@/utils/time/data_time";
 
 function parseDayjsLike(val: string) {
@@ -16,6 +17,7 @@ function parseDayjsLike(val: string) {
 }
 
 export function getStatusProp(result: Comp) {
+  const theme = getThemeColors();
   const now = new Date();
   const startTime = parseDayjsLike(result.CompStartTime);
   const endTime = parseDayjsLike(result.CompEndTime);
@@ -27,35 +29,35 @@ export function getStatusProp(result: Comp) {
     case "Running":
       if (result.IsDone) {
         status = "已结束";
-        color = "#8c8c8c";
+        color = theme.faintForeground;
         break;
       }
       if (now < startTime) {
         status = "未开始";
-        color = "#9254de";
+        color = theme.signalInfo;
       } else if (now > startTime && now < endTime) {
         status = "进行中";
-        color = "#52c41a";
+        color = theme.signalSuccess;
       } else {
         status = "待结束";
-        color = "#755b5b";
+        color = theme.signalWarning;
       }
       break;
     case "Reviewing":
       status = "审批中";
-      color = "#F4D95B";
+      color = theme.signalWarning;
       break;
     case "Reject":
       status = "驳回";
-      color = "#F3456D";
+      color = theme.destructive;
       break;
     case "Temporary":
       status = "编辑中";
-      color = "#C4F757";
+      color = theme.accent;
       break;
     case "Ban":
       status = "禁用";
-      color = "#173A4E";
+      color = theme.foreground;
       break;
   }
 

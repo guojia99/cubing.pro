@@ -102,7 +102,7 @@ function WheelSvg({ segments }: { segments: WheelSegment[] }) {
               <path
                 d={pathForSlice(startDeg, endDeg)}
                 fill={color.bg}
-                stroke="rgba(255,255,255,0.6)"
+                stroke="color-mix(in srgb, var(--card) 60%, transparent)"
                 strokeWidth="1"
               />
               <text

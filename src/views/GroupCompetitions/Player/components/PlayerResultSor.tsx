@@ -73,7 +73,7 @@ const PlayerResultsSor: React.FC<PlayerResultsSorProps> = ({ kinchSor }) => {
   return (
     <>
       <Popover content={content} title="KinChSor 算法说明" trigger="hover">
-        <Button style={{fontSize: 10, width: "4em", padding: 0, height: "2.5em", background: "#d8e7e6"}}>说明</Button>
+        <Button style={{fontSize: 10, width: "4em", padding: 0, height: "2.5em", background: "var(--muted)"}}>说明</Button>
       </Popover>
 
 

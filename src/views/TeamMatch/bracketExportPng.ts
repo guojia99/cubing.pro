@@ -1,6 +1,8 @@
 import html2canvas from 'html2canvas';
 import { saveAs } from 'file-saver';
 
+import { readCssVarFrom } from '@/theme/chartColors';
+
 function safeFileBase(name: string): string {
   const trimmed = name.trim();
   if (!trimmed) return 'team-match';
@@ -21,9 +23,14 @@ export function formatBracketExportFilename(sessionName: string): string {
  * 将正赛对阵图区域导出为 PNG（克隆 DOM 内去掉 scale transform，便于高清与完整宽度）。
  */
 export async function exportBracketElementToPng(element: HTMLElement, filename: string): Promise<void> {
+  const backgroundColor =
+    readCssVarFrom(element, '--background') ||
+    readCssVarFrom(element, '--card') ||
+    '#f7fafb';
+
   const canvas = await html2canvas(element, {
     scale: 2,
-    backgroundColor: '#0a0a12',
+    backgroundColor,
     logging: false,
     useCORS: true,
     onclone: (_doc, cloned) => {

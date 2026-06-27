@@ -12,6 +12,12 @@ import {
 import { useCallback, useEffect, useState } from "react";
 
 import { useI18n } from "@/contexts/I18nProvider";
+import {
+  CUBE_FACE_COLORS,
+  DRAW_FONT_COLOR,
+  DRAW_NEUTRAL_STICKER,
+  DRAW_TRANSPARENT,
+} from "@/theme/domainColors";
 import { DrawMutedButton } from "@/views/DrawTools/components/DrawControls";
 
 export interface ColorPaletteProps {
@@ -33,14 +39,14 @@ export function ColorPalette({
 }: ColorPaletteProps) {
   const { t } = useI18n();
   const [historyColors, setHistoryColors] = useState<string[]>([]);
-  const [customColor, setCustomColor] = useState("#3366ff");
+  const [customColor, setCustomColor] = useState<string>(CUBE_FACE_COLORS.blue);
 
   const resetColors = useCallback(() => {
     for (let i = 0; i < allKeys.length; i++) {
       if (allKeys[i].includes("fonts")) {
-        onSelectColor(allKeys[i], "#000");
+        onSelectColor(allKeys[i], DRAW_FONT_COLOR);
       } else {
-        onSelectColor(allKeys[i], "#777");
+        onSelectColor(allKeys[i], DRAW_NEUTRAL_STICKER);
       }
     }
   }, [allKeys, onSelectColor]);
@@ -71,7 +77,7 @@ export function ColorPalette({
   };
 
   const renderColorBlock = (color: string) => {
-    const isTransparent = color === "#00000000";
+    const isTransparent = color === DRAW_TRANSPARENT;
     const isSelected = selectedColor === color;
 
     return (

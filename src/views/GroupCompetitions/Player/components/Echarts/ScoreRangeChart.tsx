@@ -1,4 +1,5 @@
 import { resultTimeString } from '@/components/Data/types/result';
+import { getThemeColors } from '@/theme/chartColors';
 import ReactECharts from 'echarts-for-react';
 import React, { useState } from 'react';
 import { Select } from 'antd';
@@ -8,6 +9,7 @@ interface ScoreRangeChartProps {
 }
 
 const ScoreRangeChart: React.FC<ScoreRangeChartProps> = ({ inputData }) => {
+  const theme = getThemeColors();
   // 过滤掉负数
   const data = inputData.filter((n) => n >= 0);
 
@@ -63,7 +65,9 @@ const ScoreRangeChart: React.FC<ScoreRangeChartProps> = ({ inputData }) => {
         name: '人数',
         data: rangeCounts.map((count, idx) => ({
           value: count,
-          itemStyle: topThreeIndices.includes(idx) ? { color: '#f47885' } : { color: '#4CAF50' },
+          itemStyle: topThreeIndices.includes(idx)
+            ? { color: theme.destructive }
+            : { color: theme.signalSuccess },
         })),
         type: 'bar',
       },

@@ -11,21 +11,21 @@ const THUMBNAIL_IMG =
   "/advertisement/cuberwenjun/价目表.jpg";
 
 const ORANGE_LIGHT = {
-  bgLight: "#fff8f3",
-  bgMid: "#ffefe6",
-  bgAccent: "#ffdfd0",
-  border: "rgba(255, 152, 99, 0.35)",
-  text: "#8b5a2b",
-  textLight: "#b87333",
+  bgLight: "color-mix(in srgb, var(--signal-warning) 8%, var(--background))",
+  bgMid: "color-mix(in srgb, var(--signal-warning) 14%, var(--background))",
+  bgAccent: "color-mix(in srgb, var(--signal-warning) 22%, var(--card))",
+  border: "color-mix(in srgb, var(--signal-warning) 35%, transparent)",
+  text: "color-mix(in srgb, var(--signal-warning) 65%, var(--foreground))",
+  textLight: "color-mix(in srgb, var(--signal-warning) 45%, var(--muted-foreground))",
 };
 
 const ORANGE_DARK = {
-  bgLight: "#2a1810",
-  bgMid: "#3d2218",
-  bgAccent: "#4a2a1a",
-  border: "rgba(255, 152, 99, 0.28)",
-  text: "#ffd4b8",
-  textLight: "#e8a878",
+  bgLight: "color-mix(in srgb, var(--signal-warning) 12%, var(--background))",
+  bgMid: "color-mix(in srgb, var(--signal-warning) 18%, var(--background))",
+  bgAccent: "color-mix(in srgb, var(--signal-warning) 24%, var(--card))",
+  border: "color-mix(in srgb, var(--signal-warning) 28%, transparent)",
+  text: "color-mix(in srgb, var(--signal-warning) 40%, var(--foreground))",
+  textLight: "color-mix(in srgb, var(--signal-warning) 30%, var(--muted-foreground))",
 };
 
 function useOrangePalette() {

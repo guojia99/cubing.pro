@@ -6,7 +6,7 @@ import { Button, Input, Modal, Select, Table, message } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type CSSProperties } from "react";
 
 import BackButton from "@/components/Buttons/back_button";
 import { CompsTableColumns } from "@/components/Data/cube_comps/comps_tables";
@@ -15,6 +15,7 @@ import { rowClassNameWithStyleLines } from "@/components/Table/table_style";
 import { useAuth } from "@/contexts/AuthProvider";
 import { Auth, hasAnyAuth } from "@/lib/auth";
 import { apiAdminDeleteComp, apiApprovalComp } from "@/services/cubing-pro/auth/admin";
+import { ADMIN_LEGACY } from "@/theme/domainColors";
 import {
   apiEndComp,
   apiGetComps,
@@ -22,6 +23,14 @@ import {
   apiUpdateCompName,
 } from "@/services/cubing-pro/auth/organizers";
 import type { OrganizersAPI } from "@/services/cubing-pro/auth/typings";
+
+/** antd legacy action button — whitelist: ADMIN_LEGACY */
+const adminActionBtn = (bg: string): CSSProperties => ({
+  backgroundColor: bg,
+  fontWeight: 700,
+  color: ADMIN_LEGACY.buttonTextOnColor,
+  border: "none",
+});
 
 export function OrganizersCompsPageView() {
   const router = useRouter();
@@ -121,7 +130,7 @@ export function OrganizersCompsPageView() {
         buttons.push(
           <Button
             key="rename"
-            style={{ backgroundColor: "#13c2c2", fontWeight: 700, color: "#fff", border: "none" }}
+            style={adminActionBtn(ADMIN_LEGACY.actionCyan)}
             size="small"
             onClick={showUpdateNameModal}
           >
@@ -133,7 +142,7 @@ export function OrganizersCompsPageView() {
           buttons.push(
             <Button
               key="result"
-              style={{ backgroundColor: "#4ba3f6", fontWeight: 700, color: "#ffc", border: "none" }}
+              style={adminActionBtn(ADMIN_LEGACY.actionBlue)}
               size="small"
               onClick={() => {
                 router.replace(
@@ -171,7 +180,7 @@ export function OrganizersCompsPageView() {
           buttons.push(
             <Button
               key="end"
-              style={{ backgroundColor: "#ff3bac", fontWeight: 700, color: "#ffc", border: "none" }}
+              style={adminActionBtn(ADMIN_LEGACY.actionPink)}
               size="small"
               onClick={showEnd}
             >
@@ -205,7 +214,7 @@ export function OrganizersCompsPageView() {
           buttons.push(
             <Button
               key="approval"
-              style={{ backgroundColor: "#faad14", fontWeight: 700, color: "#ffc", border: "none" }}
+              style={adminActionBtn(ADMIN_LEGACY.warningGold)}
               size="small"
               onClick={showConfirm}
             >
@@ -222,7 +231,7 @@ export function OrganizersCompsPageView() {
               width: 520,
               content: (
                 <div>
-                  <p style={{ marginBottom: 12, color: "#cf1322" }}>
+                  <p style={{ marginBottom: 12, color: ADMIN_LEGACY.dangerText }}>
                     此操作将永久删除该比赛及其全部成绩（含预录入）、站点纪录、报名与赞助关联等数据，且不可恢复。
                   </p>
                   <p style={{ marginBottom: 8 }}>请输入比赛名称「{result.Name}」以确认：</p>
@@ -257,7 +266,7 @@ export function OrganizersCompsPageView() {
           buttons.push(
             <Button
               key="delete"
-              style={{ backgroundColor: "#ff0000", fontWeight: 700, color: "#ffc", border: "none" }}
+              style={adminActionBtn(ADMIN_LEGACY.pureRed)}
               size="small"
               onClick={showDeleteCompModal}
             >

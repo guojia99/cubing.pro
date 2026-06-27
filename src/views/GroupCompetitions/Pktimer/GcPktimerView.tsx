@@ -103,9 +103,9 @@ export function GcPktimerView() {
         size="small"
         style={{
           margin: "8px 16px",
-          backgroundColor: "#fafafa",
+          backgroundColor: "var(--background)",
           borderRadius: 8,
-          boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+          boxShadow: "0 2px 4px color-mix(in srgb, var(--foreground) 5%, transparent)",
         }}
       >
         <Table

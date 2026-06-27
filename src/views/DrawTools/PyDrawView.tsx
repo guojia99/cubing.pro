@@ -3,19 +3,10 @@
 import { useEffect, useState } from "react";
 
 import { DrawPalette } from "@/views/DrawTools/components/DrawPalette";
+import { PYRAMINX_STICKER_PALETTE } from "@/theme/domainColors";
 import type { PathSvg } from "@/views/DrawTools/types";
 
-const basePyColor = [
-  "#00000000",
-  "#033fff",
-  "#f3ff00",
-  "#d10707",
-  "#ff8806",
-  "#206606",
-  "#3d3d3d",
-  "#f5f3db",
-  "#777",
-];
+const basePyColor = [...PYRAMINX_STICKER_PALETTE];
 
 const pyPoints = [
   "87.65 463.25 4.75 420.25 79.08 304.24 87.65 463.25",

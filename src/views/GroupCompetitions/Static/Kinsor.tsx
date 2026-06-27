@@ -130,7 +130,7 @@ export function KinCh({ isSenior, isCountry, otherDataFn, pages = true }: KinChP
       render: (_value: number, sor: KinChSorResult) => {
         const filter = sor.Results.filter((item: KinChSorResultWithEvent) => item.Event === ev);
         if (filter.length === 0) {
-          return <span style={{ color: "#ccc" }}>-</span>;
+          return <span style={{ color: "var(--faint-foreground)" }}>-</span>;
         }
 
         const find = filter[0];
@@ -149,13 +149,13 @@ export function KinCh({ isSenior, isCountry, otherDataFn, pages = true }: KinChP
         if (!hasValidResult && find.ResultString) {
           return (
             <Tooltip title={tooltipContent}>
-              <span style={{ color: "#ccc" }}>0.0</span>
+              <span style={{ color: "var(--faint-foreground)" }}>0.0</span>
             </Tooltip>
           );
         }
 
         if (!hasValidResult) {
-          return <span style={{ color: "#ccc" }}>-</span>;
+          return <span style={{ color: "var(--faint-foreground)" }}>-</span>;
         }
 
         const formattedResult = find.Result.toFixed(2);
@@ -168,7 +168,7 @@ export function KinCh({ isSenior, isCountry, otherDataFn, pages = true }: KinChP
           );
         } else {
           displayText = find.IsBest ? (
-            <strong style={{ color: "#b40000" }}>{formattedResult}</strong>
+            <strong style={{ color: "var(--destructive)" }}>{formattedResult}</strong>
           ) : (
             formattedResult
           );
@@ -214,7 +214,7 @@ export function KinCh({ isSenior, isCountry, otherDataFn, pages = true }: KinChP
           if (isSenior || otherDataFn !== undefined) {
             return <>{WCALinkWithCnName(sor.wca_id, sor.WcaName)}</>;
           }
-          return <>{PlayerLink(sor.CubeId, sor.PlayerName, "rgb(29,177,236)")}</>;
+          return <>{PlayerLink(sor.CubeId, sor.PlayerName, "var(--accent)")}</>;
         },
       },
       {

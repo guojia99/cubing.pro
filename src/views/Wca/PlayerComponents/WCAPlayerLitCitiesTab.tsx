@@ -20,6 +20,12 @@ import { normalizeTaiwanCountyGeoJson, TAIWAN_COUNTY_GEOJSON_URL } from './litCi
 import { safeGeoCount } from './litCities/safeCount';
 import { wcaCountryIdToWorldMapName } from './litCities/worldCountryMap';
 import { resolveWcaCityToChinese } from '@/views/Wca/PlayerComponents/region/china_citys';
+import {
+  getChartSeriesColors,
+  getHeatmapScale,
+  getThemeColors,
+  mixCssColors,
+} from '@/theme/chartColors';
 import './WCAPlayerLitCitiesTab.css';
 
 /** 省级详图列表：中文界面下将 WCA 英文城市转为中文；省级用 resolveChinaProvinceMeta 推断，供 Suzhou/Taizhou 等消歧 */
@@ -265,6 +271,9 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos, pla
   }, [mapDataMerged, scatterPieces]);
 
   const worldOption = useMemo(() => {
+    const theme = getThemeColors();
+    const heatmap = getHeatmapScale();
+    const [scatterColor] = getChartSeriesColors(4).slice(3, 4);
     const scatterData = scatterPieces.map(s => ({
       name: wcaCountryIdToWorldMapName(s.name),
       value: [s.coord[0], s.coord[1], safeGeoCount(s.value)] as [number, number, number],
@@ -297,13 +306,16 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos, pla
         ],
         realtime: false,
         calculable: true,
-        inRange: { color: ['#e0f3ff', '#006edd'] },
+        inRange: { color: [heatmap[0]!, heatmap[heatmap.length - 1]!] },
       },
       geo: {
         map: 'world',
         roam: true,
         emphasis: { disabled: false, label: { show: false } },
-        itemStyle: { areaColor: '#f5f5f5', borderColor: '#ccc' },
+        itemStyle: {
+          areaColor: mixCssColors(theme.foreground, theme.background, 4),
+          borderColor: theme.border,
+        },
       },
       series: [
         {
@@ -321,7 +333,7 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos, pla
             name: d.name,
             value: d.value,
           })),
-          itemStyle: { color: '#722ed1' },
+          itemStyle: { color: scatterColor },
           symbolSize: (val: number | number[]) => {
             const arr = Array.isArray(val) ? val : [val];
             const n = safeGeoCount(arr[2]);
@@ -345,7 +357,9 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos, pla
   }, [byChinaProvince]);
 
   const chinaOption = useMemo(
-    () => ({
+    () => {
+      const theme = getThemeColors();
+      return {
       tooltip: {
         trigger: 'item',
         formatter: (p: { name?: string; value?: unknown }) => {
@@ -365,7 +379,12 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos, pla
         ],
         realtime: false,
         calculable: true,
-        inRange: { color: ['#fff7e6', '#fa541c'] },
+        inRange: {
+          color: [
+            mixCssColors(theme.signalWarning, theme.background, 95),
+            theme.signalWarning,
+          ],
+        },
       },
       series: [
         {
@@ -377,7 +396,8 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos, pla
           data: chinaMapData,
         },
       ],
-    }),
+    };
+    },
     [chinaMapData, maxChinaVal, intl, localeZh],
   );
 
@@ -454,6 +474,7 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos, pla
 
   const provinceDetailOption = useMemo(() => {
     if (!provinceDrill || !provinceMapReady || !provinceGeo) return undefined;
+    const theme = getThemeColors();
     const data = provincePrefectureData
       .filter(d => d.name !== '__other__' && safeGeoCount(d.value) > 0)
       .map(d => ({ name: d.name, value: safeGeoCount(d.value) }));
@@ -477,7 +498,12 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos, pla
         ],
         realtime: false,
         calculable: true,
-        inRange: { color: ['#f6ffed', '#52c41a'] },
+        inRange: {
+          color: [
+            mixCssColors(theme.signalSuccess, theme.background, 95),
+            theme.signalSuccess,
+          ],
+        },
       },
       series: [
         {
@@ -496,7 +522,7 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos, pla
               bottom: 8,
               style: {
                 text: `${intl.formatMessage({ id: 'wca.litCities.otherRegions' })}: ${safeGeoCount(other.value)}`,
-                fill: '#666',
+                fill: theme.mutedForeground,
                 fontSize: 12,
               },
             },

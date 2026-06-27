@@ -4,22 +4,15 @@ import { Box, Grid, Heading } from "@chakra-ui/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useI18n } from "@/contexts/I18nProvider";
+import {
+  SKEWB_STICKER_PALETTE,
+} from "@/theme/domainColors";
 import { DrawToggleButton } from "@/views/DrawTools/components/DrawControls";
 import { DrawNavTabs } from "@/views/DrawTools/components/DrawNavTabs";
 import { DrawPalette } from "@/views/DrawTools/components/DrawPalette";
 import type { PathSvg } from "@/views/DrawTools/types";
 
-const baseSkColor = [
-  "#00000000",
-  "#033fff",
-  "#f3ff00",
-  "#d10707",
-  "#ff8806",
-  "#206606",
-  "#3d3d3d",
-  "#f5f3db",
-  "#777",
-];
+const baseSkColor = [...SKEWB_STICKER_PALETTE];
 
 const skPoints = [
   {

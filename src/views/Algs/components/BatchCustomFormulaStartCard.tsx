@@ -55,7 +55,7 @@ export default function BatchCustomFormulaStartCard({
       bg={PRACTICE_COLORS.batch.bg}
       borderColor={PRACTICE_COLORS.batch.border}
       borderWidth="1px"
-      _hover={{ borderColor: "rgba(114, 46, 209, 0.8)" }}
+      _hover={{ borderColor: "accent" }}
     >
       <Card.Body p={4} h="full">
         {content}

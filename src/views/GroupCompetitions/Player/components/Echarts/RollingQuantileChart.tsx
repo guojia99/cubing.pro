@@ -2,6 +2,11 @@ import { Card, Select } from 'antd';
 import ReactECharts from 'echarts-for-react';
 import React, { useMemo, useState } from 'react';
 import { resultTimeString } from '@/components/Data/types/result';
+import {
+  getThemeColors,
+  mixCssColors,
+  readCssVar,
+} from '@/theme/chartColors';
 
 const { Option } = Select;
 
@@ -21,6 +26,10 @@ export const getQuantile = (sorted: number[], p: number): number => {
 };
 
 const RollingQuantileChart: React.FC<RollingQuantileChartProps> = ({ inputData, baseWindowSize=50 }) => {
+  const theme = getThemeColors();
+  const q25Color = theme.signalInfo;
+  const q50Color = theme.signalWarning;
+  const q75Color = theme.destructive;
   const data = inputData.filter((n) => n >= 0).reverse();
 
 
@@ -34,7 +43,7 @@ const RollingQuantileChart: React.FC<RollingQuantileChartProps> = ({ inputData, 
           xAxis: index ,
           yAxis: value,
           symbolSize: 10,
-          itemStyle: { color: 'red' },
+          itemStyle: { color: theme.destructive },
           name: '最佳成绩',
         };
       }
@@ -123,7 +132,7 @@ const RollingQuantileChart: React.FC<RollingQuantileChartProps> = ({ inputData, 
         type: 'line',
         data,
         symbol: 'circle',
-        lineStyle: { color: 'rgba(65,214,139,0.35)' },
+        lineStyle: { color: mixCssColors(theme.signalSuccess, 'transparent', 35) },
         markPoint: {
           symbolSize: 40,
           label: {
@@ -137,21 +146,21 @@ const RollingQuantileChart: React.FC<RollingQuantileChartProps> = ({ inputData, 
         type: 'line',
         data: q25,
         showSymbol: false,
-        lineStyle: { type: 'dashed', color: '#111dff' },
+        lineStyle: { type: 'dashed', color: q25Color },
       },
       {
         name: '50%',
         type: 'line',
         data: q50,
         showSymbol: false,
-        lineStyle: { type: 'dashed', color: '#f89600' },
+        lineStyle: { type: 'dashed', color: q50Color },
       },
       {
         name: '75%',
         type: 'line',
         data: q75,
         showSymbol: false,
-        lineStyle: { type: 'dashed', color: '#EE6666' },
+        lineStyle: { type: 'dashed', color: q75Color },
       },
     ],
   };
@@ -189,20 +198,20 @@ const RollingQuantileChart: React.FC<RollingQuantileChartProps> = ({ inputData, 
             style={{
               marginTop: 16,
               marginBottom: 16,
-              background: 'var(--ant-color-fill-alter, #f9f9f9)',
+              background: readCssVar('--muted', theme.background),
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-around', fontSize: 16 }}>
               <div>
-                <strong style={{ color: '#111dff' }}>25%</strong><br />
+                <strong style={{ color: q25Color }}>25%</strong><br />
                 {resultTimeString(latestQ25)}
               </div>
               <div>
-                <strong style={{ color: '#f89600' }}>50%</strong><br />
+                <strong style={{ color: q50Color }}>50%</strong><br />
                 {resultTimeString(latestQ50)}
               </div>
               <div>
-                <strong style={{ color: '#EE6666' }}>75%</strong><br />
+                <strong style={{ color: q75Color }}>75%</strong><br />
                 {resultTimeString(latestQ75)}
               </div>
             </div>

@@ -11,16 +11,20 @@ import {
 } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 
+import { PalettePicker } from "@/components/ui/PalettePicker";
 import { useColorMode } from "@/components/ui/color-mode";
 import { toaster } from "@/components/ui/toaster";
+import { useTheme } from "next-themes";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useI18n } from "@/contexts/I18nProvider";
 import { defaultSettings } from "@/config/defaultSettings";
 import {
+  applyPaletteToDocument,
   applyWebsiteUiToDocument,
+  readPaletteFromStorage,
   readWebsiteUiFromStorage,
-  resolveEffectiveNavTheme,
   writeWebsiteUiToStorage,
+  type Palette,
   type WebsiteUiConfig,
   type WebsiteUiNavPreference,
 } from "@/lib/websiteUiConfig";
@@ -31,6 +35,7 @@ export function SettingsPage() {
   const { t } = useI18n();
   const { currentUser } = useAuth();
   const { setColorMode } = useColorMode();
+  const { setTheme } = useTheme();
 
   const initial = useMemo(() => {
     const local = readWebsiteUiFromStorage();
@@ -38,6 +43,7 @@ export function SettingsPage() {
       navTheme: (local.navTheme ??
         defaultSettings.navTheme) as WebsiteUiNavPreference,
       fontSizeBase: local.fontSizeBase ?? 14,
+      palette: local.palette ?? readPaletteFromStorage(),
     };
   }, []);
 
@@ -45,14 +51,23 @@ export function SettingsPage() {
     initial.navTheme,
   );
   const [fontSizeBase, setFontSizeBase] = useState(initial.fontSizeBase);
+  const [palette, setPalette] = useState<Palette>(initial.palette);
   const [saving, setSaving] = useState(false);
 
+  const onPalettePreview = (next: Palette) => {
+    setPalette(next);
+    applyPaletteToDocument(next);
+  };
+
   const onSave = async () => {
-    const cfg: WebsiteUiConfig = { navTheme, fontSizeBase };
+    const cfg: WebsiteUiConfig = { navTheme, fontSizeBase, palette };
     writeWebsiteUiToStorage(cfg);
     applyWebsiteUiToDocument(cfg);
-    const effective = resolveEffectiveNavTheme(cfg);
-    setColorMode(effective === "realDark" ? "dark" : "light");
+    if (navTheme === "system") {
+      setTheme("system");
+    } else {
+      setColorMode(navTheme === "realDark" ? "dark" : "light");
+    }
 
     const tok = getToken();
     if (tok?.token && currentUser?.id) {
@@ -94,6 +109,11 @@ export function SettingsPage() {
                   <option value="system">{t("settings.themeSystem")}</option>
                 </NativeSelect.Field>
               </NativeSelect.Root>
+            </Field.Root>
+            <Field.Root>
+              <Field.Label>{t("settings.palette")}</Field.Label>
+              <PalettePicker value={palette} onChange={onPalettePreview} columns={4} />
+              <Field.HelperText>{t("settings.paletteHint")}</Field.HelperText>
             </Field.Root>
             <Field.Root>
               <Field.Label>{t("settings.fontSize")}</Field.Label>

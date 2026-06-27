@@ -9,6 +9,10 @@ import ReactECharts from 'echarts-for-react';
 import React, { useMemo, useState } from 'react';
 import { useIntl } from '@/hooks/useIntlMessage';
 import { WCACompetition, WCAResult } from '@/services/cubing-pro/wca/types';
+import {
+  getThemeColors,
+  mixCssColors,
+} from '@/theme/chartColors';
 
 export interface WCAResultChartProps {
   eventId: string;
@@ -65,6 +69,7 @@ function getQuantile(arr: number[], q: number, TrimHeadAndTail: number = 0): num
 
 const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps }) => {
   const intl = useIntl();
+  const theme = getThemeColors();
   const [recentCount, setRecentCount] = useState<number>(20);
   const [recentHeadNum, setRecentHeadNum] = useState<number>(0);
   const [recentMin, setRecentMin] = useState<number>(0);
@@ -154,6 +159,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
   }, [reversedData, eventId, intl]);
 
   const combinedOption = useMemo(() => {
+    const theme = getThemeColors();
     // ===== 多盲专用逻辑 =====
     if (eventId === '333mbf') {
       let bestScore = -Infinity;
@@ -186,7 +192,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
 
         return {
           value: [i, score],
-          itemStyle: isPR ? { color: 'red' } : undefined,
+          itemStyle: isPR ? { color: theme.destructive } : undefined,
           prType,
           extra: { solved, attempted, seconds, compName, prType },
         };
@@ -211,7 +217,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
             const score = solved - (attempted - solved);
             const timeStr = secondTimeFormat(seconds, true);
             const prStr = prType
-              ? `（<strong style="color:red;">${newBest}${prType === 'time' ? `,${sameScoreFaster}` : ''}</strong>）`
+              ? `（<strong style="color:${theme.destructive};">${newBest}${prType === 'time' ? `,${sameScoreFaster}` : ''}</strong>）`
               : '';
 
             return `
@@ -259,7 +265,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
       }
       return {
         value: [i, v],
-        itemStyle: progress ? { color: 'red' } : undefined,
+        itemStyle: progress ? { color: theme.destructive } : undefined,
         progress,
         extra: { compName },
       };
@@ -275,7 +281,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
       }
       return {
         value: [i, v],
-        itemStyle: progress ? { color: 'red' } : undefined,
+        itemStyle: progress ? { color: theme.destructive } : undefined,
         progress,
         extra: { compName },
       };
@@ -364,6 +370,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
 
   // 生成标记点，只显示头尾和当前选中值
   const generateMarks = () => {
+    const theme = getThemeColors();
     const marks = {
       [recentMin]: `${recentMin}%`,
       [recentMax]: `${recentMax}%`,
@@ -373,7 +380,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
     if (recentHeadNum !== recentMin && recentHeadNum !== recentMax) {
       // @ts-ignore
       marks[recentHeadNum] = {
-        style: { color: '#ff4d4f', fontWeight: 'bold' },
+        style: { color: theme.destructive, fontWeight: 'bold' },
         label: `${recentHeadNum}%`,
       };
     } else {
@@ -381,14 +388,14 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
       if (recentHeadNum === recentMin) {
         // @ts-ignore
         marks[recentMin] = {
-          style: { color: '#ff4d4f', fontWeight: 'bold' },
+          style: { color: theme.destructive, fontWeight: 'bold' },
           label: `${recentMin}%`,
         };
       }
       if (recentHeadNum === recentMax) {
         // @ts-ignore
         marks[recentMax] = {
-          style: { color: '#ff4d4f', fontWeight: 'bold' },
+          style: { color: theme.destructive, fontWeight: 'bold' },
           label: `${recentMax}%`,
         };
       }
@@ -406,6 +413,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
   const maName = intl.formatMessage({ id: 'wca.chart.maN' }, { n: maWindow });
 
   const distributionOption = useMemo(() => {
+    const theme = getThemeColors();
     const singles = chartData.allAttempts;
     if (singles.length === 0) return {};
 
@@ -555,7 +563,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
           // 注意：这里 data 是差值，但 tooltip 不显示
           data: q25.map((_, i) => [i, q75[i] - q25[i]]),
           lineStyle: { opacity: 0 },
-          areaStyle: { color: 'rgba(100, 100, 255, 0.15)' },
+          areaStyle: { color: mixCssColors(theme.signalInfo, 'transparent', 15) },
           stack: '四分线',
           z: -1,
           // 👇 关键：禁止 tooltip
@@ -567,7 +575,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
           type: 'line',
           data: ma.map((v, i) => [i, v]),
           smooth: true,
-          lineStyle: { width: 2, color: '#FF7F0E' },
+          lineStyle: { width: 2, color: theme.signalWarning },
           showSymbol: false,
         },
         // --- 标准差 边界线 ---
@@ -576,7 +584,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
           name: stdDevName,
           type: 'line',
           data: stdUpper.map((v, i) => [i, v]),
-          lineStyle: { type: 'dotted', color: '#2CA02C', width: 1 },
+          lineStyle: { type: 'dotted', color: theme.signalSuccess, width: 1 },
           showSymbol: false,
           tooltip: { show: false }, // 👈 不参与 tooltip
         },
@@ -585,7 +593,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
           name: stdDevName,
           type: 'line',
           data: stdLower.map((v, i) => [i, v]),
-          lineStyle: { type: 'dotted', color: '#2CA02C', width: 1 },
+          lineStyle: { type: 'dotted', color: theme.signalSuccess, width: 1 },
           showSymbol: false,
           showInLegend: false,
           tooltip: { show: false }, // 👈 不参与 tooltip
@@ -608,7 +616,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
           type: 'line',
           data: stdLower.map((_, i) => [i, stdUpper[i] - stdLower[i]]),
           lineStyle: { opacity: 0 },
-          areaStyle: { color: 'rgba(44, 160, 44, 0.1)' },
+          areaStyle: { color: mixCssColors(theme.signalSuccess, 'transparent', 10) },
           stack: 'std',
           z: -2,
           tooltip: { show: false }, // 👈 隐藏
@@ -675,7 +683,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
                   <p>
                     <b>75%（Q3）</b>：75% 的成绩比它快，代表较差成绩边界。
                   </p>
-                  <p style={{ fontSize: 12, color: '#999' }}>
+                  <p style={{ fontSize: 12, color: theme.mutedForeground }}>
                     用于评估魔方成绩的稳定性与分布趋势。
                   </p>
                 </div>

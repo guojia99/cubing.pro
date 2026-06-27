@@ -19,6 +19,8 @@ import {
   WcaProfile,
   WCAResult,
 } from '@/services/cubing-pro/wca/types';
+import { getThemeColors } from '@/theme/chartColors';
+import { MEDAL_COLORS } from '@/theme/domainColors';
 
 interface WCAPlayerResultTableProps {
   wcaProfile: WcaProfile;
@@ -60,6 +62,7 @@ type HistoricalSortMode = 'withNR' | 'withCR' | 'withWR' | 'best';
 
 // 排名转带样式的节点
 const renderRank = (rank: number | string) => {
+  const theme = getThemeColors();
   if (rank === undefined || rank === 0) {
     return <></>;
   }
@@ -71,14 +74,14 @@ const renderRank = (rank: number | string) => {
   let textColor: string | undefined = undefined;
 
   if (rank <= 3) {
-    tagColor = '#cf1322';
-    textColor = '#fff';
+    tagColor = theme.destructive;
+    textColor = theme.card;
   } else if (rank <= 10) {
-    tagColor = '#52c41a';
-    textColor = '#fff';
+    tagColor = theme.signalSuccess;
+    textColor = theme.card;
   } else if (rank <= 100) {
-    tagColor = '#1890ff';
-    textColor = '#fff';
+    tagColor = theme.accent;
+    textColor = theme.card;
   } else {
     return <Tag color="default">{rank}</Tag>;
   }
@@ -214,9 +217,9 @@ function buildCurrentTableData(
     if (gold + silver + bronze === 0) return null;
     return (
       <span style={{ display: 'inline-flex', gap: 6 }}>
-        <span style={{ color: '#bbb205' }}>🥇{gold}</span>
-        <span style={{ color: '#C0C0C0' }}>🥈{silver}</span>
-        <span style={{ color: '#ff860e' }}>🥉{bronze}</span>
+        <span style={{ color: MEDAL_COLORS.gold }}>🥇{gold}</span>
+        <span style={{ color: MEDAL_COLORS.silver }}>🥈{silver}</span>
+        <span style={{ color: MEDAL_COLORS.bronze }}>🥉{bronze}</span>
       </span>
     );
   };

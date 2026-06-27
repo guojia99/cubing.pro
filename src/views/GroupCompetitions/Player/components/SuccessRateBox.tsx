@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card, Progress, Typography } from 'antd';
+import { getThemeColors, mixCssColors } from '@/theme/chartColors';
 
 const { Text, Title } = Typography;
 
@@ -14,6 +15,7 @@ const calculateRate = (data: number[]) => {
 };
 
 const SuccessRateBox: React.FC<SuccessRateBoxProps> = ({ data }) => {
+  const theme = getThemeColors();
   const totalCount = data.length;
   const successCount = data.filter(n => n > 0).length;
   const overallRate = calculateRate(data);
@@ -35,7 +37,7 @@ const SuccessRateBox: React.FC<SuccessRateBoxProps> = ({ data }) => {
         style={{
           width: 260,
           borderRadius: 12,
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+          boxShadow: `0 4px 12px ${mixCssColors(theme.foreground, 'transparent', 10)}`,
           textAlign: 'center',
           padding: 24,
         }}
@@ -44,14 +46,14 @@ const SuccessRateBox: React.FC<SuccessRateBoxProps> = ({ data }) => {
         <Progress
           type="circle"
           percent={parseFloat(overallRate.toFixed(1))}
-          strokeColor="#52c41a"
+          strokeColor={theme.signalSuccess}
           size={100}
         />
         <div style={{ marginTop: 16 }}>
           <Text>{successCount} / {totalCount}</Text>
         </div>
 
-        <div style={{ marginTop: 16, fontSize: 12, color: 'var(--ant-color-text-tertiary, #888)' }}>
+        <div style={{ marginTop: 16, fontSize: 12, color: theme.mutedForeground }}>
           {rate20 !== null && <div>最近20把：{rate20.toFixed(0)}%</div>}
           {rate50 !== null && <div>最近50把：{rate50.toFixed(0)}%</div>}
           {rate100 !== null && <div>最近100把：{rate100.toFixed(0)}%</div>}

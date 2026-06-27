@@ -256,7 +256,7 @@ const MilestoneTimelines: React.FC<MilestoneTimelineProps> = ({
           icon: (
             <Badge
               color={MILESTONE_COLOR_MAP[m.type as MilestoneType]}
-              style={{ boxShadow: '0 0 0 2px #fff', marginTop: 8, width: 16, height: 16 }}
+              style={{ boxShadow: '0 0 0 2px var(--card)', marginTop: 8, width: 16, height: 16 }}
             />
           ),
           title: yearMonthDay ? (

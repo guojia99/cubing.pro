@@ -12,7 +12,7 @@ import type { KinChSorResult } from "@/services/cubing-pro/statistics/typings";
 const { Text } = Typography;
 
 export const getScoreColor = (score: number) => {
-  if (score <= 0) return "#ccc";
+  if (score <= 0) return "var(--faint-foreground)";
   const normalizedScore = Math.min(100, Math.max(0, score));
   const red = Math.round(180 * (normalizedScore / 100));
   const green = Math.round(150 * (1 - normalizedScore / 100));
@@ -87,9 +87,9 @@ export function KinchPlayerDetailModal({
           {isSenior ? (
             WCALinkWithCnName(player.wca_id, player.WcaName)
           ) : (
-            <>{PlayerLink(player.CubeId, player.PlayerName, "rgb(29,177,236)")}</>
+            <>{PlayerLink(player.CubeId, player.PlayerName, "var(--accent)")}</>
           )}
-          <div style={{ marginTop: 8, fontSize: "16px", color: "#f23f3f" }}>
+          <div style={{ marginTop: 8, fontSize: "16px", color: "var(--destructive)" }}>
             总分: <strong>{player.Result.toFixed(3)}</strong>
           </div>
         </div>

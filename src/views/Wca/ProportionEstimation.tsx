@@ -57,7 +57,15 @@ const DEFAULT_ANCHOR_SEC: Record<ResultProportionEstimationType, number> = {
   bld: 40,
 };
 
-const CHART_COLORS = ["#1890ff", "#52c41a", "#fa8c16", "#722ed1", "#eb2f96", "#13c2c2", "#2f54eb"];
+const CHART_COLORS = [
+  "var(--signal-info)",
+  "var(--signal-success)",
+  "var(--signal-warning)",
+  "var(--accent)",
+  "var(--destructive)",
+  "color-mix(in srgb, var(--accent) 50%, var(--signal-info))",
+  "color-mix(in srgb, var(--accent) 40%, var(--signal-success))",
+];
 
 function formatCsRangeSec(minCs: number, maxCs: number): string {
   return `${secondTimeFormat(minCs / 100, false)} – ${secondTimeFormat(maxCs / 100, false)}`;

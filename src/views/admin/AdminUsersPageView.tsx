@@ -252,7 +252,7 @@ export function AdminUsersPageView() {
       dataIndex: "CubeID",
       key: "CubeID",
       width: 120,
-      render: (value: string, player) => PlayerLink(player.CubeID, value, "#000"),
+      render: (value: string, player) => PlayerLink(player.CubeID, value, "var(--foreground)"),
     },
     {
       title: "名称",
@@ -260,7 +260,7 @@ export function AdminUsersPageView() {
       key: "Name",
       width: 150,
       render: (_value: string, player) =>
-        PlayerLink(player.CubeID, player.Name, "rgb(29,177,236)"),
+        PlayerLink(player.CubeID, player.Name, "var(--accent)"),
     },
     {
       title: "WcaID",
@@ -479,7 +479,7 @@ export function AdminUsersPageView() {
           width={520}
           destroyOnHidden
         >
-          <p style={{ marginBottom: 12, color: "#666" }}>
+          <p style={{ marginBottom: 12, color: "var(--muted-foreground)" }}>
             按位更新权限；撤销主办前请确认用户已从主办团队中移出。
           </p>
           <Checkbox.Group

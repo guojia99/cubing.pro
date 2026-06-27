@@ -8,12 +8,13 @@ import { I18nProvider } from "@/contexts/I18nProvider";
 import { system } from "@/theme";
 import { ColorModeButton, ColorModeProvider } from "./color-mode";
 import { AppToaster } from "./toaster";
+import "@/styles/tokens.css";
 import "@/styles/app-chrome.css";
 
 export function Provider({ children }: { children: ReactNode }) {
   return (
     <ChakraProvider value={system}>
-      <ColorModeProvider defaultTheme="light" enableSystem={false}>
+      <ColorModeProvider defaultTheme="light" enableSystem>
         <I18nProvider>
           <AuthProvider>
             <AppToaster />

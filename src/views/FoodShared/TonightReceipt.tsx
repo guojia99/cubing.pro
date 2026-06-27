@@ -11,6 +11,7 @@ import {
 import { useCallback, useState } from "react";
 import { LuTag, LuTrash2 } from "react-icons/lu";
 
+import { LightMode } from "@/components/ui/color-mode";
 import "@/views/FoodShared/tonight-receipt.css";
 
 export interface TonightReceiptItem {
@@ -69,24 +70,26 @@ export function TonightReceipt({
 
   if (items.length === 0) {
     return (
-      <Box className="tonight-receipt tonight-receipt-empty" bg="bg" borderWidth="1px" borderStyle="dashed" borderColor="border" color="fg.muted">
-        <div className="tonight-receipt-header">{title}</div>
-        <div className="tonight-receipt-body" style={{ padding: 24, textAlign: "center" }}>
-          {emptyText}
-        </div>
-      </Box>
+      <LightMode>
+        <Box className="tonight-receipt tonight-receipt-empty" bg="bg" borderWidth="1px" borderStyle="dashed" borderColor="border" color="fg.muted">
+          <div className="tonight-receipt-header">{title}</div>
+          <div className="tonight-receipt-body" style={{ padding: 24, textAlign: "center" }}>
+            {emptyText}
+          </div>
+        </Box>
+      </LightMode>
     );
   }
 
   return (
+    <LightMode>
     <>
       <Box
         className="tonight-receipt"
-        bg="#fffef8"
+        bg="bg.elevated"
         borderWidth="1px"
         borderColor="border"
         boxShadow="sm"
-        _dark={{ bg: "bg.muted" }}
       >
         <div className="tonight-receipt-header">
           <span>{title}</span>
@@ -125,7 +128,7 @@ export function TonightReceipt({
                   className="tonight-receipt-ingredient"
                   style={{
                     textDecoration: checked ? "line-through" : "none",
-                    color: checked ? "var(--chakra-colors-fg-muted)" : undefined,
+                    color: checked ? "var(--muted-foreground)" : undefined,
                   }}
                 >
                   <Checkbox.Root checked={checked} onCheckedChange={() => handleToggle(name)} mr="2">
@@ -178,5 +181,6 @@ export function TonightReceipt({
         </Portal>
       </Dialog.Root>
     </>
+    </LightMode>
   );
 }

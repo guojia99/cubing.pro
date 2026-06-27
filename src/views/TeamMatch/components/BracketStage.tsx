@@ -17,6 +17,7 @@ import { DownloadOutlined } from '@ant-design/icons';
 import { Button, Card, message, Space, Switch, Typography } from 'antd';
 import classNames from 'classnames';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { LightMode } from '@/components/ui/color-mode';
 import '../TeamMatch.css';
 
 type TeamMedal = 'gold' | 'silver' | 'bronze';
@@ -341,6 +342,7 @@ const BracketStage: React.FC<BracketStageProps> = ({ liveSettings, onOpenLiveSet
         </Typography.Text>
       </div>
 
+      <LightMode>
       <div ref={bracketExportRef} className="tmBracketExportBlock">
         {session.name?.trim() ? (
           <div className="tmBracketExportTitleWrap">
@@ -428,6 +430,7 @@ const BracketStage: React.FC<BracketStageProps> = ({ liveSettings, onOpenLiveSet
         </div>
       </div>
       </div>
+      </LightMode>
 
       {arenaOpen && focused?.pk && focused.teamAId && focused.teamBId && (
         <PkArenaFullscreen

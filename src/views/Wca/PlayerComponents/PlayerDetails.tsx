@@ -116,7 +116,7 @@ const WCAPlayerDetails: React.FC<WCAPlayerDetailsProps> = ({ wcaProfile, wcaResu
       key: 'competition',
       align: 'center' as const,
       render: (count: number) => (
-        <Badge count={count} style={{ backgroundColor: '#52c41a' }} overflowCount={99999} />
+        <Badge count={count} style={{ backgroundColor: 'var(--signal-success)' }} overflowCount={99999} />
       ),
     },
     {
@@ -126,9 +126,9 @@ const WCAPlayerDetails: React.FC<WCAPlayerDetailsProps> = ({ wcaProfile, wcaResu
       align: 'center' as const,
       render: (solves: number, res: any) => (
         <Space>
-          <Badge count={res.totalSolves} style={{ backgroundColor: '#25659f' }} overflowCount={9999999} />
+          <Badge count={res.totalSolves} style={{ backgroundColor: 'var(--signal-info)' }} overflowCount={9999999} />
           /
-          <Badge count={res.totalAttempts} style={{ backgroundColor: '#e67a4c' }} overflowCount={9999999} />
+          <Badge count={res.totalAttempts} style={{ backgroundColor: 'var(--signal-warning)' }} overflowCount={9999999} />
         </Space>
       ),
     },

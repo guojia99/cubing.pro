@@ -80,7 +80,7 @@ const AvatarUpload: React.FC<Props> = ({ value, onChange }) => {
         {value ? (
           <img alt="" src={value} style={{ width: 48, height: 48, borderRadius: 8, objectFit: 'cover' }} />
         ) : (
-          <div style={{ width: 48, height: 48, borderRadius: 8, background: '#f0f0f0' }} />
+          <div style={{ width: 48, height: 48, borderRadius: 8, background: 'var(--muted)' }} />
         )}
         <Upload
           accept="image/*"
