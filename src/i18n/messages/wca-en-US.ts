@@ -260,6 +260,8 @@ export const wcaMessagesEnUS = {
   "wca.historicalRank.monthWholeYear": "Full year",
   "wca.compYearRank.cohortYear": "Cohort year",
   "wca.stats.title": "WCA Data",
+  "wca.stats.wcaKinch": "Senior KinCh",
+  "wca.stats.wcaKinchDesc": "WCA senior KinCh rankings filtered by age and country",
   "wca.stats.grandSlam": "Grand Slam",
   "wca.stats.grandSlamDesc": "World, Continental, National championship podium achievements",
   "wca.stats.historicalRank": "Historical Ranks",

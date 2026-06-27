@@ -34,9 +34,9 @@ export const RecordsTable = (
         width: 100,
         render: (value: string, record: Record) => {
           return (
-            <td>
-              {CubeIcon(value, record.id + 'record', {})} {CubesCn(value)}
-            </td>
+            <>
+              {CubeIcon(value, record.id + "record", {})} {CubesCn(value)}
+            </>
           );
         },
       },
@@ -115,17 +115,17 @@ export const RecordsTable = (
       'MEventId',
       {
         title: '项目',
-        dataIndex: 'EventId',
-        key: 'EventId',
+        dataIndex: 'MEventId',
+        key: 'MEventId',
         width: 100,
-        render: (value: string, record: MRecord) => {
+        render: (_value: string, record: MRecord) => {
           if (record.BestRank !== 1 || record.AvgRank !== 1) {
-            return <></>;
+            return null;
           }
           return (
-            <td>
-              {CubeIcon(record?.MEventId, record.id + 'record', {})} {CubesCn(record.MEventId)}
-            </td>
+            <>
+              {CubeIcon(record.MEventId, `${record.id}record`, {})} {CubesCn(record.MEventId)}
+            </>
           );
         },
       },
@@ -149,10 +149,10 @@ export const RecordsTable = (
       'BestUserName',
       {
         title: '选手',
-        dataIndex: 'Best',
-        key: 'Best',
+        dataIndex: 'BestUserName',
+        key: 'BestUserName',
         width: 150,
-        render: (value: string, record: MRecord) => {
+        render: (_value: string, record: MRecord) => {
           return <>{PlayerLink(record.BestUserCudaId, record.BestUserName, '')}</>;
         },
       },
@@ -161,10 +161,10 @@ export const RecordsTable = (
       'AvgUserName',
       {
         title: '选手',
-        dataIndex: 'Best',
-        key: 'Best',
+        dataIndex: 'AvgUserName',
+        key: 'AvgUserName',
         width: 150,
-        render: (value: string, record: MRecord) => {
+        render: (_value: string, record: MRecord) => {
           return <>{PlayerLink(record.AvgUserCudaId, record.AvgUserName, '')}</>;
         },
       },
@@ -187,6 +187,16 @@ export const RecordsTable = (
   return (
     <Table
       dataSource={dataSource}
+      rowKey={(record) => {
+        const mRecord = record as MRecord;
+        if (mRecord.MEventId) {
+          return `${mRecord.MEventId}-${mRecord.BestRank}-${mRecord.AvgRank}-${record.id}`;
+        }
+        if (record.Index != null) {
+          return `${record.id}-${record.Index}`;
+        }
+        return `${record.id}-${record.CompsId}-${record.createdAt}`;
+      }}
       // @ts-ignore
       columns={columns}
       size="small"

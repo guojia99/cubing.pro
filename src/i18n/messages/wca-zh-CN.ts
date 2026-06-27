@@ -260,6 +260,8 @@ export const wcaMessagesZhCN = {
   "wca.historicalRank.monthWholeYear": "全年",
   "wca.compYearRank.cohortYear": "届别年份",
   "wca.stats.title": "WCA统计",
+  "wca.stats.wcaKinch": "WCA大龄KinCh",
+  "wca.stats.wcaKinchDesc": "按年龄与国家筛选的 WCA 大龄魔友 KinCh 排名",
   "wca.stats.grandSlam": "大满贯",
   "wca.stats.grandSlamDesc": "世锦赛、洲际赛、国家赛领奖台全达成统计",
   "wca.stats.historicalRank": "历史排名",

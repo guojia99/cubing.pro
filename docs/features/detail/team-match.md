@@ -75,9 +75,9 @@ TeamMatch.tsx
 
 | 符号 | 文件（相对 `cubing.pro/`） | 职责 |
 |------|---------------------------|------|
-| TeamMatch 主入口 | `src/pages/Tools/TeamMatch/TeamMatch.tsx` | 团体赛主页面 |
-| wcaSeeding | `src/pages/Tools/TeamMatch/seeding/wcaSeeding.ts` | WCA 成绩种子计算 |
-| oneGradeApi | `src/pages/Tools/TeamMatch/utils/oneGradeApi.ts` | One 平台 API 封装 |
+| TeamMatch 主入口 | `src/views/TeamMatch/TeamMatchView.tsx` | 团体赛主页面 |
+| wcaSeeding | `src/views/TeamMatch/wcaSeeding.ts` | WCA 成绩种子计算 |
+| oneGradeApi | `src/views/TeamMatch/oneGradeApi.ts` | One 平台 API 封装 |
 
 ## 8. 限制与待办
 

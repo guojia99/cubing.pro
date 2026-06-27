@@ -11,12 +11,25 @@ import { AdvertisementPageView } from "@/views/Advertisement/AdvertisementPageVi
 import { BuyCoffeePageView } from "@/views/BuyCoffee/BuyCoffeePageView";
 import { ExternalLinksPageView } from "@/views/ExternalLinks/ExternalLinksPageView";
 import { AdminAcknowledgmentsPageView } from "@/views/admin/AdminAcknowledgmentsPageView";
+import { AdminCompetitionGroupsPageView } from "@/views/admin/AdminCompetitionGroupsPageView";
+import { AdminDiyRankingPageView } from "@/views/admin/AdminDiyRankingPageView";
 import { AdminExternalLinksPageView } from "@/views/admin/AdminExternalLinksPageView";
 import { AdminHomePageView } from "@/views/admin/AdminHomePageView";
+import { AdminOrganizersPageView } from "@/views/admin/AdminOrganizersPageView";
+import { AdminUsersPageView } from "@/views/admin/AdminUsersPageView";
+import { OrganizersCompsPageView } from "@/views/admin/OrganizersCompsPageView";
+import { OrganizersCreateCompsPageView } from "@/views/admin/OrganizersCreateCompsPageView";
+import { OrganizersDetailsPageView } from "@/views/admin/OrganizersDetailsPageView";
+import { OrganizersGroupPageView } from "@/views/admin/OrganizersGroupPageView";
+import { OrganizersHomePageView } from "@/views/admin/OrganizersHomePageView";
+import { OrganizersListPageView } from "@/views/admin/OrganizersListPageView";
+import { OrganizersResultsPageView } from "@/views/admin/OrganizersResultsPageView";
 import { MinxDrawView } from "@/views/DrawTools/MinxDrawView";
 import { PyDrawView } from "@/views/DrawTools/PyDrawView";
 import { SkDrawView } from "@/views/DrawTools/SkDrawView";
 import { SQ1DrawView } from "@/views/DrawTools/SQ1DrawView";
+import { FloppyReductionView } from "@/views/FloppyReduction/FloppyReductionView";
+import { TeamMatchView } from "@/views/TeamMatch/TeamMatchView";
 import { ChangelogPageView } from "@/views/Changelog/ChangelogPageView";
 import { CocktailDetailView } from "@/views/Cocktails/CocktailDetailView";
 import { CocktailListView } from "@/views/Cocktails/CocktailListView";
@@ -32,6 +45,8 @@ import { GcCompetitionsView } from "@/views/GroupCompetitions/Competitions/GcCom
 import { GcEventsView } from "@/views/GroupCompetitions/Events/GcEventsView";
 import { GcPktimerView } from "@/views/GroupCompetitions/Pktimer/GcPktimerView";
 import { GcPlayersView } from "@/views/GroupCompetitions/Players/GcPlayersView";
+import { GcRecordsView } from "@/views/GroupCompetitions/Records/GcRecordsView";
+import { GcStaticView } from "@/views/GroupCompetitions/Static/GcStaticView";
 
 export const dynamic = "force-static";
 
@@ -70,6 +85,35 @@ function CatchAllContent({ routeId, path }: { routeId: string; path: string[] })
       return <AdminAcknowledgmentsPageView />;
     case "admin-other-links":
       return <AdminExternalLinksPageView />;
+    case "admin-users":
+      return <AdminUsersPageView />;
+    case "admin-manage-organizers":
+      return <AdminOrganizersPageView />;
+    case "admin-manage-groups":
+      return <AdminCompetitionGroupsPageView />;
+    case "admin-diy-ranking":
+      return <AdminDiyRankingPageView />;
+    case "admin-organizers":
+      return <OrganizersHomePageView />;
+    case "admin-organizers-comps":
+      return <OrganizersCompsPageView />;
+    case "admin-organizers-create":
+      return <OrganizersCreateCompsPageView />;
+    case "admin-organizers-details":
+      return <OrganizersDetailsPageView />;
+    case "admin-organizers-group":
+      return <OrganizersGroupPageView />;
+    case "admin-organizers-list":
+      return <OrganizersListPageView />;
+    case "admin-organizers-result":
+      return <OrganizersResultsPageView />;
+    case "admin-organizers-comp-result":
+      if (path.length >= 6) {
+        return (
+          <OrganizersResultsPageView orgId={path[2]} compId={path[4]} />
+        );
+      }
+      return <OrganizersResultsPageView />;
     case "draw-sq1":
       return <SQ1DrawView />;
     case "draw-minx":
@@ -78,6 +122,10 @@ function CatchAllContent({ routeId, path }: { routeId: string; path: string[] })
       return <SkDrawView />;
     case "draw-py":
       return <PyDrawView />;
+    case "tool-fr":
+      return <FloppyReductionView />;
+    case "tool-team-match":
+      return <TeamMatchView />;
     case "changelog":
       return <ChangelogPageView />;
     case "wca-comps":
@@ -96,6 +144,10 @@ function CatchAllContent({ routeId, path }: { routeId: string; path: string[] })
       return <GcPlayersView />;
     case "gc-pktimer":
       return <GcPktimerView />;
+    case "gc-static":
+      return <GcStaticView />;
+    case "gc-records":
+      return <GcRecordsView />;
     case "recipes":
       return <RecipeListView />;
     case "recipe-detail":
