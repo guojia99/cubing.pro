@@ -2,7 +2,7 @@
 
 import "antd/dist/reset.css";
 
-import { useParams } from "next/navigation";
+import { useRouteParam } from "@/hooks/useRouteParam";
 import { useEffect, useState } from "react";
 
 import { NotFoundStatus } from "@/components/Status/NotFoundStatus";
@@ -15,8 +15,7 @@ import PlayerResults from "./components/PlayerResults";
 import styles from "./gc-player.module.css";
 
 export function GcPlayerView() {
-  const params = useParams<{ id: string }>();
-  const id = params?.id;
+  const id = useRouteParam("id");
   const [loading, setLoading] = useState(true);
   const [is404, setIs404] = useState(false);
   const [player, setPlayer] = useState<PlayersAPI.Player>();

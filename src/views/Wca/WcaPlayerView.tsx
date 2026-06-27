@@ -4,7 +4,7 @@ import "antd/dist/reset.css";
 import "flag-icons/css/flag-icons.min.css";
 
 import { Col, Row, Spin } from "antd";
-import { useParams } from "next/navigation";
+import { useRouteParam } from "@/hooks/useRouteParam";
 import { useEffect, useState } from "react";
 
 import { useIntlMessage } from "@/hooks/useIntlMessage";
@@ -30,8 +30,7 @@ const notAvatarUrl =
 const banAvatarKey = ["2016XUWE02"];
 
 export function WcaPlayerView() {
-  const params = useParams();
-  const wcaId = typeof params?.wcaId === "string" ? params.wcaId : "";
+  const wcaId = useRouteParam("wcaId") ?? "";
   const intl = useIntlMessage();
 
   const [is404, setIs404] = useState(false);

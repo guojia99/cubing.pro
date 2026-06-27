@@ -1,12 +1,7 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 
-/** 静态导出需 dynamicParams = false；dev 保持 true 以支持任意 id */
-const PAGES = [
-  "src/app/(main)/wca/player/[wcaId]/page.tsx",
-  "src/app/(main)/competition/[id]/page.tsx",
-  "src/app/(main)/player/[id]/page.tsx",
-  "src/app/(main)/admin/organizers/[orgId]/comp/[compId]/result/page.tsx",
-];
+/** 静态导出需 dynamicParams = false；dev 保持 true 以支持任意动态 URL */
+const PAGES = ["src/app/(main)/[...path]/page.tsx"];
 
 for (const page of PAGES) {
   const bak = `${page}.bak`;

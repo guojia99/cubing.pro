@@ -16,7 +16,8 @@ import {
 } from "@ant-design/icons";
 import { Skeleton } from "antd";
 import NextLink from "next/link";
-import { useParams, useSearchParams } from "next/navigation";
+import { useRouteParam } from "@/hooks/useRouteParam";
+import { useSearchParams } from "next/navigation";
 import React, { lazy, Suspense, useEffect, useState } from "react";
 
 import CompetitionScrambles from "@/views/Competition/CompetitionComponents/CompetitionScrambles";
@@ -43,8 +44,7 @@ function TabContent({ loading, children }: { loading: boolean; children: React.R
 }
 
 export function CompetitionView() {
-  const params = useParams<{ id: string }>();
-  const id = params?.id;
+  const id = useRouteParam("id");
   const searchParams = useSearchParams();
 
   const [loading, setLoading] = useState(true);

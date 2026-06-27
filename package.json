@@ -6,7 +6,7 @@
     "clean": "rm -rf .next out dist",
     "dev": "next dev",
     "build": "next build",
-    "build:static": "node scripts/prepare-static-export.mjs && NEXT_OUTPUT_EXPORT=1 next build; node scripts/restore-static-export.mjs",
+    "build:static": "node scripts/prepare-static-export.mjs && NEXT_OUTPUT_EXPORT=1 next build && node scripts/post-static-export.mjs; node scripts/restore-static-export.mjs",
     "preview:static": "npx --yes serve@14 dist",
     "start": "next start",
     "lint": "eslint ."

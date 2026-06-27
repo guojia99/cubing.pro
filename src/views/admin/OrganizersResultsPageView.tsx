@@ -17,6 +17,7 @@ import { PlayerLink } from "@/components/Link/GcLinks";
 import { rowClassNameWithStyleLines } from "@/components/Table/table_style";
 import { NavTabs } from "@/components/Tabs/NavTabs";
 import { OrganizersGuard } from "@/components/admin/OrganizersGuard";
+import { useRouteParam } from "@/hooks/useRouteParam";
 import {
   apiAddCompResults,
   apiApprovalCompsPreResult,
@@ -1127,12 +1128,17 @@ function OrganizersResultsContent({
 }
 
 export function OrganizersResultsPageView({
-  orgId,
-  compId,
+  orgId: orgIdProp,
+  compId: compIdProp,
 }: {
   orgId?: string;
   compId?: string;
 }) {
+  const orgIdFromUrl = useRouteParam("orgId");
+  const compIdFromUrl = useRouteParam("compId");
+  const orgId = orgIdProp ?? orgIdFromUrl;
+  const compId = compIdProp ?? compIdFromUrl;
+
   return (
     <OrganizersGuard>
       {!orgId || !compId ? (
