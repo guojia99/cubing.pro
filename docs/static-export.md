@@ -36,6 +36,22 @@ location / {
 
 若需动态 URL 回退到壳页面，可对未匹配路径回退到 `welcome` 或专用 SPA 入口（按运维策略配置）。
 
+### cubing-pro gateway（`src/gateway`）
+
+Next 多页静态导出部署到主站时，**勿**使用遗留 Umi 单页模式（`indexPath` + `staticPath`、所有路由回退同一 `index.html`）。
+
+推荐 `etc/server.yaml`：
+
+```yaml
+gateway:
+  staticRoot: "/build"   # build:static 产物目录（含 algs/、_next/ 等）
+  spa: false
+```
+
+或使用 `indexPath: "/build/index.html"` 且**不配置** `staticPath`，并设 `spa: false`。
+
+若使用 `staticSites` 按 Host 托管，`spa` 同样须为 `false`。
+
 ## 开发
 
 `npm run dev` 仍使用 Next 开发服务器与 `rewrites`，不受 `output: export` 影响开发体验。
