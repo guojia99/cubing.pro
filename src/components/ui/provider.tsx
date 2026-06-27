@@ -8,6 +8,7 @@ import { I18nProvider } from "@/contexts/I18nProvider";
 import { system } from "@/theme";
 import { ColorModeButton, ColorModeProvider } from "./color-mode";
 import { AppToaster } from "./toaster";
+import "@/styles/app-chrome.css";
 
 export function Provider({ children }: { children: ReactNode }) {
   return (

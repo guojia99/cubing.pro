@@ -4,7 +4,7 @@ import "./cube_icon.css";
 
 export const CubeIcon = (c: string, key: string, styles: CSSProperties) => {
   if (c === '' || c === undefined) {
-    return <></>;
+    return <span aria-hidden />;
   }
 
   let cc = c.replace(' ', '_');

@@ -341,13 +341,11 @@ export function CountryAvatar(code: string) {
 
 
   return (
-    <>
-      <Avatar
-        style={{ width: 16, height: 16, marginRight: 8 }}
-        src={`https://flagcdn.com/${key}.svg`}
-        size="small"
-        shape="square"
-      />
-    </>
+    <Avatar
+      style={{ width: 16, height: 16, marginRight: 8 }}
+      src={`https://flagcdn.com/${key}.svg`}
+      size="small"
+      shape="square"
+    />
   );
 }

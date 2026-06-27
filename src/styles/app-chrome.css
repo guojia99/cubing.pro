@@ -1,0 +1,17 @@
+/* 全屏沉浸模式：由 useHideAppChrome 在 <html> 上切换 data-app-chrome-hidden */
+html[data-app-chrome-hidden] [data-app-header] {
+  display: none !important;
+}
+
+html[data-app-chrome-hidden] [data-app-main] {
+  padding-block: 0 !important;
+}
+
+html[data-app-chrome-hidden] [data-app-container] {
+  max-width: none !important;
+  padding-inline: 0 !important;
+}
+
+html[data-app-chrome-hidden] body {
+  overflow: hidden;
+}

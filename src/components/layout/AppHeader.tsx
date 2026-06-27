@@ -358,6 +358,7 @@ export function AppHeader() {
     <>
       <Box
         as="header"
+        data-app-header
         position="sticky"
         top="0"
         fontSize={NAV_FONT_SIZE}

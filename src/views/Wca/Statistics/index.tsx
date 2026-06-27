@@ -8,6 +8,7 @@ import {
   CrownOutlined,
   HistoryOutlined,
   HourglassOutlined,
+  OrderedListOutlined,
   RiseOutlined,
   TrophyOutlined,
   UnorderedListOutlined,
@@ -17,6 +18,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useIntlMessage } from "@/hooks/useIntlMessage";
+import { KinCh } from "@/views/GroupCompetitions/Static/Kinsor";
 
 import AllEventsAchievementRank from "./AllEventsAchievementRank";
 import CompYearRank from "./CompYearRank";
@@ -31,6 +33,7 @@ import "./index.css";
 const { Title } = Typography;
 
 type StatsTabKey =
+  | "wcaKinch"
   | "grandSlam"
   | "historical"
   | "full"
@@ -42,6 +45,7 @@ type StatsTabKey =
 
 const TAB_PARAM = "tab";
 const VALID_TAB_KEYS: StatsTabKey[] = [
+  "wcaKinch",
   "grandSlam",
   "historical",
   "full",
@@ -90,6 +94,12 @@ export function WcaStatisticsView() {
 
   const cards = useMemo(
     () => [
+      {
+        key: "wcaKinch" as StatsTabKey,
+        icon: <OrderedListOutlined />,
+        title: intl.formatMessage({ id: "wca.stats.wcaKinch" }),
+        desc: intl.formatMessage({ id: "wca.stats.wcaKinchDesc" }),
+      },
       {
         key: "grandSlam" as StatsTabKey,
         icon: <CrownOutlined />,
@@ -179,6 +189,7 @@ export function WcaStatisticsView() {
         <h1 className="stats-tab-title">
           {cards.find((c) => c.key === activeKey)?.title}
         </h1>
+        {activeKey === "wcaKinch" && <KinCh isSenior isCountry otherDataFn={undefined} />}
         {activeKey === "grandSlam" && <GrandSlamRank />}
         {activeKey === "historical" && <HistoricalRank />}
         {activeKey === "full" && <FullRank />}

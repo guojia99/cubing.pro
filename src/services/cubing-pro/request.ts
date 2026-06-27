@@ -21,19 +21,28 @@ function isCubingProHost(hostname: string) {
 }
 
 /**
- * - next dev（localhost）：同源 /v3/cube-api + rewrites
+ * - next dev（localhost）：优先直连完整 API URL（避免 trailingSlash 代理丢失尾斜杠导致 404）
+ *   本地 Go 后端可在 `.env.local` 设置 `NEXT_PUBLIC_DEV_API_BASE=http://127.0.0.1:20000/v3/cube-api`
  * - 静态站点部署在 cubing.pro：同源 /v3/cube-api
  * - 其他静态预览 / CDN：NEXT_PUBLIC_API_BASE 完整 URL
  */
 export function getAPIUrl() {
-  return "http://0.0.0.0:20000/v3/cube-api"
-
   if (typeof window === "undefined") {
     return REMOTE_API_BASE;
   }
 
   const hostname = window.location.hostname;
-  if (isDevWithProxy(hostname) || isCubingProHost(hostname)) {
+
+  if (isDevWithProxy(hostname) || isLocal()) {
+    const devApi = process.env.NEXT_PUBLIC_DEV_API_BASE?.replace(/\/$/, "");
+    if (devApi?.startsWith("http")) {
+      return devApi;
+    }
+    // 相对 /v3/cube-api 经 Next rewrite 时，POST …/admin/users/ 等尾斜杠可能被去掉 → 404
+    return REMOTE_API_BASE.replace(/\/$/, "");
+  }
+
+  if (isCubingProHost(hostname)) {
     return siteMeta.apiPrefix;
   }
 
