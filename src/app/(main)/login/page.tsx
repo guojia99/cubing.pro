@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 
+import { ExportPathMarker } from "@/components/routing/ExportPathMarker";
 import { LoginPage } from "@/views/admin/LoginPage";
 
 export const metadata: Metadata = {
@@ -9,8 +10,11 @@ export const metadata: Metadata = {
 
 export default function Page() {
   return (
-    <Suspense fallback={null}>
-      <LoginPage />
-    </Suspense>
+    <>
+      <ExportPathMarker path="/login" />
+      <Suspense fallback={null}>
+        <LoginPage />
+      </Suspense>
+    </>
   );
 }

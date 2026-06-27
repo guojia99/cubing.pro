@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { matchRoute } from "@/config/routes";
+import { ExportPathMarker } from "@/components/routing/ExportPathMarker";
 import { getGcPlayerStaticParams } from "@/lib/staticExportPaths";
 import { GcPlayerView } from "@/views/GroupCompetitions/Player/GcPlayerView";
 
@@ -28,10 +29,15 @@ export async function generateMetadata({
   };
 }
 
-export default function GcPlayerPage() {
+export default async function GcPlayerPage({ params }: GcPlayerPageProps) {
+  const { id } = await params;
+
   return (
-    <Suspense fallback={null}>
-      <GcPlayerView />
-    </Suspense>
+    <>
+      <ExportPathMarker path={`/player/${id}`} />
+      <Suspense fallback={null}>
+        <GcPlayerView />
+      </Suspense>
+    </>
   );
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { matchRoute } from "@/config/routes";
+import { ExportPathMarker } from "@/components/routing/ExportPathMarker";
 import { getCompetitionStaticParams } from "@/lib/staticExportPaths";
 import { CompetitionView } from "@/views/Competition/CompetitionView";
 
@@ -26,10 +27,17 @@ export async function generateMetadata({ params }: CompetitionPageProps): Promis
   };
 }
 
-export default function CompetitionPage() {
+export default async function CompetitionPage({
+  params,
+}: CompetitionPageProps) {
+  const { id } = await params;
+
   return (
-    <Suspense fallback={null}>
-      <CompetitionView />
-    </Suspense>
+    <>
+      <ExportPathMarker path={`/competition/${id}`} />
+      <Suspense fallback={null}>
+        <CompetitionView />
+      </Suspense>
+    </>
   );
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { AppShell } from "@/components/layout/AppShell";
+import { ExportPathMarker } from "@/components/routing/ExportPathMarker";
 import { WelcomePageView } from "@/views/Welcome/WelcomePageView";
 
 export const dynamic = "force-static";
@@ -17,10 +18,13 @@ export const metadata: Metadata = {
  */
 export default function HomePage() {
   return (
-    <AppShell>
-      <Suspense fallback={null}>
-        <WelcomePageView />
-      </Suspense>
-    </AppShell>
+    <>
+      <ExportPathMarker path="/" />
+      <AppShell>
+        <Suspense fallback={null}>
+          <WelcomePageView />
+        </Suspense>
+      </AppShell>
+    </>
   );
 }

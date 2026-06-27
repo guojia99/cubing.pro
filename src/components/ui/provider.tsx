@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 
 import { AuthProvider } from "@/contexts/AuthProvider";
 import { I18nProvider } from "@/contexts/I18nProvider";
+import { StaticExportRouteSync } from "@/components/routing/StaticExportRouteSync";
 import { system } from "@/theme";
 import { ColorModeButton, ColorModeProvider } from "./color-mode";
 import { AppToaster } from "./toaster";
@@ -17,6 +18,7 @@ export function Provider({ children }: { children: ReactNode }) {
       <ColorModeProvider defaultTheme="light" enableSystem>
         <I18nProvider>
           <AuthProvider>
+            <StaticExportRouteSync />
             <AppToaster />
             {children}
           </AuthProvider>
