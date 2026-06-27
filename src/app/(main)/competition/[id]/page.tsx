@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { matchRoute } from "@/config/routes";
+import { getCompetitionStaticParams } from "@/lib/staticExportPaths";
 import { CompetitionView } from "@/views/Competition/CompetitionView";
 
 export const dynamic = "force-static";
@@ -10,7 +11,7 @@ export const dynamic = "force-static";
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
-  return [];
+  return getCompetitionStaticParams();
 }
 
 interface CompetitionPageProps {

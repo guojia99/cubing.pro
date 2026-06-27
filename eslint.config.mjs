@@ -24,6 +24,7 @@ const eslintConfig = [
     files: [
       "src/views/GroupCompetitions/**/*.{ts,tsx}",
       "src/views/Competition/**/*.{ts,tsx}",
+      "src/views/admin/**/*.{ts,tsx}",
       "src/components/Data/**/*.{ts,tsx}",
       "src/components/Buttons/**/*.{ts,tsx}",
       "src/components/Markdown/Markdown.tsx",

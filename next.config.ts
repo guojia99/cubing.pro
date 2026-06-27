@@ -14,7 +14,9 @@ const staticExport =
   process.env.NEXT_OUTPUT_EXPORT === "true";
 
 const nextConfig: NextConfig = {
-  ...(staticExport ? { output: "export" as const } : {}),
+  ...(staticExport
+    ? { output: "export" as const, distDir: "dist" }
+    : {}),
   trailingSlash: true,
   images: {
     unoptimized: true,
