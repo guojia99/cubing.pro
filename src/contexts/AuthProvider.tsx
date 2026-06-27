@@ -1,11 +1,13 @@
 "use client";
 
+import axios from "axios";
 import {
   createContext,
   useCallback,
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -22,7 +24,9 @@ import { currentUser } from "@/services/cubing-pro/auth/auth";
 import type { CurrentUserData } from "@/services/cubing-pro/auth/types";
 import {
   AuthHeader,
+  getToken,
   processWcaCallbackToken,
+  removeToken,
   startTokenRefresh,
 } from "@/services/cubing-pro/auth/token";
 import { USER_KV_KEYS } from "@/services/cubing-pro/user/user_kv";
@@ -36,6 +40,14 @@ type AuthContextValue = {
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+
+let refreshUserInflight: Promise<CurrentUserData | null> | null = null;
+
+function shouldClearTokenOnAuthError(error: unknown): boolean {
+  if (!axios.isAxiosError(error)) return false;
+  const status = error.response?.status;
+  return status === 401 || status === 403 || status === 429;
+}
 
 async function syncWebsiteUiFromCloud(userId: number) {
   if (!userId) return;
@@ -69,26 +81,51 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const refreshUser = useCallback(async (): Promise<CurrentUserData | null> => {
-    processWcaCallbackToken();
-    try {
-      const res = await currentUser();
-      const data = parseCurrentUserData(res);
-      if (data && isLoggedIn(data.id)) {
-        setCurrentUserState(data);
-        void syncWebsiteUiFromCloud(data.id);
-        return data;
-      }
-      setCurrentUserState(null);
-      return null;
-    } catch {
-      setCurrentUserState(null);
-      return null;
+    if (refreshUserInflight) {
+      return refreshUserInflight;
     }
+
+    const run = async (): Promise<CurrentUserData | null> => {
+      processWcaCallbackToken();
+      if (!getToken()?.token) {
+        setCurrentUserState(null);
+        return null;
+      }
+
+      try {
+        const res = await currentUser();
+        const data = parseCurrentUserData(res);
+        if (data && isLoggedIn(data.id)) {
+          setCurrentUserState(data);
+          void syncWebsiteUiFromCloud(data.id);
+          return data;
+        }
+        removeToken();
+        setCurrentUserState(null);
+        return null;
+      } catch (error) {
+        if (shouldClearTokenOnAuthError(error)) {
+          removeToken();
+        }
+        setCurrentUserState(null);
+        return null;
+      }
+    };
+
+    refreshUserInflight = run().finally(() => {
+      refreshUserInflight = null;
+    });
+    return refreshUserInflight;
   }, []);
+
+  const bootstrapped = useRef(false);
 
   useEffect(() => {
     applyWebsiteUiToDocument(readWebsiteUiFromStorage());
     startTokenRefresh();
+
+    if (bootstrapped.current) return;
+    bootstrapped.current = true;
 
     void (async () => {
       setLoading(true);
