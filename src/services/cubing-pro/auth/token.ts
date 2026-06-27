@@ -57,7 +57,7 @@ export async function refreshTokenInter() {
   }
 }
 
-let tokenRefreshTimer: ReturnType<typeof setInterval> | null = null;
+let tokenRefreshTimer: number | null = null;
 
 export function startTokenRefresh() {
   if (typeof window === "undefined") return;
