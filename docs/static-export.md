@@ -32,7 +32,14 @@ npm run build:static
 ### 固定与可枚举路由
 
 - 构建时会为**无** `:param` 的路由生成 HTML（见 `src/lib/staticExportPaths.ts`）。
-- `/algs/:cube/:class` 等可枚举详情页在构建时从 API / 本地 JSON 拉取全量路径。
+- 以下路由在构建时**全量预生成**（数据来自本地 JSON 或构建时 API），**不需要** `__dynamic__` 占位：
+  - `/other/recipes/:category/:id` — `public/recipes.json`（约 350+）
+  - `/other/kitchen-skills/:category/:id` — `public/tips.json`
+  - `/other/cocktails/:slug` — `public/iba/cocktails.json`
+  - `/algs/:cube/:class` — 构建时请求 `/public/algorithm/`
+- 路径段使用**原始中文/明文**生成目录名（勿 `encodeURIComponent`），与浏览器地址栏一致。
+- 若尚未重新构建，gateway 会对未命中路径再尝试 `%XX` 编码目录名（兼容旧产物）。
+- 上述内容若在部署后新增条目，需重新 `build:static` 后发布。
 
 ### Nginx 示例（部署在 cubing.pro）
 

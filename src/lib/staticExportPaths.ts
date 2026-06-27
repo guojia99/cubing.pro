@@ -50,7 +50,7 @@ export function getAlgsDetailStaticParamsFromMap(map: AlgCubeMap): { path: strin
   for (const cube of map.CubeKeys) {
     for (const item of map.ClassMap[cube] ?? []) {
       params.push({
-        path: ["algs", cube, encodeURIComponent(item.name)],
+        path: ["algs", cube, item.name],
       });
     }
   }
@@ -136,7 +136,7 @@ export function getRecipeDetailStaticParams(): { path: string[] }[] {
   const data = readPublicJson<RecipesData>("recipes.json");
   if (!data?.recipes) return [];
   return data.recipes.map((r) => ({
-    path: ["other", "recipes", encodeURIComponent(r.category), encodeURIComponent(r.id)],
+    path: ["other", "recipes", r.category, r.id],
   }));
 }
 
@@ -144,7 +144,7 @@ export function getKitchenSkillDetailStaticParams(): { path: string[] }[] {
   const data = readPublicJson<KitchenTipsData>("tips.json");
   if (!data?.tips) return [];
   return data.tips.map((t) => ({
-    path: ["other", "kitchen-skills", encodeURIComponent(t.category), encodeURIComponent(t.id)],
+    path: ["other", "kitchen-skills", t.category, t.id],
   }));
 }
 
@@ -152,7 +152,7 @@ export function getCocktailDetailStaticParams(): { path: string[] }[] {
   const data = readPublicJson<Cocktail[]>("iba/cocktails.json");
   if (!Array.isArray(data)) return [];
   return data.map((c) => ({
-    path: ["other", "cocktails", encodeURIComponent(c.slug)],
+    path: ["other", "cocktails", c.slug],
   }));
 }
 
