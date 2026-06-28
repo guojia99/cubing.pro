@@ -26,16 +26,28 @@ import {
   UploadOutlined,
 } from '@ant-design/icons';
 import { Button, Modal, Select, Table, Upload, message } from 'antd';
-import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 const { Option } = Select;
 
+const normalizeSchedules = (
+  schedules: CompAPI.Schedule[],
+  getRoundName: (index: number, totalRounds: number) => string,
+): CompAPI.Schedule[] =>
+  schedules.map((s, index) => ({
+    ...s,
+    Round: getRoundName(index, schedules.length),
+    RoundNum: index + 1,
+    FirstRound: index === 0,
+    FinalRound: index === schedules.length - 1,
+  }));
+
 const EventTable: React.FC<{ onChange?: (val: any) => void }> = ({ onChange }) => {
   const [events, setEvents] = useState<CompAPI.Event[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentEvent, setCurrentEvent] = useState<CompAPI.Event | null>(null);
+  const [modalSchedules, setModalSchedules] = useState<CompAPI.Schedule[]>([]);
   const [form] = Form.useForm();
 
   const [eventOptions, setEventOptions] = useState<string[]>([]);
@@ -131,9 +143,9 @@ const EventTable: React.FC<{ onChange?: (val: any) => void }> = ({ onChange }) =
       dataIndex: 'Round',
       key: 'Round',
       width: 100,
-      render: (text: string, record: CompAPI.Schedule, index: number) =>
+      render: (_text: string, _record: CompAPI.Schedule, index: number) =>
         /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
-        getRoundName(index, form.getFieldValue('Schedule').length),
+        getRoundName(index, modalSchedules.length),
     },
     {
       title: '操作',
@@ -156,32 +168,23 @@ const EventTable: React.FC<{ onChange?: (val: any) => void }> = ({ onChange }) =
   const showScheduleModal = (event: CompAPI.Event) => {
     setCurrentEvent(event);
     setIsModalVisible(true);
-    form.setFieldsValue({
-      ...event,
-      Schedule:
-        event.Schedule.length > 0
-          ? event.Schedule.map((s, index) => ({
-              ...s,
-              /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
-              Round: getRoundName(index, event.Schedule.length),
-              StartTime: s.StartTime ? dayjs(s.StartTime) : null,
-              EndTime: s.EndTime ? dayjs(s.EndTime) : null,
-            }))
-          : /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
-            [createDefaultSchedule(event.EventName)],
-    });
+    const schedules =
+      event.Schedule.length > 0
+        ? event.Schedule
+        : /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
+          [createDefaultSchedule(event.EventName)];
+    /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
+    setModalSchedules(normalizeSchedules(schedules, getRoundName));
+    form.setFieldsValue({ EventName: event.EventName });
   };
 
   const handleOk = () => {
-    form.validateFields().then((values) => {
+    form.validateFields(['EventName']).then((values) => {
       const updatedEvent = {
         ...currentEvent!,
-        ...values,
-        Schedule: values.Schedule.map((s: any, index: number) => ({
-          ...s,
-          /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
-          Round: getRoundName(index, values.Schedule.length),
-        })),
+        EventName: values.EventName,
+        /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
+        Schedule: normalizeSchedules(modalSchedules, getRoundName),
       };
       updateEvents(events.map((e) => (e.Key === updatedEvent.Key ? updatedEvent : e)));
       setIsModalVisible(false);
@@ -302,23 +305,15 @@ const EventTable: React.FC<{ onChange?: (val: any) => void }> = ({ onChange }) =
   });
 
   const addSchedule = () => {
-    const schedules = form.getFieldValue('Schedule') || [];
-    const newSchedule = {
-      ...createDefaultSchedule(currentEvent?.EventName || ''),
-      Round: getRoundName(schedules.length, schedules.length + 1),
-      RoundNum: schedules.length + 1,
-      FirstRound: false,
-      FinalRound: true,
-    };
-    const newSchedules = [...schedules, newSchedule];
-    form.setFieldsValue({
-      Schedule: newSchedules.map((s, index) => ({
-        ...s,
-        Round: getRoundName(index, newSchedules.length),
-        FirstRound: index === 0,
-        FinalRound: index === newSchedules.length - 1,
-      })),
-    });
+    setModalSchedules((schedules) =>
+      normalizeSchedules(
+        [
+          ...schedules,
+          createDefaultSchedule(currentEvent?.EventName || ''),
+        ],
+        getRoundName,
+      ),
+    );
   };
 
   const handleEventChangeEventName = (key: string, value: string) => {
@@ -340,19 +335,15 @@ const EventTable: React.FC<{ onChange?: (val: any) => void }> = ({ onChange }) =
     );
   };
   const deleteSchedule = (index: number) => {
-    const schedules = form.getFieldValue('Schedule');
-    if (schedules.length > 1) {
-      const newSchedules = schedules.filter((_: any, i: number) => i !== index);
-      form.setFieldsValue({
-        Schedule: newSchedules.map((s: CompAPI.Schedule, i: number) => ({
-          ...s,
-          Round: getRoundName(i, newSchedules.length),
-          RoundNum: i + 1,
-          FirstRound: i === 0,
-          FinalRound: i === newSchedules.length - 1,
-        })),
-      });
-    }
+    setModalSchedules((schedules) => {
+      if (schedules.length <= 1) {
+        return schedules;
+      }
+      return normalizeSchedules(
+        schedules.filter((_, i) => i !== index),
+        getRoundName,
+      );
+    });
   };
 
   return (
@@ -401,32 +392,24 @@ const EventTable: React.FC<{ onChange?: (val: any) => void }> = ({ onChange }) =
               ))}
             </Select>
           </Form.Item>
-          <Form.List name="Schedule">
-            {(fields) => (
-              <>
-                <Table
-                  dataSource={fields}
-                  // @ts-ignore
-                  columns={scheduleColumns}
-                  size={'small'}
-                  pagination={false}
-                  scroll={{ x: 'max-content' }}
-                />
-                <Form.Item>
-                  <Button
-                    type="dashed"
-                    onClick={addSchedule}
-                    // block
-                    icon={<PlusOutlined />}
-                    disabled={fields.length >= 99}
-                    style={{ marginTop: '20px', float: 'right' }}
-                  >
-                    添加轮次
-                  </Button>
-                </Form.Item>
-              </>
-            )}
-          </Form.List>
+          <Table
+            dataSource={modalSchedules}
+            rowKey="RoundNum"
+            // @ts-ignore
+            columns={scheduleColumns}
+            size={'small'}
+            pagination={false}
+            scroll={{ x: 'max-content' }}
+          />
+          <Button
+            type="dashed"
+            onClick={addSchedule}
+            icon={<PlusOutlined />}
+            disabled={modalSchedules.length >= 99}
+            style={{ marginTop: '20px', float: 'right' }}
+          >
+            添加轮次
+          </Button>
         </Form>
       </Modal>
     </div>
