@@ -13,6 +13,8 @@ import {
 export * from "./types";
 export { generateHtrScramble } from "./scramble";
 export { isValidToken } from "./cube";
+export { isTrueFr } from "./solver";
+export { verifyFrSolution, type VerifyFrResult } from "./validate";
 
 function buildCaseLabel(edgeLabel: string, cornerLabel: string): string {
   return `${edgeLabel} / ${cornerLabel}`;

@@ -15,6 +15,7 @@ import {
 import dynamic from "next/dynamic";
 
 import { useI18n } from "@/contexts/I18nProvider";
+import { FR_COLORS } from "@/views/FloppyReduction/utils/constants";
 
 const FrCube3D = dynamic(
   () => import("@/views/FloppyReduction/components/FrCube3D").then((m) => m.FrCube3D),
@@ -141,7 +142,7 @@ function CaseSection({
               />
             </Box>
             <Box>
-              <Badge colorPalette="purple" mb="1">
+              <Badge colorPalette={FR_COLORS.palette} mb="1">
                 {c.label}
               </Badge>
               <Text fontSize="xs" color="fg.muted">

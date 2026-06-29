@@ -5,6 +5,7 @@ import {
   Button,
   Card,
   HStack,
+  SegmentGroup,
   SimpleGrid,
   Spinner,
   Text,
@@ -16,10 +17,13 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useI18n } from "@/contexts/I18nProvider";
 import { AxisResultCard } from "@/views/FloppyReduction/components/AxisResultCard";
 import { FrHelpDialog } from "@/views/FloppyReduction/components/FrHelpDialog";
+import { PracticeHistoryPanel } from "@/views/FloppyReduction/components/PracticeHistoryPanel";
+import { PracticePanel } from "@/views/FloppyReduction/components/PracticePanel";
 import {
   FR_EXAMPLE_SCRAMBLE,
   ScrambleInput,
 } from "@/views/FloppyReduction/components/ScrambleInput";
+import { FR_COLORS } from "@/views/FloppyReduction/utils/constants";
 import {
   analyzeScramble,
   generateHtrScramble,
@@ -46,13 +50,17 @@ const AXIS_TAB_LABEL: Record<AxisKey, string> = {
   rl: "R / L",
 };
 
-export function FloppyReductionView() {
+type FrMode = "analyze" | "practice";
+
+function AnalyzePanel({ helpOpen, onHelpOpenChange }: {
+  helpOpen: boolean;
+  onHelpOpenChange: (open: boolean) => void;
+}) {
   const { t, tf } = useI18n();
   const [input, setInput] = useState("");
   const [analysis, setAnalysis] = useState<FrAnalysis | null>(null);
   const [activeAxis, setActiveAxis] = useState<AxisKey>("ud");
   const [demo, setDemo] = useState(false);
-  const [helpOpen, setHelpOpen] = useState(false);
 
   const runAnalyze = useCallback((scramble: string) => {
     setAnalysis(analyzeScramble(scramble));
@@ -66,7 +74,6 @@ export function FloppyReductionView() {
     runAnalyze(s);
   }, [runAnalyze]);
 
-  // 首次加载默认进入随机示例（在客户端生成，避免水合不一致）
   useEffect(() => {
     handleRandom();
   }, [handleRandom]);
@@ -91,22 +98,22 @@ export function FloppyReductionView() {
         onAnalyze={() => runAnalyze(input)}
         onRandom={handleRandom}
         onExample={handleExample}
-        onHelp={() => setHelpOpen(true)}
+        onHelp={() => onHelpOpenChange(true)}
       />
 
-      <FrHelpDialog open={helpOpen} onOpenChange={setHelpOpen} />
+      <FrHelpDialog open={helpOpen} onOpenChange={onHelpOpenChange} />
 
       {analysis && !analysis.ok && (
-        <Card.Root borderRadius="lg" borderColor="red.500" borderWidth="1px">
-          <Card.Body color="red.500" fontSize="sm">
+        <Card.Root borderRadius="lg" borderColor={FR_COLORS.destructive} borderWidth="1px">
+          <Card.Body color={FR_COLORS.destructive} fontSize="sm">
             {tf("fr.error.parse", { token: analysis.errorToken ?? "" })}
           </Card.Body>
         </Card.Root>
       )}
 
       {analysis?.ok && !analysis.isHtr && (
-        <Card.Root borderRadius="lg" borderColor="orange.500" borderWidth="1px">
-          <Card.Body color="orange.600" fontSize="sm">
+        <Card.Root borderRadius="lg" borderColor={FR_COLORS.warning} borderWidth="1px">
+          <Card.Body color={FR_COLORS.warning} fontSize="sm">
             {t("fr.error.notHtr")}
           </Card.Body>
         </Card.Root>
@@ -134,7 +141,7 @@ export function FloppyReductionView() {
                   key={ax}
                   size="sm"
                   variant={activeAxis === ax ? "solid" : "outline"}
-                  colorPalette="purple"
+                  colorPalette={FR_COLORS.palette}
                   onClick={() => {
                     setActiveAxis(ax);
                     setDemo(false);
@@ -179,6 +186,57 @@ export function FloppyReductionView() {
             />
           ))}
         </SimpleGrid>
+      )}
+    </VStack>
+  );
+}
+
+export function FloppyReductionView() {
+  const { t } = useI18n();
+  const [mode, setMode] = useState<FrMode>("analyze");
+  const [helpOpen, setHelpOpen] = useState(false);
+  const [historyKey, setHistoryKey] = useState(0);
+
+  return (
+    <VStack align="stretch" gap="6">
+      <Box>
+        <Text fontSize="2xl" fontWeight="bold" mb="1">
+          {t("fr.title")}
+        </Text>
+        <Text fontSize="sm" color={FR_COLORS.fgMuted} mb="4">
+          {t("fr.subtitle")}
+        </Text>
+        <SegmentGroup.Root
+          value={mode}
+          onValueChange={(e) => {
+            const v = e.value as FrMode | null;
+            if (v) setMode(v);
+          }}
+          size="sm"
+        >
+          <SegmentGroup.Indicator />
+          <SegmentGroup.Item value="analyze">
+            <SegmentGroup.ItemText>{t("fr.mode.analyze")}</SegmentGroup.ItemText>
+            <SegmentGroup.ItemHiddenInput />
+          </SegmentGroup.Item>
+          <SegmentGroup.Item value="practice">
+            <SegmentGroup.ItemText>{t("fr.mode.practice")}</SegmentGroup.ItemText>
+            <SegmentGroup.ItemHiddenInput />
+          </SegmentGroup.Item>
+        </SegmentGroup.Root>
+      </Box>
+
+      {mode === "analyze" ? (
+        <AnalyzePanel helpOpen={helpOpen} onHelpOpenChange={setHelpOpen} />
+      ) : (
+        <>
+          <PracticePanel
+            onHistoryChange={() => setHistoryKey((k) => k + 1)}
+            onHelp={() => setHelpOpen(true)}
+          />
+          <PracticeHistoryPanel key={historyKey} />
+          <FrHelpDialog open={helpOpen} onOpenChange={setHelpOpen} />
+        </>
       )}
     </VStack>
   );
