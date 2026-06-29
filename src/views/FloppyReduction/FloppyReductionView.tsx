@@ -17,6 +17,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useI18n } from "@/contexts/I18nProvider";
 import { AxisResultCard } from "@/views/FloppyReduction/components/AxisResultCard";
 import { FrHelpDialog } from "@/views/FloppyReduction/components/FrHelpDialog";
+import { FrTutorialDialog } from "@/views/FloppyReduction/components/FrTutorialDialog";
 import { PracticeHistoryPanel } from "@/views/FloppyReduction/components/PracticeHistoryPanel";
 import { PracticePanel } from "@/views/FloppyReduction/components/PracticePanel";
 import {
@@ -52,9 +53,11 @@ const AXIS_TAB_LABEL: Record<AxisKey, string> = {
 
 type FrMode = "analyze" | "practice";
 
-function AnalyzePanel({ helpOpen, onHelpOpenChange }: {
+function AnalyzePanel({ helpOpen, onHelpOpenChange, tutorialOpen, onTutorialOpenChange }: {
   helpOpen: boolean;
   onHelpOpenChange: (open: boolean) => void;
+  tutorialOpen: boolean;
+  onTutorialOpenChange: (open: boolean) => void;
 }) {
   const { t, tf } = useI18n();
   const [input, setInput] = useState("");
@@ -99,9 +102,11 @@ function AnalyzePanel({ helpOpen, onHelpOpenChange }: {
         onRandom={handleRandom}
         onExample={handleExample}
         onHelp={() => onHelpOpenChange(true)}
+        onTutorial={() => onTutorialOpenChange(true)}
       />
 
       <FrHelpDialog open={helpOpen} onOpenChange={onHelpOpenChange} />
+      <FrTutorialDialog open={tutorialOpen} onOpenChange={onTutorialOpenChange} />
 
       {analysis && !analysis.ok && (
         <Card.Root borderRadius="lg" borderColor={FR_COLORS.destructive} borderWidth="1px">
@@ -195,6 +200,7 @@ export function FloppyReductionView() {
   const { t } = useI18n();
   const [mode, setMode] = useState<FrMode>("analyze");
   const [helpOpen, setHelpOpen] = useState(false);
+  const [tutorialOpen, setTutorialOpen] = useState(false);
   const [historyKey, setHistoryKey] = useState(0);
 
   return (
@@ -227,15 +233,22 @@ export function FloppyReductionView() {
       </Box>
 
       {mode === "analyze" ? (
-        <AnalyzePanel helpOpen={helpOpen} onHelpOpenChange={setHelpOpen} />
+        <AnalyzePanel
+          helpOpen={helpOpen}
+          onHelpOpenChange={setHelpOpen}
+          tutorialOpen={tutorialOpen}
+          onTutorialOpenChange={setTutorialOpen}
+        />
       ) : (
         <>
           <PracticePanel
             onHistoryChange={() => setHistoryKey((k) => k + 1)}
             onHelp={() => setHelpOpen(true)}
+            onTutorial={() => setTutorialOpen(true)}
           />
           <PracticeHistoryPanel key={historyKey} />
           <FrHelpDialog open={helpOpen} onOpenChange={setHelpOpen} />
+          <FrTutorialDialog open={tutorialOpen} onOpenChange={setTutorialOpen} />
         </>
       )}
     </VStack>

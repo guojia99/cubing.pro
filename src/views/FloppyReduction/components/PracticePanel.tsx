@@ -59,9 +59,11 @@ function pickRandomAxis(): AxisKey {
 export function PracticePanel({
   onHistoryChange,
   onHelp,
+  onTutorial,
 }: {
   onHistoryChange?: () => void;
   onHelp: () => void;
+  onTutorial: () => void;
 }) {
   const { t, tf } = useI18n();
   const [input, setInput] = useState("");
@@ -166,6 +168,7 @@ export function PracticePanel({
         onRandom={handleRandom}
         onExample={handleExample}
         onHelp={onHelp}
+        onTutorial={onTutorial}
       />
 
       {analysis && !analysis.ok && (
