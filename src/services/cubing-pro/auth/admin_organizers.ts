@@ -1,10 +1,8 @@
-import { AuthHeader } from '@/services/cubing-pro/auth/token';
-import { Request } from '@/services/cubing-pro/request';
+import { AuthHeader } from "@/services/cubing-pro/auth/token";
+import { Request } from "@/services/cubing-pro/request";
 
-/** 后端 ResponseOK 通用包壳 */
 type CubeApiEnvelope<T> = { code?: string; data: T; msg?: string };
 
-/** 管理端主办团队（与后端 user.Organizers JSON 一致） */
 export type AdminOrganizer = {
   id: number;
   createdAt?: string;
@@ -41,7 +39,6 @@ export type AdminUpdateOrganizerReq = {
   ass_cube_ids?: string[];
 };
 
-/** 比赛群组（多值字段可能为 JSON 字符串或已解析数组） */
 export type AdminCompetitionGroup = {
   id: number;
   createdAt?: string;
@@ -78,7 +75,7 @@ export async function apiAdminOrganizersList(params: {
   Status?: string;
 }): Promise<{ items: AdminOrganizer[]; total: number }> {
   const response = await Request.get<CubeApiEnvelope<{ items: AdminOrganizer[]; total: number }>>(
-    '/admin/competition/organizers',
+    "/admin/competition/organizers",
     {
       params,
       headers: AuthHeader(),
@@ -91,7 +88,7 @@ export async function apiAdminCreateOrganizer(
   body: AdminCreateOrganizerReq,
 ): Promise<AdminOrganizer> {
   const response = await Request.post<CubeApiEnvelope<AdminOrganizer>>(
-    '/admin/competition/organizers',
+    "/admin/competition/organizers",
     body,
     { headers: AuthHeader() },
   );

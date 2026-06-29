@@ -1,138 +1,121 @@
-import '@/components/Data/table_fixed_column.css';
-import { CubeIcon } from '@/components/CubeIcon/cube_icon';
-import { Comp } from '@/components/Data/types/comps';
-import { parseDateTime } from '@/utils/time/data_time';
-import { ProColumns } from '@ant-design/pro-table/es/typing';
-import { Badge, Radio, Select, SelectProps, Table, Tag } from 'antd';
-import dayjs from 'dayjs';
-import React from 'react';
-import { Link } from 'react-router-dom';
+"use client";
+
+import "@/components/Data/table_fixed_column.css";
+
+import { Badge, Table, Tag } from "antd";
+import type { ColumnsType } from "antd/es/table";
+import NextLink from "next/link";
+import { Fragment } from "react";
+
+import { CubeIcon } from "@/components/CubeIcon/cube_icon";
+import type { Comp } from "@/components/Data/types/comps";
+import { getThemeColors } from "@/theme/chartColors";
+import { parseDateTime } from "@/utils/time/data_time";
+
+function parseDayjsLike(val: string) {
+  return new Date(val);
+}
 
 export function getStatusProp(result: Comp) {
-  const now = dayjs();
-  const startTime = dayjs(result.CompStartTime);
-  const endTime = dayjs(result.CompEndTime);
+  const theme = getThemeColors();
+  const now = new Date();
+  const startTime = parseDayjsLike(result.CompStartTime);
+  const endTime = parseDayjsLike(result.CompEndTime);
 
-  let status = '';
-  let color = 'default'; // 默认颜色
+  let status = "";
+  let color = "default";
 
   switch (result.Status) {
-    case 'Running':
-
-      if (result.IsDone){
-        status = '已结束';
-        color = '#8c8c8c';
-        break
+    case "Running":
+      if (result.IsDone) {
+        status = "已结束";
+        color = theme.faintForeground;
+        break;
       }
-
-
-      if (now.isBefore(startTime)) {
-        status = '未开始';
-        color = '#9254de';
-      } else if (now.isAfter(startTime) && now.isBefore(endTime)) {
-        status = '进行中';
-        color = '#52c41a';
+      if (now < startTime) {
+        status = "未开始";
+        color = theme.signalInfo;
+      } else if (now > startTime && now < endTime) {
+        status = "进行中";
+        color = theme.signalSuccess;
       } else {
-        status = '待结束'
-        color = '#755b5b';
+        status = "待结束";
+        color = theme.signalWarning;
       }
       break;
-    case 'Reviewing':
-      status = '审批中';
-      color = '#F4D95B';
+    case "Reviewing":
+      status = "审批中";
+      color = theme.signalWarning;
       break;
-    case 'Reject':
-      status = '驳回';
-      color = '#F3456D';
+    case "Reject":
+      status = "驳回";
+      color = theme.destructive;
       break;
-    case 'Temporary':
-      status = '编辑中';
-      color = '#C4F757';
+    case "Temporary":
+      status = "编辑中";
+      color = theme.accent;
       break;
-    case 'Ban':
-      status = '禁用';
-      color = '#173A4E';
+    case "Ban":
+      status = "禁用";
+      color = theme.foreground;
       break;
   }
 
-  return {
-    status: status,
-    color: color,
-  };
+  return { status, color };
 }
 
-// todo 修改为动态获取
-const cubeIconOptions: SelectProps['options'] = [
-  { value: '三阶', en: '333', color: 'cyan' },
-  { value: '四阶', en: '444', color: 'red' },
-  { value: '五阶', en: '555', color: 'green' },
-  { value: '六阶', en: '666', color: 'blue' },
-];
-
-//  : TableProps<Comp>['columns']
-export const CompsTableColumns: ProColumns<Comp>[] = [
+export const CompsTableColumns: ColumnsType<Comp> = [
   {
-    title: '序号',
-    dataIndex: 'Index',
-    key: 'Index',
-    hideInSearch: true,
+    title: "序号",
+    dataIndex: "Index",
+    key: "Index",
     width: 65,
-    colSize: 1,
-    render: (value: any, result: Comp) => {
+    render: (value: number, result: Comp) => {
       const status = getStatusProp(result);
       return (
-        <div style={{ textAlign: 'center' }}>
-          <Badge color={status.color} size="default" style={{ marginRight: '10px' }} />
+        <div style={{ textAlign: "center" }}>
+          <Badge color={status.color} size="medium" style={{ marginRight: 10 }} />
           {value}
         </div>
       );
     },
   },
   {
-    title: '日期',
-    dataIndex: 'CompStartTime',
-    key: 'CompStartTime',
-    render: (text: any, result: Comp) => {
-      const startTime = dayjs(result.CompStartTime);
-      const endTime = dayjs(result.CompEndTime);
-      const daysDifference = endTime.diff(startTime, 'day'); // 天数差
-
-      if (daysDifference > 1) {
-        return  <>{parseDateTime(result.CompStartTime)}({daysDifference}天)</>;
-      }
-      return <>{parseDateTime(result.CompStartTime)})</>;
-    },
-    hideInSearch: true,
+    title: "日期",
+    dataIndex: "CompStartTime",
+    key: "CompStartTime",
     width: 130,
+    render: (_text, result: Comp) => {
+      const startTime = parseDayjsLike(result.CompStartTime);
+      const endTime = parseDayjsLike(result.CompEndTime);
+      const daysDifference = Math.floor(
+        (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60 * 24),
+      );
+      if (daysDifference > 1) {
+        return (
+          <>
+            {parseDateTime(result.CompStartTime)}({daysDifference}天)
+          </>
+        );
+      }
+      return <>{parseDateTime(result.CompStartTime)}</>;
+    },
   },
-  // {
-  //   title: "结束日",
-  //   dataIndex: 'CompEndTime',
-  //   key: "CompEndTime",
-  //   render: (text: any, result: Comp) => {
-  //     return (
-  //       <>{parseDateTime(result.CompEndTime)}</>
-  //     )
-  //   },
-  //   hideInSearch: true
-  // },
   {
-    title: '类型',
-    dataIndex: 'Genre',
-    key: 'Genre',
-    render: (text: any, result: Comp) => {
-      const mp = {
-        1: { label: 'WCA', color: 'blue', icon: 'https://cubing.com/f/images/wca.png' },
-        2: { label: '线下正式赛', color: 'green' },
-        3: { label: '线上正式赛', color: 'red' },
-        4: { label: '线下赛', color: 'orange' },
-        5: { label: '线上赛', color: 'purple' },
+    title: "类型",
+    dataIndex: "Genre",
+    key: "Genre",
+    width: 80,
+    render: (_text, result: Comp) => {
+      const mp: Record<string, { label: string; color: string; icon?: string }> = {
+        "1": { label: "WCA", color: "blue", icon: "https://cubing.com/f/images/wca.png" },
+        "2": { label: "线下正式赛", color: "green" },
+        "3": { label: "线上正式赛", color: "red" },
+        "4": { label: "线下赛", color: "orange" },
+        "5": { label: "线上赛", color: "purple" },
       };
-      const key = result.Genre + '';
-
-      // @ts-ignore with mp[key]
-      const { label, color, icon } = mp[key] || {};
-
+      const key = String(result.Genre);
+      const { label, color, icon } = mp[key] ?? { label: "", color: "default" };
       return (
         <>
           <Tag color={color}>{label}</Tag>
@@ -140,146 +123,91 @@ export const CompsTableColumns: ProColumns<Comp>[] = [
         </>
       );
     },
-    hideInSearch: true, // todo
-    renderFormItem: () => {
-      return (
-        <>
-          <Radio.Group defaultValue={'0'}>
-            <Radio.Button value="0">全部</Radio.Button>
-            {/*<Radio.Button value="1">WCA</Radio.Button>*/}
-            <Radio.Button value="4">线下赛</Radio.Button>
-            <Radio.Button value="5">线下赛</Radio.Button>
-          </Radio.Group>
-        </>
-      );
-    },
-    width: 80,
   },
   {
-    title: '名称',
-    dataIndex: 'Name',
-    key: 'Name',
-    render: (text: any, result: Comp) => {
-      return (
-        <>
-          <Link to={'/competition/' + result.id} style={{ color: 'var(--ant-color-link)' }}>
-            {result.Name}
-          </Link>
-          {result.logo && (
-            <img
-              src={result.logo}
-              alt="logo"
-              style={{ width: '1em', height: '1em', marginLeft: '0.5em', verticalAlign: 'middle' }}
-            />
-          )}
-        </>
-      );
-    },
+    title: "名称",
+    dataIndex: "Name",
+    key: "Name",
     width: 200,
+    render: (_text, result: Comp) => (
+      <>
+        <NextLink href={`/competition/${result.id}`} style={{ color: "var(--ant-color-link)" }}>
+          {result.Name}
+        </NextLink>
+        {result.logo && (
+          <img
+            src={result.logo}
+            alt="logo"
+            style={{ width: "1em", height: "1em", marginLeft: "0.5em", verticalAlign: "middle" }}
+          />
+        )}
+      </>
+    ),
   },
   {
-    title: '人数',
-    dataIndex: 'Count',
-    key: 'Count',
+    title: "人数",
+    dataIndex: "Count",
+    key: "Count",
     width: 70,
-    hideInSearch: true,
   },
   {
-    title: '项目',
-    dataIndex: 'EventMin',
-    key: 'EventMin',
+    title: "项目",
+    dataIndex: "EventMin",
+    key: "EventMin",
     width: 150,
-    render: (text: any, result: Comp) => {
-      const l = text.toString().split(';');
-
-      if (text === '') {
+    render: (text: string, result: Comp) => {
+      const l = text.toString().split(";");
+      if (text === "") {
         return <>暂无项目</>;
       }
-      const body = [];
+      const body: React.ReactNode[] = [];
       for (let i = 0; i < l.length; i++) {
-        body.push(CubeIcon(l[i], 'comp_icon_key' + result.id + '-' + l[i], { marginLeft: '3px' }));
-        if (l[i] === ''){
-          break
-        }
+        body.push(
+          <Fragment key={`${result.id}-event-${l[i]}-${i}`}>
+            {CubeIcon(l[i], `comp_icon_key${result.id}-${l[i]}`, { marginLeft: "3px" })}
+          </Fragment>,
+        );
+        if (l[i] === "") break;
         if (i >= 4) {
-          body.push(<> 等共{l.length-1}个项目</>);
+          body.push(
+            <Fragment key={`${result.id}-event-more`}> 等共{l.length - 1}个项目</Fragment>,
+          );
           break;
         }
       }
       return <>{body}</>;
     },
-    hideInSearch: true, // todo
-    renderFormItem: () => {
-      return (
-        <Select
-          mode="multiple"
-          tagRender={(props) => {
-            const { label, value, closable, onClose } = props;
-            const onPreventMouseDown = (event: React.MouseEvent<HTMLSpanElement>) => {
-              event.preventDefault();
-              event.stopPropagation();
-            };
-
-            const line = cubeIconOptions.find((option) => option.value === value);
-            return (
-              <Tag
-                color={line ? line.color : 'cyan'}
-                onMouseDown={onPreventMouseDown}
-                closable={closable}
-                onClose={onClose}
-                style={{ marginInlineEnd: 4 }}
-              >
-                {label}
-                {CubeIcon(line?.en, 'comp_icon_label_key' + '-' + label, { marginLeft: '2px' })}
-              </Tag>
-            );
-          }}
-          style={{ width: '100%' }}
-          options={cubeIconOptions}
-        />
-      );
-    },
   },
   {
-    title: '状态',
-    dataIndex: 'Status',
-    key: 'Status',
+    title: "状态",
+    dataIndex: "Status",
+    key: "Status",
     width: 70,
-    hideInSearch: true,
-    render: (text: any, result: Comp) => {
+    render: (_text, result: Comp) => {
       const status = getStatusProp(result);
-      return (
-        <>
-          <Tag color={status.color}>{status.status}</Tag>
-        </>
-      );
+      return <Tag color={status.color}>{status.status}</Tag>;
     },
   },
 ];
 
-export const CompsTable = (dataSource: Comp[], keys: string[]) => {
-  let columns = [];
-
-  for (let key of keys) {
-    for (let i = 0; i < CompsTableColumns.length; i++) {
-      if (CompsTableColumns[i].dataIndex === key) {
-        columns.push(CompsTableColumns[i]);
-        break;
-      }
-    }
+export function CompsTable(dataSource: Comp[], keys: string[]) {
+  const columns: ColumnsType<Comp> = [];
+  for (const key of keys) {
+    const col = CompsTableColumns.find((c) => c.key === key);
+    if (col) columns.push(col);
   }
   if (columns.length > 0) {
-    columns[0] = { ...columns[0], fixed: 'left' as const };
+    columns[0] = { ...columns[0], fixed: "left" as const };
   }
   return (
     <Table
       dataSource={dataSource}
-      // @ts-ignore
       columns={columns}
       pagination={false}
       size="small"
       className="cube-comps-table"
-      scroll={{ x: 'max-content' }}
+      scroll={{ x: "max-content" }}
+      rowKey="id"
     />
   );
-};
+}

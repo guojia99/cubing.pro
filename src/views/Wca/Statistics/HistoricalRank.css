@@ -1,0 +1,71 @@
+.historical-rank {
+  padding: 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+@media (min-width: 1080px) {
+  .historical-rank {
+    max-width: none;
+  }
+}
+.historical-rank .page-title {
+  text-align: center;
+  margin-bottom: 24px;
+}
+.historical-rank .filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 0;
+}
+.historical-rank .filter-row .filter-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.historical-rank .filter-row .filter-item .filter-label {
+  white-space: nowrap;
+}
+.historical-rank .filter-row .filter-item .filter-select.ant-select {
+  min-width: 120px;
+}
+.historical-rank .table-wrapper {
+  /* Table scroll.x 已处理横向滚动，此处不再加 overflow 以免分页被推出视口 */
+}
+@media (max-width: 1079px) {
+  .historical-rank {
+    padding: 12px 8px;
+    overflow: visible;
+  }
+  .historical-rank .page-title {
+    margin-bottom: 16px;
+    font-size: 18px !important;
+  }
+  .historical-rank .table-wrapper {
+    width: 100%;
+    /* 不在此处加 overflow-x，Table 的 scroll.x 会单独滚动表格区域，分页保持可见 */
+  }
+  .historical-rank .ant-table {
+    font-size: 13px;
+  }
+  .historical-rank .ant-table-cell {
+    padding: 8px 6px !important;
+  }
+  .historical-rank .ant-pagination {
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 12px 0;
+    overflow: visible !important;
+  }
+  .historical-rank .ant-pagination .ant-pagination-options {
+    margin-left: 0;
+    margin-top: 8px;
+  }
+  .historical-rank .ant-pagination .ant-pagination-item,
+  .historical-rank .ant-pagination .ant-pagination-prev,
+  .historical-rank .ant-pagination .ant-pagination-next {
+    min-width: 32px;
+  }
+}

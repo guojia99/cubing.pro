@@ -1,64 +1,81 @@
-import {refreshToken} from "@/services/cubing-pro/auth/auth";
-import {AuthAPI} from "@/services/cubing-pro/auth/typings";
+import { refreshToken } from "@/services/cubing-pro/auth/auth";
+import type { Token } from "@/services/cubing-pro/auth/types";
 
+const AUTH_TOKEN_KEY = "authToken_cubing_pro";
+const REFRESH_INTERVAL = 5 * 60 * 1000;
 
-const AUTH_TOKEN_KEY = 'authToken_cubing_pro';
-
-export const saveToken = (token: AuthAPI.Token) => {
+export function saveToken(token: Token) {
+  if (typeof window === "undefined") return;
   localStorage.setItem(AUTH_TOKEN_KEY, JSON.stringify(token));
-};
+}
 
-export const getToken = (): AuthAPI.Token | null => {
+export function getToken(): Token | null {
+  if (typeof window === "undefined") return null;
   const str = localStorage.getItem(AUTH_TOKEN_KEY);
-  if (!str) {
-    return null
-  }
-  return JSON.parse(str) as AuthAPI.Token
-};
-
-export const removeToken = () => {
-  localStorage.removeItem(AUTH_TOKEN_KEY);
-};
-
-
-const REFRESH_INTERVAL = 5 * 60 * 1000; // 每5分钟检查一次
-
-export const AuthHeader = () => {
-  const token = getToken();
-  return {
-    "Authorization": "Bearer " + token?.token,
-    // "x-cubing-pro": "Cubing-pro",
-    "Accept": 'application/json',
+  if (!str) return null;
+  try {
+    return JSON.parse(str) as Token;
+  } catch {
+    return null;
   }
 }
 
+export function removeToken() {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(AUTH_TOKEN_KEY);
+}
 
-export const refreshTokenInter = async () => {
+export function AuthHeader(): Record<string, string> {
   const token = getToken();
-  if (!token) {
-    return;
-  }
-  refreshToken().then((value) => {
-    if (value) {
-      const expireTime = new Date(value.data.expire)
-      const currentTime = new Date();
-      const timeDifference = expireTime.getTime() - currentTime.getTime(); // 时间差以毫秒为单位
-      // 计算15分钟的毫秒数
-      const fifteenMinutesInMilliseconds = 15 * 60 * 1000;
-      // 检查时间差是否小于等于15分钟
-      if (timeDifference <= fifteenMinutesInMilliseconds) {
-        return
-      }
+  return {
+    Authorization: `Bearer ${token?.token ?? ""}`,
+    Accept: "application/json",
+  };
+}
+
+export async function refreshTokenInter() {
+  const token = getToken();
+  if (!token?.token) return;
+  try {
+    const value = await refreshToken();
+    if (!value?.data?.token) return;
+    if (!value.data.expire) {
       saveToken(value.data);
-      return
+      return;
     }
-    // 如果刷新token失败，可能token已经过期，需要用户重新登录
-    removeToken()
-  })
-};
+    const expireTime = new Date(value.data.expire);
+    if (Number.isNaN(expireTime.getTime())) {
+      saveToken(value.data);
+      return;
+    }
+    const timeDifference = expireTime.getTime() - Date.now();
+    const fifteenMinutes = 15 * 60 * 1000;
+    if (timeDifference <= fifteenMinutes) return;
+    saveToken(value.data);
+  } catch {
+    // 刷新失败不应清掉刚登录的 token（网络抖动 / WCA 回调后尚无 expire）
+  }
+}
 
+let tokenRefreshTimer: number | null = null;
 
-export const startTokenRefresh = async () => {
-  await refreshTokenInter();
-  setInterval(refreshTokenInter, REFRESH_INTERVAL);
-};
+export function startTokenRefresh() {
+  if (typeof window === "undefined") return;
+  if (tokenRefreshTimer) return;
+  tokenRefreshTimer = window.setInterval(
+    () => void refreshTokenInter(),
+    REFRESH_INTERVAL,
+  );
+}
+
+/** Parse ?token= from WCA callback URL before fetching current user */
+export function processWcaCallbackToken() {
+  if (typeof window === "undefined") return;
+  const params = new URLSearchParams(window.location.search);
+  const tokenStr = params.get("token");
+  if (!tokenStr) return;
+  saveToken({ token: tokenStr, expire: "", status: "" });
+  const url = new URL(window.location.href);
+  url.searchParams.delete("token");
+  window.history.replaceState({}, "", url.toString());
+}

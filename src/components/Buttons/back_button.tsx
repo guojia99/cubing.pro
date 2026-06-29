@@ -1,14 +1,14 @@
-import { useNavigate } from '@umijs/max';
-import { Button } from 'antd';
+"use client";
 
-const BackButton: (name: string) => JSX.Element = (name: string) => {
-  const navigate = useNavigate();
+import { Button } from "antd";
+import { useRouter } from "next/navigation";
+
+export default function BackButton(name: string) {
+  const router = useRouter();
 
   return (
-    <Button type="default" onClick={() => navigate(-1)} style={{ marginBottom: '20px' }}>
+    <Button type="default" onClick={() => router.back()} style={{ marginBottom: "20px" }}>
       {name}
     </Button>
   );
-};
-
-export default BackButton;
+}

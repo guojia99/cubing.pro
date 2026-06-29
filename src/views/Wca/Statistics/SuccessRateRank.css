@@ -1,0 +1,74 @@
+.success-rate-rank {
+  padding: 16px;
+  max-width: 1000px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+@media (min-width: 1080px) {
+  .success-rate-rank {
+    max-width: none;
+  }
+}
+.success-rate-rank .filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 0;
+}
+.success-rate-rank .filter-row .filter-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.success-rate-rank .filter-row .filter-item .filter-label {
+  white-space: nowrap;
+  font-size: 12px;
+}
+.success-rate-rank .filter-row .filter-item .filter-select.ant-select {
+  min-width: 100px;
+}
+.success-rate-rank .filter-row .filter-item.filter-item-min-attempted {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.success-rate-rank .filter-row .filter-item.filter-item-min-attempted .filter-input-number {
+  flex-shrink: 0;
+}
+.success-rate-rank .filter-row .filter-item.filter-item-min-attempted .filter-presets {
+  flex-wrap: wrap;
+}
+.success-rate-rank .table-wrapper {
+  font-size: 12px;
+  width: 100%;
+}
+@media (max-width: 1079px) {
+  .success-rate-rank {
+    padding: 12px 8px;
+  }
+  .success-rate-rank .stats-rank-filter-card .filter-row .filter-item.filter-item-min-attempted .filter-presets {
+    flex: 1;
+    min-width: 0;
+  }
+  .success-rate-rank .table-wrapper {
+    width: 100%;
+    font-size: 11px;
+  }
+  .success-rate-rank .ant-table-cell {
+    padding: 6px 4px !important;
+  }
+  .success-rate-rank .ant-pagination {
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 8px 0;
+  }
+  .success-rate-rank .ant-pagination .ant-pagination-options {
+    margin-left: 0;
+    margin-top: 6px;
+  }
+  .success-rate-rank .ant-pagination .ant-pagination-item,
+  .success-rate-rank .ant-pagination .ant-pagination-prev,
+  .success-rate-rank .ant-pagination .ant-pagination-next {
+    min-width: 28px;
+  }
+}

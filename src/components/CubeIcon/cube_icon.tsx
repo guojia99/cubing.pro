@@ -1,8 +1,10 @@
-import './cube_icon.css';
+import type { CSSProperties } from "react";
 
-export const CubeIcon = (c: string, key: string, styles: any) => {
+import "./cube_icon.css";
+
+export const CubeIcon = (c: string, key: string, styles: CSSProperties) => {
   if (c === '' || c === undefined) {
-    return <></>;
+    return <span aria-hidden />;
   }
 
   let cc = c.replace(' ', '_');
@@ -13,7 +15,7 @@ export const CubeIcon = (c: string, key: string, styles: any) => {
   }
 
 
-  let name = 'cubing-icon-' + cc;
+  const name = "cubing-icon-" + cc;
   return (
     <i
       key={key}

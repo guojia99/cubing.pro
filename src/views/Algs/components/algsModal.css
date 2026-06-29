@@ -1,0 +1,24 @@
+/* 公式卡片详情弹窗 — 固定最大高度，避免 Chakra size=full 撑满视口 */
+.algs-formula-detail-modal {
+  width: min(700px, calc(100vw - 32px)) !important;
+  max-width: min(700px, calc(100vw - 32px)) !important;
+  max-height: 1080px !important;
+  height: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.algs-formula-detail-modal .algs-formula-detail-modal__body {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.algs-formula-detail-modal .algs-formula-detail-modal__list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}

@@ -1,0 +1,80 @@
+.tonight-receipt {
+  border-radius: 8px;
+  overflow: hidden;
+  font-family: Monaco, Menlo, Consolas, monospace;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.tonight-receipt.tonight-receipt-empty {
+  min-height: 120px;
+}
+
+.tonight-receipt   .tonight-receipt-header {
+    padding: 12px 16px;
+    font-weight: 600;
+    font-size: 14px !important;
+  border-bottom: 1px dashed var(--chakra-colors-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tonight-receipt .tonight-receipt-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.tonight-receipt .tonight-receipt-body {
+  padding: 12px 16px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.tonight-receipt   .tonight-receipt-dishes {
+    font-size: 14px;
+  margin-bottom: 8px;
+  color: var(--chakra-colors-fg-muted);
+}
+
+.tonight-receipt .tonight-receipt-dish {
+  padding: 2px 0;
+  border-bottom: 1px dotted var(--chakra-colors-border);
+}
+
+.tonight-receipt .tonight-receipt-dish:last-child {
+  border-bottom: none;
+}
+
+.tonight-receipt .tonight-receipt-divider {
+  height: 1px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--chakra-colors-border),
+    var(--chakra-colors-border) 2px,
+    transparent 2px,
+    transparent 6px
+  );
+  margin: 12px 0;
+}
+
+.tonight-receipt   .tonight-receipt-ingredients {
+    font-size: 14px;
+}
+
+.tonight-receipt .tonight-receipt-ingredient {
+  display: flex;
+  align-items: flex-start;
+  padding: 4px 0;
+  line-height: 1.5;
+}
+
+.tonight-receipt     .tonight-receipt-tag {
+      font-size: 14px;
+  color: var(--chakra-colors-fg-muted);
+  font-style: italic;
+}

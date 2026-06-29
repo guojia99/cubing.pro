@@ -1,0 +1,181 @@
+.algs-practice-tools-panel {
+  border: 1px solid var(--border-default);
+}
+
+.algs-practice-tools-panel .chakra-card__header {
+  border-bottom: 1px solid var(--border-default);
+}
+
+.algs-practice-tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  align-items: stretch;
+  padding-top: 8px;
+}
+
+@media (max-width: 575px) {
+  .algs-practice-tools-grid,
+  .algs-practice-tools-grid--no-random {
+    grid-template-columns: 1fr;
+  }
+}
+
+.algs-practice-tool-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  min-height: 148px;
+  height: 100%;
+  padding: 16px;
+  margin: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid var(--border-default) !important;
+  border-radius: 10px;
+  background: var(--card);
+  box-sizing: border-box;
+  box-shadow:
+    0 1px 2px color-mix(in srgb, var(--foreground) 4%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, var(--foreground) 2%, transparent);
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.algs-practice-tool-cell--random:hover,
+.algs-practice-tool-cell--random:focus-visible {
+  border-color: color-mix(in srgb, var(--accent) 65%, transparent) !important;
+  background: color-mix(in srgb, var(--accent) 8%, var(--card));
+  box-shadow:
+    0 2px 8px color-mix(in srgb, var(--accent) 12%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+.algs-practice-tool-cell--pick:hover,
+.algs-practice-tool-cell--pick:focus-visible {
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent) !important;
+  background: color-mix(in srgb, var(--accent) 6%, var(--card));
+}
+
+.algs-practice-tool-cell--pick:active {
+  border-color: color-mix(in srgb, var(--accent) 75%, transparent) !important;
+  background: color-mix(in srgb, var(--accent) 12%, var(--card));
+}
+
+.algs-practice-tool-cell--practice:hover,
+.algs-practice-tool-cell--practice:focus-visible {
+  border-color: color-mix(in srgb, var(--signal-info) 55%, transparent) !important;
+  background: color-mix(in srgb, var(--signal-info) 10%, var(--card));
+}
+
+.algs-practice-tool-cell--practice:active {
+  border-color: color-mix(in srgb, var(--signal-info) 85%, transparent) !important;
+  background: color-mix(in srgb, var(--signal-info) 18%, var(--card));
+}
+
+.algs-practice-tool-cell--proficiency:hover,
+.algs-practice-tool-cell--proficiency:focus-visible {
+  border-color: color-mix(in srgb, var(--signal-success) 45%, transparent) !important;
+  background: color-mix(in srgb, var(--signal-success) 6%, var(--card));
+}
+
+.algs-practice-tool-cell--proficiency:active {
+  border-color: color-mix(in srgb, var(--signal-success) 75%, transparent) !important;
+  background: color-mix(in srgb, var(--signal-success) 12%, var(--card));
+}
+
+.algs-practice-tool-cell--history:hover,
+.algs-practice-tool-cell--history:focus-visible {
+  border-color: color-mix(in srgb, var(--signal-warning) 50%, transparent) !important;
+  background: color-mix(in srgb, var(--signal-warning) 6%, var(--card));
+}
+
+.algs-practice-tool-cell--history:active {
+  border-color: color-mix(in srgb, var(--signal-warning) 80%, transparent) !important;
+  background: color-mix(in srgb, var(--signal-warning) 12%, var(--card));
+}
+
+.algs-practice-tool-cell--batch:hover,
+.algs-practice-tool-cell--batch:focus-visible {
+  border-color: color-mix(in srgb, var(--accent) 50%, transparent) !important;
+  background: color-mix(in srgb, var(--accent) 8%, var(--card));
+}
+
+.algs-practice-tool-cell--batch:active {
+  border-color: color-mix(in srgb, var(--accent) 80%, transparent) !important;
+  background: color-mix(in srgb, var(--accent) 14%, var(--card));
+}
+
+.algs-practice-tool-cell--batch .algs-practice-tool-title {
+  color: var(--accent);
+}
+
+.algs-practice-tool-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+
+.algs-practice-tool-cell--random .algs-practice-tool-title {
+  color: var(--accent);
+}
+
+.algs-practice-tool-cell--practice .algs-practice-tool-title {
+  color: var(--signal-info);
+}
+
+.algs-practice-tool-desc {
+  font-size: 13px;
+  color: var(--muted-foreground);
+  line-height: 1.45;
+  flex: 1;
+}
+
+.algs-practice-tool-icon {
+  font-size: 28px;
+  margin-bottom: 8px;
+  line-height: 1;
+}
+
+.algs-practice-tool-cell--pick .algs-practice-tool-icon,
+.algs-practice-tool-cell--random .algs-practice-tool-icon {
+  color: var(--accent);
+}
+
+.algs-practice-tools-empty {
+  padding: 24px;
+  text-align: center;
+  color: var(--muted-foreground);
+  border: 1px dashed var(--border-default);
+  background: var(--card);
+  border-radius: 10px;
+}
+
+.algs-practice-tools-footer {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-default);
+  font-size: 12px;
+  color: var(--faint-foreground);
+}
+
+.algs-practice-tools-footer a {
+  color: var(--accent);
+}
+
+.algs-practice-tools-hint {
+  background: color-mix(in srgb, var(--accent) 8%, var(--card));
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: var(--muted-foreground);
+  margin-bottom: 12px;
+}

@@ -1,6 +1,6 @@
 import { Record } from '@/components/Data/types/record';
 import { Result } from '@/components/Data/types/result';
-import { CompsAPI } from '@/services/cubing-pro/comps/typings';
+import type { Comp } from '@/components/Data/types/comps';
 import { KinChSorResult } from '@/services/cubing-pro/statistics/typings';
 
 declare namespace PlayersAPI {
@@ -102,7 +102,7 @@ declare namespace PlayersAPI {
 
   export type PlayerCompsResp = {
     data: {
-      items: CompsAPI.Comp[];
+      items: Comp[];
     };
   };
 

@@ -12,19 +12,15 @@ interface MarkdownProps {
 const Markdown: React.FC<MarkdownProps> = ({md}) => {
 
   return (
-    <ReactMarkdown
-      className={'markdown-body'}
-      remarkPlugins={[[remarkGfm, {singleTilde: false}]]}
-      components={{
-        // img(props) {
-        //   return <img {...props} style={{ maxWidth: 30 }} />;
-        // },
-      }}
-    >
-      {md}
-    </ReactMarkdown>
-
-  )
+    <div className="markdown-body">
+      <ReactMarkdown
+        remarkPlugins={[[remarkGfm, { singleTilde: false }]]}
+        components={{}}
+      >
+        {md}
+      </ReactMarkdown>
+    </div>
+  );
 };
 
 export default Markdown;

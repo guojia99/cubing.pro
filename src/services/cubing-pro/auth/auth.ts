@@ -1,49 +1,39 @@
-import { AuthHeader, removeToken, saveToken } from '@/services/cubing-pro/auth/token';
-import { AuthAPI } from '@/services/cubing-pro/auth/typings';
-import { Request } from '@/services/cubing-pro/request';
-
-export async function captchaCode(): Promise<AuthAPI.captchaCodeResp> {
-  const result = await Request.get('/auth/code');
-  return result.data;
-}
-
-/** 登录接口 POST /api/login/account */
-export async function login(body: AuthAPI.LoginRequest) {
-  const response = await Request.post<AuthAPI.Token>('/auth/login', body);
-  // 检查响应并保存token
-  if (response && response.data.token) {
-    saveToken(response.data);
-  }
-  return response;
-}
-
-export async function getEmailCode(body: AuthAPI.GetEmailCodeRequest) {
-  return Request.post<{
-    data: AuthAPI.GetEmailCodeResponse;
-  }>('/auth/register/email_code', body, { headers: AuthHeader() });
-}
+import { AuthHeader, removeToken } from "@/services/cubing-pro/auth/token";
+import type {
+  CurrentUser,
+  Token,
+  UpdateAvatarRequest,
+  UpdateDetailRequest,
+} from "@/services/cubing-pro/auth/types";
+import { getAPIUrl, Request } from "@/services/cubing-pro/request";
 
 export async function refreshToken() {
-  return await Request.post<AuthAPI.Token>('/auth/refresh', { headers: AuthHeader() });
+  return Request.post<Token>("/auth/refresh", {}, { headers: AuthHeader() });
 }
 
 export async function logout() {
   removeToken();
-  return Request.post<AuthAPI.Token>('/auth/logout', {}, { headers: AuthHeader() });
+  try {
+    await Request.post("/auth/logout", {}, { headers: AuthHeader() });
+  } catch {
+    // token already cleared locally
+  }
 }
 
 export async function currentUser() {
-  return Request.get<{ data: AuthAPI.CurrentUser }>('/auth/current', { headers: AuthHeader() });
+  return Request.get<{ data: CurrentUser }>("/auth/current", {
+    headers: AuthHeader(),
+  });
 }
 
-export async function register(req: AuthAPI.RegisterRequest) {
-  return Request.post<any>('/auth/register', req);
+export async function updateAvatar(req: UpdateAvatarRequest) {
+  return Request.post("/auth/user/avatar", req, { headers: AuthHeader() });
 }
 
-export async function updateAvatar(req: AuthAPI.UpdateAvatarRequest) {
-  return Request.post<any>('/auth/user/avatar', req, { headers: AuthHeader() });
+export async function updateDetail(req: UpdateDetailRequest) {
+  return Request.post("/auth/user/detail", req, { headers: AuthHeader() });
 }
 
-export async function updateDetail(req: AuthAPI.UpdateDetailRequest) {
-  return Request.post<any>('/auth/user/detail', req, { headers: AuthHeader() });
+export function getWcaLoginUrl(callbackUrl: string) {
+  return `${getAPIUrl()}/auth/wca?redirect=${encodeURIComponent(callbackUrl)}`;
 }

@@ -1,62 +1,47 @@
-import { AuthHeader } from '@/services/cubing-pro/auth/token';
-import { Request } from '@/services/cubing-pro/request';
+import { AuthHeader } from "@/services/cubing-pro/auth/token";
+import { Request } from "@/services/cubing-pro/request";
 
 type KeyValue = {
   Key: string;
   Value: string;
-  Type: number; // 1 string 2 int 3 json
+  Type: number;
 };
 
 async function getKeyValue(key: string): Promise<{ data: KeyValue }> {
-  const response = await Request.get<{ data: KeyValue }>(`/user/kv/${key}`, {
-    headers: AuthHeader(),
-  });
-  return response.data;
-}
-
-async function setKeyValue(key: string, value: any) {
-  const response = await Request.post<{ data: KeyValue }>(
-    `/user/kv/`,
-    {
-      key,
-      value: JSON.stringify(value),
-      type: 3,
-    },
+  const response = await Request.get<{ data: KeyValue }>(
+    `/user/kv/${encodeURIComponent(key)}`,
     { headers: AuthHeader() },
   );
   return response.data;
 }
 
-// 获取某个 key 对应的 map（如果没有，返回空对象）
-export async function getKeyMap(key: string): Promise<Record<string, any>> {
+async function setKeyValue(key: string, value: unknown) {
+  await Request.post(
+    `/user/kv/`,
+    { key, value: JSON.stringify(value), type: 3 },
+    { headers: AuthHeader() },
+  );
+}
+
+export async function getKeyMap(key: string): Promise<Record<string, unknown>> {
   try {
     const { data } = await getKeyValue(key);
-    const raw = (data as { value?: string; Value?: string }).value ?? (data as { Value?: string }).Value ?? '';
-    return raw ? JSON.parse(raw) : {};
-  } catch (e) {
-    // 可以按需处理 404 等错误
+    const raw =
+      (data as { value?: string; Value?: string }).value ??
+      (data as { Value?: string }).Value ??
+      "";
+    return raw ? (JSON.parse(raw) as Record<string, unknown>) : {};
+  } catch {
+    return {};
   }
-  return {}; // 默认空 map
 }
 
-// 获取 key 下某个 subkey 的值
-export async function getSubKeyValue(key: string, subKey: string): Promise<any | undefined> {
-  const map = await getKeyMap(key);
-  return map[subKey];
-}
-
-// 设置 key 下某个 subkey 的值
-export async function setSubKeyValue(key: string, subKey: string, value: any): Promise<void> {
+export async function setSubKeyValue(
+  key: string,
+  subKey: string,
+  value: unknown,
+): Promise<void> {
   const map = await getKeyMap(key);
   map[subKey] = value;
-  await setKeyValue(key, map); // 更新整个 map
-}
-
-// 删除 key 下的某个 subkey
-export async function deleteSubKey(key: string, subKey: string): Promise<void> {
-  const map = await getKeyMap(key);
-  if (subKey in map) {
-    delete map[subKey];
-    await setKeyValue(key, map);
-  }
+  await setKeyValue(key, map);
 }

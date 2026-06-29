@@ -9,14 +9,13 @@ const CopyButton = ({ textToCopy }: { textToCopy: string }) => {
       // 使用 navigator.clipboard 复制
       navigator.clipboard.writeText(textToCopy).then(() => {
         api.open({
-          message: '拷贝成功',
-          description: '',
+          title: '拷贝成功',
           duration: 2,
         });
       }).catch((err) => {
         console.error('Copy failed', err);
         api.open({
-          message: '拷贝失败',
+          title: '拷贝失败',
           description: '请手动复制',
           duration: 2,
         });
@@ -34,14 +33,13 @@ const CopyButton = ({ textToCopy }: { textToCopy: string }) => {
         document.body.removeChild(textarea);
 
         api.open({
-          message: '拷贝成功',
-          description: '',
+          title: '拷贝成功',
           duration: 2,
         });
       } catch (err) {
         console.error('Fallback copy failed', err);
         api.open({
-          message: '拷贝失败',
+          title: '拷贝失败',
           description: '请手动复制',
           duration: 2,
         });

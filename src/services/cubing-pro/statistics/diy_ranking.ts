@@ -1,13 +1,13 @@
-import { AuthHeader } from '@/services/cubing-pro/auth/token';
-import { Request } from '@/services/cubing-pro/request';
-import { StaticAPI } from '@/services/cubing-pro/statistics/typings';
-import { WCAPerson } from '@/services/cubing-pro/wca/types';
+import { AuthHeader } from "@/services/cubing-pro/auth/token";
+import { Request } from "@/services/cubing-pro/request";
+import type { StaticAPI } from "@/services/cubing-pro/statistics/typings";
+import type { WCAPerson } from "@/services/cubing-pro/wca/types";
 
 export async function apiDiyRanking(
   key: string,
 ): Promise<StaticAPI.DiyRankWCAResultStaticsResponse> {
   const response = await Request.get<StaticAPI.DiyRankWCAResultStaticsResponse>(
-    'diy_static/diy_rankings/' + key,
+    `diy_static/diy_rankings/${key}`,
     {},
   );
   return response.data;
@@ -18,17 +18,15 @@ export async function apiDiyRankingKinch(
   req: StaticAPI.KinchReq,
 ): Promise<StaticAPI.KinchResp> {
   const response = await Request.post<StaticAPI.KinchResp>(
-    'diy_static/diy_rankings/' + key + '/kinch',
-    {
-      ...req,
-    },
+    `diy_static/diy_rankings/${key}/kinch`,
+    { ...req },
   );
   return response.data;
 }
 
 export async function apiGetAllDiyRankingKey(): Promise<{ data: StaticAPI.DiyRankKeyValue[] }> {
   const response = await Request.get<{ data: StaticAPI.DiyRankKeyValue[] }>(
-    'diy_static/diy_rankings',
+    "diy_static/diy_rankings",
     {},
   );
   return response.data;
@@ -38,24 +36,24 @@ export async function apiUpdateRankingWithKey(
   key: string,
   description: string,
   persons: string[],
-): Promise<any> {
+): Promise<unknown> {
   const response = await Request.post(
     `diy_static/diy_rankings/${key}`,
     {
-      description: description,
-      persons: persons,
+      description,
+      persons,
     },
     { headers: AuthHeader() },
   );
   return response.data;
 }
 
-export async function apiCreateRanking(key: string, description: string): Promise<any> {
+export async function apiCreateRanking(key: string, description: string): Promise<unknown> {
   const response = await Request.post(
-    `diy_static/diy_rankings`,
+    "diy_static/diy_rankings",
     {
-      description: description,
-      key: key,
+      description,
+      key,
     },
     { headers: AuthHeader() },
   );
@@ -75,9 +73,7 @@ export async function apiDiyRankingSor(
   return response.data;
 }
 
-
-
-export async function apiDiyRankingPersons(key: string): Promise<{data: WCAPerson[]}>{
+export async function apiDiyRankingPersons(key: string): Promise<{ data: WCAPerson[] }> {
   const response = await Request.get(`diy_static/diy_rankings/${key}/person_list`, {});
   return response.data;
 }

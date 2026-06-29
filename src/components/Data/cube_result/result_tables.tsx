@@ -3,11 +3,12 @@ import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import { eventRouteM } from '@/components/Data/cube_result/event_route';
 import { Result, resultStringPro, resultTimeString } from '@/components/Data/types/result';
 import { Table } from 'antd';
+import type { ReactNode } from 'react';
 
 import { RecordTagWithResult } from '@/components/Data/cube_record/record_tag';
 import { generateRecordMap } from '@/components/Data/cube_record/record_utils';
 import { Record } from '@/components/Data/types/record';
-import { CompetitionLink, PlayerLink } from '@/components/Link/Links';
+import { CompetitionLink, PlayerLink } from '@/components/Link/GcLinks';
 import '@/components/Data/table_fixed_column.css';
 import './result_tables.css';
 
@@ -18,6 +19,7 @@ export const ResultsTable = (
   keys: string[],
   records: Record[] | undefined,
   other_columns: any[] | undefined = undefined,
+  fixFirstColumn: boolean = true,
 ) => {
   let recordsMap = generateRecordMap(records); // map[resultsID]Record
 
@@ -159,7 +161,7 @@ export const ResultsTable = (
         dataIndex: 'Result',
         key: 'Result',
         render: (results: number[], result: Result) => {
-          let body: JSX.Element[] = [];
+          let body: ReactNode[] = [];
           // eslint-disable-next-line array-callback-return
           const data = resultStringPro(results, result.EventRoute);
           // eslint-disable-next-line array-callback-return
@@ -181,7 +183,7 @@ export const ResultsTable = (
         dataIndex: 'Result',
         key: 'Result',
         render: (results: number[], result: Result) => {
-          let body: JSX.Element[] = [];
+          let body: ReactNode[] = [];
           // eslint-disable-next-line array-callback-return
           const data = resultStringPro(results, result.EventRoute);
           // eslint-disable-next-line array-callback-return
@@ -223,9 +225,8 @@ export const ResultsTable = (
         dataIndex: 'EventID',
         key: 'EventID',
         width: 80,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        onCell: (result: any, rowIndex: number) => ({
-          className: 'custom-cell',
+        onCell: () => ({
+          className: 'cube-result-event-only-one-cell',
         }),
         render: (value: string, result: Result) => {
           if (result.RoundNumber !== 1) {
@@ -286,7 +287,7 @@ export const ResultsTable = (
     columns.push(column);
   }
 
-  if (columns.length > 0) {
+  if (columns.length > 0 && fixFirstColumn) {
     columns[0] = { ...columns[0], fixed: 'left' as const };
   }
 
@@ -295,6 +296,7 @@ export const ResultsTable = (
       dataSource={dataSource}
       // @ts-ignore
       columns={columns}
+      rowKey="id"
       pagination={false}
       size="small"
       className="cube-results-table"
