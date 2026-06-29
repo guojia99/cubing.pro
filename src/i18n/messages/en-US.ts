@@ -479,6 +479,24 @@ const enUS: Record<MessageKey, string> = {
   "fr.showScrambleOnly": "Show scramble only",
   "fr.legend":
     "Dimmed edges are the axis's middle-layer edges (irrelevant to FR). The highlighted 8 edges and 8 corners are what FR cares about.",
+  "fr.mode.analyze": "Analyze",
+  "fr.mode.practice": "Practice",
+  "fr.practice.axisPrompt": "Choose the FR axis to practice",
+  "fr.practice.randomAxis": "Random axis",
+  "fr.practice.randomAxisHint": "(axis randomly assigned for this scramble)",
+  "fr.practice.solutionInput": "Your FR solution",
+  "fr.practice.solutionPlaceholder":
+    "Enter half-turn moves, e.g. R2 F2 U2 (Cmd/Ctrl + Enter to submit)",
+  "fr.practice.submit": "Submit",
+  "fr.practice.next": "Next",
+  "fr.practice.resultCorrect": "True FR ✓ — correct!",
+  "fr.practice.resultWrong": "Not true FR yet. Compare with the reference solution below.",
+  "fr.practice.resultFalseFr":
+    "FR shape reached but parity is off (false FR); one more axis half-turn is needed.",
+  "fr.practice.yourSolution": "Your solution",
+  "fr.practice.historyTitle": "Practice history",
+  "fr.practice.historyClear": "Clear history",
+  "fr.practice.historyEmpty": "No practice records yet",
   ...wcaMessagesEnUS,
 };
 

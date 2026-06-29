@@ -3,6 +3,7 @@
 import { Button, HStack, Spacer, Textarea, VStack } from "@chakra-ui/react";
 
 import { useI18n } from "@/contexts/I18nProvider";
+import { FR_COLORS } from "@/views/FloppyReduction/utils/constants";
 
 export const FR_EXAMPLE_SCRAMBLE =
   "R' U' F U2 B2 D R2 U' B2 L2 R2 F2 R2 B' L' R B2 R' U F U R' U2 R' U' F";
@@ -43,7 +44,7 @@ export function ScrambleInput({
         }}
       />
       <HStack gap="2" flexWrap="wrap">
-        <Button colorPalette="purple" onClick={onAnalyze}>
+        <Button colorPalette={FR_COLORS.palette} onClick={onAnalyze}>
           {t("fr.btn.analyze")}
         </Button>
         <Button variant="outline" onClick={onRandom}>
@@ -58,7 +59,7 @@ export function ScrambleInput({
         </Button>
         <Button
           variant="ghost"
-          colorPalette="blue"
+          color={FR_COLORS.accent}
           onClick={() =>
             window.open(FR_TUTORIAL_URL, "_blank", "noopener,noreferrer")
           }
