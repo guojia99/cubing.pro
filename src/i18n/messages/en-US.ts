@@ -504,6 +504,9 @@ const enUS: Record<MessageKey, string> = {
   "fr.practice.solutionInput": "Your FR solution",
   "fr.practice.solutionPlaceholder":
     "Enter half-turn moves, e.g. R2 F2 U2 (Cmd/Ctrl + Enter to submit)",
+  "fr.practice.liveInvalid": "Invalid move: {token}",
+  "fr.practice.liveTrueFr": "True FR reached",
+  "fr.practice.liveFalseFr": "FR shape reached, but parity is off (false FR)",
   "fr.practice.submit": "Submit",
   "fr.practice.next": "Next",
   "fr.practice.resultCorrect": "True FR ✓ — correct!",
