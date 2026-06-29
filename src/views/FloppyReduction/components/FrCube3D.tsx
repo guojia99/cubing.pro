@@ -98,6 +98,8 @@ export interface FrCube3DProps {
   showBackView?: boolean;
   /** 强调对象 */
   emphasis?: FrCubeEmphasis;
+  /** 显示播放控制条（需配合 solution） */
+  showControls?: boolean;
 }
 
 export function FrCube3D({
@@ -107,6 +109,7 @@ export function FrCube3D({
   height = 320,
   showBackView = true,
   emphasis = "axis",
+  showControls = false,
 }: FrCube3DProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<TwistyPlayer | null>(null);
@@ -124,7 +127,7 @@ export function FrCube3D({
         background: "none",
         hintFacelets: "none",
         backView: showBackView ? "top-right" : "none",
-        controlPanel: "none",
+        controlPanel: showControls && solution?.length ? "bottom-row" : "none",
         visualization: "3D",
       });
       player.style.width = "100%";
@@ -149,8 +152,14 @@ export function FrCube3D({
     try {
       const rot = SETUP_ROTATION[axisKey];
       player.experimentalSetupAlg = [scramble || "", rot].filter(Boolean).join(" ");
-      player.alg =
+      const algStr =
         solution && solution.length ? relabelSolution(solution, axisKey) : "";
+      player.alg = "";
+      if (algStr) {
+        requestAnimationFrame(() => {
+          player.alg = algStr;
+        });
+      }
       player.experimentalStickeringMaskOrbits = buildMask(axisKey, emphasis);
     } catch {
       // ignore transient setter errors during load
@@ -162,7 +171,7 @@ export function FrCube3D({
     const player = playerRef.current;
     if (player) applyProps(player);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scramble, axisKey, solution, emphasis]);
+  }, [scramble, axisKey, solution, emphasis, showControls]);
 
   return (
     <div

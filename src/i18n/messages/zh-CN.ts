@@ -24,7 +24,7 @@ const zhCN = {
   "nav.tools.minx": "五魔方绘图",
   "nav.tools.sk": "Skewb 绘图",
   "nav.tools.py": "Pyraminx 绘图",
-  "nav.tools.fr": "Floppy Reduction",
+  "nav.tools.fr": "FR练习器",
   "nav.other": "生活",
   "nav.other.recipes": "菜谱",
   "nav.other.kitchen": "厨房技巧",
@@ -340,6 +340,12 @@ const zhCN = {
   "home.welcome.algs.eg.desc": "二阶进阶公式",
   "home.welcome.algs.pll.title": "PLL",
   "home.welcome.algs.pll.desc": "三阶顶层进阶公式",
+  "home.welcome.practiceTools.title": "练习工具",
+  "home.welcome.practiceTools.desc":
+    "最少步与还原相关的在线练习、分析与教程工具。",
+  "home.welcome.practiceTools.fr.title": "FR练习器",
+  "home.welcome.practiceTools.fr.desc":
+    "FR（Floppy Reduction，软降）形态识别、分析与练习，含互动教程。",
   "home.welcome.draw.title": "绘图工具",
   "home.welcome.draw.desc":
     "各类魔方绘图工具，支持 SVG、PNG 图片输出，自定义颜色、旋转，定制化你的魔方公式配图",
@@ -438,7 +444,8 @@ const zhCN = {
   "changelog.backend": "后端",
   "changelog.frontendCount": "{count} 前端",
   "changelog.backendCount": "{count} 后端",
-  "fr.title": "Floppy Reduction 识别",
+  "fr.title": "FR练习器",
+  "fr.fullName": "FR 即 Floppy Reduction（软降）",
   "fr.subtitle": "从 HTR 态进一步降群至 R2 L2 F2 B2，识别三个轴的 FR 形态并给出参考步骤",
   "fr.intro":
     "输入或随机生成一个已还原到 HTR 状态的打乱，工具会分别针对 U/D、F/B、R/L 三个轴识别角形与坏棱，并给出做到 FR 的最短半转步骤。",
@@ -486,6 +493,7 @@ const zhCN = {
   "fr.legend": "淡色棱块为该轴的中层棱（FR 不关心），高亮的 8 个棱与 8 个角才是 FR 关注的对象。",
   "fr.mode.analyze": "分析",
   "fr.mode.practice": "练习",
+  "fr.mode.tutorial": "教程",
   "fr.practice.axisPrompt": "选择要练习的 FR 轴",
   "fr.practice.randomAxis": "随机轴",
   "fr.practice.randomAxisHint": "（本题轴已随机指定）",

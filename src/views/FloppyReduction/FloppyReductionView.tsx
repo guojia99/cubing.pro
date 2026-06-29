@@ -17,7 +17,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useI18n } from "@/contexts/I18nProvider";
 import { AxisResultCard } from "@/views/FloppyReduction/components/AxisResultCard";
 import { FrHelpDialog } from "@/views/FloppyReduction/components/FrHelpDialog";
-import { FrTutorialDialog } from "@/views/FloppyReduction/components/FrTutorialDialog";
+import { FrTutorialPanel } from "@/views/FloppyReduction/components/FrTutorialPanel";
 import { PracticeHistoryPanel } from "@/views/FloppyReduction/components/PracticeHistoryPanel";
 import { PracticePanel } from "@/views/FloppyReduction/components/PracticePanel";
 import {
@@ -51,13 +51,14 @@ const AXIS_TAB_LABEL: Record<AxisKey, string> = {
   rl: "R / L",
 };
 
-type FrMode = "analyze" | "practice";
+type FrMode = "analyze" | "practice" | "tutorial";
 
-function AnalyzePanel({ helpOpen, onHelpOpenChange, tutorialOpen, onTutorialOpenChange }: {
+function AnalyzePanel({
+  helpOpen,
+  onHelpOpenChange,
+}: {
   helpOpen: boolean;
   onHelpOpenChange: (open: boolean) => void;
-  tutorialOpen: boolean;
-  onTutorialOpenChange: (open: boolean) => void;
 }) {
   const { t, tf } = useI18n();
   const [input, setInput] = useState("");
@@ -102,11 +103,9 @@ function AnalyzePanel({ helpOpen, onHelpOpenChange, tutorialOpen, onTutorialOpen
         onRandom={handleRandom}
         onExample={handleExample}
         onHelp={() => onHelpOpenChange(true)}
-        onTutorial={() => onTutorialOpenChange(true)}
       />
 
       <FrHelpDialog open={helpOpen} onOpenChange={onHelpOpenChange} />
-      <FrTutorialDialog open={tutorialOpen} onOpenChange={onTutorialOpenChange} />
 
       {analysis && !analysis.ok && (
         <Card.Root borderRadius="lg" borderColor={FR_COLORS.destructive} borderWidth="1px">
@@ -200,7 +199,6 @@ export function FloppyReductionView() {
   const { t } = useI18n();
   const [mode, setMode] = useState<FrMode>("analyze");
   const [helpOpen, setHelpOpen] = useState(false);
-  const [tutorialOpen, setTutorialOpen] = useState(false);
   const [historyKey, setHistoryKey] = useState(0);
 
   return (
@@ -208,6 +206,9 @@ export function FloppyReductionView() {
       <Box>
         <Text fontSize="2xl" fontWeight="bold" mb="1">
           {t("fr.title")}
+        </Text>
+        <Text fontSize="sm" color={FR_COLORS.fgMuted} mb="1">
+          {t("fr.fullName")}
         </Text>
         <Text fontSize="sm" color={FR_COLORS.fgMuted} mb="4">
           {t("fr.subtitle")}
@@ -229,28 +230,27 @@ export function FloppyReductionView() {
             <SegmentGroup.ItemText>{t("fr.mode.practice")}</SegmentGroup.ItemText>
             <SegmentGroup.ItemHiddenInput />
           </SegmentGroup.Item>
+          <SegmentGroup.Item value="tutorial">
+            <SegmentGroup.ItemText>{t("fr.mode.tutorial")}</SegmentGroup.ItemText>
+            <SegmentGroup.ItemHiddenInput />
+          </SegmentGroup.Item>
         </SegmentGroup.Root>
       </Box>
 
-      {mode === "analyze" ? (
-        <AnalyzePanel
-          helpOpen={helpOpen}
-          onHelpOpenChange={setHelpOpen}
-          tutorialOpen={tutorialOpen}
-          onTutorialOpenChange={setTutorialOpen}
-        />
-      ) : (
+      {mode === "analyze" && (
+        <AnalyzePanel helpOpen={helpOpen} onHelpOpenChange={setHelpOpen} />
+      )}
+      {mode === "practice" && (
         <>
           <PracticePanel
             onHistoryChange={() => setHistoryKey((k) => k + 1)}
             onHelp={() => setHelpOpen(true)}
-            onTutorial={() => setTutorialOpen(true)}
           />
           <PracticeHistoryPanel key={historyKey} />
           <FrHelpDialog open={helpOpen} onOpenChange={setHelpOpen} />
-          <FrTutorialDialog open={tutorialOpen} onOpenChange={setTutorialOpen} />
         </>
       )}
+      {mode === "tutorial" && <FrTutorialPanel />}
     </VStack>
   );
 }

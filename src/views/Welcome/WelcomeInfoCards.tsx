@@ -175,6 +175,19 @@ export function WelcomeView() {
       />
 
       <GroupInfoCards
+        title={t("home.welcome.practiceTools.title")}
+        desc={t("home.welcome.practiceTools.desc")}
+        items={[
+          {
+            title: t("home.welcome.practiceTools.fr.title"),
+            desc: t("home.welcome.practiceTools.fr.desc"),
+            href: "/tools/floppy-reduction",
+            internal: true,
+          },
+        ]}
+      />
+
+      <GroupInfoCards
         title={t("home.welcome.draw.title")}
         desc={t("home.welcome.draw.desc")}
         items={[

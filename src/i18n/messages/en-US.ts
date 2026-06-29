@@ -25,7 +25,7 @@ const enUS: Record<MessageKey, string> = {
   "nav.tools.minx": "Minx drawing",
   "nav.tools.sk": "Skewb drawing",
   "nav.tools.py": "Pyraminx drawing",
-  "nav.tools.fr": "Floppy Reduction",
+  "nav.tools.fr": "FR Trainer",
   "nav.other": "Life",
   "nav.other.recipes": "Recipes",
   "nav.other.kitchen": "Kitchen skills",
@@ -341,6 +341,12 @@ const enUS: Record<MessageKey, string> = {
   "home.welcome.algs.eg.desc": "2×2 advanced algs",
   "home.welcome.algs.pll.title": "PLL",
   "home.welcome.algs.pll.desc": "3×3 last-layer algs",
+  "home.welcome.practiceTools.title": "Practice tools",
+  "home.welcome.practiceTools.desc":
+    "Online practice, analysis, and tutorial tools for fewest-moves and solving.",
+  "home.welcome.practiceTools.fr.title": "FR Trainer",
+  "home.welcome.practiceTools.fr.desc":
+    "FR (Floppy Reduction): shape recognition, analysis, practice, and an interactive tutorial.",
   "home.welcome.draw.title": "Drawing tools",
   "home.welcome.draw.desc": "Cube drawing tools with SVG/PNG export and custom styling.",
   "home.welcome.draw.cube.title": "3×3 drawing",
@@ -437,9 +443,10 @@ const enUS: Record<MessageKey, string> = {
   "changelog.backend": "Backend",
   "changelog.frontendCount": "{count} frontend",
   "changelog.backendCount": "{count} backend",
-  "fr.title": "Floppy Reduction Trainer",
+  "fr.title": "FR Trainer",
+  "fr.fullName": "FR = Floppy Reduction",
   "fr.subtitle":
-    "Reduce from HTR down to the R2 L2 F2 B2 group: detect the FR case for all three axes and get reference moves",
+    "Reduce from HTR to the R2 L2 F2 B2 group; recognize FR shape on three axes and get reference moves",
   "fr.intro":
     "Enter or randomly generate a scramble that is already at the HTR state. The tool detects corner case and bad edges for the U/D, F/B and R/L axes, and gives the shortest half-turn sequence to reach FR.",
   "fr.input.placeholder":
@@ -490,6 +497,7 @@ const enUS: Record<MessageKey, string> = {
     "Dimmed edges are the axis's middle-layer edges (irrelevant to FR). The highlighted 8 edges and 8 corners are what FR cares about.",
   "fr.mode.analyze": "Analyze",
   "fr.mode.practice": "Practice",
+  "fr.mode.tutorial": "Tutorial",
   "fr.practice.axisPrompt": "Choose the FR axis to practice",
   "fr.practice.randomAxis": "Random axis",
   "fr.practice.randomAxisHint": "(axis randomly assigned for this scramble)",

@@ -26,6 +26,7 @@ export interface TutorialCubeStepProps {
   emphasis?: FrCubeEmphasis;
   algLabel?: string;
   height?: number;
+  showControls?: boolean;
 }
 
 export function TutorialCubeStep({
@@ -36,7 +37,10 @@ export function TutorialCubeStep({
   emphasis = "axis",
   algLabel,
   height = 160,
+  showControls = false,
 }: TutorialCubeStepProps) {
+  const hasSolution = Boolean(solution?.length);
+
   return (
     <Flex
       gap="3"
@@ -45,8 +49,9 @@ export function TutorialCubeStep({
       borderRadius="md"
       p="3"
       bg={FR_COLORS.bgSubtle}
+      direction={{ base: "column", sm: "row" }}
     >
-      <Box flexShrink="0" w={`${height}px`}>
+      <Box flexShrink={0} w={{ base: "100%", sm: `${height}px` }}>
         <FrCube3D
           scramble={scramble}
           solution={solution}
@@ -54,6 +59,7 @@ export function TutorialCubeStep({
           height={height}
           showBackView={false}
           emphasis={emphasis}
+          showControls={showControls && hasSolution}
         />
       </Box>
       <Box flex="1" minW="0">

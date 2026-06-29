@@ -15,7 +15,6 @@ export interface ScrambleInputProps {
   onRandom: () => void;
   onExample: () => void;
   onHelp: () => void;
-  onTutorial: () => void;
 }
 
 export function ScrambleInput({
@@ -25,7 +24,6 @@ export function ScrambleInput({
   onRandom,
   onExample,
   onHelp,
-  onTutorial,
 }: ScrambleInputProps) {
   const { t } = useI18n();
 
@@ -55,9 +53,6 @@ export function ScrambleInput({
         <Spacer />
         <Button variant="outline" onClick={onHelp}>
           {t("fr.btn.help")}
-        </Button>
-        <Button variant="ghost" color={FR_COLORS.accent} onClick={onTutorial}>
-          {t("fr.btn.tutorial")}
         </Button>
       </HStack>
     </VStack>
