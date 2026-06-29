@@ -489,10 +489,8 @@ const enUS: Record<MessageKey, string> = {
   "fr.solution": "Reference",
   "fr.alreadyFr": "Already FR",
   "fr.noSolution": "Unsolvable",
-  "fr.demo": "Show in 3D",
   "fr.highlightTip":
     "Switch the axis to inspect; the 3D cube dims the middle-layer edges ignored for that axis:",
-  "fr.showScrambleOnly": "Show scramble only",
   "fr.legend":
     "Dimmed edges are the axis's middle-layer edges (irrelevant to FR). The highlighted 8 edges and 8 corners are what FR cares about.",
   "fr.mode.analyze": "Analyze",

@@ -116,6 +116,7 @@ export function FrCube3D({
 }: FrCube3DProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<TwistyPlayer | null>(null);
+  const playbackContentKeyRef = useRef("");
 
   // 仅在客户端创建播放器
   useEffect(() => {
@@ -165,11 +166,26 @@ export function FrCube3D({
         !previewStr && solution && solution.length
           ? relabelSolution(solution, axisKey)
           : "";
+      const playbackContentKey = `${axisKey}|${scramble}|${algStr}`;
+      const shouldResetPlayback =
+        Boolean(algStr) && playbackContentKey !== playbackContentKeyRef.current;
+      playbackContentKeyRef.current = playbackContentKey;
+
+      player.controlPanel =
+        showControls && algStr ? "bottom-row" : "none";
       player.alg = "";
       if (algStr) {
         requestAnimationFrame(() => {
           player.alg = algStr;
+          if (shouldResetPlayback) {
+            requestAnimationFrame(() => {
+              player.jumpToStart();
+              player.pause();
+            });
+          }
         });
+      } else {
+        playbackContentKeyRef.current = "";
       }
       player.experimentalStickeringMaskOrbits = buildMask(axisKey, emphasis);
     } catch {
