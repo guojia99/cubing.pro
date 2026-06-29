@@ -1,5 +1,4 @@
-import {Record} from "@/components/Data/types/record";
-import { apiDiyRankingSor } from '@/services/cubing-pro/statistics/diy_ranking';
+import type { Record } from "@/components/Data/types/record";
 
 export type KinChSorResultWithEvent = {
   Event: string;

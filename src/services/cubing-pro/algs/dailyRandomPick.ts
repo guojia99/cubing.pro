@@ -1,26 +1,27 @@
-import { getToken } from '@/services/cubing-pro/auth/token';
-import { getKeyMap, setSubKeyValue } from '@/services/cubing-pro/key_value/keyvalue_store';
+import { getToken } from "@/services/cubing-pro/auth/token";
+import {
+  getKeyMap,
+  setSubKeyValue,
+} from "@/services/cubing-pro/key_value/keyvalue_store";
 
-const KV_KEY = 'algs:daily_random_pick';
-const LS_KEY = 'algs:daily_random_pick';
+const KV_KEY = "algs:daily_random_pick";
+const LS_KEY = "algs:daily_random_pick";
 const MAX_PICKS_PER_DAY = 2;
 
 export interface PickedOption {
   cube: string;
   className: string;
-  image: string;
-  /** 第一条库公式，供 VisualCube 渲染；旧缓存可能无此字段 */
+  image?: string;
   alg?: string;
 }
 
 export interface DailyPickState {
-  date: string; // YYYY-MM-DD
+  date: string;
   picks: PickedOption[];
 }
 
 function getTodayKey(): string {
-  const now = new Date();
-  return now.toISOString().slice(0, 10);
+  return new Date().toISOString().slice(0, 10);
 }
 
 async function getFromServer(): Promise<DailyPickState | null> {
@@ -29,9 +30,9 @@ async function getFromServer(): Promise<DailyPickState | null> {
     if (!token?.token) return null;
     const map = await getKeyMap(KV_KEY);
     const today = getTodayKey();
-    const data = map[today];
+    const data = map[today] as DailyPickState | undefined;
     if (!data) return null;
-    return data as DailyPickState;
+    return data;
   } catch {
     return null;
   }
@@ -61,7 +62,7 @@ async function saveToServer(state: DailyPickState): Promise<void> {
     if (!token?.token) return;
     await setSubKeyValue(KV_KEY, state.date, state);
   } catch {
-    // ignore
+    // ignore when offline or unauthorized
   }
 }
 
@@ -78,11 +79,7 @@ export async function saveDailyPick(picks: PickedOption[]): Promise<void> {
     date: getTodayKey(),
     picks,
   };
-  try {
-    await saveToServer(state);
-  } catch {
-    // Server may fail when not logged in
-  }
+  await saveToServer(state);
   saveToLocalStorage(state);
 }
 

@@ -1,0 +1,64 @@
+.random-wheel-wrap {
+  position: relative;
+  width: 240px;
+  height: 240px;
+  margin: 0 auto 20px;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.random-wheel {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 6px color-mix(in srgb, var(--accent) 40%, transparent),
+    inset 0 0 0 4px color-mix(in srgb, var(--card) 90%, transparent),
+    0 8px 24px color-mix(in srgb, var(--foreground) 12%, transparent);
+  overflow: hidden;
+}
+
+.random-wheel.random-wheel-placeholder {
+  background: conic-gradient(
+    from 0deg,
+    color-mix(in srgb, var(--accent) 60%, transparent) 0deg 360deg
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.random-wheel-placeholder-inner {
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--accent-foreground);
+  text-shadow: 0 2px 8px color-mix(in srgb, var(--foreground) 20%, transparent);
+}
+
+.random-wheel-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.random-wheel-label {
+  font-size: 11px;
+  font-weight: 600;
+  fill: var(--foreground);
+  text-shadow: 0 0 2px color-mix(in srgb, var(--card) 80%, transparent);
+  pointer-events: none;
+}
+
+.random-wheel-pointer {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-top: 20px solid var(--accent);
+  filter: drop-shadow(0 2px 4px color-mix(in srgb, var(--foreground) 20%, transparent));
+  z-index: 2;
+}

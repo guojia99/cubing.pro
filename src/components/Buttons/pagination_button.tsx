@@ -1,9 +1,9 @@
 import React from 'react';
-import './Pagination.css'; // 引入 less 文件
+import './Pagination.css';
 
 interface PaginationProps {
-  Latest: JSX.Element | null;
-  Earliest: JSX.Element | null;
+  Latest: React.ReactNode;
+  Earliest: React.ReactNode;
 }
 
 const Pagination: React.FC<PaginationProps> = ({ Latest, Earliest }) => {

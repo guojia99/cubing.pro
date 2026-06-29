@@ -1,0 +1,143 @@
+/* 生活/菜谱/鸡尾酒：标准正文 14px */
+.food-page {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.food-page .food-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+/* 下拉与「原材料筛选」按钮统一外观 */
+.food-page .food-filter-select [data-part="field"],
+.food-page .food-filter-select select,
+.food-page .food-filter-trigger {
+  font-size: 14px !important;
+  height: 36px;
+  min-height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--chakra-colors-border);
+  background: var(--chakra-colors-bg);
+  color: var(--chakra-colors-fg);
+  padding-inline: 12px;
+}
+
+.food-page .food-filter-select [data-part="field"]:focus,
+.food-page .food-filter-select select:focus,
+.food-page .food-filter-trigger:focus-visible {
+  outline: 2px solid var(--chakra-colors-accent);
+  outline-offset: 0;
+  border-color: var(--chakra-colors-accent);
+}
+
+.food-page .food-filter-select--category {
+  width: 140px;
+  min-width: 140px;
+}
+
+.food-page .food-filter-select--difficulty {
+  width: 112px;
+  min-width: 112px;
+}
+
+.food-page .food-filter-select--ingredients {
+  width: 200px;
+  min-width: 200px;
+}
+
+.food-page .food-filter-select--wide {
+  width: 160px;
+  min-width: 160px;
+}
+
+.food-page .food-filter-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  font-weight: 400;
+  cursor: pointer;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.food-page .food-filter-trigger:hover {
+  background: var(--chakra-colors-bg-muted);
+}
+
+/* Segment 与下拉同高 */
+.food-page .food-segment-group {
+  height: 36px;
+  flex-shrink: 0;
+}
+
+.food-page .food-segment-group [data-part="item"] {
+  font-size: 14px;
+  padding-inline: 12px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.food-page .food-segment-group [data-part="item-text"],
+.food-page .food-segment-group [data-part="label"] {
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.food-page .food-toolbar .chakra-button {
+  font-size: 14px;
+  height: 36px;
+  min-height: 36px;
+  border-radius: 8px;
+}
+
+.food-page .food-meta-row {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.food-page .food-meta-row a {
+  font-size: 14px;
+}
+
+.food-page .food-detail-actions .chakra-button {
+  font-size: 14px;
+  height: 36px;
+  min-height: 36px;
+  border-radius: 8px;
+}
+
+.food-page .food-tonight-receipt-toggle {
+  font-size: 14px;
+}
+
+.food-page .food-empty-hint {
+  font-size: 14px;
+  color: var(--chakra-colors-fg-muted);
+  text-align: center;
+  padding: 32px 16px;
+}
+
+.food-page .food-card-title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.food-page .food-card-desc {
+  font-size: 14px;
+  color: var(--chakra-colors-fg-muted);
+  line-height: 1.5;
+}
+
+.food-page .food-card-meta {
+  font-size: 14px;
+  color: var(--chakra-colors-fg-muted);
+}

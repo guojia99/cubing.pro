@@ -15,7 +15,6 @@
  */
 
 const LS_KEY_PREFIX = 'algs:formula_practice_history:';
-const STORAGE_VERSION = 2;
 /** 降低限制以适配 localStorage 约 5MB 配额，image(SVG) 单条约 2-5KB */
 const MAX_SESSIONS = 50;
 const MAX_RECORDS_PER_SESSION = 100;
@@ -211,7 +210,7 @@ function saveStorageData(cube: string, classId: string, data: StorageDataV2): bo
   if (trySave(data)) return true;
 
   // 配额超限：逐步删除最旧数据并精简 image 后重试
-  let current: StorageDataV2 = { version: 2, sessions: data.sessions.map((s) => ({
+  const current: StorageDataV2 = { version: 2, sessions: data.sessions.map((s) => ({
     ...s,
     records: s.records.map(slimRecord),
   })) };

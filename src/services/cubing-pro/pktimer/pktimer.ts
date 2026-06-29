@@ -3,7 +3,7 @@ import { Request } from '@/services/cubing-pro/request';
 export interface PkTimerPlayer {
   userName: string;
   userId: number;
-  results: number[];
+  results: number[] | null;
   best: number;
   average: number;
 }
@@ -25,8 +25,8 @@ export interface PkTimerEvent {
 }
 
 export interface PkTimerPKResults {
-  players: PkTimerPlayer[];
-  event: PkTimerEvent;
+  players: PkTimerPlayer[] | null;
+  event: PkTimerEvent | null;
   count: number;
   curCount: number;
   firstMessage: Record<string, unknown>; // 空对象，可能后续有内容
@@ -40,7 +40,7 @@ export interface PkTimerGroupRecord {
   Start: boolean;
   lastRunning: string;
   startPerson: string;
-  pkResults: PkTimerPKResults;
+  pkResults: PkTimerPKResults | null;
   eps: number;
   groupName: string;
 }

@@ -1,0 +1,288 @@
+/**
+ * Cubing Pro v4 — CSS color tokens (single source of truth).
+ * Mode: .light / .dark on <html> (next-themes)
+ * Palette: data-palette on <html> (haitian default)
+ */
+
+/* ── Shared signals (all palettes) ── */
+:root,
+.light,
+.dark {
+  --signal-success: #5aac7e;
+  --signal-warning: #d4a259;
+  --signal-info: #4a9eff;
+  --destructive: #e05c5c;
+  --destructive-foreground: #ffffff;
+  --card-foreground: var(--foreground);
+  --popover-foreground: var(--foreground);
+  --ring: var(--accent);
+  --input: var(--border-default);
+}
+
+/* ── haitian (default) — light ── */
+:root,
+.light,
+[data-palette="haitian"].light,
+[data-palette="haitian"] .light {
+  --background: #f7fafb;
+  --card: #ffffff;
+  --popover: #ffffff;
+  --muted: #eef4f6;
+  --foreground: #0c3a4d;
+  --muted-foreground: #156d8c;
+  --faint-foreground: #4aafc9;
+  --accent: #1a8aad;
+  --accent-foreground: #ffffff;
+  --accent-soft: color-mix(in srgb, var(--accent) 8%, transparent);
+  --border-default: color-mix(in srgb, var(--foreground) 12%, transparent);
+  --border-strong: color-mix(in srgb, var(--foreground) 22%, transparent);
+}
+
+/* ── haitian — dark ── */
+.dark,
+[data-palette="haitian"].dark,
+[data-palette="haitian"] .dark {
+  --background: #082533;
+  --card: #0c3a4d;
+  --popover: #0e3f54;
+  --muted: #0e4458;
+  --foreground: #eef9fb;
+  --muted-foreground: #a9e0eb;
+  --faint-foreground: #4a8aa0;
+  --accent: #22a8cb;
+  --accent-foreground: #082533;
+  --accent-soft: color-mix(in srgb, var(--accent) 18%, transparent);
+  --border-default: color-mix(in srgb, var(--foreground) 14%, transparent);
+  --border-strong: color-mix(in srgb, var(--foreground) 24%, transparent);
+}
+
+/* ── qingdai 青黛 ── */
+[data-palette="qingdai"].light,
+[data-palette="qingdai"] .light {
+  --background: #f6f8fc;
+  --card: #ffffff;
+  --popover: #ffffff;
+  --muted: #eef1f9;
+  --foreground: #16223f;
+  --muted-foreground: #3a4d7a;
+  --faint-foreground: #8090b5;
+  --accent: #1e5fa8;
+  --accent-foreground: #ffffff;
+  --accent-soft: color-mix(in srgb, var(--accent) 8%, transparent);
+  --border-default: color-mix(in srgb, var(--foreground) 12%, transparent);
+  --border-strong: color-mix(in srgb, var(--foreground) 22%, transparent);
+}
+
+[data-palette="qingdai"].dark,
+[data-palette="qingdai"] .dark {
+  --background: #0a1430;
+  --card: #101d3f;
+  --popover: #13224a;
+  --muted: #13214a;
+  --foreground: #eef1fb;
+  --muted-foreground: #aab6da;
+  --faint-foreground: #5a6a96;
+  --accent: #4f8fdb;
+  --accent-foreground: #0a1430;
+  --accent-soft: color-mix(in srgb, var(--accent) 18%, transparent);
+  --border-default: color-mix(in srgb, var(--foreground) 14%, transparent);
+  --border-strong: color-mix(in srgb, var(--foreground) 24%, transparent);
+}
+
+/* ── zheshi 赭石 ── */
+[data-palette="zheshi"].light,
+[data-palette="zheshi"] .light {
+  --background: #faf6f3;
+  --card: #ffffff;
+  --popover: #ffffff;
+  --muted: #f3ebe6;
+  --foreground: #3a2018;
+  --muted-foreground: #7a5040;
+  --faint-foreground: #b08470;
+  --accent: #b8553a;
+  --accent-foreground: #ffffff;
+  --accent-soft: color-mix(in srgb, var(--accent) 8%, transparent);
+  --border-default: color-mix(in srgb, var(--foreground) 12%, transparent);
+  --border-strong: color-mix(in srgb, var(--foreground) 22%, transparent);
+}
+
+[data-palette="zheshi"].dark,
+[data-palette="zheshi"] .dark {
+  --background: #241611;
+  --card: #2e1d16;
+  --popover: #35221a;
+  --muted: #33211a;
+  --foreground: #f7ece6;
+  --muted-foreground: #dcb6a6;
+  --faint-foreground: #8a6a5a;
+  --accent: #d97757;
+  --accent-foreground: #241611;
+  --accent-soft: color-mix(in srgb, var(--accent) 18%, transparent);
+  --border-default: color-mix(in srgb, var(--foreground) 14%, transparent);
+  --border-strong: color-mix(in srgb, var(--foreground) 24%, transparent);
+}
+
+/* ── zhulu 竹露 ── */
+[data-palette="zhulu"].light,
+[data-palette="zhulu"] .light {
+  --background: #f5faf6;
+  --card: #ffffff;
+  --popover: #ffffff;
+  --muted: #e9f3ec;
+  --foreground: #16321f;
+  --muted-foreground: #3f6b4f;
+  --faint-foreground: #7aa089;
+  --accent: #3f7d57;
+  --accent-foreground: #ffffff;
+  --accent-soft: color-mix(in srgb, var(--accent) 8%, transparent);
+  --border-default: color-mix(in srgb, var(--foreground) 12%, transparent);
+  --border-strong: color-mix(in srgb, var(--foreground) 22%, transparent);
+}
+
+[data-palette="zhulu"].dark,
+[data-palette="zhulu"] .dark {
+  --background: #0d1f16;
+  --card: #13291d;
+  --popover: #173021;
+  --muted: #163020;
+  --foreground: #ecf7ef;
+  --muted-foreground: #a9d7b8;
+  --faint-foreground: #5a8a6a;
+  --accent: #5aac7e;
+  --accent-foreground: #0d1f16;
+  --accent-soft: color-mix(in srgb, var(--accent) 18%, transparent);
+  --border-default: color-mix(in srgb, var(--foreground) 14%, transparent);
+  --border-strong: color-mix(in srgb, var(--foreground) 24%, transparent);
+}
+
+/* ── xiangye 缃叶 ── */
+[data-palette="xiangye"].light,
+[data-palette="xiangye"] .light {
+  --background: #fbf8f0;
+  --card: #ffffff;
+  --popover: #ffffff;
+  --muted: #f3eddd;
+  --foreground: #352c12;
+  --muted-foreground: #6f5d22;
+  --faint-foreground: #a8925a;
+  --accent: #a8761a;
+  --accent-foreground: #2a2207;
+  --accent-soft: color-mix(in srgb, var(--accent) 8%, transparent);
+  --border-default: color-mix(in srgb, var(--foreground) 12%, transparent);
+  --border-strong: color-mix(in srgb, var(--foreground) 22%, transparent);
+}
+
+[data-palette="xiangye"].dark,
+[data-palette="xiangye"] .dark {
+  --background: #211c0e;
+  --card: #2b2413;
+  --popover: #322a17;
+  --muted: #302916;
+  --foreground: #f7f1e0;
+  --muted-foreground: #d8c79a;
+  --faint-foreground: #8a7a4a;
+  --accent: #d4a259;
+  --accent-foreground: #211c0e;
+  --accent-soft: color-mix(in srgb, var(--accent) 18%, transparent);
+  --border-default: color-mix(in srgb, var(--foreground) 14%, transparent);
+  --border-strong: color-mix(in srgb, var(--foreground) 24%, transparent);
+}
+
+/* ── qinglian 青莲 ── */
+[data-palette="qinglian"].light,
+[data-palette="qinglian"] .light {
+  --background: #f8f6fc;
+  --card: #ffffff;
+  --popover: #ffffff;
+  --muted: #f0ecf8;
+  --foreground: #261540;
+  --muted-foreground: #54407a;
+  --faint-foreground: #9080b5;
+  --accent: #6b4a9c;
+  --accent-foreground: #ffffff;
+  --accent-soft: color-mix(in srgb, var(--accent) 8%, transparent);
+  --border-default: color-mix(in srgb, var(--foreground) 12%, transparent);
+  --border-strong: color-mix(in srgb, var(--foreground) 22%, transparent);
+}
+
+[data-palette="qinglian"].dark,
+[data-palette="qinglian"] .dark {
+  --background: #19102b;
+  --card: #221638;
+  --popover: #281b41;
+  --muted: #261a40;
+  --foreground: #f2ecfb;
+  --muted-foreground: #c3b0da;
+  --faint-foreground: #6a5a96;
+  --accent: #9a6dd7;
+  --accent-foreground: #19102b;
+  --accent-soft: color-mix(in srgb, var(--accent) 18%, transparent);
+  --border-default: color-mix(in srgb, var(--foreground) 14%, transparent);
+  --border-strong: color-mix(in srgb, var(--foreground) 24%, transparent);
+}
+
+/* ── rulin 儒林苑 — 朱红 scheme @ zhongguose.com/ai/users/clf9a9c11d4547461fb1ab3 ── */
+[data-palette="rulin"].light,
+[data-palette="rulin"] .light {
+  --background: #fff8f4;
+  --card: #ffffff;
+  --popover: #ffffff;
+  --muted: #ffefe6;
+  --foreground: #390000;
+  --muted-foreground: #8c0000;
+  --faint-foreground: #c45a40;
+  --accent: #bc1b00;
+  --accent-foreground: #ffffff;
+  --accent-soft: color-mix(in srgb, var(--accent) 8%, transparent);
+  --border-default: color-mix(in srgb, var(--foreground) 12%, transparent);
+  --border-strong: color-mix(in srgb, var(--foreground) 22%, transparent);
+}
+
+[data-palette="rulin"].dark,
+[data-palette="rulin"] .dark {
+  --background: #1a0000;
+  --card: #390000;
+  --popover: #5d0000;
+  --muted: #390000;
+  --foreground: #ffc297;
+  --muted-foreground: #ff9066;
+  --faint-foreground: #c45a40;
+  --accent: #ed5126;
+  --accent-foreground: #1a0000;
+  --accent-soft: color-mix(in srgb, var(--accent) 18%, transparent);
+  --border-default: color-mix(in srgb, var(--foreground) 14%, transparent);
+  --border-strong: color-mix(in srgb, var(--foreground) 24%, transparent);
+}
+
+/* ── doukou 豆蔻紫 — scheme @ zhongguose.com/ai/users/cl242dbdf8bb6d452dbaa84 ── */
+[data-palette="doukou"].light,
+[data-palette="doukou"] .light {
+  --background: #fdf8fc;
+  --card: #ffffff;
+  --popover: #ffffff;
+  --muted: #ffecf8;
+  --foreground: #1e0015;
+  --muted-foreground: #5e1c4e;
+  --faint-foreground: #bb71a5;
+  --accent: #854072;
+  --accent-foreground: #ffffff;
+  --accent-soft: color-mix(in srgb, var(--accent) 8%, transparent);
+  --border-default: color-mix(in srgb, var(--foreground) 12%, transparent);
+  --border-strong: color-mix(in srgb, var(--foreground) 22%, transparent);
+}
+
+[data-palette="doukou"].dark,
+[data-palette="doukou"] .dark {
+  --background: #080004;
+  --card: #1e0015;
+  --popover: #39002c;
+  --muted: #1e0015;
+  --foreground: #ffdbff;
+  --muted-foreground: #f2a5da;
+  --faint-foreground: #bb71a5;
+  --accent: #d68bbf;
+  --accent-foreground: #080004;
+  --accent-soft: color-mix(in srgb, var(--accent) 18%, transparent);
+  --border-default: color-mix(in srgb, var(--foreground) 14%, transparent);
+  --border-strong: color-mix(in srgb, var(--foreground) 24%, transparent);
+}

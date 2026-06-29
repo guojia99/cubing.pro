@@ -1,0 +1,102 @@
+.yearly-full-rank {
+  padding: 16px;
+  max-width: 1000px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+@media (min-width: 1080px) {
+  .yearly-full-rank {
+    max-width: none;
+  }
+}
+.yearly-full-rank .filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 0;
+}
+.yearly-full-rank .filter-row .filter-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.yearly-full-rank .filter-row .filter-item .filter-label {
+  white-space: nowrap;
+  font-size: 12px;
+}
+.yearly-full-rank .filter-row .filter-item .filter-select.ant-select {
+  min-width: 100px;
+}
+.yearly-full-rank .table-wrapper {
+  font-size: 12px;
+  width: 100%;
+}
+.yearly-full-rank .competition-tag {
+  font-size: 12px;
+  line-height: 18px;
+  padding: 0 6px;
+  margin: 0;
+}
+.yearly-full-rank .ant-table-cell.attempts-col {
+  overflow: hidden;
+}
+.yearly-full-rank .attempts-cell {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  line-height: 1.4;
+  max-width: 100%;
+}
+.yearly-full-rank .attempts-cell:not(.expanded) {
+  overflow: hidden;
+}
+.yearly-full-rank .attempts-cell .attempts-toggle {
+  flex-shrink: 0;
+  cursor: pointer;
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 10px;
+  padding: 2px 0;
+}
+.yearly-full-rank .attempts-cell .attempts-toggle:hover {
+  color: rgba(0, 0, 0, 0.85);
+}
+.yearly-full-rank .attempts-cell .attempts-single-line {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.yearly-full-rank .attempts-cell .attempts-detail {
+  flex: 1;
+  min-width: 0;
+  max-width: 100%;
+  overflow: visible;
+}
+@media (max-width: 1079px) {
+  .yearly-full-rank {
+    padding: 12px 8px;
+  }
+  .yearly-full-rank .table-wrapper {
+    width: 100%;
+    font-size: 11px;
+  }
+  .yearly-full-rank .ant-table-cell {
+    padding: 6px 4px !important;
+  }
+  .yearly-full-rank .ant-pagination {
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 8px 0;
+  }
+  .yearly-full-rank .ant-pagination .ant-pagination-options {
+    margin-left: 0;
+    margin-top: 6px;
+  }
+  .yearly-full-rank .ant-pagination .ant-pagination-item,
+  .yearly-full-rank .ant-pagination .ant-pagination-prev,
+  .yearly-full-rank .ant-pagination .ant-pagination-next {
+    min-width: 28px;
+  }
+}

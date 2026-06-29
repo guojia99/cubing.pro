@@ -1,10 +1,10 @@
-import { AuthHeader } from '@/services/cubing-pro/auth/token';
-import { PlayersAPI } from '@/services/cubing-pro/players/typings';
-import { Request } from '@/services/cubing-pro/request';
+import { AuthHeader } from "@/services/cubing-pro/auth/token";
+import type { PlayersAPI } from "@/services/cubing-pro/players/typings";
+import { Request } from "@/services/cubing-pro/request";
 
-export async function apiApprovalComp(compId: number): Promise<any> {
-  const response = await Request.post<any>(
-    '/admin/competition/approvals/' + compId + '/approval',
+export async function apiApprovalComp(compId: number): Promise<unknown> {
+  const response = await Request.post<unknown>(
+    `/admin/competition/approvals/${compId}/approval`,
     {
       Ok: true,
     },
@@ -17,8 +17,8 @@ export async function apiApprovalComp(compId: number): Promise<any> {
 }
 
 /** 管理员删除比赛（含成绩、报名等），需管理员或超级管理员权限 */
-export async function apiAdminDeleteComp(compId: number): Promise<any> {
-  const response = await Request.delete<any>(`/admin/competition/comps/${compId}`, {
+export async function apiAdminDeleteComp(compId: number): Promise<unknown> {
+  const response = await Request.delete<unknown>(`/admin/competition/comps/${compId}`, {
     headers: AuthHeader(),
   });
   return response.data;
@@ -28,7 +28,7 @@ export async function apiAdminPlayers(
   params: PlayersAPI.PlayersReq,
 ): Promise<PlayersAPI.PlayersResp> {
   const response = await Request.post<PlayersAPI.PlayersResp>(
-    '/admin/users/',
+    "/admin/users/",
     {
       like: {
         name: params.name,
@@ -44,18 +44,22 @@ export async function apiAdminPlayers(
   return response.data;
 }
 
-export async function apiAdminCreatePlayer(params: PlayersAPI.CreatePlayerReq): Promise<any> {
-  const response = await Request.post<PlayersAPI.PlayersResp>('/admin/users/create_user', params, {
-    headers: AuthHeader(),
-  });
+export async function apiAdminCreatePlayer(params: PlayersAPI.CreatePlayerReq): Promise<unknown> {
+  const response = await Request.post<PlayersAPI.PlayersResp>(
+    "/admin/users/create_user",
+    params,
+    {
+      headers: AuthHeader(),
+    },
+  );
   return response.data;
 }
 
 export async function apiAdminUpdatePlayerName(
   params: PlayersAPI.UpdatePlayerNameWCAIDReq,
-): Promise<any> {
+): Promise<unknown> {
   const response = await Request.put<PlayersAPI.PlayersResp>(
-    '/admin/users/update_user_name',
+    "/admin/users/update_user_name",
     params,
     { headers: AuthHeader() },
   );
@@ -64,22 +68,28 @@ export async function apiAdminUpdatePlayerName(
 
 export async function apiAdminUpdatePlayerWCAID(
   params: PlayersAPI.UpdatePlayerNameWCAIDReq,
-): Promise<any> {
-  const response = await Request.put<PlayersAPI.PlayersResp>('/admin/users/update_wca_id', params, {
+): Promise<unknown> {
+  const response = await Request.put<PlayersAPI.PlayersResp>(
+    "/admin/users/update_wca_id",
+    params,
+    {
+      headers: AuthHeader(),
+    },
+  );
+  return response.data;
+}
+
+export async function apiUpdatePlayerAuth(
+  params: PlayersAPI.UpdatePlayerAuthReq,
+): Promise<unknown> {
+  const response = await Request.post<unknown>("/admin/users/update_auth", params, {
     headers: AuthHeader(),
   });
   return response.data;
 }
 
-export async function apiUpdatePlayerAuth(params: PlayersAPI.UpdatePlayerAuthReq): Promise<any> {
-  const response = await Request.post<any>('/admin/users/update_auth', params, {
-    headers: AuthHeader(),
-  });
-  return response.data;
-}
-
-export async function apiMergePlayers(params: PlayersAPI.MergePlayerReq): Promise<any> {
-  const response = await Request.post<any>('/admin/users/merge_user', params, {
+export async function apiMergePlayers(params: PlayersAPI.MergePlayerReq): Promise<unknown> {
+  const response = await Request.post<unknown>("/admin/users/merge_user", params, {
     headers: AuthHeader(),
   });
   return response.data;

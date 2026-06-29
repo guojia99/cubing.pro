@@ -1,21 +1,39 @@
 .cube_result_Best_col {
   min-width: 30px;
-  /*border-right: rgba(220, 220, 220, 0.74) 1px solid;*/
-  /*border: 1px red solid;*/
-
 }
+
 .cube_result_Average_col {
   min-width: 30px;
 }
 
 /*
- * 固定首列右侧有宽约 30px 的 ::after（含 ping 时 inset 阴影），会叠在下一列（轮次）上，
- * 表现为每行文字上方/旁边的灰块。整表关闭该伪元素。
+ * 固定首列右侧有约 30px 的 ::after 阴影（antd 6: fix-start），会叠在下一列上，
+ * 表现为每行「单次」等列文字上方/旁边的灰块。
  */
+.ant-table-wrapper.cube-results-table .ant-table-cell-fix-left::after,
+.ant-table-wrapper.cube-results-table .ant-table-cell-fix-left::before,
 .ant-table-wrapper.cube-results-table .ant-table-cell-fix-left-last::after,
-.ant-table-wrapper.cube-results-table .ant-table-cell-fix-left-first::after {
+.ant-table-wrapper.cube-results-table .ant-table-cell-fix-left-last::before,
+.ant-table-wrapper.cube-results-table .ant-table-cell-fix-left-first::after,
+.ant-table-wrapper.cube-results-table .ant-table-cell-fix-left-first::before,
+.ant-table-wrapper.cube-results-table .ant-table-cell-fix-start::after,
+.ant-table-wrapper.cube-results-table .ant-table-cell-fix-start::before,
+.ant-table-wrapper.cube-results-table .ant-table-cell-fix-start-shadow::after,
+.ant-table-wrapper.cube-results-table .ant-table-cell-fix-start-shadow-show::after,
+.ant-table-wrapper.cube-results-table .ant-table-cell-fix-end::after,
+.ant-table-wrapper.cube-results-table .ant-table-cell-fix-end::before,
+.ant-table-wrapper.cube-results-table .ant-table-cell-fix-end-shadow::after,
+.ant-table-wrapper.cube-results-table .ant-table-cell-fix-end-shadow-show::after,
+.ant-table-wrapper.cube-results-table .ant-table-fix-start-shadow-show .ant-table-container::before,
+.ant-table-wrapper.cube-results-table .ant-table-fix-end-shadow-show .ant-table-container::after {
   display: none !important;
   box-shadow: none !important;
+  background: transparent !important;
+  width: 0 !important;
+  height: 0 !important;
+  content: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
 .custom-cell {
@@ -25,12 +43,18 @@
 .custom-cell::after {
   content: '';
   position: absolute;
-  top: 50%; /* 从单元格的垂直中心开始 */
-  right: 0; /* 保证线位于右侧 */
-  width: 1px; /* 线的宽度 */
-  height: 50%; /* 线的高度为单元格高度的一半 */
-  background-color: rgba(220, 220, 220, 0.74); /* 线的颜色 */
-  transform: translateY(-50%); /* 使线垂直居中 */
+  top: 50%;
+  right: 0;
+  width: 1px;
+  height: 50%;
+  background-color: rgba(220, 220, 220, 0.74);
+  transform: translateY(-50%);
+}
+
+/* 「按比赛」项目列不画分隔线，避免空行时残影 */
+.cube-results-table .cube-result-event-only-one-cell::after {
+  display: none !important;
+  content: none !important;
 }
 
 .cube_result_player_name_col {

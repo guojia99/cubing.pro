@@ -1,46 +1,92 @@
-import { AlgorithmClass, AlgorithmGroupsResponse } from '@/services/cubing-pro/algs/typings';
-import { Request } from '@/services/cubing-pro/request';
+import { Request } from "@/services/cubing-pro/request";
 
-const CACHE_PREFIX = 'algs:cubing.pro:detail:';
-const CACHE_TTL_MS = 12 * 60 * 60 * 1000; // 12 小时
+export type AlgListItem = {
+  name: string;
+  image?: string;
+  alg?: string;
+};
 
-function getAlgDetailCacheKey(cube: string, classID: string): string {
-  return `${CACHE_PREFIX}${encodeURIComponent(cube)}::${encodeURIComponent(classID)}`;
-}
+export type AlgCubeMap = {
+  CubeKeys: string[];
+  ClassMap: Record<string, AlgListItem[]>;
+};
 
-function getCachedAlgClass(cube: string, classID: string): AlgorithmClass | null {
+export type AlgItem = {
+  name: string;
+  algs: string[];
+  image?: string;
+  scrambles?: string[];
+  [key: string]: unknown;
+};
+
+export type AlgGroupItem = {
+  name: string;
+  algs: AlgItem[];
+};
+
+export type AlgSetItem = {
+  name: string;
+  groups: AlgGroupItem[];
+  groups_keys?: string[];
+};
+
+export type AlgClassDetail = {
+  name: string;
+  sets: AlgSetItem[];
+  setKeys?: string[];
+  [key: string]: unknown;
+};
+
+const CACHE_KEY_MAP = "alg_cubemap_cache";
+const CACHE_KEY_CLASS_PREFIX = "alg_class_cache_";
+const CACHE_TTL_MAP = 10 * 60 * 1000;
+const CACHE_TTL_CLASS = 12 * 60 * 60 * 1000;
+
+function getCached<T>(key: string, ttl: number): T | null {
+  if (typeof window === "undefined") return null;
   try {
-    const key = getAlgDetailCacheKey(cube, classID);
     const raw = localStorage.getItem(key);
     if (!raw) return null;
-    const { data, ts } = JSON.parse(raw) as { data: AlgorithmClass; ts: number };
-    if (typeof ts !== 'number' || Date.now() - ts > CACHE_TTL_MS) return null;
+    const { data, ts } = JSON.parse(raw) as { data: T; ts: number };
+    if (Date.now() - ts > ttl) {
+      localStorage.removeItem(key);
+      return null;
+    }
     return data;
   } catch {
     return null;
   }
 }
 
-function setCachedAlgClass(cube: string, classID: string, data: AlgorithmClass): void {
+function setCached<T>(key: string, data: T) {
+  if (typeof window === "undefined") return;
   try {
-    const key = getAlgDetailCacheKey(cube, classID);
     localStorage.setItem(key, JSON.stringify({ data, ts: Date.now() }));
   } catch {
-    // ignore
+    // storage full
   }
 }
 
-export async function getAlgCubeMap():Promise<AlgorithmGroupsResponse>{
-  const response = await Request.get<AlgorithmGroupsResponse>("/public/algorithm/", {});
-  return response.data;
-}
-
-export async function getAlgCubeClass(cube: string, classID: string):Promise<AlgorithmClass>{
-  const cached = getCachedAlgClass(cube, classID);
+export async function getAlgCubeMap(): Promise<AlgCubeMap> {
+  const cached = getCached<AlgCubeMap>(CACHE_KEY_MAP, CACHE_TTL_MAP);
   if (cached) return cached;
 
-  const response = await Request.get<AlgorithmClass>(`/public/algorithm/${cube}/${classID}`, {});
-  const data = response.data;
-  setCachedAlgClass(cube, classID, data);
-  return data;
+  const res = await Request.get<AlgCubeMap>("/public/algorithm/");
+  setCached(CACHE_KEY_MAP, res.data);
+  return res.data;
+}
+
+export async function getAlgCubeClass(
+  cube: string,
+  classID: string,
+): Promise<AlgClassDetail> {
+  const cacheKey = `${CACHE_KEY_CLASS_PREFIX}${cube}_${classID}`;
+  const cached = getCached<AlgClassDetail>(cacheKey, CACHE_TTL_CLASS);
+  if (cached) return cached;
+
+  const res = await Request.get<AlgClassDetail>(
+    `/public/algorithm/${cube}/${classID}`,
+  );
+  setCached(cacheKey, res.data);
+  return res.data;
 }

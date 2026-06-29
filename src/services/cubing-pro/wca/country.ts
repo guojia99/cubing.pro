@@ -1,7 +1,7 @@
 import { AuthHeader } from '@/services/cubing-pro/auth/token';
 import { Request } from '@/services/cubing-pro/request';
 import { Country } from '@/services/cubing-pro/wca/types';
-import { getCountryDisplayName } from '@/pages/WCA/PlayerComponents/region/all_contiry';
+import { getCountryDisplayName } from '@/views/Wca/PlayerComponents/region/all_contiry';
 
 /** `/wca/country` 拉取后的全量缓存，供按 WCA id（如 China）解析 iso2 与展示名 */
 let cachedCountries: Country[] = [];

@@ -1,0 +1,14 @@
+/* 按项目 Tab - 全部展示，支持换行，无需滑动 */
+.wca-event-tabs {
+  width: 100%;
+}
+.wca-event-tabs .ant-tabs-nav-wrap {
+  overflow: visible !important;
+}
+.wca-event-tabs .ant-tabs-nav-list {
+  flex-wrap: wrap !important;
+  justify-content: center;
+}
+.wca-event-tabs .ant-tabs-tab {
+  flex: 0 0 auto !important;
+}

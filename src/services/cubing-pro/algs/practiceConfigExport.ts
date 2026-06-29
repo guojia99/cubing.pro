@@ -1,15 +1,14 @@
 /**
- * 练习配置导出/导入
- * 包含：熟练度、配置、选择、随机历史、练习历史、每日随机
+ * 练习配置导出/导入（localStorage 全量）
  */
 
-const PREFIX_PROFICIENCY = 'algs:formula_practice_proficiency:';
-const PREFIX_CONFIG = 'algs:formula_practice_config:';
-const PREFIX_SELECTION = 'algs:formula_practice_selection:';
-const PREFIX_RANDOM_PICK = 'algs:formula_random_pick:';
-const PREFIX_HISTORY = 'algs:formula_practice_history:';
-const KEY_DAILY_PICK = 'algs:daily_random_pick';
-const KEY_CUSTOM_FORMULAS = 'algs_custom_formulas';
+const PREFIX_PROFICIENCY = "algs:formula_practice_proficiency:";
+const PREFIX_CONFIG = "algs:formula_practice_config:";
+const PREFIX_SELECTION = "algs:formula_practice_selection:";
+const PREFIX_RANDOM_PICK = "algs:formula_random_pick:";
+const PREFIX_HISTORY = "algs:formula_practice_history:";
+const KEY_DAILY_PICK = "algs:daily_random_pick";
+const KEY_CUSTOM_FORMULAS = "algs_custom_formulas";
 
 export interface PracticeConfigExport {
   version: 1;
@@ -17,7 +16,10 @@ export interface PracticeConfigExport {
   proficiency: Record<string, unknown>;
   config: Record<string, unknown>;
   selection: Record<string, unknown>;
-  formulaRandomPick: Record<string, Array<{ setName: string; groupName: string; algName: string }>>;
+  formulaRandomPick: Record<
+    string,
+    Array<{ setName: string; groupName: string; algName: string }>
+  >;
   formulaPracticeHistory: Record<string, unknown>;
   dailyRandomPick?: unknown;
   customFormulas?: Record<string, string[]>;
@@ -46,8 +48,14 @@ function collectByPrefix(prefix: string): Record<string, unknown> {
   return result;
 }
 
-function collectFormulaRandomPick(): Record<string, Array<{ setName: string; groupName: string; algName: string }>> {
-  const result: Record<string, Array<{ setName: string; groupName: string; algName: string }>> = {};
+function collectFormulaRandomPick(): Record<
+  string,
+  Array<{ setName: string; groupName: string; algName: string }>
+> {
+  const result: Record<
+    string,
+    Array<{ setName: string; groupName: string; algName: string }>
+  > = {};
   try {
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
@@ -56,12 +64,16 @@ function collectFormulaRandomPick(): Record<string, Array<{ setName: string; gro
         const raw = localStorage.getItem(key);
         if (raw) {
           try {
-            const arr = JSON.parse(raw) as Array<{ setName?: string; groupName?: string; algName?: string }>;
+            const arr = JSON.parse(raw) as Array<{
+              setName?: string;
+              groupName?: string;
+              algName?: string;
+            }>;
             if (Array.isArray(arr)) {
               result[subKey] = arr.map((item) => ({
-                setName: item.setName ?? '',
-                groupName: item.groupName ?? '',
-                algName: item.algName ?? '',
+                setName: item.setName ?? "",
+                groupName: item.groupName ?? "",
+                algName: item.algName ?? "",
               }));
             }
           } catch {
@@ -83,22 +95,18 @@ export function exportPracticeConfig(): PracticeConfigExport {
   const formulaRandomPick = collectFormulaRandomPick();
   const formulaPracticeHistory = collectByPrefix(PREFIX_HISTORY);
 
-  let dailyRandomPick: unknown = undefined;
+  let dailyRandomPick: unknown;
   try {
     const raw = localStorage.getItem(KEY_DAILY_PICK);
-    if (raw) {
-      dailyRandomPick = JSON.parse(raw);
-    }
+    if (raw) dailyRandomPick = JSON.parse(raw);
   } catch {
     // ignore
   }
 
-  let customFormulas: Record<string, string[]> | undefined = undefined;
+  let customFormulas: Record<string, string[]> | undefined;
   try {
     const raw = localStorage.getItem(KEY_CUSTOM_FORMULAS);
-    if (raw) {
-      customFormulas = JSON.parse(raw) as Record<string, string[]>;
-    }
+    if (raw) customFormulas = JSON.parse(raw) as Record<string, string[]>;
   } catch {
     // ignore
   }
@@ -116,22 +124,26 @@ export function exportPracticeConfig(): PracticeConfigExport {
   };
 }
 
-export function importPracticeConfig(jsonStr: string): { success: boolean; message?: string } {
+export function importPracticeConfig(
+  jsonStr: string,
+): { success: boolean; message?: string } {
   try {
     const data = JSON.parse(jsonStr) as Partial<PracticeConfigExport>;
-    if (!data || typeof data !== 'object') {
-      return { success: false, message: 'Invalid format' };
+    if (!data || typeof data !== "object") {
+      return { success: false, message: "Invalid format" };
     }
     if (data.version !== 1) {
-      return { success: false, message: 'Unsupported version' };
+      return { success: false, message: "Unsupported version" };
     }
 
-    const proficiency = data.proficiency;
-    if (proficiency && typeof proficiency === 'object') {
-      Object.entries(proficiency).forEach(([subKey, val]) => {
+    if (data.proficiency && typeof data.proficiency === "object") {
+      Object.entries(data.proficiency).forEach(([subKey, val]) => {
         if (val != null) {
           try {
-            localStorage.setItem(`${PREFIX_PROFICIENCY}${subKey}`, JSON.stringify(val));
+            localStorage.setItem(
+              `${PREFIX_PROFICIENCY}${subKey}`,
+              JSON.stringify(val),
+            );
           } catch {
             // ignore
           }
@@ -139,12 +151,14 @@ export function importPracticeConfig(jsonStr: string): { success: boolean; messa
       });
     }
 
-    const config = data.config;
-    if (config && typeof config === 'object') {
-      Object.entries(config).forEach(([subKey, val]) => {
+    if (data.config && typeof data.config === "object") {
+      Object.entries(data.config).forEach(([subKey, val]) => {
         if (val != null) {
           try {
-            localStorage.setItem(`${PREFIX_CONFIG}${subKey}`, JSON.stringify(val));
+            localStorage.setItem(
+              `${PREFIX_CONFIG}${subKey}`,
+              JSON.stringify(val),
+            );
           } catch {
             // ignore
           }
@@ -152,12 +166,14 @@ export function importPracticeConfig(jsonStr: string): { success: boolean; messa
       });
     }
 
-    const selection = data.selection;
-    if (selection && typeof selection === 'object') {
-      Object.entries(selection).forEach(([subKey, val]) => {
+    if (data.selection && typeof data.selection === "object") {
+      Object.entries(data.selection).forEach(([subKey, val]) => {
         if (val != null) {
           try {
-            localStorage.setItem(`${PREFIX_SELECTION}${subKey}`, JSON.stringify(val));
+            localStorage.setItem(
+              `${PREFIX_SELECTION}${subKey}`,
+              JSON.stringify(val),
+            );
           } catch {
             // ignore
           }
@@ -165,18 +181,20 @@ export function importPracticeConfig(jsonStr: string): { success: boolean; messa
       });
     }
 
-    const formulaRandomPick = data.formulaRandomPick;
-    if (formulaRandomPick && typeof formulaRandomPick === 'object') {
-      Object.entries(formulaRandomPick).forEach(([subKey, arr]) => {
+    if (data.formulaRandomPick && typeof data.formulaRandomPick === "object") {
+      Object.entries(data.formulaRandomPick).forEach(([subKey, arr]) => {
         if (Array.isArray(arr)) {
           const items = arr.map((item) => ({
-            setName: item?.setName ?? '',
-            groupName: item?.groupName ?? '',
-            algName: item?.algName ?? '',
-            image: '', // 不导入图片
+            setName: item?.setName ?? "",
+            groupName: item?.groupName ?? "",
+            algName: item?.algName ?? "",
+            image: "",
           }));
           try {
-            localStorage.setItem(`${PREFIX_RANDOM_PICK}${subKey}`, JSON.stringify(items));
+            localStorage.setItem(
+              `${PREFIX_RANDOM_PICK}${subKey}`,
+              JSON.stringify(items),
+            );
           } catch {
             // ignore
           }
@@ -184,12 +202,17 @@ export function importPracticeConfig(jsonStr: string): { success: boolean; messa
       });
     }
 
-    const formulaPracticeHistory = data.formulaPracticeHistory;
-    if (formulaPracticeHistory && typeof formulaPracticeHistory === 'object') {
-      Object.entries(formulaPracticeHistory).forEach(([subKey, val]) => {
+    if (
+      data.formulaPracticeHistory &&
+      typeof data.formulaPracticeHistory === "object"
+    ) {
+      Object.entries(data.formulaPracticeHistory).forEach(([subKey, val]) => {
         if (val != null) {
           try {
-            localStorage.setItem(`${PREFIX_HISTORY}${subKey}`, JSON.stringify(val));
+            localStorage.setItem(
+              `${PREFIX_HISTORY}${subKey}`,
+              JSON.stringify(val),
+            );
           } catch {
             // ignore
           }
@@ -197,7 +220,7 @@ export function importPracticeConfig(jsonStr: string): { success: boolean; messa
       });
     }
 
-    if (data.dailyRandomPick != null && typeof data.dailyRandomPick === 'object') {
+    if (data.dailyRandomPick != null && typeof data.dailyRandomPick === "object") {
       try {
         localStorage.setItem(KEY_DAILY_PICK, JSON.stringify(data.dailyRandomPick));
       } catch {
@@ -205,9 +228,16 @@ export function importPracticeConfig(jsonStr: string): { success: boolean; messa
       }
     }
 
-    if (data.customFormulas != null && typeof data.customFormulas === 'object' && !Array.isArray(data.customFormulas)) {
+    if (
+      data.customFormulas != null &&
+      typeof data.customFormulas === "object" &&
+      !Array.isArray(data.customFormulas)
+    ) {
       try {
-        localStorage.setItem(KEY_CUSTOM_FORMULAS, JSON.stringify(data.customFormulas));
+        localStorage.setItem(
+          KEY_CUSTOM_FORMULAS,
+          JSON.stringify(data.customFormulas),
+        );
       } catch {
         // ignore
       }
@@ -217,7 +247,7 @@ export function importPracticeConfig(jsonStr: string): { success: boolean; messa
   } catch (e) {
     return {
       success: false,
-      message: e instanceof Error ? e.message : 'Import failed',
+      message: e instanceof Error ? e.message : "Import failed",
     };
   }
 }

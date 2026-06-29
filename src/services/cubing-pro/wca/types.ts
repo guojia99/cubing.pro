@@ -29,6 +29,8 @@ export interface WCAPerson {
   sub_id: number;
   name: string;
   country_id: string;
+  /** 搜索接口返回的国家 ISO2 */
+  iso2?: string;
   gender: string;
 }
 
