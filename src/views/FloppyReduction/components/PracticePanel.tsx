@@ -7,6 +7,7 @@ import {
   HStack,
   SegmentGroup,
   SimpleGrid,
+  Spacer,
   Spinner,
   Text,
   Textarea,
@@ -18,10 +19,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useI18n } from "@/contexts/I18nProvider";
 import { appendFrPracticeRecord, type FrAxisMode } from "@/services/cubing-pro/fr/practiceHistory";
 import { AxisResultCard } from "@/views/FloppyReduction/components/AxisResultCard";
-import {
-  FR_EXAMPLE_SCRAMBLE,
-  ScrambleInput,
-} from "@/views/FloppyReduction/components/ScrambleInput";
 import { SolutionBreakdown } from "@/views/FloppyReduction/components/SolutionBreakdown";
 import { FR_COLORS } from "@/views/FloppyReduction/utils/constants";
 import {
@@ -59,14 +56,11 @@ function pickRandomAxis(): AxisKey {
 export function PracticePanel({
   onHistoryChange,
   onHelp,
-  onTutorial,
 }: {
   onHistoryChange?: () => void;
   onHelp: () => void;
-  onTutorial: () => void;
 }) {
   const { t, tf } = useI18n();
-  const [input, setInput] = useState("");
   const [analysis, setAnalysis] = useState<FrAnalysis | null>(null);
   const [axisKey, setAxisKey] = useState<AxisKey>("ud");
   const [axisMode, setAxisMode] = useState<FrAxisMode>("pick");
@@ -95,22 +89,12 @@ export function PracticePanel({
 
   const handleRandom = useCallback(() => {
     const s = generateHtrScramble();
-    setInput(s);
     loadScramble(s, true);
   }, [loadScramble]);
 
   useEffect(() => {
     handleRandom();
   }, [handleRandom]);
-
-  const handleExample = useCallback(() => {
-    setInput(FR_EXAMPLE_SCRAMBLE);
-    loadScramble(FR_EXAMPLE_SCRAMBLE);
-  }, [loadScramble]);
-
-  const handleLoad = useCallback(() => {
-    loadScramble(input);
-  }, [input, loadScramble]);
 
   const handleRandomAxis = useCallback(() => {
     setAxisMode("random");
@@ -161,15 +145,15 @@ export function PracticePanel({
 
   return (
     <VStack align="stretch" gap="6">
-      <ScrambleInput
-        value={input}
-        onChange={setInput}
-        onAnalyze={handleLoad}
-        onRandom={handleRandom}
-        onExample={handleExample}
-        onHelp={onHelp}
-        onTutorial={onTutorial}
-      />
+      <HStack gap="2" flexWrap="wrap">
+        <Button variant="outline" colorPalette={FR_COLORS.palette} onClick={handleRandom}>
+          {t("fr.btn.random")}
+        </Button>
+        <Spacer />
+        <Button variant="outline" onClick={onHelp}>
+          {t("fr.btn.help")}
+        </Button>
+      </HStack>
 
       {analysis && !analysis.ok && (
         <Card.Root borderRadius="lg" borderColor={FR_COLORS.destructive} borderWidth="1px">
@@ -189,6 +173,10 @@ export function PracticePanel({
 
       {showCube && (
         <>
+          <Text fontFamily="mono" fontSize="sm" color="fg.muted" wordBreak="break-all">
+            {analysis!.scramble}
+          </Text>
+
           <Card.Root borderRadius="lg" variant="outline" bg="bg.subtle">
             <Card.Body>
               <Text fontSize="sm" fontWeight="medium" mb="3">
