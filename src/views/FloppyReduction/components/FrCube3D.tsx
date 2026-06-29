@@ -91,6 +91,8 @@ export interface FrCube3DProps {
   scramble: string;
   /** 可选的 FR 参考解，作为可播放的算法 */
   solution?: string[] | null;
+  /** 实时预览：将步序并入初始 setup，不触发播放动画 */
+  previewMoves?: string[] | null;
   /** 高亮的轴 */
   axisKey: AxisKey;
   height?: number;
@@ -105,6 +107,7 @@ export interface FrCube3DProps {
 export function FrCube3D({
   scramble,
   solution,
+  previewMoves,
   axisKey,
   height = 320,
   showBackView = true,
@@ -151,9 +154,17 @@ export function FrCube3D({
   function applyProps(player: TwistyPlayer) {
     try {
       const rot = SETUP_ROTATION[axisKey];
-      player.experimentalSetupAlg = [scramble || "", rot].filter(Boolean).join(" ");
+      const previewStr =
+        previewMoves && previewMoves.length
+          ? relabelSolution(previewMoves, axisKey)
+          : "";
+      const setupParts = [scramble || "", rot, previewStr].filter(Boolean);
+      player.experimentalSetupAlg = setupParts.join(" ");
+
       const algStr =
-        solution && solution.length ? relabelSolution(solution, axisKey) : "";
+        !previewStr && solution && solution.length
+          ? relabelSolution(solution, axisKey)
+          : "";
       player.alg = "";
       if (algStr) {
         requestAnimationFrame(() => {
@@ -171,7 +182,7 @@ export function FrCube3D({
     const player = playerRef.current;
     if (player) applyProps(player);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scramble, axisKey, solution, emphasis, showControls]);
+  }, [scramble, axisKey, solution, previewMoves, emphasis, showControls]);
 
   return (
     <div

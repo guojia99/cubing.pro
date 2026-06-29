@@ -24,6 +24,7 @@ import { FR_COLORS } from "@/views/FloppyReduction/utils/constants";
 import {
   analyzeScramble,
   generateHtrScramble,
+  parsePracticeSolutionInput,
   verifyFrSolution,
   type AxisKey,
   type FrAnalysis,
@@ -70,47 +71,52 @@ export function PracticePanel({
   const [demo, setDemo] = useState(false);
   const [showSteps, setShowSteps] = useState(true);
 
-  const loadScramble = useCallback(
-    (scramble: string, randomAxis = false) => {
-      const result = analyzeScramble(scramble);
-      setAnalysis(result);
-      setUserSolution("");
-      setSubmitted(false);
-      setVerifyResult(null);
-      setDemo(false);
-      setShowSteps(true);
-      if (randomAxis || axisMode === "random") {
-        setAxisMode("random");
-        setAxisKey(pickRandomAxis());
-      }
-    },
-    [axisMode],
-  );
+  const loadScramble = useCallback((scramble: string, assignRandomAxis = false) => {
+    const result = analyzeScramble(scramble);
+    setAnalysis(result);
+    setUserSolution("");
+    setSubmitted(false);
+    setVerifyResult(null);
+    setDemo(false);
+    setShowSteps(true);
+    if (assignRandomAxis) {
+      setAxisMode("random");
+      setAxisKey(pickRandomAxis());
+    }
+  }, []);
 
   const handleRandom = useCallback(() => {
-    const s = generateHtrScramble();
-    loadScramble(s, true);
+    loadScramble(generateHtrScramble(), true);
   }, [loadScramble]);
 
   useEffect(() => {
     handleRandom();
-  }, [handleRandom]);
+    // 仅首次进入练习时出题，轴切换不得触发重新随机
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const resetAttempt = useCallback(() => {
+    setUserSolution("");
+    setSubmitted(false);
+    setVerifyResult(null);
+    setDemo(false);
+  }, []);
 
   const handleRandomAxis = useCallback(() => {
     setAxisMode("random");
     setAxisKey(pickRandomAxis());
-    setSubmitted(false);
-    setVerifyResult(null);
-    setDemo(false);
-  }, []);
+    resetAttempt();
+  }, [resetAttempt]);
 
-  const handleAxisPick = useCallback((ax: AxisKey) => {
-    setAxisMode("pick");
-    setAxisKey(ax);
-    setSubmitted(false);
-    setVerifyResult(null);
-    setDemo(false);
-  }, []);
+  const handleAxisPick = useCallback(
+    (ax: AxisKey) => {
+      if (ax === axisKey && axisMode === "pick") return;
+      setAxisMode("pick");
+      setAxisKey(ax);
+      resetAttempt();
+    },
+    [axisKey, axisMode, resetAttempt],
+  );
 
   const activeResult = useMemo(
     () => analysis?.axes.find((a) => a.axisKey === axisKey) ?? null,
@@ -118,7 +124,27 @@ export function PracticePanel({
   );
 
   const showCube = analysis?.ok && analysis.isHtr;
-  const canSubmit = showCube && !submitted && userSolution.trim().length > 0;
+
+  const liveInput = useMemo(() => {
+    if (!analysis?.ok || !analysis.isHtr || submitted) {
+      return null;
+    }
+    return parsePracticeSolutionInput(analysis.scramble, userSolution, axisKey);
+  }, [analysis, userSolution, axisKey, submitted]);
+
+  const canSubmit =
+    showCube &&
+    !submitted &&
+    userSolution.trim().length > 0 &&
+    liveInput?.status !== "invalid";
+
+  const inputBorderColor = useMemo(() => {
+    if (!liveInput) return undefined;
+    if (liveInput.status === "invalid") return FR_COLORS.destructive;
+    if (liveInput.status === "trueFr") return FR_COLORS.success;
+    if (liveInput.status === "falseFr") return FR_COLORS.warning;
+    return undefined;
+  }, [liveInput]);
 
   const handleSubmit = useCallback(() => {
     if (!analysis?.ok || !analysis.isHtr) return;
@@ -216,8 +242,13 @@ export function PracticePanel({
               <Card.Body>
                 <FrCube3D
                   scramble={analysis!.scramble}
+                  previewMoves={
+                    !submitted && liveInput?.appliedMoves.length
+                      ? liveInput.appliedMoves
+                      : null
+                  }
                   solution={
-                    demo && submitted ? (activeResult?.solution ?? null) : null
+                    submitted && demo ? (activeResult?.solution ?? null) : null
                   }
                   axisKey={axisKey}
                 />
@@ -247,12 +278,34 @@ export function PracticePanel({
                     rows={3}
                     fontFamily="mono"
                     resize="vertical"
+                    borderWidth={inputBorderColor ? "2px" : "1px"}
+                    borderColor={inputBorderColor}
+                    _focusVisible={
+                      inputBorderColor
+                        ? { borderColor: inputBorderColor, outline: "none" }
+                        : undefined
+                    }
                     onKeyDown={(e) => {
                       if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && canSubmit) {
                         handleSubmit();
                       }
                     }}
                   />
+                  {liveInput?.status === "invalid" && liveInput.invalidToken && (
+                    <Text fontSize="xs" color={FR_COLORS.destructive} mt="1">
+                      {tf("fr.practice.liveInvalid", { token: liveInput.invalidToken })}
+                    </Text>
+                  )}
+                  {liveInput?.status === "trueFr" && (
+                    <Text fontSize="xs" color={FR_COLORS.success} mt="1" fontWeight="medium">
+                      {t("fr.practice.liveTrueFr")}
+                    </Text>
+                  )}
+                  {liveInput?.status === "falseFr" && (
+                    <Text fontSize="xs" color={FR_COLORS.warning} mt="1">
+                      {t("fr.practice.liveFalseFr")}
+                    </Text>
+                  )}
                   <Button
                     mt="3"
                     colorPalette={FR_COLORS.palette}
