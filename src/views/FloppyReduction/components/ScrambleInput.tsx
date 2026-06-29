@@ -8,9 +8,6 @@ import { FR_COLORS } from "@/views/FloppyReduction/utils/constants";
 export const FR_EXAMPLE_SCRAMBLE =
   "R' U' F U2 B2 D R2 U' B2 L2 R2 F2 R2 B' L' R B2 R' U F U R' U2 R' U' F";
 
-export const FR_TUTORIAL_URL =
-  "https://www.bilibili.com/opus/1009758579532496920";
-
 export interface ScrambleInputProps {
   value: string;
   onChange: (v: string) => void;
@@ -18,6 +15,7 @@ export interface ScrambleInputProps {
   onRandom: () => void;
   onExample: () => void;
   onHelp: () => void;
+  onTutorial: () => void;
 }
 
 export function ScrambleInput({
@@ -27,6 +25,7 @@ export function ScrambleInput({
   onRandom,
   onExample,
   onHelp,
+  onTutorial,
 }: ScrambleInputProps) {
   const { t } = useI18n();
 
@@ -57,13 +56,7 @@ export function ScrambleInput({
         <Button variant="outline" onClick={onHelp}>
           {t("fr.btn.help")}
         </Button>
-        <Button
-          variant="ghost"
-          color={FR_COLORS.accent}
-          onClick={() =>
-            window.open(FR_TUTORIAL_URL, "_blank", "noopener,noreferrer")
-          }
-        >
+        <Button variant="ghost" color={FR_COLORS.accent} onClick={onTutorial}>
           {t("fr.btn.tutorial")}
         </Button>
       </HStack>
