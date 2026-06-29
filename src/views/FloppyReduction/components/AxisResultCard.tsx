@@ -60,7 +60,6 @@ export interface AxisResultCardProps {
   result: AxisResult;
   active: boolean;
   onSelect: () => void;
-  onDemo: () => void;
   /** 练习模式提交前隐藏参考解与分解 */
   hideSolution?: boolean;
 }
@@ -69,7 +68,6 @@ export function AxisResultCard({
   result,
   active,
   onSelect,
-  onDemo,
   hideSolution = false,
 }: AxisResultCardProps) {
   const { t } = useI18n();
@@ -168,32 +166,18 @@ export function AxisResultCard({
           </Box>
         )}
 
-        {!hideSolution && (
+        {!hideSolution && hasSteps && (
           <HStack justify="flex-end" gap="2">
-            {hasSteps && (
-              <Button
-                size="xs"
-                variant="outline"
-                colorPalette={FR_COLORS.palette}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowSteps((v) => !v);
-                }}
-              >
-                {t("fr.steps.toggle")}
-              </Button>
-            )}
             <Button
               size="xs"
-              variant={active ? "solid" : "outline"}
+              variant="outline"
               colorPalette={FR_COLORS.palette}
-              disabled={!solution || solution.length === 0}
               onClick={(e) => {
                 e.stopPropagation();
-                onDemo();
+                setShowSteps((v) => !v);
               }}
             >
-              {t("fr.demo")}
+              {t("fr.steps.toggle")}
             </Button>
           </HStack>
         )}
