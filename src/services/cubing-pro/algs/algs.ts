@@ -4,6 +4,7 @@ export type AlgListItem = {
   name: string;
   image?: string;
   alg?: string;
+  caseCount?: number;
 };
 
 export type AlgCubeMap = {

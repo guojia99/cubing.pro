@@ -9,6 +9,7 @@ import {
   Heading,
   NativeSelect,
   Skeleton,
+  Tag,
   Text,
   VStack,
 } from "@chakra-ui/react";
@@ -56,6 +57,8 @@ function AlgsSetCard({
   item: AlgListItem;
   onClick: () => void;
 }) {
+  const { tf } = useI18n();
+
   return (
     <Card.Root
       borderRadius="xl"
@@ -64,6 +67,7 @@ function AlgsSetCard({
       bg={ALGS_COLORS.cardBg}
       borderColor={ALGS_COLORS.cardBorder}
       borderWidth="1px"
+      position="relative"
       _hover={{
         transform: "translateY(-4px)",
         boxShadow: "lg",
@@ -107,6 +111,20 @@ function AlgsSetCard({
             {item.name}
           </Text>
         </VStack>
+        {(item.caseCount ?? 0) > 0 ? (
+          <Tag.Root
+            position="absolute"
+            right="2"
+            bottom="2"
+            size="sm"
+            variant="subtle"
+            colorPalette="gray"
+          >
+            <Tag.Label fontSize="2xs">
+              {tf("algs.formulaCount", { count: item.caseCount ?? 0 })}
+            </Tag.Label>
+          </Tag.Root>
+        ) : null}
       </Card.Body>
     </Card.Root>
   );
