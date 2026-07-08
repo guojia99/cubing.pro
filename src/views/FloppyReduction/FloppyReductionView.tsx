@@ -64,12 +64,10 @@ function AnalyzePanel({
   const [input, setInput] = useState("");
   const [analysis, setAnalysis] = useState<FrAnalysis | null>(null);
   const [activeAxis, setActiveAxis] = useState<AxisKey>("ud");
-  const [demo, setDemo] = useState(false);
 
   const runAnalyze = useCallback((scramble: string) => {
     setAnalysis(analyzeScramble(scramble));
     setActiveAxis("ud");
-    setDemo(false);
   }, []);
 
   const handleRandom = useCallback(() => {
@@ -91,6 +89,9 @@ function AnalyzePanel({
     () => analysis?.axes.find((a) => a.axisKey === activeAxis) ?? null,
     [analysis, activeAxis],
   );
+
+  const activeSolution = activeResult?.solution ?? null;
+  const showPlayback = Boolean(activeSolution?.length);
 
   const showCube = analysis?.ok && analysis.isHtr;
 
@@ -129,8 +130,9 @@ function AnalyzePanel({
             <Card.Body>
               <FrCube3D
                 scramble={analysis!.scramble}
-                solution={demo ? (activeResult?.solution ?? null) : null}
+                solution={activeSolution}
                 axisKey={activeAxis}
+                showControls={showPlayback}
               />
             </Card.Body>
           </Card.Root>
@@ -146,25 +148,12 @@ function AnalyzePanel({
                   size="sm"
                   variant={activeAxis === ax ? "solid" : "outline"}
                   colorPalette={FR_COLORS.palette}
-                  onClick={() => {
-                    setActiveAxis(ax);
-                    setDemo(false);
-                  }}
+                  onClick={() => setActiveAxis(ax)}
                 >
                   {AXIS_TAB_LABEL[ax]}
                 </Button>
               ))}
             </HStack>
-            {demo && (
-              <Button
-                size="xs"
-                variant="ghost"
-                alignSelf="flex-start"
-                onClick={() => setDemo(false)}
-              >
-                {t("fr.showScrambleOnly")}
-              </Button>
-            )}
             <Text fontSize="xs" color="fg.muted">
               {t("fr.legend")}
             </Text>
@@ -179,14 +168,7 @@ function AnalyzePanel({
               key={res.axisKey}
               result={res}
               active={activeAxis === res.axisKey}
-              onSelect={() => {
-                setActiveAxis(res.axisKey);
-                setDemo(false);
-              }}
-              onDemo={() => {
-                setActiveAxis(res.axisKey);
-                setDemo(true);
-              }}
+              onSelect={() => setActiveAxis(res.axisKey)}
             />
           ))}
         </SimpleGrid>

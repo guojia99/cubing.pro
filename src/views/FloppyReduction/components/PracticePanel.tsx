@@ -68,7 +68,6 @@ export function PracticePanel({
   const [userSolution, setUserSolution] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [verifyResult, setVerifyResult] = useState<VerifyFrResult | null>(null);
-  const [demo, setDemo] = useState(false);
   const [showSteps, setShowSteps] = useState(true);
 
   const loadScramble = useCallback((scramble: string, assignRandomAxis = false) => {
@@ -77,7 +76,6 @@ export function PracticePanel({
     setUserSolution("");
     setSubmitted(false);
     setVerifyResult(null);
-    setDemo(false);
     setShowSteps(true);
     if (assignRandomAxis) {
       setAxisMode("random");
@@ -99,7 +97,6 @@ export function PracticePanel({
     setUserSolution("");
     setSubmitted(false);
     setVerifyResult(null);
-    setDemo(false);
   }, []);
 
   const handleRandomAxis = useCallback(() => {
@@ -145,6 +142,9 @@ export function PracticePanel({
     if (liveInput.status === "falseFr") return FR_COLORS.warning;
     return undefined;
   }, [liveInput]);
+
+  const referenceSolution = submitted ? (activeResult?.solution ?? null) : null;
+  const showReferencePlayback = Boolean(referenceSolution?.length);
 
   const handleSubmit = useCallback(() => {
     if (!analysis?.ok || !analysis.isHtr) return;
@@ -247,10 +247,9 @@ export function PracticePanel({
                       ? liveInput.appliedMoves
                       : null
                   }
-                  solution={
-                    submitted && demo ? (activeResult?.solution ?? null) : null
-                  }
+                  solution={referenceSolution}
                   axisKey={axisKey}
+                  showControls={showReferencePlayback}
                 />
               </Card.Body>
             </Card.Root>
@@ -261,7 +260,6 @@ export function PracticePanel({
                   result={activeResult}
                   active
                   onSelect={() => {}}
-                  onDemo={() => setDemo(true)}
                   hideSolution={!submitted}
                 />
               )}
@@ -372,17 +370,6 @@ export function PracticePanel({
                           )}
 
                         <HStack gap="2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            colorPalette={FR_COLORS.palette}
-                            disabled={
-                              !activeResult.solution || activeResult.solution.length === 0
-                            }
-                            onClick={() => setDemo(true)}
-                          >
-                            {t("fr.demo")}
-                          </Button>
                           <Button
                             size="sm"
                             variant="outline"
