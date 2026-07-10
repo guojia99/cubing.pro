@@ -12,6 +12,7 @@ dev:
 	CUBE_API_UPSTREAM=$(LOCAL_DEV_API_BASE) \
 	npm run dev
 
-# 静态导出到 dist/（HowToCook：/tmp 缓存 + git clone，见 scripts/sync-howtocook.mjs）
+# 静态导出到 dist/（HowToCook 见 scripts/sync-howtocook.mjs）
+# 指定本地目录：HOWTOCOOK_SOURCE_DIR=/path/to/HowToCook make build
 build:
 	npm run build:static
