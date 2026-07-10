@@ -15,7 +15,7 @@
  *
  * 跳过同步：SKIP_HOWTOCOOK_SYNC=1（需 public/HowToCook 已存在）
  */
-import { cpSync, existsSync, mkdirSync, readdirSync, rmSync, statSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, readdirSync, rmSync } from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 
@@ -27,9 +27,7 @@ const CACHE =
 const UPSTREAM = "https://github.com/Anduin2017/HowToCook.git";
 
 const DEFAULT_MIRRORS = [
-  "https://ghproxy.net/https://github.com/Anduin2017/HowToCook.git",
-  "https://mirror.ghproxy.com/https://github.com/Anduin2017/HowToCook.git",
-  "https://gitclone.com/github.com/Anduin2017/HowToCook.git",
+  "https://gh-proxy.com/https://github.com/Anduin2017/HowToCook.git",
   UPSTREAM,
 ];
 
