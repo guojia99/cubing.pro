@@ -3,17 +3,33 @@
 import "antd/dist/reset.css";
 
 import { Heading, VStack } from "@chakra-ui/react";
-import { CopyOutlined, UserAddOutlined } from "@ant-design/icons";
+import {
+  CopyOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  IdcardOutlined,
+  MergeCellsOutlined,
+  QqOutlined,
+  SafetyCertificateOutlined,
+  UserAddOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
 import {
   Button,
   Checkbox,
+  Divider,
+  Dropdown,
   Form,
   Input,
   Modal,
+  Space,
+  Switch,
   Table,
+  Tag,
   Tooltip,
   message,
 } from "antd";
+import type { MenuProps } from "antd";
 import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
 import { useCallback, useEffect, useState } from "react";
 
@@ -27,14 +43,19 @@ import { Auth, hasAuth } from "@/lib/auth";
 import {
   apiAdminCreatePlayer,
   apiAdminPlayers,
+  apiAdminPurgeUser,
+  apiAdminSoftDeleteUser,
   apiAdminUpdatePlayerCubeID,
   apiAdminUpdatePlayerName,
+  apiAdminUpdatePlayerQQ,
   apiAdminUpdatePlayerWCAID,
   apiMergePlayers,
   apiUpdatePlayerAuth,
 } from "@/services/cubing-pro/auth/admin";
 import type { PlayersAPI } from "@/services/cubing-pro/players/typings";
 import { getApiErrorDisplayMessage } from "@/services/cubing-pro/request";
+
+import "./admin_users_table.css";
 
 const AUTH_MANAGE_BITS: { label: string; value: Auth }[] = [
   { label: "选手", value: Auth.AuthPlayer },
@@ -48,6 +69,131 @@ function authToChecked(auth: number): number[] {
   return AUTH_MANAGE_BITS.filter((b) => hasAuth(auth, b.value)).map((b) => b.value);
 }
 
+function isDeletedUser(player: PlayersAPI.Player): boolean {
+  const d = player.deletedAt;
+  if (!d) return false;
+  if (typeof d === "string") {
+    return d.length > 0 && !d.startsWith("0001-01-01");
+  }
+  return true;
+}
+
+function showApiError(err: unknown) {
+  const ax = err as { response?: { data?: unknown } };
+  const text = getApiErrorDisplayMessage(ax.response?.data);
+  if (text) void message.error(text);
+  else if (err instanceof Error) void message.error(err.message);
+}
+
+type UserRowActionsProps = {
+  player: PlayersAPI.Player;
+  onEditName: (player: PlayersAPI.Player) => void;
+  onEditCubeId: (player: PlayersAPI.Player) => void;
+  onEditWca: (player: PlayersAPI.Player) => void;
+  onEditQq: (player: PlayersAPI.Player) => void;
+  onAuth: (player: PlayersAPI.Player) => void;
+  onMerge: (player: PlayersAPI.Player) => void;
+  onSoftDelete: (player: PlayersAPI.Player) => void;
+  onPurge: (player: PlayersAPI.Player) => void;
+};
+
+function UserRowActions({
+  player,
+  onEditName,
+  onEditCubeId,
+  onEditWca,
+  onEditQq,
+  onAuth,
+  onMerge,
+  onSoftDelete,
+  onPurge,
+}: UserRowActionsProps) {
+  if (isDeletedUser(player)) {
+    return (
+      <Button
+        type="link"
+        size="small"
+        danger
+        icon={<DeleteOutlined />}
+        className="admin-user-action-btn"
+        onClick={() => onPurge(player)}
+      >
+        彻底删除
+      </Button>
+    );
+  }
+
+  const editMenu: MenuProps["items"] = [
+    {
+      key: "name",
+      icon: <UserOutlined />,
+      label: "修改名称",
+      onClick: () => onEditName(player),
+    },
+    {
+      key: "cube",
+      icon: <IdcardOutlined />,
+      label: "修改 CubeID",
+      onClick: () => onEditCubeId(player),
+    },
+    {
+      key: "wca",
+      icon: <IdcardOutlined />,
+      label: "修改 WCA ID",
+      onClick: () => onEditWca(player),
+    },
+    {
+      key: "qq",
+      icon: <QqOutlined />,
+      label: "修改 QQ",
+      onClick: () => onEditQq(player),
+    },
+  ];
+
+  return (
+    <Space
+      size={0}
+      separator={<Divider orientation="vertical" className="admin-user-action-divider" />}
+      wrap
+      className="admin-user-row-actions"
+    >
+      <Dropdown menu={{ items: editMenu }} trigger={["click"]}>
+        <Button type="link" size="small" icon={<EditOutlined />} className="admin-user-action-btn">
+          编辑资料
+        </Button>
+      </Dropdown>
+      <Button
+        type="link"
+        size="small"
+        icon={<SafetyCertificateOutlined />}
+        className="admin-user-action-btn"
+        onClick={() => onAuth(player)}
+      >
+        权限
+      </Button>
+      <Button
+        type="link"
+        size="small"
+        icon={<MergeCellsOutlined />}
+        className="admin-user-action-btn"
+        onClick={() => onMerge(player)}
+      >
+        合并
+      </Button>
+      <Button
+        type="link"
+        size="small"
+        danger
+        icon={<DeleteOutlined />}
+        className="admin-user-action-btn"
+        onClick={() => onSoftDelete(player)}
+      >
+        软删除
+      </Button>
+    </Space>
+  );
+}
+
 export function AdminUsersPageView() {
   const [players, setPlayers] = useState<PlayersAPI.Player[]>([]);
   const [total, setTotal] = useState(0);
@@ -56,8 +202,13 @@ export function AdminUsersPageView() {
     size: 20,
     page: 1,
     name: "",
+    includeDeleted: true,
+    onlyDeleted: false,
   });
   const [searchName, setSearchName] = useState("");
+
+  const [updateQqForm] = Form.useForm();
+  const [updatePlayerQqModal, setUpdatePlayerQqModal] = useState(false);
 
   const [createUserModalOpen, setCreateUserModalOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
@@ -143,10 +294,7 @@ export function AdminUsersPageView() {
       setUpdatePlayerNameModal(false);
       void loadPlayers();
     } catch (err: unknown) {
-      const ax = err as { response?: { data?: unknown } };
-      const text = getApiErrorDisplayMessage(ax.response?.data);
-      if (text) void message.error(text);
-      else if (err instanceof Error) void message.error(err.message);
+      showApiError(err);
     } finally {
       setConfirmLoading(false);
     }
@@ -165,10 +313,7 @@ export function AdminUsersPageView() {
       setUpdatePlayerCubeIdModal(false);
       void loadPlayers();
     } catch (err: unknown) {
-      const ax = err as { response?: { data?: unknown } };
-      const text = getApiErrorDisplayMessage(ax.response?.data);
-      if (text) void message.error(text);
-      else if (err instanceof Error) void message.error(err.message);
+      showApiError(err);
     } finally {
       setConfirmLoading(false);
     }
@@ -187,13 +332,108 @@ export function AdminUsersPageView() {
       updateWCAForm.resetFields();
       setUpdatePlayerWcaModal(false);
       void loadPlayers();
-    } catch (err) {
-      if (err instanceof Error) {
-        void message.error(err.message);
-      }
+    } catch (err: unknown) {
+      showApiError(err);
     } finally {
       setConfirmLoading(false);
     }
+  };
+
+  const handleUpdateQQ = async () => {
+    try {
+      const values = await updateQqForm.validateFields();
+      setConfirmLoading(true);
+      await apiAdminUpdatePlayerQQ({
+        user_id: curUpdatePlayer?.id,
+        cube_id: curUpdatePlayer?.CubeID || "",
+        qq: values.qq ?? "",
+        qq_uni_id: values.qq_uni_id ?? "",
+      });
+      void message.success("QQ 信息已更新");
+      updateQqForm.resetFields();
+      setUpdatePlayerQqModal(false);
+      void loadPlayers();
+    } catch (err: unknown) {
+      showApiError(err);
+    } finally {
+      setConfirmLoading(false);
+    }
+  };
+
+  const handleSoftDelete = (player: PlayersAPI.Player) => {
+    Modal.confirm({
+      title: "软删除用户",
+      content: `确认软删除用户 ${player.Name}（ID: ${player.id}）？软删除后可彻底删除。`,
+      okText: "软删除",
+      okButtonProps: { danger: true },
+      cancelText: "取消",
+      onOk: async () => {
+        try {
+          await apiAdminSoftDeleteUser({ user_id: player.id, cube_id: player.CubeID });
+          void message.success("用户已软删除");
+          void loadPlayers();
+        } catch (err: unknown) {
+          showApiError(err);
+          throw err;
+        }
+      },
+    });
+  };
+
+  const handlePurge = (player: PlayersAPI.Player) => {
+    Modal.confirm({
+      title: "彻底删除用户",
+      content: `确认从数据库永久删除用户 ${player.Name}（ID: ${player.id}）？此操作不可恢复。`,
+      okText: "彻底删除",
+      okButtonProps: { danger: true },
+      cancelText: "取消",
+      onOk: async () => {
+        try {
+          await apiAdminPurgeUser({ user_id: player.id, cube_id: player.CubeID });
+          void message.success("用户已彻底删除");
+          void loadPlayers();
+        } catch (err: unknown) {
+          showApiError(err);
+          throw err;
+        }
+      },
+    });
+  };
+
+  const openEditName = (player: PlayersAPI.Player) => {
+    setCurUpdatePlayer(player);
+    setUpdatePlayerNameModal(true);
+  };
+
+  const openEditCubeId = (player: PlayersAPI.Player) => {
+    setCurUpdatePlayer(player);
+    updateCubeIdForm.setFieldsValue({ new_cube_id: player.CubeID });
+    setUpdatePlayerCubeIdModal(true);
+  };
+
+  const openEditWca = (player: PlayersAPI.Player) => {
+    setCurUpdatePlayer(player);
+    setUpdatePlayerWcaModal(true);
+  };
+
+  const openEditQq = (player: PlayersAPI.Player) => {
+    setCurUpdatePlayer(player);
+    updateQqForm.setFieldsValue({
+      qq: player.QQ ?? "",
+      qq_uni_id: player.QQUniID ?? "",
+    });
+    setUpdatePlayerQqModal(true);
+  };
+
+  const openAuth = (player: PlayersAPI.Player) => {
+    setCurUpdatePlayer(player);
+    setAuthChecked(authToChecked(player.Auth));
+    setAuthModalOpen(true);
+  };
+
+  const openMerge = (player: PlayersAPI.Player) => {
+    setCurUpdatePlayer(player);
+    setMergePlayerWcaModal(true);
   };
 
   const applyAuthDiff = async () => {
@@ -217,9 +457,7 @@ export function AdminUsersPageView() {
       setAuthModalOpen(false);
       void loadPlayers();
     } catch (err: unknown) {
-      const ax = err as { response?: { data?: unknown } };
-      const text = getApiErrorDisplayMessage(ax.response?.data);
-      if (text) void message.error(text);
+      showApiError(err);
     } finally {
       setConfirmLoading(false);
     }
@@ -273,7 +511,14 @@ export function AdminUsersPageView() {
   };
 
   const columns: ColumnsType<PlayersAPI.Player> = [
-    { title: "序号", dataIndex: "id", key: "id", width: 70 },
+    { title: "ID", dataIndex: "id", key: "id", width: 70 },
+    {
+      title: "状态",
+      key: "status",
+      width: 80,
+      render: (_v, player) =>
+        isDeletedUser(player) ? <Tag color="red">已删除</Tag> : <Tag color="green">正常</Tag>,
+    },
     {
       title: "CubeID",
       dataIndex: "CubeID",
@@ -295,6 +540,41 @@ export function AdminUsersPageView() {
       key: "WcaID",
       width: 120,
       render: (value: string) => WCALink(value),
+    },
+    {
+      title: "QQ",
+      dataIndex: "QQ",
+      key: "QQ",
+      width: 110,
+      render: (value: string | undefined) => value || "—",
+    },
+    {
+      title: "QQUniID",
+      dataIndex: "QQUniID",
+      key: "QQUniID",
+      width: 220,
+      render: (value: string | undefined) => {
+        if (!value) return "—";
+        return (
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <span
+              style={{ marginRight: 8, wordBreak: "break-all", whiteSpace: "normal", flex: 1, minWidth: 0 }}
+            >
+              {value}
+            </span>
+            <Button
+              size="small"
+              style={{ color: "blueviolet", flexShrink: 0 }}
+              icon={<CopyOutlined />}
+              onClick={() => {
+                void navigator.clipboard.writeText(value).then(() => {
+                  void message.success("复制成功");
+                });
+              }}
+            />
+          </div>
+        );
+      },
     },
     {
       title: "认领密码",
@@ -331,68 +611,21 @@ export function AdminUsersPageView() {
     {
       title: "操作",
       key: "option",
-      width: 440,
+      width: 280,
+      fixed: "right",
+      className: "admin-users-action-col",
       render: (_value, player) => (
-        <>
-          <Button
-            type="primary"
-            size="small"
-            onClick={() => {
-              setCurUpdatePlayer(player);
-              setUpdatePlayerNameModal(true);
-            }}
-          >
-            修改名称
-          </Button>
-          <Button
-            type="default"
-            size="small"
-            style={{ marginLeft: 8 }}
-            onClick={() => {
-              setCurUpdatePlayer(player);
-              updateCubeIdForm.setFieldsValue({ new_cube_id: player.CubeID });
-              setUpdatePlayerCubeIdModal(true);
-            }}
-          >
-            修改 CubeID
-          </Button>
-          <Button
-            type="default"
-            size="small"
-            style={{ marginLeft: 8 }}
-            onClick={() => {
-              setCurUpdatePlayer(player);
-              setUpdatePlayerWcaModal(true);
-            }}
-          >
-            修改WCA ID
-          </Button>
-          <Button
-            type="default"
-            size="small"
-            danger
-            style={{ marginLeft: 8 }}
-            onClick={() => {
-              setCurUpdatePlayer(player);
-              setMergePlayerWcaModal(true);
-            }}
-          >
-            合并用户
-          </Button>
-          <Button
-            type="default"
-            danger
-            size="small"
-            style={{ marginLeft: 8 }}
-            onClick={() => {
-              setCurUpdatePlayer(player);
-              setAuthChecked(authToChecked(player.Auth));
-              setAuthModalOpen(true);
-            }}
-          >
-            修改权限
-          </Button>
-        </>
+        <UserRowActions
+          player={player}
+          onEditName={openEditName}
+          onEditCubeId={openEditCubeId}
+          onEditWca={openEditWca}
+          onEditQq={openEditQq}
+          onAuth={openAuth}
+          onMerge={openMerge}
+          onSoftDelete={handleSoftDelete}
+          onPurge={handlePurge}
+        />
       ),
     },
   ];
@@ -402,16 +635,36 @@ export function AdminUsersPageView() {
       <VStack align="stretch" gap="6">
         <Heading size="xl">用户管理</Heading>
 
-        <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
-          <Input.Search
-            placeholder="搜索用户名称"
-            value={searchName}
-            onChange={(e) => setSearchName(e.target.value)}
-            onSearch={handleSearch}
-            allowClear
-            enterButton
-            style={{ maxWidth: 400 }}
-          />
+        <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center", flex: 1 }}>
+            <Input.Search
+              placeholder="搜索名称、CubeID 或用户 ID"
+              value={searchName}
+              onChange={(e) => setSearchName(e.target.value)}
+              onSearch={handleSearch}
+              allowClear
+              enterButton
+              style={{ maxWidth: 360 }}
+            />
+            <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13 }}>
+              <Switch
+                checked={tableParams.includeDeleted ?? true}
+                onChange={(checked) =>
+                  setTableParams((prev) => ({ ...prev, page: 1, includeDeleted: checked }))
+                }
+              />
+              包含已删除
+            </label>
+            <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13 }}>
+              <Switch
+                checked={tableParams.onlyDeleted ?? false}
+                onChange={(checked) =>
+                  setTableParams((prev) => ({ ...prev, page: 1, onlyDeleted: checked }))
+                }
+              />
+              仅已删除
+            </label>
+          </div>
           <Button
             type="primary"
             icon={<UserAddOutlined />}
@@ -423,9 +676,10 @@ export function AdminUsersPageView() {
         </div>
 
         <Table<PlayersAPI.Player>
+          className="admin-users-table"
           columns={columns}
           dataSource={players}
-          rowKey="CubeID"
+          rowKey="id"
           loading={loading}
           rowClassName={rowClassNameWithStyleLines}
           scroll={{ x: "max-content" }}
@@ -507,6 +761,24 @@ export function AdminUsersPageView() {
               ]}
             >
               <Input placeholder="请输入 10 位 CubeID" maxLength={10} />
+            </Form.Item>
+          </Form>
+        </Modal>
+
+        <Modal
+          title={`修改用户 ${curUpdatePlayer?.Name} 的 QQ`}
+          open={updatePlayerQqModal}
+          onOk={() => void handleUpdateQQ()}
+          confirmLoading={confirmLoading}
+          onCancel={() => setUpdatePlayerQqModal(false)}
+          destroyOnHidden
+        >
+          <Form form={updateQqForm} layout="vertical" preserve={false}>
+            <Form.Item label="QQ" name="qq">
+              <Input placeholder="QQ 号" />
+            </Form.Item>
+            <Form.Item label="QQUniID" name="qq_uni_id">
+              <Input placeholder="QQ 唯一认证 ID" />
             </Form.Item>
           </Form>
         </Modal>

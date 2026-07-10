@@ -73,6 +73,8 @@ declare namespace PlayersAPI {
     page: number;
     size: number;
     name: string;
+    includeDeleted?: boolean;
+    onlyDeleted?: boolean;
   };
 
   export type PlayersResp = {
@@ -126,6 +128,18 @@ declare namespace PlayersAPI {
   export type UpdatePlayerCubeIDReq = {
     cube_id: string;
     new_cube_id: string;
+  }
+
+  export type UpdatePlayerQQReq = {
+    user_id?: number;
+    cube_id: string;
+    qq: string;
+    qq_uni_id: string;
+  }
+
+  export type AdminUserRefReq = {
+    user_id?: number;
+    cube_id?: string;
   }
 
   export type UpdatePlayerAuthReq = {

@@ -27,15 +27,25 @@ export async function apiAdminDeleteComp(compId: number): Promise<unknown> {
 export async function apiAdminPlayers(
   params: PlayersAPI.PlayersReq,
 ): Promise<PlayersAPI.PlayersResp> {
+  const like: Record<string, string> = {};
+  const search: Record<string, string> = {};
+  const q = params.name.trim();
+  if (q) {
+    if (/^\d+$/.test(q)) {
+      search.id = q;
+    }
+    like.name = q;
+    like.cube_id = q;
+  }
   const response = await Request.post<PlayersAPI.PlayersResp>(
     "/admin/users/",
     {
-      like: {
-        name: params.name,
-        cube_id: params.name,
-      },
+      like,
+      search,
       page: params.page,
       size: params.size,
+      include_deleted: params.includeDeleted ?? true,
+      only_deleted: params.onlyDeleted ?? false,
     },
     {
       headers: AuthHeader(),
@@ -52,6 +62,35 @@ export async function apiAdminCreatePlayer(params: PlayersAPI.CreatePlayerReq): 
       headers: AuthHeader(),
     },
   );
+  return response.data;
+}
+
+export async function apiAdminUpdatePlayerQQ(
+  params: PlayersAPI.UpdatePlayerQQReq,
+): Promise<unknown> {
+  const response = await Request.put<PlayersAPI.PlayersResp>(
+    "/admin/users/update_qq",
+    params,
+    { headers: AuthHeader() },
+  );
+  return response.data;
+}
+
+export async function apiAdminSoftDeleteUser(
+  params: PlayersAPI.AdminUserRefReq,
+): Promise<unknown> {
+  const response = await Request.post<unknown>("/admin/users/soft_delete", params, {
+    headers: AuthHeader(),
+  });
+  return response.data;
+}
+
+export async function apiAdminPurgeUser(
+  params: PlayersAPI.AdminUserRefReq,
+): Promise<unknown> {
+  const response = await Request.post<unknown>("/admin/users/purge", params, {
+    headers: AuthHeader(),
+  });
   return response.data;
 }
 
