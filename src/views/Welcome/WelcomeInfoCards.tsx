@@ -220,6 +220,12 @@ export function WelcomeView() {
             href: "/draw-tools/py-d",
             internal: true,
           },
+          {
+            title: t("home.welcome.draw.fto.title"),
+            desc: t("home.welcome.draw.fto.desc"),
+            href: "/draw-tools/fto-d",
+            internal: true,
+          },
         ]}
       />
 

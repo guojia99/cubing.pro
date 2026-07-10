@@ -22,4 +22,5 @@ export type PathSvg = {
   textPoint?: number[];
   textRouteResetPoint?: number[];
   disShow?: boolean;
+  defaultFill?: string;
 };

@@ -24,6 +24,7 @@ const zhCN = {
   "nav.tools.minx": "五魔方绘图",
   "nav.tools.sk": "Skewb 绘图",
   "nav.tools.py": "Pyraminx 绘图",
+  "nav.tools.fto": "FTO 绘图",
   "nav.tools.fr": "FR练习器",
   "nav.other": "生活",
   "nav.other.recipes": "菜谱",
@@ -359,6 +360,8 @@ const zhCN = {
   "home.welcome.draw.sk.desc": "绘制 Skewb 魔方",
   "home.welcome.draw.py.title": "Pyraminx 绘图工具",
   "home.welcome.draw.py.desc": "绘制金字塔",
+  "home.welcome.draw.fto.title": "FTO 绘图工具",
+  "home.welcome.draw.fto.desc": "绘制 FTO 魔方",
   "home.welcome.recipes.title": "吃吃喝喝",
   "home.welcome.recipes.desc":
     "基于 HowToCook 开源菜谱项目，收录数百道家常菜做法；厨房技能提供烹饪技巧与进阶知识。",

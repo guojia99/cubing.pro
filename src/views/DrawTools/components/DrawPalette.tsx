@@ -11,7 +11,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import html2canvas from "html2canvas";
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { BiSolidFileJpg, BiSolidFilePng } from "react-icons/bi";
 
 import { useI18n } from "@/contexts/I18nProvider";
@@ -62,7 +62,8 @@ function buildTransform(elem: PathSvg): string {
   return parts.join(" ");
 }
 
-function defaultColorForKey(key: string): string {
+function defaultColorForKey(key: string, defaultFill?: string): string {
+  if (defaultFill) return defaultFill;
   return key.includes("fonts") ? DRAW_FONT_COLOR : DRAW_NEUTRAL_STICKER;
 }
 
@@ -103,6 +104,15 @@ export function DrawPalette({
 
   const svgPointsKey = JSON.stringify(svgPoints);
 
+  const keyDefaults = useMemo(() => {
+    const defaults: Record<string, string> = {};
+    for (const elem of svgPoints) {
+      if (!elem.defaultFill) continue;
+      defaults[buildRenderKey(storageKey, elem.key, elem.disableDrawing)] = elem.defaultFill;
+    }
+    return defaults;
+  }, [svgPointsKey, storageKey]);
+
   useEffect(() => {
     const nextKeys: string[] = [];
     for (let i = 0; i < svgPoints.length; i++) {
@@ -115,9 +125,10 @@ export function DrawPalette({
     setColors((prevColors) => {
       let changed = false;
       const next = { ...prevColors };
-      for (const key of nextKeys) {
+      for (let i = 0; i < nextKeys.length; i++) {
+        const key = nextKeys[i];
         if (next[key] === undefined) {
-          next[key] = defaultColorForKey(key);
+          next[key] = defaultColorForKey(key, svgPoints[i]?.defaultFill);
           changed = true;
         }
       }
@@ -252,7 +263,7 @@ export function DrawPalette({
               {svgPoints.map((elem) => {
                 const key = buildRenderKey(storageKey, elem.key, elem.disableDrawing);
                 const transform = buildTransform(elem);
-                const fillColor = colors[key] ?? defaultColorForKey(key);
+                const fillColor = colors[key] ?? defaultColorForKey(key, elem.defaultFill);
 
                 let curStrokeWidth = strokeWidth * strokeWidthNum;
                 if (elem.disableStrokeWidth) {
@@ -384,6 +395,7 @@ export function DrawPalette({
             presetColors={presetColors}
             storageKey={storageKey}
             allKeys={keys}
+            keyDefaults={keyDefaults}
           />
         </Card.Body>
       </Card.Root>
