@@ -55,6 +55,17 @@ export async function apiAdminCreatePlayer(params: PlayersAPI.CreatePlayerReq): 
   return response.data;
 }
 
+export async function apiAdminUpdatePlayerCubeID(
+  params: PlayersAPI.UpdatePlayerCubeIDReq,
+): Promise<unknown> {
+  const response = await Request.put<PlayersAPI.PlayersResp>(
+    "/admin/users/update_cube_id",
+    params,
+    { headers: AuthHeader() },
+  );
+  return response.data;
+}
+
 export async function apiAdminUpdatePlayerName(
   params: PlayersAPI.UpdatePlayerNameWCAIDReq,
 ): Promise<unknown> {

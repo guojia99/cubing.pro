@@ -7,7 +7,7 @@ import { CountryList, getWcaCountryLabel } from '@/services/cubing-pro/wca/count
 import { GetEventRankTimers } from '@/services/cubing-pro/wca/static';
 import { Country, StaticWithTimerRank } from '@/services/cubing-pro/wca/types';
 import { Select, Table, Spin, Space, Card } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useIntlMessage } from '@/hooks/useIntlMessage';
 import './HistoricalRank.css';
 import './StatisticsRankLayout.css';
@@ -16,12 +16,20 @@ const WORLD_KEY = '__world__';
 const DEFAULT_PAGE_SIZE = 100;
 const PAGE_SIZE_OPTIONS = [20, 50, 100];
 
+/** 历史排名可选的最大月份：往年 12 月，今年截至当前月 */
+function getMaxSelectableMonth(year: number): number {
+  const now = new Date();
+  if (year < now.getFullYear()) return 12;
+  return now.getMonth() + 1;
+}
+
 const HistoricalRank: React.FC = () => {
   const intl = useIntlMessage();
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: currentYear - 2002 }, (_, i) => 2003 + i).reverse();
 
   const [year, setYear] = useState<number>(currentYear);
+  const [month, setMonth] = useState<number>(() => getMaxSelectableMonth(currentYear));
   const [country, setCountry] = useState<string>(WORLD_KEY);
   const [eventId, setEventId] = useState<string>('333');
   const [isAvg, setIsAvg] = useState<boolean>(false);
@@ -39,7 +47,7 @@ const HistoricalRank: React.FC = () => {
   useEffect(() => {
     setLoading(true);
     const countryParam = country === WORLD_KEY ? '' : country;
-    GetEventRankTimers(eventId, year, countryParam, isAvg, page, pageSize)
+    GetEventRankTimers(eventId, year, countryParam, isAvg, page, pageSize, month)
       .then((res) => {
         setData(res.data || []);
         setTotal(res.total || 0);
@@ -49,7 +57,7 @@ const HistoricalRank: React.FC = () => {
         setTotal(0);
       })
       .finally(() => setLoading(false));
-  }, [year, country, eventId, isAvg, page, pageSize]);
+  }, [year, month, country, eventId, isAvg, page, pageSize]);
 
   const isWorld = country === WORLD_KEY;
   const rankKey = isAvg ? 'avgWorldRank' : 'singleWorldRank';
@@ -142,6 +150,14 @@ const HistoricalRank: React.FC = () => {
     ...otherOptions,
   ];
 
+  const monthOptions = useMemo(() => {
+    const maxMonth = getMaxSelectableMonth(year);
+    return Array.from({ length: maxMonth }, (_, i) => ({
+      value: i + 1,
+      label: String(i + 1),
+    }));
+  }, [year]);
+
   return (
     <div className="historical-rank">
       {/*<Title level={3} className="page-title">*/}
@@ -155,8 +171,26 @@ const HistoricalRank: React.FC = () => {
           <Select
             size="small"
             value={year}
-            onChange={setYear}
+            onChange={(v) => {
+              setYear(v);
+              const maxMonth = getMaxSelectableMonth(v);
+              if (month > maxMonth) setMonth(maxMonth);
+              setPage(1);
+            }}
             options={years.map((y) => ({ value: y, label: String(y) }))}
+            className="filter-select"
+          />
+        </div>
+        <div className="filter-item">
+          <span className="filter-label">{intl.formatMessage({ id: 'wca.historicalRank.month' })}:</span>
+          <Select
+            size="small"
+            value={month}
+            onChange={(v) => {
+              setMonth(v);
+              setPage(1);
+            }}
+            options={monthOptions}
             className="filter-select"
           />
         </div>
