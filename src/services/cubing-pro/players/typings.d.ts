@@ -123,6 +123,11 @@ declare namespace PlayersAPI {
     wca_id: string;
   }
 
+  export type UpdatePlayerCubeIDReq = {
+    cube_id: string;
+    new_cube_id: string;
+  }
+
   export type UpdatePlayerAuthReq = {
     cube_id: string;
     set: boolean;

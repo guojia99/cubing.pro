@@ -27,6 +27,7 @@ import { Auth, hasAuth } from "@/lib/auth";
 import {
   apiAdminCreatePlayer,
   apiAdminPlayers,
+  apiAdminUpdatePlayerCubeID,
   apiAdminUpdatePlayerName,
   apiAdminUpdatePlayerWCAID,
   apiMergePlayers,
@@ -68,6 +69,9 @@ export function AdminUsersPageView() {
 
   const [updateWCAForm] = Form.useForm();
   const [updatePlayerWcaModal, setUpdatePlayerWcaModal] = useState(false);
+
+  const [updateCubeIdForm] = Form.useForm();
+  const [updatePlayerCubeIdModal, setUpdatePlayerCubeIdModal] = useState(false);
 
   const [mergePlayerForm] = Form.useForm();
   const [mergePlayerWcaModal, setMergePlayerWcaModal] = useState(false);
@@ -138,10 +142,33 @@ export function AdminUsersPageView() {
       updateNameForm.resetFields();
       setUpdatePlayerNameModal(false);
       void loadPlayers();
-    } catch (err) {
-      if (err instanceof Error) {
-        void message.error(err.message);
-      }
+    } catch (err: unknown) {
+      const ax = err as { response?: { data?: unknown } };
+      const text = getApiErrorDisplayMessage(ax.response?.data);
+      if (text) void message.error(text);
+      else if (err instanceof Error) void message.error(err.message);
+    } finally {
+      setConfirmLoading(false);
+    }
+  };
+
+  const handleUpdateCubeID = async () => {
+    try {
+      const values = await updateCubeIdForm.validateFields();
+      setConfirmLoading(true);
+      await apiAdminUpdatePlayerCubeID({
+        cube_id: curUpdatePlayer?.CubeID || "",
+        new_cube_id: values.new_cube_id,
+      });
+      void message.success("CubeID 修改成功");
+      updateCubeIdForm.resetFields();
+      setUpdatePlayerCubeIdModal(false);
+      void loadPlayers();
+    } catch (err: unknown) {
+      const ax = err as { response?: { data?: unknown } };
+      const text = getApiErrorDisplayMessage(ax.response?.data);
+      if (text) void message.error(text);
+      else if (err instanceof Error) void message.error(err.message);
     } finally {
       setConfirmLoading(false);
     }
@@ -304,7 +331,7 @@ export function AdminUsersPageView() {
     {
       title: "操作",
       key: "option",
-      width: 360,
+      width: 440,
       render: (_value, player) => (
         <>
           <Button
@@ -316,6 +343,18 @@ export function AdminUsersPageView() {
             }}
           >
             修改名称
+          </Button>
+          <Button
+            type="default"
+            size="small"
+            style={{ marginLeft: 8 }}
+            onClick={() => {
+              setCurUpdatePlayer(player);
+              updateCubeIdForm.setFieldsValue({ new_cube_id: player.CubeID });
+              setUpdatePlayerCubeIdModal(true);
+            }}
+          >
+            修改 CubeID
           </Button>
           <Button
             type="default"
@@ -443,6 +482,31 @@ export function AdminUsersPageView() {
               rules={[{ required: true, message: "请输入新名称" }]}
             >
               <Input placeholder="请输入新名称" />
+            </Form.Item>
+          </Form>
+        </Modal>
+
+        <Modal
+          title={`修改用户 ${curUpdatePlayer?.Name} 的 CubeID`}
+          open={updatePlayerCubeIdModal}
+          onOk={() => void handleUpdateCubeID()}
+          confirmLoading={confirmLoading}
+          onCancel={() => setUpdatePlayerCubeIdModal(false)}
+          destroyOnHidden
+        >
+          <Form form={updateCubeIdForm} layout="vertical" preserve={false}>
+            <Form.Item label="当前 CubeID">
+              <Input value={curUpdatePlayer?.CubeID} disabled />
+            </Form.Item>
+            <Form.Item
+              label="新 CubeID"
+              name="new_cube_id"
+              rules={[
+                { required: true, message: "请输入新 CubeID" },
+                { len: 10, message: "CubeID 长度须为 10" },
+              ]}
+            >
+              <Input placeholder="请输入 10 位 CubeID" maxLength={10} />
             </Form.Item>
           </Form>
         </Modal>

@@ -2,6 +2,9 @@ import axios, { type AxiosError, type AxiosResponse } from "axios";
 
 import { siteMeta } from "@/config/defaultSettings";
 
+/** 本地 Go 后端（监听 0.0.0.0:20000；浏览器用 127.0.0.1 访问） */
+export const LOCAL_DEV_API_BASE = "http://127.0.0.1:20000/v3/cube-api";
+
 /** 线上 API 根地址 */
 export const REMOTE_API_BASE =
   process.env.NEXT_PUBLIC_API_BASE ??
@@ -22,7 +25,7 @@ function isCubingProHost(hostname: string) {
 
 /**
  * - next dev（localhost）：优先直连完整 API URL（避免 trailingSlash 代理丢失尾斜杠导致 404）
- *   本地 Go 后端可在 `.env.local` 设置 `NEXT_PUBLIC_DEV_API_BASE=http://127.0.0.1:20000/v3/cube-api`
+ *   本地 Go 后端可在 `.env.local` 设置 `NEXT_PUBLIC_DEV_API_BASE`，或执行 `make dev`
  * - 静态站点部署在 cubing.pro：同源 /v3/cube-api
  * - 其他静态预览 / CDN：NEXT_PUBLIC_API_BASE 完整 URL
  */

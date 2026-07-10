@@ -16,6 +16,7 @@ export async function GetEventRankTimers(
   is_avg: boolean,
   page: number,
   size: number,
+  month: number = 0,
 ): Promise<{
   data: StaticWithTimerRank[];
   total: number;
@@ -27,6 +28,7 @@ export async function GetEventRankTimers(
     `/wca/ranks/historical/full/${eventID}`,
     {
       year: year,
+      month,
       country: country,
       is_avg: is_avg,
       page: page,
