@@ -27,6 +27,7 @@ export interface ColorPaletteProps {
   presetColors?: string[];
   storageKey?: string;
   allKeys?: string[];
+  keyDefaults?: Record<string, string>;
 }
 
 export function ColorPalette({
@@ -36,6 +37,7 @@ export function ColorPalette({
   presetColors = [],
   storageKey = "color-history",
   allKeys = [],
+  keyDefaults = {},
 }: ColorPaletteProps) {
   const { t } = useI18n();
   const [historyColors, setHistoryColors] = useState<string[]>([]);
@@ -43,13 +45,16 @@ export function ColorPalette({
 
   const resetColors = useCallback(() => {
     for (let i = 0; i < allKeys.length; i++) {
-      if (allKeys[i].includes("fonts")) {
-        onSelectColor(allKeys[i], DRAW_FONT_COLOR);
+      const key = allKeys[i];
+      if (keyDefaults[key]) {
+        onSelectColor(key, keyDefaults[key]);
+      } else if (key.includes("fonts")) {
+        onSelectColor(key, DRAW_FONT_COLOR);
       } else {
-        onSelectColor(allKeys[i], DRAW_NEUTRAL_STICKER);
+        onSelectColor(key, DRAW_NEUTRAL_STICKER);
       }
     }
-  }, [allKeys, onSelectColor]);
+  }, [allKeys, keyDefaults, onSelectColor]);
 
   useEffect(() => {
     try {

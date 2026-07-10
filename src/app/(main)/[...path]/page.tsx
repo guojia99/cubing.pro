@@ -25,6 +25,7 @@ import { OrganizersGroupPageView } from "@/views/admin/OrganizersGroupPageView";
 import { OrganizersHomePageView } from "@/views/admin/OrganizersHomePageView";
 import { OrganizersListPageView } from "@/views/admin/OrganizersListPageView";
 import { OrganizersResultsPageView } from "@/views/admin/OrganizersResultsPageView";
+import { FtoDrawView } from "@/views/DrawTools/FtoDrawView";
 import { MinxDrawView } from "@/views/DrawTools/MinxDrawView";
 import { PyDrawView } from "@/views/DrawTools/PyDrawView";
 import { SkDrawView } from "@/views/DrawTools/SkDrawView";
@@ -124,6 +125,8 @@ function CatchAllContent({ routeId, path }: { routeId: string; path: string[] })
       return <SkDrawView />;
     case "draw-py":
       return <PyDrawView />;
+    case "draw-fto":
+      return <FtoDrawView />;
     case "tool-fr":
       return <FloppyReductionView />;
     case "tool-team-match":

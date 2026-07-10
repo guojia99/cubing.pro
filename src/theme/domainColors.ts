@@ -76,6 +76,22 @@ export const SQ1_STICKER_PALETTE = [
   DRAW_NEUTRAL_STICKER,
 ] as const;
 
+/** FTO sticker palette */
+export const FTO_STICKER_PALETTE = [
+  DRAW_TRANSPARENT,
+  "#ffffff",
+  "#deff26",
+  "#0fcc09",
+  "#2997fd",
+  "#d80f0f",
+  "#8830e3",
+  "#ff9900",
+  "#666666",
+  "#3d3d3d",
+  "#f5f3db",
+  DRAW_NEUTRAL_STICKER,
+] as const;
+
 /** Megaminx sticker palette */
 export const MEGAMINX_STICKER_PALETTE = [
   DRAW_TRANSPARENT,
