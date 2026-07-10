@@ -1,0 +1,71 @@
+/* 用户管理：右侧固定操作列纯白底，避免横向滚动时透出后方列 */
+.ant-table-wrapper.admin-users-table .admin-users-action-col,
+.ant-table-wrapper.admin-users-table .ant-table-cell-fix-end,
+.ant-table-wrapper.admin-users-table .ant-table-cell-fix-right {
+  background: #fff !important;
+  background-color: #fff !important;
+  background-image: none !important;
+  z-index: 3 !important;
+}
+
+.ant-table-wrapper.admin-users-table .ant-table-thead .admin-users-action-col,
+.ant-table-wrapper.admin-users-table .ant-table-thead .ant-table-cell-fix-end,
+.ant-table-wrapper.admin-users-table .ant-table-thead .ant-table-cell-fix-right,
+.ant-table-wrapper.admin-users-table .ant-table-sticky-holder .admin-users-action-col,
+.ant-table-wrapper.admin-users-table .ant-table-sticky-holder .ant-table-cell-fix-end,
+.ant-table-wrapper.admin-users-table .ant-table-sticky-holder .ant-table-cell-fix-right {
+  background: #fff !important;
+  background-color: #fff !important;
+  background-image: none !important;
+  z-index: 4 !important;
+}
+
+.ant-table-wrapper.admin-users-table tr.lightitem > td.admin-users-action-col,
+.ant-table-wrapper.admin-users-table tr.darkitem > td.admin-users-action-col,
+.ant-table-wrapper.admin-users-table tr.lightitem > td.ant-table-cell-fix-end,
+.ant-table-wrapper.admin-users-table tr.darkitem > td.ant-table-cell-fix-end,
+.ant-table-wrapper.admin-users-table tr.lightitem > td.ant-table-cell-fix-right,
+.ant-table-wrapper.admin-users-table tr.darkitem > td.ant-table-cell-fix-right {
+  background: #fff !important;
+  background-color: #fff !important;
+  background-image: none !important;
+}
+
+.ant-table-wrapper.admin-users-table .ant-table-tbody > tr:hover > td.admin-users-action-col,
+.ant-table-wrapper.admin-users-table .ant-table-tbody > tr:hover > td.ant-table-cell-fix-end,
+.ant-table-wrapper.admin-users-table .ant-table-tbody > tr:hover > td.ant-table-cell-fix-right,
+.ant-table-wrapper.admin-users-table .ant-table-tbody > tr.ant-table-row-hover > td.admin-users-action-col,
+.ant-table-wrapper.admin-users-table .ant-table-tbody > tr.ant-table-row-hover > td.ant-table-cell-fix-end,
+.ant-table-wrapper.admin-users-table .ant-table-tbody > tr.ant-table-row-hover > td.ant-table-cell-fix-right {
+  background: #fff !important;
+  background-color: #fff !important;
+  background-image: none !important;
+}
+
+/* 固定列左侧阴影缝：用白底盖住滚动内容 */
+.ant-table-wrapper.admin-users-table .ant-table-cell-fix-end-shadow::after,
+.ant-table-wrapper.admin-users-table .ant-table-cell-fix-end-shadow-show::after,
+.ant-table-wrapper.admin-users-table .ant-table-cell-fix-right-shadow::after,
+.ant-table-wrapper.admin-users-table .ant-table-cell-fix-right-shadow-show::after {
+  box-shadow: none !important;
+  background: #fff !important;
+  background-color: #fff !important;
+  opacity: 1 !important;
+}
+
+.admin-user-row-actions {
+  line-height: 1.2;
+}
+
+.admin-user-row-actions .admin-user-action-btn {
+  padding: 0 6px;
+  height: 24px;
+  font-size: 13px;
+}
+
+.admin-user-action-divider {
+  margin: 0;
+  height: 0.9em;
+  top: 0;
+  border-color: var(--ant-color-border-secondary, rgba(0, 0, 0, 0.12));
+}
