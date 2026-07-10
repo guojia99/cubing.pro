@@ -12,8 +12,6 @@ dev:
 	CUBE_API_UPSTREAM=$(LOCAL_DEV_API_BASE) \
 	npm run dev
 
-# 静态导出到 dist/
-# HowToCook 在 /tmp 缓存后同步到 public/（镜像 + git lfs），见 scripts/sync-howtocook.mjs
-# 可覆盖：HOWTOCOOK_CACHE_DIR、HOWTOCOOK_MIRRORS、SKIP_HOWTOCOOK_SYNC=1
+# 静态导出到 dist/（HowToCook：/tmp 缓存 + git clone，见 scripts/sync-howtocook.mjs）
 build:
 	npm run build:static
