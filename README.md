@@ -33,4 +33,4 @@ npm run dev
 
 ## API 代理
 
-开发环境将 `/v3/cube-api/*` 代理到 `http://localhost:20000`（见 `next.config.ts`）。
+开发环境默认将 `/v3/cube-api/*` 代理到线上 `https://cubing.pro/v3/cube-api`（见 `next.config.ts`）。
