@@ -96,7 +96,7 @@ const WCAPlayerDetails: React.FC<WCAPlayerDetailsProps> = ({ wcaProfile, wcaResu
           </a>
           <a href={`https://cubing.com/results/person/${wcaProfile.wcaId}`} target="_blank" rel="noopener noreferrer">
             <Image
-              src=" https://cubing.com/f/images/icon196.png"
+              src="https://cubing.com/images/logo.png"
               alt="Cubing China Logo"
               width={16}
               height={16}
