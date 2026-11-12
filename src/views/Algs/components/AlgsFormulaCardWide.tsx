@@ -1,17 +1,16 @@
 "use client";
 
-import { Box, Card, Text, Flex } from "@chakra-ui/react";
-import { useEffect, useMemo, useState } from "react";
+import { Box, Card, Text } from "@chakra-ui/react";
+import { useMemo } from "react";
 import type { AlgItem } from "@/services/cubing-pro/algs/algs";
 import { getCustomAlgs } from "@/services/cubing-pro/algs/customAlgs";
-import { getAlgsSelection, buildAlgsKey, type AlgsSelectionValue } from "../utils/storage";
+import { getAlgsSelection, buildAlgsKey } from "../utils/storage";
 import { getFormulaFontFamilyCSSValue, type FormulaFontFamilyId } from "../utils/formulaFontFamily";
 import { getAlgDisplayName } from "../utils/algDisplayName";
 import { useI18n } from "@/contexts/I18nProvider";
 import AlgsCubeDiagram from "./AlgsCubeDiagram";
-import FormulaNameTag from "./FormulaNameTag";
-import { SET_CARD_COLORS } from "../utils/constants";
 import { getDiagramDimensions } from "../utils/diagramDisplay";
+import "../styles/algsDetail.css";
 
 const MAX_ALT = 3;
 const ALT_FORMULA_FONT_OFFSET = 2;
@@ -29,6 +28,7 @@ interface AlgsFormulaCardWideProps {
   diagramSize?: number;
   hideFormulaDiagram?: boolean;
   hideAltFormulas?: boolean;
+  refreshVersion?: number;
   onOpenModal: () => void;
 }
 
@@ -38,29 +38,26 @@ export default function AlgsFormulaCardWide({
   setName,
   groupName,
   alg,
-  setColorIndex = 0,
   formulaFontSize = 14,
   formulaFontFamily,
   useVisualCube = true,
   diagramSize = 160,
   hideFormulaDiagram = false,
   hideAltFormulas = false,
+  refreshVersion = 0,
   onOpenModal,
 }: AlgsFormulaCardWideProps) {
   const { locale } = useI18n();
   const storageKey = buildAlgsKey(cube, classId, setName, groupName, alg.name);
-  const [selection, setSelectionState] = useState<AlgsSelectionValue | null>(() =>
-    getAlgsSelection(storageKey),
-  );
-
-  useEffect(() => {
-    setSelectionState(getAlgsSelection(storageKey));
-  }, [storageKey]);
+  const selection = getAlgsSelection(storageKey);
 
   const activeSource = selection?.source ?? "library";
   const selectedIdx = selection?.index ?? 0;
   const libraryFormulas = alg.algs;
-  const customFormulas = useMemo(() => getCustomAlgs(storageKey), [storageKey]);
+  const customFormulas = useMemo(() => {
+    void refreshVersion;
+    return getCustomAlgs(storageKey);
+  }, [storageKey, refreshVersion]);
   const formulas = activeSource === "custom" ? customFormulas : libraryFormulas;
 
   const displayScramble = useMemo(() => {
@@ -83,44 +80,29 @@ export default function AlgsFormulaCardWide({
     return [selected, ...alts];
   }, [formulas, selectedIdx, hideAltFormulas]);
 
-  const colors = SET_CARD_COLORS[setColorIndex % SET_CARD_COLORS.length];
   const fontCss = getFormulaFontFamilyCSSValue(formulaFontFamily);
   const displayName = getAlgDisplayName(alg, locale);
-  const diagramDims = getDiagramDimensions(diagramSize, "wide");
+  const diagramDims = getDiagramDimensions(diagramSize, "square");
 
   return (
     <Card.Root
+      className={`algs-formula-card algs-formula-card--wide${hideFormulaDiagram ? " algs-formula-card--no-diagram" : ""}`}
       position="relative"
       variant="outline"
-      borderRadius="xl"
-      bg={colors.bg}
-      borderColor={colors.border}
+      borderRadius="lg"
+      bg="bg.elevated"
+      borderColor="border"
     >
-      <FormulaNameTag name={displayName} />
-      <Card.Body pt={10} px={3} pb={3}>
-        <Flex align="stretch" gap={4} minW={0}>
+      <Card.Body className="algs-formula-wide-body">
           <button
             type="button"
             onClick={onOpenModal}
-            style={{
-              flex: hideFormulaDiagram ? "0 0 auto" : "0 0 33%",
-              maxWidth: hideFormulaDiagram ? "28%" : "33%",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
-              background: "transparent",
-              border: "none",
-              cursor: "pointer",
-              color: "inherit",
-              textAlign: "center",
-              padding: 0,
-              minWidth: 0,
-            }}
+            className="algs-formula-wide-preview"
+            aria-label={displayName}
           >
+            <Text className="algs-formula-card-title" title={displayName} fontSize="xs" fontWeight="semibold" color="accent">{displayName} <span aria-hidden="true">↗</span></Text>
             {!hideFormulaDiagram && (
-              <Box w="100%">
+              <Box className="algs-formula-card-diagram">
                 <AlgsCubeDiagram
                   cube={cube}
                   classId={classId}
@@ -137,24 +119,25 @@ export default function AlgsFormulaCardWide({
             )}
           </button>
 
-          <Flex flex={1} minW={0} direction="column" justify="center" gap={1.5}>
+          <Box className="algs-formula-wide-formulas">
             {formulaRows.map((row, i) => (
               <Text
                 key={row.isSel ? "selected" : `alt-${i}`}
                 fontFamily={fontCss}
+                className="algs-formula-card-formula"
+                title={row.text}
                 fontSize={`${row.isSel ? formulaFontSize : Math.max(8, formulaFontSize - ALT_FORMULA_FONT_OFFSET)}px`}
                 lineHeight={1.45}
                 fontWeight={row.isSel ? "semibold" : "normal"}
                 color={row.isSel ? "accent" : "fg.muted"}
-                wordBreak="break-all"
+                overflowWrap="anywhere"
                 whiteSpace="normal"
                 userSelect="text"
               >
-                {row.text}
+                <span>{row.text}</span>
               </Text>
             ))}
-          </Flex>
-        </Flex>
+          </Box>
       </Card.Body>
     </Card.Root>
   );

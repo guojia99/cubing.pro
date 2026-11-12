@@ -33,7 +33,7 @@ export default function UsageInstructionsModal({
               {t("algs.usageInstructions.title")}
             </Dialog.Title>
             <Dialog.CloseTrigger asChild>
-              <CloseButton size="sm" />
+              <CloseButton size="sm" color="signal.destructive" borderRadius="4px" />
             </Dialog.CloseTrigger>
           </Dialog.Header>
           <Dialog.Body pb={4}>

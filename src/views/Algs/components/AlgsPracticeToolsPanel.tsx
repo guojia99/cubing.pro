@@ -43,16 +43,18 @@ export default function AlgsPracticeToolsPanel({
     <Card.Root
       size="sm"
       className="algs-practice-tools-panel"
-      mb={4}
-      borderRadius="xl"
+      borderRadius="12px"
       variant="outline"
+      bg="bg.elevated"
+      borderColor="border"
+      minW={0}
     >
-      <Card.Header py={3} px={4}>
-        <Card.Title fontSize="sm" fontWeight="semibold">
+      <Card.Header pt="12px" pb="8px" px="12px">
+        <Card.Title fontSize="12px" lineHeight="18px" fontWeight="semibold">
           {t("algs.detail.practiceTools")}
         </Card.Title>
       </Card.Header>
-      <Card.Body pt={2} px={4} pb={4}>
+      <Card.Body pt={0} px="10px" pb="10px">
         <div
           className={`algs-practice-tools-grid${showRandomPick ? "" : " algs-practice-tools-grid--no-random"}`}
         >

@@ -13,7 +13,7 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useI18n } from "@/contexts/I18nProvider";
 import { useReleaseOverlayOnUnmount } from "@/lib/overlayCleanup";
@@ -31,7 +31,6 @@ import {
 import { buildFormulaKey } from "@/services/cubing-pro/algs/formulaPracticeSelection";
 
 import AlgsCubeDiagram from "./AlgsCubeDiagram";
-import ProficiencySelect from "./ProficiencySelect";
 import {
   buildAlgsKey,
   getAlgsSelection,
@@ -64,6 +63,7 @@ interface AlgsModalProps {
   formulaFontFamily?: FormulaFontFamilyId;
   diagramSize?: number;
   hideFormulaDiagram?: boolean;
+  onChanged?: () => void;
 }
 
 export default function AlgsModal({
@@ -78,8 +78,19 @@ export default function AlgsModal({
   formulaFontFamily,
   diagramSize = 180,
   hideFormulaDiagram = false,
+  onChanged,
 }: AlgsModalProps) {
   const { t, locale } = useI18n();
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open || !window.visualViewport) return;
+    const viewport = window.visualViewport;
+    const resize = () => modalRef.current?.style.setProperty("--algs-dialog-viewport-height", `${viewport.height}px`);
+    resize();
+    viewport.addEventListener("resize", resize);
+    return () => viewport.removeEventListener("resize", resize);
+  }, [open]);
 
   const item = items[currentIndex];
   const alg = item?.alg;
@@ -113,9 +124,10 @@ export default function AlgsModal({
       setTab("library");
     }
     setCustomFormulas(getCustomAlgs(storageKey));
+    setCustomInput("");
     if (formulaKey) {
       const map = getFormulaProficiency(cube, classId);
-      setProficiencyState(map[formulaKey] ?? 0);
+      setProficiencyState(map[formulaKey] ?? DEFAULT_PROFICIENCY);
     }
   }, [storageKey, formulaKey, cube, classId]);
 
@@ -154,13 +166,14 @@ export default function AlgsModal({
   }, [tab, selection, scrambleList]);
 
   const handleSelectFormula = useCallback(
-    (index: number) => {
+    (index: number, source: "library" | "custom" = tab) => {
       if (!storageKey) return;
-      const value: AlgsSelectionValue = { source: tab, index };
+      const value: AlgsSelectionValue = { source, index };
       setAlgsSelection(storageKey, value);
       setSelection(value);
+      onChanged?.();
     },
-    [storageKey, tab],
+    [storageKey, tab, onChanged],
   );
 
   const handleAddCustom = useCallback(() => {
@@ -176,7 +189,8 @@ export default function AlgsModal({
     setAlgsSelection(storageKey, newSel);
     setSelection(newSel);
     setCustomInput("");
-  }, [customInput, customFormulas, storageKey]);
+    onChanged?.();
+  }, [customInput, customFormulas, storageKey, onChanged]);
 
   const handleRemoveCustom = useCallback(
     (index: number) => {
@@ -191,17 +205,20 @@ export default function AlgsModal({
           setAlgsSelection(storageKey, fallback);
           setSelection(fallback);
           setTab("library");
-        } else if (selection.index >= updated.length) {
+        } else {
           const newSel: AlgsSelectionValue = {
             source: "custom",
-            index: updated.length - 1,
+            index: selection.index > index
+              ? selection.index - 1
+              : Math.min(selection.index, updated.length - 1),
           };
           setAlgsSelection(storageKey, newSel);
           setSelection(newSel);
         }
       }
+      onChanged?.();
     },
-    [storageKey, customFormulas, selection],
+    [storageKey, customFormulas, selection, onChanged],
   );
 
   const handleProficiencyChange = useCallback(
@@ -209,8 +226,9 @@ export default function AlgsModal({
       if (!formulaKey) return;
       setFormulaProficiency(cube, classId, formulaKey, level);
       setProficiencyState(level);
+      onChanged?.();
     },
-    [cube, classId, formulaKey],
+    [cube, classId, formulaKey, onChanged],
   );
 
   const handlePrev = useCallback(() => {
@@ -241,12 +259,11 @@ export default function AlgsModal({
       placement="center"
     >
       <Dialog.Backdrop />
-      <Dialog.Positioner>
+      <Dialog.Positioner className="algs-formula-detail-positioner">
         <Dialog.Content
+          ref={modalRef}
           className="algs-formula-detail-modal"
-          borderRadius="2xl"
-          maxH="1080px"
-          maxW="700px"
+          borderRadius="12px"
           w="full"
           display="flex"
           flexDirection="column"
@@ -256,31 +273,36 @@ export default function AlgsModal({
             display="flex"
             justifyContent="space-between"
             alignItems="center"
+            gap={2}
             borderBottomWidth="1px"
             borderColor="border"
             px={4}
-            py={3}
+            py="10px"
           >
-            <Dialog.Title fontSize="md" fontWeight="bold" truncate>
+            <Dialog.Title fontSize="15px" lineHeight={1.5} fontWeight="semibold" minW={0} overflowWrap="anywhere">
               {alg ? getAlgDisplayName(alg, locale) : ""}
             </Dialog.Title>
             <Dialog.CloseTrigger asChild>
-              <CloseButton size="sm" />
+              <CloseButton className="algs-formula-detail-modal__close" size="sm" flexShrink={0}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18" /></svg>
+              </CloseButton>
             </Dialog.CloseTrigger>
           </Dialog.Header>
 
           <Dialog.Body
             className="algs-formula-detail-modal__body"
             px={4}
-            py={4}
+            py={3}
             flex="1"
             minH={0}
-            overflow="hidden"
+            overflowY="auto"
             display="flex"
             flexDirection="column"
           >
             {!alg ? null : (
-              <VStack gap={4} align="stretch" flex="1" minH={0}>
+              <Box className="algs-formula-detail-modal__layout">
+                <VStack className="algs-formula-detail-modal__preview" gap={3} align="stretch" minW={0}>
+                <Text fontSize="11px" color="fg.muted" overflowWrap="anywhere">{setName} · {groupName}</Text>
                 {!hideFormulaDiagram && (
                   <Box flexShrink={0} display="flex" justifyContent="center">
                     <AlgsCubeDiagram
@@ -302,13 +324,13 @@ export default function AlgsModal({
                   <Box
                     flexShrink={0}
                     bg="bg.muted"
-                    borderRadius="lg"
-                    px={3}
+                    borderRadius="8px"
+                    px="10px"
                     py={2}
                     borderWidth="1px"
                     borderColor="border"
                   >
-                    <Text fontSize="xs" color="fg.muted" mb={1}>
+                    <Text fontSize="11px" color="fg.muted" mb={1}>
                       Scramble
                     </Text>
                     <Text
@@ -322,23 +344,40 @@ export default function AlgsModal({
                   </Box>
                 )}
 
+                <Box bg="accent.soft" borderRadius="8px" p="10px" fontFamily={fontCss} fontSize="md" overflowWrap="anywhere" fontWeight="semibold">{displayFormula}</Box>
+                <Box>
+                  <Text fontSize="11px" color="fg.muted" mb={1.5}>{t("algs.proficiency")}</Text>
+                  <HStack gap={1} flexWrap="wrap" role="group" aria-label={t("algs.proficiency")}>
+                    {(["unknown", "unskilled", "average", "skilled", "mastered"] as const).map((level) => (
+                      <Button key={level} size="xs" fontSize="12px" borderRadius="8px" colorPalette="brand" aria-pressed={proficiency === level}
+                        variant={proficiency === level ? "solid" : "outline"}
+                        onClick={() => handleProficiencyChange(level)}>
+                        {t(`algs.formulaPractice.proficiency.${level}`)}
+                      </Button>
+                    ))}
+                  </HStack>
+                </Box>
+                </VStack>
+                <VStack gap={3} align="stretch" minW={0}>
+
                 <Box flexShrink={0}>
                 <SegmentGroup.Root
                   value={tab}
                   onValueChange={(e) => {
-                    const v = e.value as "library" | "custom";
+                    if (e.value !== "library" && e.value !== "custom") return;
+                    const v = e.value;
                     setTab(v);
                     if (v === "library") {
                       handleSelectFormula(
                         selection?.source === "library"
                           ? selection.index
-                          : 0,
+                          : 0, v,
                       );
                     } else if (customFormulas.length > 0) {
                       handleSelectFormula(
                         selection?.source === "custom"
                           ? Math.min(selection.index, customFormulas.length - 1)
-                          : 0,
+                          : 0, v,
                       );
                     }
                   }}
@@ -348,7 +387,7 @@ export default function AlgsModal({
                   p="1"
                   gap="0"
                   bg="segment.track"
-                  borderRadius="lg"
+                  borderRadius="8px"
                   borderWidth="1px"
                   borderColor="border"
                 >
@@ -363,9 +402,10 @@ export default function AlgsModal({
                     justifyContent="center"
                     cursor="pointer"
                     borderRadius="md"
-                    px={4}
-                    py={1.5}
-                    fontSize="sm"
+                    px={3}
+                    py={1}
+                    minH="32px"
+                    fontSize="12px"
                     fontWeight="medium"
                     color="segment.fg"
                     transition="color 0.15s"
@@ -382,9 +422,10 @@ export default function AlgsModal({
                     justifyContent="center"
                     cursor="pointer"
                     borderRadius="md"
-                    px={4}
-                    py={1.5}
-                    fontSize="sm"
+                    px={3}
+                    py={1}
+                    minH="32px"
+                    fontSize="12px"
                     fontWeight="medium"
                     color="segment.fg"
                     transition="color 0.15s"
@@ -403,15 +444,20 @@ export default function AlgsModal({
                     <Input
                       placeholder="R U R' U'"
                       value={customInput}
+                      aria-label={t("algs.custom")}
                       onChange={(e) => setCustomInput(e.target.value)}
                       onKeyDown={(e) => {
-                        if (e.key === "Enter") handleAddCustom();
+                        if (e.key === "Enter" && !e.nativeEvent.isComposing) handleAddCustom();
                       }}
                       size="sm"
+                      fontSize="sm"
+                      borderRadius="8px"
                       flex={1}
                     />
                     <Button
                       size="sm"
+                      fontSize="12px"
+                      borderRadius="8px"
                       colorPalette="brand"
                       onClick={handleAddCustom}
                       disabled={!customInput.trim()}
@@ -430,23 +476,22 @@ export default function AlgsModal({
                 >
                 <VStack gap={1.5} align="stretch">
                   {activeFormulas.length === 0 && (
-                    <Text fontSize="sm" color="fg.muted" textAlign="center" py={3}>
+                    <Text fontSize="12px" color="fg.muted" textAlign="center" py={3}>
                       {tab === "custom"
                         ? t("algs.noData")
                         : t("algs.noData")}
                     </Text>
                   )}
                   {activeFormulas.map((formula, idx) => {
-                    const isActive =
-                      selection?.source === tab && selection.index === idx;
+                    const isActive = (selection?.source ?? "library") === tab && (selection?.index ?? 0) === idx;
                     return (
                       <HStack
                         key={`${tab}-${idx}`}
                         gap={2}
-                        px={3}
-                        py={2}
-                        borderRadius="lg"
-                        borderWidth="1.5px"
+                        px="10px"
+                        py={1.5}
+                        borderRadius="8px"
+                        borderWidth="1px"
                         borderColor={
                           isActive ? "formula.selected.border" : "border"
                         }
@@ -459,14 +504,19 @@ export default function AlgsModal({
                             : "brand.500",
                           bg: isActive ? "formula.selected.bg" : "bg.muted",
                         }}
-                        onClick={() => handleSelectFormula(idx)}
                       >
                         <Box
+                          as="button"
+                          onClick={() => handleSelectFormula(idx)}
+                          aria-pressed={isActive}
+                          textAlign="left"
+                          minW={0}
+                          p={1}
                           flex={1}
                           fontFamily={fontCss}
                           fontSize="sm"
                           lineHeight={1.5}
-                          wordBreak="break-all"
+                          overflowWrap="anywhere"
                           fontWeight={isActive ? "bold" : "normal"}
                           color={isActive ? "formula.selected.fg" : "fg"}
                         >
@@ -494,22 +544,8 @@ export default function AlgsModal({
                 </VStack>
                 </Box>
 
-                <Box
-                  flexShrink={0}
-                  borderTopWidth="1px"
-                  borderColor="border"
-                  pt={3}
-                >
-                  <Text fontSize="xs" color="fg.muted" mb={2}>
-                    {t("algs.proficiency")}
-                  </Text>
-                  <ProficiencySelect
-                    value={proficiency}
-                    onChange={handleProficiencyChange}
-                    size="sm"
-                  />
-                </Box>
-              </VStack>
+                </VStack>
+              </Box>
             )}
           </Dialog.Body>
 
@@ -518,13 +554,15 @@ export default function AlgsModal({
             borderTopWidth="1px"
             borderColor="border"
             px={4}
-            py={3}
+            py="10px"
             display="flex"
             justifyContent="space-between"
             alignItems="center"
           >
             <Button
               size="sm"
+              fontSize="12px"
+              borderRadius="8px"
               variant="ghost"
               onClick={handlePrev}
               disabled={!hasPrev}
@@ -533,12 +571,14 @@ export default function AlgsModal({
               &larr; Prev
             </Button>
 
-            <Text fontSize="xs" color="fg.muted">
-              {currentIndex + 1} / {items.length}
+            <Text fontSize="11px" color="fg.muted">
+              {items.length ? currentIndex + 1 : 0} / {items.length}
             </Text>
 
             <Button
               size="sm"
+              fontSize="12px"
+              borderRadius="8px"
               variant="ghost"
               onClick={handleNext}
               disabled={!hasNext}

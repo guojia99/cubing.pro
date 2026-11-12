@@ -39,7 +39,12 @@ export function getFormulaPracticeSelection(
             selectedFormulas: Array.isArray(data.selectedFormulas) ? data.selectedFormulas : [],
           };
           saveFormulaPracticeSelection(cube, classId, migrated);
-          localStorage.removeItem(getLegacyStorageKey(cube, classId));
+          if (localStorage.getItem(getStorageKey(cube, classId)) !== JSON.stringify(migrated)) {
+            throw new Error('Selection migration verification failed');
+          }
+          if (localStorage.getItem(getLegacyStorageKey(cube, classId)) === raw) {
+            localStorage.removeItem(getLegacyStorageKey(cube, classId));
+          }
           return migrated;
         }
       }
@@ -62,9 +67,5 @@ export function saveFormulaPracticeSelection(
   classId: string,
   selection: FormulaPracticeSelection,
 ): void {
-  try {
-    localStorage.setItem(getStorageKey(cube, classId), JSON.stringify(selection));
-  } catch {
-    // ignore
-  }
+  localStorage.setItem(getStorageKey(cube, classId), JSON.stringify(selection));
 }

@@ -477,7 +477,7 @@ export default function BatchCustomFormulaModal({
               {modalTitle}
             </Dialog.Title>
             <Dialog.CloseTrigger asChild>
-              <CloseButton size="sm" />
+              <CloseButton size="sm" color="signal.destructive" borderRadius="4px" />
             </Dialog.CloseTrigger>
           </Dialog.Header>
           <Dialog.Body pt={2} pb={4}>
