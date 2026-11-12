@@ -14,6 +14,7 @@ import {
   GridItem,
   Heading,
   HStack,
+  Input,
   Separator,
   SimpleGrid,
   Skeleton,
@@ -22,7 +23,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 
 import { useI18n } from "@/contexts/I18nProvider";
 import {
@@ -44,6 +45,7 @@ import AlgsFloatButtons from "./components/AlgsFloatButtons";
 import AlgsPageSettingsPanel from "./components/AlgsPageSettingsPanel";
 import AlgsModal from "./components/AlgsModal";
 import AlgsPracticeToolsPanel from "./components/AlgsPracticeToolsPanel";
+import AlgsResizablePanels from "./components/AlgsResizablePanels";
 import FormulaRandomPickModal from "./components/FormulaRandomPickModal";
 import FormulaPracticeModal from "./components/FormulaPracticeModal";
 import BatchCustomFormulaModal from "./components/BatchCustomFormulaModal";
@@ -75,8 +77,10 @@ import {
 } from "./utils/formulaFontFamily";
 import { useReleaseOverlayOnUnmount } from "@/lib/overlayCleanup";
 import { isVisualCubeCube } from "./utils/visualCubeCube";
-import { SET_CARD_COLORS } from "./utils/constants";
 import { getAlgDisplayName } from "./utils/algDisplayName";
+import { getCustomAlgs } from "@/services/cubing-pro/algs/customAlgs";
+import { collectVisibleFormulaKeys } from "./utils/algsFormulaFilter";
+import "./styles/algsDetail.css";
 
 interface ModalState {
   items: FormulaItem[];
@@ -97,8 +101,12 @@ export function AlgsDetailView({ cube, classId }: Props) {
   const [selectedSets, setSelectedSets] = useState<string[]>([]);
   const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
   const [hiddenFormulaKeys, setHiddenKeys] = useState<string[]>([]);
-  const [filterCollapsibleOpen, setFilterCollapsibleOpen] = useState(false);
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [contentWidth, setContentWidth] = useState(0);
+  const [search, setSearch] = useState("");
+  const deferredSearch = useDeferredValue(search);
+  const [refreshVersion, setRefreshVersion] = useState(0);
 
   const [pageSettingsOpen, setPageSettingsOpen] = useState(false);
   const [formulaFontSize, setFontSizeState] = useState(() => getFormulaFontSize());
@@ -110,6 +118,24 @@ export function AlgsDetailView({ cube, classId }: Props) {
   const [hideFormulaDiagram, setHideFormulaDiagramState] = useState(() =>
     getHideFormulaDiagram(),
   );
+
+  useEffect(() => {
+    const element = contentRef.current;
+    if (!element) return;
+    const observer = new ResizeObserver(([entry]) => setContentWidth(entry.contentRect.width));
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [loading, data]);
+
+  const cardMinWidth = Math.max(196, hideFormulaDiagram ? 0 : diagramSize + 22);
+  const gridColumns = Math.min(columnsPerRow, Math.max(1, Math.floor((contentWidth - 26 + 8) / (cardMinWidth + 8))));
+  const cardLayout = {
+    "--algs-grid-columns": gridColumns,
+    "--algs-diagram-height": `${hideFormulaDiagram ? 0 : diagramSize}px`,
+    "--algs-formula-height": `${formulaFontSize * 1.4 * 3 + 12}px`,
+    "--algs-wide-formula-height": `${formulaFontSize * 1.45 * 2}px`,
+    "--algs-wide-formula-rows": hideAltFormulas ? 1 : 4,
+  } as CSSProperties;
 
   const [statModalOpen, setStatModalOpen] = useState(false);
   const [modalState, setModalState] = useState<ModalState | null>(null);
@@ -123,7 +149,10 @@ export function AlgsDetailView({ cube, classId }: Props) {
   const [formulaPracticeOpen, setFormulaPracticeOpen] = useState(false);
   const [batchCustomOpen, setBatchCustomOpen] = useState(false);
 
-  const containerRef = useRef<HTMLDivElement>(null);
+  const handleChanged = useCallback(() => {
+    setRefreshVersion((version) => version + 1);
+    setUnskilledRefreshKey((version) => version + 1);
+  }, []);
 
   useReleaseOverlayOnUnmount();
 
@@ -135,6 +164,8 @@ export function AlgsDetailView({ cube, classId }: Props) {
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
+    setSearch("");
+    setModalState(null);
     getAlgCubeClass(cube, classId)
       .then((d) => {
         if (cancelled) return;
@@ -213,7 +244,24 @@ export function AlgsDetailView({ cube, classId }: Props) {
     return items;
   }, [visibleGroups]);
 
+  // Search only changes the library display, never the selected practice scope.
+  const displayedGroups = useMemo(() => {
+    void refreshVersion; // Local custom formulas can change without a data refetch.
+    const query = deferredSearch.trim().toLocaleLowerCase();
+    if (!query) return visibleGroups;
+    return visibleGroups.flatMap((group) => {
+      const algs = group.algs.filter((alg) => {
+        const custom = getCustomAlgs(buildAlgsKey(cube, classId, group.setName, group.groupName, alg.name));
+        return [group.setName, group.groupName, alg.name, getAlgDisplayName(alg, locale), ...alg.algs, ...custom]
+          .some((value) => value.toLocaleLowerCase().includes(query));
+      });
+      return algs.length ? [{ ...group, algs }] : [];
+    });
+  }, [visibleGroups, deferredSearch, cube, classId, locale, refreshVersion]);
+  const displayedCount = displayedGroups.reduce((count, group) => count + group.algs.length, 0);
+
   const settingsPreview = useMemo(() => {
+    void refreshVersion;
     const first = allModalItems[0];
     if (!first) {
       return {
@@ -228,11 +276,13 @@ export function AlgsDetailView({ cube, classId }: Props) {
     const sel = getAlgsSelection(
       buildAlgsKey(cube, classId, first.setName, first.groupName, first.alg.name),
     );
-    const formulas = first.alg.algs;
-    const idx = sel?.source === "library" ? (sel.index ?? 0) : 0;
+    const formulas = sel?.source === "custom"
+      ? getCustomAlgs(buildAlgsKey(cube, classId, first.setName, first.groupName, first.alg.name))
+      : first.alg.algs;
+    const idx = sel?.index ?? 0;
     const formula = formulas[idx] ?? formulas[0] ?? "";
     const scramble =
-      first.alg.scrambles?.[idx] ?? first.alg.scrambles?.[0] ?? "";
+      first.alg.scrambles?.[sel?.source === "custom" ? 0 : idx] ?? first.alg.scrambles?.[0] ?? "";
     return {
       formula,
       name: getAlgDisplayName(first.alg, locale),
@@ -241,7 +291,7 @@ export function AlgsDetailView({ cube, classId }: Props) {
       setName: first.setName,
       groupName: first.groupName,
     };
-  }, [allModalItems, cube, classId, locale]);
+  }, [allModalItems, cube, classId, locale, refreshVersion]);
 
   const totalFormulas = useMemo(
     () => visibleGroups.reduce((s, g) => s + g.algs.length, 0),
@@ -249,6 +299,8 @@ export function AlgsDetailView({ cube, classId }: Props) {
   );
 
   const proficiencyStats = useMemo(() => {
+    void refreshVersion;
+    void statModalOpen; // Also reload changes made in the existing proficiency tool.
     const map = getFormulaProficiency(cube, classId);
     const entries = Object.values(map);
     return {
@@ -259,7 +311,7 @@ export function AlgsDetailView({ cube, classId }: Props) {
       unskilled: entries.filter((l) => l === "unskilled").length,
       unknown: entries.filter((l) => l === "unknown").length,
     };
-  }, [cube, classId]);
+  }, [cube, classId, refreshVersion, statModalOpen]);
 
   const setFormulaCounts = useMemo(() => {
     if (!data) return [];
@@ -314,9 +366,14 @@ export function AlgsDetailView({ cube, classId }: Props) {
   const handleGroupDeselectAll = useCallback(() => setSelectedGroups([]), []);
 
   const handleFormulaSelectAll = useCallback(() => {
-    setHiddenKeys([]);
-    persistHiddenFormulaKeys(cube, classId, []);
-  }, [cube, classId]);
+    if (!data) return;
+    const scope = new Set(collectVisibleFormulaKeys(data, selectedSets, selectedGroups));
+    setHiddenKeys((previous) => {
+      const next = previous.filter((key) => !scope.has(key));
+      persistHiddenFormulaKeys(cube, classId, next);
+      return next;
+    });
+  }, [data, selectedSets, selectedGroups, cube, classId]);
 
   const handleFormulaDeselectAll = useCallback(() => {
     if (!data) return;
@@ -333,8 +390,11 @@ export function AlgsDetailView({ cube, classId }: Props) {
         });
       });
     });
-    setHiddenKeys(keys);
-    persistHiddenFormulaKeys(cube, classId, keys);
+    setHiddenKeys((previous) => {
+      const next = [...new Set([...previous, ...keys])];
+      persistHiddenFormulaKeys(cube, classId, next);
+      return next;
+    });
   }, [data, selectedSets, selectedGroups, cube, classId]);
 
   const handleFontSizeChange = useCallback((n: number) => {
@@ -431,7 +491,7 @@ export function AlgsDetailView({ cube, classId }: Props) {
           </Card.Body>
         </Card.Root>
         <Separator />
-        <Grid templateColumns="repeat(4, 1fr)" gap={4}>
+        <Grid templateColumns={{ base: "1fr", md: "repeat(2, minmax(0, 1fr))", xl: "repeat(4, minmax(0, 1fr))" }} gap={4}>
           {Array.from({ length: 8 }).map((_, i) => (
             <GridItem key={i}>
               <Skeleton height="220px" borderRadius="xl" />
@@ -458,16 +518,34 @@ export function AlgsDetailView({ cube, classId }: Props) {
     );
   }
 
+  const toolsPanel = allModalItems.length > 0 && (
+    <AlgsPracticeToolsPanel
+      cube={cube}
+      classId={classId}
+      flatAlgs={allModalItems}
+      showRandomPick={allModalItems.length >= 8}
+      formulaRandomRefreshKey={formulaRandomRefreshKey}
+      unskilledRefreshKey={unskilledRefreshKey}
+      onOpenRandom={() => { setFormulaRandomModalMode("random"); setFormulaRandomModalOpen(true); }}
+      onOpenHistory={() => { setFormulaRandomModalMode("history"); setFormulaRandomModalOpen(true); }}
+      onPickFormula={handleOpenModalByIndex}
+      onOpenFormulaPractice={() => setFormulaPracticeOpen(true)}
+      onOpenBatchCustom={() => setBatchCustomOpen(true)}
+    />
+  );
+
   return (
     <>
-      <VStack ref={containerRef} align="stretch" gap={6}>
+      <Box className="algs-detail-shell">
+      <Box className="algs-detail-workbench" style={cardLayout}>
         <Flex
+          className="algs-detail-header"
           justify="space-between"
           align="center"
           flexWrap="wrap"
           gap={3}
         >
-          <HStack gap={3} flex={1} minW={0}>
+          <HStack className="algs-detail-heading" gap={2} flex={1} minW={0} align="center">
             <Button
               variant="ghost"
               size="sm"
@@ -480,16 +558,16 @@ export function AlgsDetailView({ cube, classId }: Props) {
               </Link>
             </Button>
             <Separator orientation="vertical" h="24px" />
-            <Heading size="lg" truncate>
+            <Heading as="h1" fontSize={{ base: "md", md: "lg" }} lineHeight="short" overflowWrap="anywhere">
               {data.name}
             </Heading>
-            <Badge colorPalette="brand" fontSize="sm">
+            <Badge colorPalette="brand" fontSize="11px" lineHeight="20px" h="22px" flexShrink={0}>
               {cube}
             </Badge>
           </HStack>
 
-          <HStack gap={2} flexShrink={0}>
-            <Text fontSize="sm" color="fg.muted">
+          <HStack gap={2} flexWrap="wrap" minW={0}>
+            <Text fontSize="xs" color="fg.muted">
               {totalFormulas} {t("algs.detail.statFormulas")}
             </Text>
             <Separator orientation="vertical" h="16px" />
@@ -499,25 +577,23 @@ export function AlgsDetailView({ cube, classId }: Props) {
               colorPalette="brand"
               onClick={() => setStatModalOpen(true)}
             >
-              📊 {t("algs.practice.stats")}
+              {t("algs.practice.stats")}
+            </Button>
+            <Button size="sm" fontSize="xs" colorPalette="brand" disabled={!allModalItems.length} onClick={() => setFormulaPracticeOpen(true)}>
+              {t("algs.formulaPractice.start")}
             </Button>
           </HStack>
         </Flex>
 
-        <Separator />
+        <Box as="section" className="algs-detail-tools" aria-label={t("algs.detail.practiceTools")}>
+          {toolsPanel}
+        </Box>
 
-        <Collapsible.Root
-          open={filterCollapsibleOpen}
-          onOpenChange={(e) => setFilterCollapsibleOpen(e.open)}
-        >
-          <Collapsible.Trigger asChild>
-            <Button size="sm" variant="ghost" colorPalette="brand">
-              {filterCollapsibleOpen ? "▼" : "▶"}{" "}
-              {t("algs.detail.filterPanel")}
-            </Button>
-          </Collapsible.Trigger>
-          <Collapsible.Content>
-            <Box mt={3}>
+        <AlgsResizablePanels navigation={<Box as="aside" id="algs-filter-pane" className="algs-detail-navigation">
+          <Heading as="h2" fontSize="xs" mb={2}>{t("algs.detail.filterPanel")}</Heading>
+          <Text fontSize="11px" color="fg.muted" mb={3}>
+            {locale === "en-US" ? "Choose your practice scope" : "选择分组与公式，设置本次练习范围"}
+          </Text>
               <AlgsFilterPanel
                 data={data}
                 selectedSets={selectedSets}
@@ -533,35 +609,29 @@ export function AlgsDetailView({ cube, classId }: Props) {
                 onFormulaSelectAll={handleFormulaSelectAll}
                 onFormulaDeselectAll={handleFormulaDeselectAll}
               />
-            </Box>
-          </Collapsible.Content>
-        </Collapsible.Root>
+          <nav aria-label={t("algs.detail.group")} className="algs-detail-group-links">
+            {displayedGroups.map((group) => (
+              <a key={buildGroupKey(group.setName, group.groupName)} href={`#algs-group-${encodeURIComponent(buildGroupKey(group.setName, group.groupName))}`}>
+                <span>{group.setName} · {group.groupName}</span><span>{group.algs.length}</span>
+              </a>
+            ))}
+          </nav>
+        </Box>}>
 
-        {allModalItems.length > 0 && (
-          <AlgsPracticeToolsPanel
-            cube={cube}
-            classId={classId}
-            flatAlgs={allModalItems}
-            showRandomPick={allModalItems.length >= 8}
-            formulaRandomRefreshKey={formulaRandomRefreshKey}
-            unskilledRefreshKey={unskilledRefreshKey}
-            onOpenRandom={() => {
-              setFormulaRandomModalMode("random");
-              setFormulaRandomModalOpen(true);
-            }}
-            onOpenHistory={() => {
-              setFormulaRandomModalMode("history");
-              setFormulaRandomModalOpen(true);
-            }}
-            onPickFormula={handleOpenModalByIndex}
-            onOpenFormulaPractice={() => setFormulaPracticeOpen(true)}
-            onOpenBatchCustom={() => setBatchCustomOpen(true)}
-          />
-        )}
+        <VStack ref={contentRef} id="algs-formula-pane" className="algs-detail-content" align="stretch" gap={3} minW={0}>
+          <Box className="algs-detail-toolbar">
+            <Input type="search" size="sm" fontSize="xs" aria-label={locale === "en-US" ? "Search current formulas" : "搜索本页公式"}
+              placeholder={locale === "en-US" ? "Search names, groups or formulas…" : "搜索名称、分组或公式…"}
+              value={search} onChange={(event) => setSearch(event.target.value)} minW={0} bg="bg.elevated" />
+            <Button size="sm" fontSize="xs" className="algs-detail-mobile-filter" variant="outline" onClick={() => setFilterDrawerOpen(true)}>{t("algs.detail.filterPanel")}</Button>
+            <Button size="sm" fontSize="xs" variant="outline" onClick={() => setPageSettingsOpen(true)}>{t("algs.config")}</Button>
+          </Box>
+          <Flex gap={2} justify="space-between" flexWrap="wrap" fontSize="11px" color="fg.muted" aria-live="polite">
+            <Text>{displayedCount} / {totalFormulas} {t("algs.detail.statFormulas")}</Text>
+            <Text>{locale === "en-US" ? "Search changes this view; practice uses your selected scope." : "搜索仅影响展示，练习使用已选范围。"}</Text>
+          </Flex>
 
-        <Separator />
-
-        {visibleGroups.length === 0 && (
+        {displayedGroups.length === 0 && (
           <Box textAlign="center" py={12}>
             <Text color="fg.muted" fontSize="lg">
               {t("algs.noData")}
@@ -572,6 +642,7 @@ export function AlgsDetailView({ cube, classId }: Props) {
               variant="outline"
               colorPalette="brand"
               onClick={() => {
+                if (search) { setSearch(""); return; }
                 setSelectedSets(setKeys);
                 const allG: string[] = [];
                 data.sets.forEach((set) => {
@@ -585,54 +656,59 @@ export function AlgsDetailView({ cube, classId }: Props) {
                 persistHiddenFormulaKeys(cube, classId, []);
               }}
             >
-              {t("algs.noData")}
+              {locale === "en-US" ? (search ? "Clear search" : "Reset filters") : (search ? "清除搜索" : "重置筛选")}
             </Button>
           </Box>
         )}
 
-        {visibleGroups.map((group) => {
-          const colors =
-            SET_CARD_COLORS[group.setColorIndex % SET_CARD_COLORS.length];
+        {displayedGroups.map((group) => {
           return (
             <Card.Root
               key={`${group.setName}::${group.groupName}`}
+              id={`algs-group-${encodeURIComponent(buildGroupKey(group.setName, group.groupName))}`}
+              className="algs-detail-group"
               variant="outline"
               borderRadius="xl"
-              bg={colors.bg}
-              borderColor={colors.border}
+              bg="bg.elevated"
+              borderColor="border"
+              minW={0}
             >
-              <Card.Body p={4}>
-                <HStack gap={2} mb={3}>
+              <Card.Body p={3} gap={0}>
+                <HStack className="algs-detail-group-heading" gap={2} mb={2} align="center" minW={0}>
                   <Badge
                     colorPalette="brand"
                     variant="subtle"
-                    borderRadius="full"
-                    px={3}
-                    py={1}
+                    borderRadius="md"
+                    px={2}
+                    py={0}
+                    h="22px"
+                    lineHeight="20px"
+                    fontSize="11px"
+                    flexShrink={0}
                   >
                     {group.setName}
                   </Badge>
-                  <Text
-                    fontSize="sm"
+                  <Heading as="h2"
+                    fontSize="xs"
                     fontWeight="medium"
                     color="fg.muted"
+                    lineHeight="22px"
+                    truncate
+                    title={group.groupName}
                   >
                     {group.groupName}
-                  </Text>
-                  <Text fontSize="xs" color="fg.muted" ml="auto">
+                  </Heading>
+                  <Text fontSize="11px" lineHeight="22px" color="fg.muted" ml="auto" flexShrink={0}>
                     {group.algs.length}
                   </Text>
                 </HStack>
 
-                <Grid
-                  templateColumns={`repeat(${columnsPerRow}, minmax(0, 1fr))`}
-                  gap={3}
-                >
+                <Grid className={`algs-case-grid${columnsPerRow === 1 ? " algs-case-grid--wide" : ""}`}>
                   {group.algs.map((alg) => {
                     const cardKey = `${group.setName}:${group.groupName}:${alg.name}`;
                     if (columnsPerRow === 1) {
                       return (
-                        <GridItem key={cardKey}>
+                        <GridItem key={cardKey} minW={0}>
                           <AlgsFormulaCardWide
                             cube={cube}
                             classId={classId}
@@ -646,6 +722,7 @@ export function AlgsDetailView({ cube, classId }: Props) {
                             diagramSize={diagramSize}
                             hideFormulaDiagram={hideFormulaDiagram}
                             hideAltFormulas={hideAltFormulas}
+                            refreshVersion={refreshVersion}
                             onOpenModal={() =>
                               handleOpenModal(
                                 group.setName,
@@ -658,7 +735,7 @@ export function AlgsDetailView({ cube, classId }: Props) {
                       );
                     }
                     return (
-                      <GridItem key={cardKey}>
+                      <GridItem key={cardKey} minW={0}>
                         <AlgsFormulaCard
                           cube={cube}
                           classId={classId}
@@ -671,6 +748,7 @@ export function AlgsDetailView({ cube, classId }: Props) {
                           useVisualCube={useVisualCube}
                           diagramSize={diagramSize}
                           hideFormulaDiagram={hideFormulaDiagram}
+                          refreshVersion={refreshVersion}
                           onClick={() =>
                             handleOpenModal(
                               group.setName,
@@ -687,7 +765,10 @@ export function AlgsDetailView({ cube, classId }: Props) {
             </Card.Root>
           );
         })}
-      </VStack>
+        </VStack>
+        </AlgsResizablePanels>
+      </Box>
+      </Box>
 
       {!pageSettingsOpen && !filterDrawerOpen && (
         <AlgsFloatButtons
@@ -724,6 +805,7 @@ export function AlgsDetailView({ cube, classId }: Props) {
         onClose={() => {
           setFormulaPracticeOpen(false);
           setUnskilledRefreshKey((k) => k + 1);
+          setRefreshVersion((version) => version + 1);
         }}
         cube={cube}
         classId={classId}
@@ -732,7 +814,7 @@ export function AlgsDetailView({ cube, classId }: Props) {
 
       <BatchCustomFormulaModal
         open={batchCustomOpen}
-        onClose={() => setBatchCustomOpen(false)}
+        onClose={() => { setBatchCustomOpen(false); handleChanged(); }}
         cube={cube}
         classId={classId}
         flatAlgs={allModalItems}
@@ -749,16 +831,16 @@ export function AlgsDetailView({ cube, classId }: Props) {
       >
         <Drawer.Backdrop />
         <Drawer.Positioner>
-          <Drawer.Content>
+          <Drawer.Content className="algs-detail-drawer" maxW={{ base: "100vw", md: "480px" }}>
             <Drawer.Header>
               <Drawer.Title>
                 {t("algs.detail.filterPanel")}
               </Drawer.Title>
               <Drawer.CloseTrigger asChild>
-                <CloseButton size="sm" />
+                <CloseButton size="sm" color="signal.destructive" borderRadius="4px" />
               </Drawer.CloseTrigger>
             </Drawer.Header>
-            <Drawer.Body>
+            <Drawer.Body overflowY="auto" minH={0}>
               <AlgsFilterPanel
                 data={data}
                 selectedSets={selectedSets}
@@ -788,16 +870,16 @@ export function AlgsDetailView({ cube, classId }: Props) {
       >
         <Drawer.Backdrop />
         <Drawer.Positioner>
-          <Drawer.Content>
+          <Drawer.Content className="algs-detail-drawer" maxW={{ base: "100vw", md: "480px" }}>
             <Drawer.Header>
               <Drawer.Title>
                 {t("algs.config")}
               </Drawer.Title>
               <Drawer.CloseTrigger asChild>
-                <CloseButton size="sm" />
+                <CloseButton size="sm" color="signal.destructive" borderRadius="4px" />
               </Drawer.CloseTrigger>
             </Drawer.Header>
-            <Drawer.Body>
+            <Drawer.Body overflowY="auto" minH={0}>
               <AlgsPageSettingsPanel
                 cube={cube}
                 classId={classId}
@@ -845,7 +927,7 @@ export function AlgsDetailView({ cube, classId }: Props) {
                 {t("algs.practice.stats")}
               </Dialog.Title>
               <Dialog.CloseTrigger asChild>
-                <CloseButton size="sm" />
+                <CloseButton size="sm" color="signal.destructive" borderRadius="4px" />
               </Dialog.CloseTrigger>
             </Dialog.Header>
             <Dialog.Body overflowY="auto">
@@ -855,13 +937,12 @@ export function AlgsDetailView({ cube, classId }: Props) {
                     fontSize="5xl"
                     fontWeight="bold"
                     lineHeight={1}
-                    bgGradient="linear(to-r, teal.400, cyan.500)"
-                    bgClip="text"
+                     color="accent"
                   >
                     {totalFormulas}
                   </Text>
                   <Text fontSize="sm" color="fg.muted" mt={2}>
-                    {t("algs.noData")}
+                     {t("algs.detail.statFormulas")}
                   </Text>
                 </Box>
 
@@ -893,19 +974,17 @@ export function AlgsDetailView({ cube, classId }: Props) {
                   <Text fontSize="sm" fontWeight="semibold" mb={3}>
                     {t("algs.practice.stats")}
                   </Text>
-                  <SimpleGrid columns={3} gap={2}>
+                  <SimpleGrid columns={{ base: 2, sm: 3 }} gap={2}>
                     <Box
                       textAlign="center"
                       p={3}
                       borderRadius="lg"
-                      bg="green.50"
-                      _dark={{ bg: "green.900/20" }}
+                      bg="bg.muted"
                     >
                       <Text
                         fontWeight="bold"
                         fontSize="xl"
-                        color="green.600"
-                        _dark={{ color: "green.400" }}
+                        color="signal.success"
                       >
                         {proficiencyStats.mastered}
                       </Text>
@@ -917,14 +996,12 @@ export function AlgsDetailView({ cube, classId }: Props) {
                       textAlign="center"
                       p={3}
                       borderRadius="lg"
-                      bg="blue.50"
-                      _dark={{ bg: "blue.900/20" }}
+                      bg="bg.muted"
                     >
                       <Text
                         fontWeight="bold"
                         fontSize="xl"
-                        color="blue.600"
-                        _dark={{ color: "blue.400" }}
+                        color="accent"
                       >
                         {proficiencyStats.skilled}
                       </Text>
@@ -936,14 +1013,12 @@ export function AlgsDetailView({ cube, classId }: Props) {
                       textAlign="center"
                       p={3}
                       borderRadius="lg"
-                      bg="orange.50"
-                      _dark={{ bg: "orange.900/20" }}
+                      bg="bg.muted"
                     >
                       <Text
                         fontWeight="bold"
                         fontSize="xl"
-                        color="orange.600"
-                        _dark={{ color: "orange.400" }}
+                        color="fg"
                       >
                         {proficiencyStats.average}
                       </Text>
@@ -955,14 +1030,12 @@ export function AlgsDetailView({ cube, classId }: Props) {
                       textAlign="center"
                       p={3}
                       borderRadius="lg"
-                      bg="red.50"
-                      _dark={{ bg: "red.900/20" }}
+                      bg="bg.muted"
                     >
                       <Text
                         fontWeight="bold"
                         fontSize="xl"
-                        color="red.500"
-                        _dark={{ color: "red.400" }}
+                        color="signal.destructive"
                       >
                         {proficiencyStats.unskilled}
                       </Text>
@@ -974,14 +1047,12 @@ export function AlgsDetailView({ cube, classId }: Props) {
                       textAlign="center"
                       p={3}
                       borderRadius="lg"
-                      bg="gray.50"
-                      _dark={{ bg: "gray.800/40" }}
+                      bg="bg.muted"
                     >
                       <Text
                         fontWeight="bold"
                         fontSize="xl"
-                        color="gray.500"
-                        _dark={{ color: "gray.400" }}
+                        color="fg.muted"
                       >
                         {proficiencyStats.unknown}
                       </Text>
@@ -993,14 +1064,12 @@ export function AlgsDetailView({ cube, classId }: Props) {
                       textAlign="center"
                       p={3}
                       borderRadius="lg"
-                      bg="teal.50"
-                      _dark={{ bg: "teal.900/20" }}
+                      bg="accent.soft"
                     >
                       <Text
                         fontWeight="bold"
                         fontSize="xl"
-                        color="teal.600"
-                        _dark={{ color: "teal.400" }}
+                        color="accent"
                       >
                         {proficiencyStats.total}
                       </Text>
@@ -1090,14 +1159,8 @@ export function AlgsDetailView({ cube, classId }: Props) {
         formulaFontFamily={formulaFontFamily}
         diagramSize={diagramSize}
         hideFormulaDiagram={hideFormulaDiagram}
+        onChanged={handleChanged}
       />
-
-      <style>{`
-        @keyframes algsFloat {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-3px); }
-        }
-      `}</style>
     </>
   );
 }

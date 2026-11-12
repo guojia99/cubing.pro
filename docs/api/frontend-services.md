@@ -276,9 +276,9 @@
 
 ---
 
-## algs/（localStorage 模块，无 API）
+## algs/（浏览器存储模块，无 API）
 
-> 以下模块纯 localStorage 操作，不调用后端
+> 除每日抽题 KV 外，不调用后端；历史使用 IndexedDB，其余配置主要使用 localStorage。
 
 ### customAlgs.ts
 
@@ -318,16 +318,23 @@
 
 常量：`PAGE_SIZE`（历史分页大小，默认 20）
 
+存储操作均返回 Promise，写入在 IndexedDB 事务提交后才 resolve；无记录/会话数量截断。
+
 | 函数 | 说明 |
 |------|------|
-| `getFormulaPracticeHistory(cube, classId)` | 获取练习历史 |
+| `getFormulaPracticeHistory(cube, classId)` | 显式读取全部历史；普通 UI 应使用分页/summary |
 | `createPracticeSession(cube, classId, params)` | 创建练习会话 |
 | `getFormulaPracticeHistoryPage(cube, classId, page)` | 分页查询历史 |
-| `appendFormulaPracticeRecord(...)` | 追加练习记录 |
+| `appendFormulaPracticeRecord(...)` | 追加并返回已提交单条记录；input.id 支持幂等重试，会话缺失抛 `PracticeSessionMissingError` |
 | `deleteFormulaPracticeRecord(...)` | 删除练习记录 |
 | `computeTrimmedMean(times, ratio)` | 计算截尾均值 |
 | `computeAverages(records, ratio)` | 计算 ao50/ao100/ao1000 |
 | `clearFormulaPracticeHistory(cube, classId)` | 清空历史 |
+| `getFormulaPracticeHistorySummary(cube, classId, trimRatio)` | 总条数、最近最多 1000 条及满样本 aoN |
+| `getFormulaPracticeFrequencyStats(cube, classId)` | 游标聚合全部历史频率，frequency 为 0–1 |
+| `getFormulaPracticeHistoryCount(cube, classId)` | 按索引获取总数 |
+
+`exportPracticeConfig()` 与 `importPracticeConfig(json)` 同样为异步；导出版本 2、兼容旧版 1 导入。
 
 ### formulaPracticeProficiency.ts
 

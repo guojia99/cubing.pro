@@ -219,18 +219,22 @@ export function AlgsListView() {
     [router],
   );
 
-  const handleExport = useCallback(() => {
-    const config = exportPracticeConfig();
-    const blob = new Blob([JSON.stringify(config, null, 2)], {
-      type: "application/json",
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `practice-config-${new Date().toISOString().slice(0, 10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toaster.create({ title: t("algs.practiceConfig.exportSuccess"), type: "success" });
+  const handleExport = useCallback(async () => {
+    try {
+      const config = await exportPracticeConfig();
+      const blob = new Blob([JSON.stringify(config, null, 2)], {
+        type: "application/json",
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `practice-config-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toaster.create({ title: t("algs.practiceConfig.exportSuccess"), type: "success" });
+    } catch (error) {
+      toaster.create({ title: error instanceof Error ? error.message : "Export failed", type: "error" });
+    }
   }, [t]);
 
   const handleImportClick = () => {
@@ -241,9 +245,9 @@ export function AlgsListView() {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = () => {
+    reader.onload = async () => {
       const text = reader.result as string;
-      const result = importPracticeConfig(text);
+      const result = await importPracticeConfig(text);
       if (result.success) {
         toaster.create({
           title: t("algs.practiceConfig.importSuccess"),
@@ -387,13 +391,13 @@ export function AlgsListView() {
                       syncButtonText={t("algs.cloud.sync")}
                       uploadOkText={t("algs.cloud.uploadOk")}
                       syncOkText={t("algs.cloud.syncOk")}
-                      getPayloadForUpload={() => {
-                        const raw = JSON.stringify(exportPracticeConfig(), null, 2);
+                      getPayloadForUpload={async () => {
+                        const raw = JSON.stringify(await exportPracticeConfig(), null, 2);
                         assertPayloadWithinLimit(raw);
                         return raw;
                       }}
-                      applyCloudPayload={(raw) => {
-                        const result = importPracticeConfig(raw);
+                      applyCloudPayload={async (raw) => {
+                        const result = await importPracticeConfig(raw);
                         if (!result.success) {
                           throw new Error(result.message ?? "import failed");
                         }

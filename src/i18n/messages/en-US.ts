@@ -1,7 +1,9 @@
 import type { MessageKey } from "@/i18n/messages/zh-CN";
 import { wcaMessagesEnUS } from "./wca-en-US";
+import { practiceEnUS } from "./formula-practice";
 
 const enUS: Record<MessageKey, string> = {
+  ...practiceEnUS,
   "app.name": "Cubing Pro",
   "app.version": "v4.0.0",
   "nav.home": "Home",
@@ -260,7 +262,7 @@ const enUS: Record<MessageKey, string> = {
   "algs.usageInstructions.randomFunc": "Random Function",
   "algs.usageInstructions.randomFuncDesc": "The random function picks a formula from your current filter for practice, with wheel animation and history.",
   "algs.usageInstructions.formulaPractice": "Formula Practice",
-  "algs.usageInstructions.formulaPracticeDesc": "Formula practice supports sequential, random, and non-repeating random modes. It draws scrambles for timed practice, with history and arrow keys to navigate.",
+  "algs.usageInstructions.formulaPracticeDesc": "Choose sequential, random, non-repeating random, or proficiency-weighted practice. Hold Space or the timer to prepare, release to start, and press again to stop. Saving advances to the next question. Resume sessions, browse paged history, or navigate with arrow keys.",
   "algs.practiceHistoryStats.title": "Practice History Stats",
   "algs.practiceHistoryStats.desc": "View occurrence count and frequency per formula",
   "algs.practiceHistoryStats.modalTitle": "Practice History Stats",

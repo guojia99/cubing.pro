@@ -15,6 +15,9 @@
     "build:static": "npm run howtocook:prepare && node scripts/prepare-static-export.mjs && NEXT_OUTPUT_EXPORT=1 next build && node scripts/post-static-export.mjs; node scripts/restore-static-export.mjs",
     "preview:static": "npx --yes serve@14 dist",
     "start": "next start",
+    "test:algs": "node --test src/views/Algs/components/formulaPracticeTimer.test.mjs && tsx --test src/services/cubing-pro/algs/formulaPracticeHistory.test.mjs",
+    "test:algs:browser": "node src/views/Algs/components/formulaPracticeTimer.browser.test.mjs",
+    "test:algs:layout": "node src/views/Algs/components/algsLayout.browser.test.mjs",
     "lint": "eslint ."
   },
   "dependencies": {
@@ -54,9 +57,13 @@
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.5",
     "@types/uuid": "^10.0.0",
+    "esbuild": "^0.28.2",
     "eslint": "^9.28.0",
     "eslint-config-next": "^15.3.4",
+    "fake-indexeddb": "^6.2.8",
     "less": "^4.6.4",
+    "playwright": "^1.65.0",
+    "tsx": "^4.23.15",
     "typescript": "^5.8.3"
   }
 }

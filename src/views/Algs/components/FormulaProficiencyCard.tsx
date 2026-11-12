@@ -11,7 +11,6 @@ import {
 } from "@chakra-ui/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useI18n } from "@/contexts/I18nProvider";
-import { useReleaseOverlayOnUnmount } from "@/lib/overlayCleanup";
 import {
   getFormulaProficiency,
   setFormulaProficiency,
@@ -41,7 +40,6 @@ export default function FormulaProficiencyCard({
   refreshKey = 0,
   embedded = false,
 }: FormulaProficiencyCardProps) {
-  useReleaseOverlayOnUnmount();
   const { t } = useI18n();
   const [modalOpen, setModalOpen] = useState(false);
   const [proficiencyMap, setProficiencyMap] = useState<Record<string, ProficiencyLevel>>(
@@ -145,7 +143,7 @@ export default function FormulaProficiencyCard({
                 {t("algs.proficiencyCard.modalTitle")}
               </Dialog.Title>
               <Dialog.CloseTrigger asChild>
-                <CloseButton size="sm" />
+                <CloseButton size="sm" color="signal.destructive" borderRadius="4px" />
               </Dialog.CloseTrigger>
             </Dialog.Header>
             <Dialog.Body overflowY="auto" maxH="560px" pb={4}>

@@ -29,7 +29,7 @@ export function getFormulaPracticeConfig(
     if (!raw) return { ...DEFAULT_CONFIG };
     const data = JSON.parse(raw) as Partial<FormulaPracticeConfig>;
     return {
-      trimRatio: typeof data.trimRatio === 'number' ? Math.max(0, Math.min(50, data.trimRatio)) : DEFAULT_CONFIG.trimRatio,
+      trimRatio: typeof data.trimRatio === 'number' && Number.isFinite(data.trimRatio) ? Math.max(0, Math.min(50, data.trimRatio)) : DEFAULT_CONFIG.trimRatio,
       remindProficiency: typeof data.remindProficiency === 'boolean' ? data.remindProficiency : DEFAULT_CONFIG.remindProficiency,
     };
   } catch {
@@ -42,12 +42,11 @@ export function saveFormulaPracticeConfig(
   classId: string,
   config: Partial<FormulaPracticeConfig>,
 ): void {
-  if (!cube || !classId) return;
-  try {
-    const current = getFormulaPracticeConfig(cube, classId);
-    const next = { ...current, ...config };
-    localStorage.setItem(getStorageKey(cube, classId), JSON.stringify(next));
-  } catch {
-    // ignore
+  if (!cube || !classId) throw new Error('cube and classId are required');
+  const current = getFormulaPracticeConfig(cube, classId);
+  const next = { ...current, ...config };
+  if (!Number.isFinite(next.trimRatio) || next.trimRatio < 0 || next.trimRatio > 50 || typeof next.remindProficiency !== 'boolean') {
+    throw new Error('Invalid practice configuration');
   }
+  localStorage.setItem(getStorageKey(cube, classId), JSON.stringify(next));
 }
