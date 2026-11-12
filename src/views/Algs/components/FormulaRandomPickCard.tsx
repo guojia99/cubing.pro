@@ -55,13 +55,10 @@ export default function FormulaRandomPickCard({
   };
 
   const preview = latestPick ? (
-    <div
-      role="button"
-      tabIndex={0}
+    <button
+      type="button"
+      disabled={findIndex(latestPick.setName, latestPick.groupName, latestPick.algName) < 0}
       onClick={handleLatestClick}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") handleLatestClick();
-      }}
       className="algs-practice-tool-random-preview"
     >
       <SvgRenderer
@@ -78,7 +75,7 @@ export default function FormulaRandomPickCard({
           {latestPick.setName} · {latestPick.groupName}
         </Text>
       </Box>
-    </div>
+    </button>
   ) : (
     <div className="algs-practice-tool-random-empty">
       <SvgRenderer

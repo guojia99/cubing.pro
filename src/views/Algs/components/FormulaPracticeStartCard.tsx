@@ -2,7 +2,6 @@
 
 import { Card } from "@chakra-ui/react";
 import { useI18n } from "@/contexts/I18nProvider";
-import { PRACTICE_COLORS } from "../utils/constants";
 import "../styles/practiceTools.css";
 
 export interface FormulaPracticeStartCardProps {
@@ -49,13 +48,15 @@ export default function FormulaPracticeStartCard({
 
   return (
     <Card.Root
+      as="button"
+      className="algs-practice-tool-cell algs-practice-tool-cell--practice"
       size="sm"
       cursor="pointer"
       onClick={onStart}
       h="full"
       borderRadius="xl"
-      bg={PRACTICE_COLORS.practice.bg}
-      borderColor={PRACTICE_COLORS.practice.border}
+      bg="algs.card.bg"
+      borderColor="algs.card.border"
       borderWidth="1px"
       _hover={{ borderColor: "signal.info" }}
     >

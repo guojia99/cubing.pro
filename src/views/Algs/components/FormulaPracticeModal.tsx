@@ -1,1548 +1,511 @@
 "use client";
 
-import {
-  Box,
-  Button,
-  Checkbox,
-  CloseButton,
-  Dialog,
-  HStack,
-  NativeSelect,
-  Slider,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react";
-
+import { Button, CloseButton, Dialog } from "@chakra-ui/react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useI18n } from "@/contexts/I18nProvider";
-import { useReleaseOverlayOnUnmount } from "@/lib/overlayCleanup";
 import type { MessageKey } from "@/i18n";
+import { useReleaseOverlayOnUnmount } from "@/lib/overlayCleanup";
 import {
-  appendFormulaPracticeRecord,
-  clearFormulaPracticeHistory,
-  computeAverages,
-  createPracticeSession,
-  deleteFormulaPracticeRecord,
-  getFormulaPracticeHistory,
-  PAGE_SIZE,
-  type FormulaPracticeRecord,
+  appendFormulaPracticeRecord, clearFormulaPracticeHistory, computeAverages, computeTrimmedMean,
+  createPracticeSession, deleteFormulaPracticeRecord, getFormulaPracticeHistoryPage,
+  getFormulaPracticeHistorySummary, PAGE_SIZE, type FormulaPracticeRecord,
+  type FormulaPracticeHistorySummary, type HistoryPageResult,
 } from "@/services/cubing-pro/algs/formulaPracticeHistory";
-import {
-  getFormulaPracticeConfig,
-  saveFormulaPracticeConfig,
-} from "@/services/cubing-pro/algs/formulaPracticeConfig";
-import {
-  buildFormulaKey,
-  buildGroupKey,
-  getFormulaPracticeSelection,
-  saveFormulaPracticeSelection,
-} from "@/services/cubing-pro/algs/formulaPracticeSelection";
-import {
-  getFormulaProficiency,
-  getProficiencyLevel,
-  PROFICIENCY_WEIGHTS,
-  setFormulaProficiency,
-  type ProficiencyLevel,
-} from "@/services/cubing-pro/algs/formulaPracticeProficiency";
-
+import { getFormulaPracticeConfig, saveFormulaPracticeConfig } from "@/services/cubing-pro/algs/formulaPracticeConfig";
+import { buildGroupKey, getFormulaPracticeSelection, saveFormulaPracticeSelection } from "@/services/cubing-pro/algs/formulaPracticeSelection";
+import { getFormulaProficiency, getProficiencyLevel, PROFICIENCY_WEIGHTS, setFormulaProficiency, type ProficiencyLevel } from "@/services/cubing-pro/algs/formulaPracticeProficiency";
 import type { FormulaItem, FormulaPracticeMode } from "../types";
-import ProficiencySelect from "./ProficiencySelect";
+import { formulaKey, formatPracticeTime, PracticeTimer, snapshotIdentity, type PracticeSnapshot, type TimerView } from "./formulaPracticeTimer";
 import SvgRenderer from "./SvgRenderer";
 import "./formulaPracticeModal.css";
 
 export type { FormulaPracticeMode, FormulaItem } from "../types";
-
-interface FormulaPracticeModalProps {
-  open: boolean;
-  onClose: () => void;
-  cube: string;
-  classId: string;
-  flatAlgs: FormulaItem[];
-}
-
-const PRACTICE_MODES: FormulaPracticeMode[] = [
-  "sequential",
-  "random",
-  "nonRepeatRandom",
-  "weightedRandom",
-];
-
-const MODE_LABEL_KEYS: Record<FormulaPracticeMode, MessageKey> = {
-  sequential: "algs.formulaPractice.modeSequential",
-  random: "algs.formulaPractice.modeRandom",
-  nonRepeatRandom: "algs.formulaPractice.modeNonRepeat",
-  weightedRandom: "algs.formulaPractice.modeWeighted",
+interface Props { open: boolean; onClose: () => void; cube: string; classId: string; flatAlgs: FormulaItem[] }
+type View = "config" | "main" | "history" | "detail" | "confirm";
+type PracticeDetail =
+  | { kind: "record"; value: FormulaPracticeRecord }
+  | { kind: "question"; value: Omit<FormulaPracticeRecord, "id" | "createdAt" | "timeMs"> };
+const MODES: Record<FormulaPracticeMode, MessageKey> = {
+  sequential: "algs.formulaPractice.modeSequential", random: "algs.formulaPractice.modeRandom",
+  nonRepeatRandom: "algs.formulaPractice.modeNonRepeat", weightedRandom: "algs.formulaPractice.modeWeighted",
+};
+const PHASE_LABELS: Record<TimerView["phase"], MessageKey> = {
+  ready: "algs.practice.ready", armed: "algs.practice.armed", running: "algs.practice.running",
+  saving: "algs.practice.saving", loading: "algs.practice.loading", error: "algs.practice.error", clearing: "algs.practice.clearing",
+};
+const PROFICIENCY_LABELS: Record<ProficiencyLevel, MessageKey> = {
+  mastered: "algs.formulaPractice.proficiency.mastered", skilled: "algs.formulaPractice.proficiency.skilled",
+  average: "algs.formulaPractice.proficiency.average", unskilled: "algs.formulaPractice.proficiency.unskilled", unknown: "algs.formulaPractice.proficiency.unknown",
 };
 
-const PROFICIENCY_LEVELS: ProficiencyLevel[] = [
-  "mastered",
-  "skilled",
-  "average",
-  "unskilled",
-  "unknown",
-];
-
-const PROFICIENCY_LABEL_KEYS: Record<ProficiencyLevel, MessageKey> = {
-  mastered: "algs.formulaPractice.proficiency.mastered",
-  skilled: "algs.formulaPractice.proficiency.skilled",
-  average: "algs.formulaPractice.proficiency.average",
-  unskilled: "algs.formulaPractice.proficiency.unskilled",
-  unknown: "algs.formulaPractice.proficiency.unknown",
-};
-
-const SELECTED_BTN_PROPS = {
-  colorPalette: "teal" as const,
-  variant: "solid" as const,
-};
-
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
+function PracticeProficiency({ value, onChange, disabled }: { value: ProficiencyLevel; onChange: (level: ProficiencyLevel) => void; disabled?: boolean }) {
+  const { t } = useI18n();
+  return <div className="fp-proficiency" role="group" aria-label={t("algs.formulaPractice.proficiencyRemindTitle")}>
+    {(Object.keys(PROFICIENCY_LABELS) as ProficiencyLevel[]).map((level) => <button key={level} type="button" disabled={disabled} aria-pressed={value === level} onClick={() => onChange(level)}>{t(PROFICIENCY_LABELS[level])}</button>)}
+  </div>;
 }
 
-function buildFormulaSlots(
-  selectedAlgs: FormulaItem[],
-): Array<{ algIdx: number; scrambleIdx: number }> {
-  return selectedAlgs.map((item, algIdx) => {
-    const scrambles = item.alg.scrambles ?? [];
-    const scrambleIdx =
-      scrambles.length <= 1 ? 0 : Math.floor(Math.random() * scrambles.length);
-    return { algIdx, scrambleIdx };
-  });
+function initialSelection(cube: string, classId: string, algs: FormulaItem[]): Set<string> {
+  const saved = getFormulaPracticeSelection(cube, classId);
+  // An explicitly empty selection is distinct from no saved selection.
+  return new Set(saved ? saved.selectedFormulas.filter((key) => algs.some((item) => formulaKey(item) === key)) : algs.map(formulaKey));
 }
 
-function buildWeightedSlots(
-  selectedAlgs: FormulaItem[],
-  getWeight: (formulaKey: string) => number,
-  count: number,
-): Array<{ algIdx: number; scrambleIdx: number }> {
-  if (selectedAlgs.length === 0) return [];
-  const slots: Array<{ algIdx: number; scrambleIdx: number }> = [];
-  const baseSlots = selectedAlgs.map((item, algIdx) => {
-    const scrambles = item.alg.scrambles ?? [];
-    const scrambleIdx =
-      scrambles.length <= 1 ? 0 : Math.floor(Math.random() * scrambles.length);
-    return {
-      algIdx,
-      scrambleIdx,
-      key: buildFormulaKey(item.setName, item.groupName, item.alg.name),
-    };
-  });
-  const totalWeight =
-    baseSlots.reduce((s, slot) => s + getWeight(slot.key), 0) || 1;
-  for (let i = 0; i < count; i++) {
-    let r = Math.random() * totalWeight;
-    let picked = false;
-    for (const slot of baseSlots) {
-      r -= getWeight(slot.key);
-      if (r <= 0) {
-        slots.push({ algIdx: slot.algIdx, scrambleIdx: slot.scrambleIdx });
-        picked = true;
-        break;
-      }
-    }
-    if (!picked) {
-      slots.push({
-        algIdx: baseSlots[0].algIdx,
-        scrambleIdx: baseSlots[0].scrambleIdx,
-      });
-    }
-  }
-  return slots;
-}
-
-function FormulaPracticeDialog({
-  open,
-  onClose,
-  title,
-  children,
-  size,
-  className,
-  contentClassName,
-  hideHeader,
-  closeOnInteractOutside = true,
-  wrapClassName,
-}: {
-  open: boolean;
-  onClose: () => void;
-  title?: ReactNode;
-  children: ReactNode;
-  size?: "md" | "lg" | "xl" | { base: "full"; md: "lg" | "xl" | "md" };
-  className?: string;
-  contentClassName?: string;
-  hideHeader?: boolean;
-  closeOnInteractOutside?: boolean;
-  wrapClassName?: string;
-}) {
-  useReleaseOverlayOnUnmount();
-
-  return (
-    <Dialog.Root
-      open={open}
-      onOpenChange={(e) => {
-        if (!e.open) onClose();
-      }}
-      size={size ?? "md"}
-      placement="center"
-      closeOnInteractOutside={closeOnInteractOutside}
-      closeOnEscape={closeOnInteractOutside}
-    >
-      <Dialog.Backdrop className={wrapClassName} />
-      <Dialog.Positioner className={wrapClassName}>
-        <Dialog.Content
-          className={`formula-practice-modal formula-practice-dialog-content ${contentClassName ?? ""} ${className ?? ""}`}
-          borderRadius={{ base: wrapClassName ? "0" : "2xl", md: "2xl" }}
-        >
-          {!hideHeader && title != null && (
-            <Dialog.Header
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-              borderBottomWidth="1px"
-              borderColor="border"
-            >
-              <Dialog.Title fontSize="md" fontWeight="semibold">
-                {title}
-              </Dialog.Title>
-              <Dialog.CloseTrigger asChild>
-                <CloseButton size="sm" />
-              </Dialog.CloseTrigger>
-            </Dialog.Header>
-          )}
-          <Dialog.Body className="formula-practice-dialog-body">{children}</Dialog.Body>
-        </Dialog.Content>
-      </Dialog.Positioner>
-    </Dialog.Root>
-  );
-}
-
-export default function FormulaPracticeModal({
-  open,
-  onClose,
-  cube,
-  classId,
-  flatAlgs,
-}: FormulaPracticeModalProps) {
-  useReleaseOverlayOnUnmount();
-  const { t, tf } = useI18n();
-
-  const [phase, setPhase] = useState<"config" | "practice">("practice");
-  const [mode, setMode] = useState<FormulaPracticeMode>("weightedRandom");
-  const [selectedFormulaKeys, setSelectedFormulaKeys] = useState<Set<string>>(
-    new Set(),
-  );
-  const [scrambleSlots, setScrambleSlots] = useState<
-    Array<{ algIdx: number; scrambleIdx: number }>
-  >([]);
-  const [currentSlotIndex, setCurrentSlotIndex] = useState(0);
-  const [timerState, setTimerState] = useState<"ready" | "running" | "stopped">(
-    "ready",
-  );
-  const [timerMs, setTimerMs] = useState(0);
-  const [history, setHistory] = useState<FormulaPracticeRecord[]>([]);
-  const [detailRecord, setDetailRecord] = useState<FormulaPracticeRecord | null>(
-    null,
-  );
-  const [contentVisible, setContentVisible] = useState(true);
-  const [practiceSubView, setPracticeSubView] = useState<
-    "main" | "fullHistory" | "detail"
-  >("main");
-  const [detailReturnView, setDetailReturnView] = useState<
-    "main" | "fullHistory"
-  >("main");
-  const [historyPage, setHistoryPage] = useState(1);
-  const [trimRatio, setTrimRatio] = useState(
-    () => getFormulaPracticeConfig(cube, classId).trimRatio,
-  );
-  const [proficiencyRemindOpen, setProficiencyRemindOpen] = useState(false);
-  const [lastPracticedFormula, setLastPracticedFormula] = useState<{
-    formulaKey: string;
-    formulaName: string;
-    setName: string;
-    groupName: string;
-  } | null>(null);
-  const [proficiencyMap, setProficiencyMap] = useState<
-    Record<string, ProficiencyLevel>
-  >(() => getFormulaProficiency(cube, classId));
-  const [remindProficiency, setRemindProficiency] = useState(
-    () => getFormulaPracticeConfig(cube, classId).remindProficiency,
-  );
-
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const startTimeRef = useRef<number>(0);
-  const timerStateRef = useRef(timerState);
-  const remindProficiencyRef = useRef(remindProficiency);
-  timerStateRef.current = timerState;
-  remindProficiencyRef.current = remindProficiency;
-
-  const [isMobile, setIsMobile] = useState(false);
+function TimerDigits({ state, open }: { state: TimerView; open: boolean }) {
+  const [elapsed, setElapsed] = useState(0);
   useEffect(() => {
-    if (typeof window === "undefined" || !window.matchMedia) return;
-    const mq = window.matchMedia("(max-width: 768px)");
-    const apply = () => setIsMobile(mq.matches);
-    apply();
-    mq.addEventListener("change", apply);
-    return () => mq.removeEventListener("change", apply);
-  }, []);
+    if (!open || state.phase !== "running") return;
+    let frame = 0;
+    const tick = () => {
+      setElapsed(Math.max(0, performance.now() - state.startedAt));
+      frame = requestAnimationFrame(tick);
+    };
+    tick();
+    return () => cancelAnimationFrame(frame);
+  }, [open, state.phase, state.startedAt]);
+  return <span className="fp-digits" aria-hidden="true">{formatPracticeTime(state.phase === "running" ? elapsed : state.elapsed)}</span>;
+}
 
-  type PracticeSession = {
-    sessionId: string;
-    algs: FormulaItem[];
-    slots: Array<{ algIdx: number; scrambleIdx: number }>;
-    mode: FormulaPracticeMode;
-  };
-  const sessionRef = useRef<PracticeSession | null>(null);
-  const currentSlotIndexRef = useRef(0);
-  currentSlotIndexRef.current = currentSlotIndex;
-
-  const selectedAlgs = useMemo(
-    () =>
-      flatAlgs.filter((item) =>
-        selectedFormulaKeys.has(
-          buildFormulaKey(item.setName, item.groupName, item.alg.name),
-        ),
-      ),
-    [flatAlgs, selectedFormulaKeys],
-  );
-
-  const formulaKeyToImage = useMemo(() => {
-    const map = new Map<string, string>();
-    flatAlgs.forEach((item) => {
-      map.set(
-        buildFormulaKey(item.setName, item.groupName, item.alg.name),
-        item.alg.image ?? "",
-      );
+export default function FormulaPracticeModal(props: Props) {
+  // Keep each library's pending save and session isolated when the parent changes libraries.
+  const [timers] = useState(() => new Map<string, PracticeTimer>());
+  const key = JSON.stringify([props.cube, props.classId]);
+  let timer = timers.get(key);
+  if (!timer) {
+    timer = new PracticeTimer({
+      now: () => performance.now(), random: Math.random,
+      weight: (formula) => PROFICIENCY_WEIGHTS[getProficiencyLevel(props.cube, props.classId, formula)],
+      create: (snapshot) => createPracticeSession(snapshot.cube, snapshot.classId, { mode: snapshot.mode, selectedFormulas: snapshot.algs.map(formulaKey) }),
+      append: (snapshot, sessionId, input) => appendFormulaPracticeRecord(snapshot.cube, snapshot.classId, sessionId, input),
+      clear: (snapshot) => clearFormulaPracticeHistory(snapshot.cube, snapshot.classId),
     });
-    return map;
-  }, [flatAlgs]);
+    timers.set(key, timer);
+  }
+  return <PracticeLibrary key={key} {...props} timer={timer} />;
+}
 
-  const currentSlot = scrambleSlots[currentSlotIndex];
-  const currentItem = currentSlot ? selectedAlgs[currentSlot.algIdx] : null;
-  const currentScramble = currentItem
-    ? ((currentItem.alg.scrambles ?? [])[currentSlot?.scrambleIdx ?? 0] ?? "")
-    : "";
+function PracticeLibrary({ open, onClose, cube, classId, flatAlgs, timer }: Props & { timer: PracticeTimer }) {
+  useReleaseOverlayOnUnmount();
+  const { t, tf, locale } = useI18n();
+  const state = useSyncExternalStore(timer.subscribe, timer.getSnapshot, timer.getSnapshot);
+  const [view, setView] = useState<View>(() => state.snapshot ? "main" : "config");
+  const [mode, setMode] = useState<FormulaPracticeMode>(() => state.snapshot?.mode ?? "weightedRandom");
+  const [selected, setSelected] = useState(() => initialSelection(cube, classId, flatAlgs));
+  const [config, setConfig] = useState(() => getFormulaPracticeConfig(cube, classId));
+  const [answerVisible, setAnswerVisible] = useState(false);
+  const [detail, setDetail] = useState<PracticeDetail | null>(null);
+  const [returnView, setReturnView] = useState<View>("main");
+  const [confirmation, setConfirmation] = useState<FormulaPracticeRecord | "clear" | null>(null);
+  const [confirmationReturn, setConfirmationReturn] = useState<View>("history");
+  const [notice, setNotice] = useState<MessageKey | null>(null);
+  const [actionBusy, setActionBusy] = useState(false);
+  const actionLock = useRef(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const timerButtonRef = useRef<HTMLButtonElement>(null);
+  const [proficiencies, setProficiencies] = useState(() => getFormulaProficiency(cube, classId));
+  const [dismissedReminder, setDismissedReminder] = useState<string | null>(null);
+  const [summary, setSummary] = useState<FormulaPracticeHistorySummary | null>(null);
+  const [page, setPage] = useState(1);
+  const [history, setHistory] = useState<HistoryPageResult | null>(null);
+  const [historyBusy, setHistoryBusy] = useState(false);
+  const [dataError, setDataError] = useState(false);
+  const [refresh, setRefresh] = useState(0);
+  const [summaryBusy, setSummaryBusy] = useState(false);
+  const summaryRequest = useRef(0);
+  const historyRequest = useRef(0);
+  const selectedAlgs = flatAlgs.filter((item) => selected.has(formulaKey(item)));
+  const draft: PracticeSnapshot = { cube, classId, algs: selectedAlgs, mode, ...config };
+  const identity = snapshotIdentity(draft);
+  const snapshotMatches = identity === state.identity;
+  const locked = timer.isBlocked() || actionBusy;
+  const slot = state.slots[state.index];
+  const item = slot ? state.snapshot?.algs[slot.algIdx] : null;
+  const scramble = item?.alg.scrambles?.[slot?.scrambleIdx ?? 0] ?? "";
+  const running = state.phase === "running";
+  const canTime = open && view === "main" && snapshotMatches && !actionBusy && Boolean(scramble);
+  const controls = useRef({ canTime });
+  controls.current = { canTime };
 
-  const loadHistory = useCallback(() => {
-    setHistory(getFormulaPracticeHistory(cube, classId));
-  }, [cube, classId]);
+  useEffect(() => {
+    if (!open) { timer.interrupt(); return; }
+    const nextConfig = getFormulaPracticeConfig(cube, classId);
+    setConfig(nextConfig);
+    setSelected(initialSelection(cube, classId, flatAlgs));
+    setMode(timer.getSnapshot().snapshot?.mode ?? "weightedRandom");
+    setProficiencies(getFormulaProficiency(cube, classId));
+    setNotice(null);
+    setView(timer.getSnapshot().snapshot ? "main" : "config");
+    // Re-read stored preferences on each open, not on a parent array reallocation.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, cube, classId, timer]);
 
-  const initSelection = useCallback(() => {
-    const saved = getFormulaPracticeSelection(cube, classId);
-    if (saved?.selectedFormulas?.length) {
-      const keys = new Set<string>();
-      saved.selectedFormulas.forEach((key) => {
-        if (
-          flatAlgs.some(
-            (item) =>
-              buildFormulaKey(item.setName, item.groupName, item.alg.name) ===
-              key,
-          )
-        ) {
-          keys.add(key);
-        }
-      });
-      if (keys.size > 0) {
-        setSelectedFormulaKeys(keys);
+  useEffect(() => {
+    if (!open || view !== "main" || snapshotMatches || !state.snapshot) return;
+    timer.interrupt();
+    if (!timer.getSnapshot().pending && !["loading", "saving", "clearing"].includes(timer.getSnapshot().phase)) {
+      setView("config");
+      setNotice("algs.practice.updated");
+    }
+  }, [open, view, snapshotMatches, identity, state.snapshot, state.phase, timer]);
+
+  useEffect(() => {
+    return () => { timer.interrupt(); };
+  }, [timer]);
+
+  useEffect(() => { setAnswerVisible(false); }, [state.index, state.sessionId, state.revision]);
+  useEffect(() => { setNotice(null); }, [state.revision]);
+
+  useEffect(() => {
+    if (!open) return;
+    const frame = requestAnimationFrame(() => {
+      if (view === "main") {
+        if (!timer.isBlocked()) timerButtonRef.current?.focus({ preventScroll: true });
+      } else contentRef.current?.focus({ preventScroll: true });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [open, view, state.sessionId, state.revision, timer]);
+
+  const effectiveTrim = state.snapshot?.trimRatio ?? config.trimRatio;
+  useEffect(() => {
+    if (!open) return;
+    let active = true;
+    const request = ++summaryRequest.current;
+    setSummaryBusy(true);
+    setDataError(false);
+    getFormulaPracticeHistorySummary(cube, classId, effectiveTrim).then((result) => {
+      if (active && request === summaryRequest.current) setSummary(result);
+    }).catch(() => {
+      if (active && request === summaryRequest.current) setDataError(true);
+    }).finally(() => { if (active && request === summaryRequest.current) setSummaryBusy(false); });
+    return () => { active = false; };
+  }, [open, cube, classId, effectiveTrim, state.revision, refresh]);
+
+  useEffect(() => {
+    if (!open || view !== "history") return;
+    let active = true;
+    const request = ++historyRequest.current;
+    setHistoryBusy(true);
+    setHistory(null);
+    setDataError(false);
+    getFormulaPracticeHistoryPage(cube, classId, page, PAGE_SIZE).then((result) => {
+      if (!active || request !== historyRequest.current) return;
+      const max = Math.max(1, Math.ceil(result.total / result.pageSize));
+      if (page > max) setPage(max);
+      else setHistory(result);
+    }).catch(() => { if (active && request === historyRequest.current) setDataError(true); })
+      .finally(() => { if (active && request === historyRequest.current) setHistoryBusy(false); });
+    return () => { active = false; };
+  }, [open, view, page, cube, classId, state.revision, refresh]);
+
+  useEffect(() => {
+    if (!open) return;
+    const interactive = (target: EventTarget | null) => target instanceof Element && Boolean(target.closest('input, textarea, select, button, a, [contenteditable]:not([contenteditable="false"]), [role="button"], [role="slider"]'));
+    const eligible = (event: KeyboardEvent, allowRepeat = false) => {
+      if (!controls.current.canTime || event.defaultPrevented || event.isComposing || (!allowRepeat && event.repeat) || event.altKey || event.ctrlKey || event.metaKey) return false;
+      const target = event.target;
+      const root = contentRef.current;
+      if (!root || !(target instanceof Element) || target.closest('[role="dialog"]') !== root) return false;
+      return target === timerButtonRef.current || !interactive(target);
+    };
+    const down = (event: KeyboardEvent) => {
+      if (event.repeat) {
+        if (event.code === "Space" && eligible(event, true)) event.preventDefault();
         return;
       }
-    }
-    setSelectedFormulaKeys(
-      new Set(
-        flatAlgs.map((i) =>
-          buildFormulaKey(i.setName, i.groupName, i.alg.name),
-        ),
-      ),
-    );
-  }, [cube, classId, flatAlgs]);
-
-  const saveSelection = useCallback(() => {
-    const selectedSets = new Set<string>();
-    const selectedGroups = new Set<string>();
-    const selectedFormulas: string[] = [];
-    selectedFormulaKeys.forEach((key) => {
-      const parts = key.split(":");
-      if (parts.length >= 3) {
-        const [setName, groupName] = parts;
-        selectedSets.add(setName);
-        selectedGroups.add(buildGroupKey(setName, groupName));
-        selectedFormulas.push(key);
+      if (!eligible(event)) return;
+      const phase = timer.getSnapshot().phase;
+      if (phase === "running") {
+        event.preventDefault();
+        event.stopPropagation();
+        if (event.code === "Escape") timer.interrupt();
+        else timer.stop();
+      } else if (event.code === "Space" && phase === "ready") {
+        event.preventDefault();
+        timer.arm("keyboard");
+      } else if (event.code === "ArrowUp" || event.code === "ArrowDown") {
+        event.preventDefault();
+        timer.navigate(event.code === "ArrowUp" ? -1 : 1);
       }
-    });
-    saveFormulaPracticeSelection(cube, classId, {
-      selectedSets: Array.from(selectedSets),
-      selectedGroups: Array.from(selectedGroups),
-      selectedFormulas,
-    });
-  }, [cube, classId, selectedFormulaKeys]);
-
-  const getWeightForKey = useCallback(
-    (formulaKey: string) => {
-      const level = proficiencyMap[formulaKey] ?? "average";
-      return PROFICIENCY_WEIGHTS[level];
-    },
-    [proficiencyMap],
-  );
-
-  const buildSlotsForMode = useCallback(
-    (m: FormulaPracticeMode) => {
-      const baseSlots = buildFormulaSlots(selectedAlgs);
-      if (m === "sequential") return baseSlots;
-      if (m === "weightedRandom") {
-        return buildWeightedSlots(
-          selectedAlgs,
-          getWeightForKey,
-          Math.max(selectedAlgs.length, 1),
-        );
-      }
-      return shuffle([...baseSlots]);
-    },
-    [selectedAlgs, getWeightForKey],
-  );
-
-  useEffect(() => {
-    if (open) {
-      loadHistory();
-      initSelection();
-      const config = getFormulaPracticeConfig(cube, classId);
-      setTrimRatio(config.trimRatio);
-      setRemindProficiency(config.remindProficiency);
-      setProficiencyMap(getFormulaProficiency(cube, classId));
-      setPracticeSubView("main");
-      setDetailRecord(null);
-    }
-  }, [open, loadHistory, initSelection, cube, classId]);
-
-  const hasAutoStarted = useRef(false);
-  useEffect(() => {
-    if (!open) {
-      hasAutoStarted.current = false;
-      return;
-    }
-    if (selectedAlgs.length === 0 && scrambleSlots.length === 0) {
-      setPhase("config");
-    } else if (
-      selectedAlgs.length > 0 &&
-      scrambleSlots.length === 0 &&
-      !hasAutoStarted.current
-    ) {
-      hasAutoStarted.current = true;
-      saveSelection();
-      const formulaKeys = selectedAlgs.map((i) =>
-        buildFormulaKey(i.setName, i.groupName, i.alg.name),
-      );
-      const sessionId = createPracticeSession(cube, classId, {
-        mode,
-        selectedFormulas: formulaKeys,
-      });
-      const slots = buildSlotsForMode(mode);
-      sessionRef.current = {
-        sessionId,
-        algs: [...selectedAlgs],
-        slots: [...slots],
-        mode,
-      };
-      setScrambleSlots(slots);
-      setCurrentSlotIndex(0);
-      setPhase("practice");
-    }
-  }, [
-    open,
-    selectedAlgs.length,
-    scrambleSlots.length,
-    mode,
-    saveSelection,
-    cube,
-    classId,
-    buildSlotsForMode,
-    selectedAlgs,
-  ]);
-
-  const groupedAlgs = useMemo(() => {
-    const map = new Map<string, Map<string, FormulaItem[]>>();
-    flatAlgs.forEach((item) => {
-      if (!map.has(item.setName)) {
-        map.set(item.setName, new Map());
-      }
-      const groupMap = map.get(item.setName)!;
-      if (!groupMap.has(item.groupName)) {
-        groupMap.set(item.groupName, []);
-      }
-      groupMap.get(item.groupName)!.push(item);
-    });
-    return map;
-  }, [flatAlgs]);
-
-  const handleSetToggle = (setName: string) => {
-    const groupMap = groupedAlgs.get(setName);
-    if (!groupMap) return;
-    const keys: string[] = [];
-    groupMap.forEach((items) => {
-      items.forEach((item) =>
-        keys.push(
-          buildFormulaKey(item.setName, item.groupName, item.alg.name),
-        ),
-      );
-    });
-    setSelectedFormulaKeys((prev) => {
-      const next = new Set(prev);
-      const allSelected = keys.every((k) => prev.has(k));
-      keys.forEach((k) => (allSelected ? next.delete(k) : next.add(k)));
-      return next;
-    });
-  };
-
-  const handleGroupToggle = (setName: string, groupName: string) => {
-    const items = groupedAlgs.get(setName)?.get(groupName) ?? [];
-    const keys = items.map((i) =>
-      buildFormulaKey(i.setName, i.groupName, i.alg.name),
-    );
-    setSelectedFormulaKeys((prev) => {
-      const next = new Set(prev);
-      const allSelected = keys.every((k) => prev.has(k));
-      keys.forEach((k) => (allSelected ? next.delete(k) : next.add(k)));
-      return next;
-    });
-  };
-
-  const handleFormulaToggle = (
-    setName: string,
-    groupName: string,
-    algName: string,
-  ) => {
-    const key = buildFormulaKey(setName, groupName, algName);
-    setSelectedFormulaKeys((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
-    });
-  };
-
-  const startPractice = () => {
-    if (selectedAlgs.length === 0) return;
-    saveSelection();
-
-    const formulaKeys = selectedAlgs.map((i) =>
-      buildFormulaKey(i.setName, i.groupName, i.alg.name),
-    );
-    const sessionId = createPracticeSession(cube, classId, {
-      mode,
-      selectedFormulas: formulaKeys,
-    });
-
-    const slots = buildSlotsForMode(mode);
-
-    sessionRef.current = {
-      sessionId,
-      algs: [...selectedAlgs],
-      slots: [...slots],
-      mode,
     };
-
-    setScrambleSlots(slots);
-    setCurrentSlotIndex(0);
-    setTimerState("ready");
-    setTimerMs(0);
-    setContentVisible(true);
-    setPhase("practice");
-  };
-
-  const startTimer = useCallback(() => {
-    if (!open || phase !== "practice") return;
-    if (timerStateRef.current !== "ready") return;
-    startTimeRef.current = Date.now();
-    setTimerMs(0);
-    setTimerState("running");
-  }, [open, phase]);
-
-  const stopTimerAndNext = useCallback(() => {
-    if (timerRef.current != null) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-
-    const elapsedMs = Date.now() - startTimeRef.current;
-    setTimerState("stopped");
-
-    const session = sessionRef.current;
-    const slotIdx = currentSlotIndexRef.current;
-
-    if (!session) {
-      setTimerState("ready");
-      setTimerMs(0);
-      return;
-    }
-
-    const { algs, slots, mode: sessionMode } = session;
-    const slot = slots[slotIdx];
-    const item = slot != null ? algs[slot.algIdx] : null;
-
-    const formulaKey =
-      item != null
-        ? buildFormulaKey(item.setName, item.groupName, item.alg.name)
-        : "";
-    if (item != null && slot != null && session.sessionId) {
-      const scramble =
-        (item.alg.scrambles ?? [])[slot.scrambleIdx ?? 0] ?? "";
-
-      const nextHistory = appendFormulaPracticeRecord(
-        cube,
-        classId,
-        session.sessionId,
-        {
-          timeMs: elapsedMs,
-          formulaKey,
-          formulaName: item.alg.name,
-          setName: item.setName,
-          groupName: item.groupName,
-          scramble,
-          scrambleIndex: slot.scrambleIdx,
-          image: "",
-          algs: item.alg.algs ?? [],
-        },
-      );
-      setHistory(nextHistory);
-
-      if (sessionMode === "weightedRandom" && remindProficiencyRef.current) {
-        setLastPracticedFormula({
-          formulaKey,
-          formulaName: item.alg.name,
-          setName: item.setName,
-          groupName: item.groupName,
-        });
-        setProficiencyRemindOpen(true);
-      }
-    }
-
-    const nextIdx = slotIdx + 1 >= slots.length ? 0 : slotIdx + 1;
-
-    if (nextIdx === 0 && slots.length > 1) {
-      if (sessionMode === "nonRepeatRandom") {
-        const shuffled = shuffle([...slots]);
-        sessionRef.current = {
-          sessionId: session.sessionId,
-          algs,
-          slots: shuffled,
-          mode: sessionMode,
-        };
-        setScrambleSlots(shuffled);
-      } else if (sessionMode === "weightedRandom") {
-        const newSlots = buildWeightedSlots(
-          algs,
-          (k) => PROFICIENCY_WEIGHTS[getProficiencyLevel(cube, classId, k)],
-          Math.max(algs.length, 1),
-        );
-        sessionRef.current = {
-          sessionId: session.sessionId,
-          algs,
-          slots: newSlots,
-          mode: sessionMode,
-        };
-        setScrambleSlots(newSlots);
-      }
-    }
-
-    setCurrentSlotIndex(nextIdx);
-    setTimerState("ready");
-    setTimerMs(0);
-  }, [cube, classId]);
-
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (!open || phase !== "practice") return;
-      if (timerStateRef.current === "running") {
-        e.preventDefault();
-        e.stopPropagation();
-        stopTimerAndNext();
-        return;
-      }
-      if (e.code === "Space") {
-        e.preventDefault();
-        if (timerStateRef.current === "ready") {
-          startTimer();
-        }
-      } else if (e.code === "ArrowUp") {
-        e.preventDefault();
-        setCurrentSlotIndex(
-          (i) => (i - 1 + scrambleSlots.length) % scrambleSlots.length,
-        );
-      } else if (e.code === "ArrowDown") {
-        e.preventDefault();
-        setCurrentSlotIndex((i) => (i + 1) % scrambleSlots.length);
-      }
-    },
-    [open, phase, scrambleSlots.length, stopTimerAndNext, startTimer],
-  );
-
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => handleKeyDown(e);
-    document.addEventListener("keydown", handler, true);
+    const up = (event: KeyboardEvent) => {
+      if (event.code !== "Space") return;
+      if (eligible(event)) { event.preventDefault(); timer.release("keyboard"); }
+      else timer.cancelArm("keyboard");
+    };
+    const interrupt = () => timer.interrupt();
+    const visibility = () => { if (document.hidden) interrupt(); };
+    document.addEventListener("keydown", down);
+    document.addEventListener("keyup", up);
+    window.addEventListener("blur", interrupt);
+    document.addEventListener("visibilitychange", visibility);
     return () => {
-      document.removeEventListener("keydown", handler, true);
-      if (timerRef.current != null) clearInterval(timerRef.current);
+      document.removeEventListener("keydown", down);
+      document.removeEventListener("keyup", up);
+      window.removeEventListener("blur", interrupt);
+      document.removeEventListener("visibilitychange", visibility);
     };
-  }, [handleKeyDown]);
+  }, [open, timer]);
 
-  useEffect(() => {
-    if (timerState === "running" && phase === "practice") {
-      const tick = () => {
-        setTimerMs(Date.now() - startTimeRef.current);
-      };
-      timerRef.current = setInterval(tick, 50);
-      return () => {
-        if (timerRef.current != null) {
-          clearInterval(timerRef.current);
-          timerRef.current = null;
-        }
-      };
+  function go(next: View) {
+    if (timer.isBlocked() || actionLock.current) return;
+    if (view === "config" && next === "main" && state.snapshot) {
+      setMode(state.snapshot.mode);
+      setConfig({ trimRatio: state.snapshot.trimRatio, remindProficiency: state.snapshot.remindProficiency });
+      setSelected(new Set(state.snapshot.algs.map(formulaKey)));
     }
-  }, [timerState, phase]);
-
-  const handleClearHistory = () => {
-    if (!window.confirm(t("algs.formulaPractice.clearHistory") + "?")) return;
-    clearFormulaPracticeHistory(cube, classId);
-    loadHistory();
-  };
-
-  const handleBackToConfig = () => {
-    if (timerRef.current != null) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
+    controls.current.canTime = false;
+    setNotice(null);
+    setView(next);
+  }
+  function requestClose() {
+    const current = timer.getSnapshot();
+    if (current.pending || ["saving", "loading", "clearing"].includes(current.phase) || actionLock.current) {
+      setNotice("algs.practice.pendingClose"); return;
     }
-    sessionRef.current = null;
-    setPhase("config");
-    setTimerState("ready");
-    setTimerMs(0);
-  };
-
-  const formatTime = (ms: number) => {
-    const s = Math.floor(ms / 1000);
-    const m = Math.floor(s / 60);
-    const sec = s % 60;
-    const cent = Math.floor((ms % 1000) / 10);
-    return `${m > 0 ? `${m}:` : ""}${sec.toString().padStart(2, "0")}.${cent.toString().padStart(2, "0")}`;
-  };
-
-  const handlePracticeClose = () => {
-    if (phase === "practice" && timerState === "running") return;
-    setPracticeSubView("main");
-    setDetailRecord(null);
+    if (current.phase === "running") { setNotice("algs.practice.runningClose"); return; }
+    timer.interrupt();
+    controls.current.canTime = false;
     onClose();
-  };
-
-  const openDetailView = useCallback(
-    (
-      record: FormulaPracticeRecord,
-      returnView: "main" | "fullHistory" = "main",
-    ) => {
-      setDetailRecord(record);
-      setDetailReturnView(returnView);
-      setPracticeSubView("detail");
-    },
-    [],
-  );
-
-  const toggleBtnProps = (selected: boolean) =>
-    selected ? SELECTED_BTN_PROPS : { variant: "outline" as const, size: "sm" as const };
-
-  const totalHistoryPages = Math.max(1, Math.ceil(history.length / PAGE_SIZE));
-
-  if (phase === "config") {
-    return (
-      <FormulaPracticeDialog
-        open={open}
-        onClose={onClose}
-        title={t("algs.formulaPractice.title")}
-        size={isMobile ? { base: "full", md: "md" } : "md"}
-        className="formula-practice-modal--config"
-        wrapClassName={
-          isMobile ? "formula-practice-modal-wrap--fullscreen-mobile" : undefined
-        }
-      >
-        <div className="formula-practice-config">
-          <div className="formula-practice-mode-row">
-            <Text fontWeight="medium" mb={2}>
-              {t("algs.formulaPractice.mode")}
-            </Text>
-            <div className="formula-practice-mode-radio">
-              {PRACTICE_MODES.map((m) => (
-                <label key={m}>
-                  <input
-                    type="radio"
-                    name="practice-mode"
-                    value={m}
-                    checked={mode === m}
-                    onChange={() => setMode(m)}
-                  />
-                  {t(MODE_LABEL_KEYS[m])}
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <div className="formula-practice-selector">
-            <HStack gap={2} mb={2} flexWrap="wrap">
-              <Text fontSize="xs" color="fg.muted">
-                {t("algs.detail.set")}
-              </Text>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() =>
-                  setSelectedFormulaKeys(
-                    new Set(
-                      flatAlgs.map((i) =>
-                        buildFormulaKey(i.setName, i.groupName, i.alg.name),
-                      ),
-                    ),
-                  )
-                }
-              >
-                {t("algs.detail.selectAll")}
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => setSelectedFormulaKeys(new Set())}
-              >
-                {t("algs.detail.deselectAll")}
-              </Button>
-            </HStack>
-            <HStack gap={2} flexWrap="wrap" mb={3}>
-              {Array.from(groupedAlgs.keys()).map((setName) => {
-                const groupMap = groupedAlgs.get(setName)!;
-                const allKeys = Array.from(groupMap.values())
-                  .flat()
-                  .map((i) =>
-                    buildFormulaKey(i.setName, i.groupName, i.alg.name),
-                  );
-                const setSelected = allKeys.every((k) =>
-                  selectedFormulaKeys.has(k),
-                );
-                return (
-                  <Button
-                    key={setName}
-                    size="sm"
-                    borderRadius="full"
-                    onClick={() => handleSetToggle(setName)}
-                    {...toggleBtnProps(setSelected)}
-                  >
-                    {setName}
-                  </Button>
-                );
-              })}
-            </HStack>
-            <Text fontSize="xs" color="fg.muted" mb={2}>
-              {t("algs.detail.group")}
-            </Text>
-            <VStack align="stretch" gap={3}>
-              {Array.from(groupedAlgs.entries()).map(([setName, groupMap]) => (
-                <Box key={setName}>
-                  <Text fontSize="xs" color="fg.subtle" mb={1.5}>
-                    {setName}
-                  </Text>
-                  <VStack align="stretch" gap={2}>
-                    {Array.from(groupMap.entries()).map(([groupName, items]) => {
-                      const groupKey = buildGroupKey(setName, groupName);
-                      const groupSelected = items.every((item) =>
-                        selectedFormulaKeys.has(
-                          buildFormulaKey(
-                            item.setName,
-                            item.groupName,
-                            item.alg.name,
-                          ),
-                        ),
-                      );
-                      return (
-                        <Box key={groupKey}>
-                          <HStack gap={2} flexWrap="wrap">
-                            <Button
-                              size="sm"
-                              borderRadius="full"
-                              onClick={() =>
-                                handleGroupToggle(setName, groupName)
-                              }
-                              {...toggleBtnProps(groupSelected)}
-                            >
-                              {groupName}
-                            </Button>
-                            {items.map((item) => {
-                              const key = buildFormulaKey(
-                                item.setName,
-                                item.groupName,
-                                item.alg.name,
-                              );
-                              const sel = selectedFormulaKeys.has(key);
-                              return (
-                                <Button
-                                  key={key}
-                                  size="sm"
-                                  borderRadius="full"
-                                  onClick={() =>
-                                    handleFormulaToggle(
-                                      setName,
-                                      groupName,
-                                      item.alg.name,
-                                    )
-                                  }
-                                  {...toggleBtnProps(sel)}
-                                >
-                                  {item.alg.name}
-                                </Button>
-                              );
-                            })}
-                          </HStack>
-                        </Box>
-                      );
-                    })}
-                  </VStack>
-                </Box>
-              ))}
-            </VStack>
-          </div>
-
-          <Text fontSize="sm" color="fg.muted" mb={3}>
-            {tf("algs.formulaPractice.selectedCount", {
-              count: selectedAlgs.length,
-            })}
-          </Text>
-
-          <Box mb={4}>
-            <Text fontWeight="medium" mb={2}>
-              {t("algs.formulaPractice.trimRatio")}
-            </Text>
-            <HStack gap={3} align="center">
-              <Slider.Root
-                min={0}
-                max={50}
-                step={1}
-                value={[trimRatio]}
-                flex={1}
-                maxW="200px"
-                onValueChange={(details) => {
-                  const n = details.value[0];
-                  if (n == null) return;
-                  setTrimRatio(n);
-                  saveFormulaPracticeConfig(cube, classId, { trimRatio: n });
-                }}
-              >
-                <Slider.Track>
-                  <Slider.Range />
-                </Slider.Track>
-                <Slider.Thumb index={0} />
-              </Slider.Root>
-              <Text fontSize="xs" color="fg.muted">
-                {trimRatio}%
-              </Text>
-            </HStack>
-            <Text fontSize="xs" color="fg.subtle" mt={1}>
-              {tf("algs.formulaPractice.trimRatioDesc", { p: trimRatio })}
-            </Text>
-          </Box>
-
-          <Button
-            colorPalette="teal"
-            size="lg"
-            onClick={startPractice}
-            disabled={selectedAlgs.length === 0}
-          >
-            {t("algs.formulaPractice.start")}
-          </Button>
-        </div>
-      </FormulaPracticeDialog>
-    );
+  }
+  async function startPractice() {
+    if (timer.isBlocked() || actionLock.current || !selectedAlgs.length) return;
+    setNotice(null);
+    try {
+      saveFormulaPracticeSelection(cube, classId, {
+        selectedSets: [...new Set(selectedAlgs.map((alg) => alg.setName))],
+        selectedGroups: [...new Set(selectedAlgs.map((alg) => buildGroupKey(alg.setName, alg.groupName)))],
+        selectedFormulas: selectedAlgs.map(formulaKey),
+      });
+      saveFormulaPracticeConfig(cube, classId, config);
+      if (await timer.configure(draft) && mounted.current) setView("main");
+    } catch { if (mounted.current) setNotice("algs.practice.actionError"); }
+  }
+  function toggle(keys: string[]) {
+    setSelected((previous) => {
+      const next = new Set(previous);
+      const all = keys.every((key) => previous.has(key));
+      keys.forEach((key) => all ? next.delete(key) : next.add(key));
+      return next;
+    });
+  }
+  function proficiency(key: string, level: ProficiencyLevel) {
+    setFormulaProficiency(cube, classId, key, level);
+    setProficiencies((previous) => ({ ...previous, [key]: level }));
+  }
+  function showDetail(record: FormulaPracticeRecord, from: View) {
+    if (timer.isBlocked() || actionLock.current) return;
+    setDetail({ kind: "record", value: record }); setReturnView(from); go("detail");
+  }
+  function showQuestion() {
+    if (timer.getSnapshot().phase !== "ready" || actionLock.current || !item || !slot) return;
+    setDetail({ kind: "question", value: {
+      formulaKey: formulaKey(item), formulaName: item.alg.name, setName: item.setName, groupName: item.groupName,
+      scramble, scrambleIndex: slot.scrambleIdx, image: item.alg.image ?? "", algs: [...item.alg.algs],
+    } });
+    setReturnView("main"); go("detail");
+  }
+  function confirmDelete(record: FormulaPracticeRecord | "clear", from: View) {
+    setConfirmation(record); setConfirmationReturn(from); go("confirm");
+  }
+  const mounted = useRef(true);
+  useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
+  async function performDeletion() {
+    if (actionLock.current || timer.isBlocked() || !confirmation) return;
+    actionLock.current = true;
+    setActionBusy(true);
+    setNotice(null);
+    try {
+      if (confirmation === "clear") {
+        if (!await timer.clearHistory()) { if (mounted.current) setNotice("algs.practice.actionError"); return; }
+      } else await deleteFormulaPracticeRecord(cube, classId, confirmation.id);
+      if (!mounted.current) return;
+      setRefresh((value) => value + 1);
+      setView(confirmationReturn === "detail" ? returnView : confirmationReturn);
+      setConfirmation(null);
+    } catch { if (mounted.current) setNotice("algs.practice.actionError"); }
+    finally { actionLock.current = false; if (mounted.current) setActionBusy(false); }
   }
 
-  const practiceDialogTitle = (
-    <HStack justify="space-between" flexWrap="wrap" gap={2} w="full">
-      {practiceSubView === "fullHistory" ? (
-        <HStack gap={2} minW={0}>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => setPracticeSubView("main")}
-          >
-            ←
-          </Button>
-          <Text fontWeight="semibold">{t("algs.formulaPractice.fullHistory")}</Text>
-        </HStack>
-      ) : practiceSubView === "detail" && detailRecord ? (
-        <HStack gap={2} minW={0} flex={1}>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => setPracticeSubView(detailReturnView)}
-          >
-            ←
-          </Button>
-          <Text fontWeight="semibold" truncate>
-            {detailRecord.formulaName}
-          </Text>
-        </HStack>
-      ) : (
-        <>
-          <Text fontWeight="semibold">{t("algs.formulaPractice.title")}</Text>
-          <NativeSelect.Root size="sm" width="140px" ml="auto">
-            <NativeSelect.Field
-              value={mode}
-              onChange={(e) => {
-                const newMode = e.target.value as FormulaPracticeMode;
-                setMode(newMode);
-                if (sessionRef.current) {
-                  const { algs } = sessionRef.current;
-                  const newSlots =
-                    newMode === "sequential"
-                      ? buildFormulaSlots(algs)
-                      : newMode === "weightedRandom"
-                        ? buildWeightedSlots(
-                            algs,
-                            getWeightForKey,
-                            Math.max(algs.length, 1),
-                          )
-                        : shuffle(buildFormulaSlots(algs));
-                  sessionRef.current = {
-                    ...sessionRef.current,
-                    mode: newMode,
-                    slots: newSlots,
-                  };
-                  setScrambleSlots(newSlots);
-                  setCurrentSlotIndex(0);
-                }
-              }}
-            >
-              {PRACTICE_MODES.map((m) => (
-                <option key={m} value={m}>
-                  {t(MODE_LABEL_KEYS[m])}
-                </option>
-              ))}
-            </NativeSelect.Field>
-          </NativeSelect.Root>
-        </>
-      )}
-    </HStack>
-  );
+  const groups = new Map<string, Map<string, FormulaItem[]>>();
+  const formulaImages = new Map<string, string>();
+  flatAlgs.forEach((alg) => {
+    formulaImages.set(formulaKey(alg), alg.alg.image ?? "");
+    if (!groups.has(alg.setName)) groups.set(alg.setName, new Map());
+    const set = groups.get(alg.setName)!;
+    if (!set.has(alg.groupName)) set.set(alg.groupName, []);
+    set.get(alg.groupName)!.push(alg);
+  });
+  const records = summary?.recentRecords ?? [];
+  const averages = computeAverages(records, effectiveTrim);
+  const mean = computeTrimmedMean(records.map((record) => record.timeMs), 0);
+  const reminder = state.snapshot?.mode === "weightedRandom" && state.snapshot.remindProficiency && state.lastRecord && state.lastRecord.id !== dismissedReminder ? state.lastRecord : null;
+  const detailItem = detail?.value;
+  const detailRecord = detail?.kind === "record" ? detail.value : null;
+  const detailImage = detailItem ? detailItem.image || formulaImages.get(detailItem.formulaKey) || "" : "";
+  const title = view === "config" ? t("algs.practice.config") : view === "history" ? t("algs.formulaPractice.fullHistory") : view === "detail" ? t(detailRecord ? "algs.practice.recordDetail" : "algs.practice.questionDetail") : t("algs.formulaPractice.title");
 
-  const renderFullHistoryPanel = () => (
-    <div className="formula-practice-full-history-inline">
-      <div className="formula-practice-full-history-list">
-        {history.length === 0 ? (
-          <div
-            className="formula-practice-empty"
-            style={{ padding: 24, textAlign: "center" }}
-          >
-            {t("algs.formulaPractice.historyEmpty")}
+  function renderRecords(list: FormulaPracticeRecord[], from: View) {
+    return list.map((record) => <div className="fp-record" key={record.id}>
+      <button type="button" className="fp-record-open" onClick={() => showDetail(record, from)} disabled={locked}>
+        {(record.image || formulaImages.get(record.formulaKey)) && <span className="fp-record-image" aria-hidden="true"><SvgRenderer svg={record.image || formulaImages.get(record.formulaKey)!} maxWidth={40} maxHeight={48} /></span>}
+        <span className="fp-record-info"><strong>{record.formulaName}</strong><small>{record.setName} / {record.groupName}</small></span>
+        <span className="fp-record-time">{formatPracticeTime(record.timeMs)}</span>
+      </button>
+      <PracticeProficiency disabled={locked} value={proficiencies[record.formulaKey] ?? "average"} onChange={(level) => proficiency(record.formulaKey, level)} />
+      <Button size="xs" variant="ghost" disabled={locked} onClick={() => confirmDelete(record, from)}>{t("algs.practice.delete")}</Button>
+    </div>);
+  }
+
+  return <Dialog.Root open={open} onOpenChange={(event) => { if (!event.open) requestClose(); }} placement="center" size="xl" closeOnInteractOutside={false} closeOnEscape={false}
+    onEscapeKeyDown={(event) => {
+      event.preventDefault();
+      if (timer.getSnapshot().phase === "running" || timer.getSnapshot().phase === "armed") timer.interrupt();
+      else if (view !== "main" && view !== "config") go(view === "confirm" ? confirmationReturn : view === "detail" ? returnView : "main");
+      else requestClose();
+    }}>
+    <Dialog.Backdrop />
+    <Dialog.Positioner className="fp-positioner">
+      <Dialog.Content ref={contentRef} colorPalette="brand" className={`formula-practice-modal fp-dialog ${running ? "fp-running" : ""}`} aria-busy={state.phase === "loading" || actionBusy}>
+        <Dialog.Header className="fp-header">
+          <div><Dialog.Title>{title}</Dialog.Title><Dialog.Description className="fp-meta">{cube} / {classId}</Dialog.Description></div>
+          <div className="fp-actions">
+            {view !== "main" && state.sessionId && <Button size="sm" variant="ghost" disabled={locked} onClick={() => go(view === "confirm" ? confirmationReturn : view === "detail" ? returnView : "main")}>{t("algs.practice.back")}</Button>}
+            <CloseButton className="fp-close" size="sm" variant="ghost" aria-label={t("algs.practice.close")} title={t("algs.practice.close")} onClick={requestClose}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18" /></svg>
+            </CloseButton>
           </div>
-        ) : (
-          (() => {
-            const start = (historyPage - 1) * PAGE_SIZE;
-            const pageRecords = history.slice(start, start + PAGE_SIZE);
-            return pageRecords.map((record) => {
-              const displayImage =
-                record.image || formulaKeyToImage.get(record.formulaKey) || "";
-              const prof = proficiencyMap[record.formulaKey] ?? "average";
-              return (
-                <div key={record.id} className="formula-practice-full-history-item">
-                  <SvgRenderer
-                    svg={displayImage}
-                    maxWidth={40}
-                    maxHeight={56}
-                    style={{ flexShrink: 0 }}
-                  />
-                  <div
-                    className="formula-practice-full-history-item-info"
-                    onClick={() => openDetailView(record, "fullHistory")}
-                  >
-                    <div className="formula-practice-full-history-item-name">
-                      {record.formulaName}
-                    </div>
-                    <div className="formula-practice-full-history-item-meta">
-                      {record.setName} · {record.groupName}
-                    </div>
-                  </div>
-                  <span className="formula-practice-full-history-item-time">
-                    {formatTime(record.timeMs)}
-                  </span>
-                  <ProficiencySelect
-                    value={prof}
-                    onChange={(v) => {
-                      setFormulaProficiency(cube, classId, record.formulaKey, v);
-                      setProficiencyMap((prev) => ({
-                        ...prev,
-                        [record.formulaKey]: v,
-                      }));
-                    }}
-                    size="sm"
-                  />
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    colorPalette="red"
-                    aria-label={t("algs.formulaPractice.confirmDelete")}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (
-                        !window.confirm(t("algs.formulaPractice.confirmDelete"))
-                      ) {
-                        return;
-                      }
-                      const next = deleteFormulaPracticeRecord(
-                        cube,
-                        classId,
-                        record.id,
-                      );
-                      setHistory(next);
-                      if (pageRecords.length === 1 && historyPage > 1) {
-                        setHistoryPage(historyPage - 1);
-                      }
-                    }}
-                  >
-                    🗑
-                  </Button>
-                </div>
-              );
-            });
-          })()
-        )}
-      </div>
-      {history.length > PAGE_SIZE && (
-        <div className="formula-practice-pagination">
-          <Button
-            size="sm"
-            variant="outline"
-            disabled={historyPage <= 1}
-            onClick={() => setHistoryPage((p) => Math.max(1, p - 1))}
-          >
-            ‹
-          </Button>
-          {Array.from({ length: totalHistoryPages }, (_, i) => i + 1).map(
-            (p) => (
-              <Button
-                key={p}
-                size="sm"
-                variant={p === historyPage ? "solid" : "outline"}
-                colorPalette={p === historyPage ? "teal" : undefined}
-                onClick={() => setHistoryPage(p)}
-              >
-                {p}
-              </Button>
-            ),
-          )}
-          <Button
-            size="sm"
-            variant="outline"
-            disabled={historyPage >= totalHistoryPages}
-            onClick={() =>
-              setHistoryPage((p) => Math.min(totalHistoryPages, p + 1))
-            }
-          >
-            ›
-          </Button>
-          <Text fontSize="xs" color="fg.muted" ml={2}>
-            {tf("algs.formulaPractice.totalRecords", { total: history.length })}
-          </Text>
-        </div>
-      )}
-    </div>
-  );
+        </Dialog.Header>
+        <Dialog.Body className="fp-body">
+          {notice && <div className="fp-notice" role="status">{t(notice)}</div>}
+          {state.pending && <div className="fp-notice" role="status">
+            <strong>{formatPracticeTime(state.pending.timeMs)} · {state.pending.formulaName}</strong>
+            <p>{t(state.phase === "saving" ? "algs.practice.saving" : "algs.practice.saveError")}</p>
+            {state.phase === "error" && <Button size="sm" colorPalette="brand" onClick={() => timer.retry()}>{t("algs.practice.retry")}</Button>}
+          </div>}
+          {state.phase === "error" && !state.pending && <div className="fp-notice" role="alert">{t("algs.practice.sessionError")} <Button size="sm" onClick={startPractice}>{t("algs.practice.retry")}</Button></div>}
+          {dataError && <div className="fp-notice" role="status">{t("algs.practice.dataError")} <Button size="sm" variant="outline" onClick={() => setRefresh((value) => value + 1)}>{t("algs.practice.retry")}</Button></div>}
 
-  const renderDetailPanel = () =>
-    detailRecord ? (
-      <Box>
-        <Text fontSize="xs" color="fg.muted" mb={2}>
-          {t("algs.modal.scramble")}
-        </Text>
-        <div className="formula-practice-detail-scramble">
-          {detailRecord.scramble}
-        </div>
-        <SvgRenderer
-          svg={
-            detailRecord.image ||
-            formulaKeyToImage.get(detailRecord.formulaKey) ||
-            ""
-          }
-          maxHeight={180}
-          style={{ marginBottom: 16 }}
-        />
-        <HStack gap={2} mb={4} align="center">
-          <Text fontSize="xs" color="fg.muted">
-            {t("algs.proficiencyCard.title")}:
-          </Text>
-          <ProficiencySelect
-            value={proficiencyMap[detailRecord.formulaKey] ?? "average"}
-            onChange={(v) => {
-              setFormulaProficiency(cube, classId, detailRecord.formulaKey, v);
-              setProficiencyMap((prev) => ({
-                ...prev,
-                [detailRecord.formulaKey]: v,
-              }));
-            }}
-            size="sm"
-          />
-        </HStack>
-        <Text fontSize="xs" color="fg.muted" mb={2}>
-          {t("algs.modal.formulaList")}
-        </Text>
-        <VStack gap={2} align="stretch">
-          {detailRecord.algs.map((alg, idx) => (
-            <div key={idx} className="formula-practice-detail-alg-item">
-              {alg}
-            </div>
-          ))}
-        </VStack>
-      </Box>
-    ) : null;
+          {view === "config" && <div className="fp-config">
+            <fieldset disabled={locked} className="fp-fieldset">
+              <legend>{t("algs.formulaPractice.mode")}</legend>
+              <div className="fp-modes">{(Object.keys(MODES) as FormulaPracticeMode[]).map((value) => <label key={value} className={mode === value ? "fp-mode fp-selected" : "fp-mode"}>
+                <input type="radio" name="fp-mode" checked={mode === value} onChange={() => setMode(value)} />{t(MODES[value])}
+              </label>)}</div>
+            </fieldset>
+            <fieldset disabled={locked} className="fp-fieldset">
+              <legend>{tf("algs.formulaPractice.selectedCount", { count: selectedAlgs.length })}</legend>
+              <div className="fp-actions"><Button size="sm" variant="outline" onClick={() => setSelected(new Set(flatAlgs.map(formulaKey)))}>{t("algs.detail.selectAll")}</Button><Button size="sm" variant="outline" onClick={() => setSelected(new Set())}>{t("algs.detail.deselectAll")}</Button></div>
+              {[...groups].map(([setName, set]) => <section className="fp-set" key={setName}>
+                <Button size="sm" variant="outline" aria-pressed={[...set.values()].flat().every((alg) => selected.has(formulaKey(alg)))} onClick={() => toggle([...set.values()].flat().map(formulaKey))}>{setName}</Button>
+                {[...set].map(([groupName, algs]) => <div className="fp-group" key={groupName}>
+                  <Button size="xs" variant="ghost" aria-pressed={algs.every((alg) => selected.has(formulaKey(alg)))} onClick={() => toggle(algs.map(formulaKey))}>{groupName}</Button>
+                  <div className="fp-choices">{algs.map((alg) => <label key={formulaKey(alg)}><input type="checkbox" checked={selected.has(formulaKey(alg))} onChange={() => toggle([formulaKey(alg)])} />{alg.alg.name}</label>)}</div>
+                </div>)}
+              </section>)}
+            </fieldset>
+            <fieldset disabled={locked} className="fp-fieldset">
+              <legend>{t("algs.formulaPractice.trimRatio")}</legend>
+              <label className="fp-range"><span>{config.trimRatio}%</span><input type="range" min={0} max={50} step={1} aria-label={t("algs.formulaPractice.trimRatio")} value={config.trimRatio} onChange={(event) => setConfig({ ...config, trimRatio: Number(event.target.value) })} /></label>
+              <p className="fp-meta">{tf("algs.formulaPractice.trimRatioDesc", { p: config.trimRatio })}</p>
+              <label className="fp-check"><input type="checkbox" checked={config.remindProficiency} onChange={(event) => setConfig({ ...config, remindProficiency: event.target.checked })} />{t("algs.practice.remind")}</label>
+            </fieldset>
+            {!selectedAlgs.length && <p role="status">{t("algs.practice.emptySelection")}</p>}
+            <Button colorPalette="brand" size="lg" disabled={locked || !selectedAlgs.length} loading={state.phase === "loading"} onClick={startPractice}>{t(snapshotMatches && state.sessionId ? "algs.practice.resume" : "algs.formulaPractice.start")}</Button>
+          </div>}
 
-  return (
-    <>
-      <FormulaPracticeDialog
-        open={open}
-        onClose={handlePracticeClose}
-        title={practiceDialogTitle}
-        size={isMobile ? { base: "full", md: "xl" } : "xl"}
-        hideHeader={timerState === "running" && practiceSubView === "main"}
-        closeOnInteractOutside={
-          timerState !== "running" && practiceSubView === "main"
-        }
-        wrapClassName={
-          isMobile ? "formula-practice-modal-wrap--fullscreen-mobile" : undefined
-        }
-        className={`formula-practice-modal--practice ${
-          timerState === "running"
-            ? "formula-practice-modal--timer-running"
-            : isMobile
-              ? "formula-practice-modal--mobile"
-              : ""
-        }`.trim()}
-      >
-        {practiceSubView === "fullHistory" ? (
-          renderFullHistoryPanel()
-        ) : practiceSubView === "detail" ? (
-          renderDetailPanel()
-        ) : (
-        <div
-          className={`formula-practice-practice-root ${
-            timerState === "running"
-              ? "formula-practice-practice-root--timing"
-              : ""
-          }`}
-        >
-          {timerState === "running" && (
-            <div
-              className="formula-practice-timing-overlay"
-              onPointerDown={(e) => {
-                e.preventDefault();
-                stopTimerAndNext();
-              }}
-              role="presentation"
-            >
-              <div className="formula-practice-timing-digits">
-                {formatTime(timerMs)}
+          {view === "main" && <div className="fp-layout">
+            <section className="fp-stage" aria-label={t("algs.formulaPractice.timerZone")}>
+              <div className="fp-stage-top"><span className="fp-meta">{state.snapshot ? t(MODES[state.snapshot.mode]) : ""}</span><span className="fp-meta">{tf("algs.formulaPractice.formulaNavHint", { current: state.slots.length ? state.index + 1 : 0, total: state.slots.length })}</span></div>
+              <p className="fp-scramble">{scramble || t("algs.formulaPractice.noScramble")}</p>
+              <button type="button" ref={timerButtonRef} className={`fp-timer fp-timer-${state.phase}`} aria-label={`${t(PHASE_LABELS[state.phase])}. ${t("algs.practice.controls")}`} aria-describedby="fp-instructions" disabled={!canTime || !["ready", "armed", "running"].includes(state.phase)}
+                onKeyDown={(event) => {
+                  if (event.code !== "Enter") return;
+                  event.preventDefault();
+                  if (event.repeat || event.nativeEvent.isComposing || event.altKey || event.ctrlKey || event.metaKey || !canTime) return;
+                  if (timer.getSnapshot().phase === "running") timer.stop();
+                  else if (timer.arm("activation")) timer.release("activation");
+                }}
+                onPointerDown={(event) => {
+                  if (!event.isPrimary || event.button !== 0 || !canTime) return;
+                  event.preventDefault();
+                  event.currentTarget.focus({ preventScroll: true });
+                  if (timer.getSnapshot().phase === "running") { timer.stop(); return; }
+                  if (timer.arm(`pointer:${event.pointerId}`)) event.currentTarget.setPointerCapture(event.pointerId);
+                }}
+                onPointerUp={(event) => {
+                  if (!event.isPrimary || event.button !== 0) return;
+                  event.preventDefault();
+                  if (canTime) timer.release(`pointer:${event.pointerId}`);
+                  else timer.cancelArm(`pointer:${event.pointerId}`);
+                  if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+                }}
+                onPointerCancel={(event) => timer.cancelArm(`pointer:${event.pointerId}`)}
+                onLostPointerCapture={(event) => timer.cancelArm(`pointer:${event.pointerId}`)}
+                onBlur={() => timer.cancelArm("keyboard")}
+                onClick={(event) => {
+                  // Native Enter/assistive activation has no pointer sequence. Space is handled on keyup.
+                  if (event.detail !== 0 || !canTime) return;
+                  if (timer.getSnapshot().phase === "running") timer.stop();
+                  else if (timer.arm("activation")) timer.release("activation");
+                }}>
+                <TimerDigits state={state} open={open} /><span className="fp-timer-label">{t(PHASE_LABELS[state.phase])}</span>
+              </button>
+              <p id="fp-instructions" className="fp-meta fp-instructions">{t("algs.practice.controls")}</p>
+              <div className="fp-actions fp-navigation">
+                <Button variant="outline" size="sm" disabled={locked} onClick={() => timer.navigate(-1)}>{t("algs.practice.previous")}</Button>
+                <Button variant="outline" size="sm" disabled={locked} onClick={() => timer.navigate(1)}>{t("algs.practice.next")}</Button>
+                {(running || state.phase === "armed") && <Button size="sm" variant="outline" onClick={() => timer.interrupt()}>{t("algs.practice.interrupt")}</Button>}
               </div>
-            </div>
-          )}
-
-          <div className="formula-practice-main" aria-hidden={timerState === "running"}>
-            {currentScramble ? (
-              <>
-                <div className="formula-practice-formula-section">
-                  {currentItem && (
-                    <div
-                      className={`formula-practice-header ${contentVisible ? "" : "formula-practice-header-hidden"}`}
-                    >
-                      {contentVisible ? (
-                        <>
-                          <SvgRenderer
-                            svg={currentItem.alg.image ?? ""}
-                            maxWidth={isMobile ? 120 : 140}
-                            maxHeight={isMobile ? 160 : 200}
-                            style={{ flexShrink: 0 }}
-                          />
-                          <div className="formula-practice-header-info">
-                            <div className="formula-practice-formula-name">
-                              {currentItem.alg.name}
-                            </div>
-                            <div className="formula-practice-formula-meta">
-                              {currentItem.setName} · {currentItem.groupName}
-                            </div>
-                          </div>
-                        </>
-                      ) : (
-                        <div className="formula-practice-header-placeholder">
-                          •••
-                        </div>
-                      )}
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        ml={2}
-                        onClick={() => setContentVisible(!contentVisible)}
-                      >
-                        {contentVisible ? "🙈" : "👁"}{" "}
-                        {contentVisible
-                          ? t("algs.formulaPractice.hideContent")
-                          : t("algs.formulaPractice.showContent")}
-                      </Button>
-                    </div>
-                  )}
-
-                  <div
-                    className="formula-practice-scramble-block formula-practice-scramble-clickable"
-                    onClick={() =>
-                      currentItem &&
-                      openDetailView({
-                        id: "",
-                        createdAt: 0,
-                        timeMs: 0,
-                        formulaKey: buildFormulaKey(
-                          currentItem.setName,
-                          currentItem.groupName,
-                          currentItem.alg.name,
-                        ),
-                        formulaName: currentItem.alg.name,
-                        setName: currentItem.setName,
-                        groupName: currentItem.groupName,
-                        scramble: currentScramble,
-                        scrambleIndex: currentSlot?.scrambleIdx ?? 0,
-                        image: currentItem.alg.image ?? "",
-                        algs: currentItem.alg.algs ?? [],
-                      })
-                    }
-                  >
-                    <div className="formula-practice-scramble-label">
-                      {t("algs.formulaPractice.scrambleLabel")}
-                    </div>
-                    <div className="formula-practice-scramble">{currentScramble}</div>
-                  </div>
-                </div>
-
-                <div className="formula-practice-timer-panel">
-                  <div className="formula-practice-timer-panel-title">
-                    {t("algs.formulaPractice.timerZone")}
-                  </div>
-                  <div
-                    className="formula-practice-start-zone"
-                    onPointerDown={(e) => {
-                      if (timerState !== "ready") return;
-                      e.preventDefault();
-                      startTimer();
-                    }}
-                    role="presentation"
-                  >
-                    <div
-                      className={`formula-practice-timer ready ${isMobile ? "formula-practice-timer--mobile-start" : ""}`}
-                    >
-                      {t("algs.formulaPractice.tapMiddleToStart")}
-                    </div>
-                  </div>
-                </div>
-
-                {currentItem && (
-                  <div className="formula-practice-nav-hint">
-                    {tf("algs.formulaPractice.formulaNavHint", {
-                      current: currentSlotIndex + 1,
-                      total: scrambleSlots.length,
-                    })}
-                  </div>
-                )}
-              </>
-            ) : (
-              <Text color="fg.muted">{t("algs.formulaPractice.noScramble")}</Text>
-            )}
-
-            {timerState !== "running" && (
-              <div className="formula-practice-hints">
-                {t("algs.formulaPractice.hintArrow")}
+              {state.interrupted && <p className="fp-meta" role="status">{t("algs.practice.interrupted")}</p>}
+              <div className="fp-answer">
+                <Button size="sm" variant="ghost" disabled={locked} aria-expanded={answerVisible} onClick={() => setAnswerVisible(!answerVisible)}>{t(answerVisible ? "algs.practice.hideAnswer" : "algs.practice.showAnswer")}</Button>
+                <Button size="sm" variant="ghost" disabled={locked || state.phase !== "ready" || !item} onClick={showQuestion}>{t("algs.practice.questionDetail")}</Button>
+                {answerVisible && item && <div className="fp-answer-content">
+                  {item.alg.image ? <SvgRenderer svg={item.alg.image} maxWidth={140} maxHeight={140} /> : <span className="fp-meta">{t("algs.practice.noImage")}</span>}
+                  <div><h3>{item.alg.name}</h3><p className="fp-meta">{item.setName} / {item.groupName}</p>{item.alg.algs.map((alg, index) => <p className="fp-alg" key={index}>{alg}</p>)}</div>
+                </div>}
               </div>
-            )}
-          </div>
+            </section>
+            <aside className="fp-sidebar" inert={running || state.phase === "armed" ? true : undefined}>
+              <div className="fp-actions"><Button size="sm" variant="outline" disabled={locked} onClick={() => go("config")}>{t("algs.practice.config")}</Button><Button size="sm" variant="ghost" disabled={locked} onClick={() => { setPage(1); go("history"); }}>{t("algs.formulaPractice.viewAllHistory")} ({summary?.total ?? 0})</Button></div>
+              <section className="fp-stats" aria-busy={summaryBusy}>
+                <p className="fp-meta">{tf("algs.practice.mean", { count: records.length })}</p><strong className="fp-mean">{mean === null ? "—" : formatPracticeTime(mean)}</strong>
+                <p className="fp-meta">{tf("algs.practice.statistics", { trim: effectiveTrim })}</p>
+                <dl className="fp-averages">{([50, 100, 1000] as const).map((n) => <div key={n}><dt>ao{n}</dt><dd>{averages[`ao${n}`] === null ? records.length < n ? tf("algs.practice.progress", { count: records.length, total: n }) : "—" : formatPracticeTime(averages[`ao${n}`]!)}</dd></div>)}</dl>
+                {effectiveTrim === 50 && records.length >= 50 && <p className="fp-meta">{t("algs.practice.trimUnavailable")}</p>}
+              </section>
+              {reminder && <section className="fp-reminder" aria-label={t("algs.formulaPractice.proficiencyRemindTitle")}>
+                <p>{tf("algs.formulaPractice.proficiencyRemindDesc", { name: reminder.formulaName })}</p>
+                <div className="fp-actions"><PracticeProficiency disabled={locked} value={proficiencies[reminder.formulaKey] ?? "average"} onChange={(level) => { proficiency(reminder.formulaKey, level); setDismissedReminder(reminder.id); }} /><Button size="xs" variant="ghost" onClick={() => setDismissedReminder(reminder.id)}>{t("algs.practice.skip")}</Button></div>
+              </section>}
+              <section><h3 className="fp-section-title">{t("algs.formulaPractice.historyTitle")}</h3>{summaryBusy && !summary ? <p className="fp-meta">{t("algs.practice.loadingHistory")}</p> : !records.length ? <p className="fp-meta">{t("algs.formulaPractice.historyEmpty")}</p> : renderRecords(records.slice(0, 3), "main")}</section>
+            </aside>
+          </div>}
 
-          <div
-            className={`formula-practice-below-main ${timerState === "running" ? "formula-practice-below-main--inert" : ""}`}
-            aria-hidden={timerState === "running"}
-          >
-            <HStack justify="space-between" mt={4}>
-              <Button size="sm" variant="outline" onClick={handleBackToConfig}>
-                {t("algs.formulaPractice.backToConfig")}
-              </Button>
-              <Button
-                size="sm"
-                colorPalette="red"
-                variant="outline"
-                onClick={handleClearHistory}
-              >
-                🗑 {t("algs.formulaPractice.clearHistory")}
-              </Button>
-            </HStack>
-
-            <div className="formula-practice-history">
-              <HStack justify="space-between" mb={2}>
-                <span className="formula-practice-history-header">
-                  {t("algs.formulaPractice.historyTitle")}
-                </span>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => {
-                    setHistoryPage(1);
-                    setPracticeSubView("fullHistory");
-                  }}
-                >
-                  📜 {t("algs.formulaPractice.viewAllHistory")} ({history.length})
-                </Button>
-              </HStack>
-              {history.length > 0 &&
-                (() => {
-                  const avgs = computeAverages(history, trimRatio);
-                  return (
-                    <div className="formula-practice-ao-row">
-                      {avgs.ao50 != null && (
-                        <span className="formula-practice-ao-item">
-                          ao50: {formatTime(avgs.ao50)}
-                        </span>
-                      )}
-                      {avgs.ao100 != null && (
-                        <span className="formula-practice-ao-item">
-                          ao100: {formatTime(avgs.ao100)}
-                        </span>
-                      )}
-                      {avgs.ao1000 != null && (
-                        <span className="formula-practice-ao-item">
-                          ao1000: {formatTime(avgs.ao1000)}
-                        </span>
-                      )}
-                    </div>
-                  );
-                })()}
-              {history.length === 0 ? (
-                <div className="formula-practice-empty">
-                  {t("algs.formulaPractice.historyEmpty")}
-                </div>
-              ) : (
-                history.slice(0, 3).map((record) => {
-                  const displayImage =
-                    record.image || formulaKeyToImage.get(record.formulaKey) || "";
-                  const prof = proficiencyMap[record.formulaKey] ?? "average";
-                  return (
-                    <div
-                      key={record.id}
-                      className="formula-practice-history-item"
-                      onClick={() => openDetailView(record)}
-                    >
-                      <SvgRenderer
-                        svg={displayImage}
-                        maxWidth={36}
-                        maxHeight={48}
-                        style={{ flexShrink: 0 }}
-                      />
-                      <div className="formula-practice-history-item-info">
-                        <div className="formula-practice-history-item-name">
-                          {record.formulaName}
-                        </div>
-                        <div className="formula-practice-history-item-meta">
-                          {record.setName} · {record.groupName}
-                        </div>
-                      </div>
-                      <span className="formula-practice-history-item-time">
-                        {formatTime(record.timeMs)}
-                      </span>
-                      <div onClick={(e) => e.stopPropagation()}>
-                        <ProficiencySelect
-                          value={prof}
-                          onChange={(v) => {
-                            setFormulaProficiency(
-                              cube,
-                              classId,
-                              record.formulaKey,
-                              v,
-                            );
-                            setProficiencyMap((prev) => ({
-                              ...prev,
-                              [record.formulaKey]: v,
-                            }));
-                          }}
-                          size="sm"
-                        />
-                      </div>
-                    </div>
-                  );
-                })
-              )}
-            </div>
-          </div>
-        </div>
-        )}
-      </FormulaPracticeDialog>
-
-      <FormulaPracticeDialog
-        open={proficiencyRemindOpen}
-        onClose={() => setProficiencyRemindOpen(false)}
-        title={t("algs.formulaPractice.proficiencyRemindTitle")}
-        size="md"
-      >
-        {lastPracticedFormula && (
-          <Box>
-            <Text fontSize="sm" color="fg.muted" mb={3}>
-              {tf("algs.formulaPractice.proficiencyRemindDesc", {
-                name: lastPracticedFormula.formulaName,
-              })}
-            </Text>
-            <HStack gap={2} flexWrap="wrap" mb={4}>
-              {PROFICIENCY_LEVELS.map((level) => (
-                <Button
-                  key={level}
-                  size="sm"
-                  onClick={() => {
-                    setFormulaProficiency(
-                      cube,
-                      classId,
-                      lastPracticedFormula.formulaKey,
-                      level,
-                    );
-                    setProficiencyMap((prev) => ({
-                      ...prev,
-                      [lastPracticedFormula.formulaKey]: level,
-                    }));
-                    setProficiencyRemindOpen(false);
-                  }}
-                  {...toggleBtnProps(
-                    proficiencyMap[lastPracticedFormula.formulaKey] === level,
-                  )}
-                >
-                  {t(PROFICIENCY_LABEL_KEYS[level])}
-                </Button>
-              ))}
-            </HStack>
-            <Checkbox.Root
-              checked={!remindProficiency}
-              onCheckedChange={(e) => {
-                const checked = e.checked === true;
-                const next = !checked;
-                setRemindProficiency(next);
-                saveFormulaPracticeConfig(cube, classId, {
-                  remindProficiency: next,
-                });
-              }}
-            >
-              <Checkbox.HiddenInput />
-              <Checkbox.Control />
-              <Checkbox.Label>
-                {t("algs.formulaPractice.proficiencyDontRemind")}
-              </Checkbox.Label>
-            </Checkbox.Root>
-          </Box>
-        )}
-      </FormulaPracticeDialog>
-    </>
-  );
+          {view === "history" && <section aria-busy={historyBusy}>
+            <div className="fp-history-heading"><p className="fp-meta">{tf("algs.formulaPractice.totalRecords", { total: history?.total ?? summary?.total ?? 0 })}</p><Button size="sm" variant="outline" disabled={locked || !(history?.total ?? summary?.total)} onClick={() => confirmDelete("clear", "history")}>{t("algs.formulaPractice.clearHistory")}</Button></div>
+            {historyBusy ? <p role="status">{t("algs.practice.loadingHistory")}</p> : history && !history.records.length ? <p>{t("algs.formulaPractice.historyEmpty")}</p> : renderRecords(history?.records ?? [], "history")}
+            {history && <nav className="fp-pagination" aria-label={t("algs.formulaPractice.fullHistory")}>
+              <Button size="sm" variant="outline" disabled={locked || historyBusy || page <= 1} onClick={() => setPage((value) => value - 1)}>{t("algs.practice.previousPage")}</Button>
+              <span className="fp-meta">{tf("algs.practice.page", { page: history.page, pages: Math.max(1, Math.ceil(history.total / PAGE_SIZE)), total: history.total })}</span>
+              <Button size="sm" variant="outline" disabled={locked || historyBusy || page >= Math.ceil(history.total / PAGE_SIZE)} onClick={() => setPage((value) => value + 1)}>{t("algs.practice.nextPage")}</Button>
+            </nav>}
+          </section>}
+          {view === "detail" && detailItem && <section className="fp-detail">
+            <div className="fp-history-heading"><div><h2>{detailItem.formulaName}</h2><p className="fp-meta">{detailItem.setName} / {detailItem.groupName}</p></div>{detailRecord && <strong className="fp-mean">{formatPracticeTime(detailRecord.timeMs)}</strong>}</div>
+            {detailRecord && <p className="fp-meta">{new Date(detailRecord.createdAt).toLocaleString(locale)}</p>}
+            <p className="fp-scramble">{detailItem.scramble}</p>
+            {detailImage ? <SvgRenderer svg={detailImage} maxWidth={200} maxHeight={200} /> : <p className="fp-meta">{t("algs.practice.noImage")}</p>}
+            <h3>{t("algs.practice.answer")}</h3>{detailItem.algs.map((alg, index) => <p className="fp-alg" key={index}>{alg}</p>)}
+            <div className="fp-actions"><PracticeProficiency value={proficiencies[detailItem.formulaKey] ?? "average"} onChange={(level) => proficiency(detailItem.formulaKey, level)} />{detailRecord && <Button variant="outline" onClick={() => confirmDelete(detailRecord, "detail")}>{t("algs.practice.delete")}</Button>}</div>
+          </section>}
+          {view === "confirm" && <section className="fp-confirm" aria-busy={actionBusy}>
+            <h2>{t(confirmation === "clear" ? "algs.formulaPractice.clearHistory" : "algs.practice.delete")}</h2>
+            <p>{t(confirmation === "clear" ? "algs.practice.confirmClear" : "algs.formulaPractice.confirmDelete")}</p>
+            <div className="fp-actions"><Button variant="outline" disabled={actionBusy} onClick={() => go(confirmationReturn)}>{t("algs.practice.cancel")}</Button><Button colorPalette="red" loading={actionBusy} disabled={actionBusy} onClick={performDeletion}>{t("algs.practice.confirmAction")}</Button></div>
+          </section>}
+        </Dialog.Body>
+      </Dialog.Content>
+    </Dialog.Positioner>
+  </Dialog.Root>;
 }
