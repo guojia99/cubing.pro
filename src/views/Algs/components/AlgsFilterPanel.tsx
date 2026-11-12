@@ -1,11 +1,12 @@
 "use client";
 
-import { Box, Button, Card, Text, VStack, HStack, Badge } from "@chakra-ui/react";
+import { Box, Text, VStack, HStack } from "@chakra-ui/react";
 import { useMemo } from "react";
 import { useI18n } from "@/contexts/I18nProvider";
 import type { AlgClassDetail } from "@/services/cubing-pro/algs/algs";
 import { buildGroupKey } from "@/services/cubing-pro/algs/formulaPracticeSelection";
 import { collectVisibleFormulaKeys } from "../utils/algsFormulaFilter";
+import "./algsFilter.css";
 
 interface AlgsFilterPanelProps {
   data: AlgClassDetail;
@@ -52,41 +53,34 @@ export default function AlgsFilterPanel({
   const visibleCount = scopeKeys.filter((k) => !hiddenSet.has(k)).length;
 
   return (
-    <VStack align="stretch" gap={3}>
-      <Card.Root size="sm" variant="outline">
-        <Card.Body p={3}>
-          <HStack gap={2} mb={2} flexWrap="wrap" align="center">
+    <VStack className="algs-filter-panel" align="stretch" gap={3}>
+      <Box as="section" className="algs-filter-section">
+          <HStack className="algs-filter-heading" gap={1} mb={2} flexWrap="wrap" align="center">
             <Text fontSize="xs" color="fg.muted">{t("algs.detail.set")}</Text>
-            <Button size="2xs" variant="outline" onClick={onSetSelectAll}>{t("algs.detail.selectAll")}</Button>
-            <Button size="2xs" variant="outline" onClick={onSetDeselectAll}>{t("algs.detail.deselectAll")}</Button>
+            <button type="button" className="algs-filter-action" onClick={onSetSelectAll}>{t("algs.detail.selectAll")}</button>
+            <button type="button" className="algs-filter-action" onClick={onSetDeselectAll}>{t("algs.detail.deselectAll")}</button>
           </HStack>
-          <HStack gap={2} flexWrap="wrap">
+          <div className="algs-filter-grid">
             {setKeys.map((name) => (
-              <Badge
+              <button
                 key={name}
-                as="button"
-                cursor="pointer"
-                variant={selectedSets.includes(name) ? "solid" : "outline"}
-                colorPalette="brand"
-                borderRadius="full"
-                px={3}
-                py={1}
-                fontSize="sm"
+                type="button"
+                className="algs-filter-choice"
+                aria-pressed={selectedSets.includes(name)}
                 onClick={() => onSetToggle(name)}
               >
-                {name}
-              </Badge>
+                <span className="algs-filter-check" aria-hidden="true" />
+                <span className="algs-filter-label">{name}</span>
+              </button>
             ))}
-          </HStack>
-        </Card.Body>
-      </Card.Root>
+          </div>
+      </Box>
 
-      <Card.Root size="sm" variant="outline">
-        <Card.Body p={3}>
-          <HStack gap={2} mb={2} flexWrap="wrap" align="center">
+      <Box as="section" className="algs-filter-section">
+          <HStack className="algs-filter-heading" gap={1} mb={2} flexWrap="wrap" align="center">
             <Text fontSize="xs" color="fg.muted">{t("algs.detail.group")}</Text>
-            <Button size="2xs" variant="outline" onClick={onGroupSelectAll}>{t("algs.detail.selectAll")}</Button>
-            <Button size="2xs" variant="outline" onClick={onGroupDeselectAll}>{t("algs.detail.deselectAll")}</Button>
+            <button type="button" className="algs-filter-action" onClick={onGroupSelectAll}>{t("algs.detail.selectAll")}</button>
+            <button type="button" className="algs-filter-action" onClick={onGroupDeselectAll}>{t("algs.detail.deselectAll")}</button>
           </HStack>
           <VStack align="stretch" gap={3}>
             {setKeys
@@ -98,37 +92,31 @@ export default function AlgsFilterPanel({
                 return (
                   <Box key={setName}>
                     <Text fontSize="xs" color="fg.muted" mb={1}>{setName}</Text>
-                    <HStack gap={2} flexWrap="wrap">
+                    <div className="algs-filter-grid">
                       {gKeys.map((gName) => {
                         const key = buildGroupKey(setName, gName);
                         return (
-                          <Badge
+                          <button
                             key={key}
-                            as="button"
-                            cursor="pointer"
-                            variant={selectedGroups.includes(key) ? "solid" : "outline"}
-                            colorPalette="brand"
-                            borderRadius="full"
-                            px={3}
-                            py={1}
-                            fontSize="xs"
+                            type="button"
+                            className="algs-filter-choice"
+                            aria-pressed={selectedGroups.includes(key)}
                             onClick={() => onGroupToggle(key)}
                           >
-                            {gName}
-                          </Badge>
+                            <span className="algs-filter-check" aria-hidden="true" />
+                            <span className="algs-filter-label">{gName}</span>
+                          </button>
                         );
                       })}
-                    </HStack>
+                    </div>
                   </Box>
                 );
               })}
           </VStack>
-        </Card.Body>
-      </Card.Root>
+      </Box>
 
-      <Card.Root size="sm" variant="outline">
-        <Card.Body p={3}>
-          <HStack gap={2} mb={2} flexWrap="wrap" align="center">
+      <Box as="section" className="algs-filter-section">
+          <HStack className="algs-filter-heading" gap={1} mb={2} flexWrap="wrap" align="center">
             <Text fontSize="xs" color="fg.muted">
               {t("algs.detail.formulaFilter")}
               {scopeKeys.length > 0 && (
@@ -137,14 +125,14 @@ export default function AlgsFilterPanel({
                 </Text>
               )}
             </Text>
-            <Button size="2xs" variant="outline" onClick={onFormulaSelectAll} disabled={scopeKeys.length === 0}>
+            <button type="button" className="algs-filter-action" onClick={onFormulaSelectAll} disabled={scopeKeys.length === 0}>
               {t("algs.detail.selectAll")}
-            </Button>
-            <Button size="2xs" variant="outline" onClick={onFormulaDeselectAll} disabled={scopeKeys.length === 0}>
+            </button>
+            <button type="button" className="algs-filter-action" onClick={onFormulaDeselectAll} disabled={scopeKeys.length === 0}>
               {t("algs.detail.deselectAll")}
-            </Button>
+            </button>
           </HStack>
-          <Box maxH="420px" overflowY="auto" pr={1}>
+          <Box maxH="420px" overflowY="auto">
             <VStack align="stretch" gap={3}>
               {setKeys
                 .filter((sn) => selectedSets.includes(sn))
@@ -166,30 +154,25 @@ export default function AlgsFilterPanel({
                         return (
                           <Box key={buildGroupKey(setName, gName)} mb={2}>
                             <Text fontSize="2xs" color="fg.muted" mb={1}>{gName}</Text>
-                            <Box display="grid" gridTemplateColumns="repeat(auto-fill, minmax(70px, 1fr))" gap={1}>
+                            <div className="algs-filter-grid">
                               {algs.map((alg) => {
                                 const fKey = `${setName}:${gName}:${alg.name}`;
                                 const visible = !hiddenSet.has(fKey);
                                 return (
-                                  <Badge
+                                  <button
                                     key={fKey}
-                                    as="button"
-                                    cursor="pointer"
-                                    variant={visible ? "solid" : "outline"}
-                                    colorPalette="brand"
-                                    borderRadius="md"
-                                    px={2}
-                                    py={0.5}
-                                    fontSize="2xs"
-                                    truncate
+                                    type="button"
+                                    className="algs-filter-choice"
+                                    aria-pressed={visible}
                                     title={alg.name}
                                     onClick={() => onFormulaToggle(fKey)}
                                   >
-                                    {alg.name}
-                                  </Badge>
+                                    <span className="algs-filter-check" aria-hidden="true" />
+                                    <span className="algs-filter-label">{alg.name}</span>
+                                  </button>
                                 );
                               })}
-                            </Box>
+                            </div>
                           </Box>
                         );
                       })}
@@ -198,8 +181,7 @@ export default function AlgsFilterPanel({
                 })}
             </VStack>
           </Box>
-        </Card.Body>
-      </Card.Root>
+      </Box>
     </VStack>
   );
 }

@@ -1,34 +1,14 @@
-/**
- * 公式练习历史 - 存储格式与 API
- *
- * 存储 key: algs:formula_practice_history:{cube}-{classId}
- * 不同公式库(cube+classId)使用不同 key，互不干扰
- *
- * 存储结构 v2（按会话组织）：
- * {
- *   version: 2,
- *   sessions: PracticeSession[]
- * }
- *
- * 每次「开始练习」创建一个会话，该次练习中完成的每条公式作为一条记录追加到该会话。
- * 支持保存多条练习记录，按会话分组，便于按练习轮次查看。
- */
+import {
+  deleteScope, historyScope, historyTransaction, migrateHistoryScope,
+  type RecordRow,
+} from './formulaPracticeHistoryDb';
 
-const LS_KEY_PREFIX = 'algs:formula_practice_history:';
-/** 降低限制以适配 localStorage 约 5MB 配额，image(SVG) 单条约 2-5KB */
-const MAX_SESSIONS = 50;
-const MAX_RECORDS_PER_SESSION = 100;
-const MAX_TOTAL_RECORDS = 500;
 export const PAGE_SIZE = 20;
 
 export interface FormulaPracticeRecord {
-  /** 唯一标识，用于列表 key */
   id: string;
-  /** 创建时间戳 */
   createdAt: number;
-  /** 耗时(ms) */
   timeMs: number;
-  /** 公式唯一键: setName:groupName:formulaName */
   formulaKey: string;
   formulaName: string;
   setName: string;
@@ -39,261 +19,12 @@ export interface FormulaPracticeRecord {
   algs: string[];
 }
 
-/** 练习会话：一次「开始练习」到「返回配置」之间的所有记录 */
 export interface PracticeSession {
-  /** 会话唯一标识 */
   id: string;
-  /** 会话创建时间 */
   createdAt: number;
-  /** 练习模式 */
   mode: 'sequential' | 'random' | 'nonRepeatRandom' | 'weightedRandom';
-  /** 该次练习选中的公式 key 列表 */
   selectedFormulas: string[];
-  /** 该会话内的练习记录（按完成顺序） */
   records: FormulaPracticeRecord[];
-}
-
-interface StorageDataV2 {
-  version: 2;
-  sessions: PracticeSession[];
-}
-
-/** 旧版 v1 存储结构（兼容迁移） */
-interface StorageDataV1 {
-  version: 1;
-  records: FormulaPracticeRecord[];
-}
-
-/** 当前 key 格式: {cube}-{classId} */
-function getStorageKey(cube: string, classId: string): string {
-  return `${LS_KEY_PREFIX}${encodeURIComponent(cube)}-${encodeURIComponent(classId)}`;
-}
-
-/** 旧 key 格式(兼容迁移): {cube}:{classId} */
-function getLegacyStorageKey(cube: string, classId: string): string {
-  return `${LS_KEY_PREFIX}${encodeURIComponent(cube)}:${encodeURIComponent(classId)}`;
-}
-
-function generateRecordId(): string {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-}
-
-function generateSessionId(): string {
-  return `s-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-}
-
-/** 将旧格式迁移为 v2 会话结构 */
-function migrateToV2(raw: string): StorageDataV2 | null {
-  try {
-    const parsed = JSON.parse(raw);
-    let records: FormulaPracticeRecord[] = [];
-
-    if (Array.isArray(parsed)) {
-      // 最旧格式：直接是 FormulaPracticeRecord[]
-      records = parsed.map((r: Record<string, unknown>, i: number) => ({
-        id: `${(r.createdAt as number) ?? Date.now()}-${i}`,
-        createdAt: (r.createdAt as number) ?? Date.now(),
-        timeMs: (r.time as number) ?? (r.timeMs as number) ?? 0,
-        formulaKey: (r.formulaKey as string) ?? `${r.setName}:${r.groupName}:${r.formulaName}`,
-        formulaName: (r.formulaName as string) ?? '',
-        setName: (r.setName as string) ?? '',
-        groupName: (r.groupName as string) ?? '',
-        scramble: (r.scramble as string) ?? '',
-        scrambleIndex: (r.scrambleIndex as number) ?? 0,
-        image: (r.image as string) ?? '',
-        algs: Array.isArray(r.algs) ? r.algs : [],
-      }));
-    } else if ((parsed?.version === 1 || parsed?.version === '1') && Array.isArray(parsed?.records)) {
-      const v1 = parsed as StorageDataV1;
-      records = v1.records.map((r, i) => {
-        const raw = r as unknown as { time?: number };
-        return {
-          ...r,
-          id: r.id || `${r.createdAt}-${i}`,
-          timeMs: raw?.time != null ? raw.time : r.timeMs,
-        };
-      });
-    } else if (parsed?.version === 2 || parsed?.version === '2') {
-      // v2 格式：确保 sessions 存在且每个 session 的 records 存在
-      const sessions = Array.isArray(parsed?.sessions)
-        ? (parsed.sessions as PracticeSession[]).map((s) => ({
-            ...s,
-            records: Array.isArray(s?.records) ? s.records : [],
-          }))
-        : [];
-      return { version: 2, sessions };
-    }
-
-    if (records.length > 0) {
-      const legacySession: PracticeSession = {
-        id: generateSessionId(),
-        createdAt: records[records.length - 1]?.createdAt ?? Date.now(),
-        mode: 'sequential',
-        selectedFormulas: [],
-        records: records.reverse(),
-      };
-      return { version: 2, sessions: [legacySession] };
-    }
-  } catch {
-    // ignore
-  }
-  return null;
-}
-
-function loadStorageData(cube: string, classId: string): StorageDataV2 {
-  try {
-    const key = getStorageKey(cube, classId);
-    let raw = localStorage.getItem(key);
-    let fromLegacyKey = false;
-    if (!raw) {
-      const legacyKey = getLegacyStorageKey(cube, classId);
-      raw = localStorage.getItem(legacyKey);
-      fromLegacyKey = !!raw;
-    }
-    if (raw) {
-      const migrated = migrateToV2(raw);
-      if (migrated) {
-        // 若从旧格式迁移而来，持久化 v2 并清理旧 key
-        const isOldFormat =
-          fromLegacyKey ||
-          raw.startsWith('[') ||
-          /"version"\s*:\s*1\b/.test(raw);
-        if (isOldFormat) {
-          saveStorageData(cube, classId, migrated);
-          if (fromLegacyKey) {
-            try {
-              localStorage.removeItem(getLegacyStorageKey(cube, classId));
-            } catch {
-              // ignore
-            }
-          }
-        }
-        return migrated;
-      }
-    }
-  } catch {
-    // ignore
-  }
-  return { version: 2, sessions: [] };
-}
-
-/** 精简记录：移除 image 以减小体积（展示时可通过 formulaKey 查找） */
-function slimRecord(r: FormulaPracticeRecord): FormulaPracticeRecord {
-  return { ...r, image: '' };
-}
-
-/** 尝试保存，若配额超限则逐步删除最旧数据后重试 */
-function saveStorageData(cube: string, classId: string, data: StorageDataV2): boolean {
-  if (!cube || !classId) {
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('[formulaPractice] saveStorageData skipped: cube or classId empty', { cube, classId });
-    }
-    return false;
-  }
-  const key = getStorageKey(cube, classId);
-
-  const trySave = (d: StorageDataV2): boolean => {
-    try {
-      localStorage.setItem(key, JSON.stringify(d));
-      return true;
-    } catch (e) {
-      if (e instanceof DOMException && e.name === 'QuotaExceededError') {
-        return false;
-      }
-      if (process.env.NODE_ENV === 'development') {
-        console.error('[formulaPractice] saveStorageData failed:', e);
-      }
-      return false;
-    }
-  };
-
-  if (trySave(data)) return true;
-
-  // 配额超限：逐步删除最旧数据并精简 image 后重试
-  const current: StorageDataV2 = { version: 2, sessions: data.sessions.map((s) => ({
-    ...s,
-    records: s.records.map(slimRecord),
-  })) };
-  if (trySave(current)) return true;
-
-  while (current.sessions.length > 0) {
-    const last = current.sessions[current.sessions.length - 1];
-    if (last.records.length > 1) {
-      last.records = last.records.slice(1);
-      current.sessions[current.sessions.length - 1] = { ...last };
-    } else {
-      current.sessions = current.sessions.slice(0, -1);
-    }
-    if (current.sessions.length === 0) break;
-    if (trySave(current)) return true;
-  }
-
-  // 最后尝试只保存最新一条记录
-  if (data.sessions.length > 0 && data.sessions[0].records.length > 0) {
-    const latest = data.sessions[0].records[data.sessions[0].records.length - 1];
-    const minimal: StorageDataV2 = {
-      version: 2,
-      sessions: [{
-        ...data.sessions[0],
-        records: [slimRecord(latest)],
-      }],
-    };
-    if (trySave(minimal)) return true;
-  }
-  return false;
-}
-
-/** 从所有会话中扁平化出所有记录（按 createdAt 倒序，最新在前） */
-function flattenRecords(sessions: PracticeSession[]): FormulaPracticeRecord[] {
-  const all: FormulaPracticeRecord[] = [];
-  (sessions ?? []).forEach((s) => {
-    const recs = Array.isArray(s?.records) ? s.records : [];
-    recs.forEach((r) => all.push(r));
-  });
-  all.sort((a, b) => b.createdAt - a.createdAt);
-  return all;
-}
-
-export function getFormulaPracticeHistory(
-  cube: string,
-  classId: string,
-): FormulaPracticeRecord[] {
-  const data = loadStorageData(cube, classId);
-  return flattenRecords(data.sessions);
-}
-
-/**
- * 创建新的练习会话，在「开始练习」时调用
- */
-export function createPracticeSession(
-  cube: string,
-  classId: string,
-  params: { mode: PracticeSession['mode']; selectedFormulas: string[] },
-): string {
-  if (!cube || !classId) {
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('[formulaPractice] createPracticeSession skipped: cube or classId empty', {
-        cube,
-        classId,
-        cubeType: typeof cube,
-        classIdType: typeof classId,
-      });
-    }
-    return '';
-  }
-
-  const data = loadStorageData(cube, classId);
-  const session: PracticeSession = {
-    id: generateSessionId(),
-    createdAt: Date.now(),
-    mode: params.mode,
-    selectedFormulas: params.selectedFormulas,
-    records: [],
-  };
-
-  const nextSessions = [session, ...data.sessions].slice(0, MAX_SESSIONS);
-  saveStorageData(cube, classId, { version: 2, sessions: nextSessions });
-  return session.id;
 }
 
 export interface HistoryPageResult {
@@ -303,23 +34,11 @@ export interface HistoryPageResult {
   pageSize: number;
 }
 
-/**
- * 分页获取练习历史
- */
-export function getFormulaPracticeHistoryPage(
-  cube: string,
-  classId: string,
-  page: number,
-  pageSize: number = PAGE_SIZE,
-): HistoryPageResult {
-  const records = getFormulaPracticeHistory(cube, classId);
-  const total = records.length;
-  const start = (page - 1) * pageSize;
-  const pageRecords = records.slice(start, start + pageSize);
-  return { records: pageRecords, total, page, pageSize };
-}
-
 export interface AppendRecordInput {
+  /** Keep the same ID when retrying a pending record. Omit for a new random ID. */
+  id?: string;
+  /** If supplied, retries must use the same timestamp. */
+  createdAt?: number;
   timeMs: number;
   formulaKey: string;
   formulaName: string;
@@ -331,142 +50,240 @@ export interface AppendRecordInput {
   algs: string[];
 }
 
-/**
- * 向指定会话追加一条练习记录，并返回追加后的完整历史（用于立即更新 UI）
- * @param sessionId 由 createPracticeSession 返回的会话 id
- */
-export function appendFormulaPracticeRecord(
-  cube: string,
-  classId: string,
-  sessionId: string,
-  input: AppendRecordInput,
-): FormulaPracticeRecord[] {
-  if (!cube || !classId) {
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('[formulaPractice] appendFormulaPracticeRecord skipped: cube or classId empty', {
-        cube,
-        classId,
-      });
-    }
-    return getFormulaPracticeHistory(cube, classId);
+export class PracticeSessionMissingError extends Error {
+  readonly code = 'PRACTICE_SESSION_MISSING' as const;
+
+  constructor(public readonly sessionId: string) {
+    super(`Practice session not found: ${sessionId}`);
+    this.name = 'PracticeSessionMissingError';
   }
+}
 
-  const data = loadStorageData(cube, classId);
-  let sessionIdx = data.sessions.findIndex((s) => s.id === sessionId);
+async function library(cube: string, classId: string) {
+  const scope = historyScope(cube, classId);
+  const legacy = `${encodeURIComponent(cube)}:${encodeURIComponent(classId)}`;
+  return { scope, db: await migrateHistoryScope(scope, legacy) };
+}
 
-  // 若找不到会话（如刷新后 sessionId 丢失），创建新会话并追加记录，避免数据丢失
-  if (sessionIdx < 0 && sessionId) {
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('[formulaPractice] session not found, creating fallback session', {
-        sessionId,
-        existingSessionIds: data.sessions.map((s) => s.id),
-      });
-    }
-    const fallbackSession: PracticeSession = {
-      id: generateSessionId(),
-      createdAt: Date.now(),
-      mode: 'sequential',
-      selectedFormulas: [],
-      records: [],
-    };
-    const sessions = [fallbackSession, ...data.sessions].slice(0, MAX_SESSIONS);
-    sessionIdx = 0;
-    saveStorageData(cube, classId, { version: 2, sessions });
-    data.sessions = sessions;
-  } else if (sessionIdx < 0) {
-    return getFormulaPracticeHistory(cube, classId);
+export async function createPracticeSession(
+  cube: string, classId: string,
+  params: { mode: PracticeSession['mode']; selectedFormulas: string[] },
+): Promise<string> {
+  const { db, scope } = await library(cube, classId);
+  const id = `s-${crypto.randomUUID()}`;
+  await historyTransaction<void>(db, 'readwrite', (tx, done) => {
+    tx.objectStore('sessions').add({ scope, id, createdAt: Date.now(), ...params });
+    done();
+  });
+  return id;
+}
+
+/** Returns the committed record; matching scope/ID retries never write a second time. */
+export async function appendFormulaPracticeRecord(
+  cube: string, classId: string, sessionId: string, input: AppendRecordInput,
+): Promise<FormulaPracticeRecord> {
+  if (!sessionId) throw new PracticeSessionMissingError(sessionId);
+  if (!Number.isFinite(input.timeMs) || input.timeMs < 0) throw new Error('Invalid practice time');
+  if (input.id !== undefined && (typeof input.id !== 'string' || !input.id.trim())) {
+    throw new Error('Invalid practice record ID');
   }
-
+  if (input.createdAt !== undefined && (!Number.isFinite(input.createdAt) || input.createdAt < 0)) {
+    throw new Error('Invalid practice record timestamp');
+  }
+  const explicitCreatedAt = input.createdAt !== undefined;
+  // Snapshot pending input before any await so caller mutations cannot alter the write.
   const record: FormulaPracticeRecord = {
-    id: generateRecordId(),
-    createdAt: Date.now(),
-    timeMs: input.timeMs,
-    formulaKey: input.formulaKey,
-    formulaName: input.formulaName,
-    setName: input.setName,
-    groupName: input.groupName,
-    scramble: input.scramble,
-    scrambleIndex: input.scrambleIndex,
-    image: input.image,
-    algs: input.algs,
+    ...input, algs: [...input.algs], id: input.id ?? crypto.randomUUID(), createdAt: input.createdAt ?? Date.now(),
   };
-
-  const sessions = [...data.sessions];
-  const session = { ...sessions[sessionIdx] };
-  session.records = [...session.records, record].slice(-MAX_RECORDS_PER_SESSION);
-  sessions[sessionIdx] = session;
-
-  // 若总记录数超限，移除最旧会话中的多余记录
-  const totalRecords = sessions.reduce((sum, s) => sum + s.records.length, 0);
-  if (totalRecords > MAX_TOTAL_RECORDS) {
-    let toRemove = totalRecords - MAX_TOTAL_RECORDS;
-    for (let i = sessions.length - 1; i >= 0 && toRemove > 0; i--) {
-      const s = sessions[i];
-      if (s.records.length <= toRemove) {
-        toRemove -= s.records.length;
-        sessions[i] = { ...s, records: [] };
-      } else {
-        sessions[i] = { ...s, records: s.records.slice(toRemove) };
-        toRemove = 0;
-      }
-    }
-  }
-
-  saveStorageData(cube, classId, { version: 2, sessions });
-  return flattenRecords(sessions);
-}
-
-/**
- * 删除单条记录
- */
-export function deleteFormulaPracticeRecord(
-  cube: string,
-  classId: string,
-  recordId: string,
-): FormulaPracticeRecord[] {
-  if (!cube || !classId) return getFormulaPracticeHistory(cube, classId);
-  const data = loadStorageData(cube, classId);
-  const sessions = data.sessions
-    .map((s) => ({ ...s, records: s.records.filter((r) => r.id !== recordId) }))
-    .filter((s) => s.records.length > 0);
-  saveStorageData(cube, classId, { version: 2, sessions });
-  return flattenRecords(sessions);
-}
-
-/**
- * 计算去头尾平均 (trimmed mean)
- * @param times 时间数组(ms)，按时间顺序（最新在前）
- * @param trimRatio 0-50，去掉最大和最小各 trimRatio% 的数据
- */
-export function computeTrimmedMean(times: number[], trimRatio: number): number | null {
-  if (times.length === 0) return null;
-  const n = times.length;
-  const trimCount = Math.floor((n * trimRatio) / 100);
-  if (trimCount * 2 >= n) return null;
-  const sorted = [...times].sort((a, b) => a - b);
-  const trimmed = sorted.slice(trimCount, n - trimCount);
-  return trimmed.reduce((s, t) => s + t, 0) / trimmed.length;
-}
-
-/**
- * 计算 ao50, ao100, ao1000
- */
-export function computeAverages(
-  records: FormulaPracticeRecord[],
-  trimRatio: number,
-): { ao50: number | null; ao100: number | null; ao1000: number | null } {
-  const times = records.map((r) => r.timeMs);
-  return {
-    ao50: computeTrimmedMean(times.slice(0, 50), trimRatio),
-    ao100: computeTrimmedMean(times.slice(0, 100), trimRatio),
-    ao1000: computeTrimmedMean(times.slice(0, 1000), trimRatio),
-  };
-}
-
-export function clearFormulaPracticeHistory(cube: string, classId: string): void {
+  const { db, scope } = await library(cube, classId);
+  let failure: Error | undefined;
   try {
-    localStorage.removeItem(getStorageKey(cube, classId));
-  } catch {
-    // ignore
+    return await historyTransaction<FormulaPracticeRecord>(db, 'readwrite', (tx, done) => {
+      const records = tx.objectStore('records');
+      const request = records.get([scope, record.id]);
+      request.onsuccess = () => {
+        const existing = request.result as RecordRow | undefined;
+        if (existing) {
+          const fields = ['timeMs', 'formulaKey', 'formulaName', 'setName', 'groupName',
+            'scramble', 'scrambleIndex', 'image'] as const;
+          if (existing.sessionId !== sessionId ||
+              (explicitCreatedAt && existing.createdAt !== record.createdAt) ||
+              fields.some((field) => existing[field] !== record[field]) ||
+              existing.algs.length !== record.algs.length ||
+              existing.algs.some((alg, index) => alg !== record.algs[index])) {
+            failure = new Error(`Practice record ID conflict: ${record.id}`);
+            tx.abort();
+            return;
+          }
+          const committed: Partial<RecordRow> = { ...existing };
+          delete committed.scope;
+          delete committed.sessionId;
+          done(committed as FormulaPracticeRecord);
+          return;
+        }
+        const session = tx.objectStore('sessions').get([scope, sessionId]);
+        session.onsuccess = () => {
+          if (!session.result) {
+            failure = new PracticeSessionMissingError(sessionId);
+            tx.abort();
+            return;
+          }
+          records.add({ ...record, scope, sessionId });
+          done(record);
+        };
+      };
+    });
+  } catch (error) {
+    throw failure ?? error;
   }
+}
+
+function readRecords(
+  tx: IDBTransaction, scope: string, offset: number, limit: number,
+  done: (records: FormulaPracticeRecord[]) => void,
+): void {
+  const records: FormulaPracticeRecord[] = [];
+  const range = IDBKeyRange.bound([scope, -Infinity], [scope, Infinity, []]);
+  const request = tx.objectStore('records').index('scopeCreatedAt').openCursor(range, 'prev');
+  let skipped = false;
+  request.onsuccess = () => {
+    const cursor = request.result;
+    if (!cursor || records.length >= limit) { done(records); return; }
+    if (offset > 0 && !skipped) { skipped = true; cursor.advance(offset); return; }
+    const record: Partial<RecordRow> = { ...cursor.value as RecordRow };
+    delete record.scope;
+    delete record.sessionId;
+    records.push(record as FormulaPracticeRecord);
+    if (records.length >= limit) done(records);
+    else cursor.continue();
+  };
+}
+
+/** Explicit full-history query for callers that need every record. Ordinary UI should page. */
+export async function getFormulaPracticeHistory(cube: string, classId: string): Promise<FormulaPracticeRecord[]> {
+  const { db, scope } = await library(cube, classId);
+  return historyTransaction(db, 'readonly', (tx, done) => readRecords(tx, scope, 0, Infinity, done));
+}
+
+export async function getFormulaPracticeHistoryPage(
+  cube: string, classId: string, page: number, pageSize: number = PAGE_SIZE,
+): Promise<HistoryPageResult> {
+  if (!Number.isSafeInteger(page) || page < 1 || !Number.isSafeInteger(pageSize) || pageSize < 1 ||
+      !Number.isSafeInteger((page - 1) * pageSize)) throw new Error('Invalid history pagination');
+  const { db, scope } = await library(cube, classId);
+  return historyTransaction(db, 'readonly', (tx, done) => {
+    const count = tx.objectStore('records').index('scope').count(scope);
+    count.onsuccess = () => {
+      readRecords(tx, scope, (page - 1) * pageSize, pageSize, (records) => {
+        done({ records, total: count.result, page, pageSize });
+      });
+    };
+  });
+}
+
+export async function getRecentFormulaPracticeHistory(
+  cube: string, classId: string, limit: number = 1000,
+): Promise<FormulaPracticeRecord[]> {
+  return (await getFormulaPracticeHistoryPage(cube, classId, 1, limit)).records;
+}
+
+export async function getFormulaPracticeHistoryCount(cube: string, classId: string): Promise<number> {
+  const { db, scope } = await library(cube, classId);
+  return historyTransaction(db, 'readonly', (tx, done) => {
+    const request = tx.objectStore('records').index('scope').count(scope);
+    request.onsuccess = () => done(request.result);
+  });
+}
+
+export interface FormulaPracticeFrequencyStats {
+  items: Array<{
+    formulaKey: string;
+    formulaName: string;
+    setName: string;
+    groupName: string;
+    count: number;
+    /** Fraction of this library's records, from 0 to 1. */
+    frequency: number;
+  }>;
+  total: number;
+}
+
+/** One cursor pass; memory grows with distinct formula keys, not record count. */
+export async function getFormulaPracticeFrequencyStats(
+  cube: string, classId: string,
+): Promise<FormulaPracticeFrequencyStats> {
+  const { db, scope } = await library(cube, classId);
+  return historyTransaction(db, 'readonly', (tx, done) => {
+    const items = new Map<string, FormulaPracticeFrequencyStats['items'][number]>();
+    let total = 0;
+    const range = IDBKeyRange.bound([scope, -Infinity], [scope, Infinity, []]);
+    const request = tx.objectStore('records').index('scopeCreatedAt').openCursor(range, 'prev');
+    request.onsuccess = () => {
+      const cursor = request.result;
+      if (cursor) {
+        const record = cursor.value as RecordRow;
+        const item = items.get(record.formulaKey);
+        if (item) item.count++;
+        else items.set(record.formulaKey, {
+          formulaKey: record.formulaKey, formulaName: record.formulaName,
+          setName: record.setName, groupName: record.groupName, count: 1, frequency: 0,
+        });
+        total++;
+        cursor.continue();
+      } else {
+        const result = [...items.values()];
+        for (const item of result) item.frequency = item.count / total;
+        result.sort((a, b) => b.count - a.count || a.formulaKey.localeCompare(b.formulaKey));
+        done({ items: result, total });
+      }
+    };
+  });
+}
+
+export async function deleteFormulaPracticeRecord(cube: string, classId: string, recordId: string): Promise<void> {
+  const { db, scope } = await library(cube, classId);
+  await historyTransaction<void>(db, 'readwrite', (tx, done) => {
+    tx.objectStore('records').delete([scope, recordId]);
+    done();
+  });
+}
+
+export async function clearFormulaPracticeHistory(cube: string, classId: string): Promise<void> {
+  const { db, scope } = await library(cube, classId);
+  await historyTransaction<void>(db, 'readwrite', (tx, done) => {
+    deleteScope(tx, 'records', scope);
+    deleteScope(tx, 'sessions', scope);
+    done();
+  });
+}
+
+export function computeTrimmedMean(times: number[], trimRatio: number): number | null {
+  if (!times.length || !Number.isFinite(trimRatio) || trimRatio < 0 || trimRatio > 50) return null;
+  const trimCount = Math.floor(times.length * trimRatio / 100);
+  if (trimCount * 2 >= times.length) return null;
+  const sorted = [...times].sort((a, b) => a - b);
+  const trimmed = sorted.slice(trimCount, times.length - trimCount);
+  return trimmed.reduce((sum, time) => sum + time, 0) / trimmed.length;
+}
+
+export function computeAverages(
+  records: FormulaPracticeRecord[], trimRatio: number,
+): { ao50: number | null; ao100: number | null; ao1000: number | null } {
+  const times = records.map((record) => record.timeMs);
+  const average = (n: number) => times.length >= n ? computeTrimmedMean(times.slice(0, n), trimRatio) : null;
+  return { ao50: average(50), ao100: average(100), ao1000: average(1000) };
+}
+
+export interface FormulaPracticeHistorySummary {
+  total: number;
+  recentRecords: FormulaPracticeRecord[];
+  averages: ReturnType<typeof computeAverages>;
+}
+
+/** Snapshot-consistent total and averages over at most the latest 1000 records. */
+export async function getFormulaPracticeHistorySummary(
+  cube: string, classId: string, trimRatio: number = 5,
+): Promise<FormulaPracticeHistorySummary> {
+  const { total, records } = await getFormulaPracticeHistoryPage(cube, classId, 1, 1000);
+  return { total, recentRecords: records, averages: computeAverages(records, trimRatio) };
 }

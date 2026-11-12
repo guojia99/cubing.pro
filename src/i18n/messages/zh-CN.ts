@@ -1,6 +1,8 @@
 import { wcaMessagesZhCN } from "./wca-zh-CN";
+import { practiceZhCN } from "./formula-practice";
 
 const zhCN = {
+  ...practiceZhCN,
   "app.name": "Cubing Pro",
   "app.version": "v4.0.0",
   "nav.home": "首页",
@@ -260,7 +262,7 @@ const zhCN = {
   "algs.usageInstructions.randomFunc": "随机功能",
   "algs.usageInstructions.randomFuncDesc": "使用随机功能可从当前筛选的公式中随机选择一条进行练习，支持转盘动画和历史记录。",
   "algs.usageInstructions.formulaPractice": "公式练习器",
-  "algs.usageInstructions.formulaPracticeDesc": "公式练习器支持按顺序、随机、不重复随机三种模式，从打乱列表中抽取打乱进行计时练习，支持历史记录和上下键切换。",
+  "algs.usageInstructions.formulaPracticeDesc": "支持顺序、随机、不重复随机和熟练度加权四种模式。按住空格或计时区准备，松开开始，再次按下停止；成绩保存后自动下一题。支持续练、历史分页和上下键切题。",
   "algs.practiceHistoryStats.title": "练习历史统计",
   "algs.practiceHistoryStats.desc": "查看各公式在练习中的出现次数和频率",
   "algs.practiceHistoryStats.modalTitle": "练习历史统计",

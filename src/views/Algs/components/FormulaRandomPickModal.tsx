@@ -1,7 +1,7 @@
 "use client";
 
 import { Button, CloseButton, Dialog } from "@chakra-ui/react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useI18n } from "@/contexts/I18nProvider";
 import { useReleaseOverlayOnUnmount } from "@/lib/overlayCleanup";
 import type { FormulaPickItem } from "@/services/cubing-pro/algs/formulaRandomPick";
@@ -13,6 +13,7 @@ import type { FormulaItem } from "../types";
 import SvgRenderer from "./SvgRenderer";
 import RandomWheel, { type WheelSegment } from "./RandomWheel";
 import "./formulaRandomPickModal.css";
+import "../styles/algsRandomDetail.css";
 
 const WHEEL_SEGMENT_COUNT = 12;
 const SPIN_DURATION_MIN = 5000;
@@ -55,6 +56,13 @@ export default function FormulaRandomPickModal({
   const [wheelSegments, setWheelSegments] = useState<FormulaItem[]>([]);
   const [winner, setWinner] = useState<FormulaItem | null>(null);
   const [history, setHistory] = useState<FormulaPickItem[]>([]);
+  const spinTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const cancelSpin = useCallback(() => {
+    if (spinTimeoutRef.current !== null) {
+      clearTimeout(spinTimeoutRef.current);
+      spinTimeoutRef.current = null;
+    }
+  }, []);
   const [spinParams, setSpinParams] = useState<{
     duration: number;
     rotation: number;
@@ -65,7 +73,7 @@ export default function FormulaRandomPickModal({
   }, [cube, classId]);
 
   const doSpin = useCallback(() => {
-    if (spinning || flatAlgs.length < 8) return;
+    if (!open || spinning || spinTimeoutRef.current !== null || flatAlgs.length < 8) return;
 
     const count = Math.min(WHEEL_SEGMENT_COUNT, flatAlgs.length);
     const shuffled = shuffle(flatAlgs);
@@ -88,7 +96,8 @@ export default function FormulaRandomPickModal({
 
     setSpinParams({ duration, rotation: finalRotation });
 
-    setTimeout(() => {
+    spinTimeoutRef.current = setTimeout(() => {
+      spinTimeoutRef.current = null;
       setSpinning(false);
       setPhase("result");
       saveFormulaPick(cube, classId, {
@@ -100,9 +109,11 @@ export default function FormulaRandomPickModal({
       loadHistory();
       onPickSuccess?.();
     }, duration);
-  }, [flatAlgs, spinning, cube, classId, loadHistory, onPickSuccess]);
+  }, [open, flatAlgs, spinning, cube, classId, loadHistory, onPickSuccess]);
 
   useEffect(() => {
+    cancelSpin();
+    setSpinning(false);
     if (open) {
       loadHistory();
       if (mode === "random") {
@@ -113,7 +124,8 @@ export default function FormulaRandomPickModal({
         setSpinning(false);
       }
     }
-  }, [open, mode, loadHistory]);
+    return cancelSpin;
+  }, [open, mode, loadHistory, cancelSpin]);
 
   const wheelSegmentsForWheel: WheelSegment[] = useMemo(
     () =>
@@ -151,6 +163,7 @@ export default function FormulaRandomPickModal({
   };
 
   const handleClose = () => {
+    cancelSpin();
     setPhase("idle");
     setSpinning(false);
     setWheelSegments([]);
@@ -174,6 +187,8 @@ export default function FormulaRandomPickModal({
           <Dialog.Content
             borderRadius="xl"
             maxW="400px"
+            maxH="calc(100dvh - 24px)"
+            w="calc(100vw - 24px)"
             className="formula-random-pick-modal formula-random-history-modal"
           >
             <Dialog.Header display="flex" justifyContent="space-between" alignItems="center">
@@ -181,10 +196,10 @@ export default function FormulaRandomPickModal({
                 {t("algs.formulaRandom.historyTitle")}
               </Dialog.Title>
               <Dialog.CloseTrigger asChild>
-                <CloseButton size="sm" />
+                <CloseButton size="sm" color="signal.destructive" borderRadius="4px" />
               </Dialog.CloseTrigger>
             </Dialog.Header>
-            <Dialog.Body pb={4}>
+            <Dialog.Body pb={4} overflowY="auto" minH={0}>
               <div className="formula-random-history-list">
                 {history.length === 0 ? (
                   <p className="formula-random-history-empty">
@@ -192,7 +207,9 @@ export default function FormulaRandomPickModal({
                   </p>
                 ) : (
                   history.map((item, i) => (
-                    <div
+                    <button
+                      type="button"
+                      disabled={!flatAlgs.some((formula) => formula.setName === item.setName && formula.groupName === item.groupName && formula.alg.name === item.algName)}
                       key={`${item.setName}-${item.groupName}-${item.algName}-${i}`}
                       className="formula-random-history-item"
                       onClick={() => handleHistoryItemClick(item)}
@@ -211,7 +228,7 @@ export default function FormulaRandomPickModal({
                           {item.setName} · {item.groupName}
                         </div>
                       </div>
-                    </div>
+                    </button>
                   ))
                 )}
               </div>
@@ -236,12 +253,17 @@ export default function FormulaRandomPickModal({
         <Dialog.Content
           borderRadius="xl"
           maxW="460px"
+          maxH="calc(100dvh - 24px)"
+          w="calc(100vw - 24px)"
           className="formula-random-pick-modal random-pick-modal"
         >
-          <Dialog.CloseTrigger asChild position="absolute" top={3} right={3}>
-            <CloseButton size="sm" />
+          <Dialog.Header display="flex" alignItems="center" justifyContent="space-between">
+          <Dialog.Title fontSize="md">{t("algs.detail.randomPickCard")}</Dialog.Title>
+          <Dialog.CloseTrigger asChild>
+            <CloseButton size="sm" color="signal.destructive" borderRadius="4px" />
           </Dialog.CloseTrigger>
-          <Dialog.Body pt={8} pb={6} px={6}>
+          </Dialog.Header>
+          <Dialog.Body pt={2} pb={6} px={{ base: 3, md: 6 }} overflowY="auto" minH={0}>
             <div className="random-pick-content">
               {phase === "idle" && (
                 <>
@@ -288,7 +310,8 @@ export default function FormulaRandomPickModal({
                   <p className="random-pick-result-title">
                     {t("algs.formulaRandom.resultTitle")}
                   </p>
-                  <div
+                  <button
+                    type="button"
                     className="formula-random-result-card formula-random-option-card"
                     onClick={() => handlePickClick(winner)}
                   >
@@ -302,7 +325,7 @@ export default function FormulaRandomPickModal({
                     <div className="formula-random-option-meta">
                       {winner.setName} · {winner.groupName}
                     </div>
-                  </div>
+                  </button>
                   <p className="random-pick-click-hint">
                     {t("algs.randomPick.clickHint")}
                   </p>

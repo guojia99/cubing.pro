@@ -10,12 +10,11 @@ import {
   HStack,
   Text,
 } from "@chakra-ui/react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useI18n } from "@/contexts/I18nProvider";
-import { useReleaseOverlayOnUnmount } from "@/lib/overlayCleanup";
 import { toaster } from "@/components/ui/toaster";
 import {
-  getFormulaPracticeHistory,
+  getFormulaPracticeFrequencyStats,
   clearFormulaPracticeHistory,
 } from "@/services/cubing-pro/algs/formulaPracticeHistory";
 import {
@@ -68,66 +67,51 @@ export default function PracticeHistoryStatsCard({
   refreshKey = 0,
   embedded = false,
 }: PracticeHistoryStatsCardProps) {
-  useReleaseOverlayOnUnmount();
   const { t, tf } = useI18n();
   const [modalOpen, setModalOpen] = useState(false);
   const [clearTrigger, setClearTrigger] = useState(0);
   const [confirmClear, setConfirmClear] = useState(false);
   const [sortKey, setSortKey] = useState<"count" | "frequency">("count");
   const [sortAsc, setSortAsc] = useState(false);
+  const [historyStats, setHistoryStats] = useState<{ items: FormulaStatsItem[]; total: number }>({ items: [], total: 0 });
+  const [busy, setBusy] = useState(false);
+  const [loadError, setLoadError] = useState(false);
 
-  const proficiencyMap = useMemo(
-    () => getFormulaProficiency(cube, classId),
-    [cube, classId, refreshKey],
-  );
+  useEffect(() => {
+    let cancelled = false;
+    setLoadError(false);
+    setHistoryStats({ items: [], total: 0 });
+    void getFormulaPracticeFrequencyStats(cube, classId).then((result) => {
+      if (!cancelled) setHistoryStats({ total: result.total, items: result.items.map((item) => ({ ...item, frequency: item.frequency * 100 })) });
+    }).catch(() => { if (!cancelled) setLoadError(true); });
+    return () => { cancelled = true; };
+  }, [cube, classId, refreshKey, clearTrigger, modalOpen]);
+
+  const proficiencyMap = getFormulaProficiency(cube, classId);
 
   const stats = useMemo(() => {
-    const records = getFormulaPracticeHistory(cube, classId);
-    const total = records.length;
-    const map = new Map<
-      string,
-      { formulaName: string; setName: string; groupName: string; count: number }
-    >();
-    for (const r of records) {
-      const existing = map.get(r.formulaKey);
-      if (existing) {
-        existing.count += 1;
-      } else {
-        map.set(r.formulaKey, {
-          formulaName: r.formulaName,
-          setName: r.setName,
-          groupName: r.groupName,
-          count: 1,
-        });
-      }
-    }
-    const items: FormulaStatsItem[] = [];
-    map.forEach((v, key) => {
-      items.push({
-        formulaKey: key,
-        formulaName: v.formulaName,
-        setName: v.setName,
-        groupName: v.groupName,
-        count: v.count,
-        frequency: total > 0 ? (v.count / total) * 100 : 0,
-      });
-    });
+    const items = [...historyStats.items];
     items.sort((a, b) => {
       const av = sortKey === "count" ? a.count : a.frequency;
       const bv = sortKey === "count" ? b.count : b.frequency;
       return sortAsc ? av - bv : bv - av;
     });
-    return { items, total };
-  }, [cube, classId, refreshKey, clearTrigger, sortKey, sortAsc]);
+    return { items, total: historyStats.total };
+  }, [historyStats, sortKey, sortAsc]);
 
-  const handleClearHistory = () => {
-    clearFormulaPracticeHistory(cube, classId);
-    setClearTrigger((n) => n + 1);
-    setConfirmClear(false);
-    toaster.create({
-      title: t("algs.practiceHistoryStats.clearSuccess"),
-      type: "success",
-    });
+  const handleClearHistory = async () => {
+    setBusy(true);
+    try {
+      await clearFormulaPracticeHistory(cube, classId);
+      setClearTrigger((n) => n + 1);
+      setConfirmClear(false);
+      toaster.create({
+        title: t("algs.practiceHistoryStats.clearSuccess"),
+        type: "success",
+      });
+    } catch (error) {
+      toaster.create({ title: error instanceof Error ? error.message : t("algs.loadError"), type: "error" });
+    } finally { setBusy(false); }
   };
 
   const toggleSort = (key: "count" | "frequency") => {
@@ -204,10 +188,11 @@ export default function PracticeHistoryStatsCard({
                 {t("algs.practiceHistoryStats.modalTitle")}
               </Dialog.Title>
               <Dialog.CloseTrigger asChild>
-                <CloseButton size="sm" />
+                <CloseButton size="sm" color="signal.destructive" borderRadius="4px" />
               </Dialog.CloseTrigger>
             </Dialog.Header>
             <Dialog.Body overflowY="auto" maxH="640px" pb={4}>
+              {loadError && <Text role="alert" color="signal.destructive">{t("algs.loadError")}</Text>}
               <Text fontSize="xs" color="fg.muted" mb={3}>
                 {tf("algs.practiceHistoryStats.modalDesc", { total: stats.total })}
               </Text>
@@ -312,7 +297,8 @@ export default function PracticeHistoryStatsCard({
                     <Button
                       size="sm"
                       colorPalette="red"
-                      onClick={handleClearHistory}
+                       onClick={handleClearHistory}
+                       disabled={busy}
                     >
                       {t("algs.practiceHistoryStats.clearConfirmOk")}
                     </Button>
