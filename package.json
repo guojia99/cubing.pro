@@ -18,7 +18,7 @@
     "test:algs": "node --test src/views/Algs/components/formulaPracticeTimer.test.mjs && tsx --test src/services/cubing-pro/algs/formulaPracticeHistory.test.mjs",
     "test:algs:browser": "node src/views/Algs/components/formulaPracticeTimer.browser.test.mjs",
     "test:algs:layout": "node src/views/Algs/components/algsLayout.browser.test.mjs",
-    "test:puzzles": "node --test src/components/puzzles/model.test.mjs src/components/puzzles/practiceSetup.test.mjs src/components/puzzles/notation.test.mjs src/components/puzzles/cuberootCubeDiagrams.test.mjs src/components/puzzles/cuberootSpecialDiagrams.test.mjs src/views/Algs/utils/twoByTwoCategories.test.mjs",
+    "test:puzzles": "node --test src/components/puzzles/model.test.mjs src/components/puzzles/practiceSetup.test.mjs src/components/puzzles/notation.test.mjs src/components/puzzles/cubeDiagrams.test.mjs src/components/puzzles/specialDiagrams.test.mjs src/views/Algs/utils/twoByTwoCategories.test.mjs",
     "test:puzzles:browser": "node src/components/puzzles/puzzleDiagram.browser.test.mjs",
     "test:puzzles:native": "node src/components/puzzles/nativeTwoByTwo.regression.test.mjs",
     "lint": "eslint ."

@@ -2,7 +2,7 @@
 
 > 目标：把 Cubing Pro v4 现有「品牌色板 + 浅/深双模式」的配色，升级为一套**单一真值来源（Single Source of Truth）的语义令牌体系**，并在「设置」中支持用户切换**整套配色皮肤（中国传统色系）**。
 >
-> 参考标准：[cuberoot.me /code/tokens](https://cuberoot.me/zh/code/tokens)（令牌方法论）、[中国色 配色工具](https://zhongguose.com/ai/palettes)（皮肤取色）。
+> 参考标准：上游语义令牌方法论（来源见 `src/vendor/puzzle-drawing/SOURCES.md`）、[中国色 配色工具](https://zhongguose.com/ai/palettes)（皮肤取色）。
 
 ---
 
@@ -20,7 +20,7 @@
 
 ---
 
-## 1. 设计原则（来自 cuberoot 标准）
+## 1. 设计原则
 
 1. **单一真值来源**：全站配色只从一组令牌取值。背景 / 文字 / 品牌 / 状态 / 边框五组令牌，每个都同时给出**亮、暗两套真值**。
 2. **绝不硬码灰阶 / 中间色**：需要 hover 底、半透明叠加、弱化色、压暗一档时，一律用 `color-mix(in srgb, var(--token) N%, transparent|black|white)` 从令牌推导。
@@ -32,7 +32,7 @@
 
 ## 2. 令牌体系（五组 + 衍生规则）
 
-> 命名采用 cuberoot 的语义命名（`--background` / `--foreground` …），落到 Chakra 时映射为同名 semanticToken（见 §4）。下表为 **`claude-海天`（默认皮肤）** 的真值；其余皮肤见 §3。
+> 使用语义命名（`--background` / `--foreground` …），落到 Chakra 时映射为同名 semanticToken（见 §4）。下表为 **`claude-海天`（默认皮肤）** 的真值；其余皮肤见 §3。
 
 ### 2.1 背景与表面 `surfaces`
 
@@ -322,7 +322,7 @@ rg "#[0-9a-fA-F]{3,6}\b|rgba?\(" src --type ts --type tsx
 
 ## 7. 主题策略（页面级）
 
-参考 cuberoot「双主题 / dark-locked / light-locked」，为本项目落地：
+本项目支持「双主题 / dark-locked / light-locked」：
 - **双主题（跟随用户）**：绝大多数页面，走令牌自动翻。
 - **强制深色（dark-locked）**：PK 大屏 / 直播比分等沉浸式场景（`TeamMatch` 全屏）——用 `<Box className="dark">` 局部锁定，避免浅色下大屏刺眼。
 - **强制浅色（light-locked）**：导出图（`bracketExportPng` / `TonightReceipt` 等需固定底色的截图导出）——局部锁 `light`，保证导出一致。

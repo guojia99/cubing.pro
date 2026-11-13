@@ -5,9 +5,9 @@
  * cubevis/scripts/images.py: clean_alg_fto (relative grips and CIF/EIF switch),
  * clean_alg (visual brackets); cubevis/cube.py: FTORotations and FTO actions.
  * https://github.com/mihlefeld/ALLG-ImageGen/tree/dbd5a7fd8f3bee827d25056aa93c457bdf91f453/cubevis
- * RuiminYan/cuberoot.me, pinned 68c0592cd3ce582b161b4c6bf5ad2eeb30449a81:
+ * RuiminYan, pinned 68c0592cd3ce582b161b4c6bf5ad2eeb30449a81:
  * core/packages/shared/src/fto_notation.ts: LowCubes EIF slice/H/S actions.
- * https://github.com/RuiminYan/cuberoot.me/blob/68c0592cd3ce582b161b4c6bf5ad2eeb30449a81/core/packages/shared/src/fto_notation.ts
+ * Original source URL is retained in vendor/puzzle-drawing/SOURCES.md.
  *
  * Action proof: all 72 oriented stickers admit an equivariant bijection to
  * cubing 0.63.3 FTO KPuzzle under all eight CIF (and eight EIF) face generators.

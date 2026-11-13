@@ -134,6 +134,11 @@ function PracticeLibrary({ open, onClose, cube, classId, flatAlgs, timer, setupB
   const actionLock = useRef(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const timerButtonRef = useRef<HTMLButtonElement>(null);
+  const [fullscreen, setFullscreen] = useState(false);
+  const ownsFullscreen = useRef(false);
+  const fullscreenPending = useRef(false);
+  const practiceOpen = useRef(open);
+  practiceOpen.current = open;
   const [proficiencies, setProficiencies] = useState(() => getFormulaProficiency(cube, classId));
   const [dismissedReminder, setDismissedReminder] = useState<string | null>(null);
   const [summary, setSummary] = useState<FormulaPracticeHistorySummary | null>(null);
@@ -184,6 +189,56 @@ function PracticeLibrary({ open, onClose, cube, classId, flatAlgs, timer, setupB
   useEffect(() => {
     return () => { timer.interrupt(); };
   }, [timer]);
+
+  useEffect(() => {
+    if (!open) return;
+    practiceOpen.current = true;
+    const syncFullscreen = () => {
+      const active = ownsFullscreen.current && document.fullscreenElement === document.documentElement;
+      if (!document.fullscreenElement) ownsFullscreen.current = false;
+      setFullscreen(active);
+      // Browser Escape/fullscreen transitions must never create a false result.
+      timer.interrupt();
+      if (controls.current.canTime) timerButtonRef.current?.focus({ preventScroll: true });
+    };
+    document.addEventListener("fullscreenchange", syncFullscreen);
+    return () => {
+      practiceOpen.current = false;
+      document.removeEventListener("fullscreenchange", syncFullscreen);
+      setFullscreen(false);
+      if (ownsFullscreen.current && document.fullscreenElement === document.documentElement) {
+        ownsFullscreen.current = false;
+        void document.exitFullscreen().catch(() => {});
+      }
+    };
+  }, [open, timer]);
+
+  async function toggleFullscreen() {
+    if (fullscreenPending.current || timer.isBlocked() || actionLock.current) return;
+    fullscreenPending.current = true;
+    try {
+      if (ownsFullscreen.current && document.fullscreenElement === document.documentElement) {
+        await document.exitFullscreen();
+      } else {
+        if (document.fullscreenElement || !document.documentElement.requestFullscreen) {
+          throw new Error("Fullscreen unavailable");
+        }
+        // Use the document root so dialog portals and native 3D controls remain visible.
+        ownsFullscreen.current = true;
+        await document.documentElement.requestFullscreen();
+        if (!practiceOpen.current && document.fullscreenElement === document.documentElement) {
+          ownsFullscreen.current = false;
+          await document.exitFullscreen();
+        }
+      }
+    } catch {
+      ownsFullscreen.current = false;
+      if (practiceOpen.current) setNotice("algs.practice.fullscreenUnavailable");
+    } finally {
+      fullscreenPending.current = false;
+      if (controls.current.canTime) timerButtonRef.current?.focus({ preventScroll: true });
+    }
+  }
 
   useEffect(() => { setAnswerVisible(false); }, [state.index, state.sessionId, state.revision]);
   useEffect(() => { setNotice(null); }, [state.revision]);
@@ -324,6 +379,9 @@ function PracticeLibrary({ open, onClose, cube, classId, flatAlgs, timer, setupB
   function proficiency(key: string, level: ProficiencyLevel) {
     setFormulaProficiency(cube, classId, key, level);
     setProficiencies((previous) => ({ ...previous, [key]: level }));
+    if (controls.current.canTime && timer.getSnapshot().phase === "ready") {
+      timerButtonRef.current?.focus({ preventScroll: true });
+    }
   }
   function showDetail(record: FormulaPracticeRecord, from: View) {
     if (timer.isBlocked() || actionLock.current) return;
@@ -395,6 +453,7 @@ function PracticeLibrary({ open, onClose, cube, classId, flatAlgs, timer, setupB
     onEscapeKeyDown={(event) => {
       event.preventDefault();
       if (timer.getSnapshot().phase === "running" || timer.getSnapshot().phase === "armed") timer.interrupt();
+      else if (ownsFullscreen.current && document.fullscreenElement === document.documentElement) void document.exitFullscreen().catch(() => {});
       else if (view !== "main" && view !== "config") go(view === "confirm" ? confirmationReturn : view === "detail" ? returnView : "main");
       else requestClose();
     }}>
@@ -405,6 +464,9 @@ function PracticeLibrary({ open, onClose, cube, classId, flatAlgs, timer, setupB
           <div><Dialog.Title>{title}</Dialog.Title><Dialog.Description className="fp-meta">{cube} / {classId}</Dialog.Description></div>
           <div className="fp-actions">
             {view !== "main" && state.sessionId && <Button size="sm" variant="ghost" disabled={locked} onClick={() => go(view === "confirm" ? confirmationReturn : view === "detail" ? returnView : "main")}>{t("algs.practice.back")}</Button>}
+            <Button className="fp-fullscreen-toggle" size="sm" variant="ghost" disabled={locked} aria-pressed={fullscreen} onClick={toggleFullscreen}>
+              {t(fullscreen ? "algs.practice.exitFullscreen" : "algs.practice.fullscreen")}
+            </Button>
             <CloseButton className="fp-close" size="sm" variant="ghost" aria-label={t("algs.practice.close")} title={t("algs.practice.close")} onClick={requestClose}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18" /></svg>
             </CloseButton>

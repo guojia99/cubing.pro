@@ -15,23 +15,7 @@
     "incremental": true,
     "plugins": [{ "name": "next" }],
     "paths": {
-      "@/*": ["./src/*"],
-      "@cuberoot/visualcube": ["./src/vendor/cuberoot/visualcube/src/index.ts"],
-      "@cuberoot/visualcube/svg": ["./src/vendor/cuberoot/visualcube/src/preset.ts"],
-      "@cuberoot/vendor-sr-puzzlegen": ["./src/vendor/cuberoot/vendor-sr-puzzlegen/src/index.ts"],
-      "@cuberoot/shared/alg-notation": ["./src/vendor/cuberoot/shared/src/alg_notation.ts"],
-      "@cuberoot/shared/cube-unfolded-svg": ["./src/vendor/cuberoot/shared/src/cube_unfolded_svg.ts"],
-      "@cuberoot/shared/fto-notation": ["./src/vendor/cuberoot/shared/src/fto_notation.ts"],
-      "@cuberoot/shared/nnn-sim": ["./src/vendor/cuberoot/shared/src/nnn_sim.ts"],
-      "@cuberoot/shared/skewb-pyramid-svg": ["./src/vendor/cuberoot/shared/src/skewb_pyramid_svg.ts"],
-      "@cuberoot/shared/sq1-notation": ["./src/vendor/cuberoot/shared/src/sq1_notation.ts"],
-      "@cuberoot/shared/sr-rotations": ["./src/vendor/cuberoot/shared/src/sr_rotations.ts"],
-      "@cuberoot/puzzle-render-core/iso-svg": ["./src/vendor/cuberoot/puzzle-render-core/src/iso-svg.ts"],
-      "@cuberoot/puzzle-render-core/sq1-svg": ["./src/vendor/cuberoot/puzzle-render-core/src/sq1-svg.ts"],
-      "@cuberoot/puzzle-render-core/fto-eif-image": ["./src/vendor/cuberoot/puzzle-render-core/src/fto-eif-image.ts"],
-      "@cuberoot/puzzle-render-core/fto-draw-elements": ["./src/vendor/cuberoot/puzzle-render-core/src/fto-draw-elements.ts"],
-      "@cuberoot/puzzle-render-core/support/sq1-stage-mask": ["./src/vendor/cuberoot/puzzle-render-core/src/support/sq1-stage-mask.ts"],
-      "@cuberoot/puzzle-render-core/support/cube-colors": ["./src/vendor/cuberoot/puzzle-render-core/src/support/cube-colors.ts"]
+      "@/*": ["./src/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

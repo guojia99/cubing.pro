@@ -28,14 +28,6 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ["@chakra-ui/react", "react-icons"],
   },
-  webpack(config) {
-    // Vendored ESM TypeScript retains upstream .js import specifiers.
-    config.resolve.extensionAlias = {
-      ...config.resolve.extensionAlias,
-      ".js": [".js", ".ts", ".tsx"],
-    };
-    return config;
-  },
   async rewrites() {
     // 仅 next dev / next start 生效；output: export 产物不经过 rewrites
     return [

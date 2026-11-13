@@ -1,0 +1,223 @@
+import { ColorCode } from './../colors'
+import { Axis } from './../math'
+import { ICubeColorScheme } from './models/color-scheme'
+
+export enum Face {
+  U = 0,
+  R = 1,
+  F = 2,
+  D = 3,
+  L = 4,
+  B = 5,
+}
+
+export const AllFaces = [Face.U, Face.R, Face.F, Face.D, Face.L, Face.B]
+
+export class FaceRotationVectors {
+  static U = [0, -1, 0]
+  static R = [1, 0, 0]
+  static F = [0, 0, -1]
+  static D = [0, 1, 0]
+  static L = [-1, 0, 0]
+  static B = [0, 0, 1]
+}
+
+// sch=ygrwbo — 黄顶红前
+export const DefaultColorScheme: ICubeColorScheme = {
+  [Face.U]: ColorCode.Yellow,
+  [Face.R]: ColorCode.Green,
+  [Face.F]: ColorCode.Red,
+  [Face.D]: ColorCode.White,
+  [Face.L]: ColorCode.Blue,
+  [Face.B]: ColorCode.Orange,
+}
+
+export const JapaneseColorScheme: ICubeColorScheme = {
+  [Face.U]: ColorCode.Blue,
+  [Face.R]: ColorCode.Orange,
+  [Face.F]: ColorCode.Green,
+  [Face.D]: ColorCode.White,
+  [Face.L]: ColorCode.Red,
+  [Face.B]: ColorCode.Yellow,
+}
+
+export enum AlgorithmUnit {
+  F = 'F',
+  U = 'U',
+  R = 'R',
+  L = 'L',
+  D = 'D',
+  B = 'B',
+  M = 'M',
+  E = 'E',
+  S = 'S',
+  X = 'x',
+  Y = 'y',
+  Z = 'z',
+}
+
+export const AxisSymbolToAxis: { [symbol: string]: Axis } = {
+  x: Axis.X,
+  y: Axis.Y,
+  z: Axis.Z,
+}
+
+export const possibleMoves: string[] = [
+  AlgorithmUnit.F,
+  AlgorithmUnit.U,
+  AlgorithmUnit.R,
+  AlgorithmUnit.L,
+  AlgorithmUnit.D,
+  AlgorithmUnit.B,
+  AlgorithmUnit.M,
+  AlgorithmUnit.E,
+  AlgorithmUnit.S,
+  AlgorithmUnit.X,
+  AlgorithmUnit.Y,
+  AlgorithmUnit.Z,
+]
+
+export const cubeRotations: string[] = [AlgorithmUnit.X, AlgorithmUnit.Y, AlgorithmUnit.Z]
+
+export enum TurnAbbreviation {
+  Clockwise = '',
+  CounterClockwise = "'",
+  Double = '2',
+  DoubleCounter1 = "2'",
+  DoubleCounter2 = "'2",
+}
+
+export enum Masking {
+  FL = 'fl',
+  F2L = 'f2l',
+  AF2L = 'af2l',
+  LL = 'll',
+  CLL = 'cll',
+  ELL = 'ell',
+  OLL = 'oll',
+  OCLL = 'ocll',
+  OELL = 'oell',
+  COLL = 'coll',
+  OCELL = 'ocell',
+  WV = 'wv',
+  VH = 'vh',
+  ELS = 'els',
+  CLS = 'cls',
+  CMLL = 'cmll',
+  CROSS = 'cross',
+  // PHP's f2l_3 / f2l_2 / f2l_sm / f2l_1 ("F2L with N slots left") were bit-identical to
+  // xcross / xxcross / xxcross_diag / xxxcross (up to a y rotation), so they're gone —
+  // pick the cross-progress mask and re-anchor it with the whole-cube rotation instead.
+  F2B = 'f2b',
+  LINE = 'line',
+
+  // Extended masks (ported from PHP visualcube `index.php`, cubeSize=3 only)
+  // Block-building blocks
+  TWO_BY_TWO_BY_TWO = '2x2x2',
+  TWO_BY_TWO_BY_THREE = '2x2x3',
+  // Cross progress. PHP shipped one mask per slot (cross_fr/br/fb/lr, xcross_fr/br/fl/bl,
+  // xxcross, dec, tec_fr/fl/bl/br); consumers now re-anchor with a whole-cube rotation,
+  // so only one representative per *shape* is kept — the rest were rotations of these.
+  CROSS_HALF = 'cross_half',          // 2 adjacent cross edges (PHP cross_fr)
+  CROSS_HALF_OPP = 'cross_half_opp',  // 2 opposite cross edges (PHP cross_fb)
+  CROSS_PARTIAL = 'cross_partial',    // PHP "Cross" — 4 cross edges, no side/U centers
+  /** @deprecated Use CROSS. */
+  CROSS_FULL = 'cross',
+  XCROSS = 'xcross',                  // cross + 1 pair (PHP xcross_fr)
+  XXCROSS = 'xxcross',                // cross + 2 adjacent pairs (FL+FR)
+  XXCROSS_DIAG = 'xxcross_diag',      // cross + 2 diagonal pairs (PHP "DEC" = FR+BL)
+  XXXCROSS = 'xxxcross',              // cross + 3 pairs, FR slot open (PHP tec_fr)
+  PAIR = 'pair',
+  // EO / orbit
+  EO_ORBIT = 'eo_orbit',
+  EO_OUTER_ORBIT = 'eo_outer_orbit',
+  // EOLR variants (EO + LR pair) — PHP suffix is bandage-style
+  EOLRB_R = 'eolrb_r',
+  EOLRB_L = 'eolrb_l',
+  EOLRB_F = 'eolrb_f',
+  EOLRB_B = 'eolrb_b',
+  EOLS = 'eols',
+  L5EF = 'l5ef',
+  // Roux blocks
+  ROUX_CO = 'roux_co',
+  ROUX_DR = 'roux_dr',
+  ROUX_DR_ONLY = 'roux_dronly',
+  FB = 'fb',
+  SB = 'sb',
+  FB1 = 'fb1',
+  FB2 = 'fb2',
+  SB1 = 'sb1',
+  SB2 = 'sb2',
+  // 1x1x2 / 1x2x2 partials (PHP's 222_fl/bl/br were the DFR 2x2x2 block rotated to the
+  // other three D corners — one mask + a whole-cube rotation covers all four)
+  ONE_ONE_TWO = '112',
+  ONE_TWO_TWO = '122',
+  // Square-1 first-block variants (kept as 3x3 mask shapes)
+  SQ_RDF = 'sq_rdf',
+  SQ_FDR = 'sq_fdr',
+  SQ_DFR = 'sq_dfr',
+  // DR (Domino Reduction)
+  DR = 'dr',
+  DR_R = 'dr_r',
+  DR_R_U2_RP = 'dr_r_u2_rp',
+  DR_R_U_RP = 'dr_r_u_rp',
+  DR_R_UP_RP = 'dr_r_up_rp',
+  DR_U = 'dr_u',
+  // Mehta
+  MEHTA_SQ = 'mehta_sq',
+  MEHTA_BELT2 = 'mehta_belt2',
+  MEHTA_EOLE2 = 'mehta_eole2',
+  MEHTA_TDR = 'mehta_tdr',
+  // Extra 3x3
+  OLLCP = 'ollcp',
+  CLL_FULL = 'cll_full',
+
+  // 2x2
+  FF = 'ff',
+
+  // NxN — multi-size; mask string keyed by cubeSize. Reused across sizes when mask differs but name matches PHP.
+  // 4x4
+  F1C = 'f1c',
+  F2C = 'f2c',
+  F1E = 'f1e',
+  LCE = 'lce',
+  NO_CORNER = 'no_corner',
+  HOYA = 'hoya',
+  YAU = 'yau',
+  MEYER = 'meyer',
+  HALF_CENTER = 'half_center',
+  // 4x4 / 5x5 / 6x6 / 7x7
+  L2C = 'l2c',
+  CENTER = 'center',
+  // 5x5 / 6x6 / 7x7
+  L2E = 'l2e',
+  L1E = 'l1e',
+  // 5x5 / 6x6
+  T = 't',
+  // 5x5
+  ONE_BY_THREE = '1x3',
+  TWO_BY_THREE = '2x3',
+  THREE_BY_THREE = '3x3', // also 6x6/7x7
+  TWO_BY_TWO = '2x2',     // also 6x6/7x7
+  MIDGE = 'midge',
+  T_CENTER = 't_center',
+  X_CENTER = 'x_center',
+  WING = 'wing',
+  // 6x6
+  ONE_BY_FOUR = '1x4',
+  TWO_BY_FOUR = '2x4',
+  THREE_BY_FOUR = '3x4',
+  FOUR_BY_FOUR = '4x4', // also 7x7
+  THREE_ONE_BY_FOUR = '3_1x4',
+  OBLIQUE = 'oblique',
+  // 7x7
+  ONE_BY_FIVE = '1x5',
+  TWO_BY_FIVE = '2x5',
+  THREE_BY_FIVE = '3x5',
+  FOUR_BY_FIVE = '4x5',
+  FIVE_BY_FIVE = '5x5',
+  // 9x9
+  UF = 'uf',
+  DF = 'df',
+  UB = 'ub',
+}
