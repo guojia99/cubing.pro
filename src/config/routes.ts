@@ -43,6 +43,8 @@ export const APP_ROUTES: AppRoute[] = [
   { id: "admin-organizers-list", name: "主办团队", pattern: "/admin/organizers/list", implType: "api-driven", renderMode: "client-spa", pageComponent: "Admin/OrganizersComponent/OrganizersList.tsx", tags: ["admin"] },
   { id: "admin-organizers-comp-result", name: "录入成绩", pattern: "/admin/organizers/:orgId/comp/:compId/result", implType: "api-driven", renderMode: "client-spa", pageComponent: "Admin/OrganizersComponent/OrganizersResults.tsx", tags: ["admin"] },
   { id: "admin-admins", name: "后台首页", pattern: "/admin/admins", implType: "frontend-only", renderMode: "client-spa", pageComponent: "Admin/Admin.tsx", tags: ["admin"] },
+  { id: "admin-competition-approvals", name: "群赛审批", pattern: "/admin/competition/approvals", implType: "api-driven", renderMode: "client-spa", pageComponent: "admin/OrganizersCompsPageView.tsx", tags: ["admin"] },
+  { id: "admin-competition-manage", name: "群赛管理", pattern: "/admin/competition/manage", implType: "api-driven", renderMode: "client-spa", pageComponent: "admin/OrganizersResultsPageView.tsx", hidden: true, tags: ["admin"] },
   { id: "admin-users", name: "用户管理", pattern: "/admin/users", implType: "api-driven", renderMode: "client-spa", pageComponent: "Admin/AdminComponent/Users.tsx", tags: ["admin"] },
   { id: "admin-manage-organizers", name: "管理主办", pattern: "/admin/manage/organizers", implType: "api-driven", renderMode: "client-spa", pageComponent: "Admin/AdminComponent/AdminOrganizers.tsx", tags: ["admin"] },
   { id: "admin-manage-groups", name: "管理群组", pattern: "/admin/manage/groups", implType: "api-driven", renderMode: "client-spa", pageComponent: "Admin/AdminComponent/AdminCompetitionGroups.tsx", tags: ["admin"] },

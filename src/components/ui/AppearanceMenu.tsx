@@ -3,6 +3,7 @@
 import {
   Box,
   Button,
+  ClientOnly,
   IconButton,
   Menu,
   Portal,
@@ -92,7 +93,9 @@ export function AppearanceMenu() {
             _icon: { width: "5", height: "5" },
           }}
         >
-          <ColorModeIcon />
+          <ClientOnly fallback={<Box boxSize="5" aria-hidden="true" />}>
+            <ColorModeIcon />
+          </ClientOnly>
         </IconButton>
       </Menu.Trigger>
       <Portal>

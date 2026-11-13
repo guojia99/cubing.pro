@@ -76,6 +76,8 @@ declare namespace CompAPI {
   type CompJson = {
     Events: Event[];
     Cost: Cost;
+    /** 服务端 End 写入的新增成绩截止时间；不代表停止审批旧单。 */
+    ResultClosedAt?: string | null;
   };
 
   type Org = {
@@ -121,6 +123,9 @@ declare namespace CompAPI {
     RegistrationRestartTime: string; // 报名重开时间
 
     OrganizersID: number;
+    GroupId?: number;
+    OrganizersName?: string;
+    GroupName?: string;
     Org: Org;
     Group: Group;
 
@@ -158,4 +163,3 @@ declare namespace CompRecordAPI {
     msg: string;
   };
 }
-

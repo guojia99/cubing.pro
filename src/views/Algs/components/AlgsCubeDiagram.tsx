@@ -3,8 +3,7 @@
 import { Box } from "@chakra-ui/react";
 
 import SvgRenderer from "./SvgRenderer";
-import AlgsVisualCube from "./AlgsVisualCube";
-import { isVisualCubeCube } from "../utils/visualCubeCube";
+import PuzzleDiagram from "@/components/puzzles/PuzzleDiagram";
 
 export interface AlgsCubeDiagramProps {
   cube: string;
@@ -14,8 +13,10 @@ export interface AlgsCubeDiagramProps {
   imageSvg?: string;
   scramble?: string;
   formula?: string;
-  /** 为 false 时对该魔方类型仍使用后端 SVG 图 */
+  /** Legacy preference; supported puzzles now always render locally. */
   useVisualCube?: boolean;
+  interactive?: boolean;
+  stateSource?: "formula" | "scramble";
   maxWidth?: number;
   maxHeight?: number;
   className?: string;
@@ -30,7 +31,8 @@ export default function AlgsCubeDiagram({
   imageSvg = "",
   scramble,
   formula = "",
-  useVisualCube = true,
+  interactive = false,
+  stateSource = "formula",
   maxWidth,
   maxHeight,
   className,
@@ -39,28 +41,11 @@ export default function AlgsCubeDiagram({
   const w = maxWidth ?? 180;
   const h = maxHeight ?? 180;
 
-  if (useVisualCube && isVisualCubeCube(cube)) {
-    return (
-      <AlgsVisualCube
-        cube={cube}
-        classId={classId}
-        setName={setName}
-        groupName={groupName}
-        scramble={scramble}
-        formula={formula}
-        width={w}
-        height={h}
-        className={className}
-        style={{ width: "100%", minWidth: 0, ...style }}
-      />
-    );
-  }
-
-  if (!imageSvg) return null;
-
   return (
-    <Box className={className} style={style}>
-      <SvgRenderer svg={imageSvg} maxWidth={maxWidth} maxHeight={maxHeight} />
+    <Box className={className} style={style} width="full" minW={0}>
+      <PuzzleDiagram cube={cube} classId={classId} setName={setName} groupName={groupName}
+        formula={formula} scramble={scramble} maxWidth={w} maxHeight={h} interactive={interactive} stateSource={stateSource}
+        fallback={imageSvg ? <SvgRenderer svg={imageSvg} maxWidth={w} maxHeight={h} /> : undefined} />
     </Box>
   );
 }

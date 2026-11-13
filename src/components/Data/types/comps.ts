@@ -14,4 +14,5 @@ export type Comp = {
   logo: string;
   IsDone: boolean;
   Count: number;
+  GroupId?: number;
 };

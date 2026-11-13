@@ -26,7 +26,7 @@ export function AdminGuard({
     if (getToken()?.token) {
       removeToken();
     }
-    router.replace(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
+    router.replace(`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search + window.location.hash)}`);
   }, [currentUser?.id, loading, router]);
 
   if (loading) {

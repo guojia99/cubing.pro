@@ -10,53 +10,39 @@ import { Fragment } from "react";
 import { CubeIcon } from "@/components/CubeIcon/cube_icon";
 import type { Comp } from "@/components/Data/types/comps";
 import { getThemeColors } from "@/theme/chartColors";
+import { beijingDate, isGroupCompetition, publicCompetitionStatus } from "@/lib/groupCompetition";
 import { parseDateTime } from "@/utils/time/data_time";
-
-function parseDayjsLike(val: string) {
-  return new Date(val);
-}
 
 export function getStatusProp(result: Comp) {
   const theme = getThemeColors();
-  const now = new Date();
-  const startTime = parseDayjsLike(result.CompStartTime);
-  const endTime = parseDayjsLike(result.CompEndTime);
-
-  let status = "";
+  const now = Date.now();
+  const status = publicCompetitionStatus(result, now);
   let color = "default";
 
   switch (result.Status) {
     case "Running":
-      if (result.IsDone) {
-        status = "已结束";
+      if (status === "已结束") {
         color = theme.faintForeground;
         break;
       }
-      if (now < startTime) {
-        status = "未开始";
+      if (status === "未开始") {
         color = theme.signalInfo;
-      } else if (now > startTime && now < endTime) {
-        status = "进行中";
+      } else if (status === "进行中") {
         color = theme.signalSuccess;
       } else {
-        status = "待结束";
         color = theme.signalWarning;
       }
       break;
     case "Reviewing":
-      status = "审批中";
       color = theme.signalWarning;
       break;
     case "Reject":
-      status = "驳回";
       color = theme.destructive;
       break;
     case "Temporary":
-      status = "编辑中";
       color = theme.accent;
       break;
     case "Ban":
-      status = "禁用";
       color = theme.foreground;
       break;
   }
@@ -86,19 +72,12 @@ export const CompsTableColumns: ColumnsType<Comp> = [
     key: "CompStartTime",
     width: 130,
     render: (_text, result: Comp) => {
-      const startTime = parseDayjsLike(result.CompStartTime);
-      const endTime = parseDayjsLike(result.CompEndTime);
-      const daysDifference = Math.floor(
-        (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60 * 24),
-      );
-      if (daysDifference > 1) {
-        return (
-          <>
-            {parseDateTime(result.CompStartTime)}({daysDifference}天)
-          </>
-        );
+      if (isGroupCompetition(result)) {
+        const start = beijingDate(result.CompStartTime), end = beijingDate(result.CompEndTime);
+        return <>{start}{end && end !== start ? ` 至 ${end}` : ""}（北京）</>;
       }
-      return <>{parseDateTime(result.CompStartTime)}</>;
+      const days = Math.floor((Date.parse(result.CompEndTime) - Date.parse(result.CompStartTime)) / 86400_000);
+      return <>{parseDateTime(result.CompStartTime)}{days > 1 ? `(${days}天)` : ""}</>;
     },
   },
   {
@@ -128,7 +107,7 @@ export const CompsTableColumns: ColumnsType<Comp> = [
     title: "名称",
     dataIndex: "Name",
     key: "Name",
-    width: 200,
+    width: 360,
     render: (_text, result: Comp) => (
       <>
         <NextLink href={`/competition/${result.id}`} style={{ color: "var(--ant-color-link)" }}>
@@ -156,8 +135,8 @@ export const CompsTableColumns: ColumnsType<Comp> = [
     key: "EventMin",
     width: 150,
     render: (text: string, result: Comp) => {
-      const l = text.toString().split(";");
-      if (text === "") {
+      const l = (text ?? "").split(";");
+      if (!text) {
         return <>暂无项目</>;
       }
       const body: React.ReactNode[] = [];

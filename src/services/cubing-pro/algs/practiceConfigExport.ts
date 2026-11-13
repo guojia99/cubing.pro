@@ -1,4 +1,11 @@
 import { exportHistory, importHistory, normalizeHistory } from './formulaPracticeHistoryDb';
+import {
+  DEFAULT_PUZZLE_PREFERENCES,
+  PUZZLE_PREFERENCES_KEY,
+  normalizePuzzlePreferences,
+  notifyPuzzlePreferencesChanged,
+  type PuzzlePreferences,
+} from '@/components/puzzles/preferences';
 
 const PREFIX_PROFICIENCY = 'algs:formula_practice_proficiency:';
 const PREFIX_CONFIG = 'algs:formula_practice_config:';
@@ -21,6 +28,8 @@ export interface PracticeConfigExport {
   customFormulas?: Record<string, string[]>;
   /** Values keyed by the suffix of the actual algs_custom_ localStorage keys. */
   customAlgs?: Record<string, unknown>;
+  /** Optional in version 2; older backups leave current preferences untouched. */
+  puzzlePreferences?: PuzzlePreferences;
 }
 
 function parseValue(raw: string): unknown {
@@ -44,6 +53,9 @@ export async function exportPracticeConfig(): Promise<PracticeConfigExport> {
   const formulaPracticeHistory = await exportHistory();
   const daily = localStorage.getItem(KEY_DAILY_PICK);
   const custom = localStorage.getItem(KEY_CUSTOM_FORMULAS);
+  // Read storage directly: the UI reader intentionally tolerates read errors,
+  // whereas a backup must reject rather than silently export defaults.
+  const preferences = localStorage.getItem(PUZZLE_PREFERENCES_KEY);
   return {
     version: 2,
     exportedAt: new Date().toISOString(),
@@ -55,6 +67,9 @@ export async function exportPracticeConfig(): Promise<PracticeConfigExport> {
     dailyRandomPick: daily === null ? undefined : parseValue(daily),
     customFormulas: custom === null ? undefined : parseValue(custom) as Record<string, string[]>,
     customAlgs: collectByPrefix(PREFIX_CUSTOM),
+    puzzlePreferences: preferences === null
+      ? DEFAULT_PUZZLE_PREFERENCES
+      : normalizePuzzlePreferences(parseValue(preferences)),
   };
 }
 
@@ -82,6 +97,9 @@ export async function importPracticeConfig(jsonStr: string): Promise<{ success: 
       }
     }
     if (data.dailyRandomPick !== undefined) writes.set(KEY_DAILY_PICK, JSON.stringify(data.dailyRandomPick));
+    if (data.version === 2 && data.puzzlePreferences !== undefined) {
+      writes.set(PUZZLE_PREFERENCES_KEY, JSON.stringify(normalizePuzzlePreferences(data.puzzlePreferences)));
+    }
     if (data.customFormulas !== undefined) {
       entries(data.customFormulas);
       if (!writes.has(KEY_CUSTOM_FORMULAS)) writes.set(KEY_CUSTOM_FORMULAS, JSON.stringify(data.customFormulas));
@@ -106,6 +124,7 @@ export async function importPracticeConfig(jsonStr: string): Promise<{ success: 
     }
     // importHistory resolves at DB commit; legacy-key cleanup is best-effort after that boundary.
     if (Object.keys(histories).length) await importHistory(histories);
+    if (writes.has(PUZZLE_PREFERENCES_KEY)) notifyPuzzlePreferencesChanged();
     return { success: true };
   } catch (error) {
     // localStorage and IndexedDB cannot share a transaction. Restore settings if the DB fails.

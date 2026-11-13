@@ -10,7 +10,7 @@ import {
   saveFormulaPick,
 } from "@/services/cubing-pro/algs/formulaRandomPick";
 import type { FormulaItem } from "../types";
-import SvgRenderer from "./SvgRenderer";
+import AlgsCubeDiagram from "./AlgsCubeDiagram";
 import RandomWheel, { type WheelSegment } from "./RandomWheel";
 import "./formulaRandomPickModal.css";
 import "../styles/algsRandomDetail.css";
@@ -206,30 +206,41 @@ export default function FormulaRandomPickModal({
                     {t("algs.formulaRandom.historyEmpty")}
                   </p>
                 ) : (
-                  history.map((item, i) => (
-                    <button
-                      type="button"
-                      disabled={!flatAlgs.some((formula) => formula.setName === item.setName && formula.groupName === item.groupName && formula.alg.name === item.algName)}
-                      key={`${item.setName}-${item.groupName}-${item.algName}-${i}`}
-                      className="formula-random-history-item"
-                      onClick={() => handleHistoryItemClick(item)}
-                    >
-                      <SvgRenderer
-                        svg={item.image}
-                        maxWidth={60}
-                        maxHeight={80}
-                        style={{ flexShrink: 0 }}
-                      />
-                      <div className="formula-random-history-item-info">
-                        <div className="formula-random-history-item-name">
-                          {item.algName}
+                  history.map((item, i) => {
+                    const formula = flatAlgs.find((formula) => formula.setName === item.setName && formula.groupName === item.groupName && formula.alg.name === item.algName);
+                    return (
+                      <button
+                        type="button"
+                        disabled={!formula}
+                        key={`${item.setName}-${item.groupName}-${item.algName}-${i}`}
+                        className="formula-random-history-item"
+                        onClick={() => handleHistoryItemClick(item)}
+                      >
+                        <AlgsCubeDiagram
+                          cube={cube}
+                          classId={classId}
+                          setName={item.setName}
+                          groupName={item.groupName}
+                          formula={formula?.alg.algs[0]}
+                          scramble={formula?.alg.scrambles?.[0]}
+                          imageSvg={item.image || formula?.alg.image}
+                          useVisualCube={Boolean(formula?.alg.algs[0]?.trim() || formula?.alg.scrambles?.[0]?.trim())}
+                          interactive={false}
+                          maxWidth={60}
+                          maxHeight={80}
+                          style={{ width: 60, maxWidth: "100%", flexShrink: 0 }}
+                        />
+                        <div className="formula-random-history-item-info">
+                          <div className="formula-random-history-item-name">
+                            {item.algName}
+                          </div>
+                          <div className="formula-random-history-item-meta">
+                            {item.setName} · {item.groupName}
+                          </div>
                         </div>
-                        <div className="formula-random-history-item-meta">
-                          {item.setName} · {item.groupName}
-                        </div>
-                      </div>
-                    </button>
-                  ))
+                      </button>
+                    );
+                  })
                 )}
               </div>
             </Dialog.Body>
@@ -315,11 +326,19 @@ export default function FormulaRandomPickModal({
                     className="formula-random-result-card formula-random-option-card"
                     onClick={() => handlePickClick(winner)}
                   >
-                    <SvgRenderer
-                      svg={winner.alg.image ?? ""}
+                    <AlgsCubeDiagram
+                      cube={cube}
+                      classId={classId}
+                      setName={winner.setName}
+                      groupName={winner.groupName}
+                      formula={winner.alg.algs[0]}
+                      scramble={winner.alg.scrambles?.[0]}
+                      imageSvg={winner.alg.image}
+                      useVisualCube={Boolean(winner.alg.algs[0]?.trim() || winner.alg.scrambles?.[0]?.trim())}
+                      interactive={false}
                       maxWidth={120}
                       maxHeight={160}
-                      style={{ marginBottom: 8 }}
+                      style={{ width: 120, maxWidth: "100%", marginBottom: 8 }}
                     />
                     <div className="random-pick-option-name">{winner.alg.name}</div>
                     <div className="formula-random-option-meta">

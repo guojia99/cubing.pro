@@ -18,7 +18,7 @@ import { AdminExternalLinksPageView } from "@/views/admin/AdminExternalLinksPage
 import { AdminHomePageView } from "@/views/admin/AdminHomePageView";
 import { AdminOrganizersPageView } from "@/views/admin/AdminOrganizersPageView";
 import { AdminUsersPageView } from "@/views/admin/AdminUsersPageView";
-import { OrganizersCompsPageView } from "@/views/admin/OrganizersCompsPageView";
+import { AdminCompetitionApprovalsPageView, OrganizersCompsPageView } from "@/views/admin/OrganizersCompsPageView";
 import { OrganizersCreateCompsPageView } from "@/views/admin/OrganizersCreateCompsPageView";
 import { OrganizersDetailsPageView } from "@/views/admin/OrganizersDetailsPageView";
 import { OrganizersGroupPageView } from "@/views/admin/OrganizersGroupPageView";
@@ -89,6 +89,10 @@ function CatchAllContent({ routeId, path }: { routeId: string; path: string[] })
       return <AdvertisementPageView />;
     case "admin-admins":
       return <AdminHomePageView />;
+    case "admin-competition-approvals":
+      return <AdminCompetitionApprovalsPageView />;
+    case "admin-competition-manage":
+      return <OrganizersResultsPageView admin />;
     case "admin-acknowledgments":
       return <AdminAcknowledgmentsPageView />;
     case "admin-other-links":

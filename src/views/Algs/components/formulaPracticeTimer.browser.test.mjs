@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import http from 'node:http';
+import { setTimeout as delay } from 'node:timers/promises';
 
 // Optional browser tools live outside the repository. No production dependencies added.
 // PRACTICE_BROWSER_TOOLS=/path/to/tools node src/views/Algs/components/formulaPracticeTimer.browser.test.mjs
@@ -27,9 +28,12 @@ const bundle = await esbuild.build({
     import AlgsFilterPanel from '${root}/src/views/Algs/components/AlgsFilterPanel';
     import * as history from '${service}';
     import {importHistory} from '${db}';
+    import {renderFromSimpleQuery} from '@cuberoot/visualcube/svg';
     import '${root}/src/styles/tokens.css';
     import '${root}/src/views/Algs/styles/algsDetail.css';
     window.practiceHistory = history; window.importHistory = importHistory;
+    window.practiceVendorReference = setup => renderFromSimpleQuery({cubeSize:3,size:240,setup,view:'pll',
+      sch:'#ffdd00,#00a651,#e53935,#ffffff,#2266ff,#ff8800'});
     window.practiceTest = {creates: [], appends: [], pages: [], summaries: [], failAppend: false, delayAppend: false, failSummary: false, failCreate: false, failDelete: false, failClear: false};
     const algs = Array.from({length: 4}, (_, i) => ({setName: 'Set', groupName: 'Group', alg: {name: 'Case '+(i+1), scrambles: ["R U R'", "F U F'"], algs: ["R U R' U'"], image: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60"><rect x="8" y="8" width="44" height="44" fill="#22a8cb"/></svg>'}}));
     const filterData = {name: 'PLL', sets: [{name: 'Set', groups: [{name: 'Group', algs: algs.map(item => item.alg)}]}]};
@@ -54,9 +58,22 @@ const bundle = await esbuild.build({
     window.practiceRoot = createRoot(document.getElementById('root'));
     window.practiceRoot.render(<React.StrictMode><ChakraProvider value={system}><I18nProvider>{location.pathname === '/controls' ? <ControlsHost/> : <Host/>}</I18nProvider></ChakraProvider></React.StrictMode>);
   `, loader: 'tsx', resolveDir: root },
-  bundle: true, write: false, outdir: '/practice-test', jsx: 'automatic',
+  // A single in-memory IIFE bundles dynamic imports; React.lazy still resolves asynchronously.
+  bundle: true, write: false, outdir: '/practice-test', format: 'iife', jsx: 'automatic',
   define: { 'process.env.NODE_ENV': '"development"', 'process.env': '{}' },
-  plugins: [{ name: 'controlled-practice-storage', setup(build) {
+  plugins: [{ name: 'next-dynamic-browser', setup(build) {
+    build.onResolve({ filter: /^next\/dynamic$/ }, () => ({ path: 'dynamic', namespace: 'browser-adapter' }));
+    build.onLoad({ filter: /.*/, namespace: 'browser-adapter' }, () => ({
+      contents: `import React, {lazy, Suspense} from 'react';
+        export default function dynamic(load, options = {}) {
+          const Component = lazy(() => load().then(module => ({default: module.default || module})));
+          return function Dynamic(props) {
+            const Loading = options.loading;
+            return React.createElement(Suspense, {fallback: Loading ? React.createElement(Loading) : null}, React.createElement(Component, props));
+          };
+        }`, resolveDir: root,
+    }));
+  } }, { name: 'controlled-practice-storage', setup(build) {
     build.onResolve({ filter: /formulaPracticeHistory$/ }, (args) => ({ path: args.path, namespace: 'controlled' }));
     build.onLoad({ filter: /.*/, namespace: 'controlled' }, () => ({
       contents: `
@@ -106,9 +123,41 @@ const server = http.createServer((request, response) => {
   response.end(request.url === '/bundle.js' ? js : request.url === '/bundle.css' ? css : '<!DOCTYPE html><html data-palette="haitian"><head><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/bundle.css"></head><body><div id="root"></div><script src="/bundle.js"></script></body></html>');
 });
 await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
-const browser = await chromium.launch({ headless: true });
+const browser = await chromium.launch({ headless: true, args: ['--enable-unsafe-swiftshader'] });
 const errors = [];
 const origin = `http://127.0.0.1:${server.address().port}`;
+const playerSelector = 'cubing-pro-managed-twisty-player';
+async function poll(description, predicate, {timeout = 10000, interval = 50} = {}) {
+  const deadline = performance.now() + timeout;
+  const timeoutError = () => Object.assign(new Error(`Timed out waiting for ${description}`), {name: 'TimeoutError'});
+  while (performance.now() < deadline) {
+    let timer;
+    let result;
+    try {
+      result = await Promise.race([
+        predicate(),
+        new Promise((_, reject) => { timer = setTimeout(() => reject(timeoutError()), Math.max(1, Math.ceil(deadline - performance.now()))); }),
+      ]);
+    } finally { clearTimeout(timer); }
+    if (result === true) return;
+    await delay(Math.min(interval, Math.max(0, deadline - performance.now())));
+  }
+  throw timeoutError();
+}
+const waitInBrowser = (page, description, predicate, arg) => poll(description, async () => Boolean(await page.evaluate(predicate, arg)));
+async function assertManagedPlayer(scope) {
+  const player = scope.locator(playerSelector);
+  await poll('managed practice player readiness', () => scope.evaluate(host => {
+    const player = host.querySelector('cubing-pro-managed-twisty-player');
+    return !!host.querySelector('[role="alert"]') || player?.style.visibility === 'visible'
+      && !!host.querySelector('select:not(:disabled)');
+  }), {timeout: 40000});
+  assert.deepEqual(await scope.getByRole('alert').allTextContents(), []);
+  assert.equal(await player.count(), 1, 'one real managed player under StrictMode');
+  assert.equal(await player.isVisible(), true);
+  const canvases = await player.evaluate(async element => (await element.experimentalCurrentCanvases()).map(canvas => [canvas.width, canvas.height]));
+  assert.ok(canvases.length > 0 && canvases.every(([width, height]) => width > 0 && height > 0));
+}
 async function assertIconClose(page, button) {
   await button.evaluate(async element => {
     const animations = element.closest('[role="dialog"]').getAnimations({subtree: true});
@@ -139,15 +188,105 @@ async function assertIconClose(page, button) {
   assert.equal(focus.focused, true, 'close is keyboard reachable');
   assert.notEqual(focus.outline, 'none', 'close has a visible focus outline');
 }
+async function assertLocalDiagram(scope, expectedSetup) {
+  const diagram = scope.locator('.puzzle-diagram');
+  await diagram.scrollIntoViewIfNeeded();
+  await diagram.locator('svg[role="img"], [role="alert"]').first().waitFor();
+  assert.deepEqual(await diagram.getByRole('alert').allTextContents(), [], 'valid setup renders without errors');
+  assert.equal(await diagram.getAttribute('data-puzzle'), '3x3x3', 'real local puzzle is prepared');
+  assert.equal(await diagram.getAttribute('data-state-source'), 'scramble', 'practice diagram uses the recorded setup');
+  const svg = diagram.locator('svg[role="img"]');
+  assert.equal(await svg.count(), 1, 'one locally generated SVG under StrictMode');
+  assert.equal(await svg.isVisible(), true);
+  assert.ok(await svg.locator('path, polygon, rect, use').count() > 5, 'local SVG contains puzzle stickers');
+  assert.equal(await diagram.locator('svg circle[fill="red"], svg rect[x="8"][fill="#22a8cb"]').count(), 0, 'local generation takes precedence over stored and formula-key images');
+  const integrity = await svg.evaluate(svg => {
+    const ids = [...document.querySelectorAll('[id]')].map(node => node.id);
+    const duplicates = ids.filter((id, index) => ids.indexOf(id) !== index);
+    const invalid = [];
+    let references = 0;
+    const verify = id => {
+      references++;
+      const target = svg.getElementById(id);
+      if (!target || target.closest('svg') !== svg || document.getElementById(id) !== target) invalid.push(id);
+    };
+    for (const node of [svg, ...svg.querySelectorAll('*')]) {
+      for (const attribute of node.attributes) {
+        if (attribute.localName === 'href') {
+          if (attribute.value.startsWith('#')) verify(attribute.value.slice(1));
+          else invalid.push(attribute.value);
+        }
+      }
+      const values = [...node.attributes].map(attribute => attribute.value);
+      if (node.localName === 'style') values.push(node.textContent);
+      for (const value of values) for (const match of value.matchAll(/url\(\s*["']?([^"')\s]+)["']?\s*\)/g)) {
+        if (match[1].startsWith('#')) verify(match[1].slice(1));
+        else invalid.push(match[1]);
+      }
+    }
+    return {duplicates, invalid, references, undefinedStops: [...svg.querySelectorAll('stop')].filter(stop => /undefined/i.test(stop.outerHTML)).length};
+  });
+  assert.deepEqual(integrity.duplicates, [], 'same-page practice SVG IDs are unique');
+  assert.deepEqual(integrity.invalid, [], 'practice href/url references resolve inside their own SVG');
+  assert.equal(integrity.undefinedStops, 0, 'any vendor gradient stops have valid colors');
+  // Fixtures own these setups: recent/history rows are R U; live questions use
+  // the displayed source text. Never derive the reference from diagram output.
+  const setup = expectedSetup ?? await scope.locator('.fp-scramble').textContent();
+  const actual = await svg.screenshot();
+  const bounds = await svg.boundingBox();
+  await svg.evaluate((svg, {setup,bounds}) => {
+    const host = document.createElement('div');
+    host.dataset.testid = 'practice-vendor-reference';
+    host.style.cssText = `position:fixed;left:${bounds.x}px;top:${bounds.y}px;width:${bounds.width}px;height:${bounds.height}px;background:white;z-index:2147483647`;
+    host.innerHTML = window.practiceVendorReference(setup);
+    host.querySelector('svg').setAttribute('width','100%');
+    host.querySelector('svg').setAttribute('height','100%');
+    document.body.append(host);
+  }, {setup,bounds});
+  const reference = scope.page().getByTestId('practice-vendor-reference').locator('svg');
+  try {
+    const geometry = svg => ({viewBox:svg.getAttribute('viewBox'),nodes:[...svg.querySelectorAll('path,polygon,rect')].map(node => {
+      const box = node.getBBox(), style = getComputedStyle(node);
+      return {tag:node.localName,shape:['d','points','x','y','width','height','transform'].map(key => node.getAttribute(key)),
+        box:[box.x,box.y,box.width,box.height],fill:style.fill,stroke:style.stroke};
+    })});
+    assert.deepEqual(await svg.evaluate(geometry),await reference.evaluate(geometry),'practice 2D matches the direct vendor plan for the recorded setup');
+    const expected = await reference.screenshot();
+    const pixels = await scope.page().evaluate(async images => {
+      const samples = await Promise.all(images.map(async base64 => {
+        const image = await createImageBitmap(await (await fetch('data:image/png;base64,'+base64)).blob());
+        const canvas = document.createElement('canvas'); canvas.width=image.width; canvas.height=image.height;
+        const context = canvas.getContext('2d'); context.drawImage(image,0,0); image.close();
+        return {width:canvas.width,height:canvas.height,data:context.getImageData(0,0,canvas.width,canvas.height).data};
+      }));
+      if (samples[0].width !== samples[1].width || samples[0].height !== samples[1].height) throw new Error('Practice screenshot dimensions differ');
+      let changed=0,colored=0;
+      for (let i=0;i<samples[0].data.length;i+=4) {
+        if ([0,1,2,3].some(channel => Math.abs(samples[0].data[i+channel]-samples[1].data[i+channel])>12)) changed++;
+        if (samples[0].data[i+3]>128 && Math.max(...samples[0].data.slice(i,i+3))-Math.min(...samples[0].data.slice(i,i+3))>30) colored++;
+      }
+      return {changed,colored,total:samples[0].width*samples[0].height};
+    }, [actual,expected].map(png => png.toString('base64')));
+    assert.ok(pixels.colored>10,'practice thumbnail paints real colored pixels');
+    assert.ok(pixels.changed/pixels.total<0.005,`practice upstream screenshot pixels: ${JSON.stringify(pixels)}`);
+  } finally { await scope.page().getByTestId('practice-vendor-reference').evaluateAll(nodes => nodes.forEach(node => node.remove())); }
+}
 try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto(origin);
+  let attempts = 0;
+  const negativeStart = performance.now();
+  await assert.rejects(poll('practice async false control', async () => {
+    attempts++;
+    return await page.evaluate(async () => { await new Promise(resolve => setTimeout(resolve, 10)); return false; });
+  }, {timeout: 250, interval: 20}), {name: 'TimeoutError'});
+  assert.ok(attempts >= 2 && performance.now() - negativeStart >= 250, 'Node polling awaits false promises and retries until timeout');
   const dialog = page.getByRole('dialog');
   await assertIconClose(page, dialog.getByRole('button', { name: '关闭练习器', exact: true }));
   const timer = page.locator('.fp-timer');
   const phase = async (name) => {
-    try { await page.waitForFunction((name) => document.querySelector('.fp-timer')?.classList.contains('fp-timer-' + name), name, { timeout: 8000 }); }
+    try { await poll(`timer phase ${name}`, () => page.evaluate(name => document.querySelector('.fp-timer')?.classList.contains('fp-timer-' + name) === true, name), {timeout: 8000}); }
     catch (error) { console.error('PHASE FAILURE', name, await page.evaluate(() => ({ text: document.querySelector('[role=dialog]')?.textContent, active: document.activeElement?.outerHTML, timer: document.querySelector('.fp-timer')?.outerHTML })), errors); throw error; }
   };
   const start = async () => { await timer.focus(); await page.keyboard.down('Space'); await phase('armed'); await page.keyboard.up('Space'); await phase('running'); };
@@ -160,7 +299,10 @@ try {
   await page.keyboard.press('Enter');
   await page.locator('.fp-detail').waitFor();
   assert.equal(await dialog.getByRole('heading', { name: '题目详情', exact: true }).count(), 1);
-  assert.equal(await page.locator('.fp-detail svg').count(), 1);
+  assert.equal(await page.locator('.fp-detail').getByRole('button', { name: '3D', exact: true }).getAttribute('aria-pressed'), 'true', 'auto defaults interactive details to 3D');
+  await assertManagedPlayer(page.locator('.fp-detail'));
+  await page.locator('.fp-detail').getByRole('button', { name: '2D', exact: true }).click();
+  await assertLocalDiagram(page.locator('.fp-detail'));
   assert.equal(await page.locator('.fp-detail .fp-alg').textContent(), "R U R' U'");
   assert.equal(await dialog.getByRole('button', { name: '删除记录', exact: true }).count(), 0);
   assert.equal(await page.locator('.fp-detail .fp-mean').count(), 0);
@@ -261,7 +403,7 @@ try {
   const savesAfterReadFailure = await page.evaluate(() => window.practiceTest.appends.length);
   await page.evaluate(() => { window.practiceTest.failSummary = false; });
   await dialog.getByRole('button', { name: '重试', exact: true }).click();
-  await page.waitForFunction(() => !document.querySelector('.fp-notice')?.textContent.includes('历史加载失败'));
+  await waitInBrowser(page, 'history retry clears notice', () => !document.querySelector('.fp-notice')?.textContent.includes('历史加载失败'));
   assert.equal(await page.evaluate(() => window.practiceTest.appends.length), savesAfterReadFailure);
   console.log('PASS committed write survives statistics read failure without append retry');
 
@@ -272,26 +414,28 @@ try {
     window.setPracticeProps({ open: false });
   });
   await page.getByRole('button', { name: 'Reopen', exact: true }).click();
-  await page.waitForFunction(() => document.querySelector('.fp-stats')?.textContent.includes('近 1000 次均值'));
+  await waitInBrowser(page, '1000-result statistics', () => document.querySelector('.fp-stats')?.textContent.includes('近 1000 次均值'));
   assert.equal(await page.locator('.fp-mean').textContent(), '01.54');
-  assert.equal(await page.locator('.fp-record').first().locator('svg circle').count(), 1, 'saved image wins in recent history');
-  assert.equal(await page.locator('.fp-record').nth(1).locator('svg rect').count(), 1, 'empty legacy image falls back in recent history');
+  await assertLocalDiagram(page.locator('.fp-record').first(),'R U');
+  await assertLocalDiagram(page.locator('.fp-record').nth(1),'R U');
   assert.equal(await page.locator('.fp-stats').textContent().then((text) => text.includes('1000 / 1000 次')), false);
   await dialog.getByRole('button', { name: /查看全部/ }).click();
-  await page.waitForFunction(() => document.querySelectorAll('.fp-record').length === 20);
-  assert.equal(await page.locator('.fp-record').first().locator('svg circle').count(), 1);
+  await waitInBrowser(page, '20 history rows', () => document.querySelectorAll('.fp-record').length === 20);
+  await assertLocalDiagram(page.locator('.fp-record').first(),'R U');
   await page.locator('.fp-record-open').first().click();
   await page.locator('.fp-detail').waitFor();
-  assert.equal(await page.locator('.fp-detail svg circle').count(), 1, 'saved image wins in record detail');
+  await page.locator('.fp-detail').getByRole('button', { name: '2D', exact: true }).click();
+  await assertLocalDiagram(page.locator('.fp-detail'));
   await dialog.getByRole('button', { name: '返回', exact: true }).click();
   await dialog.getByRole('button', { name: '下一页', exact: true }).click();
-  await page.waitForFunction(() => document.querySelector('.fp-pagination')?.textContent.includes('第 2 / 53 页'));
+  await waitInBrowser(page, 'history page two', () => document.querySelector('.fp-pagination')?.textContent.includes('第 2 / 53 页'));
   assert.equal(await page.evaluate(() => window.practiceTest.pages.at(-1)[2]), 2);
   assert.equal(await page.evaluate(() => window.practiceTest.pages.at(-1)[3]), 20);
-  assert.equal(await page.locator('.fp-record svg rect').count(), 20, 'paged legacy records use formula-key fallback');
+  for (const record of await page.locator('.fp-record').all()) await assertLocalDiagram(record,'R U');
   await page.locator('.fp-record-open').first().focus(); await page.keyboard.press('Enter');
   await page.locator('.fp-detail').waitFor();
-  assert.equal(await page.locator('.fp-detail svg rect').count(), 1, 'empty legacy record detail uses formula-key fallback');
+  await page.locator('.fp-detail').getByRole('button', { name: '2D', exact: true }).click();
+  await assertLocalDiagram(page.locator('.fp-detail'));
   assert.equal(await page.getByRole('dialog').count(), 1);
   await page.keyboard.press('Space');
   assert.equal(await page.evaluate(() => window.practiceTest.appends.length), savesAfterReadFailure);
@@ -309,7 +453,7 @@ try {
   assert.equal(await page.evaluate(() => window.practiceHistory.getFormulaPracticeHistoryCount('333', 'PLL')), 1045);
   await page.evaluate(() => { window.practiceTest.failDelete = false; });
   await dialog.getByRole('button', { name: '确认', exact: true }).click();
-  await page.waitForFunction(() => document.querySelector('.fp-pagination')?.textContent.includes('1044'));
+  await waitInBrowser(page, 'record deletion updates pagination', () => document.querySelector('.fp-pagination')?.textContent.includes('1044'));
   await dialog.getByRole('button', { name: '清空历史', exact: true }).click();
   await page.locator('.fp-confirm').waitFor();
   await dialog.getByRole('button', { name: '取消', exact: true }).click();
@@ -321,13 +465,13 @@ try {
   assert.equal(await page.evaluate(() => window.practiceHistory.getFormulaPracticeHistoryCount('333', 'PLL')), 1044);
   await page.evaluate(() => { window.practiceTest.failClear = false; });
   await dialog.getByRole('button', { name: '确认', exact: true }).click();
-  await page.waitForFunction(() => document.querySelector('.fp-body')?.textContent.includes('暂无练习记录'));
+  await waitInBrowser(page, 'cleared history', () => document.querySelector('.fp-body')?.textContent.includes('暂无练习记录'));
   await dialog.getByRole('button', { name: '返回', exact: true }).click();
   await phase('ready');
   await start(); await stop();
   assert.equal(await page.evaluate(() => window.practiceHistory.getFormulaPracticeHistoryCount('333', 'PLL')), 1);
   console.log('PASS real IndexedDB pagination over 1045 rows, bounded 1000-result statistics, keyboard details, delete/clear confirmation, rebuilt session');
-  console.log('PASS legacy empty-image fallback and stored-image precedence in recent, paged history and record details');
+  console.log('PASS real local diagrams override stored/empty images in recent, paged history and record details');
 
   // Pending old-library writes and reads cannot update the active library.
   await page.evaluate(() => { window.practiceTest.delayAppend = true; });
@@ -335,12 +479,12 @@ try {
   await page.evaluate(() => window.setPracticeProps({ classId: 'OLL' }));
   await dialog.getByRole('button', { name: '开始练习', exact: true }).click(); await phase('ready');
   await page.evaluate(() => { window.practiceTest.delayAppend = false; window.practiceTest.releaseAppend(); });
-  await page.waitForFunction(() => document.querySelector('.fp-meta')?.textContent.includes('OLL'));
+  await waitInBrowser(page, 'active OLL library', () => document.querySelector('.fp-meta')?.textContent.includes('OLL'));
   assert.equal(await page.evaluate(() => window.practiceHistory.getFormulaPracticeHistoryCount('333', 'OLL')), 0);
   assert.equal(await page.locator('.fp-stage-top').textContent().then((text) => text.includes('1 / 4')), true);
   await page.evaluate(() => { window.practiceTest.delaySummary = 'OLL'; window.setPracticeProps({ open: false }); });
   await page.getByRole('button', { name: 'Reopen', exact: true }).click();
-  await page.waitForFunction(() => Boolean(window.practiceTest.releaseSummary));
+  await waitInBrowser(page, 'pending summary release', () => Boolean(window.practiceTest.releaseSummary));
   await page.evaluate(() => window.setPracticeProps({ classId: 'Other' }));
   await page.evaluate(() => window.practiceTest.releaseSummary());
   await dialog.getByRole('button', { name: '开始练习', exact: true }).click(); await phase('ready');
@@ -377,7 +521,7 @@ try {
   await dialog.getByRole('button', { name: '重试', exact: true }).click(); await phase('ready');
   assert.equal(await page.evaluate(() => window.practiceTest.creates.at(-1)[2].selectedFormulas.length), 3);
   await dialog.getByRole('button', { name: '显示答案', exact: true }).click();
-  assert.equal(await page.locator('.fp-answer-content svg').count(), 1);
+  await assertLocalDiagram(page.locator('.fp-answer-content'),await page.locator('.fp-scramble').textContent());
   await dialog.getByRole('button', { name: '隐藏答案', exact: true }).click();
   assert.equal(await page.locator('.fp-answer-content').count(), 0);
   await page.evaluate(() => window.setPracticeProps({ flatAlgs: [{ setName: 'Set', groupName: 'Group', alg: { name: 'Case 1', scrambles: ['NEW QUESTION'], algs: ['NEW ANSWER'], image: '' } }] }));
@@ -453,7 +597,7 @@ try {
   await recoveryPage.goto(origin);
   const recoveryDialog = recoveryPage.getByRole('dialog');
   const recoveryTimer = recoveryPage.locator('.fp-timer');
-  const recoveryPhase = name => recoveryPage.waitForFunction(name => document.querySelector('.fp-timer')?.classList.contains('fp-timer-' + name), name, { timeout: 8000 });
+  const recoveryPhase = name => poll(`recovery phase ${name}`, () => recoveryPage.evaluate(name => document.querySelector('.fp-timer')?.classList.contains('fp-timer-' + name) === true, name), {timeout: 8000});
   const recoverySolve = async () => {
     await recoveryTimer.focus(); await recoveryPage.keyboard.down('Space'); await recoveryPhase('armed');
     await recoveryPage.keyboard.up('Space'); await recoveryPhase('running');
@@ -504,6 +648,49 @@ try {
   await recoveryContext.close();
   console.log('PASS external clear/import then resume: missing session recreation, create failure retry, stable pending ID/time, lost-ack idempotency, close/config restored');
 
+  const legacyContext = await browser.newContext();
+  const legacy = await legacyContext.newPage();
+  legacy.on('pageerror', error => errors.push(error.message));
+  await legacy.goto(origin);
+  await legacy.evaluate(async () => {
+    const records = [
+      { id: 'legacy-image', createdAt: 2, formulaName: 'Legacy image', image: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60"><circle cx="30" cy="30" r="20" fill="red"/></svg>' },
+      { id: 'legacy-formula-image', createdAt: 1, formulaName: 'Legacy formula image', image: '' },
+    ].map(record => ({ ...record, timeMs: 1000, formulaKey: 'Set:Group:Case 1', setName: 'Set', groupName: 'Group', scramble: '', scrambleIndex: 0, algs: [] }));
+    await window.importHistory({ '333-PLL': { version: 2, sessions: [{ id: 'legacy-session', createdAt: 1, mode: 'sequential', selectedFormulas: [], records }] } });
+    window.setPracticeProps({ open: false });
+  });
+  await legacy.getByRole('button', { name: 'Reopen', exact: true }).click();
+  const legacyDialog = legacy.getByRole('dialog');
+  await legacyDialog.getByRole('button', { name: '开始练习', exact: true }).click();
+  const legacyImages = ['svg circle[fill="red"]', 'svg rect[x="8"][fill="#22a8cb"]'];
+  async function assertLegacyImage(scope, selector) {
+    // Preparation replaces the loading box with the fallback, changing row height.
+    await scope.locator('.puzzle-diagram').evaluate(element => element.scrollIntoView({ block: 'nearest' }));
+    await scope.locator(selector).waitFor();
+    assert.equal(await scope.locator(selector).count(), 1, 'image-only legacy record retains its fallback');
+    assert.equal(await scope.locator('svg[role="img"]').count(), 0, 'no generated state for an image-only record');
+    assert.deepEqual(await scope.getByRole('alert').allTextContents(), []);
+  }
+  for (const [index, selector] of legacyImages.entries()) {
+    await assertLegacyImage(legacy.locator('.fp-record').nth(index), selector);
+  }
+  await legacyDialog.getByRole('button', { name: /查看全部/ }).click();
+  await legacy.locator('.fp-pagination').waitFor();
+  for (const [index, selector] of legacyImages.entries()) {
+    const record = legacy.locator('.fp-record').nth(index);
+    await assertLegacyImage(record, selector);
+    await record.locator('.fp-record-open').click();
+    await legacy.locator('.fp-detail').getByRole('button', { name: '2D', exact: true }).click();
+    await assertLegacyImage(legacy.locator('.fp-detail'), selector);
+    await legacyDialog.getByRole('button', { name: '返回', exact: true }).click();
+    await legacy.locator('.fp-pagination').waitFor();
+  }
+  assert.equal(await legacy.evaluate(() => window.practiceHistory.getFormulaPracticeHistoryCount('333', 'PLL')), 2);
+  assert.equal(await legacy.evaluate(() => window.practiceTest.appends.length), 0);
+  await legacyContext.close();
+  console.log('PASS image-only legacy stored-image and formula-key fallbacks in recent, paged history and 2D details');
+
   const touchContext = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
   const touch = await touchContext.newPage();
   touch.on('pageerror', (error) => errors.push(error.message));
@@ -513,12 +700,12 @@ try {
   const box = await touchTimer.boundingBox();
   const cdp = await touchContext.newCDPSession(touch);
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: box.x + box.width / 2, y: box.y + box.height / 2, id: 1 }] });
-  await touch.waitForFunction(() => document.querySelector('.fp-timer-armed'));
+  await waitInBrowser(touch, 'touch armed', () => !!document.querySelector('.fp-timer-armed'));
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-  await touch.waitForFunction(() => document.querySelector('.fp-timer-running'));
+  await waitInBrowser(touch, 'touch running', () => !!document.querySelector('.fp-timer-running'));
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: box.x + box.width / 2, y: box.y + box.height / 2, id: 2 }] });
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-  await touch.waitForFunction(() => document.querySelector('.fp-timer-ready'));
+  await waitInBrowser(touch, 'touch ready', () => !!document.querySelector('.fp-timer-ready'));
   assert.equal(await touch.evaluate(() => window.practiceTest.appends.length), 1);
   if (process.env.PRACTICE_SCREENSHOT_DIR) await touch.screenshot({ path: `${process.env.PRACTICE_SCREENSHOT_DIR}/formula-practice-mobile.png`, fullPage: true });
   console.log('PASS mobile real touch down/hold/release/start/stop writes exactly once');
@@ -571,6 +758,15 @@ try {
   await controls.getByRole('button', {name: 'Open formula', exact: true}).click();
   const formulaDialog = controls.getByRole('dialog');
   const formulaClose = formulaDialog.getByRole('button', {name: 'Close', exact: true});
+  assert.equal(await formulaDialog.getByRole('button', {name: '3D', exact: true}).getAttribute('aria-pressed'), 'true');
+  await assertManagedPlayer(formulaDialog);
+  await formulaDialog.getByRole('button', {name: '2D', exact: true}).click();
+  const formulaDiagram = formulaDialog.locator('.puzzle-diagram');
+  await formulaDiagram.locator('svg[role="img"], [role="alert"]').first().waitFor();
+  assert.deepEqual(await formulaDiagram.getByRole('alert').allTextContents(), []);
+  assert.equal(await formulaDiagram.getAttribute('data-puzzle'), '3x3x3', 'false legacy useVisualCube preference still generates locally');
+  assert.ok(await formulaDiagram.locator('svg[role="img"] path, svg[role="img"] polygon, svg[role="img"] rect, svg[role="img"] use').count() > 5);
+  assert.equal(await formulaDiagram.locator('svg rect[x="8"][fill="#22a8cb"]').count(), 0);
   await assertIconClose(controls, formulaClose);
   await controls.keyboard.press('Enter');
   await formulaDialog.waitFor({state: 'hidden'});
