@@ -9,7 +9,7 @@
     "recipes:parse": "python3 scripts/parse_recipes.py",
     "tips:parse": "python3 scripts/parse_tips.py",
     "howtocook:parse": "npm run recipes:parse && npm run tips:parse",
-    "howtocook:prepare": "npm run howtocook:sync && npm run howtocook:parse",
+    "howtocook:prepare": "node scripts/prepare-howtocook.mjs",
     "prebuild": "npm run howtocook:prepare",
     "build": "next build",
     "build:static": "npm run howtocook:prepare && node scripts/prepare-static-export.mjs && NEXT_OUTPUT_EXPORT=1 next build && node scripts/post-static-export.mjs; node scripts/restore-static-export.mjs",
