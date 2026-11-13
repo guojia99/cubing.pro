@@ -1,0 +1,21 @@
+.group-competition .ant-card { border-color: #cde7f0; margin-bottom: 16px; }
+.group-competition .ant-form-item { margin-bottom: 16px; }
+.group-competition .gc-filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); gap: 12px; align-items: end; }
+.group-competition .gc-filters .ant-input-number, .group-competition .gc-filters .ant-select, .group-competition .gc-filters .ant-picker { width: 100%; }
+.group-competition .gc-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.group-competition .gc-stack { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; min-width: 0; }
+.group-competition .gc-stack > *, .group-competition .ant-tabs-content, .group-competition .ant-tabs-tabpane, .group-competition .ant-card-body { min-width: 0; }
+.group-competition .ant-card-head-wrapper { flex-wrap: wrap; gap: 8px; }
+.group-competition .ant-card-head-title { white-space: normal; overflow-wrap: anywhere; }
+.group-competition .gc-name { overflow-wrap: anywhere; white-space: normal; line-height: 1.65; }
+.group-competition .gc-short-name { max-width: 8em; }
+.group-competition .gc-dates { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.group-competition .gc-dates .ant-tag { margin-inline-end: 0; white-space: normal; overflow-wrap: anywhere; }
+.group-competition .gc-secondary { display: block; font-size: 12px; color: #64748b; }
+.group-competition .ant-table-cell { vertical-align: top; }
+.group-competition .ant-select-selection-item { white-space: normal; }
+@media (max-width: 640px) {
+  .group-competition .ant-card-body { padding: 14px; }
+  .group-competition .ant-tabs-nav-list { flex-wrap: wrap; }
+  .group-competition .ant-form-item-label { white-space: normal; }
+}

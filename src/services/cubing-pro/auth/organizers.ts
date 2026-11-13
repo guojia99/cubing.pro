@@ -2,7 +2,7 @@ import { AuthHeader } from "@/services/cubing-pro/auth/token";
 import type { OrganizersAPI } from "@/services/cubing-pro/auth/typings";
 import type { CompAPI, CompResultAPI, CompsAPI } from "@/services/cubing-pro/comps/typings";
 import type { PlayersAPI } from "@/services/cubing-pro/players/typings";
-import { Request } from "@/services/cubing-pro/request";
+import { getApiErrorDisplayMessage, Request } from "@/services/cubing-pro/request";
 
 export async function apiMeOrganizers(): Promise<OrganizersAPI.MeOrganizersResp> {
   const response = await Request.get<OrganizersAPI.MeOrganizersResp>("/organizers/me", {
@@ -25,6 +25,8 @@ export async function apiCreateComps(
   const response = await Request.post<CompsAPI.CompsResp>(`/organizers/${orgID}/comp/`, req, {
     headers: AuthHeader(),
   });
+  const body = response.data as CompsAPI.CompsResp & { code?: string | number; msg?: string };
+  if (String(body.code) !== "200") throw new Error(getApiErrorDisplayMessage(body) ?? body.msg ?? "创建比赛失败");
   return response.data;
 }
 

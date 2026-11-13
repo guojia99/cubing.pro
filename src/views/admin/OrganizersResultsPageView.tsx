@@ -1,1151 +1,440 @@
 "use client";
 
-import "antd/dist/reset.css";
-
-import { Text } from "@chakra-ui/react";
-import { CubesCn } from "@/components/CubeIcon/cube";
-import { CubeIcon } from "@/components/CubeIcon/cube_icon";
-import { eventRouteM } from "@/components/Data/cube_result/event_route";
-import { ResultsTable } from "@/components/Data/cube_result/result_tables";
-import {
-  PreResult,
-  Result,
-  resultStringPro,
-  resultTimeString,
-} from "@/components/Data/types/result";
-import { PlayerLink } from "@/components/Link/GcLinks";
-import { rowClassNameWithStyleLines } from "@/components/Table/table_style";
-import { NavTabs } from "@/components/Tabs/NavTabs";
+import { Alert, AutoComplete, Button, Card, Cascader, Form, Input, InputNumber, Modal, Progress, Select, Space, Spin, Switch, Table, Tag, message } from "antd";
+import type { ColumnsType } from "antd/es/table";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { AdminGuard } from "@/components/admin/AdminGuard";
 import { OrganizersGuard } from "@/components/admin/OrganizersGuard";
+import { CubesCn } from "@/components/CubeIcon/cube";
+import { resultStringPro, resultTimeString, type PreResult, type Result } from "@/components/Data/types/result";
+import { NavTabs } from "@/components/Tabs/NavTabs";
 import { useRouteParam } from "@/hooks/useRouteParam";
-import {
-  apiAddCompResults,
-  apiApprovalCompsPreResult,
-  apiDeleteCompsResult,
-  apiGetAllPlayers,
-  apiGetCompsPreResult,
-  apiGetCompsResults,
-  apiGetCompsResultsWithPlayer,
-  apiGetOrgComp,
-  apiOrganizers,
-} from "@/services/cubing-pro/auth/organizers";
-import { OrganizersAPI } from "@/services/cubing-pro/auth/typings";
-import { CompAPI } from "@/services/cubing-pro/comps/typings";
-import { apiEvents } from "@/services/cubing-pro/events/events";
-import { EventsAPI } from "@/services/cubing-pro/events/typings";
-import { PlayersAPI } from "@/services/cubing-pro/players/typings";
-import { isNumber } from "@/utils/types/numbers";
-import { ADMIN_LEGACY } from "@/theme/domainColors";
-import { CloseCircleOutlined, InfoCircleOutlined } from "@ant-design/icons";
-import {
-  Alert,
-  Button,
-  Card,
-  Cascader,
-  Form,
-  Input,
-  Modal,
-  Progress,
-  Select,
-  Space,
-  Table,
-  Tag,
-  Tooltip,
-  message,
-} from "antd";
-import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
-import TextArea from "antd/es/input/TextArea";
-import { TableRowSelection } from "antd/es/table/interface";
-import React, { useCallback, useEffect, useState } from "react";
+import { competitionError, competitionService, type CompetitionMode, type Query, type Registration } from "@/services/cubing-pro/auth/groupCompetition";
+import type { CompAPI } from "@/services/cubing-pro/comps/typings";
+import { apiPlayers } from "@/services/cubing-pro/players/players";
+import { GroupCompetitionShell } from "./GroupCompetitionShell";
+import { EventTable } from "./OrganizersCreateCompsPageView";
+import { CompetitionSwitcher } from "./CompetitionSwitcher";
+import { useCompetitionOptions } from "./useCompetitionOptions";
+import { attemptCount, beijingDate, canEnterResults, canReviewResults, competitionEditTimes, competitionStatus, competitionReturnPath, isGroupCompetition, parseAttempts, parseBatchResults, positiveInteger, preResultReviewFilter, publicCompetitionStatus, validateEvents, type BatchItem } from "@/lib/groupCompetition";
 
-function normalizeMbldScoreText(value: string): string {
-  return value
-    .replace(/：/g, ":")
-    .replace(/。/g, ".")
-    .replace(/\s*\/\s*/g, "/")
-    .replace(/\s+/g, " ")
-    .trim();
+type Service = ReturnType<typeof competitionService>;
+type Action = (fn: () => Promise<unknown>, success: string, refresh?: boolean) => Promise<void>;
+type BatchProgress = { completed: number; total: number; failed: number; errors: string[] };
+
+function formatResults(row: Result): string {
+  const values = row.Result ?? [];
+  if (!attemptCount(row.EventRoute)) return values.length ? `${values.join(" / ")}（成绩类型缺失）` : "历史成绩缺失";
+  if (row.EventRoute >= 8 && row.EventRoute <= 10) {
+    const scores: string[] = [];
+    const special: Record<number, string> = { [-10002]: "DNP", [-10003]: "DNT" };
+    for (let i = 0; i < values.length; i += 3) scores.push(i + 2 < values.length ? `${values[i]}/${values[i + 1]} ${special[values[i + 2]] ?? resultTimeString(values[i + 2])}` : "多盲三元组缺失");
+    return scores.join(" / ") || "历史成绩缺失";
+  }
+  return resultStringPro(values, row.EventRoute).join(" / ");
 }
 
-/** 解析多盲成绩，如 `23/38 1:26`、`23 / 38 1:26` */
-function parseMultiBlindParts(value: string): { ratio: string; time: string } | null {
-  const normalized = normalizeMbldScoreText(value);
-  if (!normalized) return null;
-  const match = normalized.match(/^(\d+\/\d+)\s+(.+)$/);
-  if (!match) return null;
-  return { ratio: match[1], time: match[2] };
+function ProgressReport({ value }: { value: BatchProgress | null }) {
+  if (!value) return null;
+  return <Card size="small" title={`已处理 ${value.completed}/${value.total} · 失败 ${value.failed}`}>
+    <Progress percent={Math.round(value.completed * 100 / Math.max(value.total, 1))} status={value.completed < value.total ? "active" : value.failed ? "exception" : "success"} />
+    {value.errors.length > 0 && <Alert type="error" title="以下项目未成功，可修正后重试" description={<ul>{value.errors.map((error, i) => <li key={i}>{error}</li>)}</ul>} />}
+  </Card>;
 }
 
-function isMultiBlindRoute(route: number): boolean {
-  return [8, 9, 10].includes(route);
-}
-
-function OrganizersResultsContent({
-  orgId,
-  compId,
-}: {
-  orgId: string;
-  compId: string;
-}) {
-  const [org, setOrg] = useState<OrganizersAPI.OrganizersResp | null>(null);
-  const [comp, setComp] = useState<CompAPI.CompResp | null>(null);
-  const [events, setEvents] = useState<EventsAPI.Event[]>([]);
-
-  const [players, setPlayers] = useState<PlayersAPI.Player[]>();
-
-  // 单个录入
-  const [curPlayer, setCurPlayer] = useState<any>();
-  const [curSchedule, setCurSchedule] = useState<CompAPI.Schedule | null>(null);
-  const [curEvent, setCurEvent] = useState<CompAPI.Event | null>(null);
-  const [oneResults, setOneResults] = useState<Result[]>([]);
-  const [scheduleOpt, setScheduleOpt] = useState<[]>();
-  const [inputValues, setInputValues] = useState<string[]>(Array(5));
-  const [curRound, setCurRound] = useState<any>();
-
-  // 多录入
-  const [multiResults, setMultiResults] = useState<Result[]>([]);
-  const [parserResults, setParserResults] = useState<any[]>([]);
-
-  // 录入审批
-  const [preResultSelectedRowKeys, setPreResultSelectedRowKeys] = useState<React.Key[]>([]);
-  const [preResults, setPreResults] = useState<PreResult[]>([]);
-  const [preResultPage, setPreResultPage] = useState(1);
-  const [preResultPageSize, setPreResultPageSize] = useState(20);
-  const [preResultTotal, setPreResultTotal] = useState(0);
-  const [preResultLoading, setPreResultLoading] = useState(false);
-
+function PlayerPicker({ value, onChange, disabled }: { value: string; onChange: (value: string) => void; disabled: boolean }) {
+  const [options, setOptions] = useState<{ value: string; label: string }[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [revision, setRevision] = useState(0);
   useEffect(() => {
-    apiEvents().then((value) => {
-      setEvents(value.data.Events);
-    });
-    // @ts-ignore
-    apiGetOrgComp(orgId, compId).then((value) => {
-      setComp(value);
-      let data = [];
-      for (let i = 0; i < value.data.comp_json.Events.length; i++) {
-        const ev = value.data.comp_json.Events[i];
-        if (ev.EventID === '' || ev.EventID === undefined) {
-          continue;
+    let active = true;
+    setLoading(true); setError("");
+    (async () => {
+      const players = new Map<string, { value: string; label: string }>();
+      let loaded = 0;
+      for (let page = 1; active; page++) {
+        const response = await apiPlayers({ page, size: 500, name: "" });
+        if (!active) return;
+        const items = response.data.items ?? [];
+        for (const player of items) {
+          if (player.CubeID) players.set(player.CubeID, { value: player.CubeID, label: `${player.Name} · ${player.CubeID}` });
         }
-
-        let children = [];
-        for (let j = 0; j < ev.Schedule.length; j++) {
-          let s = ev.Schedule[j];
-          children.push({
-            value: s.RoundNum,
-            label: s.Round,
-          });
-        }
-
-        let v = {
-          value: ev.EventID,
-          label: (
-            <>
-              {CubeIcon(ev.EventID, ev.EventID, {})}
-              {CubesCn(ev.EventID)}
-            </>
-          ),
-          children: children,
-        };
-        data.push(v);
+        loaded += items.length;
+        if (loaded >= response.data.total) break;
+        if (!items.length) throw new Error("选手列表未加载完整，请重试");
       }
-      // @ts-ignore
-      setScheduleOpt(data);
-    });
-    // @ts-ignore
-    apiOrganizers(orgId).then((value) => {
-      setOrg(value);
-    });
-    apiGetAllPlayers(orgId, compId).then((value) => {
-      setPlayers(value.data.items);
-    });
-  }, [orgId, compId]);
+      if (active) setOptions([...players.values()]);
+    })().catch((e) => { if (active) setError(competitionError(e)); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [revision]);
+  return <><AutoComplete value={value} options={options} disabled={disabled} onChange={onChange} filterOption={(input, option) => String(option?.label ?? "").toLocaleLowerCase().includes(input.trim().toLocaleLowerCase())} notFoundContent={loading ? <Spin size="small" /> : "无匹配选手"} style={{ width: "100%", maxWidth: 500 }}><Input aria-label="选手 CubeID" placeholder="输入 CubeID，或搜索姓名后选择" /></AutoComplete>{error && <Alert type="warning" title={`选手列表加载失败：${error}`} action={<Button size="small" onClick={() => setRevision((v) => v + 1)}>重试</Button>} />}</>;
+}
 
-  const loadPreResults = useCallback(
-    async (page = preResultPage, pageSize = preResultPageSize) => {
-      setPreResultLoading(true);
+function ScoreList({ rows, onDelete, busy }: { rows: Result[]; onDelete: (row: Result) => void; busy: boolean }) {
+  return <Table<Result> rowKey="id" size="small" dataSource={rows} scroll={{ x: 700 }} columns={[
+    { title: "选手", key: "player", width: 320, render: (_, r) => `${r.PersonName || ""} ${r.CubeID || ""}` },
+    { title: "项目 / 轮次", key: "event", width: 150, render: (_, r) => `${r.EventID} / ${r.Round || r.RoundNumber}` },
+    { title: "最佳 / 平均", key: "best", render: (_, r) => r.EventRoute >= 8 ? "见多盲成绩" : `${resultTimeString(r.Best ?? NaN, r.EventRoute === 3)} / ${resultTimeString(r.Average ?? NaN)}` },
+    { title: "成绩", key: "score", render: (_, r) => formatResults(r) },
+    { title: "操作", key: "delete", width: 90, fixed: "right", render: (_, r) => <Button danger size="small" disabled={busy} onClick={() => onDelete(r)}>删除</Button> },
+  ]} />;
+}
+
+function CompetitionManagement({ comp, service, busy, act, mode }: { comp: CompAPI.Data; service: Service; busy: boolean; act: Action; mode: CompetitionMode }) {
+  const group = isGroupCompetition(comp);
+  const router = useRouter();
+  const [modal, modalContext] = Modal.useModal();
+  const [form] = Form.useForm();
+  const [editError, setEditError] = useState("");
+  const [registrations, setRegistrations] = useState<Registration[]>([]);
+  const [regLoading, setRegLoading] = useState(false);
+  const loadPlayers = async () => {
+    setRegLoading(true);
+    try { setRegistrations(await service.players() ?? []); } catch (e) { setRegistrations([]); void message.error(competitionError(e)); } finally { setRegLoading(false); }
+  };
+  useEffect(() => {
+    form.setFieldsValue({ Name: comp.Name, Count: comp.Count, CanPreResult: comp.CanPreResult,
+      startDate: group ? beijingDate(comp.CompStartTime) : comp.CompStartTime, endDate: group ? beijingDate(comp.CompEndTime) : comp.CompEndTime, Illustrate: comp.Illustrate,
+      events: comp.comp_json.Events.map((event) => ({ ...event, Key: event.Key || event.EventID })) });
+  }, [comp, form, group]);
+
+  const rounds = comp.comp_json.Events.flatMap((event) => event.Schedule.map((round) => ({ key: `${event.EventID}-${round.RoundNum}`, event, round })));
+  const confirmAction = (title: string, fn: () => Promise<unknown>, success: string, content: string) => modal.confirm({ title, content, cancelText: "取消", okText: "确认", onOk: () => act(fn, success).catch(() => undefined) });
+  return <div className="gc-stack">
+    {modalContext}
+    <Card title="比赛操作"><div className="gc-actions">
+      {(comp.Status === "Temporary" || comp.Status === "Reject") && <Button type="primary" loading={busy} onClick={() => confirmAction("提交比赛申请", service.apply, "申请已提交", group ? "提交后等待管理员审批；通过后即可录入已配置项目轮次的成绩。" : "提交后等待管理员审批。")}>提交 / 重新申请</Button>}
+      {comp.Status === "Running" && !comp.IsDone && <Button danger loading={busy} onClick={() => confirmAction("结束比赛", service.end, "比赛已标记结束", group ? "允许存在待审成绩。标记结束后仍可新增、覆盖、修改、删除成绩和审批，不受赛期或轮次开放状态限制。此操作不可恢复。" : "确认结束比赛？此操作不可恢复。")}>结束比赛</Button>}
+      <Button disabled={busy} onClick={() => {
+        let name = "";
+        modal.confirm({ title: "永久删除比赛", content: <><p>将删除比赛及成绩等关联数据。请输入完整比赛名称「{comp.Name}」确认。</p><Input onChange={(e) => { name = e.target.value; }} /></>, okText: "永久删除", okButtonProps: { danger: true }, cancelText: "取消", onOk: () => {
+          if (name.trim() !== comp.Name.trim()) { void message.error("名称不一致"); return; }
+          return act(async () => { await service.remove(); router.push(mode === "admin" ? "/admin/competition/approvals" : "/admin/organizers/comps"); }, "已删除", false).catch(() => undefined);
+        } });
+      }}>删除比赛</Button>
+    </div></Card>
+    <Card title="手动轮次管理" extra={group && <Button type="primary" loading={busy} disabled={busy || comp.IsDone || comp.Status !== "Running" || !rounds.some(({ round }) => !round.IsRunning)} onClick={() => confirmAction("开放全部轮次", service.openAllRounds, "全部轮次已开放", "将一次性开放本场群赛所有项目的全部轮次，保留现有成绩、打乱和晋级名单。")}>一键开放全部轮次</Button>}>{group && <Alert type="info" showIcon title="轮次开放状态用于赛程管理，不限制已审批群赛的成绩录入；关闭轮次也可新增或覆盖成绩。" style={{ marginBottom: 16 }} />}
+      <Table rowKey="key" size="small" dataSource={rounds} pagination={false} scroll={{ x: 700 }} columns={[
+        { title: "项目", render: (_, r) => <>{CubesCn(r.event.EventID)} ({r.event.EventID})</> },
+        { title: "轮次", render: (_, r) => `第 ${r.round.RoundNum} 轮 · ${r.round.Round}` },
+        { title: "状态", render: (_, r) => <Tag color={r.round.IsRunning ? "cyan" : "default"}>{r.round.IsRunning ? "开放中" : "已关闭 / 未开放"}</Tag> },
+        { title: "操作", width: 120, fixed: "right", render: (_, r) => <Button type={r.round.IsRunning ? "default" : "primary"} disabled={busy || comp.IsDone || comp.Status !== "Running" || (!r.round.IsRunning && !canEnterResults(comp))} onClick={() => confirmAction(`${r.round.IsRunning ? "关闭" : "开放"} ${r.event.EventID} 第 ${r.round.RoundNum} 轮`, () => service.round(r.event.EventID, r.round.RoundNum, !r.round.IsRunning), "轮次状态已更新", r.round.IsRunning ? "关闭后将计算晋级名单。下一轮需另行手动开放。" : group ? "开放此轮次，不影响其他轮次、已有成绩或晋级名单。" : "确认开放此轮次？")}>{r.round.IsRunning ? "关闭轮次" : "开放轮次"}</Button> },
+      ]} />
+    </Card>
+    <Card title="编辑比赛"><Form form={form} layout="vertical" disabled={busy} onFinish={async (values) => {
       try {
-        const value = await apiGetCompsPreResult(orgId, compId, false, page, pageSize);
-
-        for (let i = 0; i < value.data.items.length; i++) {
-          value.data.items[i].key = value.data.items[i].id;
-        }
-
-        setPreResults(value.data.items);
-        setPreResultTotal(value.data.total);
-        setPreResultSelectedRowKeys([]);
-      } finally {
-        setPreResultLoading(false);
-      }
-    },
-    [orgId, compId, preResultPage, preResultPageSize],
-  );
-
-  useEffect(() => {
-    void loadPreResults();
-  }, [loadPreResults]);
-
-  if (!comp || !org) {
-    return <>loading</>;
-  }
-  if (comp.data.OrganizersID !== org.data.id) {
-    return <>无权限</>;
-  }
-
-  const playerOptions =
-    players?.map((player) => ({
-      value: player.CubeID,
-      label: `${player.CubeID} - ${player.Name}`,
-    })) ?? [];
-
-  const updateRound = (v: any) => {
-    if (v === undefined || v === '' || v === null) {
-      return;
-    }
-
-    setCurRound(v);
-    const ev = comp.data.comp_json.Events.find((value) => {
-      return value.EventID === v[0];
-    });
-    if (ev === undefined) {
-      return;
-    }
-    setCurEvent(ev);
-
-    const schedule = ev.Schedule.find((value) => {
-      return value.RoundNum === v[1];
-    });
-    if (schedule) {
-      setCurSchedule(schedule);
-    }
-
-    // @ts-ignore
-    apiGetCompsResults(orgId, compId, ev.EventID, schedule.RoundNum).then((value) => {
-      if (value === undefined || value.data === undefined) {
-        return;
-      }
-      for (let i = 0; i < value.data.length; i++) {
-        value.data[i].Rank -= 1;
-      }
-      setOneResults(value.data);
-    });
-  };
-
-  const filterOption = (input: string, option?: { label?: string }) =>
-    (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
-
-  const getEventRoundNum = () => {
-    if (!curEvent) {
-      return 0;
-    }
-
-    const event = events.find((value) => {
-      return value.id === curEvent?.EventID;
-    });
-    if (event === undefined) {
-      return 0;
-    }
-    switch (event.base_route_typ) {
-      case 1:
-        return 1;
-      case 2:
-      case 3:
-      case 4:
-        return 3;
-      case 5:
-      case 6:
-      case 7:
-        return 5;
-      case 8:
-        return 1;
-      case 9:
-        return 2;
-      case 10:
-        return 3;
-    }
-    return 0;
-  };
-
-  const filedStyle = {
-    width: 300,
-  };
-  const updateResultValue = (index: number, value: string) => {
-    const updatedValues = [...inputValues];
-    updatedValues[index] = value;
-    setInputValues(updatedValues);
-  };
-
-  const parseTimeToSeconds = (time: string) => {
-    if (time === 'DNF' || time === 'd' || time === 'D') {
-      return -10000;
-    }
-    if (time === 'DNS') {
-      return -10001;
-    }
-
-    // 解析纯秒数格式
-    if (/^\d+(\.\d+)?$/.test(time)) {
-      return parseFloat(time);
-    }
-
-    // 解析分+秒格式
-    if (/^\d{1,2}[:：]\d{2}(\.\d+)?$/.test(time)) {
-      const [minutes, seconds] = time.split(/[:：]/);
-      return parseFloat(minutes) * 60 + parseFloat(seconds);
-    }
-
-    // 解析时+分+秒格式
-    if (/^\d{1,2}[:：]\d{2}[:：]\d{3}(\.\d+)?$/.test(time)) {
-      const [hours, minutes, seconds] = time.split(/[:：]/);
-      return parseFloat(hours) * 3600 + parseFloat(minutes) * 60 + parseFloat(seconds);
-    }
-    return -10000;
-  };
-
-  // 更新输出框的成绩，不符合的需要删除或更新
-  const inputOneResultUpdate = (v: string, index: number) => {
-    const value = v
-      // .replace(/\s+/g, '')
-      .replace(/：/g, ':') // 替换所有大写的"："为":"
-      .replace(/。/g, '.'); // 替换所有大写的"。"为"."
-    updateResultValue(index, value);
-
-    // 确认是否是指定的格式
-    if (!curEvent) {
-      message.warning('请先选择项目', 2).then();
-      return;
-    }
-
-    const reg0 = /^\d+\/\d+$/;
-
-    const reg1 = /^(\d+(\.\d*)?)$/;
-    const reg2 = /^(\d*[:|：]\d*\.{0,1}\d{0,3})$/;
-    const reg3 = /^(\d*[:|：]\d*[:|：]\d*)$/;
-
-    const event = events.find((value) => {
-      return value.id === curEvent?.EventID;
-    });
-    if (!event) {
-      message.warning('请先选择一个项目', 2).then();
-      return;
-    }
-    if (isMultiBlindRoute(event.base_route_typ)) {
-      const parts = parseMultiBlindParts(value);
-      if (!parts) {
-        if (value.trim() === "") return;
-        if (value.includes("/") || value.includes(" ")) {
-          void message.warning(`${value}不符合多盲格式`, 2);
-        }
-        return;
-      }
-
-      const { ratio, time } = parts;
-      if (!reg0.test(ratio) || !checkResult(time)) {
-        void message.warning(`${value}不符合多盲格式`, 2);
-        return;
-      }
-
-      const sl = ratio.split("/");
-      if (sl.length >= 2) {
-        const num1 = Number(sl[0]);
-        const num2 = Number(sl[1]);
-        if (num2 < num1) {
-          void message.warning(`${value}录入复原成绩个数不应大于尝试个数`, 2);
-        }
-      }
-      return;
-    }
-
-    if (value === 'DNF' || value === 'DNS' || value === 'd' || value === 'D') {
-      return;
-    }
-
-    // 确认是否符合时间格式
-    // 时分秒 {number} : {number} : {number} . {number}
-    // 分秒   {number} : {number} . {number}
-    // 秒    {number} . {number}
-    if (reg1.test(value) || reg2.test(value) || reg3.test(value)) {
-      return;
-    }
-    message.warning(value + '不符合格式', 2).then();
-  };
-
-  const checkResult = (input: any): boolean => {
-    const reg =
-      /^((([0-1]?\d|2[0-3]):([0-5]?\d|60):([0-5]?\d|60)(\.\d{1,3})?)|(([0-5]?\d|60):([0-5]?\d|60)(\.\d{1,3})?)|([0-5]?\d(\.\d{1,3})?))$/;
-
-    if (isNumber(input)) {
-      return true;
-    }
-
-    if (input === 'DNF' || input === 'DNS' || input === 'D' || input === 'd') {
-      return true;
-    }
-
-    return reg.test(input);
-  };
-
-  const onOneFinish = () => {
-    if (!curPlayer) {
-      message.warning('请选择一个玩家').then();
-      return;
-    }
-
-    if (!curSchedule) {
-      message.warning('请选择一个轮次').then();
-      return;
-    }
-
-    const event = events.find((value) => {
-      return value.id === curEvent?.EventID;
-    });
-
-    if (!event) {
-      message.warning('请选择一个项目').then();
-      return;
-    }
-    let results: number[] = [];
-
-    const reg = /^\d+\/\d+$/;
-
-    for (let i = 0; i < getEventRoundNum(); i++) {
-      if (inputValues[i] === null || inputValues[i] === '' || inputValues[i] === undefined) {
-        message.warning(`第${i + 1}个成绩未输入`).then();
-        return;
-      }
-      if (isMultiBlindRoute(event.base_route_typ)) {
-        const parts = parseMultiBlindParts(inputValues[i]);
-        if (!parts || !reg.test(parts.ratio) || !checkResult(parts.time)) {
-          void message.warning(`第${i + 1}个成绩格式不正确, 请按 a/b xx:yy:zz的格式录入`);
-          return;
-        }
-        const [solved, attempted] = parts.ratio.split("/");
-        results.push(Number(solved), Number(attempted), parseTimeToSeconds(parts.time));
-        continue;
-      }
-      if (!checkResult(inputValues[i])) {
-        message.warning(`第${i + 1}个成绩格式不正确`).then();
-        return;
-      }
-      results.push(parseTimeToSeconds(inputValues[i]));
-    }
-
-    apiAddCompResults(orgId, compId, curEvent?.EventID, curSchedule?.RoundNum, results, curPlayer)
-      .then(() => {
-        message.success('成绩录入成功').then();
-        updateRound(curRound);
-        setInputValues([]);
-      })
-      .catch((value) => {
-        message.error('成绩录入失败:' + value.response.data.error).then();
-      });
-  };
-
-  const updateMultiPlayer = (v: any) => {
-    if (v === undefined || v === '' || v === null) {
-      setMultiResults([]);
-      setCurPlayer(undefined);
-      return;
-    }
-
-    apiGetCompsResultsWithPlayer(orgId, compId, v).then((value) => {
-      if (value === undefined || value.data === undefined) {
-        return;
-      }
-      setMultiResults(value.data);
-    });
-    setCurPlayer(v);
-  };
-
-  const updateMultiInput = (v: string) => {
-    let slice = v.replaceAll('【', '[').replaceAll('】', ']').split('\n');
-    slice = slice.filter((value) => {
-      return value !== '';
-    });
-
-    let parserResults = [];
-
-    for (let i = 0; i < slice.length; i++) {
-      let line = slice[i]
-        .replaceAll(',', ' ')
-        .replaceAll('，', ' ')
-        .replaceAll('(', '')
-        .replaceAll(')', '')
-        .replaceAll(' [', '[');
-
-      const data = line.split(' ').filter((value) => {
-        return value !== '';
-      });
-
-      if (data.length <= 1) {
-        message.warning(`${slice[i]} 存在格式错误`).then();
-        continue;
-      }
-      let oneLineStr = data[0];
-
-      let result = {
-        Index: i + 1,
-        EventID: data[0],
-        Round: 1,
-        RoundNum: 1,
-        Result: [] as number[],
-        Error: '',
-        EventRoute: 7,
-      };
-
-      if (oneLineStr.indexOf('[') !== -1) {
-        const match = oneLineStr.match(/^([a-zA-Z0-9]+)\[(\d+)]$/);
-        if (match) {
-          result.EventID = match[1]; // 前面的数字
-          result.Round = Number(match[2]); // 方括号内的数字
-          result.RoundNum = Number(match[2]);
-        }
-      }
-      const evs = events.find((value) => {
-        if (result.EventID === '' || result.EventID === undefined) {
-          return false;
-        }
-        if (
-          value.id === result.EventID ||
-          value.name === result.EventID ||
-          value.cn === result.EventID
-        ) {
-          return true;
-        }
-        // 兼容中文名
-        const otherNames = value.otherNames.split(';');
-        for (let i = 0; i < otherNames.length; i++) {
-          if (result.EventID === otherNames[i]) {
-            return true;
+        setEditError("");
+        const times = competitionEditTimes(comp, values.startDate, values.endDate);
+        const events: CompAPI.Event[] = values.events;
+        validateEvents(events);
+        await act(async () => {
+          // Preserve every existing field required by the backend's full-edit contract.
+          await service.update({ ...comp, Count: values.Count, CanPreResult: values.CanPreResult, Illustrate: values.Illustrate,
+             ...times, comp_json: { ...comp.comp_json, Events: events } });
+          if (values.Name.trim() !== comp.Name) {
+            try { await service.rename(values.Name.trim()); }
+            catch (e) { throw new Error(`比赛配置已保存，但名称修改失败：${competitionError(e)}。请刷新后重试改名。`); }
           }
-        }
-        return false;
-      });
-      if (evs === undefined) {
-        result.Error = '项目不存在';
-        parserResults.push(result);
-        continue;
-      }
-      result.EventRoute = evs.base_route_typ;
-      result.EventID = evs.id;
-
-      if (isMultiBlindRoute(evs.base_route_typ)) {
-        const parts = parseMultiBlindParts(data.slice(1).join(" "));
-        if (!parts) {
-          result.Error = "成绩格式错误";
-        } else if (!/^\d+\/\d+$/.test(parts.ratio) || !checkResult(parts.time)) {
-          result.Error = "成绩格式不正确";
-        } else {
-          const [solved, attempted] = parts.ratio.split("/");
-          result.Result.push(Number(solved), Number(attempted), parseTimeToSeconds(parts.time));
-        }
-      } else {
-        for (let j = 1; j < data.length; j++) {
-          if (!checkResult(data[j])) {
-            result.Error = `${data[j]}成绩格式不正确`;
-            break;
-          }
-          // @ts-ignore
-          result.Result.push(parseTimeToSeconds(data[j]));
-        }
-      }
-      console.log(result);
-      // 获取项目轮次
-      const compEv = comp.data.comp_json.Events.find((value) => {
-        return value.EventID === evs.id;
-      });
-      if (compEv === undefined) {
-        result.Error = '本次比赛未开放该项目';
-        parserResults.push(result);
-        continue;
-      }
-      // todo 轮次
-
-      const schedule = compEv.Schedule.find((value) => {
-        return value.RoundNum === result.Round;
-      });
-      if (schedule === undefined) {
-        result.Error = '本次比赛未开放该轮次';
-      } else {
-        // @ts-ignore
-        result.Round = schedule.Round;
-      }
-      parserResults.push(result);
-    }
-    setParserResults(parserResults);
-  };
-
-  const onMultiFinish = async () => {
-    if (parserResults === undefined || parserResults.length === 0) {
-      message.error('无成绩可提交').then();
-      return;
-    }
-
-    if (!curPlayer) {
-      message.error('请选择一个玩家').then();
-      return;
-    }
-
-    for (let i = 0; i < parserResults.length; i++) {
-      if (parserResults[i].Error) {
-        message.error(`第${i + 1}个成绩存在: ${parserResults[i].Error}错误,请删除后再添加`).then();
-        return;
-      }
-    }
-
-    for (let i = 0; i < parserResults.length; i++) {
-      const result = parserResults[i];
-      await apiAddCompResults(
-        orgId,
-        compId,
-        result.EventID,
-        result.RoundNum,
-        result.Result,
-        curPlayer,
-      )
-        .then(() => {
-          message.success(result.EventID + ' ' + result.Round + '成绩录入成功');
-          updateRound(curRound);
-          setInputValues([]);
-        })
-        .catch((value) => {
-          message.error('成绩录入失败:' + value.response.data.error);
-        });
-    }
-
-    setParserResults([]);
-    updateMultiPlayer(curPlayer);
-  };
-
-  const deleteResultsColumn = {
-    title: '操作',
-    dataIndex: 'PersonName',
-    key: 'PersonName',
-    width: 100,
-    render: (value: string, result: Result) => {
-      const showConfirm = () => {
-        Modal.warning({
-          title: '是否删除成绩?',
-          content: (
-            <p>
-              确认要执行对{result.PersonName}的{result.EventID}-{result.Round}成绩进行删除
-            </p>
-          ),
-          okText: '删除',
-          okButtonProps: {
-            style: { backgroundColor: 'red', borderColor: 'red', color: 'white' }, // 自定义样式
-          },
-          async onOk() {
-            await apiDeleteCompsResult(orgId, compId, result.id)
-              .then(() => {
-                message.info('成绩删除成功').then();
-              })
-              .catch((value) => {
-                message.error('成绩删除失败:' + value.response.data.error).then();
-              });
-            updateMultiPlayer(curPlayer)
-            updateRound(curRound);
-          },
-        });
-      };
-      return (
-        <Button size={'small'} danger onClick={showConfirm}>
-          删除
-        </Button>
-      );
-    },
-  };
-
-  const onInputResult = () => {
-    return (
-      <>
-        <Form onFinish={onOneFinish} labelCol={{ span: 4 }} wrapperCol={{ span: 14 }}>
-          <Card>
-            <Form.Item label="选择轮次">
-              <Cascader
-                style={filedStyle}
-                options={scheduleOpt}
-                onChange={updateRound}
-                placeholder="选择项目和轮次"
-              />
-            </Form.Item>
-            <Form.Item label="选择选手">
-              <Select
-                style={filedStyle}
-                placeholder="输入姓名或 CubeID 筛选已报名选手"
-                value={curPlayer}
-                onChange={(value) => {
-                  setCurPlayer(value);
-                }}
-                options={playerOptions}
-                optionFilterProp="label"
-                filterOption={filterOption}
-                allowClear={{ clearIcon: <CloseCircleOutlined style={{ color: "red" }} /> }}
-                showSearch
-              />
-            </Form.Item>
-
-            <Form.Item
-              label={
-                <span>
-                  <Tooltip
-                    title={
-                      <>
-                        <p>成绩格式为: xx:yy:zz.www</p>
-                        <p>可以输入DNF、DNS、D等代表成绩无效</p>
-                        <p>多盲等以 a/b xx:yy:zz 格式录入（`/` 两侧可留空格）</p>
-                      </>
-                    }
-                  >
-                    <InfoCircleOutlined style={{ marginRight: 5, color: ADMIN_LEGACY.tooltipGold }} />
-                  </Tooltip>
-                  录入成绩
-                </span>
-              }
-            >
-              <Space orientation="vertical" size={7} style={filedStyle}>
-                {Array.from({ length: getEventRoundNum() }, (_, index) => (
-                  <Space.Compact key={`result${index + 1}`} block>
-                    <Input
-                      style={{ width: 44, textAlign: "center", pointerEvents: "none" }}
-                      value={`${index + 1}`}
-                      readOnly
-                    />
-                    <Input
-                      name={`result${index + 1}`}
-                      value={inputValues[index]}
-                      placeholder="请输入成绩"
-                      onChange={(e) => inputOneResultUpdate(e.target.value, index)}
-                    />
-                  </Space.Compact>
-                ))}
-              </Space>
-            </Form.Item>
-
-            <Form.Item wrapperCol={{ offset: 4, span: 16 }}>
-              <Button htmlType="submit">提交</Button>
-            </Form.Item>
-          </Card>
-        </Form>
-
-        {/*成绩列表*/}
-        {curEvent && (
-          <Card style={{ marginTop: 20 }}>
-            <h1>
-              {CubesCn(curEvent?.EventID)} {curSchedule?.Round}
-            </h1>
-            {ResultsTable(
-              oneResults,
-              ['Rank', 'CubeID', 'PersonName', 'Best', 'Average', 'Result'],
-              undefined,
-              [deleteResultsColumn],
-            )}
-          </Card>
-        )}
-      </>
-    );
-  };
-
-  const multiInputResult = () => {
-    return (
-      <>
-        <Form onFinish={onMultiFinish} labelCol={{ span: 4 }} wrapperCol={{ span: 18 }}>
-          <Card>
-            <Form.Item label="选择选手">
-              <Select
-                style={filedStyle}
-                allowClear={{ clearIcon: <CloseCircleOutlined style={{ color: "red" }} /> }}
-                placeholder="输入姓名或 CubeID 筛选已报名选手"
-                value={curPlayer}
-                onChange={(value) => {
-                  updateMultiPlayer(value);
-                }}
-                options={playerOptions}
-                optionFilterProp="label"
-                filterOption={filterOption}
-                showSearch
-              />
-            </Form.Item>
-            <Form.Item
-              label={
-                <span>
-                  <Tooltip
-                    title={
-                      <>
-                        <p>录入: 333 1 2 3 4 5</p>
-                        <p>允许多个成绩同时录入: 333 1 2 3 4 5 444 1 2 3 4 5, 以换行分割</p>
-                        <p>允许DNF, DNS: 333 DNS DNF d s D</p>
-                        <p>录入某个轮次的: 333[1] 1 2 3 4 5</p>
-                        <p>注意, 请不要输入中文字符</p>
-                      </>
-                    }
-                  >
-                    <InfoCircleOutlined style={{ marginRight: 5, color: ADMIN_LEGACY.tooltipGold }} />
-                  </Tooltip>
-                  批量录入
-                </span>
-              }
-            >
-              <TextArea
-                style={{ minHeight: 200 }}
-                onChange={(e) => {
-                  updateMultiInput(e.target.value);
-                }}
-              ></TextArea>
-            </Form.Item>
-
-            <Form.Item label="项目" style={{ width: '100%' }}>
-              <Table
-                dataSource={parserResults}
-                rowKey="Index"
-                // @ts-ignore
-                columns={[
-                  {
-                    title: '序号',
-                    dataIndex: 'Index',
-                    key: 'Index',
-                    width: 50,
-                  },
-                  {
-                    title: '项目',
-                    dataIndex: 'EventID',
-                    key: 'EventID',
-                    width: 100,
-                    render: (value) => {
-                      return (
-                        <>
-                          {CubeIcon(value, value, {})} {CubesCn(value)}
-                        </>
-                      );
-                    },
-                  },
-                  {
-                    title: '轮次',
-                    dataIndex: 'Round',
-                    key: 'Round',
-                    width: 100,
-                  },
-                  {
-                    title: '成绩',
-                    dataIndex: 'Result',
-                    key: 'Result',
-                    render: (results: any[], result: any) => {
-                      const data = resultStringPro(results, result.EventRoute);
-                      return (
-                        <>
-                          {result.Error && <Alert title={result.Error} type="error" showIcon />}
-                          <div className="cube_result_results_col">
-                            {data.map((value: string, idx: number) => (
-                              <span
-                                key={idx}
-                                className="cube_result_result_cell"
-                                style={{ minWidth: "80px", display: "inline-block" }}
-                              >
-                                {value}
-                              </span>
-                            ))}
-                          </div>
-                        </>
-                      );
-                    },
-                  },
-                ]}
-                pagination={false}
-                size="small"
-                scroll={{ x: 'max-content' }} // 启用横向滚动
-              />
-            </Form.Item>
-
-            <Form.Item wrapperCol={{ offset: 4, span: 16 }} style={{ marginTop: 20 }}>
-              <Button htmlType="submit">提交</Button>
-            </Form.Item>
-          </Card>
-        </Form>
-        {multiResults && (
-          <Card style={{ marginTop: 20 }}>
-            <h2>{curPlayer} 本场比赛成绩</h2>
-            {ResultsTable(
-              multiResults,
-              ['EventName', 'Round', 'Best', 'Average', 'Result'],
-              undefined,
-              [deleteResultsColumn],
-            )}
-          </Card>
-        )}
-      </>
-    );
-  };
-
-  const preResultColumns: ColumnsType<PreResult> = [
-    {
-      title: "项目",
-      dataIndex: "EventID",
-      key: "EventID",
-      width: 80,
-      render: (value: string, result: PreResult) => (
-        <span style={{ minWidth: "80px", width: "80px", display: "inline-block" }}>
-          {CubeIcon(result.EventID, result.EventID, {})} {CubesCn(value)}
-        </span>
-      ),
-    },
-    {
-      title: "轮次",
-      dataIndex: "Round",
-      key: "Round",
-      width: 80,
-    },
-    {
-      title: "玩家名",
-      dataIndex: "PersonName",
-      key: "PersonName",
-      width: 100,
-      render: (value: string, result: PreResult) => (
-        <>{PlayerLink(result.CubeID, value, "")}</>
-      ),
-    },
-    {
-      title: "CubeID",
-      dataIndex: "CubeID",
-      key: "CubeID",
-      width: 120,
-    },
-    {
-      title: "单次",
-      dataIndex: "Best",
-      key: "Best",
-      width: 100,
-      render: (results: number, result: PreResult) => {
-        const m = eventRouteM(result.EventRoute);
-        const inter = m.integer ? m.integer : false;
-
-        if (m.repeatedly) {
-          return <span className="cube_result_Best_col">{resultTimeString(results, true)}</span>;
-        }
-        return <span className="cube_result_Best_col">{resultTimeString(results, inter)}</span>;
-      },
-    },
-    {
-      title: "平均",
-      dataIndex: "Average",
-      key: "Average",
-      width: 100,
-      render: (results: number, result: PreResult) => {
-        const m = eventRouteM(result.EventRoute);
-        if (m.repeatedly) {
-          return <span className="cube_result_Average_col">-</span>;
-        }
-
-        return (
-          <span className="cube_result_Average_col">
-            {resultTimeString(results, false, false, m.integer)}
-          </span>
-        );
-      },
-    },
-    {
-      title: "成绩",
-      dataIndex: "Result",
-      key: "Result",
-      render: (results: number[], result: PreResult) => {
-        const data = resultStringPro(results, result.EventRoute);
-        return (
-          <div className="cube_result_results_col">
-            {data.map((value: string, idx: number) => (
-              <span
-                key={idx}
-                className="cube_result_result_cell"
-                style={{ minWidth: "80px", display: "inline-block" }}
-              >
-                {value}
-              </span>
-            ))}
-          </div>
-        );
-      },
-    },
-    {
-      title: "来源",
-      dataIndex: "Source",
-      key: "Source",
-      width: 120,
-    },
-    {
-      title: "状态",
-      dataIndex: "Finish",
-      key: "Finish",
-      width: 100,
-      render: (f: boolean) => {
-        if (f) {
-          return <Tag color={ADMIN_LEGACY.successGreen}>已审批</Tag>;
-        }
-        return <Tag color={ADMIN_LEGACY.pendingGold}>待审批</Tag>;
-      },
-    },
-  ];
-
-  const onPreResultSelectChange = (newSelectedRowKeys: React.Key[]) => {
-    setPreResultSelectedRowKeys(newSelectedRowKeys);
-  };
-
-  const preResultRowSelection: TableRowSelection<PreResult> = {
-    selectedRowKeys: preResultSelectedRowKeys,
-    onChange: onPreResultSelectChange,
-    selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT, Table.SELECTION_NONE],
-  };
-
-  const onPreResultFinish = (ok: boolean) => {
-    return () => {
-      if (preResultSelectedRowKeys.length === 0) {
-        void message.warning("你未选择任何成绩");
-        return;
-      }
-
-      const color = ok ? ADMIN_LEGACY.actionLime : ADMIN_LEGACY.errorRed;
-
-      let progress = 0;
-      let startSend = false;
-
-      Modal.confirm({
-        title: ok ? "是否通过" : "是否驳回",
-        content: (
-          <>
-            <p>{`确认要执行对 ${preResultSelectedRowKeys.length} 个成绩的${
-              ok ? "通过" : "驳回"
-            }操作?`}</p>
-            {startSend && (
-              <Progress percent={progress} status={progress === 100 ? "success" : "active"} />
-            )}
-          </>
-        ),
-        okText: ok ? "通过" : "驳回",
-        okButtonProps: {
-          style: { backgroundColor: color, borderColor: color, color: "white" },
-        },
-        async onOk() {
-          startSend = true;
-          for (let i = 0; i < preResultSelectedRowKeys.length; i++) {
-            const k = preResultSelectedRowKeys[i];
-            const res = preResults.find((value) => value.key === k);
-            progress = (i * 100) / preResultSelectedRowKeys.length;
-
-            if (res === undefined) {
-              continue;
-            }
-            await apiApprovalCompsPreResult(orgId, compId, ok, res.id).catch((error) => {
-              void message.error(
-                `保存审批失败: ${res.EventID} - ${res.Round} / ${error.response.data.error}`,
-              );
-            });
-          }
-
-          void loadPreResults();
-        },
-      });
-    };
-  };
-
-  const handlePreResultTableChange = (pagination: TablePaginationConfig) => {
-    setPreResultPage(pagination.current ?? 1);
-    setPreResultPageSize(pagination.pageSize ?? 20);
-  };
-
-  const preResultInputResult = () => {
-    return (
-      <>
-        <Card>
-          <div style={{ marginBottom: 16, overflow: "hidden" }}>
-            <p style={{ display: "inline", fontWeight: 700, fontSize: 20 }}>录入审批</p>
-            <Button
-              danger
-              onClick={onPreResultFinish(false)}
-              style={{ float: "right", marginLeft: 20 }}
-            >
-              驳回
-            </Button>
-            <Button
-              type="primary"
-              onClick={onPreResultFinish(true)}
-              style={{ float: "right", backgroundColor: ADMIN_LEGACY.actionLime }}
-            >
-              通过
-            </Button>
-          </div>
-          <Table<PreResult>
-            rowSelection={preResultRowSelection}
-            size="small"
-            columns={preResultColumns}
-            dataSource={preResults}
-            rowKey="id"
-            loading={preResultLoading}
-            rowClassName={rowClassNameWithStyleLines}
-            pagination={{
-              current: preResultPage,
-              pageSize: preResultPageSize,
-              total: preResultTotal,
-              showQuickJumper: true,
-            }}
-            onChange={handlePreResultTableChange}
-            scroll={{ x: "max-content" }}
-            sticky
-          />
-        </Card>
-      </>
-    );
-  };
-
-  const items = [
-    {
-      key: 'one',
-      label: '录入',
-      children: onInputResult(),
-    },
-    {
-      key: 'multi',
-      label: '批量录入',
-      children: multiInputResult(),
-    },
-    {
-      key: 'pre_result',
-      label: '录入审批',
-      children: preResultInputResult(),
-    },
-  ];
-
-  return (
-    <>
-      <h2>
-        <center>{comp.data.Name} 成绩录入</center>
-      </h2>
-
-      <NavTabs
-        type="line"
-        items={items}
-        tabsKey="input_tabs"
-        indicator={{ size: (origin: number) => origin - 20, align: 'center' }}
-      />
-    </>
-  );
+        }, "比赛已保存");
+      } catch (e) { setEditError(competitionError(e)); }
+    }}>
+      <div className="gc-filters">
+        <Form.Item name="Name" label="比赛名称" rules={[{ required: true, whitespace: true }]}><Input maxLength={200} /></Form.Item>
+        <Form.Item name="Count" label="人数上限" rules={[{ required: true }]}><InputNumber min={1} precision={0} /></Form.Item>
+        <Form.Item name="startDate" label={group ? "开始日（00:00）" : "开赛时间（保留原时间与时区）"} rules={[{ required: group }]}><Input type={group ? "date" : "text"} readOnly={!group} /></Form.Item>
+        <Form.Item name="endDate" label={group ? "结束日（含全天）" : "结束时间（保留原时间与时区）"} rules={[{ required: group }]}><Input type={group ? "date" : "text"} readOnly={!group} /></Form.Item>
+        <Form.Item name="CanPreResult" label="允许预录入" valuePropName="checked"><Switch /></Form.Item>
+      </div>
+      <Form.Item name="Illustrate" label="比赛说明"><Input.TextArea autoSize={{ minRows: 3, maxRows: 10 }} /></Form.Item>
+      <Form.Item name="events" label="项目与轮次（开放状态仅通过上方开关管理）" rules={[{ required: true }]}><EventTable /></Form.Item>
+      {editError && <Alert type="error" title={editError} style={{ marginBottom: 16 }} />}
+      <Button type="primary" htmlType="submit" loading={busy}>保存比赛</Button>
+    </Form></Card>
+    <Card title="报名选手审批" extra={<Button loading={regLoading} onClick={() => void loadPlayers()}>加载 / 刷新报名</Button>}>
+      <Table<Registration> rowKey="id" loading={regLoading} dataSource={registrations} size="small" scroll={{ x: 650 }} columns={[
+        { title: "选手", render: (_, r) => `${r.UserName} · 用户 #${r.UserID}` }, { title: "项目", dataIndex: "Events" }, { title: "状态", dataIndex: "Status" },
+        { title: "操作", width: 170, fixed: "right", render: (_, r) => <Space><Button disabled={busy || comp.IsDone} onClick={() => void act(async () => { await service.approvePlayer(r.id, true); await loadPlayers(); }, "报名已通过").catch(() => undefined)}>通过</Button><Button danger disabled={busy || comp.IsDone} onClick={() => void act(async () => { await service.approvePlayer(r.id, false); await loadPlayers(); }, "报名已驳回").catch(() => undefined)}>驳回</Button></Space> },
+      ]} />
+    </Card>
+  </div>;
 }
 
-export function OrganizersResultsPageView({
-  orgId: orgIdProp,
-  compId: compIdProp,
-}: {
-  orgId?: string;
-  compId?: string;
-}) {
-  const orgIdFromUrl = useRouteParam("orgId");
-  const compIdFromUrl = useRouteParam("compId");
-  const orgId = orgIdProp ?? orgIdFromUrl;
-  const compId = compIdProp ?? compIdFromUrl;
+function PreResults({ comp, service, busy, act }: { comp: CompAPI.Data; service: Service; busy: boolean; act: Action }) {
+  const [modal, modalContext] = Modal.useModal();
+  const router = useRouter();
+  const search = useSearchParams();
+  const queryString = search?.toString() ?? "";
+  const [form] = Form.useForm();
+  const [rows, setRows] = useState<PreResult[]>([]);
+  const [total, setTotal] = useState(0);
+  const [selected, setSelected] = useState<React.Key[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [revision, setRevision] = useState(0);
+  const [progress, setProgress] = useState<BatchProgress | null>(null);
+  const page = positiveInteger(search?.get("pre_page") ?? null);
+  const size = positiveInteger(search?.get("pre_size") ?? null, 20, 100);
+  const mode = search?.get("pre_finish") || "false";
+  const { id: compId } = comp;
 
-  return (
-    <OrganizersGuard>
-      {!orgId || !compId ? (
-        <Text color="fg.muted">请从比赛列表进入成绩录入页面。</Text>
-      ) : (
-        <OrganizersResultsContent orgId={orgId} compId={compId} />
-      )}
-    </OrganizersGuard>
-  );
+  useEffect(() => {
+    const controller = new AbortController();
+    const params = new URLSearchParams(queryString);
+    const filters: Query = { page, size };
+    const values: Record<string, string> = { finish: mode };
+    for (const name of ["event", "round", "player", "source", "start_time", "end_time"]) {
+      const value = params.get(`pre_${name}`) || "";
+      values[name] = value;
+      if (value) filters[name] = value;
+    }
+    form.setFieldsValue(values);
+    setLoading(true); setSelected([]); setError(""); setRows([]); setTotal(0);
+    (async () => {
+      const data = await service.preResults({ ...filters, ...preResultReviewFilter(mode) }, controller.signal);
+      if (!controller.signal.aborted) { setRows(data.items ?? []); setTotal(data.total); }
+    })().catch((e) => { if (!controller.signal.aborted) setError(competitionError(e)); })
+      .finally(() => { if (!controller.signal.aborted) setLoading(false); });
+    return () => controller.abort();
+    // Service is selected by the parent mode/org/competition identity.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryString, compId, form, revision]);
+
+  const navigate = (values: Record<string, unknown>, p = 1, s = size) => {
+    const params = new URLSearchParams(window.location.search);
+    for (const name of ["finish", "event", "round", "player", "source", "start_time", "end_time"]) {
+      const value = values[name];
+      if (value !== "" && value !== undefined && value !== null) params.set(`pre_${name}`, String(value)); else params.delete(`pre_${name}`);
+    }
+    params.set("pre_page", String(p)); params.set("pre_size", String(s));
+    router.push(`${window.location.pathname}?${params}`);
+  };
+
+  const approve = (detail: string) => {
+    const targets = rows.filter((row) => selected.includes(row.id) && !row.Finish);
+    if (!targets.length) { void message.warning("请选择待审成绩"); return; }
+    const actionLabel = ({ ok: "通过", not: "驳回", timeout: "标记超时", doubtful: "标记存疑" } as Record<string, string>)[detail];
+    const dialog = modal.confirm({ title: `确认${actionLabel} ${targets.length} 条成绩`, content: "操作会逐条执行。成功项保留，失败项将显示具体原因。", cancelText: "取消", okText: "确认", keyboard: false, maskClosable: false,
+      onOk: () => act(async () => {
+        const status: BatchProgress = { completed: 0, total: targets.length, failed: 0, errors: [] };
+        setProgress({ ...status });
+        dialog.update({ cancelButtonProps: { disabled: true } });
+        for (const row of targets) {
+          try { await service.approveResult(row.id, detail); }
+           catch (e) {
+             const error = competitionError(e);
+             status.failed++; status.errors.push(`#${row.id} ${row.PersonName} ${row.EventID}：${error}`);
+           }
+          status.completed++; setProgress({ ...status, errors: [...status.errors] });
+          dialog.update({ content: <ProgressReport value={{ ...status, errors: [...status.errors] }} /> });
+        }
+        setRevision((v) => v + 1);
+        if (status.failed) throw new Error(`已处理 ${status.total} 条，成功 ${status.total - status.failed} 条，失败 ${status.failed} 条`);
+      }, "选中成绩审批完成").catch(() => undefined),
+    });
+  };
+
+  const approveOne = (row: PreResult) => modal.confirm({ title: `普通审批通过 #${row.id}`, content: `${row.PersonName} · ${row.EventID} · ${row.Round}`, okText: "普通审批", cancelText: "取消", onOk: () => act(async () => {
+    await service.approveResult(row.id, "ok"); setRevision((value) => value + 1);
+  }, "成绩已通过").catch(() => undefined) });
+
+  const columns: ColumnsType<PreResult> = [
+    { title: "ID / 提交时间", key: "id", width: 180, render: (_, r) => <><span>#{r.id}</span><br /><Tag>{r.updatedAt ? new Date(r.updatedAt).toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" }) : "历史时间缺失"}</Tag></> },
+    { title: "选手", key: "player", width: 320, render: (_, r) => <div className="gc-name">{r.PersonName}<br />{r.CubeID || "CubeID 缺失"}</div> },
+    { title: "项目 / 轮次", key: "event", width: 150, render: (_, r) => `${r.EventID} / ${r.RoundName || r.Round || r.RoundNumber || "缺失"}` },
+    { title: "成绩", key: "result", width: 320, render: (_, r) => formatResults(r) },
+    { title: "最佳 / 平均", key: "best", width: 150, render: (_, r) => r.EventRoute >= 8 ? "见多盲成绩" : `${resultTimeString(r.Best ?? NaN, r.EventRoute === 3)} / ${resultTimeString(r.Average ?? NaN)}` },
+    { title: "来源", dataIndex: "Source", width: 150 },
+    { title: "处理状态", key: "status", width: 110, render: (_, r) => <Tag color={r.FinishDetail === "ok" ? "cyan" : r.Finish ? "red" : "gold"}>{({ ok: "已通过", not: "已驳回", timeout: "已超时", doubtful: "存疑待审", wait: "待审" } as Record<string, string>)[r.Finish ? r.FinishDetail : r.Detail] || (r.Finish ? "已处理" : "待审")}</Tag> },
+    { title: "处理人 / 说明", key: "processor", width: 320, render: (_, r) => <div className="gc-name">{r.Processor || "—"}<br />{r.Detail}</div> },
+    { title: "单条审批", key: "action", width: 210, fixed: "right", render: (_, row) => !row.Finish && <div className="gc-actions"><Button size="small" disabled={busy || !canReviewResults(comp)} onClick={() => approveOne(row)}>普通审批</Button></div> },
+  ];
+  return <div className="gc-stack">
+    {modalContext}
+    <Card title="成绩审批筛选"><Form form={form} layout="vertical" disabled={busy} onFinish={(values) => {
+      if (values.start_time && values.end_time && Number(values.start_time) >= Number(values.end_time)) { void message.error("时间终点必须大于起点"); return; }
+      navigate(values);
+    }}><div className="gc-filters">
+      <Form.Item label="处理状态" name="finish"><Select options={[{ value: "false", label: "待审" }, { value: "ok", label: "已通过" }, { value: "not", label: "已驳回" }, { value: "timeout", label: "已超时" }, { value: "true", label: "全部已完成" }, { value: "all", label: "全部" }]} /></Form.Item>
+      <Form.Item label="项目" name="event"><Select allowClear options={comp.comp_json.Events.map((ev) => ({ value: ev.EventID, label: ev.EventID }))} /></Form.Item>
+      <Form.Item label="轮次" name="round"><InputNumber min={1} precision={0} /></Form.Item>
+      <Form.Item label="姓名 / CubeID" name="player"><Input allowClear /></Form.Item>
+      <Form.Item label="来源（精确）" name="source"><Input allowClear placeholder="web-api / robot-group-7" /></Form.Item>
+      <Form.Item label="提交起点（Unix 秒，含）" name="start_time"><InputNumber min={0} precision={0} /></Form.Item>
+      <Form.Item label="提交终点（Unix 秒，不含）" name="end_time"><InputNumber min={0} precision={0} /></Form.Item>
+    </div><div className="gc-actions"><Button type="primary" htmlType="submit" loading={loading}>查询</Button><Button onClick={() => navigate({ finish: "false" })}>重置</Button><Button onClick={() => setRevision((v) => v + 1)} loading={loading}>刷新</Button></div></Form></Card>
+    {error && <Alert type="error" title={error} showIcon />}
+    <ProgressReport value={progress} />
+    <Card title={`成绩审批 · 共 ${total} 条`}>
+      <div className="gc-actions" style={{ marginBottom: 16 }}><span>已选 {selected.length} 条</span><Button type="primary" disabled={busy || !canReviewResults(comp) || !selected.length} onClick={() => approve("ok")}>通过</Button><Button danger disabled={busy || !canReviewResults(comp) || !selected.length} onClick={() => approve("not")}>驳回</Button><Button disabled={busy || !canReviewResults(comp) || !selected.length} onClick={() => approve("timeout")}>标记超时</Button><Button disabled={busy || !canReviewResults(comp) || !selected.length} onClick={() => approve("doubtful")}>存疑待审</Button></div>
+      <Table rowKey="id" dataSource={rows} columns={columns} size="small" loading={loading} scroll={{ x: 2250 }} rowSelection={{ selectedRowKeys: selected, onChange: setSelected, getCheckboxProps: (row) => ({ disabled: busy || row.Finish || !canReviewResults(comp) }) }} pagination={{ current: page, pageSize: size, total, showSizeChanger: true, pageSizeOptions: [10, 20, 50, 100], onChange: (p, s) => navigate(form.getFieldsValue(), p, s) }} />
+    </Card>
+  </div>;
+}
+
+function OrganizersResultsContent({ orgId, compId, mode }: { orgId: string; compId: string; mode: CompetitionMode }) {
+  const [modal, modalContext] = Modal.useModal();
+  const search = useSearchParams();
+  const returnTo = competitionReturnPath(search?.get("returnTo") ?? null, mode === "admin");
+  const [comp, setComp] = useState<CompAPI.Data | null>(null);
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  const busyRef = useRef(false);
+  const [clock, setClock] = useState(Date.now());
+  const [player, setPlayer] = useState("");
+  const [round, setRound] = useState<[string, number] | null>(null);
+  const [inputs, setInputs] = useState<string[]>([]);
+  const [batchText, setBatchText] = useState("");
+  const [batchRows, setBatchRows] = useState<BatchItem[]>([]);
+  const [progress, setProgress] = useState<BatchProgress | null>(null);
+  const [results, setResults] = useState<Result[]>([]);
+  const [resultLoading, setResultLoading] = useState(false);
+  const resultRequest = useRef(0);
+  const service = competitionService(mode, orgId, compId);
+  const { options, loading: optionsLoading, error: optionsError } = useCompetitionOptions(mode === "admin");
+
+  const reload = useCallback(async () => {
+    const value = await competitionService(mode, orgId, compId).detail();
+    if (mode === "organizer" && String(value.OrganizersID) !== orgId) throw new Error("比赛不属于当前团队");
+    setComp(value);
+  }, [mode, orgId, compId]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    setComp(null); setError("");
+    competitionService(mode, orgId, compId).detail(controller.signal).then((value) => {
+      if (mode === "organizer" && String(value.OrganizersID) !== orgId) throw new Error("比赛不属于当前团队");
+      if (!controller.signal.aborted) setComp(value);
+    }).catch((e) => { if (!controller.signal.aborted) setError(competitionError(e)); });
+    return () => controller.abort();
+  }, [mode, orgId, compId]);
+  useEffect(() => { const timer = setInterval(() => setClock(Date.now()), 15_000); return () => clearInterval(timer); }, []);
+  useEffect(() => {
+    resultRequest.current++;
+    setResults([]); setResultLoading(false);
+  }, [round, player]);
+
+  const act: Action = async (fn, success, refresh = true) => {
+    if (busyRef.current) throw new Error("正在处理，请勿重复提交");
+    busyRef.current = true; setBusy(true);
+    try {
+      await fn();
+      void message.success(success);
+      if (refresh) await reload().catch((e) => message.warning(`操作已成功，但刷新比赛失败：${competitionError(e)}。请刷新页面，不要重复提交。`));
+    }
+    catch (e) { void message.error(competitionError(e)); throw e; }
+    finally { busyRef.current = false; setBusy(false); }
+  };
+
+  const loadResults = useCallback(async (withPlayer = false) => {
+    if ((withPlayer && !player.trim()) || (!withPlayer && !round && !player.trim())) { setResults([]); return; }
+    const request = ++resultRequest.current;
+    setResultLoading(true); setResults([]);
+    try {
+      const rows = await competitionService(mode, orgId, compId).results(!withPlayer && round ? { event_id: round[0], round_num: round[1] } : { cube_id: player.trim() });
+      if (request === resultRequest.current) setResults(rows ?? []);
+    }
+    catch (e) { if (request === resultRequest.current) void message.error(competitionError(e)); }
+    finally { if (request === resultRequest.current) setResultLoading(false); }
+  }, [mode, orgId, compId, round, player]);
+
+  if (error) return <Alert type="error" showIcon title={error} action={<Button onClick={() => { setError(""); void reload().catch((e) => setError(competitionError(e))); }}>重试</Button>} />;
+  if (!comp) return <Spin description="加载比赛…"><div style={{ minHeight: 100 }} /></Spin>;
+  const group = isGroupCompetition(comp);
+  const canEnter = canEnterResults(comp);
+  const currentEvent = comp.comp_json.Events.find((event) => event.EventID === round?.[0]);
+  const currentRound = currentEvent?.Schedule.find((schedule) => schedule.RoundNum === round?.[1]);
+  const count = attemptCount(currentEvent?.EventRoute ?? 0);
+  const validNewEntry = () => {
+    if (!canEnterResults(comp)) throw new Error("群赛尚未审批通过，不能录入成绩");
+    if (!player.trim()) throw new Error("请填写或选择选手 CubeID");
+  };
+  const validateRound = (eventId: string, roundNum: number) => {
+    const event = comp.comp_json.Events.find((ev) => ev.EventID === eventId);
+    const schedule = event?.Schedule.find((s) => s.RoundNum === roundNum);
+    if (!event || !schedule) throw new Error(`${eventId} 第 ${roundNum} 轮不存在`);
+    return event;
+  };
+  const parseBatch = (text: string) => parseBatchResults(text, comp.comp_json.Events, false);
+
+  const entry = (multi: boolean) => <div className="gc-stack"><Card title={multi ? "批量录入同一选手成绩" : "单条成绩录入"}>
+    <Form layout="vertical" disabled={busy} onFinish={async () => {
+      let actionStarted = false;
+      try {
+        validNewEntry();
+        if (!multi) {
+          if (!round || !currentEvent || !currentRound) throw new Error("请选择项目与轮次");
+          validateRound(round[0], round[1]);
+          if (inputs.length < count || Array.from({ length: count }, (_, index) => inputs[index]?.trim()).some((value) => !value)) throw new Error(`请填写完整的 ${count} 个成绩`);
+          const scores = parseAttempts(inputs.slice(0, count).join(" "), currentEvent.EventRoute);
+          actionStarted = true;
+          await act(async () => { await service.addResult(round[0], round[1], scores, player.trim()); setInputs([]); }, "成绩录入成功");
+          await loadResults(false);
+        } else {
+          const rows = parseBatch(batchText);
+          setBatchRows(rows);
+          if (!rows.length) throw new Error("请输入批量成绩");
+          if (rows.some((row) => row.error)) throw new Error("请先修正预览中的格式或轮次错误");
+          actionStarted = true;
+          await act(async () => {
+            const status: BatchProgress = { completed: 0, total: rows.length, failed: 0, errors: [] };
+            const failed: BatchItem[] = [];
+            setProgress({ ...status });
+            for (const row of rows) {
+              try { validNewEntry(); await service.addResult(row.event, row.round, row.values, player.trim()); }
+              catch (e) { status.failed++; row.error = competitionError(e); status.errors.push(`${row.event}[${row.round}]：${row.error}`); failed.push(row); }
+              status.completed++; setProgress({ ...status, errors: [...status.errors] });
+            }
+            setBatchRows(failed); setBatchText(failed.map((row) => row.line).join("\n"));
+            if (status.failed) throw new Error(`成功 ${rows.length - failed.length} 条，失败 ${failed.length} 条；输入区仅保留失败项`);
+          }, "批量成绩录入完成");
+          await loadResults(true);
+        }
+       } catch (e) { if (!actionStarted) void message.error(competitionError(e)); else await loadResults(multi); }
+    }}>
+      <Form.Item label="选手 CubeID（录入资格由后台校验，赛后仍可查询）"><PlayerPicker value={player} onChange={setPlayer} disabled={busy} /></Form.Item>
+      {!multi ? <>
+        <Form.Item label="项目与轮次"><Cascader aria-label="查询项目与轮次" style={{ width: "100%", maxWidth: 500 }} value={round ? [round[0], String(round[1])] : undefined} options={comp.comp_json.Events.map((ev) => ({ value: ev.EventID, label: `${ev.EventID} ${ev.EventName}`, children: ev.Schedule.map((s) => ({ value: String(s.RoundNum), label: `${s.RoundNum} · ${s.Round}${s.IsRunning ? "（开放）" : "（关闭）"}` })) }))} onChange={(v) => { setRound(v ? [String(v[0]), Number(v[1])] : null); setInputs([]); }} /></Form.Item>
+        {Array.from({ length: count }, (_, i) => <Form.Item key={i} label={`成绩 ${i + 1}`}><Input disabled={!canEnter} value={inputs[i] ?? ""} placeholder={currentEvent && currentEvent.EventRoute >= 8 ? "3/4 10:00 / 3/4 DNF / 0/0 DNS" : "12.34 / 1:02.34 / DNF / DNS"} onChange={(e) => setInputs((previous) => { const next = [...previous]; next[i] = e.target.value; return next; })} style={{ maxWidth: 500 }} /></Form.Item>)}
+      </> : <>
+        <Alert type="info" title="每行一个项目轮次，如 333[1] 12 13 14 15 16。多盲如 333mbf[1] 3/4 10:00；多次多盲连续填写多组。成功行会移除，仅保留失败行。" style={{ marginBottom: 16 }} />
+        <Form.Item label="批量成绩"><Input.TextArea disabled={!canEnter} rows={8} value={batchText} onChange={(e) => { setBatchText(e.target.value); setBatchRows(parseBatch(e.target.value)); }} /></Form.Item>
+        <Table rowKey="key" dataSource={batchRows} size="small" pagination={false} scroll={{ x: 700 }} columns={[{ title: "项目", dataIndex: "event" }, { title: "轮次", dataIndex: "round" }, { title: "原始输入", dataIndex: "line" }, { title: "校验", render: (_, row) => row.error ? <Tag color="red">{row.error}</Tag> : <Tag color="cyan">可提交</Tag> }]} />
+      </>}
+      <Button htmlType="submit" type="primary" loading={busy} disabled={!canEnter || (!multi && !currentRound)} style={{ marginTop: 16 }}>确认录入{multi ? ` ${batchRows.length} 条` : ""}</Button>
+    </Form>
+  </Card>{multi && <ProgressReport value={progress} />}<Card title="已录入成绩" extra={<Button loading={resultLoading} disabled={busy} onClick={() => void loadResults(multi)}>查询 / 刷新成绩</Button>}>
+    <ScoreList rows={results} busy={busy || (group && !canEnter)} onDelete={(row) => modal.confirm({ title: `删除 #${row.id} ${row.PersonName} ${row.EventID} ${row.Round}？`, okText: "删除", cancelText: "取消", okButtonProps: { danger: true }, onOk: () => act(async () => { await service.deleteResult(row.id); await loadResults(multi); }, "成绩已删除").catch(() => undefined) })} />
+  </Card></div>;
+
+  const orgName = comp.OrganizersName || comp.Org?.Name || options.organizers.find((org) => org.id === comp.OrganizersID)?.Name || "团队名称未提供";
+  const groupName = comp.GroupName || comp.Group?.name || options.groups.find((group) => group.id === comp.GroupId)?.Name || "群组名称未提供";
+  return <GroupCompetitionShell title={`#${comp.id} ${comp.Name}`} description={<>{orgName}{group && <> · {groupName}</>} · {group ? competitionStatus(comp, clock) : publicCompetitionStatus(comp, clock)} · <Tag>{group ? beijingDate(comp.CompStartTime) : comp.CompStartTime}</Tag>至 <Tag>{group ? beijingDate(comp.CompEndTime) : comp.CompEndTime}</Tag></>}>
+    {modalContext}
+    <div className="gc-actions" style={{ marginBottom: 16 }}><Link href={returnTo}>返回比赛列表</Link><Button disabled={busy} onClick={() => void reload().catch((e) => message.error(competitionError(e)))}>刷新比赛</Button><Tag color="cyan">{mode === "admin" ? "管理员模式" : "主办模式"}</Tag></div>
+    {optionsError && <Alert type="warning" title={`名称选项加载失败：${optionsError}`} style={{ marginBottom: 16 }} />}
+    <CompetitionSwitcher comp={comp} mode={mode} options={options} loading={optionsLoading} />
+    {group && <Alert type={canEnter ? "info" : "warning"} showIcon title={canEnter ? "群赛已审批通过，可新增、覆盖、修改、删除成绩和审批，不受赛期、结束标记或轮次开放状态限制。" : "群赛尚未审批通过，暂不能录入或修改成绩。"} style={{ marginBottom: 16 }} />}
+    <NavTabs tabsKey="input_tabs" items={[
+      { key: "manage", label: "比赛管理", disabled: busy, children: <CompetitionManagement comp={comp} service={service} busy={busy} act={act} mode={mode} /> },
+      { key: "one", label: "单条录入", disabled: busy, children: entry(false) },
+      { key: "multi", label: "批量录入", disabled: busy, children: entry(true) },
+      { key: "pre_result", label: "成绩审批", disabled: busy, children: <PreResults comp={comp} service={service} busy={busy} act={act} /> },
+    ]} />
+  </GroupCompetitionShell>;
+}
+
+export function OrganizersResultsPageView({ orgId: orgIdProp, compId: compIdProp, admin = false }: { orgId?: string; compId?: string; admin?: boolean }) {
+  const search = useSearchParams();
+  const routeOrg = useRouteParam("orgId");
+  const routeComp = useRouteParam("compId");
+  const orgId = orgIdProp ?? routeOrg ?? search?.get("orgId") ?? "";
+  const compId = compIdProp ?? routeComp ?? search?.get("compId") ?? "";
+  const Guard = admin ? AdminGuard : OrganizersGuard;
+  const validId = (value: string) => /^\d+$/.test(value) && Number.isSafeInteger(Number(value)) && Number(value) > 0;
+  const valid = validId(compId) && (admin || validId(orgId));
+  return <Guard>{valid ? <OrganizersResultsContent key={`${admin ? "admin" : orgId}:${compId}`} orgId={orgId} compId={compId} mode={admin ? "admin" : "organizer"} /> : <Alert type="info" title="请从比赛列表选择比赛进入管理。" action={<Link href={admin ? "/admin/competition/approvals" : "/admin/organizers/comps"}>比赛列表</Link>} />}</Guard>;
 }

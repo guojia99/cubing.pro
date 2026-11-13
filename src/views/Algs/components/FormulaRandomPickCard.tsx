@@ -7,6 +7,7 @@ import { getFormulaPickHistory } from "@/services/cubing-pro/algs/formulaRandomP
 import type { FormulaItem } from "../types";
 import { ALGS_COLORS } from "../utils/constants";
 import { RANDOM_PICK_ICON_SVG } from "../utils/randomPickIcon";
+import AlgsCubeDiagram from "./AlgsCubeDiagram";
 import SvgRenderer from "./SvgRenderer";
 import "../styles/practiceTools.css";
 
@@ -54,18 +55,30 @@ export default function FormulaRandomPickCard({
     if (idx >= 0) onPickFormula(idx);
   };
 
+  const latestFormula = latestPick
+    ? flatAlgs[findIndex(latestPick.setName, latestPick.groupName, latestPick.algName)]
+    : undefined;
+
   const preview = latestPick ? (
     <button
       type="button"
-      disabled={findIndex(latestPick.setName, latestPick.groupName, latestPick.algName) < 0}
+      disabled={!latestFormula}
       onClick={handleLatestClick}
       className="algs-practice-tool-random-preview"
     >
-      <SvgRenderer
-        svg={latestPick.image}
+      <AlgsCubeDiagram
+        cube={cube}
+        classId={classId}
+        setName={latestPick.setName}
+        groupName={latestPick.groupName}
+        formula={latestFormula?.alg.algs[0]}
+        scramble={latestFormula?.alg.scrambles?.[0]}
+        imageSvg={latestPick.image || latestFormula?.alg.image}
+        useVisualCube={Boolean(latestFormula?.alg.algs[0]?.trim() || latestFormula?.alg.scrambles?.[0]?.trim())}
+        interactive={false}
         maxWidth={48}
         maxHeight={64}
-        style={{ flexShrink: 0 }}
+        style={{ width: 48, maxWidth: "100%", flexShrink: 0 }}
       />
       <Box minW={0} flex={1} textAlign={embedded ? "center" : "left"}>
         <Text fontWeight="semibold" fontSize="sm">

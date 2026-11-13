@@ -47,6 +47,7 @@ import RandomPickModal from "./components/RandomPickModal";
 import { RANDOM_PICK_ICON_SVG } from "./utils/randomPickIcon";
 import SvgRenderer from "./components/SvgRenderer";
 import { ALGS_COLORS } from "./utils/constants";
+import { groupTwoByTwoCategories } from "./utils/twoByTwoCategories";
 
 function AlgsSetCard({
   cube,
@@ -173,7 +174,7 @@ function ToolMiniCard({
 }
 
 export function AlgsListView() {
-  const { t, tf } = useI18n();
+  const { t, tf, locale } = useI18n();
   const router = useRouter();
   const { currentUser } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -420,6 +421,7 @@ export function AlgsListView() {
           ) : (
             cubesWithItems.map((cube) => {
               const items = classMap[cube] ?? [];
+              const groups = cube === "222" ? groupTwoByTwoCategories(items) : [{ id: "all", label: "", items }];
               return (
                 <Card.Root
                   key={cube}
@@ -434,11 +436,13 @@ export function AlgsListView() {
                     </Heading>
                   </Card.Header>
                   <Card.Body pt={0}>
-                    <Grid
-                      templateColumns="repeat(auto-fill, minmax(180px, 1fr))"
-                      gap="4"
-                    >
-                      {items.map((item) => (
+                    <VStack align="stretch" gap="6">
+                    {groups.map((group) => <Box key={group.id} as="section" data-algs-subcategory={cube === "222" ? group.id : undefined}>
+                      {cube === "222" && <Heading as="h3" size="sm" mb="3" color="fg.muted">
+                        {group.label || (locale === "zh-CN" ? "其他" : "Other")}
+                      </Heading>}
+                    <Grid templateColumns="repeat(auto-fill, minmax(min(180px, 100%), 1fr))" gap="4">
+                      {group.items.map((item) => (
                         <AlgsSetCard
                           key={`${cube}/${item.name}`}
                           cube={cube}
@@ -447,6 +451,8 @@ export function AlgsListView() {
                         />
                       ))}
                     </Grid>
+                    </Box>)}
+                    </VStack>
                   </Card.Body>
                 </Card.Root>
               );

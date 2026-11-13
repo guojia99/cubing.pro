@@ -1,7 +1,8 @@
 "use client";
 
 import { Button, CloseButton, Dialog } from "@chakra-ui/react";
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { displayPracticeScramble, hasPracticeScramble, preparePracticeSetups } from "@/components/puzzles/practiceSetup";
 import { useI18n } from "@/contexts/I18nProvider";
 import type { MessageKey } from "@/i18n";
 import { useReleaseOverlayOnUnmount } from "@/lib/overlayCleanup";
@@ -16,7 +17,7 @@ import { buildGroupKey, getFormulaPracticeSelection, saveFormulaPracticeSelectio
 import { getFormulaProficiency, getProficiencyLevel, PROFICIENCY_WEIGHTS, setFormulaProficiency, type ProficiencyLevel } from "@/services/cubing-pro/algs/formulaPracticeProficiency";
 import type { FormulaItem, FormulaPracticeMode } from "../types";
 import { formulaKey, formatPracticeTime, PracticeTimer, snapshotIdentity, type PracticeSnapshot, type TimerView } from "./formulaPracticeTimer";
-import SvgRenderer from "./SvgRenderer";
+import AlgsCubeDiagram from "./AlgsCubeDiagram";
 import "./formulaPracticeModal.css";
 
 export type { FormulaPracticeMode, FormulaItem } from "../types";
@@ -81,10 +82,41 @@ export default function FormulaPracticeModal(props: Props) {
     });
     timers.set(key, timer);
   }
-  return <PracticeLibrary key={key} {...props} timer={timer} />;
+  return <PreparedPracticeLibrary key={key} {...props} timer={timer} />;
 }
 
-function PracticeLibrary({ open, onClose, cube, classId, flatAlgs, timer }: Props & { timer: PracticeTimer }) {
+function PreparedPracticeLibrary(props: Props & { timer: PracticeTimer }) {
+  const { open, cube, classId, flatAlgs } = props;
+  // A parent may reallocate flatAlgs; only changed setup inputs restart preparation.
+  const setupKey = JSON.stringify([cube, classId, flatAlgs.map((item) => hasPracticeScramble(item.alg.scrambles) ? null : item.alg.algs)]);
+  const needsSetup = flatAlgs.some((item) => !hasPracticeScramble(item.alg.scrambles));
+  const [result, setResult] = useState<{ key: string; setups: string[][] } | null>(null);
+  const ready = !needsSetup || result?.key === setupKey;
+
+  useEffect(() => {
+    if (!open || ready) return;
+    let active = true;
+    const [requestCube, requestClassId, formulas] = JSON.parse(setupKey) as [string, string, (string[] | null)[]];
+    void preparePracticeSetups(requestCube, requestClassId, formulas).then((setups) => {
+      if (active) setResult({ key: setupKey, setups });
+    }).catch(() => {
+      if (active) setResult({ key: setupKey, setups: [] });
+    });
+    return () => { active = false; };
+  }, [open, ready, setupKey]);
+
+  const preparedAlgs = useMemo(() => {
+    if (!needsSetup || result?.key !== setupKey) return flatAlgs;
+    return flatAlgs.map((item, index) => {
+      const scrambles = result.setups[index];
+      return hasPracticeScramble(item.alg.scrambles) || !scrambles?.length ? item : { ...item, alg: { ...item.alg, scrambles } };
+    });
+  }, [flatAlgs, needsSetup, result, setupKey]);
+
+  return <PracticeLibrary {...props} flatAlgs={preparedAlgs} setupBusy={!ready} />;
+}
+
+function PracticeLibrary({ open, onClose, cube, classId, flatAlgs, timer, setupBusy }: Props & { timer: PracticeTimer; setupBusy: boolean }) {
   useReleaseOverlayOnUnmount();
   const { t, tf, locale } = useI18n();
   const state = useSyncExternalStore(timer.subscribe, timer.getSnapshot, timer.getSnapshot);
@@ -122,7 +154,7 @@ function PracticeLibrary({ open, onClose, cube, classId, flatAlgs, timer }: Prop
   const item = slot ? state.snapshot?.algs[slot.algIdx] : null;
   const scramble = item?.alg.scrambles?.[slot?.scrambleIdx ?? 0] ?? "";
   const running = state.phase === "running";
-  const canTime = open && view === "main" && snapshotMatches && !actionBusy && Boolean(scramble);
+  const canTime = open && view === "main" && !setupBusy && snapshotMatches && !actionBusy && Boolean(scramble.trim());
   const controls = useRef({ canTime });
   controls.current = { canTime };
 
@@ -142,11 +174,12 @@ function PracticeLibrary({ open, onClose, cube, classId, flatAlgs, timer }: Prop
   useEffect(() => {
     if (!open || view !== "main" || snapshotMatches || !state.snapshot) return;
     timer.interrupt();
+    if (setupBusy) return;
     if (!timer.getSnapshot().pending && !["loading", "saving", "clearing"].includes(timer.getSnapshot().phase)) {
       setView("config");
       setNotice("algs.practice.updated");
     }
-  }, [open, view, snapshotMatches, identity, state.snapshot, state.phase, timer]);
+  }, [open, view, snapshotMatches, identity, state.snapshot, state.phase, timer, setupBusy]);
 
   useEffect(() => {
     return () => { timer.interrupt(); };
@@ -268,7 +301,7 @@ function PracticeLibrary({ open, onClose, cube, classId, flatAlgs, timer }: Prop
     onClose();
   }
   async function startPractice() {
-    if (timer.isBlocked() || actionLock.current || !selectedAlgs.length) return;
+    if (setupBusy || timer.isBlocked() || actionLock.current || !selectedAlgs.length) return;
     setNotice(null);
     try {
       saveFormulaPracticeSelection(cube, classId, {
@@ -343,11 +376,13 @@ function PracticeLibrary({ open, onClose, cube, classId, flatAlgs, timer }: Prop
   const detailRecord = detail?.kind === "record" ? detail.value : null;
   const detailImage = detailItem ? detailItem.image || formulaImages.get(detailItem.formulaKey) || "" : "";
   const title = view === "config" ? t("algs.practice.config") : view === "history" ? t("algs.formulaPractice.fullHistory") : view === "detail" ? t(detailRecord ? "algs.practice.recordDetail" : "algs.practice.questionDetail") : t("algs.formulaPractice.title");
+  const setupLoadingText = locale === "en-US" ? "Preparing missing scrambles. Practice will be available when ready." : "正在为缺失打乱的公式准备打乱，完成后可开始练习。";
+  const missingSetupText = locale === "en-US" ? "Some formulas have no usable scramble. You can view or skip them, but cannot start their timer." : "部分公式暂无可用打乱，可查看或切换题目，但不能启动计时。";
 
   function renderRecords(list: FormulaPracticeRecord[], from: View) {
     return list.map((record) => <div className="fp-record" key={record.id}>
       <button type="button" className="fp-record-open" onClick={() => showDetail(record, from)} disabled={locked}>
-        {(record.image || formulaImages.get(record.formulaKey)) && <span className="fp-record-image" aria-hidden="true"><SvgRenderer svg={record.image || formulaImages.get(record.formulaKey)!} maxWidth={40} maxHeight={48} /></span>}
+        {(record.algs[0] || record.scramble || record.image || formulaImages.get(record.formulaKey)) && <span className="fp-record-image" aria-hidden="true"><AlgsCubeDiagram cube={cube} classId={classId} setName={record.setName} groupName={record.groupName} formula={record.algs[0]} scramble={record.scramble} stateSource="scramble" interactive={false} imageSvg={record.image || formulaImages.get(record.formulaKey)} useVisualCube={Boolean(record.algs[0]?.trim() || record.scramble?.trim())} maxWidth={40} maxHeight={48} /></span>}
         <span className="fp-record-info"><strong>{record.formulaName}</strong><small>{record.setName} / {record.groupName}</small></span>
         <span className="fp-record-time">{formatPracticeTime(record.timeMs)}</span>
       </button>
@@ -365,7 +400,7 @@ function PracticeLibrary({ open, onClose, cube, classId, flatAlgs, timer }: Prop
     }}>
     <Dialog.Backdrop />
     <Dialog.Positioner className="fp-positioner">
-      <Dialog.Content ref={contentRef} colorPalette="brand" className={`formula-practice-modal fp-dialog ${running ? "fp-running" : ""}`} aria-busy={state.phase === "loading" || actionBusy}>
+      <Dialog.Content ref={contentRef} colorPalette="brand" className={`formula-practice-modal fp-dialog ${running ? "fp-running" : ""}`} aria-busy={setupBusy || state.phase === "loading" || actionBusy}>
         <Dialog.Header className="fp-header">
           <div><Dialog.Title>{title}</Dialog.Title><Dialog.Description className="fp-meta">{cube} / {classId}</Dialog.Description></div>
           <div className="fp-actions">
@@ -377,12 +412,13 @@ function PracticeLibrary({ open, onClose, cube, classId, flatAlgs, timer }: Prop
         </Dialog.Header>
         <Dialog.Body className="fp-body">
           {notice && <div className="fp-notice" role="status">{t(notice)}</div>}
+          {setupBusy ? <div className="fp-notice" role="status">{setupLoadingText}</div> : flatAlgs.some((alg) => !hasPracticeScramble(alg.alg.scrambles)) && <div className="fp-notice" role="status">{missingSetupText}</div>}
           {state.pending && <div className="fp-notice" role="status">
             <strong>{formatPracticeTime(state.pending.timeMs)} · {state.pending.formulaName}</strong>
             <p>{t(state.phase === "saving" ? "algs.practice.saving" : "algs.practice.saveError")}</p>
             {state.phase === "error" && <Button size="sm" colorPalette="brand" onClick={() => timer.retry()}>{t("algs.practice.retry")}</Button>}
           </div>}
-          {state.phase === "error" && !state.pending && <div className="fp-notice" role="alert">{t("algs.practice.sessionError")} <Button size="sm" onClick={startPractice}>{t("algs.practice.retry")}</Button></div>}
+          {state.phase === "error" && !state.pending && <div className="fp-notice" role="alert">{t("algs.practice.sessionError")} <Button size="sm" disabled={setupBusy} onClick={startPractice}>{t("algs.practice.retry")}</Button></div>}
           {dataError && <div className="fp-notice" role="status">{t("algs.practice.dataError")} <Button size="sm" variant="outline" onClick={() => setRefresh((value) => value + 1)}>{t("algs.practice.retry")}</Button></div>}
 
           {view === "config" && <div className="fp-config">
@@ -399,7 +435,7 @@ function PracticeLibrary({ open, onClose, cube, classId, flatAlgs, timer }: Prop
                 <Button size="sm" variant="outline" aria-pressed={[...set.values()].flat().every((alg) => selected.has(formulaKey(alg)))} onClick={() => toggle([...set.values()].flat().map(formulaKey))}>{setName}</Button>
                 {[...set].map(([groupName, algs]) => <div className="fp-group" key={groupName}>
                   <Button size="xs" variant="ghost" aria-pressed={algs.every((alg) => selected.has(formulaKey(alg)))} onClick={() => toggle(algs.map(formulaKey))}>{groupName}</Button>
-                  <div className="fp-choices">{algs.map((alg) => <label key={formulaKey(alg)}><input type="checkbox" checked={selected.has(formulaKey(alg))} onChange={() => toggle([formulaKey(alg)])} />{alg.alg.name}</label>)}</div>
+                  <div className="fp-choices">{algs.map((alg) => <label key={formulaKey(alg)}><input type="checkbox" checked={selected.has(formulaKey(alg))} onChange={() => toggle([formulaKey(alg)])} />{alg.alg.name}{!setupBusy && !hasPracticeScramble(alg.alg.scrambles) && <small className="fp-meta"> · {t("algs.formulaPractice.noScramble")}</small>}</label>)}</div>
                 </div>)}
               </section>)}
             </fieldset>
@@ -410,13 +446,13 @@ function PracticeLibrary({ open, onClose, cube, classId, flatAlgs, timer }: Prop
               <label className="fp-check"><input type="checkbox" checked={config.remindProficiency} onChange={(event) => setConfig({ ...config, remindProficiency: event.target.checked })} />{t("algs.practice.remind")}</label>
             </fieldset>
             {!selectedAlgs.length && <p role="status">{t("algs.practice.emptySelection")}</p>}
-            <Button colorPalette="brand" size="lg" disabled={locked || !selectedAlgs.length} loading={state.phase === "loading"} onClick={startPractice}>{t(snapshotMatches && state.sessionId ? "algs.practice.resume" : "algs.formulaPractice.start")}</Button>
+            <Button colorPalette="brand" size="lg" disabled={setupBusy || locked || !selectedAlgs.length} loading={setupBusy || state.phase === "loading"} onClick={startPractice}>{t(snapshotMatches && state.sessionId ? "algs.practice.resume" : "algs.formulaPractice.start")}</Button>
           </div>}
 
           {view === "main" && <div className="fp-layout">
             <section className="fp-stage" aria-label={t("algs.formulaPractice.timerZone")}>
               <div className="fp-stage-top"><span className="fp-meta">{state.snapshot ? t(MODES[state.snapshot.mode]) : ""}</span><span className="fp-meta">{tf("algs.formulaPractice.formulaNavHint", { current: state.slots.length ? state.index + 1 : 0, total: state.slots.length })}</span></div>
-              <p className="fp-scramble">{scramble || t("algs.formulaPractice.noScramble")}</p>
+              <p className="fp-scramble">{displayPracticeScramble(scramble) || t("algs.formulaPractice.noScramble")}</p>
               <button type="button" ref={timerButtonRef} className={`fp-timer fp-timer-${state.phase}`} aria-label={`${t(PHASE_LABELS[state.phase])}. ${t("algs.practice.controls")}`} aria-describedby="fp-instructions" disabled={!canTime || !["ready", "armed", "running"].includes(state.phase)}
                 onKeyDown={(event) => {
                   if (event.code !== "Enter") return;
@@ -461,7 +497,7 @@ function PracticeLibrary({ open, onClose, cube, classId, flatAlgs, timer }: Prop
                 <Button size="sm" variant="ghost" disabled={locked} aria-expanded={answerVisible} onClick={() => setAnswerVisible(!answerVisible)}>{t(answerVisible ? "algs.practice.hideAnswer" : "algs.practice.showAnswer")}</Button>
                 <Button size="sm" variant="ghost" disabled={locked || state.phase !== "ready" || !item} onClick={showQuestion}>{t("algs.practice.questionDetail")}</Button>
                 {answerVisible && item && <div className="fp-answer-content">
-                  {item.alg.image ? <SvgRenderer svg={item.alg.image} maxWidth={140} maxHeight={140} /> : <span className="fp-meta">{t("algs.practice.noImage")}</span>}
+                  {item.alg.algs[0] || scramble || item.alg.image ? <AlgsCubeDiagram cube={cube} classId={classId} setName={item.setName} groupName={item.groupName} formula={item.alg.algs[0]} scramble={scramble} stateSource="scramble" interactive={false} imageSvg={item.alg.image} useVisualCube={Boolean(item.alg.algs[0]?.trim() || scramble.trim())} maxWidth={140} maxHeight={140} style={{ width: 140, maxWidth: "100%" }} /> : <span className="fp-meta">{t("algs.practice.noImage")}</span>}
                   <div><h3>{item.alg.name}</h3><p className="fp-meta">{item.setName} / {item.groupName}</p>{item.alg.algs.map((alg, index) => <p className="fp-alg" key={index}>{alg}</p>)}</div>
                 </div>}
               </div>
@@ -494,8 +530,8 @@ function PracticeLibrary({ open, onClose, cube, classId, flatAlgs, timer }: Prop
           {view === "detail" && detailItem && <section className="fp-detail">
             <div className="fp-history-heading"><div><h2>{detailItem.formulaName}</h2><p className="fp-meta">{detailItem.setName} / {detailItem.groupName}</p></div>{detailRecord && <strong className="fp-mean">{formatPracticeTime(detailRecord.timeMs)}</strong>}</div>
             {detailRecord && <p className="fp-meta">{new Date(detailRecord.createdAt).toLocaleString(locale)}</p>}
-            <p className="fp-scramble">{detailItem.scramble}</p>
-            {detailImage ? <SvgRenderer svg={detailImage} maxWidth={200} maxHeight={200} /> : <p className="fp-meta">{t("algs.practice.noImage")}</p>}
+            <p className="fp-scramble">{displayPracticeScramble(detailItem.scramble)}</p>
+            {detailItem.algs[0] || detailItem.scramble || detailImage ? <AlgsCubeDiagram cube={cube} classId={classId} setName={detailItem.setName} groupName={detailItem.groupName} formula={detailItem.algs[0]} scramble={detailItem.scramble} stateSource="scramble" interactive imageSvg={detailImage} useVisualCube={Boolean(detailItem.algs[0]?.trim() || detailItem.scramble?.trim())} maxWidth={200} maxHeight={200} /> : <p className="fp-meta">{t("algs.practice.noImage")}</p>}
             <h3>{t("algs.practice.answer")}</h3>{detailItem.algs.map((alg, index) => <p className="fp-alg" key={index}>{alg}</p>)}
             <div className="fp-actions"><PracticeProficiency value={proficiencies[detailItem.formulaKey] ?? "average"} onChange={(level) => proficiency(detailItem.formulaKey, level)} />{detailRecord && <Button variant="outline" onClick={() => confirmDelete(detailRecord, "detail")}>{t("algs.practice.delete")}</Button>}</div>
           </section>}

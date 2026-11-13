@@ -302,7 +302,8 @@ export default function BatchCustomFormulaModal({
             groupName={groupName}
             imageSvg={alg.image}
             scramble={defaultScramble}
-            formula=""
+            formula={selectedLibraryFormula}
+            interactive
             useVisualCube={useVisualCube}
             maxWidth={260}
             maxHeight={260}

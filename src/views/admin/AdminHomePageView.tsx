@@ -79,10 +79,10 @@ export function AdminHomePageView() {
         title: "申请列表",
         children: [
           {
-            title: "比赛申请",
-            description: "审批比赛申请",
+            title: "群赛审批",
+            description: "全局筛选群赛、审批申请与成绩",
             avatar: "📝",
-            disabled: true,
+            to: "/admin/competition/approvals",
           },
           {
             title: "主办申请",
@@ -122,7 +122,7 @@ export function AdminHomePageView() {
             title: "比赛管理",
             description: "比赛列表、详情和修改",
             avatar: "📋",
-            disabled: true,
+            to: "/admin/competition/approvals?status=all",
           },
           {
             title: "主办团队管理",

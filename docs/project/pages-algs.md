@@ -26,5 +26,5 @@ Algs/
 | 熟练度追踪 | frontend-only | localStorage |
 | 随机抽公式 | hybrid | localStorage + KV（每日抽题） |
 | 自定义公式 | frontend-only | localStorage |
-| VisualCube 渲染 | frontend-only | VisualCube URL |
+| 本地 SVG / 交互 3D | frontend-only | 打包的 cuberoot 各类型绘图模块、cubing.js、Three.js；公式反推或 setup 正向执行 |
 | 练习统计（ao50/100/1000） | frontend-only | localStorage |

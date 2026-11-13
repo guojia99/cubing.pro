@@ -18,6 +18,9 @@
     "test:algs": "node --test src/views/Algs/components/formulaPracticeTimer.test.mjs && tsx --test src/services/cubing-pro/algs/formulaPracticeHistory.test.mjs",
     "test:algs:browser": "node src/views/Algs/components/formulaPracticeTimer.browser.test.mjs",
     "test:algs:layout": "node src/views/Algs/components/algsLayout.browser.test.mjs",
+    "test:puzzles": "node --test src/components/puzzles/model.test.mjs src/components/puzzles/practiceSetup.test.mjs src/components/puzzles/notation.test.mjs src/components/puzzles/cuberootCubeDiagrams.test.mjs src/components/puzzles/cuberootSpecialDiagrams.test.mjs src/views/Algs/utils/twoByTwoCategories.test.mjs",
+    "test:puzzles:browser": "node src/components/puzzles/puzzleDiagram.browser.test.mjs",
+    "test:puzzles:native": "node src/components/puzzles/nativeTwoByTwo.regression.test.mjs",
     "lint": "eslint ."
   },
   "dependencies": {
@@ -33,7 +36,7 @@
     "axios": "^1.17.0",
     "classnames": "^2.5.1",
     "cstimer_module": "^0.1.5",
-    "cubing": "^0.63.3",
+    "cubing": "0.63.3",
     "echarts": "^6.1.0",
     "echarts-for-react": "^3.0.6",
     "file-saver": "^2.0.5",
@@ -48,6 +51,7 @@
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
     "sr-visualizer": "^1.0.13",
+    "three": "0.170.0",
     "uuid": "^14.0.0",
     "xlsx": "^0.18.5"
   },
@@ -56,6 +60,7 @@
     "@types/node": "^22.15.30",
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.5",
+    "@types/three": "^0.169.0",
     "@types/uuid": "^10.0.0",
     "esbuild": "^0.28.2",
     "eslint": "^9.28.0",

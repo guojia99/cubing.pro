@@ -11,6 +11,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useI18n } from "@/contexts/I18nProvider";
+import PuzzlePreferencesPanel from "@/components/puzzles/PuzzlePreferencesPanel";
 import {
   type FormulaFontFamilyId,
   FORMULA_FONT_FAMILY_IDS,
@@ -105,9 +106,7 @@ export default function AlgsPageSettingsPanel({
   onDiagramSizeChange,
   hideFormulaDiagram,
   onHideFormulaDiagramChange,
-  showVisualCubeSwitch,
   useVisualCube,
-  onUseVisualCubeChange,
   showHideAltFormulas,
   hideAltFormulas,
   onHideAltFormulasChange,
@@ -128,7 +127,7 @@ export default function AlgsPageSettingsPanel({
   const diagramDims = getDiagramDimensions(diagramSize, "square");
   const canPreviewDiagram =
     !hideFormulaDiagram &&
-    Boolean(previewSetName && previewGroupName && (previewImageSvg || useVisualCube));
+    Boolean(previewImageSvg || previewFormula?.trim() || previewScramble?.trim());
 
   return (
     <VStack align="stretch" gap={5}>
@@ -293,32 +292,12 @@ export default function AlgsPageSettingsPanel({
         </Switch.Root>
       )}
 
-      {showVisualCubeSwitch && (
-        <Switch.Root
-          width="100%"
-          size="sm"
-          colorPalette="brand"
-          checked={useVisualCube}
-          onCheckedChange={(e) => onUseVisualCubeChange(e.checked === true)}
-        >
-          <Switch.HiddenInput />
-          <Flex
-            as="span"
-            width="100%"
-            align="center"
-            justify="space-between"
-            gap={3}
-            cursor="pointer"
-          >
-            <Switch.Label fontSize="sm" flex={1} cursor="pointer">
-              {t("algs.config.visualCube")}
-            </Switch.Label>
-            <Switch.Control cursor="pointer">
-              <Switch.Thumb />
-            </Switch.Control>
-          </Flex>
-        </Switch.Root>
-      )}
+      <PuzzlePreferencesPanel />
+      <Text fontSize="xs" color="fg.muted">
+        {locale === "zh-CN"
+          ? "公式说明图示现在由本地生成。"
+          : "Algorithm explanation diagrams are now generated locally."}
+      </Text>
 
       <Field.Root>
         <Field.Label fontSize="sm" mb={1}>

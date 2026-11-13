@@ -468,6 +468,111 @@ export function AlgsDetailView({ cube, classId }: Props) {
 
   const handleModalClose = useCallback(() => setModalState(null), []);
 
+  const formulaGroups = useMemo(() => displayedGroups.map((group) => {
+    return (
+      <Card.Root
+        key={`${group.setName}::${group.groupName}`}
+        id={`algs-group-${encodeURIComponent(buildGroupKey(group.setName, group.groupName))}`}
+        className="algs-detail-group"
+        variant="outline"
+        borderRadius="xl"
+        bg="bg.elevated"
+        borderColor="border"
+        minW={0}
+      >
+        <Card.Body p={3} gap={0}>
+          <HStack className="algs-detail-group-heading" gap={2} mb={2} align="center" minW={0}>
+            <Badge
+              colorPalette="brand"
+              variant="subtle"
+              borderRadius="md"
+              px={2}
+              py={0}
+              h="22px"
+              lineHeight="20px"
+              fontSize="11px"
+              flexShrink={0}
+            >
+              {group.setName}
+            </Badge>
+            <Heading as="h2"
+              fontSize="xs"
+              fontWeight="medium"
+              color="fg.muted"
+              lineHeight="22px"
+              truncate
+              title={group.groupName}
+            >
+              {group.groupName}
+            </Heading>
+            <Text fontSize="11px" lineHeight="22px" color="fg.muted" ml="auto" flexShrink={0}>
+              {group.algs.length}
+            </Text>
+          </HStack>
+
+          <Grid className={`algs-case-grid${columnsPerRow === 1 ? " algs-case-grid--wide" : ""}`}>
+            {group.algs.map((alg) => {
+              const cardKey = `${group.setName}:${group.groupName}:${alg.name}`;
+              if (columnsPerRow === 1) {
+                return (
+                  <GridItem key={cardKey} minW={0}>
+                    <AlgsFormulaCardWide
+                      cube={cube}
+                      classId={classId}
+                      setName={group.setName}
+                      groupName={group.groupName}
+                      alg={alg}
+                      setColorIndex={group.setColorIndex}
+                      formulaFontSize={formulaFontSize}
+                      formulaFontFamily={formulaFontFamily}
+                      useVisualCube={useVisualCube}
+                      diagramSize={diagramSize}
+                      hideFormulaDiagram={hideFormulaDiagram}
+                      hideAltFormulas={hideAltFormulas}
+                      refreshVersion={refreshVersion}
+                      onOpenModal={() =>
+                        handleOpenModal(
+                          group.setName,
+                          group.groupName,
+                          alg,
+                        )
+                      }
+                    />
+                  </GridItem>
+                );
+              }
+              return (
+                <GridItem key={cardKey} minW={0}>
+                  <AlgsFormulaCard
+                    cube={cube}
+                    classId={classId}
+                    setName={group.setName}
+                    groupName={group.groupName}
+                    alg={alg}
+                    setColorIndex={group.setColorIndex}
+                    formulaFontSize={formulaFontSize}
+                    formulaFontFamily={formulaFontFamily}
+                    useVisualCube={useVisualCube}
+                    diagramSize={diagramSize}
+                    hideFormulaDiagram={hideFormulaDiagram}
+                    refreshVersion={refreshVersion}
+                    onClick={() =>
+                      handleOpenModal(
+                        group.setName,
+                        group.groupName,
+                        alg,
+                      )
+                    }
+                  />
+                </GridItem>
+              );
+            })}
+          </Grid>
+        </Card.Body>
+      </Card.Root>
+    );
+  }), [displayedGroups, columnsPerRow, cube, classId, formulaFontSize, formulaFontFamily, useVisualCube, diagramSize, hideFormulaDiagram, hideAltFormulas, refreshVersion, handleOpenModal]);
+
   const showVisualCubeSwitch = isVisualCubeCube(cube);
   const showHideAltFormulas = columnsPerRow === 1;
 
@@ -661,110 +766,7 @@ export function AlgsDetailView({ cube, classId }: Props) {
           </Box>
         )}
 
-        {displayedGroups.map((group) => {
-          return (
-            <Card.Root
-              key={`${group.setName}::${group.groupName}`}
-              id={`algs-group-${encodeURIComponent(buildGroupKey(group.setName, group.groupName))}`}
-              className="algs-detail-group"
-              variant="outline"
-              borderRadius="xl"
-              bg="bg.elevated"
-              borderColor="border"
-              minW={0}
-            >
-              <Card.Body p={3} gap={0}>
-                <HStack className="algs-detail-group-heading" gap={2} mb={2} align="center" minW={0}>
-                  <Badge
-                    colorPalette="brand"
-                    variant="subtle"
-                    borderRadius="md"
-                    px={2}
-                    py={0}
-                    h="22px"
-                    lineHeight="20px"
-                    fontSize="11px"
-                    flexShrink={0}
-                  >
-                    {group.setName}
-                  </Badge>
-                  <Heading as="h2"
-                    fontSize="xs"
-                    fontWeight="medium"
-                    color="fg.muted"
-                    lineHeight="22px"
-                    truncate
-                    title={group.groupName}
-                  >
-                    {group.groupName}
-                  </Heading>
-                  <Text fontSize="11px" lineHeight="22px" color="fg.muted" ml="auto" flexShrink={0}>
-                    {group.algs.length}
-                  </Text>
-                </HStack>
-
-                <Grid className={`algs-case-grid${columnsPerRow === 1 ? " algs-case-grid--wide" : ""}`}>
-                  {group.algs.map((alg) => {
-                    const cardKey = `${group.setName}:${group.groupName}:${alg.name}`;
-                    if (columnsPerRow === 1) {
-                      return (
-                        <GridItem key={cardKey} minW={0}>
-                          <AlgsFormulaCardWide
-                            cube={cube}
-                            classId={classId}
-                            setName={group.setName}
-                            groupName={group.groupName}
-                            alg={alg}
-                            setColorIndex={group.setColorIndex}
-                            formulaFontSize={formulaFontSize}
-                            formulaFontFamily={formulaFontFamily}
-                            useVisualCube={useVisualCube}
-                            diagramSize={diagramSize}
-                            hideFormulaDiagram={hideFormulaDiagram}
-                            hideAltFormulas={hideAltFormulas}
-                            refreshVersion={refreshVersion}
-                            onOpenModal={() =>
-                              handleOpenModal(
-                                group.setName,
-                                group.groupName,
-                                alg,
-                              )
-                            }
-                          />
-                        </GridItem>
-                      );
-                    }
-                    return (
-                      <GridItem key={cardKey} minW={0}>
-                        <AlgsFormulaCard
-                          cube={cube}
-                          classId={classId}
-                          setName={group.setName}
-                          groupName={group.groupName}
-                          alg={alg}
-                          setColorIndex={group.setColorIndex}
-                          formulaFontSize={formulaFontSize}
-                          formulaFontFamily={formulaFontFamily}
-                          useVisualCube={useVisualCube}
-                          diagramSize={diagramSize}
-                          hideFormulaDiagram={hideFormulaDiagram}
-                          refreshVersion={refreshVersion}
-                          onClick={() =>
-                            handleOpenModal(
-                              group.setName,
-                              group.groupName,
-                              alg,
-                            )
-                          }
-                        />
-                      </GridItem>
-                    );
-                  })}
-                </Grid>
-              </Card.Body>
-            </Card.Root>
-          );
-        })}
+        {formulaGroups}
         </VStack>
         </AlgsResizablePanels>
       </Box>

@@ -20,7 +20,7 @@ import { buildFormulaKey } from "@/services/cubing-pro/algs/formulaPracticeSelec
 import type { FormulaItem } from "../types";
 import { ALGS_COLORS } from "../utils/constants";
 import ProficiencySelect from "./ProficiencySelect";
-import SvgRenderer from "./SvgRenderer";
+import AlgsCubeDiagram from "./AlgsCubeDiagram";
 import "../styles/practiceTools.css";
 
 interface FormulaProficiencyCardProps {
@@ -215,11 +215,19 @@ export default function FormulaProficiencyCard({
                                   bg="bg.subtle"
                                   borderRadius="lg"
                                 >
-                                  <SvgRenderer
-                                    svg={item.alg.image ?? ""}
+                                  <AlgsCubeDiagram
+                                    cube={cube}
+                                    classId={classId}
+                                    setName={item.setName}
+                                    groupName={item.groupName}
+                                    formula={item.alg.algs[0]}
+                                    scramble={item.alg.scrambles?.[0]}
+                                    imageSvg={item.alg.image}
+                                    useVisualCube={Boolean(item.alg.algs[0]?.trim() || item.alg.scrambles?.[0]?.trim())}
+                                    interactive={false}
                                     maxWidth={40}
                                     maxHeight={56}
-                                    style={{ flexShrink: 0 }}
+                                    style={{ width: 40, maxWidth: "100%", flexShrink: 0 }}
                                   />
                                   <Box flex={1} minW={0}>
                                     <Text fontWeight="medium" fontSize="sm">

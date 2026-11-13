@@ -313,34 +313,11 @@ export default function AlgsModal({
                       imageSvg={alg.image}
                       scramble={displayScramble}
                       formula={displayFormula}
+                      interactive
                       useVisualCube={useVisualCube}
                       maxWidth={diagramDims.maxWidth}
                       maxHeight={diagramDims.maxHeight}
                     />
-                  </Box>
-                )}
-
-                {displayScramble && (
-                  <Box
-                    flexShrink={0}
-                    bg="bg.muted"
-                    borderRadius="8px"
-                    px="10px"
-                    py={2}
-                    borderWidth="1px"
-                    borderColor="border"
-                  >
-                    <Text fontSize="11px" color="fg.muted" mb={1}>
-                      Scramble
-                    </Text>
-                    <Text
-                      fontSize="sm"
-                      fontFamily="mono"
-                      wordBreak="break-all"
-                      lineHeight={1.5}
-                    >
-                      {displayScramble}
-                    </Text>
                   </Box>
                 )}
 

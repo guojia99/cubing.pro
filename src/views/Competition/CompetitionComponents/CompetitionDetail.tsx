@@ -3,6 +3,7 @@ import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import Markdown from '@/components/Markdown/Markdown';
 import { CompAPI } from '@/services/cubing-pro/comps/typings';
 import { parseDateTime } from '@/utils/time/data_time';
+import { beijingDate, isGroupCompetition, publicCompetitionStatus } from '@/lib/groupCompetition';
 import { Card, Descriptions, Table, Tag } from 'antd';
 import React from 'react';
 import '@wangeditor/editor/dist/css/style.css';
@@ -43,6 +44,7 @@ const CompetitionDetail: React.FC<CompetitionDetailProps> = ({ comp }) => {
           <Descriptions.Item label="类型">
             {<Tag color={GenreColor}>{GenreLabel}</Tag>}
           </Descriptions.Item>
+          {comp && isGroupCompetition(comp.data) && <Descriptions.Item label="状态">{publicCompetitionStatus(comp.data)}</Descriptions.Item>}
 
           {wca && (
             <Descriptions.Item label="认证">
@@ -110,12 +112,12 @@ const CompetitionDetail: React.FC<CompetitionDetailProps> = ({ comp }) => {
       <div key={'__comps_detail_times_key'}>
         <Card style={{ marginBottom: '20px' }}>
           <Descriptions column={1} title="比赛时间">
-            <Descriptions.Item label="开赛时间">
-              {[parseDateTime(comp.data.CompStartTime)]}
+            <Descriptions.Item label={isGroupCompetition(comp.data) ? "开始日（北京时间）" : "开赛时间"}>
+              {isGroupCompetition(comp.data) ? `${beijingDate(comp.data.CompStartTime)} 00:00` : parseDateTime(comp.data.CompStartTime)}
             </Descriptions.Item>
 
-            <Descriptions.Item label="结束时间">
-              {[parseDateTime(comp.data.CompEndTime)]}
+            <Descriptions.Item label={isGroupCompetition(comp.data) ? "结束日（北京时间）" : "结束时间"}>
+              {isGroupCompetition(comp.data) ? `${beijingDate(comp.data.CompEndTime)}（含全天，次日 00:00 截止）` : parseDateTime(comp.data.CompEndTime)}
             </Descriptions.Item>
 
             {comp?.data.RegistrationStartTime && (

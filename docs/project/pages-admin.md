@@ -62,3 +62,4 @@ Admin/
 |------|------|
 | 主办详情占位路由 | [features/detail/admin-organizers-details.md](../features/detail/admin-organizers-details.md) |
 | 成绩录入 / 预成绩 | [features/detail/admin-organizers-result.md](../features/detail/admin-organizers-result.md) |
+| 群赛全局审批与管理（新前端） | [features/detail/admin-group-competition.md](../features/detail/admin-group-competition.md) |
