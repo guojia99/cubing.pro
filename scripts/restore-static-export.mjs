@@ -1,6 +1,7 @@
-import { existsSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, rmSync, unlinkSync, writeFileSync } from "node:fs";
 
 const PAGES = ["src/app/(main)/[...path]/page.tsx"];
+rmSync(".static-export-algs.json", { force: true });
 
 for (const page of PAGES) {
   const bak = `${page}.bak`;

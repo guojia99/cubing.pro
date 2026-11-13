@@ -12,7 +12,7 @@
     "howtocook:prepare": "node scripts/prepare-howtocook.mjs",
     "prebuild": "npm run howtocook:prepare",
     "build": "next build",
-    "build:static": "npm run howtocook:prepare && node scripts/prepare-static-export.mjs && NEXT_OUTPUT_EXPORT=1 next build && node scripts/post-static-export.mjs; node scripts/restore-static-export.mjs",
+    "build:static": "node scripts/build-static.mjs",
     "preview:static": "npx --yes serve@14 dist",
     "start": "next start",
     "test:algs": "node --test src/views/Algs/components/formulaPracticeTimer.test.mjs && tsx --test src/services/cubing-pro/algs/formulaPracticeHistory.test.mjs",
@@ -21,6 +21,7 @@
     "test:puzzles": "node --test src/components/puzzles/model.test.mjs src/components/puzzles/practiceSetup.test.mjs src/components/puzzles/notation.test.mjs src/components/puzzles/cubeDiagrams.test.mjs src/components/puzzles/specialDiagrams.test.mjs src/views/Algs/utils/twoByTwoCategories.test.mjs",
     "test:puzzles:browser": "node src/components/puzzles/puzzleDiagram.browser.test.mjs",
     "test:puzzles:native": "node src/components/puzzles/nativeTwoByTwo.regression.test.mjs",
+    "test:static-export": "node --test src/lib/staticExportPaths.test.mjs scripts/static-export.test.mjs",
     "lint": "eslint ."
   },
   "dependencies": {
