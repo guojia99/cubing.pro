@@ -14,7 +14,7 @@ function getBuildTimeApiBase(): string {
     process.env.CUBE_API_UPSTREAM ??
     process.env.NEXT_PUBLIC_API_BASE ??
     "https://cubing.pro/v3/cube-api"
-  );
+  ).replace(/\/+$/, "");
 }
 
 /** 已由 app 目录单独实现的页面，不再由 [...path] 预渲染 */
@@ -45,27 +45,75 @@ export function getCatchAllStaticParams(): { path: string[] }[] {
 
 /** /algs/:cube/:class — 构建时从 API 拉取全部分组 */
 export function getAlgsDetailStaticParamsFromMap(map: AlgCubeMap): { path: string[] }[] {
+  if (!map || typeof map !== "object" || !Array.isArray(map.CubeKeys) || !map.CubeKeys.length) {
+    throw new Error("CubeKeys must be a nonempty array");
+  }
+  if (!map.ClassMap || typeof map.ClassMap !== "object" || Array.isArray(map.ClassMap)) {
+    throw new Error("ClassMap must be an object of arrays");
+  }
+  for (const [cube, entries] of Object.entries(map.ClassMap)) {
+    validatePathSegment(cube, `ClassMap key ${JSON.stringify(cube)}`);
+    if (!Array.isArray(entries)) {
+      throw new Error(`ClassMap[${JSON.stringify(cube)}] must be an array`);
+    }
+    for (const [index, item] of entries.entries()) {
+      validatePathSegment(item?.name, `ClassMap[${JSON.stringify(cube)}][${index}].name`);
+    }
+  }
+
   const params: { path: string[] }[] = [];
+  const seen = new Set<string>();
 
   for (const cube of map.CubeKeys) {
-    for (const item of map.ClassMap[cube] ?? []) {
-      params.push({
-        path: ["algs", cube, item.name],
-      });
+    validatePathSegment(cube, "CubeKeys entry");
+    if (!Object.hasOwn(map.ClassMap, cube) || !Array.isArray(map.ClassMap[cube])) {
+      throw new Error(`ClassMap[${JSON.stringify(cube)}] must be an array`);
+    }
+    for (const item of map.ClassMap[cube]) {
+      const segments = ["algs", cube, item.name];
+      const key = JSON.stringify(segments);
+      if (!seen.has(key)) {
+        seen.add(key);
+        params.push({ path: segments });
+      }
     }
   }
 
   return params;
 }
 
+function validatePathSegment(value: unknown, label: string): asserts value is string {
+  if (
+    typeof value !== "string" || !value.trim() ||
+    value === "." || value === ".." || /[/\\\u0000-\u001f\u007f]/.test(value)
+  ) {
+    throw new Error(`${label} must be a nonempty path segment without /, \\, control characters, . or ..`);
+  }
+}
+
 async function fetchAlgCubeMapForBuild(): Promise<AlgCubeMap | null> {
+  const endpoint = `${getBuildTimeApiBase()}/public/algorithm/`;
   try {
-    const res = await fetch(`${getBuildTimeApiBase()}/public/algorithm/`, {
-      cache: "force-cache",
+    const res = await fetch(endpoint, {
+      cache: "no-store",
+      signal: AbortSignal.timeout(15000),
     });
-    if (!res.ok) return null;
-    return (await res.json()) as AlgCubeMap;
-  } catch {
+    if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`.trim());
+    let map: AlgCubeMap;
+    try {
+      map = await res.json();
+    } catch (error) {
+      throw new Error(`invalid JSON: ${error instanceof Error ? error.message : String(error)}`);
+    }
+    const params = getAlgsDetailStaticParamsFromMap(map);
+    if (isStaticExportBuild() && !params.length) {
+      throw new Error("static export requires at least one algorithm detail path");
+    }
+    return map;
+  } catch (error) {
+    if (isStaticExportBuild()) {
+      throw new Error(`GET ${endpoint}: ${error instanceof Error ? error.message : String(error)}`);
+    }
     return null;
   }
 }
@@ -171,10 +219,24 @@ export async function getAllCatchAllStaticParams(): Promise<{ path: string[] }[]
     return [...staticPaths, ...dynamicPlaceholders, ...foodPaths];
   }
 
+  const algPaths = getAlgsDetailStaticParamsFromMap(map);
+  if (isStaticExportBuild()) {
+    const apiBase = getBuildTimeApiBase();
+    try {
+      fs.writeFileSync(
+        path.join(process.cwd(), ".static-export-algs.json"),
+        JSON.stringify({ version: 1, apiBase, paths: algPaths.map(({ path }) => path) }),
+        "utf-8",
+      );
+    } catch (error) {
+      throw new Error(`GET ${apiBase}/public/algorithm/: cannot write .static-export-algs.json: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
   return [
     ...staticPaths,
     ...dynamicPlaceholders,
     ...foodPaths,
-    ...getAlgsDetailStaticParamsFromMap(map),
+    ...algPaths,
   ];
 }

@@ -13,6 +13,7 @@
 
 # next.js
 /.next/
+/.static-export-algs.json
 /dist/
 /dist
 

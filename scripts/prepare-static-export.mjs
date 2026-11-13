@@ -1,7 +1,8 @@
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 
 /** 静态导出需 dynamicParams = false；dev 保持 true 以支持任意动态 URL */
 const PAGES = ["src/app/(main)/[...path]/page.tsx"];
+rmSync(".static-export-algs.json", { force: true });
 
 for (const page of PAGES) {
   const bak = `${page}.bak`;

@@ -6,14 +6,14 @@
 npm run build:static
 ```
 
-输出目录：`out/`（勿提交 git）。
+输出目录：`dist/`（勿提交 git）。也可执行 `make build SKIP_HOWTOCOOK=1` 使用仓库中已有的菜谱数据。
 
 ## API
 
 | 部署方式 | 浏览器请求 API |
 |----------|----------------|
 | `cubing.pro` 同源 | `/v3/cube-api` |
-| 其他静态托管 / 本地 `serve out` | `NEXT_PUBLIC_API_BASE`（默认 `https://cubing.pro/v3/cube-api`） |
+| 其他静态托管 / 本地 `serve dist` | `NEXT_PUBLIC_API_BASE`（默认 `https://cubing.pro/v3/cube-api`） |
 
 构建前可在 `.env.production` 修改 `NEXT_PUBLIC_API_BASE`。
 
@@ -36,10 +36,20 @@ npm run build:static
   - `/other/recipes/:category/:id` — `public/recipes.json`（约 350+）
   - `/other/kitchen-skills/:category/:id` — `public/tips.json`
   - `/other/cocktails/:slug` — `public/iba/cocktails.json`
-  - `/algs/:cube/:class` — 构建时请求 `/public/algorithm/`
+  - `/algs/:cube/:class` — 每次构建使用 `cache: no-store` 请求最新 `/public/algorithm/`，不复用 Next 的持久请求缓存
 - 路径段使用**原始中文/明文**生成目录名（勿 `encodeURIComponent`），与浏览器地址栏一致。
 - 若尚未重新构建，gateway 会对未命中路径再尝试 `%XX` 编码目录名（兼容旧产物）。
 - 上述内容若在部署后新增条目，需重新 `build:static` 后发布。
+
+### 公式库新增分类与导出检查
+
+构建时目录 API 优先使用 `CUBE_API_UPSTREAM`，其次 `NEXT_PUBLIC_API_BASE`，默认线上 API。接口不可达、返回非 2xx、目录格式异常或无详情路径时，静态构建会明确失败，不再静默跳过公式页。
+
+成功请求后写入临时 `.static-export-algs.json`，导出后逐项检查 `dist/algs/<cube>/<class>/index.html` 与 `index.txt` 均存在且非空；日志应出现 `Verified ... algorithm routes from ...`。临时路由修改及 manifest 在构建结束时恢复/清理，恢复脚本不会覆盖失败退出码。
+
+例如新增 LS1 后，应同时存在 `dist/algs/222/LS1/index.html` 和 `dist/algs/222/LS1/index.txt`。发布时完整同步 `dist/`，包括 `_next/` 和各分类的 HTML/TXT，不能只上传旧目录或只同步 HTML。服务器若仍返回 404，先检查其 staticRoot 是否指向本次产物，以及这两个文件是否已实际上传。
+
+回归命令：`npm run test:static-export`。验证了新增分类目录更新、接口失败、特殊字符路径、缺失产物与构建失败码的恢复行为。
 
 ### Nginx 示例（部署在 cubing.pro）
 
