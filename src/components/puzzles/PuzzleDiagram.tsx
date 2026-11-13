@@ -116,8 +116,8 @@ export default function PuzzleDiagram({
       const colors = puzzleFaceColors(preferences, puzzle);
       try {
         const svg = isCubePuzzle(puzzle)
-          ? await (await import("./cuberootCubeDiagrams")).renderCubeDiagram(puzzle, state, classId, setName, groupName, colors)
-          : await (await import("./cuberootSpecialDiagrams")).renderSpecialDiagram(puzzle, state, classId, colors, setName);
+          ? await (await import("./cubeDiagrams")).renderCubeDiagram(puzzle, state, classId, setName, groupName, colors)
+          : await (await import("./specialDiagrams")).renderSpecialDiagram(puzzle, state, classId, colors, setName);
         return { ...state, puzzle, svg, stickering };
       } catch (error) {
         // A drawing limitation must not disable a separately validated 3D state.

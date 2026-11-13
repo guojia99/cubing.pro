@@ -1,5 +1,5 @@
 /**
- * Independently implemented notation adapter; no cuberoot.me code is copied.
+ * Independently implemented notation adapter; no upstream code is copied.
  * Notation sources (rules, not a license grant):
  * https://raw.githubusercontent.com/mihlefeld/ALLG-ImageGen/dbd5a7fd8f3bee827d25056aa93c457bdf91f453/cubevis/cube.py
  * https://raw.githubusercontent.com/mihlefeld/ALLG-ImageGen/dbd5a7fd8f3bee827d25056aa93c457bdf91f453/cubevis/scripts/images.py
@@ -7,9 +7,9 @@
  * Pinned ALLG solver submodule: single BL/BR versus distinct wide bl/br:
  * https://raw.githubusercontent.com/trangium/trangium.github.io/210a5d8997a8979ee3da92ab8a141e8ebc56041d/BatchSolver2/src/presets.js
  * Corner-name reference only (its Sarah macros differ from this library):
- * https://raw.githubusercontent.com/RuiminYan/cuberoot.me/main/core/packages/shared/src/skewb_notation.ts
+ * Source URL retained in vendor/puzzle-drawing/SOURCES.md (Skewb corner names).
  * EIF spelling reference only, NOT a CIF/EIF conversion implementation:
- * https://raw.githubusercontent.com/RuiminYan/cuberoot.me/main/core/packages/shared/src/fto_notation.ts
+ * Source URL retained in vendor/puzzle-drawing/SOURCES.md (FTO EIF spelling).
  *
  * ALLG cube.py permutations verify the macros below, including Pyraminx H/S.
  * FTO action rules, attribution and CIF/EIF proofs are in ftoNotation.ts.
@@ -17,7 +17,7 @@
  */
 
 import { normalizeFtoNotation } from "./ftoNotation";
-import { MOVE_RE, stripGripMarks } from "@cuberoot/shared/alg-notation";
+import { MOVE_RE, stripGripMarks } from "@/vendor/puzzle-drawing/shared/src/alg_notation";
 
 const SKEWB_CORNERS: Readonly<Record<string, string>> = {
   F: "F", L: "UL", R: "UR", B: "U",

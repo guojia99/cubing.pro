@@ -10,6 +10,10 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
+  {
+    // Preserve pinned upstream sources; lint our adapters and application code.
+    ignores: ["src/vendor/puzzle-drawing/**"],
+  },
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
     files: ["src/views/Wca/**/*.{ts,tsx}", "src/services/cubing-pro/wca/**/*.ts"],

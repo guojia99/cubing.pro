@@ -13,7 +13,7 @@ const bundle = await build({
       export * from './libraryNotation';
       export * from './square1Notation';
       export * from './preferences';
-      export {stripGripMarks} from '@cuberoot/shared/alg-notation';`,
+      export {stripGripMarks} from '@/vendor/puzzle-drawing/shared/src/alg_notation';`,
     resolveDir: fileURLToPath(new URL('.', import.meta.url)),
   },
   bundle: true, write: false, format: 'esm', platform: 'node',
@@ -320,7 +320,7 @@ test('Pyraminx H/S macros preserve inverse, repeat, tips and visual grouping act
 
 test('FTO CIF/EIF brace samples retain independently checked native actions', async () => {
   // Short action fixtures from the local fto-proof.mjs oracle: ALLG-ImageGen
-  // dbd5a7fd and cuberoot.me 68c0592c, checked against cubing 0.63.3.
+  // Source revisions dbd5a7fd and 68c0592c, checked against cubing 0.63.3.
   // Keep expectations literal; do not import its network/API audit at test time.
   const samples = [
     ['{U,F} H S', "R B' R' B R' L R L'"],

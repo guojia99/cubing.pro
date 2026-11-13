@@ -28,7 +28,7 @@ const bundle = await esbuild.build({
     import AlgsFilterPanel from '${root}/src/views/Algs/components/AlgsFilterPanel';
     import * as history from '${service}';
     import {importHistory} from '${db}';
-    import {renderFromSimpleQuery} from '@cuberoot/visualcube/svg';
+    import {renderFromSimpleQuery} from '@/vendor/puzzle-drawing/visualcube/src/preset';
     import '${root}/src/styles/tokens.css';
     import '${root}/src/views/Algs/styles/algsDetail.css';
     window.practiceHistory = history; window.importHistory = importHistory;
@@ -145,6 +145,26 @@ async function poll(description, predicate, {timeout = 10000, interval = 50} = {
   throw timeoutError();
 }
 const waitInBrowser = (page, description, predicate, arg) => poll(description, async () => Boolean(await page.evaluate(predicate, arg)));
+async function assertWindowPracticeDialog(page) {
+  await page.getByRole('dialog').evaluate(async element => {
+    await Promise.all(element.getAnimations().map(animation => animation.finished.catch(() => {})));
+  });
+  const metrics = await page.getByRole('dialog').evaluate(element => {
+    const bounds = element.getBoundingClientRect();
+    const body = element.querySelector('.fp-body');
+    return {x: bounds.x, y: bounds.y, width: bounds.width, height: bounds.height,
+      viewportWidth: innerWidth, viewportHeight: innerHeight,
+      maxHeight: getComputedStyle(element).maxHeight,
+      overflow: element.scrollWidth > element.clientWidth || body.scrollWidth > body.clientWidth,
+      pageOverflow: document.documentElement.scrollWidth > innerWidth};
+  });
+  assert.ok(Math.abs(metrics.x) <= 1 && Math.abs(metrics.y) <= 1, `dialog starts at viewport origin: ${JSON.stringify(metrics)}`);
+  assert.ok(Math.abs(metrics.width - metrics.viewportWidth) <= 1, `dialog fills viewport width: ${JSON.stringify(metrics)}`);
+  assert.ok(Math.abs(metrics.height - metrics.viewportHeight) <= 1, `dialog fills 100dvh: ${JSON.stringify(metrics)}`);
+  assert.equal(metrics.maxHeight, `${metrics.viewportHeight}px`, 'dialog maximum height follows the viewport');
+  assert.equal(metrics.overflow, false, 'dialog and scroll body have no horizontal overflow');
+  assert.equal(metrics.pageOverflow, false, 'practice does not widen the document');
+}
 async function assertManagedPlayer(scope) {
   const player = scope.locator(playerSelector);
   await poll('managed practice player readiness', () => scope.evaluate(host => {
@@ -272,6 +292,197 @@ async function assertLocalDiagram(scope, expectedSetup) {
   } finally { await scope.page().getByTestId('practice-vendor-reference').evaluateAll(nodes => nodes.forEach(node => node.remove())); }
 }
 try {
+  const interactionContext = await browser.newContext({viewport: {width: 1440, height: 900}});
+  const interaction = await interactionContext.newPage();
+  interaction.on('pageerror', error => errors.push(error.message));
+  await interaction.goto(origin);
+  const interactionDialog = interaction.getByRole('dialog');
+  const interactionTimer = interaction.locator('.fp-timer');
+  const interactionPhase = name => waitInBrowser(interaction, `interaction timer ${name}`, name =>
+    document.querySelector('.fp-timer')?.classList.contains('fp-timer-' + name), name);
+  const timerFocused = () => waitInBrowser(interaction, 'timer focus restored without test focus()', () =>
+    document.activeElement === document.querySelector('.fp-timer'));
+  const settleInput = () => interaction.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  let interactionSaves = 0;
+  async function assertInteractionSaves() {
+    assert.equal(await interaction.evaluate(() => window.practiceTest.appends.length), interactionSaves, 'one append per completed solve, none for control activation/interruption');
+    assert.equal(await interaction.evaluate(() => window.practiceHistory.getFormulaPracticeHistoryCount('333', 'PLL')), interactionSaves, 'committed result count matches completed solves');
+  }
+  // Deliberately never focus the timer here: these solves depend on production focus restoration.
+  async function solveFromRestoredFocus() {
+    await timerFocused();
+    await interaction.keyboard.down('Space'); await interactionPhase('armed');
+    await interaction.keyboard.up('Space'); await interactionPhase('running');
+    await assertInteractionSaves();
+    await interaction.keyboard.down('Space');
+    await interaction.keyboard.up('Space'); await interactionPhase('ready');
+    interactionSaves++;
+    await settleInput(); await interactionPhase('ready'); await assertInteractionSaves();
+    await waitInBrowser(interaction, 'recent results refreshed', () => document.querySelector('.fp-stats')?.getAttribute('aria-busy') === 'false');
+  }
+  async function tabTo(button) {
+    // Reach the control with real Tab navigation, including the modal focus trap.
+    for (let i = 0; i < 80; i++) {
+      await interaction.keyboard.press('Tab');
+      if (await button.evaluate(element => element === document.activeElement)) return;
+    }
+    assert.fail('proficiency control must be reachable with Tab');
+  }
+  async function selectProficiencyWithSpace(button, restoresTimer) {
+    const isReminder = await button.evaluate(element => Boolean(element.closest('.fp-reminder')));
+    const label = await button.textContent();
+    button = button.locator('..').getByRole('button', {name: label, exact: true});
+    assert.notEqual(await button.getAttribute('aria-pressed'), 'true', 'exercise an actual proficiency change');
+    await tabTo(button);
+    await interaction.keyboard.down('Space');
+    assert.equal(await button.getAttribute('aria-pressed'), 'false', 'native Space activation waits for keyup');
+    if (restoresTimer) await interactionPhase('ready');
+    await assertInteractionSaves();
+    await interaction.keyboard.up('Space');
+    if (isReminder) {
+      assert.equal(await reminder.count(), 0, 'keyup selection dismisses the reminder');
+      assert.equal(await recent.getByRole('button', {name: label, exact: true}).getAttribute('aria-pressed'), 'true', 'keyup updates completed formula proficiency');
+    } else assert.equal(await button.getAttribute('aria-pressed'), 'true', 'keyup selects proficiency');
+    await settleInput();
+    await assertInteractionSaves();
+    if (restoresTimer) {
+      await timerFocused(); await interactionPhase('ready');
+      await solveFromRestoredFocus();
+    } else {
+      assert.equal(await button.evaluate(element => element === document.activeElement), true, 'non-main selection retains control focus');
+      assert.equal(await interactionTimer.count(), 0, 'history/detail cannot expose an active timer');
+    }
+  }
+  await assertWindowPracticeDialog(interaction);
+  assert.equal(await interaction.evaluate(() => document.fullscreenElement), null, 'window-filling layout needs no native fullscreen');
+  assert.equal(await interactionDialog.getByRole('radio', {name: '权重随机', exact: true}).isChecked(), true);
+  await interactionDialog.getByRole('checkbox', {name: '完成后提醒标记熟练度', exact: true}).check();
+  const configCase = interactionDialog.getByRole('checkbox', {name: 'Case 4', exact: true});
+  await configCase.focus(); await interaction.keyboard.press('Space');
+  assert.equal(await configCase.isChecked(), false, 'configuration checkbox consumes Space');
+  await interaction.keyboard.press('Space');
+  assert.equal(await configCase.isChecked(), true);
+  const configRange = interactionDialog.getByRole('slider');
+  await configRange.focus(); await interaction.keyboard.press('Space'); await interaction.keyboard.press('ArrowRight');
+  assert.equal(await configRange.inputValue(), '6', 'configuration range receives its own keyboard input');
+  assert.equal(await interaction.evaluate(() => window.practiceTest.creates.length), 0);
+  await assertInteractionSaves();
+  await interactionDialog.getByRole('button', {name: '开始练习', exact: true}).click(); await interactionPhase('ready');
+  await solveFromRestoredFocus();
+  const reminder = interaction.locator('.fp-reminder');
+  await reminder.getByRole('button', {name: '熟练', exact: true}).click();
+  await timerFocused(); await interactionPhase('ready');
+  assert.equal(await reminder.count(), 0, 'mouse selection dismisses the completed-result reminder');
+  await solveFromRestoredFocus();
+  const recent = interaction.locator('.fp-record').first();
+  const recentUnknown = recent.getByRole('button', {name: '完全不会', exact: true});
+  await recentUnknown.click();
+  assert.equal(await recentUnknown.getAttribute('aria-pressed'), 'true');
+  await timerFocused(); await interactionPhase('ready'); await solveFromRestoredFocus();
+  await selectProficiencyWithSpace(reminder.getByRole('button', {name: '完全熟练', exact: true}), true);
+  await selectProficiencyWithSpace(recent.getByRole('button', {name: '不熟练', exact: true}), true);
+  console.log('PASS reminder/recent proficiency clicks restore timer focus; native Tab/Space keyup selection never starts timing, next Space solve saves exactly once');
+
+  await interactionDialog.getByRole('button', {name: /查看全部/}).click();
+  await interaction.locator('.fp-pagination').waitFor();
+  await selectProficiencyWithSpace(interaction.locator('.fp-record').first().locator('.fp-proficiency button[aria-pressed="false"]').first(), false);
+  await interaction.locator('.fp-record-open').first().click();
+  await interaction.locator('.fp-detail').waitFor();
+  await selectProficiencyWithSpace(interaction.locator('.fp-detail .fp-proficiency button[aria-pressed="false"]').first(), false);
+  await interactionDialog.getByRole('button', {name: '返回', exact: true}).click();
+  await interaction.locator('.fp-pagination').waitFor();
+  await interactionDialog.getByRole('button', {name: '返回', exact: true}).click(); await interactionPhase('ready');
+  await timerFocused(); await assertInteractionSaves();
+  console.log('PASS history/detail proficiency keyup stays isolated; config checkbox/range input remains usable without starting a session');
+
+  const sessionBeforeFullscreen = await interaction.evaluate(() => window.practiceTest.creates.length);
+  const questionBeforeFullscreen = await interaction.locator('.fp-stage-top').textContent();
+  async function enterFullscreen(label = '全屏', exitLabel = '退出全屏') {
+    await interactionDialog.getByRole('button', {name: label, exact: true}).click();
+    await waitInBrowser(interaction, 'real Chromium root fullscreen', () => document.fullscreenElement === document.documentElement);
+    const exit = interactionDialog.getByRole('button', {name: exitLabel, exact: true});
+    await exit.waitFor();
+    assert.equal(await exit.getAttribute('aria-pressed'), 'true');
+    await timerFocused(); await interactionPhase('ready');
+    await assertWindowPracticeDialog(interaction);
+  }
+  await enterFullscreen();
+  await solveFromRestoredFocus();
+  const questionAfterFullscreenSolve = await interaction.locator('.fp-stage-top').textContent();
+  await interactionDialog.getByRole('button', {name: '退出全屏', exact: true}).click();
+  await waitInBrowser(interaction, 'native fullscreen exit', () => document.fullscreenElement === null);
+  await interactionDialog.getByRole('button', {name: '全屏', exact: true}).waitFor();
+  await timerFocused(); await interactionPhase('ready'); await assertInteractionSaves();
+  assert.equal(await interactionDialog.isVisible(), true, 'exit keeps the modal open');
+  assert.equal(await interaction.locator('.fp-stage-top').textContent(), questionAfterFullscreenSolve, 'exit keeps the current question');
+  assert.equal(await interaction.evaluate(() => window.practiceTest.creates.length), sessionBeforeFullscreen, 'fullscreen does not replace the practice session');
+  assert.notEqual(questionAfterFullscreenSolve, questionBeforeFullscreen, 'fullscreen solve advances the practice question');
+  await assertWindowPracticeDialog(interaction);
+
+  await enterFullscreen();
+  await interaction.keyboard.down('Space'); await interactionPhase('armed');
+  await interaction.evaluate(() => document.exitFullscreen());
+  await interactionPhase('ready'); await timerFocused();
+  await interaction.keyboard.up('Space'); await settleInput(); await interactionPhase('ready'); await assertInteractionSaves();
+  await enterFullscreen();
+  await interaction.keyboard.down('Space'); await interactionPhase('armed');
+  await interaction.keyboard.up('Space'); await interactionPhase('running');
+  await interaction.evaluate(() => document.exitFullscreen());
+  await interactionPhase('ready'); await timerFocused(); await assertInteractionSaves();
+  await enterFullscreen();
+  await interaction.keyboard.down('Space'); await interactionPhase('armed');
+  await interaction.keyboard.up('Space'); await interactionPhase('running');
+  await interaction.keyboard.press('Escape'); await interactionPhase('ready');
+  assert.equal(await interactionDialog.isVisible(), true, 'Escape interrupts without closing the practice modal');
+  await assertInteractionSaves();
+  if (await interaction.evaluate(() => document.fullscreenElement !== null)) {
+    await interactionDialog.getByRole('button', {name: '退出全屏', exact: true}).click();
+  }
+  await waitInBrowser(interaction, 'fullscreen exit after Escape', () => document.fullscreenElement === null);
+  await enterFullscreen();
+  const questionBeforeClose = await interaction.locator('.fp-stage-top').textContent();
+  await interactionDialog.getByRole('button', {name: '关闭练习器', exact: true}).click();
+  await interactionDialog.waitFor({state: 'hidden'});
+  await waitInBrowser(interaction, 'closing exits owned fullscreen', () => document.fullscreenElement === null);
+  await interaction.getByRole('button', {name: 'Reopen', exact: true}).click(); await interactionPhase('ready');
+  assert.equal(await interaction.locator('.fp-stage-top').textContent(), questionBeforeClose);
+  assert.equal(await interaction.evaluate(() => window.practiceTest.creates.length), sessionBeforeFullscreen);
+  await assertInteractionSaves();
+  console.log('PASS real Chromium requestFullscreen/exit on document root, usable timer, session/results retained, armed/running fullscreenchange and Escape interrupt without saves, close exits owned fullscreen');
+
+  for (const locale of ['zh-CN', 'en-US']) {
+    await interaction.evaluate(locale => window.setPracticeLocale(locale), locale);
+    const enterLabel = locale === 'zh-CN' ? '全屏' : 'Fullscreen';
+    const exitLabel = locale === 'zh-CN' ? '退出全屏' : 'Exit fullscreen';
+    await interactionDialog.getByRole('button', {name: enterLabel, exact: true}).waitFor();
+    await enterFullscreen(enterLabel, exitLabel);
+    await interactionDialog.getByRole('button', {name: exitLabel, exact: true}).click();
+    await waitInBrowser(interaction, 'localized fullscreen exit', () => document.fullscreenElement === null);
+    for (const fault of ['denied', 'unsupported']) {
+      // Only fault paths are injected; successful fullscreen above always uses Chromium's native APIs.
+      await interaction.evaluate(fault => {
+        window.practiceFullscreenAttempts = 0;
+        Object.defineProperty(document.documentElement, 'requestFullscreen', {configurable: true, value: fault === 'unsupported' ? undefined : () => {
+          window.practiceFullscreenAttempts++;
+          return Promise.reject(new DOMException('Test fullscreen denial', 'NotAllowedError'));
+        }});
+      }, fault);
+      await interactionDialog.getByRole('button', {name: enterLabel, exact: true}).click();
+      const unavailable = locale === 'zh-CN' ? '浏览器暂不支持或未允许全屏，已保持窗口内全屏练习。' : 'Browser fullscreen is unavailable or was denied. Practice still fills the window.';
+      await interactionDialog.getByRole('status').filter({hasText: unavailable}).waitFor();
+      assert.equal(await interaction.evaluate(() => window.practiceFullscreenAttempts), fault === 'denied' ? 1 : 0);
+      assert.equal(await interaction.evaluate(() => document.fullscreenElement), null);
+      assert.equal(await interactionDialog.getByRole('button', {name: enterLabel, exact: true}).getAttribute('aria-pressed'), 'false');
+      await assertWindowPracticeDialog(interaction); await timerFocused();
+      await solveFromRestoredFocus();
+      await interaction.evaluate(() => { delete document.documentElement.requestFullscreen; });
+    }
+  }
+  await interaction.evaluate(() => window.setPracticeLocale('zh-CN'));
+  await interactionDialog.getByRole('button', {name: '全屏', exact: true}).waitFor();
+  await interactionContext.close();
+  console.log('PASS zh/en fullscreen and exit labels, denied/unsupported notices, 100dvh fallback and continued timing');
+
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto(origin);
@@ -542,6 +753,7 @@ try {
 
   for (const width of [320, 390, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: width === 390 ? 420 : 820 });
+    await assertWindowPracticeDialog(page);
     const metrics = await dialog.evaluate((element) => ({
       overflow: element.scrollWidth > element.clientWidth,
       outside: element.getBoundingClientRect().right > innerWidth + 1,
@@ -551,6 +763,29 @@ try {
     assert.equal(metrics.overflow, false, `dialog horizontal overflow at ${width}`);
     assert.equal(metrics.outside, false, `dialog outside viewport at ${width}`);
     assert.ok(metrics.height <= metrics.screen + 1, `dialog height at ${width}`);
+  }
+  for (const width of [320, 768, 1440]) {
+    await page.setViewportSize({width, height: 320});
+    await assertWindowPracticeDialog(page);
+    await dialog.getByRole('button', {name: '练习配置', exact: true}).click();
+    const body = page.locator('.fp-body');
+    assert.equal(await body.evaluate(element => element.scrollHeight > element.clientHeight), true, `short-screen config scrolls at ${width}`);
+    const resume = dialog.getByRole('button', {name: '继续练习', exact: true});
+    await resume.scrollIntoViewIfNeeded();
+    const accessibility = await resume.evaluate(element => {
+      const body = element.closest('.fp-body'), bounds = element.getBoundingClientRect(), scrollBounds = body.getBoundingClientRect();
+      const close = document.querySelector('.fp-close'), closeBounds = close.getBoundingClientRect();
+      return {scrollTop: body.scrollTop, reachable: bounds.top >= scrollBounds.top - 1 && bounds.bottom <= innerHeight + 1,
+        closeVisible: closeBounds.top >= 0 && closeBounds.bottom <= innerHeight && closeBounds.right <= innerWidth,
+        closeHit: close.contains(document.elementFromPoint(closeBounds.x + closeBounds.width / 2, closeBounds.y + closeBounds.height / 2))};
+    });
+    assert.ok(accessibility.scrollTop > 0, `short-screen config can scroll to its last action at ${width}`);
+    assert.equal(accessibility.reachable, true, `resume remains reachable at ${width}`);
+    assert.equal(accessibility.closeVisible && accessibility.closeHit, true, `close stays visible and clickable after scrolling at ${width}`);
+    await dialog.getByRole('button', {name: '关闭练习器', exact: true}).click();
+    await dialog.waitFor({state: 'hidden'});
+    await page.getByRole('button', {name: 'Reopen', exact: true}).click(); await phase('ready');
+    await assertWindowPracticeDialog(page);
   }
   await page.emulateMedia({ reducedMotion: 'reduce', colorScheme: 'dark' });
   await dialog.getByRole('button', { name: '练习配置', exact: true }).click();
