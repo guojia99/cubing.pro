@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import type { TwistyPlayer } from "cubing/twisty";
 import type { Mesh } from "three";
+import { useI18n } from "@/contexts/I18nProvider";
 import styles from "./TwoSolver.module.css";
 
 export type SolverCubeProps = {
@@ -104,29 +105,41 @@ async function initialize(slot: Slot): Promise<Vantage[]> {
     if (vantages.length) break;
     await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
   }
-  if (destroyed) { await dispose(); throw new Error("播放器已卸载"); }
+  if (destroyed) { await dispose(); throw new Error("PLAYER_UNMOUNTED"); }
   await Promise.all(vantages.map(async (vantage) => {
     await vantage.canvasInfo();
     await (await vantage.scene?.experimentalTwisty3DPuzzleWrapper())?.twisty3DPuzzle();
   }));
-  if (destroyed) { await dispose(); throw new Error("播放器已卸载"); }
+  if (destroyed) { await dispose(); throw new Error("PLAYER_UNMOUNTED"); }
   if (!slot.owner) park(slot);
   return vantages;
 }
 
-export default function SolverCube({ setup, alg, height, label = "二阶魔方 3D" }: SolverCubeProps) {
+export default function SolverCube({ setup, alg, height, label: providedLabel }: SolverCubeProps) {
+  const { t } = useI18n();
+  const label = providedLabel ?? t("two.detail.cubeLabel");
   const host = useRef<HTMLDivElement>(null);
+  const nativeRoot = useRef<HTMLDivElement | null>(null);
+  const currentLabel = useRef(label);
   const playerId = useId();
   const key = JSON.stringify([setup, alg]);
-  const [result, setResult] = useState<{ key: string; error?: string }>();
+  const [result, setResult] = useState<{ key: string; error?: "two.detail.cubeBusy" | "two.detail.cubeFailed" }>();
   const current = result?.key === key ? result : undefined;
+
+  useEffect(() => {
+    currentLabel.current = label;
+    if (nativeRoot.current) {
+      nativeRoot.current.setAttribute("aria-label", label);
+      nativeRoot.current.dataset.solverCubePlayer = label;
+    }
+  }, [label]);
 
   useEffect(() => {
     const container = host.current;
     if (!container) return;
     const slot = slots.find((item) => !item.owner);
     if (!slot) {
-      setResult({ key, error: "3D 播放器正在使用中，请稍后重试。" });
+      setResult({ key, error: "two.detail.cubeBusy" });
       return;
     }
     const owner = Symbol();
@@ -143,7 +156,7 @@ export default function SolverCube({ setup, alg, height, label = "二阶魔方 3
     const fail = () => {
       if (!cancelled) {
         release();
-        setResult({ key, error: "无法加载 3D 魔方，请检查公式或刷新页面重试。" });
+        setResult({ key, error: "two.detail.cubeFailed" });
       }
     };
     void (async () => {
@@ -154,7 +167,7 @@ export default function SolverCube({ setup, alg, height, label = "二阶魔方 3
       const vantages = await (slot.ready ??= initialize(slot));
       if (cancelled) return;
       const { root, player } = slot;
-      if (!root || !player) throw new Error("播放器不可用");
+      if (!root || !player) throw new Error("PLAYER_UNAVAILABLE");
       player.pause();
       player.experimentalDragInput = "auto";
       player.experimentalSetupAlg = setup;
@@ -207,25 +220,27 @@ export default function SolverCube({ setup, alg, height, label = "二阶魔方 3
         frame = requestAnimationFrame(align);
       };
       root.setAttribute("role", "region");
-      root.setAttribute("aria-label", label);
+      nativeRoot.current = root;
+      root.setAttribute("aria-label", currentLabel.current);
       root.id = playerId;
-      root.dataset.solverCubePlayer = label;
+      root.dataset.solverCubePlayer = currentLabel.current;
       align();
       setResult({ key });
     })().catch(fail);
     return () => {
       cancelled = true;
+      nativeRoot.current = null;
       release();
       if (slot.owner === owner) { slot.owner = undefined; slot.release = undefined; }
     };
-  }, [setup, alg, key, label, playerId]);
+  }, [setup, alg, key, playerId]);
 
   return <div ref={host} className={styles.solverCube} role="region" aria-label={label}
     aria-busy={!current} aria-owns={current && !current.error ? playerId : undefined}
     data-solver-cube={label} data-setup={setup} data-alg={alg}
     style={{ height: Number.isFinite(height) ? Math.max(160, height) : 280 }}>
     {(!current || current.error) && <p className={styles.solverCubeStatus} role={current?.error ? "alert" : "status"}>
-      {current?.error || "正在加载 3D 魔方…"}
+      {t(current?.error ?? "two.detail.cubeLoading")}
     </p>}
   </div>;
 }

@@ -5,6 +5,7 @@ import { METHODS, type MethodData, type MethodId } from "./types";
 export interface IndexedFormula {
   method: MethodId; name: string; group: string; sourceApi: string;
   color: string; algorithm: string[]; preAuf: string; postAuf: string;
+  source?: { set: string; group: string; name: string; rawAlg: string };
 }
 export interface Library {
   index: Map<number, IndexedFormula[]>;
@@ -43,7 +44,8 @@ export async function buildLibrary(model: CubeModel, datasets: MethodData[], pro
               if (dedupe.has(identity)) { accepted = true; continue; }
               dedupe.add(identity);
               const entry: IndexedFormula = { method: dataset.method, name: record.name, group: record.group, sourceApi: api,
-                color: normalizedColor, algorithm: aligned, preAuf, postAuf };
+                color: normalizedColor, algorithm: aligned, preAuf, postAuf,
+                ...(record.set ? { source: { set: record.set, group: record.group, name: record.name, rawAlg: raw } } : {}) };
               const list = library.index.get(key);
               if (list) list.push(entry); else library.index.set(key, [entry]);
               library.masks.add(model.mask(required, color));

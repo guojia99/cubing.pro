@@ -23,6 +23,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 
 import { useI18n } from "@/contexts/I18nProvider";
@@ -80,11 +81,13 @@ import { isVisualCubeCube } from "./utils/visualCubeCube";
 import { getAlgDisplayName } from "./utils/algDisplayName";
 import { getCustomAlgs } from "@/services/cubing-pro/algs/customAlgs";
 import { collectVisibleFormulaKeys } from "./utils/algsFormulaFilter";
+import { parseFormulaDeepLink, resolveFormulaDeepLink } from "./utils/formulaDeepLink";
 import "./styles/algsDetail.css";
 
 interface ModalState {
   items: FormulaItem[];
   index: number;
+  initialLibraryIndex?: number;
 }
 
 interface Props {
@@ -94,6 +97,12 @@ interface Props {
 
 export function AlgsDetailView({ cube, classId }: Props) {
   const { t, locale } = useI18n();
+  const query = useSearchParams()?.toString() ?? "";
+  const routeKey = JSON.stringify([cube, classId]);
+  const deepLinkFingerprint = JSON.stringify([cube, classId, query]);
+  const handledDeepLink = useRef<string | null>(null);
+  const [loadedRoute, setLoadedRoute] = useState<string | null>(null);
+  const [deepLinkNotice, setDeepLinkNotice] = useState<"invalid" | "missing" | "ambiguous" | null>(null);
 
   const [data, setData] = useState<AlgClassDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -164,12 +173,14 @@ export function AlgsDetailView({ cube, classId }: Props) {
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
+    setLoadedRoute(null);
     setSearch("");
     setModalState(null);
     getAlgCubeClass(cube, classId)
       .then((d) => {
         if (cancelled) return;
         setData(d);
+        setLoadedRoute(routeKey);
         const sKeys = d.setKeys ?? d.sets.map((s) => s.name);
         setSelectedSets(sKeys);
         const gKeys: string[] = [];
@@ -191,7 +202,36 @@ export function AlgsDetailView({ cube, classId }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [cube, classId]);
+  }, [cube, classId, routeKey]);
+
+  useEffect(() => {
+    handledDeepLink.current = null;
+    setDeepLinkNotice(null);
+    setModalState(null);
+  }, [deepLinkFingerprint]);
+
+  useEffect(() => {
+    if (handledDeepLink.current === deepLinkFingerprint) return;
+    const parsed = parseFormulaDeepLink(query);
+    if (parsed.kind === "none") {
+      handledDeepLink.current = deepLinkFingerprint;
+      return;
+    }
+    if (parsed.kind === "invalid") {
+      handledDeepLink.current = deepLinkFingerprint;
+      setDeepLinkNotice("invalid");
+      return;
+    }
+    // A route can render once with the previous route's data before its fetch effect runs.
+    if (loading || !data || loadedRoute !== routeKey) return;
+    handledDeepLink.current = deepLinkFingerprint;
+    const result = resolveFormulaDeepLink(data, parsed.target);
+    if (result.kind !== "found") {
+      setDeepLinkNotice(result.kind);
+      return;
+    }
+    setModalState({ items: result.items, index: result.index, initialLibraryIndex: result.libraryIndex });
+  }, [query, deepLinkFingerprint, loading, data, loadedRoute, routeKey]);
 
   const setKeys = useMemo(
     () => data?.setKeys ?? data?.sets.map((s) => s.name) ?? [],
@@ -463,7 +503,7 @@ export function AlgsDetailView({ cube, classId }: Props) {
   );
 
   const handleModalNavigate = useCallback((index: number) => {
-    setModalState((prev) => (prev ? { ...prev, index } : null));
+    setModalState((prev) => (prev ? { items: prev.items, index } : null));
   }, []);
 
   const handleModalClose = useCallback(() => setModalState(null), []);
@@ -642,6 +682,12 @@ export function AlgsDetailView({ cube, classId }: Props) {
   return (
     <>
       <Box className="algs-detail-shell">
+      {deepLinkNotice && (
+        <HStack role="alert" borderWidth="1px" borderRadius="md" p={3} mb={3}>
+          <Text flex={1}>{t(`algs.deepLink.${deepLinkNotice}`)}</Text>
+          <CloseButton size="sm" aria-label={t("algs.deepLink.dismiss")} onClick={() => setDeepLinkNotice(null)} />
+        </HStack>
+      )}
       <Box className="algs-detail-workbench" style={cardLayout}>
         <Flex
           className="algs-detail-header"
@@ -1156,6 +1202,7 @@ export function AlgsDetailView({ cube, classId }: Props) {
         classId={classId}
         items={modalState?.items ?? []}
         currentIndex={modalState?.index ?? 0}
+        initialLibraryIndex={modalState?.initialLibraryIndex}
         onNavigate={handleModalNavigate}
         useVisualCube={useVisualCube}
         formulaFontFamily={formulaFontFamily}

@@ -4,6 +4,7 @@ import { build } from "esbuild";
 import type { KPuzzle } from "cubing/kpuzzle";
 import { METHODS, type Solution } from "./engine/types";
 import { compactNotation, formatAnnotatedSolution, formatFullSolution, formatSolutionStages } from "./solutionFormat";
+import { tDetail, twoSolverDetailEnUS, twoSolverDetailZhCN } from "../../i18n/messages/two-solver-detail";
 
 let kp: KPuzzle;
 before(async () => {
@@ -80,6 +81,43 @@ test("empty stages still annotate counts and never insert executable placeholder
   const annotated = formatAnnotatedSolution(solution);
   assert.match(annotated, /\n\/\/朝向 0\/0\n\/\/做底 0\/0\n\/\/AUF 0\/0\n\/\/CLL 0\/0\n\/\/AUF 0\/0\n/);
   exact("", annotated);
+});
+
+test("localized annotations preserve executable moves, stage IDs, counts and method names", () => {
+  for (const { id } of METHODS) {
+    const solution = fixture({ method: id });
+    const original = JSON.stringify(solution);
+    const zh = formatAnnotatedSolution(solution);
+    const en = formatAnnotatedSolution(solution, "en-US");
+    assert.equal(zh, formatAnnotatedSolution(solution, "zh-CN"));
+    assert.match(en, /Original stages · Before cancellation 7 moves → After cancellation 3 moves/);
+    assert.match(en, /x y \/\/Orientation 0\/0/);
+    assert.match(en, /F \(R U\) \/\/Base 3\/3/);
+    assert.ok(en.includes(`//${id} 2/6`));
+    assert.doesNotMatch(en, /[\u3400-\u9fff]/);
+    const moves = (text: string) => text.split("\n").map(line => line.split("//")[0]).join("\n");
+    assert.equal(moves(en), moves(zh));
+    exact(solution.original, en);
+    const stages = formatSolutionStages(solution, "en-US");
+    assert.deepEqual(stages.map(stage => stage.label), ["Orientation", "Base", "Pre-AUF", "Algorithm", "Post-AUF"]);
+    const invariantFields = (stage: (typeof stages)[number]) => [stage.id, stage.value, stage.parts, stage.text, stage.count, stage.cumulative];
+    assert.deepEqual(stages.map(invariantFields), formatSolutionStages(solution).map(invariantFields));
+    assert.equal(JSON.stringify(solution), original);
+  }
+  const empty = fixture({ orientation: "", base: "", preAuf: "", algorithm: "", postAuf: "", execution: "", boundary: undefined });
+  assert.match(formatAnnotatedSolution(empty, "en-US"), /Includes orientation: No moves needed$/);
+  exact("", formatAnnotatedSolution(empty, "en-US"));
+});
+
+test("detail catalogs have matching keys and interpolation placeholders", () => {
+  assert.deepEqual(Object.keys(twoSolverDetailEnUS).sort(), Object.keys(twoSolverDetailZhCN).sort());
+  for (const key of Object.keys(twoSolverDetailZhCN) as (keyof typeof twoSolverDetailZhCN)[]) {
+    const placeholders = (text: string) => [...text.matchAll(/\{([^}]+)\}/g)].map(match => match[1]).sort();
+    assert.deepEqual(placeholders(twoSolverDetailEnUS[key]), placeholders(twoSolverDetailZhCN[key]), key);
+    assert.ok(twoSolverDetailEnUS[key].length);
+  }
+  assert.equal(tDetail("en-US", "two.detail.copiedFull", { method: "CLL", caseName: "{method} 源名称" }),
+    "Copied the full solution for CLL {method} 源名称.");
 });
 
 test("normalization in every stage retains rotation frames, AUF and original marker ranges", () => {

@@ -1,9 +1,17 @@
 import type { MessageKey } from "@/i18n/messages/zh-CN";
 import { wcaMessagesEnUS } from "./wca-en-US";
 import { practiceEnUS } from "./formula-practice";
+import { twoSolverMainEnUS } from "./two-solver-main";
+import { twoSolverDetailEnUS } from "./two-solver-detail";
+import { twoSolverEngineEnUS } from "./two-solver-engine";
+import { algDeepLinkEnUS } from "./algs-deep-link";
 
 const enUS: Record<MessageKey, string> = {
   ...practiceEnUS,
+  ...twoSolverMainEnUS,
+  ...twoSolverDetailEnUS,
+  ...twoSolverEngineEnUS,
+  ...algDeepLinkEnUS,
   "app.name": "Cubing Pro",
   "app.version": "v4.0.0",
   "nav.home": "Home",

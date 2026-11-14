@@ -3,6 +3,7 @@ import { cancelStages, compactNotation } from "./cancellation";
 import { type Library, matchingColor } from "./library";
 import { type CubeModel, type State, SOLVED, moveCount, parseMoves, token } from "./state";
 import { DEFAULT_FAMILY_DEPTHS, familyOf, METHODS, type SearchOptions, type SearchResult, type Solution } from "./types";
+import { rotationFreeTransition } from "./transition";
 
 export const depthFor = (options: SearchOptions, method: SearchOptions["methods"][number]) => options.familyDepths?.[familyOf(method)] ?? options.maxDepth;
 
@@ -13,6 +14,7 @@ export function validateOptions(options: SearchOptions): void {
   if (!Number.isInteger(options.maxDepth) || options.maxDepth < 0 || options.maxDepth > 6) throw new Error("做底深度须在 0–6 之间");
   if (options.familyDepths && Object.keys(DEFAULT_FAMILY_DEPTHS).some(f => !Number.isInteger(options.familyDepths![f as keyof typeof DEFAULT_FAMILY_DEPTHS]) || options.familyDepths![f as keyof typeof DEFAULT_FAMILY_DEPTHS] < 0 || options.familyDepths![f as keyof typeof DEFAULT_FAMILY_DEPTHS] > 6)) throw new Error("各体系做底深度须在 0–6 之间");
   if (options.maxOverlap !== undefined && (!Number.isInteger(options.maxOverlap) || options.maxOverlap < 0 || options.maxOverlap > 6)) throw new Error("消步最大重叠数须在 0–6 之间");
+  if (options.forbidTransitionRotations !== undefined && typeof options.forbidTransitionRotations !== "boolean") throw new Error("Invalid transition rotation setting");
   if (!["ruf", "all"].includes(options.moveSet)) throw new Error("无效的动作集合");
   if (!Number.isFinite(options.timeLimitMs) || options.timeLimitMs < 100 || options.timeLimitMs > 60000) throw new Error("无效的搜索时间上限");
   if (!Number.isInteger(options.maxSolutions) || options.maxSolutions < 1 || options.maxSolutions > 2000) throw new Error("无效的结果上限");
@@ -74,7 +76,9 @@ export async function search(model: CubeModel, library: Library, scramble: strin
       if (path.length > depthFor(options, c.method)) continue;
       const color = matchingColor(model, state, c.color);
       if (!options.colors.includes(color)) continue;
-      const right = [...(c.preAuf ? [c.preAuf] : []), ...c.algorithm, ...(c.postAuf ? [c.postAuf] : [])];
+      const algorithm = options.forbidTransitionRotations !== false ? rotationFreeTransition(model, c.algorithm) : c.algorithm;
+      if (!algorithm) continue;
+      const right = [...(c.preAuf ? [c.preAuf] : []), ...algorithm, ...(c.postAuf ? [c.postAuf] : [])];
       const original = [...path, ...right];
       const identity = `${c.method}:${color}:${orientation.join(" ")}:${original.join(" ")}`;
       if (processed.has(identity)) continue;
@@ -97,11 +101,12 @@ export async function search(model: CubeModel, library: Library, scramble: strin
         const solution: Solution = {
           id: `s${++candidateId}`, method: c.method, caseName: c.name, group: c.group, color,
           orientation: inspection.orientation.join(" "), base: path.join(" "), preAuf: c.preAuf,
-          algorithm: c.algorithm.join(" "), postAuf: c.postAuf,
+          algorithm: algorithm.join(" "), postAuf: c.postAuf,
           original: [...orientation, ...original].join(" "), execution: inspection.execution.join(" "),
           baseMoves: path.length, moves: moveCount(inspection.execution), originalMoves: moveCount(original),
           cancelled: moveCount(original) - moveCount(inspection.execution),
           ergonomics: evaluateErgonomics(inspection.execution), sourceApi: c.sourceApi,
+          ...(c.source ? { source: c.source } : {}),
           boundary: { left: path.join(" "), right: right.join(" "),
             leftMarked: provenance.leftMarked, rightMarked: provenance.rightMarked,
             overlap: provenance.overlap },

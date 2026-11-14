@@ -58,6 +58,7 @@ interface AlgsModalProps {
   classId: string;
   items: AlgsModalItem[];
   currentIndex: number;
+  initialLibraryIndex?: number;
   onNavigate?: (index: number) => void;
   useVisualCube?: boolean;
   formulaFontFamily?: FormulaFontFamilyId;
@@ -73,6 +74,7 @@ export default function AlgsModal({
   classId,
   items,
   currentIndex,
+  initialLibraryIndex,
   onNavigate,
   useVisualCube = true,
   formulaFontFamily,
@@ -116,7 +118,13 @@ export default function AlgsModal({
 
   const loadState = useCallback(() => {
     if (!storageKey) return;
-    const sel = getAlgsSelection(storageKey);
+    // Deep links preview the source variant without changing the saved preference.
+    const sel = initialLibraryIndex !== undefined
+      && Number.isInteger(initialLibraryIndex)
+      && initialLibraryIndex >= 0
+      && initialLibraryIndex < (alg?.algs.length ?? 0)
+      ? { source: "library" as const, index: initialLibraryIndex }
+      : getAlgsSelection(storageKey);
     setSelection(sel);
     if (sel?.source === "custom") {
       setTab("custom");
@@ -129,7 +137,7 @@ export default function AlgsModal({
       const map = getFormulaProficiency(cube, classId);
       setProficiencyState(map[formulaKey] ?? DEFAULT_PROFICIENCY);
     }
-  }, [storageKey, formulaKey, cube, classId]);
+  }, [storageKey, formulaKey, cube, classId, alg, initialLibraryIndex]);
 
   useEffect(() => {
     if (open && storageKey) {

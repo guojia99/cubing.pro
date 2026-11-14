@@ -14,10 +14,10 @@ const locations = {
   TEG1: "2x2/TEG-1", TEG2: "2x2/TEG-2", FH: "2x2/FH",
 };
 await mkdir(output, { recursive: true });
-const manifest = { source: "2x2DB", origin: "https://2x2db.vercel.app/database", schema: 1, methods: {} };
+const manifest = { source: "2x2DB", origin: "https://2x2db.vercel.app/database", schema: 2, methods: {} };
 for (const [method, location] of Object.entries(locations)) {
   const raw = await readFile(path.join(source, location, "algs_info.json"), "utf8");
-  const records = Object.values(JSON.parse(raw)).map(r => ({ name: r.name, group: r.group, algs: r.a }));
+  const records = Object.values(JSON.parse(raw)).map(r => ({ name: r.name, group: r.group, algs: r.a, set: r.algset }));
   const text = JSON.stringify({ method, records });
   await writeFile(path.join(output, `${method}.json`), text + "\n");
   manifest.methods[method] = { records: records.length, sha256: createHash("sha256").update(text + "\n").digest("hex") };

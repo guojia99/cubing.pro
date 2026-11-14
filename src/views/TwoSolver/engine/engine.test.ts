@@ -70,7 +70,7 @@ let oracleAlg: typeof import("cubing/alg").Alg;
 function options(overrides: Partial<SearchOptions> = {}): SearchOptions {
   return {
     methods: [...engine.DEFAULT_METHODS], colors: [..."URFDLB"], maxDepth: 0,
-    moveSet: "ruf", maxSolutions: 500, timeLimitMs: 10000, ...overrides,
+    moveSet: "ruf", maxSolutions: 500, timeLimitMs: 10000, forbidTransitionRotations: false, ...overrides,
   };
 }
 
