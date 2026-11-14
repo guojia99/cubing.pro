@@ -31,6 +31,7 @@ import { PyDrawView } from "@/views/DrawTools/PyDrawView";
 import { SkDrawView } from "@/views/DrawTools/SkDrawView";
 import { SQ1DrawView } from "@/views/DrawTools/SQ1DrawView";
 import { FloppyReductionView } from "@/views/FloppyReduction/FloppyReductionView";
+import TwoSolverView from "@/views/TwoSolver/TwoSolverView";
 import { TeamMatchView } from "@/views/TeamMatch/TeamMatchView";
 import { ChangelogPageView } from "@/views/Changelog/ChangelogPageView";
 import { CocktailDetailView } from "@/views/Cocktails/CocktailDetailView";
@@ -133,6 +134,8 @@ function CatchAllContent({ routeId, path }: { routeId: string; path: string[] })
       return <FtoDrawView />;
     case "tool-fr":
       return <FloppyReductionView />;
+    case "tool-two-solver":
+      return <TwoSolverView />;
     case "tool-team-match":
       return <TeamMatchView />;
     case "changelog":
