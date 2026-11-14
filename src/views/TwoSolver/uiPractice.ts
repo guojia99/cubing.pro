@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import type { SearchOptions } from "./engine/types";
 
 export type Penalty = "none" | "+2" | "DNF";
 export type PracticeQuestion = Readonly<{
   id: string;
   scramble: string;
   sampling: string;
+  searchOptions?: SearchOptions;
 }>;
 export type PracticeRecord = PracticeQuestion & Readonly<{
   elapsedMs: number;
@@ -23,11 +25,13 @@ export function adjustedTime(record: Pick<PracticeRecord, "elapsedMs" | "penalty
   return record.penalty === "DNF" ? Infinity : record.elapsedMs + (record.penalty === "+2" ? 2000 : 0);
 }
 
-export function formatTime(ms: number): string {
+export function formatTime(ms: number, precision = 2): string {
   if (!Number.isFinite(ms)) return "DNF";
-  const hundredths = Math.floor(Math.max(0, ms) / 10);
-  const seconds = Math.floor(hundredths / 100);
-  return `${seconds >= 60 ? `${Math.floor(seconds / 60)}:` : ""}${seconds >= 60 ? String(seconds % 60).padStart(2, "0") : seconds}.${String(hundredths % 100).padStart(2, "0")}`;
+  const places = Number.isInteger(precision) ? Math.max(0, Math.min(3, precision)) : 2;
+  const unit = 10 ** places;
+  const ticks = Math.floor(Math.max(0, ms) / (1000 / unit));
+  const seconds = Math.floor(ticks / unit);
+  return `${seconds >= 60 ? `${Math.floor(seconds / 60)}:` : ""}${seconds >= 60 ? String(seconds % 60).padStart(2, "0") : seconds}${places ? `.${String(ticks % unit).padStart(places, "0")}` : ""}`;
 }
 
 function readHistory(): PracticeRecord[] {
@@ -48,7 +52,7 @@ function readHistory(): PracticeRecord[] {
   }).slice(0, HISTORY_LIMIT);
 }
 
-export function usePracticeTimer(question: PracticeQuestion | null, inspection: boolean, enabled: boolean) {
+export function usePracticeTimer(question: PracticeQuestion | null, inspection: boolean, enabled: boolean, holdMs = 300, onAdvance?: () => void, onStart?: () => void) {
   const [phase, setPhase] = useState<Phase>("idle");
   const [clock, setClock] = useState(0);
   const [history, setHistory] = useState<PracticeRecord[]>([]);
@@ -56,6 +60,10 @@ export function usePracticeTimer(question: PracticeQuestion | null, inspection: 
   const [storageError, setStorageError] = useState<string | null>(null);
   const live = useRef({ phase: "idle" as Phase, started: 0, inspectionMs: 0, penalty: "none" as Penalty, question });
   const held = useRef(false);
+  const [holding, setHolding] = useState(false);
+  const [armed, setArmed] = useState(false);
+  const holdStarted = useRef(0);
+  const holdTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const actionRef = useRef<() => void>(() => {});
 
   useEffect(() => {
@@ -72,8 +80,12 @@ export function usePracticeTimer(question: PracticeQuestion | null, inspection: 
 
   useEffect(() => {
     live.current = { phase: "idle", started: 0, inspectionMs: 0, penalty: "none",
-      question: question ? { id: question.id, scramble: question.scramble, sampling: question.sampling } : null };
+      question: question ? { id: question.id, scramble: question.scramble, sampling: question.sampling,
+        ...(question.searchOptions ? { searchOptions: structuredClone(question.searchOptions) } : {}) } : null };
     held.current = false;
+    clearTimeout(holdTimeout.current);
+    setHolding(false);
+    setArmed(false);
     setPhase("idle");
     setClock(0);
   }, [question]);
@@ -90,7 +102,9 @@ export function usePracticeTimer(question: PracticeQuestion | null, inspection: 
 
   function action() {
     const current = live.current;
-    if (!enabled || !hydrated || !current.question || current.question.id !== question?.id || current.phase === "stopped") return;
+    if (!enabled || !hydrated) return;
+    if (!current.question || current.phase === "stopped") { onAdvance?.(); return; }
+    if (current.question.id !== question?.id) return;
     const now = performance.now();
     if (current.phase === "running") {
       const elapsedMs = now - current.started;
@@ -103,6 +117,7 @@ export function usePracticeTimer(question: PracticeQuestion | null, inspection: 
       setHistory((rows) => rows.some((row) => row.id === record.id) ? rows : [record, ...rows].slice(0, HISTORY_LIMIT));
       return;
     }
+    onStart?.();
     if (current.phase === "idle" && inspection) {
       current.phase = "inspection";
     } else {
@@ -120,41 +135,58 @@ export function usePracticeTimer(question: PracticeQuestion | null, inspection: 
   useEffect(() => { actionRef.current = action; });
 
   useEffect(() => {
-    const interactive = (target: EventTarget | null) => target instanceof Element
-      && Boolean(target.closest("input, textarea, select, button, a, [contenteditable]:not([contenteditable='false']), [role='button'], [role='tab'], [role='slider'], [role='textbox'], summary, twisty-player"));
+    const clearHold = () => {
+      held.current = false;
+      clearTimeout(holdTimeout.current);
+      setHolding(false);
+      setArmed(false);
+    };
+    const editing = (event: KeyboardEvent) => event.composedPath().some(target => target instanceof Element
+      && Boolean(target.closest("input, textarea, select, [contenteditable]:not([contenteditable='false']), [role='textbox'], [role='slider']")));
     const down = (event: KeyboardEvent) => {
-      if (!enabled || event.defaultPrevented || event.isComposing || event.code !== "Space" || event.repeat || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || interactive(event.target)) return;
+      if (!enabled || event.isComposing || event.code !== "Space" || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || editing(event)) return;
       event.preventDefault();
-      held.current = true;
+      event.stopImmediatePropagation();
+      if (event.repeat) return;
       if (live.current.phase === "running") {
         actionRef.current();
-        held.current = false;
+        clearHold();
+        return;
       }
+      if (!hydrated || (question && live.current.question?.id !== question.id)) return;
+      held.current = true;
+      holdStarted.current = performance.now();
+      setHolding(true);
+      const delay = Math.max(0, Number.isFinite(holdMs) ? holdMs : 300);
+      setArmed(delay === 0);
+      holdTimeout.current = setTimeout(() => { if (held.current) setArmed(true); }, delay);
     };
     const up = (event: KeyboardEvent) => {
+      if (enabled && event.code === "Space" && !editing(event)) { event.preventDefault(); event.stopImmediatePropagation(); }
       if (event.code !== "Space" || !held.current) return;
-      held.current = false;
-      if (!enabled || interactive(event.target)) return;
+      const ready = performance.now() - holdStarted.current >= Math.max(0, holdMs);
+      clearHold();
+      if (!enabled || editing(event) || !ready) return;
       event.preventDefault();
       actionRef.current();
     };
-    const blur = () => { held.current = false; };
-    window.addEventListener("keydown", down);
-    window.addEventListener("keyup", up);
+    const blur = clearHold;
+    window.addEventListener("keydown", down, true);
+    window.addEventListener("keyup", up, true);
     window.addEventListener("blur", blur);
     return () => {
-      window.removeEventListener("keydown", down);
-      window.removeEventListener("keyup", up);
+      window.removeEventListener("keydown", down, true);
+      window.removeEventListener("keyup", up, true);
       window.removeEventListener("blur", blur);
-      held.current = false;
+      clearHold();
     };
-  }, [enabled]);
+  }, [enabled, hydrated, holdMs, question]);
 
   function setPenalty(id: string, penalty: Penalty) {
     setHistory((rows) => rows.map((row) => row.id === id ? { ...row, penalty } : row));
   }
 
-  return { phase, clock, history: history as readonly PracticeRecord[], storageError, hydrated, action, setPenalty,
+  return { phase, clock, history: history as readonly PracticeRecord[], storageError, hydrated, action, setPenalty, held: holding, armed,
     isTiming: phase === "inspection" || phase === "running",
     isTimingNow: () => live.current.phase === "inspection" || live.current.phase === "running" };
 }

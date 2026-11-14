@@ -1,0 +1,27 @@
+.panel { min-width: 0; padding: 18px 0; color: var(--ink, var(--foreground)); border-top: 1px solid var(--line, var(--border-default)); }
+.heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; }
+.heading h2 { margin: 0; font-size: 16px; font-weight: 600; }
+.source, .hint, .footnote { color: var(--muted-ink, var(--muted-foreground)); font-size: 11px; line-height: 1.8; }
+.metrics { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; margin: 16px 0; }
+.metrics dt { font-size: 11px; color: var(--muted-ink, var(--muted-foreground)); }
+.metrics dd { margin: 5px 0 0; font-size: clamp(17px, 2vw, 24px); font-weight: 500; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; margin-bottom: 10px; }
+.controls label { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; }
+.controls input { width: 15px; height: 15px; margin: 0; accent-color: var(--accent, #1696a6); }
+.chart { min-width: 0; touch-action: pan-y; }
+.chartFrame { width: 100%; min-width: 0; max-width: 100%; overflow: hidden; }
+.loading, .empty { display: grid; place-items: center; min-height: 200px; margin: 0; padding: 20px; text-align: center; color: var(--muted-ink, var(--muted-foreground)); font-size: 12px; }
+.notice { margin: 8px 0; font-size: 12px; line-height: 1.8; color: var(--muted-ink, var(--muted-foreground)); }
+.review { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 12px; font-size: 12px; }
+.review select { flex: 1 1 200px; min-width: 0; max-width: 100%; }
+.review select, .review button { min-height: 36px; padding: 6px 10px; border: 1px solid var(--line, var(--border-default)); border-radius: 5px; background: var(--surface, var(--card)); color: inherit; font: inherit; }
+.review button { cursor: pointer; }
+.review button:hover { border-color: var(--accent, #1696a6); }
+.panel :is(input, select, button):focus-visible { outline: 2px solid var(--ring, var(--accent, #1696a6)); outline-offset: 3px; }
+.footnote { margin: 12px 0 0 !important; }
+@media (max-width: 640px) {
+  .metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 10px; }
+  .controls > .hint { flex-basis: 100%; }
+  .review > label { flex-basis: 100%; }
+  .review > .hint { flex-basis: 100%; }
+}

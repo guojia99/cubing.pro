@@ -1,5 +1,5 @@
 import { evaluateErgonomics } from "./ergonomics";
-import { cancelBoundary, compactNotation } from "./cancellation";
+import { cancelStages, compactNotation } from "./cancellation";
 import { type Library, matchingColor } from "./library";
 import { type CubeModel, type State, SOLVED, moveCount, parseMoves, token } from "./state";
 import { DEFAULT_FAMILY_DEPTHS, familyOf, METHODS, type SearchOptions, type SearchResult, type Solution } from "./types";
@@ -82,14 +82,15 @@ export async function search(model: CubeModel, library: Library, scramble: strin
       // Independent exact state checks guard AUF, color normalization and all
       // cancellation transformations before a candidate can reach the UI.
       if (!model.solved(model.applySequence(initial, [...orientation, ...original]))) continue;
-      const boundary = cancelBoundary(model, path, right, options.maxOverlap ?? 1);
-      // Compact each resulting local notation without crossing the retained
-      // split a second time (which would defeat the user's overlap limit).
+      const boundary = cancelStages(model, path, right, options.maxOverlap ?? 1);
+      const internal = cancelStages(model, path, right, 0);
       const compact = boundary.execution;
-      const baseScore = evaluateErgonomics(original), compactScore = evaluateErgonomics(compact);
-      // Preserve a less cancelled sequence if execution is actually smoother.
-      const alternatives = baseScore.cost + 0.015 < compactScore.cost ? [original, compact] : [compact];
+      const baseScore = evaluateErgonomics(internal.execution), compactScore = evaluateErgonomics(compact);
+      // Grip alternatives may omit cross-stage cancellation, but must not
+      // reintroduce redundant turns inside a formula or AUF/rotation run.
+      const alternatives = baseScore.cost + 0.015 < compactScore.cost ? [internal.execution, compact] : [compact];
       for (const executionTokens of alternatives) {
+        const provenance = executionTokens === compact ? boundary : internal;
         const inspection = { orientation: compactNotation(model, orientation), execution: executionTokens };
         if (!model.solved(model.applySequence(initial, [...inspection.orientation, ...inspection.execution]))) continue;
         const key = `${c.method}:${color}:${inspection.orientation.join(" ")}:${inspection.execution.join(" ")}`;
@@ -102,9 +103,8 @@ export async function search(model: CubeModel, library: Library, scramble: strin
           cancelled: moveCount(original) - moveCount(inspection.execution),
           ergonomics: evaluateErgonomics(inspection.execution), sourceApi: c.sourceApi,
           boundary: { left: path.join(" "), right: right.join(" "),
-            leftMarked: executionTokens === compact ? boundary.leftMarked : path.map(() => false),
-            rightMarked: executionTokens === compact ? boundary.rightMarked : right.map(() => false),
-            overlap: executionTokens === compact ? boundary.overlap : 0 },
+            leftMarked: provenance.leftMarked, rightMarked: provenance.rightMarked,
+            overlap: provenance.overlap },
         };
         const previous = results.get(key);
         if (!previous || solution.baseMoves < previous.baseMoves) results.set(key, solution);

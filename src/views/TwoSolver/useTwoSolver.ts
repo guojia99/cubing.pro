@@ -36,7 +36,7 @@ export function useTwoSolver() {
     return () => { mounted.current = false; dispose(); };
   }, []);
 
-  function request(type: "solve" | "validate", scramble: string, options?: SearchOptions): Promise<unknown> {
+  function request(type: "solve" | "validate" | "scramble", scramble: string, options?: SearchOptions): Promise<unknown> {
     if (pending.current) throw new Error("已有搜索任务正在运行");
     if (!worker.current) {
       const instance = new Worker(new URL("./solver.worker.ts", import.meta.url), { type: "module" });
@@ -61,7 +61,7 @@ export function useTwoSolver() {
         if (pending.current?.id !== id) return;
         dispose("初始化或搜索超时，请重试或减少启用的方法");
         if (mounted.current) setError("初始化或搜索超时，请重试或减少启用的方法");
-      }, type === "validate" ? 20000 : 90000);
+      }, type === "solve" ? 90000 : 20000);
       pending.current = { id, resolve, reject, timer };
       const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
       worker.current!.postMessage({ id, type, scramble, options, baseUrl: new URL(`${basePath}/`, window.location.origin).href });
@@ -91,7 +91,9 @@ export function useTwoSolver() {
       for (let attempt = 0; attempt < 30; attempt++) {
         const scramble = (await randomScrambleForEvent("222")).toString();
         if (run !== generation.current || !mounted.current) return null;
-        if (await request("validate", scramble)) return scramble;
+        const normalized = await request("scramble", scramble) as string | null;
+        if (run !== generation.current || !mounted.current) return null;
+        if (normalized) return normalized;
       }
       throw new Error("未能生成满足至少 4 步还原条件的打乱，请重试");
     } catch (e) {

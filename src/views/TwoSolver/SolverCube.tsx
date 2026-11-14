@@ -185,6 +185,8 @@ export default function SolverCube({ setup, alg, height, label = "二阶魔方 3
         let right = Math.min(document.documentElement.clientWidth, rect.right);
         let bottom = Math.min(window.innerHeight, rect.bottom);
         let visible = container.isConnected && rect.width > 0 && rect.height > 0;
+        const modal = [...document.querySelectorAll<HTMLElement>('[role="dialog"][data-state="open"]')].at(-1);
+        if (modal && !modal.contains(container)) visible = false;
         let layer = 1;
         for (let parent: HTMLElement | null = container; parent; parent = parent.parentElement) {
           const style = getComputedStyle(parent);
