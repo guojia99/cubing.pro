@@ -25,6 +25,20 @@ Ordinary practice uses random-state scrambles and the exact >=4-HTM acceptance c
 
 ## Verification
 
+Solver results retain the exact library source tuple (set, group, case name and raw formula) separately from aligned/cancelled execution. `Algs ↗` opens a new tab using an encoded deep link; the library resolves it uniquely against the full dataset and opens its existing formula modal at the exact library variant. Saved selections, hidden cases, filters, custom formulas and proficiency are not overwritten. Missing/ambiguous/stale links show localized notices, never fuzzy matches. Synthetic skips without a source do not show a misleading category link. `npm run test:two-solver:formula` exercises the real solver-to-popup flow.
+
+`forbidTransitionRotations` defaults to true, including previously stored options with no flag. Search settings expose a bilingual checkbox. Initial inspection rotations remain allowed, but algorithm entries containing x/y/z before the first non-U layer turn are excluded after equivalent local compaction (opening U turns count as AUF). Internal algorithm rotations after that entry are preserved. This filters the original stage contract rather than hiding a transition rotation inside inspection or changing the RUF base path. Disable the checkbox to restore all original entries.
+
+## Internationalization
+
+The workbench uses the site's `I18nProvider`, `zh-CN` / `en-US` catalogs and `cubing_pro_locale` preference. Its named catalogs are split into main UI, details/formatting and engine messages under `src/i18n/messages/two-solver-*.ts`, with typed key and interpolation parity tests. The site language menu and the timer Display-language preference share the same locale; changing it does not invalidate a search, generate a new question or alter saved results.
+
+Transient statuses and review labels render from message descriptors. Historical sampling uses language-neutral structured data, with a bounded adapter for previous Chinese descriptions. Worker progress/errors and ergonomic explanations retain their original diagnostic protocol and localize at the presentation boundary via `solverMessages.ts`. Unknown diagnostic text and source case names remain intact. Numbers, dates, chart labels/tooltips, accessibility text, 3D messages and annotated clipboard comments follow the selected locale; cube move notation and numeric score values remain unchanged.
+
+```sh
+TWO_SOLVER_URL=http://127.0.0.1:3128/tools/solver/222/ npm run test:two-solver:i18n
+```
+
 Stage normalization also merges turns separated by a rotation frame that commutes with the face: e.g. `U' y U2 -> U y`, `R' x R2 -> R x`. This is applied to the complete finish (pre-AUF + formula + post-AUF) before the bounded base/finish join. Internal cleanup does not consume the cross-stage overlap budget; zero overlap disables cross-stage reduction only. Both smoother alternatives and reduced outputs retain internal cleanup, original-token parentheses, exact frame, and recalculated counts/scores.
 
 Generated scrambles contain only R/U/F turns. `engine/scramble.ts` rewrites native random-state output algebraically, carrying the whole-cube frame forward and dropping only its final physical rotation. It verifies the exact frame relation before returning; the Worker then applies the independent >=4-HTM check. This preserves the sampled 2x2 state modulo physical rotation; it is not a random-move generator. User-entered and historical scrambles can still contain other legal moves.

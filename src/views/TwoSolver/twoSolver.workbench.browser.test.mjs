@@ -216,6 +216,14 @@ try {
     assert.deepEqual(value.options.methods, ['CLL', 'EG1', 'EG2', 'LEG1']);
     assert.deepEqual(value.options.familyDepths, defaults);
     assert.equal(value.options.maxOverlap, 1);
+    assert.equal(value.options.forbidTransitionRotations, true);
+    for (const solution of value.result.solutions) {
+      assert.doesNotMatch(solution.base, /[xyz]/);
+      for (const move of solution.algorithm.trim().split(/\s+/).filter(Boolean)) {
+        assert.doesNotMatch(move, /^[xyz]/, 'algorithm entry must not rotate before its first non-U turn');
+        if (move[0] !== 'U') break;
+      }
+    }
     assert.ok(report.workers.some(worker => new URL(worker).origin === new URL(url).origin));
     for (const method of value.options.methods) assert.ok(report.datasets.some(item => item.url.endsWith(`/${method}.json`) && item.status === 200));
     assert.equal((await activity()).results.length, 1);
@@ -223,6 +231,8 @@ try {
   }, true);
 
   await check('Compact toolbar, no sidebar or hero, real 3/2/1-column geometry and mobile dialog fit', async () => {
+    const sticky = main.locator('[data-sticky-scramble]');
+    assert.equal(await sticky.locator('code').textContent(), example);
     const css = await readFile(new URL('./SolutionCards.module.css', import.meta.url), 'utf8');
     assert.match(css, /max-width:\s*1199px/);
     assert.match(css, /max-width:\s*639px/);
@@ -233,6 +243,12 @@ try {
     for (const [width, columns] of [[1440, 3], [1200, 3], [1199, 2], [1024, 2], [640, 2], [639, 1], [390, 1], [320, 1]]) {
       await page.setViewportSize({ width, height: 1000 });
       await cards.first().scrollIntoViewIfNeeded();
+      await page.evaluate(() => window.scrollTo(0, 650));
+      await page.waitForTimeout(80);
+      const pinned = await sticky.boundingBox();
+      assert.ok(pinned && Math.abs(pinned.y - 72) <= 1, `${width}px analysis scramble stays below the header`);
+      assert.ok(pinned.width <= width && pinned.height > 0);
+      assert.equal(await sticky.locator('code').textContent(), await main.locator('#two-scramble').inputValue());
       const geometry = await cards.evaluateAll(elements => {
         const grid = elements[0].parentElement;
         return { display: getComputedStyle(grid).display, columns: getComputedStyle(grid).gridTemplateColumns.split(/\s+/).length,
@@ -278,6 +294,8 @@ try {
       assert.deepEqual(await config.getByRole('tab').allTextContents(), ['搜索', '筛选']);
       for (const [family, depth] of Object.entries(defaults)) assert.equal(await config.getByRole('combobox', { name: `${family} 做底上限`, exact: true }).inputValue(), String(depth));
       assert.equal(await config.getByRole('combobox', { name: '消步最大重叠数', exact: true }).inputValue(), '1');
+      assert.equal(await config.getByRole('checkbox', { name: '阶段衔接禁止转体', exact: true }).isChecked(), true);
+      await config.getByRole('checkbox', { name: '阶段衔接禁止转体', exact: true }).uncheck();
       await config.getByRole('combobox', { name: '解法数量上限', exact: true }).selectOption('50');
       await config.getByRole('combobox', { name: 'EG 做底上限', exact: true }).selectOption('4');
       await config.getByRole('combobox', { name: '消步最大重叠数', exact: true }).selectOption('2');
@@ -313,6 +331,19 @@ try {
     assert.equal((await activity()).busyStarts, before.activity.busyStarts);
     assert.deepEqual((await activity()).results, before.activity.results);
     return { snapshotIdentity: before.snapshot.identity, discarded: ['search', 'filters', 'sort'] };
+  });
+
+  await check('Transition rotation toggle applies and persists in both directions', async () => {
+    for (const enabled of [false, true]) {
+      await openConfig();
+      await config.getByRole('checkbox', { name: '阶段衔接禁止转体', exact: true }).setChecked(enabled);
+      await apply();
+      await poll(async () => (await snapshot())?.options.forbidTransitionRotations === enabled, 'rotation setting captured by new search');
+      const value = await settled(20);
+      assert.equal(value.options.forbidTransitionRotations, enabled);
+      assert.equal((await stored(settingsKey)).forbidTransitionRotations, enabled);
+    }
+    return { defaultEnabled: true, persisted: true };
   });
 
   await check('Search Apply triggers exactly one rerun; 50 persists with first 20 and increments of 20', async () => {

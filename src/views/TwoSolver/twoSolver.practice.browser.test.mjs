@@ -757,7 +757,7 @@ try {
      await button('下一条').click();
      const conditional = await questionReady(next.id);
      assert.notEqual(conditional.id, next.id);
-     assert.match(conditional.sampling, /^条件抽样：/);
+     assert.equal(JSON.parse(conditional.sampling).kind, 'conditional');
      assert.equal(await scramble(), conditional.scramble);
      assert.ok(conditional.result.solutions.length > 0);
      const reset = await openSettings('练习设置');

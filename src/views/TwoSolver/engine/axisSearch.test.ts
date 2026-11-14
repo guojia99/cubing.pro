@@ -54,7 +54,7 @@ before(async () => {
 
 function options(patch: Partial<SearchOptions> = {}): SearchOptions {
   return { methods: ["CLL"], colors: [..."URFDLB"], maxDepth: 0, moveSet: "all",
-    maxSolutions: 2000, timeLimitMs: 10000, ...patch };
+    maxSolutions: 2000, timeLimitMs: 10000, forbidTransitionRotations: false, ...patch };
 }
 
 function exact(original: string, actual: string): void {

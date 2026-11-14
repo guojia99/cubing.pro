@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { averageOf, buildPracticeStats, formatPracticeTooltip, formatStatistic, meanOf } from "./practiceStatistics";
+import { averageOf, buildPracticeStats, formatPracticeDate, formatPracticeTooltip, formatStatistic, meanOf } from "./practiceStatistics";
 import type { PracticeRecord } from "./uiPractice";
 
 function record(id: number, elapsedMs = id * 1000, penalty: PracticeRecord["penalty"] = "none"): PracticeRecord {
@@ -100,8 +100,35 @@ test("tooltip is plain text for richText, includes source and prevents rich toke
   const tooltip = formatPracticeTooltip(point, 3);
   assert.ok(tooltip.includes("3.234 (+2)"));
   assert.ok(tooltip.includes("原始用时：1.234"));
-  assert.ok(tooltip.includes(source.date));
+  assert.ok(tooltip.includes(formatPracticeDate(source.date)));
   assert.ok(tooltip.includes('<img src=x onerror="alert(1)"> （evil|text） R U'));
   assert.ok(!tooltip.includes("{evil|"));
   assert.equal(tooltip.split("\n").length, 6);
+});
+
+test("tooltips localize labels and dates while retaining precision, penalties and DNF", () => {
+  const source = record(1, 1234.567, "+2");
+  const point = buildPracticeStats([source]).points[0];
+  const before = JSON.stringify(point);
+  for (const locale of ["zh-CN", "en-US"] as const) {
+    const tooltip = formatPracticeTooltip(point, 3, locale);
+    const expectedDate = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "medium" }).format(new Date(source.date));
+    assert.equal(formatPracticeDate(source.date, locale), expectedDate);
+    assert.ok(tooltip.includes(expectedDate));
+    assert.ok(tooltip.includes("3.234 (+2)"));
+    assert.ok(tooltip.includes("1.234"));
+    assert.ok(tooltip.includes(source.scramble));
+    assert.equal(tooltip.split("\n").length, 6);
+    assert.ok(formatPracticeTooltip(buildPracticeStats([record(1, 1234, "DNF")]).points[0], 2, locale).includes("DNF"));
+  }
+  const en = formatPracticeTooltip(point, 3, "en-US");
+  assert.match(en, /^Attempt 1 · 3\.234 \(\+2\)\nRaw time: 1\.234/);
+  assert.match(en, /Date: /);
+  assert.match(en, /Scramble: R U R'/);
+  assert.match(en, /Click a result to review$/);
+  assert.doesNotMatch(en, /[\u3400-\u9fff]/);
+  assert.notEqual(formatPracticeDate(source.date, "en-US"), formatPracticeDate(source.date, "zh-CN"));
+  assert.equal(formatPracticeTooltip(point, 3), formatPracticeTooltip(point, 3, "zh-CN"));
+  assert.equal(formatPracticeDate("invalid date", "en-US"), "invalid date");
+  assert.equal(JSON.stringify(point), before);
 });

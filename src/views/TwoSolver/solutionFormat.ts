@@ -1,4 +1,5 @@
 import type { Solution } from "./engine/types";
+import { tDetail, type DetailLocale } from "../../i18n/messages/two-solver-detail";
 
 export type StageId = "orientation" | "base" | "preAuf" | "algorithm" | "postAuf";
 export type StagePart = { text: string; cancelled: boolean };
@@ -59,13 +60,13 @@ export function formatFullSolution(solution: Solution): string {
   return compactNotation([solution.orientation, solution.execution].filter(Boolean).join(" "));
 }
 
-export function formatSolutionStages(solution: Solution) {
+export function formatSolutionStages(solution: Solution, locale: DetailLocale = "zh-CN") {
   const definitions: { id: StageId; label: string; annotation: string; value: string }[] = [
-    { id: "orientation", label: "朝向", annotation: "朝向", value: solution.orientation },
-    { id: "base", label: "做底", annotation: "做底", value: solution.base },
-    { id: "preAuf", label: "前置 AUF", annotation: "AUF", value: solution.preAuf },
-    { id: "algorithm", label: "公式", annotation: solution.method, value: solution.algorithm },
-    { id: "postAuf", label: "后置 AUF", annotation: "AUF", value: solution.postAuf },
+    { id: "orientation", label: tDetail(locale, "two.detail.stage.orientation"), annotation: tDetail(locale, "two.detail.stage.orientation"), value: solution.orientation },
+    { id: "base", label: tDetail(locale, "two.detail.stage.base"), annotation: tDetail(locale, "two.detail.stage.base"), value: solution.base },
+    { id: "preAuf", label: tDetail(locale, "two.detail.stage.preAuf"), annotation: "AUF", value: solution.preAuf },
+    { id: "algorithm", label: tDetail(locale, "two.detail.stage.algorithm"), annotation: solution.method, value: solution.algorithm },
+    { id: "postAuf", label: tDetail(locale, "two.detail.stage.postAuf"), annotation: "AUF", value: solution.postAuf },
   ];
   let rightOffset = 0, cumulative = 0;
   return definitions.map(stage => {
@@ -89,13 +90,13 @@ export function formatSolutionStages(solution: Solution) {
   });
 }
 
-export function formatAnnotatedSolution(solution: Solution): string {
-  const stages = formatSolutionStages(solution);
+export function formatAnnotatedSolution(solution: Solution, locale: DetailLocale = "zh-CN"): string {
+  const stages = formatSolutionStages(solution, locale);
   const originalMoves = stages.at(-1)!.cumulative;
   return [
-    `// ${solution.method} · 原始分段 · 未消步 ${originalMoves} 步 → 消步后 ${solution.moves} 步（步数不计朝向与转体）`,
-    "// 括号标出消步重叠；括号内动作仍执行一次。",
+    tDetail(locale, "two.detail.annotationSummary", { method: solution.method, originalMoves, moves: solution.moves }),
+    tDetail(locale, "two.detail.annotationOverlap"),
     ...stages.map(stage => `${stage.text}${stage.text ? " " : ""}//${stage.annotation} ${stage.count}/${stage.cumulative}`),
-    `// 消步后完整解法 · 含朝向：${formatFullSolution(solution) || "无需转动"}`,
+    tDetail(locale, "two.detail.annotationFull", { solution: formatFullSolution(solution) || tDetail(locale, "two.detail.noMoves") }),
   ].join("\n");
 }

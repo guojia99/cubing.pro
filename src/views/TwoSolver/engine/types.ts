@@ -26,7 +26,7 @@ export const COLORS = [
 export interface SearchOptions {
   methods: MethodId[]; colors: string[]; maxDepth: number; moveSet: "ruf" | "all";
   maxSolutions: number; timeLimitMs: number;
-  familyDepths?: FamilyDepths; maxOverlap?: number;
+  familyDepths?: FamilyDepths; maxOverlap?: number; forbidTransitionRotations?: boolean;
 }
 export interface Ergonomics {
   score: number; cost: number; regrips: number; rotations: number;
@@ -38,11 +38,12 @@ export interface Solution {
   original: string; execution: string; baseMoves: number; moves: number; originalMoves: number;
   cancelled: number; ergonomics: Ergonomics; sourceApi: string;
   boundary?: { left: string; right: string; leftMarked: boolean[]; rightMarked: boolean[]; overlap: number };
+  source?: { set: string; group: string; name: string; rawAlg: string };
 }
 export interface SearchResult {
   solutions: Solution[]; nodes: number; elapsedMs: number; complete: boolean;
   reason: "complete" | "time" | "limit" | "cancelled";
   data: { loaded: number; rejected: number }; depthReached: number;
 }
-export interface FormulaRecord { name: string; group: string; algs: string[] }
+export interface FormulaRecord { name: string; group: string; algs: string[]; set?: string }
 export interface MethodData { method: MethodId; records: FormulaRecord[] }

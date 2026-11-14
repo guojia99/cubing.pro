@@ -1,4 +1,5 @@
 import { adjustedTime, formatTime, type PracticeRecord } from "./uiPractice";
+import { tDetail, type DetailLocale } from "../../i18n/messages/two-solver-detail";
 
 /** Milliseconds; null means an incomplete window, Infinity means DNF. */
 export type PracticeStatistic = number | null;
@@ -50,16 +51,21 @@ export function buildPracticeStats(records: readonly PracticeRecord[], windowSiz
 }
 
 /** Plain text only: the chart must use ECharts' richText tooltip renderer. */
-export function formatPracticeTooltip(point: ReturnType<typeof buildPracticeStats>["points"][number], precision: number): string {
+export function formatPracticeTooltip(point: ReturnType<typeof buildPracticeStats>["points"][number], precision: number, locale: DetailLocale = "zh-CN"): string {
   const { record } = point;
   // Avoid user text becoming rich-text tokens or additional tooltip lines.
   const text = (value: string) => value.replace(/\{/g, "（").replace(/\}/g, "）").replace(/[\r\n\t]/g, " ");
   return [
-    `第 ${point.number} 次 · ${formatTime(adjustedTime(record), precision)}${record.penalty === "+2" ? " (+2)" : ""}`,
-    `原始用时：${formatTime(record.elapsedMs, precision)}`,
-    `ao5：${formatStatistic(point.ao5, precision)} · ao12：${formatStatistic(point.ao12, precision)}`,
-    `日期：${text(record.date)}`,
-    `打乱：${text(record.scramble)}`,
-    "点击成绩点复盘",
+    `${tDetail(locale, "two.detail.attempt", { number: point.number })} · ${formatTime(adjustedTime(record), precision)}${record.penalty === "+2" ? " (+2)" : ""}`,
+    tDetail(locale, "two.detail.rawTime", { time: formatTime(record.elapsedMs, precision) }),
+    tDetail(locale, "two.detail.averages", { ao5: formatStatistic(point.ao5, precision), ao12: formatStatistic(point.ao12, precision) }),
+    tDetail(locale, "two.detail.date", { date: text(formatPracticeDate(record.date, locale)) }),
+    tDetail(locale, "two.detail.scramble", { scramble: text(record.scramble) }),
+    tDetail(locale, "two.detail.reviewHint"),
   ].join("\n");
+}
+
+export function formatPracticeDate(value: string, locale: DetailLocale = "zh-CN"): string {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? value : new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "medium" }).format(date);
 }

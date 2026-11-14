@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useI18n } from "@/contexts/I18nProvider";
+import { translateWithParams } from "@/i18n";
 import type { SearchOptions } from "./engine/types";
 
 export type Penalty = "none" | "+2" | "DNF";
@@ -53,11 +55,12 @@ function readHistory(): PracticeRecord[] {
 }
 
 export function usePracticeTimer(question: PracticeQuestion | null, inspection: boolean, enabled: boolean, holdMs = 300, onAdvance?: () => void, onStart?: () => void) {
+  const { locale } = useI18n();
   const [phase, setPhase] = useState<Phase>("idle");
   const [clock, setClock] = useState(0);
   const [history, setHistory] = useState<PracticeRecord[]>([]);
   const [hydrated, setHydrated] = useState(false);
-  const [storageError, setStorageError] = useState<string | null>(null);
+  const [storageError, setStorageError] = useState<"two.engine.storage.readFailed" | "two.engine.storage.writeFailed" | null>(null);
   const live = useRef({ phase: "idle" as Phase, started: 0, inspectionMs: 0, penalty: "none" as Penalty, question });
   const held = useRef(false);
   const [holding, setHolding] = useState(false);
@@ -68,14 +71,14 @@ export function usePracticeTimer(question: PracticeQuestion | null, inspection: 
 
   useEffect(() => {
     try { setHistory(readHistory()); }
-    catch { setStorageError("无法读取本地历史，仍可继续本次练习。"); }
+    catch { setStorageError("two.engine.storage.readFailed"); }
     setHydrated(true);
   }, []);
 
   useEffect(() => {
     if (!hydrated) return;
     try { localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); }
-    catch { setStorageError("无法在此设备保存历史，请保持页面打开以保留本次练习记录。"); }
+    catch { setStorageError("two.engine.storage.writeFailed"); }
   }, [history, hydrated]);
 
   useEffect(() => {
@@ -186,7 +189,7 @@ export function usePracticeTimer(question: PracticeQuestion | null, inspection: 
     setHistory((rows) => rows.map((row) => row.id === id ? { ...row, penalty } : row));
   }
 
-  return { phase, clock, history: history as readonly PracticeRecord[], storageError, hydrated, action, setPenalty, held: holding, armed,
+  return { phase, clock, history: history as readonly PracticeRecord[], storageError: storageError === null ? null : translateWithParams(locale, storageError, {}), hydrated, action, setPenalty, held: holding, armed,
     isTiming: phase === "inspection" || phase === "running",
     isTimingNow: () => live.current.phase === "inspection" || live.current.phase === "running" };
 }

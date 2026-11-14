@@ -37,7 +37,7 @@ function key(pattern: KPattern): string {
 function options(overrides: Partial<SearchOptions> = {}): SearchOptions {
   // maxDepth remains explicit to exercise callers using the legacy API.
   return { methods: [...methods], colors: [..."URFDLB"], maxDepth: 0,
-    moveSet: "ruf", maxSolutions: 2000, timeLimitMs: 10000, ...overrides };
+    moveSet: "ruf", maxSolutions: 2000, timeLimitMs: 10000, forbidTransitionRotations: false, ...overrides };
 }
 
 function depths(value: number): FamilyDepths {

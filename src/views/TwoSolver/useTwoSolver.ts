@@ -1,8 +1,11 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { useI18n } from "@/contexts/I18nProvider";
 import type { SearchOptions, SearchResult } from "./engine/types";
+import { localizeEngineText } from "./solverMessages";
 
 export function useTwoSolver() {
+  const { locale } = useI18n();
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -101,5 +104,7 @@ export function useTwoSolver() {
       return null;
     } finally { if (run === generation.current && mounted.current) setBusy(false); }
   }
-  return { busy, progress, error, result, solve, generate, cancel };
+  // Store original wire messages; changing locale only changes their display.
+  return { busy, progress: localizeEngineText(progress, locale),
+    error: error === null ? null : localizeEngineText(error, locale), result, solve, generate, cancel };
 }

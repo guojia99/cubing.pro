@@ -8,9 +8,9 @@
 .solutionCard {
   min-width: 0;
   padding: 16px;
-  border: 1px solid color-mix(in srgb, var(--method-tint) 35%, var(--border-default));
+   border: 1px solid color-mix(in srgb, var(--bottom-tint) 38%, var(--border-default));
   border-radius: 12px;
-  background: color-mix(in srgb, var(--method-tint) 13%, var(--card));
+   background: color-mix(in srgb, var(--bottom-tint) 16%, var(--card));
   color: var(--foreground);
 }
 
@@ -24,7 +24,8 @@
 .methodLine { gap: 8px; }
 .methodLine h3 { margin: 0; font-size: 15px; font-weight: 600; }
 .rank { color: var(--muted-foreground); font: 10px/1.5 "SFMono-Regular", Consolas, monospace; }
-.colorDot { width: 9px; height: 9px; flex: none; border: 1px solid color-mix(in srgb, var(--foreground) 25%, transparent); border-radius: 50%; }
+.colorDot { width: 15px; height: 15px; flex: none; border: 1px solid color-mix(in srgb, var(--foreground) 25%, transparent); border-radius: 50%; }
+.bottomBadge { display: inline-flex; align-items: center; gap: 5px; margin-left: auto; color: var(--foreground); font-size: 11px; white-space: nowrap; }
 .caseName { margin: 4px 0 0 !important; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted-foreground); font-size: 11px; }
 .moveCount { display: flex; align-items: baseline; gap: 4px; flex: none; }
 .moveCount strong { font: 500 34px/1 "Outfit", sans-serif; font-variant-numeric: tabular-nums; letter-spacing: -.05em; }
@@ -62,7 +63,7 @@
 .small, .notes { color: var(--muted-foreground); font-size: 11px; line-height: 1.75; }
 .details .small { margin-top: 10px; }
 .notes { padding-left: 16px; margin: 8px 0 0; }
-.cardActions { flex-wrap: wrap; gap: 4px; margin-top: 12px; padding-top: 8px; border-top: 1px solid color-mix(in srgb, var(--method-tint) 25%, var(--border-default)); }
+.cardActions { flex-wrap: wrap; gap: 4px; margin-top: 12px; padding-top: 8px; border-top: 1px solid color-mix(in srgb, var(--bottom-tint) 25%, var(--border-default)); }
 .button { display: inline-flex; align-items: center; justify-content: center; min-height: 36px; padding: 6px 9px; border: 0; border-radius: 5px; background: transparent; color: var(--foreground); cursor: pointer; font-family: inherit; font-size: 11px; font-weight: 500; line-height: 1.5; }
 .button:hover, .button[aria-pressed="true"] { background: color-mix(in srgb, var(--foreground) 7%, transparent); }
 .textLink { display: inline-flex; align-items: center; min-height: 36px; margin-left: auto; color: var(--muted-foreground); font-size: 11px; text-underline-offset: 3px; }

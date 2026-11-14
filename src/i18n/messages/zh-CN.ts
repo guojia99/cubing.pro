@@ -1,8 +1,16 @@
 import { wcaMessagesZhCN } from "./wca-zh-CN";
 import { practiceZhCN } from "./formula-practice";
+import { twoSolverMainZhCN } from "./two-solver-main";
+import { twoSolverDetailZhCN } from "./two-solver-detail";
+import { twoSolverEngineZhCN } from "./two-solver-engine";
+import { algDeepLinkZhCN } from "./algs-deep-link";
 
 const zhCN = {
   ...practiceZhCN,
+  ...twoSolverMainZhCN,
+  ...twoSolverDetailZhCN,
+  ...twoSolverEngineZhCN,
+  ...algDeepLinkZhCN,
   "app.name": "Cubing Pro",
   "app.version": "v4.0.0",
   "nav.home": "首页",

@@ -134,7 +134,7 @@ function foreignFormula(source: MethodId, wrongLabel: MethodId): { raw: string; 
 
 function options(overrides: Partial<SearchOptions> = {}): SearchOptions {
   return { methods: engine.METHODS.map(({ id }) => id), colors: [..."URFDLB"], maxDepth: 3,
-    maxSolutions: 500, timeLimitMs: 10000, moveSet: "ruf", ...overrides };
+    maxSolutions: 500, timeLimitMs: 10000, moveSet: "ruf", forbidTransitionRotations: false, ...overrides };
 }
 
 function verify(scramble: string, solutions: Solution[], requested: SearchOptions): void {
