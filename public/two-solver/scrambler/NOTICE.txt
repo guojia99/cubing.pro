@@ -1,0 +1,5 @@
+cubing.js 0.63.3
+Source: https://github.com/cubing/cubing.js
+License: MPL-2.0 OR GPL-3.0-or-later
+Generated without source modifications by scripts/prepare-two-scrambler.mjs.
+The module graph includes dependency license notices in generated files.

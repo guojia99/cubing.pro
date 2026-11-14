@@ -44,6 +44,7 @@ export const MAIN_NAV: NavGroupDef[] = [
     children: [
       { labelKey: "nav.tools.teamMatch", href: "/tools/team-match" },
       { labelKey: "nav.tools.fr", href: "/tools/floppy-reduction" },
+      { labelKey: "nav.tools.twoSolver", href: "/tools/solver/222" },
       {
         labelKey: "nav.tools.draw",
         children: [

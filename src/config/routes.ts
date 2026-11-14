@@ -72,6 +72,7 @@ export const APP_ROUTES: AppRoute[] = [
   { id: "draw-py", name: "Pyraminx 绘图", pattern: "/draw-tools/py-d", implType: "frontend-only", renderMode: "client-spa", pageComponent: "Tools/Draws/PyDraw.tsx", tags: ["tool"] },
   { id: "draw-fto", name: "FTO 绘图", pattern: "/draw-tools/fto-d", implType: "frontend-only", renderMode: "client-spa", pageComponent: "Tools/Draws/FtoDraw.tsx", tags: ["tool"] },
   { id: "tool-fr", name: "FR练习器", pattern: "/tools/floppy-reduction", implType: "frontend-only", renderMode: "client-spa", pageComponent: "FloppyReduction/FloppyReductionView.tsx", tags: ["tool"] },
+  { id: "tool-two-solver", name: "二阶求解器", pattern: "/tools/solver/222", implType: "frontend-only", renderMode: "client-spa", pageComponent: "TwoSolver/TwoSolverView.tsx", tags: ["tool"] },
   { id: "test", name: "测试", pattern: "/test", implType: "frontend-only", renderMode: "client-spa", pageComponent: "Tests/Test.tsx" },
   { id: "wca-comps", name: "WCA 赛事", pattern: "/wca/wca-comps", implType: "api-driven", renderMode: "client-spa", pageComponent: "Tools/Comps/WCAComps.tsx", tags: ["wca"] },
   { id: "wca-player", name: "WCA 选手", pattern: "/wca/player/:wcaId", implType: "api-driven", renderMode: "client-spa", pageComponent: "WCA/Player.tsx", tags: ["wca"] },

@@ -28,6 +28,7 @@ const zhCN = {
   "nav.tools.py": "Pyraminx 绘图",
   "nav.tools.fto": "FTO 绘图",
   "nav.tools.fr": "FR练习器",
+  "nav.tools.twoSolver": "二阶求解器",
   "nav.other": "生活",
   "nav.other.recipes": "菜谱",
   "nav.other.kitchen": "厨房技巧",

@@ -29,6 +29,7 @@ const enUS: Record<MessageKey, string> = {
   "nav.tools.py": "Pyraminx drawing",
   "nav.tools.fto": "FTO drawing",
   "nav.tools.fr": "FR Trainer",
+  "nav.tools.twoSolver": "2×2 Solver",
   "nav.other": "Life",
   "nav.other.recipes": "Recipes",
   "nav.other.kitchen": "Kitchen skills",
