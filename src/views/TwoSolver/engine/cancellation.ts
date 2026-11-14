@@ -41,43 +41,69 @@ function compactRotations(model: CubeModel, moves: readonly string[]): string[] 
   return [...rotation.tokens];
 }
 
-/** Local notation only: never conjugate layer turns or discard the final frame. */
-export function compactNotation(model: CubeModel, tokens: string[]): string[] {
-  const out = [...tokens];
+type TaggedMove = { move: string; sources: number[] };
+
+/** Local reductions retain the left turn's position and the exact rotation frame. */
+function normalizeStage(model: CubeModel, tokens: readonly string[]) {
+  const out: TaggedMove[] = tokens.map((move, index) => ({ move, sources: [index] }));
+  const marked = tokens.map(() => false);
   const opposite: Record<string, string> = { U: "D", D: "U", R: "L", L: "R", F: "B", B: "F" };
+  const replace = (start: number, count: number, replacement: TaggedMove[]) => {
+    const before = out.slice(start, start + count);
+    if (!model.equal(model.applySequence(SOLVED, before.map(t => t.move)),
+      model.applySequence(SOLVED, replacement.map(t => t.move)))) {
+      throw new Error("Stage normalization changed the exact transformation");
+    }
+    for (const item of before) for (const index of item.sources) marked[index] = true;
+    out.splice(start, count, ...replacement);
+  };
   for (;;) {
     let changed = false;
     for (let i = 0; i < out.length; i++) {
-      if (isRotation(out[i])) {
+      if (isRotation(out[i].move)) {
         let end = i + 1;
-        while (end < out.length && isRotation(out[end])) end++;
+        while (end < out.length && isRotation(out[end].move)) end++;
         const run = out.slice(i, end);
-        const compact = compactRotations(model, run);
+        const compact = compactRotations(model, run.map(t => t.move));
         if (compact.length < run.length) {
-          out.splice(i, run.length, ...compact);
+          const sources = run.flatMap(t => t.sources);
+          replace(i, run.length, compact.map(move => ({ move, sources })));
           changed = true;
           break;
         }
         i = end - 1;
         continue;
       }
-      // Opposite faces commute. Combine an entire same-axis block without
-      // changing the relative order of any noncommuting turns.
-      const face = out[i][0];
-      let end = i;
-      while (end < out.length && (out[end][0] === face || out[end][0] === opposite[face])) end++;
-      const faces = [face, opposite[face]];
-      const compact = faces.map(f => token(f, out.slice(i, end)
-        .filter(t => t[0] === f).reduce((sum, t) => sum + amount(t), 0))).filter(Boolean);
-      if (compact.length < end - i) {
-        out.splice(i, end - i, ...compact);
+      const first = out[i], face = first.move[0];
+      let end = i + 1;
+      while (end < out.length) {
+        if (isRotation(out[end].move)) {
+          let stop = end + 1;
+          while (stop < out.length && isRotation(out[stop].move)) stop++;
+          const rotations = out.slice(end, stop).map(t => t.move);
+          // Test the complete frame, not just the rotation token's axis.
+          if (model.conjugate([first.move], invert(rotations))[0] !== first.move) break;
+          end = stop;
+        } else if (out[end].move[0] === opposite[face]) end++;
+        else break;
+      }
+      if (end < out.length && out[end].move[0] === face) {
+        const combined = token(face, amount(first.move) + amount(out[end].move));
+        const sources = [...first.sources, ...out[end].sources];
+        replace(i, end - i + 1, [
+          ...(combined ? [{ move: combined, sources }] : []), ...out.slice(i + 1, end),
+        ]);
         changed = true;
         break;
       }
-      i = end - 1;
     }
-    if (!changed) return out;
+    if (!changed) return { items: out, marked };
   }
+}
+
+/** Local notation only: never conjugate layer turns or discard the final frame. */
+export function compactNotation(model: CubeModel, tokens: string[]): string[] {
+  return normalizeStage(model, tokens).items.map(t => t.move);
 }
 
 /**
@@ -165,6 +191,21 @@ export function cancelBoundary(model: CubeModel, left: string[], right: string[]
   return {
     execution, leftMarked: marked.slice(0, left.length), rightMarked: marked.slice(left.length), overlap,
     saved: original.filter(t => !isRotation(t)).length - execution.filter(t => !isRotation(t)).length,
+  };
+}
+
+/** Normalize each stage independently, then spend overlap only at the join. */
+export function cancelStages(model: CubeModel, left: string[], right: string[], maxOverlap: number = 1): ReturnType<typeof cancelBoundary> {
+  const l = normalizeStage(model, left), r = normalizeStage(model, right);
+  const result = cancelBoundary(model, l.items.map(t => t.move), r.items.map(t => t.move), maxOverlap);
+  for (const [stage, flags] of [[l, result.leftMarked], [r, result.rightMarked]] as const) {
+    for (let i = 0; i < flags.length; i++) if (flags[i]) {
+      for (const index of stage.items[i].sources) stage.marked[index] = true;
+    }
+  }
+  return {
+    ...result, leftMarked: l.marked, rightMarked: r.marked,
+    saved: [...left, ...right].filter(t => !isRotation(t)).length - result.execution.filter(t => !isRotation(t)).length,
   };
 }
 

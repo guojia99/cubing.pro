@@ -3,17 +3,23 @@ import { getModel } from "./engine/state";
 import { buildLibrary, type Library } from "./engine/library";
 import { isCompetitionDistance, search, validateOptions } from "./engine/search";
 import type { MethodData, MethodId, SearchOptions } from "./engine/types";
+import { toRufScramble } from "./engine/scramble";
 
 const datasets = new Map<MethodId, MethodData>();
 let activeLibrary: { key: string; library: Library } | undefined;
 const worker = self as unknown as DedicatedWorkerGlobalScope;
 worker.onmessage = async (event: MessageEvent<{
-  id: number; type: "solve" | "validate"; scramble: string; options?: SearchOptions; baseUrl: string;
+  id: number; type: "solve" | "validate" | "scramble"; scramble: string; options?: SearchOptions; baseUrl: string;
 }>) => {
   const { id, type, scramble, options, baseUrl } = event.data;
   const progress = (text: string) => worker.postMessage({ id, type: "progress", text });
   try {
     const model = await getModel();
+    if (type === "scramble") {
+      const normalized = toRufScramble(model, scramble);
+      worker.postMessage({ id, type: "result", result: isCompetitionDistance(model, normalized) ? normalized : null });
+      return;
+    }
     if (type === "validate") {
       worker.postMessage({ id, type: "result", result: isCompetitionDistance(model, scramble) });
       return;
