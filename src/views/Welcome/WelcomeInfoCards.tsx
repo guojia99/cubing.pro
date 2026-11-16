@@ -184,6 +184,12 @@ export function WelcomeView() {
             href: "/tools/floppy-reduction",
             internal: true,
           },
+          {
+            title: t("home.welcome.practiceTools.twoSolver.title"),
+            desc: t("home.welcome.practiceTools.twoSolver.desc"),
+            href: "/tools/solver/222",
+            internal: true,
+          },
         ]}
       />
 
