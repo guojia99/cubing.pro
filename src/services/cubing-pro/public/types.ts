@@ -4,6 +4,7 @@ export interface Thank {
   amount: number;
   avatar: string;
   other: string;
+  pinned?: boolean;
 }
 
 export interface OtherLinks {

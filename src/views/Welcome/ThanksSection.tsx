@@ -2,6 +2,8 @@
 
 import {
   Avatar,
+  Badge,
+  Box,
   Button,
   Card,
   Grid,
@@ -12,7 +14,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useI18n } from "@/contexts/I18nProvider";
 import { getAcknowledgments } from "@/services/cubing-pro/public/orgs";
@@ -22,13 +24,21 @@ import { apiGetWCAPersonProfile } from "@/services/cubing-pro/wca/wca_api";
 const DEFAULT_AVATAR =
   "https://assets.worldcubeassociation.org/assets/062b138/assets/missing_avatar_thumb-d77f478a307a91a9d4a083ad197012a391d5410f6dd26cb0b0e3118a5de71438.png";
 
-const MAX_VISIBLE = 12;
+const VISIBLE_ROWS = 3;
+const MAX_COLUMNS = 5;
+const MIN_CARD_WIDTH = 170;
+const GRID_GAP = 16;
+
+function columnsForWidth(width: number): number {
+  return Math.min(MAX_COLUMNS, Math.max(1, Math.floor((width + GRID_GAP) / (MIN_CARD_WIDTH + GRID_GAP))));
+}
 
 type ThanksPerson = {
   wcaID: string;
   nickname: string;
   amount: number;
   avatar?: string;
+  pinned?: boolean;
 };
 
 function hasValidWcaId(wcaID: string): boolean {
@@ -41,6 +51,7 @@ function thankToThanksPerson(t: Thank): ThanksPerson {
     nickname: t.nickname ?? "",
     amount: t.amount ?? 0,
     avatar: t.avatar || undefined,
+    pinned: !!t.pinned,
   };
 }
 
@@ -56,6 +67,19 @@ export function ThanksSection({ data }: { data?: Thank[] }) {
   const [avatarCache, setAvatarCache] = useState<Record<string, string>>({});
   const [thanksList, setThanksList] = useState<ThanksPerson[]>([]);
   const [loading, setLoading] = useState(true);
+  const [columns, setColumns] = useState(4);
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = gridRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver((entries) => {
+      const width = entries[0]?.contentRect.width ?? 0;
+      if (width > 0) setColumns(columnsForWidth(width));
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -71,9 +95,6 @@ export function ThanksSection({ data }: { data?: Thank[] }) {
     void fetchData();
   }, [data]);
 
-  const hasMore = thanksList.length > MAX_VISIBLE;
-  const displayList = expanded ? thanksList : thanksList.slice(0, MAX_VISIBLE);
-
   useEffect(() => {
     const toFetch = thanksList.filter((p) => !p.avatar && p.wcaID?.length === 10);
     for (const person of toFetch) {
@@ -88,58 +109,86 @@ export function ThanksSection({ data }: { data?: Thank[] }) {
     }
   }, [thanksList]);
 
-  if (loading || thanksList.length === 0) return null;
+  const sortedList = useMemo(() => {
+    const pinned = thanksList.filter((p) => p.pinned);
+    const normal = thanksList.filter((p) => !p.pinned);
+    return [...pinned, ...normal];
+  }, [thanksList]);
+
+  const maxVisible = columns * VISIBLE_ROWS;
+  const hasMore = sortedList.length > maxVisible;
+  const displayList = expanded ? sortedList : sortedList.slice(0, maxVisible);
+
+  if (loading || sortedList.length === 0) return null;
 
   return (
     <Card.Root mb="6" borderRadius="xl">
-      <Card.Body>
-        <Heading size="lg" mb="1">
+      <Card.Body p="5">
+        <Heading size="lg" mb="2">
           {t("home.thanks.title")}
         </Heading>
-        <Text fontSize="xs" color="fg.muted" mb="4">
+        <Text fontSize="sm" color="fg.muted" mb="6">
           {t("home.thanks.sponsorNote")}
+          {" · "}
+          {tf("home.thanks.count", { count: sortedList.length })}
         </Text>
-        <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} gap="4">
+        <Box ref={gridRef}>
+          <SimpleGrid columns={columns} gap="4">
           {displayList.map((person, index) => (
             <Card.Root
-              key={hasValidWcaId(person.wcaID) ? person.wcaID : `anon-${index}`}
+              key={hasValidWcaId(person.wcaID) ? person.wcaID : `anon-${person.nickname}-${index}`}
               variant="outline"
               borderRadius="lg"
+              _hover={{ shadow: "md" }}
             >
-              <Card.Body display="flex" flexDirection="column" alignItems="center" gap="2" py="4">
-                <Avatar.Root size="xl">
+              <Card.Body display="flex" flexDirection="column" alignItems="center" gap="2" py="5">
+                <Avatar.Root size="lg">
                   <Avatar.Image src={getAvatarUrl(person, avatarCache)} alt={person.nickname} />
                   <Avatar.Fallback name={person.nickname} />
                 </Avatar.Root>
-                <VStack gap="0" textAlign="center">
+                <VStack gap="0" textAlign="center" maxW="100%">
                   {hasValidWcaId(person.wcaID) ? (
-                    <Link asChild color="accent" fontWeight="medium" fontSize="sm">
+                    <Link asChild color="accent" fontWeight="medium" fontSize="sm" truncate>
                       <NextLink href={`/wca/player/${person.wcaID}`}>{person.nickname}</NextLink>
                     </Link>
                   ) : (
-                    <Text fontSize="sm" fontWeight="medium">
+                    <Text fontSize="sm" fontWeight="medium" truncate maxW="100%">
                       {person.nickname}
                     </Text>
                   )}
+                  {person.pinned && (
+                    <Badge colorPalette="brand" variant="subtle" borderRadius="full" mt="1">
+                      {t("home.thanks.pinned")}
+                    </Badge>
+                  )}
                   {hasValidWcaId(person.wcaID) && (
+                    <Link
+                      asChild
+                      fontSize="2xs"
+                      fontFamily="mono"
+                      color="fg.muted"
+                      _hover={{ color: "accent" }}
+                    >
+                      <NextLink href={`/wca/player/${person.wcaID}`}>{person.wcaID}</NextLink>
+                    </Link>
+                  )}
+                  {person.amount > 0 && (
                     <Text fontSize="2xs" color="fg.muted">
-                      {person.wcaID}
+                      ¥{person.amount}
                     </Text>
                   )}
-                  <Text fontSize="xs" color="fg.muted">
-                    ¥{person.amount}
-                  </Text>
                 </VStack>
               </Card.Body>
             </Card.Root>
           ))}
         </SimpleGrid>
+        </Box>
         {hasMore && (
           <Grid placeItems="center" mt="4">
             <Button variant="ghost" size="sm" onClick={() => setExpanded(!expanded)}>
               {expanded
                 ? t("home.thanks.collapse")
-                : tf("home.thanks.expand", { count: thanksList.length - MAX_VISIBLE })}
+                : tf("home.thanks.expand", { count: sortedList.length - maxVisible })}
             </Button>
           </Grid>
         )}
