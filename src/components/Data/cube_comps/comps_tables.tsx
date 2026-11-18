@@ -87,7 +87,7 @@ export const CompsTableColumns: ColumnsType<Comp> = [
     width: 80,
     render: (_text, result: Comp) => {
       const mp: Record<string, { label: string; color: string; icon?: string }> = {
-        "1": { label: "WCA", color: "blue", icon: "https://cubing.com/f/images/wca.png" },
+        "1": { label: "WCA", color: "blue", icon: "/images/wca.svg" },
         "2": { label: "线下正式赛", color: "green" },
         "3": { label: "线上正式赛", color: "red" },
         "4": { label: "线下赛", color: "orange" },

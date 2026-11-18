@@ -50,7 +50,7 @@ const CompetitionDetail: React.FC<CompetitionDetailProps> = ({ comp }) => {
             <Descriptions.Item label="认证">
               WCA认证
               <img
-                src="https://cubing.com/f/images/wca.png"
+                src="/images/wca.svg"
                 alt="wca_icon"
                 style={{ width: 16, marginLeft: 8 }}
               />

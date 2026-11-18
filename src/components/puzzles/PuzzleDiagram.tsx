@@ -25,6 +25,10 @@ export interface PuzzleDiagramProps {
   interactive?: boolean;
   stateSource?: "formula" | "scramble";
   fallback?: React.ReactNode;
+  /** Hide the built-in "diagram setup" disclosure (the host renders its own). */
+  hideSetupDetails?: boolean;
+  /** Receives the authoritative prepared state behind the rendered diagram. */
+  onPrepared?: (info: { puzzle: PuzzleID; setup: string } | null) => void;
 }
 
 type Prepared = Awaited<ReturnType<typeof import("./model").preparePuzzle>> & {
@@ -70,22 +74,32 @@ function isolateSVGIDs(svg: Element): void {
 export default function PuzzleDiagram({
   cube, classId, setName, groupName, formula = "", scramble = "",
   maxWidth = 180, maxHeight = 180, interactive = false, stateSource = "formula", fallback,
+  hideSetupDetails = false, onPrepared,
 }: PuzzleDiagramProps) {
   const { locale } = useI18n();
   const zh = locale === "zh-CN";
   const preferences = usePuzzlePreferences();
   const [override, setOverride] = useState<"2D" | "3D" | null>(null);
+  const [netView, setNetView] = useState(false);
   const [result, setResult] = useState<{ key: string; prepared?: Prepared; error?: string; unsupported?: boolean } | null>(null);
   const host = useRef<HTMLDivElement>(null);
   const wrapper = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
-  const key = JSON.stringify([cube, classId, setName, groupName, formula, scramble, stateSource, preferences.bottom, preferences.front]);
+  const key = JSON.stringify([cube, classId, setName, groupName, formula, scramble, stateSource, preferences.bottom, preferences.front, netView]);
   const prepared = result?.key === key ? result.prepared : undefined;
   const error = result?.key === key ? result.error : undefined;
   const twoLayer = prepared?.puzzle === "2x2x2";
   const pbl = twoLayer && usesTwoByTwo3D(classId, setName, groupName);
   const automatic = twoLayer && !pbl ? "2D" : "3D";
   const mode = override ?? (interactive ? preferences.view === "auto" ? automatic : preferences.view : "2D");
+  // Mirrors model.isCubePuzzle; a static model import would pull cubing.js into
+  // the initial bundle that this component otherwise lazy-loads per diagram.
+  const cubePuzzle = prepared ? /^[2-7]x[2-7]x[2-7]$/.test(prepared.puzzle) : false;
+  const netActive = netView && mode === "2D" && cubePuzzle && !pbl;
+
+  useEffect(() => {
+    onPrepared?.(prepared ? { puzzle: prepared.puzzle, setup: prepared.setup } : null);
+  }, [prepared, onPrepared]);
 
   useEffect(() => {
     if (!wrapper.current || typeof IntersectionObserver === "undefined") { setVisible(true); return; }
@@ -116,7 +130,9 @@ export default function PuzzleDiagram({
       const colors = puzzleFaceColors(preferences, puzzle);
       try {
         const svg = isCubePuzzle(puzzle)
-          ? await (await import("./cubeDiagrams")).renderCubeDiagram(puzzle, state, classId, setName, groupName, colors)
+          ? netView
+            ? await (await import("./cubeDiagrams")).renderCubeNetDiagram(puzzle, state, colors)
+            : await (await import("./cubeDiagrams")).renderCubeDiagram(puzzle, state, classId, setName, groupName, colors)
           : await (await import("./specialDiagrams")).renderSpecialDiagram(puzzle, state, classId, colors, setName);
         return { ...state, puzzle, svg, stickering };
       } catch (error) {
@@ -163,11 +179,27 @@ export default function PuzzleDiagram({
 
   const height = interactive && mode === "3D" ? Math.max(260, maxHeight) : maxHeight;
   const colors = puzzleFaceColors(preferences, prepared?.puzzle);
+  // Always visible for interactive cube diagrams, including while 3D is shown:
+  // picking a sub-mode enters 2D directly, so the net layout stays discoverable.
+  const netToggleVisible = interactive && cubePuzzle && !pbl && !error;
+  const selectNetLayout = (net: boolean) => {
+    setNetView(net);
+    if (mode !== "2D") setOverride("2D");
+  };
   return <Box ref={wrapper} className="puzzle-diagram" data-puzzle={prepared?.puzzle} data-state-source={stateSource}
-    w="full" minW={0} maxW={interactive && mode === "3D" ? "full" : `${maxWidth}px`} mx="auto">
+    data-view={mode} data-net={netActive ? "true" : undefined}
+    w="full" minW={0} maxW={interactive && (mode === "3D" || netActive) ? "full" : `${maxWidth}px`} mx="auto">
     {interactive && <Flex gap={1} mb={1} justify="center" role="group" aria-label={zh ? "图示视图" : "Diagram view"}>
       {(["2D", "3D"] as const).map((view) => <Button key={view} type="button" size="xs" variant={mode === view ? "solid" : "ghost"}
         colorPalette="brand" aria-pressed={mode === view} onClick={(event) => { event.stopPropagation(); setOverride(view); }}>{view}</Button>)}
+    </Flex>}
+    {netToggleVisible && <Flex gap={1} mb={1} justify="center" role="group" aria-label={zh ? "平面图样式" : "2D layout"}>
+      <Button type="button" size="xs" variant={mode === "2D" && !netView ? "solid" : "ghost"} colorPalette="brand"
+        aria-pressed={mode === "2D" && !netView}
+        onClick={(event) => { event.stopPropagation(); selectNetLayout(false); }}>{zh ? "标准" : "Standard"}</Button>
+      <Button type="button" size="xs" variant={mode === "2D" && netView ? "solid" : "ghost"} colorPalette="brand"
+        aria-pressed={mode === "2D" && netView}
+        onClick={(event) => { event.stopPropagation(); selectNetLayout(true); }}>{zh ? "展开图" : "Net"}</Button>
     </Flex>}
     {error ? <Box minH={`${Math.min(height, 80)}px`} display="flex" alignItems="center" justifyContent="center">
       {fallback && (result?.unsupported || (!formula.trim() && !scramble.trim())) ? fallback : <Text role="alert" fontSize="xs" color="fg.muted" overflowWrap="anywhere">{zh ? "无法生成图示：" : "Cannot render: "}{error}</Text>}
@@ -183,11 +215,13 @@ export default function PuzzleDiagram({
     {interactive && prepared?.annotation && <Text fontSize="xs" color="fg.muted" mt={2}>
       {zh ? `原始起手提示 ${prepared.annotation}；图示与动画采用正文标准握法。` : `Source starting view ${prepared.annotation}; diagram and playback use the formula body's standard grip.`}
     </Text>}
-    {interactive && prepared && <Box as="details" mt={2} fontSize="xs" color="fg.muted" minW={0}>
-      <summary style={{ cursor: "pointer" }}>{zh ? "图示打乱" : "Diagram setup"}</summary>
-      <Text as="code" display="block" mt={1} whiteSpace="pre-wrap" overflowWrap="anywhere">
-        {displayPracticeScramble(prepared.setup) || (zh ? "已复原" : "Solved")}
-      </Text>
+    {interactive && prepared && !hideSetupDetails && <Box mt={2} fontSize="xs" color="fg.muted" minW={0}>
+      <details open>
+        <summary style={{ cursor: "pointer" }}>{zh ? "图示打乱" : "Diagram setup"}</summary>
+        <Text as="code" display="block" mt={1} whiteSpace="pre-wrap" overflowWrap="anywhere">
+          {displayPracticeScramble(prepared.setup) || (zh ? "已复原" : "Solved")}
+        </Text>
+      </details>
     </Box>}
   </Box>;
 }

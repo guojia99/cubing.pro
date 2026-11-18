@@ -21,6 +21,10 @@ export interface AlgsCubeDiagramProps {
   maxHeight?: number;
   className?: string;
   style?: React.CSSProperties;
+  /** Hide the built-in "diagram setup" disclosure (the host renders its own). */
+  hideSetupDetails?: boolean;
+  /** Receives the authoritative prepared state behind the rendered diagram. */
+  onPrepared?: (info: { puzzle: string; setup: string } | null) => void;
 }
 
 export default function AlgsCubeDiagram({
@@ -37,6 +41,8 @@ export default function AlgsCubeDiagram({
   maxHeight,
   className,
   style,
+  hideSetupDetails,
+  onPrepared,
 }: AlgsCubeDiagramProps) {
   const w = maxWidth ?? 180;
   const h = maxHeight ?? 180;
@@ -45,7 +51,8 @@ export default function AlgsCubeDiagram({
     <Box className={className} style={style} width="full" minW={0}>
       <PuzzleDiagram cube={cube} classId={classId} setName={setName} groupName={groupName}
         formula={formula} scramble={scramble} maxWidth={w} maxHeight={h} interactive={interactive} stateSource={stateSource}
-        fallback={imageSvg ? <SvgRenderer svg={imageSvg} maxWidth={w} maxHeight={h} /> : undefined} />
+        fallback={imageSvg ? <SvgRenderer svg={imageSvg} maxWidth={w} maxHeight={h} /> : undefined}
+        hideSetupDetails={hideSetupDetails} onPrepared={onPrepared} />
     </Box>
   );
 }

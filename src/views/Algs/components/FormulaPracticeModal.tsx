@@ -514,7 +514,13 @@ function PracticeLibrary({ open, onClose, cube, classId, flatAlgs, timer, setupB
           {view === "main" && <div className="fp-layout">
             <section className="fp-stage" aria-label={t("algs.formulaPractice.timerZone")}>
               <div className="fp-stage-top"><span className="fp-meta">{state.snapshot ? t(MODES[state.snapshot.mode]) : ""}</span><span className="fp-meta">{tf("algs.formulaPractice.formulaNavHint", { current: state.slots.length ? state.index + 1 : 0, total: state.slots.length })}</span></div>
-              <p className="fp-scramble">{displayPracticeScramble(scramble) || t("algs.formulaPractice.noScramble")}</p>
+              {item && (item.alg.algs[0] || scramble || item.alg.image) && <div className="fp-scramble-figure" aria-label={t("algs.practice.scrambleDiagram")}>
+                <AlgsCubeDiagram cube={cube} classId={classId} setName={item.setName} groupName={item.groupName} formula={item.alg.algs[0]} scramble={scramble} stateSource="scramble" interactive={false} imageSvg={item.alg.image} useVisualCube={Boolean(item.alg.algs[0]?.trim() || scramble.trim())} maxWidth={160} maxHeight={160} />
+              </div>}
+              <div className="fp-scramble-row">
+                {displayPracticeScramble(scramble) ? <span className="fp-scramble-label">{t("algs.practice.scrambleLabel")}</span> : null}
+                <p className="fp-scramble">{displayPracticeScramble(scramble) || t("algs.formulaPractice.noScramble")}</p>
+              </div>
               <button type="button" ref={timerButtonRef} className={`fp-timer fp-timer-${state.phase}`} aria-label={`${t(PHASE_LABELS[state.phase])}. ${t("algs.practice.controls")}`} aria-describedby="fp-instructions" disabled={!canTime || !["ready", "armed", "running"].includes(state.phase)}
                 onKeyDown={(event) => {
                   if (event.code !== "Enter") return;
@@ -558,10 +564,9 @@ function PracticeLibrary({ open, onClose, cube, classId, flatAlgs, timer, setupB
               <div className="fp-answer">
                 <Button size="sm" variant="ghost" disabled={locked} aria-expanded={answerVisible} onClick={() => setAnswerVisible(!answerVisible)}>{t(answerVisible ? "algs.practice.hideAnswer" : "algs.practice.showAnswer")}</Button>
                 <Button size="sm" variant="ghost" disabled={locked || state.phase !== "ready" || !item} onClick={showQuestion}>{t("algs.practice.questionDetail")}</Button>
-                {answerVisible && item && <div className="fp-answer-content">
-                  {item.alg.algs[0] || scramble || item.alg.image ? <AlgsCubeDiagram cube={cube} classId={classId} setName={item.setName} groupName={item.groupName} formula={item.alg.algs[0]} scramble={scramble} stateSource="scramble" interactive={false} imageSvg={item.alg.image} useVisualCube={Boolean(item.alg.algs[0]?.trim() || scramble.trim())} maxWidth={140} maxHeight={140} style={{ width: 140, maxWidth: "100%" }} /> : <span className="fp-meta">{t("algs.practice.noImage")}</span>}
-                  <div><h3>{item.alg.name}</h3><p className="fp-meta">{item.setName} / {item.groupName}</p>{item.alg.algs.map((alg, index) => <p className="fp-alg" key={index}>{alg}</p>)}</div>
-                </div>}
+              {answerVisible && item && <div className="fp-answer-content">
+                <div><h3>{item.alg.name}</h3><p className="fp-meta">{item.setName} / {item.groupName}</p>{item.alg.algs.map((alg, index) => <p className="fp-alg" key={index}>{alg}</p>)}</div>
+              </div>}
               </div>
             </section>
             <aside className="fp-sidebar" inert={running || state.phase === "armed" ? true : undefined}>

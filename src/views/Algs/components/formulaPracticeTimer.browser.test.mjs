@@ -731,8 +731,12 @@ try {
   await page.evaluate(() => { window.practiceTest.failCreate = false; });
   await dialog.getByRole('button', { name: '重试', exact: true }).click(); await phase('ready');
   assert.equal(await page.evaluate(() => window.practiceTest.creates.at(-1)[2].selectedFormulas.length), 3);
+  // The scramble diagram is always visible on its own line, labeled as a
+  // scramble; the answer area carries formulas only.
+  await assertLocalDiagram(page.locator('.fp-scramble-figure'), await page.locator('.fp-scramble').textContent());
+  assert.equal(await page.locator('.fp-scramble-label').textContent(), '打乱');
   await dialog.getByRole('button', { name: '显示答案', exact: true }).click();
-  await assertLocalDiagram(page.locator('.fp-answer-content'),await page.locator('.fp-scramble').textContent());
+  assert.equal(await page.locator('.fp-answer-content .puzzle-diagram').count(), 0, 'answer shows formulas only');
   await dialog.getByRole('button', { name: '隐藏答案', exact: true }).click();
   assert.equal(await page.locator('.fp-answer-content').count(), 0);
   await page.evaluate(() => window.setPracticeProps({ flatAlgs: [{ setName: 'Set', groupName: 'Group', alg: { name: 'Case 1', scrambles: ['NEW QUESTION'], algs: ['NEW ANSWER'], image: '' } }] }));
@@ -932,6 +936,9 @@ try {
   await touch.goto(origin);
   await touch.getByRole('button', { name: '开始练习', exact: true }).click();
   const touchTimer = touch.locator('.fp-timer');
+  // The scramble diagram renders asynchronously above the timer; wait for the
+  // layout to settle so a mid-touch shift cannot pointercancel the hold.
+  await touch.locator('.fp-scramble-figure svg, .fp-scramble-figure img, .fp-scramble-figure [role="alert"]').first().waitFor();
   const box = await touchTimer.boundingBox();
   const cdp = await touchContext.newCDPSession(touch);
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: box.x + box.width / 2, y: box.y + box.height / 2, id: 1 }] });
