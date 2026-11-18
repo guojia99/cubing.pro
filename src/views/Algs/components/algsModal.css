@@ -40,6 +40,15 @@
   outline: 2px solid var(--ring, var(--accent));
   outline-offset: 2px;
 }
+/* Download tools only make sense for the 2D SVG diagram: hidden while a 3D
+   player or a still-loading diagram is shown, without shifting layout. */
+.algs-formula-detail-modal .algs-diagram-figure .algs-diagram-tools {
+  visibility: hidden;
+  min-height: 24px;
+}
+.algs-formula-detail-modal .algs-diagram-figure:has(svg):not(:has(.puzzle-diagram[data-view="3D"])) .algs-diagram-tools {
+  visibility: visible;
+}
 @media (max-width: 767px) {
   .algs-formula-detail-positioner { padding: 0 !important; align-items: stretch !important; }
   .algs-formula-detail-modal {

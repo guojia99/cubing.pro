@@ -34,7 +34,11 @@
 .fp-dialog .fp-layout { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(300px, 1fr); min-height: 100%; }
 .fp-dialog .fp-stage { padding: 16px 20px 20px; min-width: 0; display: flex; flex-direction: column; align-items: stretch; }
 .fp-dialog .fp-stage-top { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
-.fp-dialog .fp-scramble { font-family: var(--chakra-fonts-mono); font-size: clamp(17px, 2vw, 23px); line-height: 1.8; text-align: center; overflow-wrap: anywhere; padding: 24px 0; min-height: 100px; }
+.fp-dialog .fp-scramble-figure { display: flex; justify-content: center; padding: 12px 0 0; }
+.fp-dialog .fp-scramble-figure .puzzle-diagram { width: 100%; max-width: 160px; }
+.fp-dialog .fp-scramble-row { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 16px 0 24px; min-height: 72px; }
+.fp-dialog .fp-scramble-row .fp-scramble { flex: 1; min-width: 0; font-family: var(--chakra-fonts-mono); font-size: clamp(17px, 2vw, 23px); line-height: 1.8; text-align: center; overflow-wrap: anywhere; }
+.fp-dialog .fp-scramble-label { flex-shrink: 0; padding: 2px 8px; border: 1px solid var(--border-default); border-radius: 6px; background: var(--accent-soft); color: var(--muted-foreground); font-size: 11px; font-weight: 600; line-height: 1.6; user-select: none; }
 .fp-dialog .fp-timer { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; width: 100%; min-height: 230px; padding: 20px 8px; border-radius: 12px; border: 1px solid var(--border-default); background: var(--card); color: var(--foreground); cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; transition: border-color 120ms, background 120ms; }
 .fp-dialog .fp-timer:disabled { cursor: default; }
 .fp-dialog .fp-timer-armed { border-color: var(--fp-accent); background: var(--accent-soft); color: var(--foreground); }
@@ -44,7 +48,7 @@
 .fp-dialog .fp-instructions { text-align: center; max-width: 380px; margin: 12px auto; }
 .fp-dialog .fp-navigation { justify-content: center; }
 .fp-dialog .fp-answer { margin-top: 16px; border-top: 1px solid var(--border-default); padding-top: 12px; }
-.fp-dialog .fp-answer-content { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 12px; padding-top: 12px; }
+.fp-dialog .fp-answer-content { padding-top: 12px; }
 .fp-dialog h2, .fp-dialog h3 { font-size: 12px; font-weight: 600; }
 .fp-dialog .fp-alg { font-family: var(--chakra-fonts-mono); font-size: var(--chakra-font-sizes-md, 16px); line-height: 1.8; overflow-wrap: anywhere; padding: 12px 0; border-bottom: 1px solid var(--border-default); }
 .fp-dialog .fp-sidebar { display: flex; flex-direction: column; gap: 16px; padding: 16px; border-left: 1px solid var(--border-default); background: var(--background); min-width: 0; }
@@ -90,6 +94,10 @@
 .fp-dialog :is(button, input, select):focus-visible { outline: 2px solid var(--fp-accent); outline-offset: 3px; }
 .fp-dialog .fp-fieldset:disabled { opacity: .65; }
 .fp-running .fp-answer-content { display: none; }
+/* Keep the layout slot: hiding the diagram with display:none would shift the
+   timer upward under a held touch, and the synthesized tap could land on
+   whatever button moves beneath the finger. */
+.fp-running .fp-scramble-figure { visibility: hidden; }
 @media (min-width: 900px) {
   .fp-dialog .fp-body > section .fp-record-open { flex-basis: 50%; }
 }
@@ -102,15 +110,15 @@
   .fp-dialog .fp-sidebar { border-left: 0; border-top: 1px solid var(--border-default); padding: 12px; }
   .fp-dialog .fp-timer { min-height: 220px; }
   .fp-dialog .fp-digits { font-size: clamp(52px, 17vw, 90px); }
-  .fp-dialog .fp-scramble { min-height: 80px; padding: 16px 0; }
+  .fp-dialog .fp-scramble-row { min-height: 56px; padding: 12px 0 16px; }
   .fp-dialog .fp-config, .fp-dialog .fp-body > section { padding: 12px; }
   .fp-dialog .fp-modes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .fp-dialog .fp-answer-content { grid-template-columns: minmax(0, 1fr); }
   .fp-dialog .fp-notice { margin: 10px 12px; }
 }
 @media (max-height: 600px) {
   .fp-dialog .fp-timer { min-height: 150px; }
-  .fp-dialog .fp-scramble { min-height: 0; padding: 12px 0; }
+  .fp-dialog .fp-scramble-row { min-height: 0; padding: 12px 0; }
+  .fp-dialog .fp-scramble-figure { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .fp-dialog *, .fp-positioner { animation: none !important; transition: none !important; scroll-behavior: auto !important; }

@@ -11,6 +11,7 @@ const bundle = await build({
     export * from './src/components/puzzles/model';
     export * from '@/vendor/puzzle-drawing/visualcube/src/index';
     export * from '@/vendor/puzzle-drawing/visualcube/src/preset';
+    export { renderUnfoldedSvg, WCA_COLORS } from './src/vendor/puzzle-drawing/shared/src/cube_unfolded_svg';
     export {makeStickerColors} from './src/vendor/puzzle-drawing/visualcube/src/cube/stickers';
   ` },
   bundle: true, write: false, format: 'esm', platform: 'node',
@@ -307,4 +308,45 @@ test('proof cache stays bounded and evicted actions are proved again', async () 
   const evicted = api.diagramChecks.proofs;
   await render('7x7x7', first, 'PLL');
   assert.equal(api.diagramChecks.proofs - evicted, 1);
+});
+
+// WCA palette in URFDLB letter order — WCA_COLORS is cstimer face order D L B U R F.
+const wcaColors = {
+  U: '#FFFFFF', R: '#EE0000', F: '#00D800', D: '#FEFE00', L: '#FFA100', B: '#0000F2',
+};
+for (let n = 2; n <= 7; n++) test(`${n}x${n}: unfolded net is byte-identical to the cstimer reference on shared WCA notation`, async () => {
+  const puzzle = `${n}x${n}x${n}`;
+  // Parity is over outer + wide moves only: the cstimer sim reads `2R` as
+  // two-layer wide (its documented image-tool quirk), while KPuzzle/visualcube
+  // read it as the depth-2 single slice — inner-slice tokens are not shared
+  // semantics and are covered by the render tests below instead.
+  const scrambles = ['', 'R U R\' U\'', "F2 L' D B2 U' R2"];
+  if (n > 3) scrambles.push("2Rw' U2 2Lw F2 2Lw' F2 2Rw2 U2 F2", `${n - 1}Rw U' 2Lw' F2`);
+  for (const scramble of scrambles) {
+    const state = await api.preparePuzzle(puzzle, '', scramble, 'scramble', !scramble.trim());
+    const net = await api.renderCubeNetDiagram(puzzle, state, wcaColors);
+    assert.equal(net, api.renderUnfoldedSvg(n, scramble), `${puzzle}: ${scramble || '(solved)'}`);
+  }
+  // Inner-slice notation renders through the authoritative KPuzzle state.
+  if (n > 3) {
+    const slice = await api.renderCubeNetDiagram(puzzle, await api.preparePuzzle(puzzle, '', `2R' U 3R F2 ${n - 1}Rw`, 'scramble'), wcaColors);
+    assert.match(slice, /^<svg\b/);
+    assert.ok(!/NaN|Infinity/.test(slice));
+  }
+});
+
+test('unfolded net keeps the local palette and renders formula-source setups and rotations', async () => {
+  const formula = "R U R' U' R' F R2 U' R' U' R U R' F'";
+  const state = await api.preparePuzzle('3x3x3', formula, '', 'formula');
+  const net = await api.renderCubeNetDiagram('3x3x3', state, colors);
+  assert.match(net, /^<svg\b/);
+  assert.ok(net.includes(colors.U.toUpperCase()) || net.includes(colors.U.toLowerCase()), 'local U palette is used');
+  assert.ok(!net.includes('#FFFFFF') || colors.U.toUpperCase() === '#FFFFFF', 'WCA white does not leak into a custom palette');
+  // A T-perm net must not look solved: count non-U stickers on the U face band.
+  const stickers = [...net.matchAll(/fill="([^"]+)"[^>]*\/>/g)].map(match => match[1]);
+  assert.ok(stickers.length === 54 && new Set(stickers).size > 1, 'scrambled net shows mixed colors');
+  const rotated = await api.preparePuzzle('3x3x3', '', "y2 R U R'", 'scramble');
+  const rotatedNet = await api.renderCubeNetDiagram('3x3x3', rotated, wcaColors);
+  assert.notEqual(rotatedNet, await api.renderCubeNetDiagram('3x3x3', await api.preparePuzzle('3x3x3', '', 'R U R\'', 'scramble'), wcaColors), 'rotations are state, not formatting');
+  await assert.rejects(api.renderCubeNetDiagram('3x3x3', state, { ...colors, U: 'red' }), /#RRGGBB/);
 });

@@ -1,6 +1,7 @@
 import type { PuzzleID } from "cubing/twisty";
-import { AllFaces, CubeData, parseAlgorithm, renderCubeSVG } from "@/vendor/puzzle-drawing/visualcube/src/index";
+import { AllFaces, CubeData, Face, parseAlgorithm, renderCubeSVG } from "@/vendor/puzzle-drawing/visualcube/src/index";
 import { buildSimpleOptions, renderFromSimpleQuery } from "@/vendor/puzzle-drawing/visualcube/src/preset";
+import { renderUnfoldedStateSvg } from "@/vendor/puzzle-drawing/shared/src/cube_unfolded_svg";
 import { parsePuzzleAlg, puzzleLoader } from "./model";
 import type { preparePuzzle } from "./model";
 
@@ -74,6 +75,74 @@ export async function renderCubeDiagram(
   groupName: string,
   colors: Record<string, string>,
 ): Promise<string> {
+  const { size, setupTokens } = await cubeFacelets(puzzle, state);
+
+  const category = `${classId} ${setName} ${groupName}`;
+  const has = (token: string) => new RegExp(`(?:^|[^A-Z0-9])${token}(?:$|[^A-Z0-9])`, "i").test(category);
+  let view = size === 2 ? "plan" : "pll";
+  let mask: string | undefined;
+  let hideGreySides = false;
+  if (size > 3 && (has("L2E") || has("LCE"))) view = "iso";
+  if (size > 3 && has("L2C")) { mask = "center"; hideGreySides = true; }
+  if (size > 3 && has("OLLP")) { view = "oll"; hideGreySides = true; }
+  if (size === 3) {
+    if (has("ZBLS")) { view = "iso"; mask = "vh"; }
+    else if (has("ZBLL")) mask = "coll";
+    else if (has("CMLL") || has("COLL")) { mask = has("CMLL") ? "cmll" : "coll"; hideGreySides = true; }
+    else if (has("WV") || has("VLS") || has("SV")) { mask = "wv"; hideGreySides = true; }
+    else if (has("F2L")) view = "f2l";
+    else if (has("OLL")) { view = "oll"; hideGreySides = true; }
+  }
+  const palette = [...faces].map(face => colors[face]);
+  if (palette.some(color => !color || !/^#[\da-f]{6}$/i.test(color))) {
+    throw new Error("Cube diagram requires six local #RRGGBB face colors (URFDLB)");
+  }
+  const query = { setup: setupTokens.join(" "), cubeSize: size, size: 240, view, mask,
+    ngs: hideGreySides, sch: palette.join(",") };
+  // Explicit local palette overrides the source site's holding scheme, including
+  // OLL's yellow/grey default. Native piece-following masks run before setup.
+  if (!mask) return renderFromSimpleQuery(query);
+  return renderCubeSVG(buildSimpleOptions(query));
+}
+
+/**
+ * WCA unfolded net (U top / L F R B band / D bottom) for the interactive 2D
+ * sub-mode. Shares the fully proven pattern→vendor conversion above, so the
+ * net state is the same authoritative facelet state as the standard 2D view.
+ */
+export async function renderCubeNetDiagram(
+  puzzle: PuzzleID,
+  state: Awaited<ReturnType<typeof preparePuzzle>>,
+  colors: Record<string, string>,
+): Promise<string> {
+  const { size, vendor } = await cubeFacelets(puzzle, state);
+  const palette = [...faces].map(face => colors[face]);
+  if (palette.some(color => !color || !/^#[\da-f]{6}$/i.test(color))) {
+    throw new Error("Cube diagram requires six local #RRGGBB face colors (URFDLB)");
+  }
+  const faceColor = new Map(faces.split("").map((face, index) => [face, palette[index]]));
+  // cstimer face order D L B U R F; drawn (row, col) maps identically to the
+  // vendor array index on every face: cstimer's L/B horizontal and D vertical
+  // posit mirrors cancel the net's own drawn mirrors (parity-locked in tests).
+  const netFaces = [Face.D, Face.L, Face.B, Face.U, Face.R, Face.F];
+  return renderUnfoldedStateSvg(size, (face, row, col) => {
+    const color = faceColor.get(vendor.faces[netFaces[face]][row * size + col]);
+    if (!color) throw new Error(`Cube net facelet mismatch: ${puzzle}`);
+    return color;
+  });
+}
+
+/**
+ * Pattern → verified vendor CubeData facelets. Every action is proved against
+ * the native KPuzzle transformation, the final replay is re-evaluated in full,
+ * and the completed vendor state must match the native pattern facelets.
+ * The two source lines touched by the test's proof/setup counters must stay
+ * verbatim (the proof CubeData construction and the full-setup replay).
+ */
+async function cubeFacelets(
+  puzzle: PuzzleID,
+  state: Prepared,
+): Promise<{ size: number; vendor: CubeData; setupTokens: string[] }> {
   const size = Number(puzzle[0]);
   if (size < 2 || size > 7 || puzzle !== `${size}x${size}x${size}`) {
     throw new Error(`Unsupported cube diagram: ${puzzle}`);
@@ -154,31 +223,5 @@ export async function renderCubeDiagram(
   if (AllFaces.flatMap(face => vendor.faces[face]).join("") !== nativeFacelets(state.pattern).join("")) {
     throw new Error(`Native/vendor cube state mismatch: ${puzzle}`);
   }
-
-  const category = `${classId} ${setName} ${groupName}`;
-  const has = (token: string) => new RegExp(`(?:^|[^A-Z0-9])${token}(?:$|[^A-Z0-9])`, "i").test(category);
-  let view = size === 2 ? "plan" : "pll";
-  let mask: string | undefined;
-  let hideGreySides = false;
-  if (size > 3 && (has("L2E") || has("LCE"))) view = "iso";
-  if (size > 3 && has("L2C")) { mask = "center"; hideGreySides = true; }
-  if (size > 3 && has("OLLP")) { view = "oll"; hideGreySides = true; }
-  if (size === 3) {
-    if (has("ZBLS")) { view = "iso"; mask = "vh"; }
-    else if (has("ZBLL")) mask = "coll";
-    else if (has("CMLL") || has("COLL")) { mask = has("CMLL") ? "cmll" : "coll"; hideGreySides = true; }
-    else if (has("WV") || has("VLS") || has("SV")) { mask = "wv"; hideGreySides = true; }
-    else if (has("F2L")) view = "f2l";
-    else if (has("OLL")) { view = "oll"; hideGreySides = true; }
-  }
-  const palette = [...faces].map(face => colors[face]);
-  if (palette.some(color => !color || !/^#[\da-f]{6}$/i.test(color))) {
-    throw new Error("Cube diagram requires six local #RRGGBB face colors (URFDLB)");
-  }
-  const query = { setup: setup.join(" "), cubeSize: size, size: 240, view, mask,
-    ngs: hideGreySides, sch: palette.join(",") };
-  // Explicit local palette overrides the source site's holding scheme, including
-  // OLL's yellow/grey default. Native piece-following masks run before setup.
-  if (!mask) return renderFromSimpleQuery(query);
-  return renderCubeSVG(buildSimpleOptions(query));
+  return { size, vendor, setupTokens: setup };
 }

@@ -41,7 +41,7 @@ export function LoginPage() {
     >
       <VStack gap="6" maxW="md" textAlign="center">
         <Image
-          src="/WCA%20Logo.svg"
+          src="/images/wca.svg"
           alt="WCA"
           w="40"
           h="40"
