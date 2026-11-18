@@ -1,6 +1,10 @@
 "use client";
 
+import { translateWcaPuzzleExtra as extra } from "@/i18n/messages/wca-puzzle-extra";
+
 import "antd/dist/reset.css";
+import { PageHeader } from "@/components/ui/page";
+import "./wca-ui.css";
 
 import { LineChartOutlined, ReadOutlined, TeamOutlined, ThunderboltOutlined } from "@ant-design/icons";
 import {
@@ -21,11 +25,14 @@ import {
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import ReactECharts from "echarts-for-react";
+import { color as chartColor } from "echarts";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { CubeIcon } from "@/components/CubeIcon/cube_icon";
 import { MarkdownViewer } from "@/components/Markdown/MarkdownViewer";
 import { useIntlMessage } from "@/hooks/useIntlMessage";
+import { getChartAxisStyle, getChartTooltipStyle } from "@/theme/chartColors";
+import { useThemeColors } from "@/theme/useThemeColors";
 import {
   getResultProportionEstimation,
   impliedCentisAllEvents,
@@ -41,7 +48,7 @@ import { secondTimeFormat } from "@/views/Wca/utils/wca_results";
 
 import "./ProportionEstimation.css";
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 const WR_OPTIONS = [100, 200, 500, 1000] as const;
 
@@ -56,16 +63,6 @@ const DEFAULT_ANCHOR_SEC: Record<ResultProportionEstimationType, number> = {
   "333-333oh": 6.5,
   bld: 40,
 };
-
-const CHART_COLORS = [
-  "var(--signal-info)",
-  "var(--signal-success)",
-  "var(--signal-warning)",
-  "var(--accent)",
-  "var(--destructive)",
-  "color-mix(in srgb, var(--accent) 50%, var(--signal-info))",
-  "color-mix(in srgb, var(--accent) 40%, var(--signal-success))",
-];
 
 function formatCsRangeSec(minCs: number, maxCs: number): string {
   return `${secondTimeFormat(minCs / 100, false)} – ${secondTimeFormat(maxCs / 100, false)}`;
@@ -82,6 +79,7 @@ function sortChartPointsByX(points: [number, number][]): [number, number][] {
 
 export function ProportionEstimationView() {
   const intl = useIntlMessage();
+  const theme = useThemeColors();
   const [estimationType, setEstimationType] = useState<ResultProportionEstimationType>("bigcube");
   const [wrN, setWrN] = useState<number>(500);
   const [data, setData] = useState<ResultProportionEstimationResult | null>(null);
@@ -162,6 +160,7 @@ export function ProportionEstimationView() {
       return null;
     }
     const samples = data.curve_samples;
+    const chartColors = [theme.signalInfo, theme.signalSuccess, theme.signalWarning, theme.accent, theme.destructive, chartColor.lerp(.5, [theme.signalInfo, theme.accent]), chartColor.lerp(.4, [theme.signalSuccess, theme.accent])];
     const events = data.events;
 
     const xForSample = (s: ProportionCurveSample) => {
@@ -183,19 +182,22 @@ export function ProportionEstimationView() {
         showSymbol: samples.length <= 30,
         symbolSize: 6,
         lineStyle: { width: ev === anchorEvent ? 3 : 2 },
-        itemStyle: { color: CHART_COLORS[idx % CHART_COLORS.length] },
+        itemStyle: { color: chartColors[idx % chartColors.length] },
         emphasis: { focus: "series" as const },
         data: sortChartPointsByX(pts),
       };
     });
 
     const xName = intl.formatMessage({ id: "wca.proportion.chartXAnchor" });
+    const axisStyle = getChartAxisStyle();
     const yName = intl.formatMessage({ id: "wca.proportion.chartY" });
     const fmt = (n: number) => secondTimeFormat(n, false);
 
     return {
-      color: CHART_COLORS,
+      color: chartColors,
+      textStyle: { color: theme.foreground },
       tooltip: {
+        ...getChartTooltipStyle(),
         trigger: "axis" as const,
         axisPointer: { type: "cross" as const },
         formatter: (params: unknown) => {
@@ -225,6 +227,8 @@ export function ProportionEstimationView() {
         },
       },
       legend: {
+        textStyle: { color: theme.mutedForeground },
+        pageTextStyle: { color: theme.mutedForeground },
         type: "scroll" as const,
         bottom: 0,
         data: events,
@@ -237,28 +241,34 @@ export function ProportionEstimationView() {
         containLabel: false,
       },
       xAxis: {
+        ...axisStyle,
+        nameTextStyle: { color: theme.mutedForeground },
         type: "value" as const,
         name: xName,
         nameLocation: "middle" as const,
         nameGap: 28,
         scale: true,
         axisLabel: {
+          color: theme.mutedForeground,
           formatter: (val: string | number) => fmt(typeof val === "string" ? parseFloat(val) : val),
         },
       },
       yAxis: {
+        ...axisStyle,
+        nameTextStyle: { color: theme.mutedForeground },
         type: "value" as const,
         name: yName,
         nameLocation: "middle" as const,
         nameGap: 44,
         scale: true,
         axisLabel: {
+          color: theme.mutedForeground,
           formatter: (val: string | number) => fmt(typeof val === "string" ? parseFloat(val) : val),
         },
       },
       series,
     };
-  }, [data, backendAnchor, anchorEvent, globalMap, intl]);
+  }, [data, backendAnchor, anchorEvent, globalMap, intl, theme]);
 
   const segmentColumns: ColumnsType<ProportionEstimationSegment & { ratio: Record<string, number> }> =
     useMemo(() => {
@@ -359,12 +369,8 @@ export function ProportionEstimationView() {
   );
 
   return (
-    <div className="proportion-page">
-      <div className="proportion-hero">
-        <div className="proportion-hero-bar">
-          <Title level={3} className="proportion-title">
-            <LineChartOutlined /> {intl.formatMessage({ id: "wca.proportion.title" })}
-          </Title>
+    <div className="proportion-page wca-page">
+      <PageHeader eyebrow={extra(intl.locale, "wcaPuzzleExtra.performance")} title={<><LineChartOutlined /> {intl.formatMessage({ id: "wca.proportion.title" })}</>} actions={
           <Button
             type="link"
             icon={<ReadOutlined />}
@@ -373,8 +379,7 @@ export function ProportionEstimationView() {
           >
             {intl.formatMessage({ id: "wca.proportion.algorithmBtn" })}
           </Button>
-        </div>
-      </div>
+      } />
 
       <Card className="proportion-controls" variant="borderless" loading={loading}>
         <Row gutter={[16, 16]} align="middle">

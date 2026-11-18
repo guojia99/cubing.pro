@@ -1,3 +1,6 @@
+import { readStoredLocale } from "@/i18n";
+import { translateShared } from "@/i18n/messages/shared";
+
 const KEY_PREFIX = "algs:formula_practice_proficiency:";
 
 export type ProficiencyLevel = "mastered" | "skilled" | "average" | "unskilled" | "unknown";
@@ -13,12 +16,16 @@ export const PROFICIENCY_WEIGHTS: Record<ProficiencyLevel, number> = {
 export const DEFAULT_PROFICIENCY: ProficiencyLevel = "average";
 
 export const PROFICIENCY_LABELS: Record<ProficiencyLevel, string> = {
-  mastered: "精通",
-  skilled: "熟练",
-  average: "一般",
-  unskilled: "生疏",
-  unknown: "未知",
+  get mastered() { return getProficiencyLabel("mastered"); },
+  get skilled() { return getProficiencyLabel("skilled"); },
+  get average() { return getProficiencyLabel("average"); },
+  get unskilled() { return getProficiencyLabel("unskilled"); },
+  get unknown() { return getProficiencyLabel("unknown"); },
 };
+
+export function getProficiencyLabel(level: ProficiencyLevel, locale: string = readStoredLocale()): string {
+  return translateShared(locale, `shared.proficiency.${level}`);
+}
 
 type ProficiencyMap = Record<string, ProficiencyLevel>;
 

@@ -2,15 +2,19 @@
   width: 100%;
   margin-bottom: 16px;
   box-sizing: border-box;
-  color: var(--ant-color-text, inherit);
+  color: var(--foreground);
 }
 
 .wca-player-container .ant-card {
-  background: var(--ant-color-bg-container) !important;
+  background: var(--card) !important;
+  border-color: var(--border-default);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
 }
 
 .wca-player-container .ant-card-body {
-  background: var(--ant-color-bg-container) !important;
+  background: var(--card) !important;
+  border-radius: inherit;
 }
 
 .wca-player-container .header-section {
@@ -44,7 +48,7 @@
     padding: 0 4px;
   }
   .wca-player-container .ant-card {
-    border-radius: 12px;
+    border-radius: var(--radius-card);
   }
   .wca-player-container .ant-table-cell {
     padding: 10px 6px;

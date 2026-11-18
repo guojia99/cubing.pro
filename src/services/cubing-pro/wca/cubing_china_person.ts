@@ -1,4 +1,5 @@
 import { Request } from '@/services/cubing-pro/request';
+import { ClientMessageError } from '../clientError';
 
 /** 与后端 `internel/crawler/cubing/person_page.go` PersonPageCode 一致 */
 export type CubingPersonPageCode =
@@ -38,7 +39,7 @@ type ApiEnvelope<T> = {
 export async function apiGetCubingChinaPerson(wcaId: string): Promise<CubingPersonPageResult> {
   const id = wcaId.trim();
   if (id.length !== 10) {
-    throw new Error('WCA ID 长度应为 10');
+    throw new ClientMessageError('shared.error.wcaId');
   }
   const res = await Request.get<ApiEnvelope<CubingPersonPageResult>>(`/wca/cubing-china/person/${encodeURIComponent(id)}`);
   return res.data.data;

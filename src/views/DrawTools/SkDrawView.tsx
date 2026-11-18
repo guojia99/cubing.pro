@@ -468,6 +468,8 @@ export function SkDrawView() {
   return (
     <DrawNavTabs
       tabsKey="sk_draw_tabs"
+      title={t("home.welcome.draw.sk.title")}
+      description={t("home.welcome.draw.sk.desc")}
       items={[
         {
           key: "simple_sk",

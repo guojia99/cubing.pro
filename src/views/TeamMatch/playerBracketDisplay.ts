@@ -1,4 +1,5 @@
 import type { Player, School, SeedingEntry } from '@/views/TeamMatch/types';
+import { tm, type TeamMatchLocale } from './i18n';
 
 export function fmtSeedingVal(v: number | 'DNF' | null | undefined): string {
   if (v === 'DNF') return 'DNF';
@@ -15,9 +16,8 @@ export function seedingEntryForPlayer(
 }
 
 /** 当前项目下正式录入的「最佳」单次 / 平均（与成绩录入表一致） */
-export function formatPlayerSingleAverageLine(entry: SeedingEntry | undefined): string {
-  if (!entry) return `单次 ${fmtSeedingVal(null)} · 平均 ${fmtSeedingVal(null)}`;
-  return `单次 ${fmtSeedingVal(entry.single)} · 平均 ${fmtSeedingVal(entry.average)}`;
+export function formatPlayerSingleAverageLine(entry: SeedingEntry | undefined, locale: TeamMatchLocale = 'zh-CN'): string {
+  return tm(locale, 'teamMatch.scoreLine', { single: fmtSeedingVal(entry?.single), average: fmtSeedingVal(entry?.average) });
 }
 
 export function schoolNameForPlayer(player: Player | undefined, schools: School[]): string {

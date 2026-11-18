@@ -121,7 +121,7 @@ export default function SolutionCards({ solutions, scramble }: { solutions: Solu
 
   async function copy(solution: Solution, annotated = false) {
     try {
-      await navigator.clipboard.writeText(annotated ? formatAnnotatedSolution(solution, locale) : formatFullSolution(solution));
+      await navigator.clipboard.writeText(annotated ? formatAnnotatedSolution(solution, locale, t) : formatFullSolution(solution));
       setCopyStatus({ method: solution.method, caseName: solution.caseName, annotated });
     } catch { setCopyStatus("failed"); }
   }
@@ -133,7 +133,7 @@ export default function SolutionCards({ solutions, scramble }: { solutions: Solu
       const colorKey = COLOR_KEYS[solution.color as keyof typeof COLOR_KEYS];
       const bottomColor = tf("two.detail.bottomColor", { color: colorKey ? t(colorKey) : solution.color });
       const libraryLink = formulaLibraryLink(solution);
-      const stages = formatSolutionStages(solution, locale);
+      const stages = formatSolutionStages(solution, locale, t);
       const full = formatFullSolution(solution);
       const notes = solution.ergonomics.notes.filter(note => note !== "顺手度仅供排序参考，实际执行感受取决于握姿与指法；步数不含前置朝向调整。"
         && note !== "采用 two-tool 三连参考权重；不代表个人实测速度。");
@@ -162,7 +162,7 @@ export default function SolutionCards({ solutions, scramble }: { solutions: Solu
         </div>
         <details className={styles.details}>
           <summary>{t("two.detail.details")}</summary>
-          <code className={styles.annotatedAlg}>{formatAnnotatedSolution(solution, locale)}</code>
+          <code className={styles.annotatedAlg}>{formatAnnotatedSolution(solution, locale, t)}</code>
           <p className={styles.small}>{tf("two.detail.costSummary", { regrips: solution.ergonomics.regrips, rotations: solution.ergonomics.rotations, cost: solution.ergonomics.cost.toFixed(2), confidence: t(solution.ergonomics.confidence === "reference" ? "two.detail.referenceScore" : "two.detail.estimatedScore") })}</p>
           {notes.length > 0 && <ul className={styles.notes}>{notes.map((note, i) => <li key={i}>{localizeEngineText(note, locale)}</li>)}</ul>}
         </details>

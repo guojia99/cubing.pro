@@ -2,13 +2,15 @@
 
 import { HStack, Tag } from "@chakra-ui/react";
 import type { ProficiencyLevel } from "@/services/cubing-pro/algs/formulaPracticeProficiency";
+import { useI18n } from "@/contexts/I18nProvider";
+import { translateShared } from "@/i18n/messages/shared";
 
-const LEVELS: { value: ProficiencyLevel; label: string; color: string }[] = [
-  { value: "unknown", label: "?", color: "gray" },
-  { value: "unskilled", label: "生", color: "red" },
-  { value: "average", label: "中", color: "orange" },
-  { value: "skilled", label: "熟", color: "blue" },
-  { value: "mastered", label: "精", color: "green" },
+const LEVELS: { value: ProficiencyLevel; color: string }[] = [
+  { value: "unknown", color: "gray" },
+  { value: "unskilled", color: "red" },
+  { value: "average", color: "orange" },
+  { value: "skilled", color: "blue" },
+  { value: "mastered", color: "green" },
 ];
 
 interface ProficiencySelectProps {
@@ -22,6 +24,7 @@ export default function ProficiencySelect({
   onChange,
   size = "md",
 }: ProficiencySelectProps) {
+  const { locale } = useI18n();
   return (
     <HStack gap="1">
       {LEVELS.map((l) => (
@@ -38,7 +41,7 @@ export default function ProficiencySelect({
           _hover={{ opacity: 0.8 }}
         >
           <Tag.Label fontSize={size === "sm" ? "xs" : "sm"} fontWeight="bold">
-            {l.label}
+            {translateShared(locale, `shared.proficiency.${l.value}`)}
           </Tag.Label>
         </Tag.Root>
       ))}

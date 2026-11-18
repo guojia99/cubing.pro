@@ -3,13 +3,15 @@
  * @see docs/project/app-and-config.md
  */
 
+import { SUPPORTED_LOCALES } from "@/i18n/locales";
+
 export const defaultSettings = {
   navTheme: "light" as const,
   layout: "top" as const,
   contentWidth: "Fluid" as const,
   fixedHeader: true,
   locale: "zh-CN" as const,
-  supportedLocales: ["zh-CN", "en-US"] as const,
+  supportedLocales: SUPPORTED_LOCALES.map(({ key }) => key),
 };
 
 export const siteMeta = {

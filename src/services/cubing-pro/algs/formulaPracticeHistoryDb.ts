@@ -1,4 +1,5 @@
 import type { FormulaPracticeRecord, PracticeSession } from './formulaPracticeHistory';
+import { ClientMessageError } from '../clientError';
 
 export const HISTORY_PREFIX = 'algs:formula_practice_history:';
 export type SessionRow = Omit<PracticeSession, 'records'> & { scope: string };
@@ -11,7 +12,7 @@ export function openHistoryDb(): Promise<IDBDatabase> {
   if (!database) {
     database = new Promise<IDBDatabase>((resolve, reject) => {
       if (typeof indexedDB === 'undefined') {
-        reject(new Error('IndexedDB is unavailable'));
+        reject(new ClientMessageError('shared.error.databaseUnavailable'));
         return;
       }
       const request = indexedDB.open('cubing-pro-formula-practice-history', 1);
@@ -26,10 +27,10 @@ export function openHistoryDb(): Promise<IDBDatabase> {
         records.createIndex('session', ['scope', 'sessionId']);
         db.createObjectStore('migrations', { keyPath: 'key' });
       };
-      request.onerror = () => reject(request.error ?? new Error('Cannot open history database'));
+      request.onerror = () => reject(request.error ?? new ClientMessageError('shared.error.databaseOpen'));
       request.onblocked = () => {
         blocked = true;
-        reject(new Error('History database upgrade is blocked; close other tabs'));
+        reject(new ClientMessageError('shared.error.databaseBlocked'));
       };
       request.onsuccess = () => {
         const db = request.result;
@@ -53,7 +54,7 @@ export function historyTransaction<T>(
     let value: T;
     let failure: unknown;
     tx.oncomplete = () => resolve(value);
-    tx.onabort = () => reject(failure ?? tx.error ?? new Error('History transaction aborted'));
+    tx.onabort = () => reject(failure ?? tx.error ?? new ClientMessageError('shared.error.transaction'));
     tx.onerror = () => { failure ??= tx.error; };
     try { work(tx, (next) => { value = next; }); }
     catch (error) { failure = error; tx.abort(); }
@@ -61,7 +62,7 @@ export function historyTransaction<T>(
 }
 
 export function historyScope(cube: string, classId: string): string {
-  if (!cube || !classId) throw new Error('cube and classId are required');
+  if (!cube || !classId) throw new ClientMessageError('shared.error.practiceConfig');
   return `${encodeURIComponent(cube)}-${encodeURIComponent(classId)}`;
 }
 
@@ -70,30 +71,33 @@ export function canonicalHistoryScope(scope: string): string {
 }
 
 function object(value: unknown): Record<string, unknown> {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Invalid history entry');
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new ClientMessageError('shared.error.invalidHistory');
   return value as Record<string, unknown>;
 }
 
 function strings(value: unknown): string[] {
   if (value === undefined) return [];
-  if (!Array.isArray(value) || value.some((item) => typeof item !== 'string')) throw new Error('Invalid history string array');
+  if (!Array.isArray(value) || value.some((item) => typeof item !== 'string')) throw new ClientMessageError('shared.error.invalidHistory');
   return value;
 }
 
 function number(value: unknown, fallback = 0): number {
   if (value === undefined) return fallback;
-  if (typeof value !== 'number' || !Number.isFinite(value)) throw new Error('Invalid history number');
+  if (typeof value !== 'number' || !Number.isFinite(value)) throw new ClientMessageError('shared.error.invalidHistory');
   return value;
 }
 
 function text(value: unknown, fallback = ''): string {
   if (value === undefined) return fallback;
-  if (typeof value !== 'string') throw new Error('Invalid history text');
+  if (typeof value !== 'string') throw new ClientMessageError('shared.error.invalidHistory');
   return value;
 }
 
 export function normalizeHistory(value: unknown): HistorySnapshot {
-  if (typeof value === 'string') value = JSON.parse(value);
+  if (typeof value === 'string') {
+    try { value = JSON.parse(value); }
+    catch { throw new ClientMessageError('shared.error.invalidHistory'); }
+  }
   const record = (value: unknown, index: number): FormulaPracticeRecord => {
     const r = object(value);
     return {
@@ -111,12 +115,12 @@ export function normalizeHistory(value: unknown): HistorySnapshot {
   else {
     const data = object(value);
     if (String(data.version) === '2') {
-      if (!Array.isArray(data.sessions)) throw new Error('Invalid history sessions');
+      if (!Array.isArray(data.sessions)) throw new ClientMessageError('shared.error.invalidHistory');
       const sessions = data.sessions.map((value, index): PracticeSession => {
         const s = object(value);
         const mode = s.mode ?? 'sequential';
-        if (!['sequential', 'random', 'nonRepeatRandom', 'weightedRandom'].includes(String(mode))) throw new Error('Invalid practice mode');
-        if (!Array.isArray(s.records)) throw new Error('Invalid session records');
+        if (!['sequential', 'random', 'nonRepeatRandom', 'weightedRandom'].includes(String(mode))) throw new ClientMessageError('shared.error.invalidHistory');
+        if (!Array.isArray(s.records)) throw new ClientMessageError('shared.error.invalidHistory');
         return {
           ...s, id: text(s.id) || `legacy-session-${number(s.createdAt)}-${index}`,
           createdAt: number(s.createdAt), mode: mode as PracticeSession['mode'],
@@ -125,7 +129,7 @@ export function normalizeHistory(value: unknown): HistorySnapshot {
       });
       return { version: 2, sessions };
     }
-    if (String(data.version) !== '1' || !Array.isArray(data.records)) throw new Error('Unsupported history format');
+    if (String(data.version) !== '1' || !Array.isArray(data.records)) throw new ClientMessageError('shared.error.historyFormat');
     legacy = data.records;
   }
   const records = legacy.map(record).reverse();
@@ -147,7 +151,7 @@ function mergeSessionMetadata(
   if (existing.id !== incoming.id || existing.createdAt !== incoming.createdAt || existing.mode !== incoming.mode ||
       existing.selectedFormulas.length !== incoming.selectedFormulas.length ||
       existing.selectedFormulas.some((formula, index) => formula !== incoming.selectedFormulas[index])) {
-    throw new Error('Conflicting history session metadata');
+    throw new ClientMessageError('shared.error.historyConflict');
   }
   return existing;
 }
@@ -167,7 +171,7 @@ export function putHistory(tx: IDBTransaction, scope: string, data: HistorySnaps
   const recordIds = new Set<string>();
   const sessionIds = new Set<string>();
   for (const session of data.sessions) {
-    if (sessionIds.has(session.id)) throw new Error('Duplicate history session ID');
+    if (sessionIds.has(session.id)) throw new ClientMessageError('shared.error.historyConflict');
     sessionIds.add(session.id);
     const { records: entries, ...metadata } = session;
     const row: SessionRow = { ...metadata, scope };
@@ -184,7 +188,7 @@ export function putHistory(tx: IDBTransaction, scope: string, data: HistorySnaps
       };
     } else sessions.put(row);
     for (const entry of entries) {
-      if (recordIds.has(entry.id)) throw new Error('Duplicate history record ID');
+      if (recordIds.has(entry.id)) throw new ClientMessageError('shared.error.historyConflict');
       recordIds.add(entry.id);
       const row: RecordRow = { ...entry, scope, sessionId: session.id };
       if (merge) {
@@ -301,7 +305,7 @@ export async function importHistory(histories: Record<string, unknown>): Promise
           for (const record of session.records) {
             const old = existing.records.find((r) => r.id === record.id);
             if (!old) existing.records.push(record);
-            else if (JSON.stringify(old) !== JSON.stringify(record)) throw new Error('Conflicting backup record IDs');
+            else if (JSON.stringify(old) !== JSON.stringify(record)) throw new ClientMessageError('shared.error.historyConflict');
           }
         }
       }

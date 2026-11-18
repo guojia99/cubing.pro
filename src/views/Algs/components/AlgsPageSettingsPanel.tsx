@@ -11,6 +11,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useI18n } from "@/contexts/I18nProvider";
+import { translatePuzzleExtra as extra } from "@/i18n/messages/puzzle-extra";
 import PuzzlePreferencesPanel from "@/components/puzzles/PuzzlePreferencesPanel";
 import {
   type FormulaFontFamilyId,
@@ -120,9 +121,7 @@ export default function AlgsPageSettingsPanel({
   const { t, locale } = useI18n();
   const sampleFormula =
     previewFormula?.trim() ||
-    (locale === "zh-CN"
-      ? t("algs.config.previewFormulaZh")
-      : t("algs.config.previewFormulaEn"));
+    t("algs.config.previewFormulaZh");
   const sampleName = previewName?.trim() ?? "";
   const diagramDims = getDiagramDimensions(diagramSize, "square");
   const canPreviewDiagram =
@@ -294,9 +293,7 @@ export default function AlgsPageSettingsPanel({
 
       <PuzzlePreferencesPanel />
       <Text fontSize="xs" color="fg.muted">
-        {locale === "zh-CN"
-          ? "公式说明图示现在由本地生成。"
-          : "Algorithm explanation diagrams are now generated locally."}
+        {extra(locale, "puzzleExtra.localDiagrams")}
       </Text>
 
       <Field.Root>

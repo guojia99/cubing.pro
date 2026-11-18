@@ -2,21 +2,24 @@
 
 import {
   Button,
-  Card,
+  Box,
   Field,
-  Heading,
   Input,
   NativeSelect,
+  SimpleGrid,
+  Stack,
   VStack,
 } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 
 import { PalettePicker } from "@/components/ui/PalettePicker";
+import { PageHeader, SectionHeader, Surface } from "@/components/ui/page";
 import { useColorMode } from "@/components/ui/color-mode";
 import { toaster } from "@/components/ui/toaster";
 import { useTheme } from "next-themes";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useI18n } from "@/contexts/I18nProvider";
+import { getSiteContent } from "@/i18n/messages/site-content";
 import { defaultSettings } from "@/config/defaultSettings";
 import {
   applyPaletteToDocument,
@@ -32,7 +35,7 @@ import { getToken } from "@/services/cubing-pro/auth/token";
 import { USER_KV_KEYS, setUserKv } from "@/services/cubing-pro/user/user_kv";
 
 export function SettingsPage() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const { currentUser } = useAuth();
   const { setColorMode } = useColorMode();
   const { setTheme } = useTheme();
@@ -90,11 +93,11 @@ export function SettingsPage() {
   };
 
   return (
-    <VStack align="stretch" gap="6" maxW="lg">
-      <Heading size="xl">{t("settings.title")}</Heading>
-      <Card.Root>
-        <Card.Body>
-          <VStack gap="5" align="stretch">
+    <VStack align="stretch" gap="6" maxW="var(--page-max)" w="full" mx="auto">
+      <PageHeader eyebrow={getSiteContent(locale)("siteContent.preferences")} title={t("settings.title")} />
+      <Surface p={{ base: "4", md: "6" }}>
+          <Stack gap="6" align="stretch">
+            <SimpleGrid columns={{ base: 1, md: 2 }} gap={{ base: "5", md: "8" }}>
             <Field.Root>
               <Field.Label>{t("settings.theme")}</Field.Label>
               <NativeSelect.Root>
@@ -111,11 +114,6 @@ export function SettingsPage() {
               </NativeSelect.Root>
             </Field.Root>
             <Field.Root>
-              <Field.Label>{t("settings.palette")}</Field.Label>
-              <PalettePicker value={palette} onChange={onPalettePreview} columns={4} />
-              <Field.HelperText>{t("settings.paletteHint")}</Field.HelperText>
-            </Field.Root>
-            <Field.Root>
               <Field.Label>{t("settings.fontSize")}</Field.Label>
               <Input
                 type="number"
@@ -126,6 +124,12 @@ export function SettingsPage() {
               />
               <Field.HelperText>{t("settings.fontSizeHint")}</Field.HelperText>
             </Field.Root>
+            </SimpleGrid>
+            <Box borderTopWidth="1px" borderColor="border" pt="5">
+              <SectionHeader title={t("settings.palette")} description={t("settings.paletteHint")} />
+              <Box mt="4" maxW="3xl" css={{ "& > div": { gridTemplateColumns: { base: "repeat(2, minmax(0, 1fr))", md: "repeat(4, minmax(0, 1fr))" } } }}><PalettePicker value={palette} onChange={onPalettePreview} columns={4} /></Box>
+            </Box>
+            <Box borderTopWidth="1px" borderColor="border" pt="5">
             <Button
               colorPalette="brand"
               alignSelf="flex-start"
@@ -134,9 +138,9 @@ export function SettingsPage() {
             >
               {t("settings.save")}
             </Button>
-          </VStack>
-        </Card.Body>
-      </Card.Root>
+            </Box>
+          </Stack>
+      </Surface>
     </VStack>
   );
 }

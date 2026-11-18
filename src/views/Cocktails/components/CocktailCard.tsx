@@ -1,18 +1,16 @@
 "use client";
 
 import { Box, Card, Text } from "@chakra-ui/react";
+import { useState } from "react";
+import { useI18n } from "@/contexts/I18nProvider";
+import { getSiteContent, getCocktailCategoryLabel } from "@/i18n/messages/site-content";
 
 import { CardActionButtons } from "@/views/FoodShared/CardActionButtons";
 
-import { getCategoryLabelZh } from "../categoryZh";
-import { getCocktailZhName } from "../cocktailNameZhMap";
-import type { Cocktail } from "../types";
-
-const PLACEHOLDER_IMG =
-  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Crect fill='%23f5f5f5' width='200' height='200'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23999' font-size='14'%3E暂无图片%3C/text%3E%3C/svg%3E";
+import { getCocktailDisplayName, type CocktailContent } from "@/lib/cocktailContent";
 
 interface CocktailCardProps {
-  cocktail: Cocktail;
+  cocktail: CocktailContent;
   onClick: () => void;
   isFav: boolean;
   onFavoriteChange: () => void;
@@ -30,9 +28,12 @@ export function CocktailCard({
   onTonightChange,
   inTonightMode,
 }: CocktailCardProps) {
-  const zh = getCocktailZhName(cocktail.slug, cocktail.name);
+  const { locale } = useI18n();
+  const sc = getSiteContent(locale);
+  const [imageFailed, setImageFailed] = useState(false);
+  const displayName = getCocktailDisplayName(cocktail, locale);
   const imgSrc = cocktail.image_path ? `/iba/${cocktail.image_path}` : "";
-  const descPreview = (cocktail.ingredients ?? []).slice(0, 3).join("、") || "—";
+  const descPreview = (cocktail.ingredients ?? []).slice(0, 3).join(sc("siteContent.separator")) || "—";
 
   return (
     <Box className="food-card-wrapper">
@@ -43,13 +44,12 @@ export function CocktailCard({
         cursor="pointer"
         position="relative"
         height="100%"
-        onClick={onClick}
       >
         <CardActionButtons
           isFavorite={isFav}
           isInTonight={isInTonight}
           inTonightMode={inTonightMode}
-          tonightTitle="添加到今晚喝什么"
+          tonightTitle={sc("siteContent.addDrinks")}
           onFavoriteClick={(e) => {
             e.stopPropagation();
             onFavoriteChange();
@@ -59,21 +59,19 @@ export function CocktailCard({
             onTonightChange();
           }}
         />
-        {imgSrc ? (
+        {imgSrc && !imageFailed ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={imgSrc}
-            alt={zh}
+            alt={displayName}
             loading="lazy"
             decoding="async"
-            style={{ width: "100%", height: 350, objectFit: "cover" }}
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = PLACEHOLDER_IMG;
-            }}
+            style={{ width: "100%", aspectRatio: "4 / 3", objectFit: "cover" }}
+            onError={() => setImageFailed(true)}
           />
         ) : (
           <Box
-            h="350px"
+            aspectRatio="4 / 3"
             bg="bg.muted"
             display="flex"
             alignItems="center"
@@ -84,18 +82,18 @@ export function CocktailCard({
             🍸
           </Box>
         )}
-        <Card.Body p="4">
-          <Text className="food-card-title" fontWeight="semibold" mb="1">
-            {zh}
+        <Card.Body p="5">
+          <Text as="h3" className="food-card-title" fontWeight="semibold" mb="1">
+            <a className="food-card-link" href={`/other/cocktails/${encodeURIComponent(cocktail.slug)}`} onClick={(event) => { if (!event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) { event.preventDefault(); onClick(); } }}>{displayName}</a>
           </Text>
-          <Text className="food-card-meta" mb="2">
-            {cocktail.name}
-          </Text>
+          {cocktail.originalName !== displayName ? (
+            <Text className="food-card-meta" mb="2">{cocktail.originalName}</Text>
+          ) : null}
           <Text className="food-card-desc" lineClamp={2} minH="42px">
             {descPreview}
           </Text>
           <Text mt="2" className="food-card-meta">
-            {getCategoryLabelZh(cocktail.category)}
+            {getCocktailCategoryLabel(locale, cocktail.category)}
           </Text>
         </Card.Body>
       </Card.Root>

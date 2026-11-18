@@ -1,6 +1,7 @@
 import type { PkArenaHeroDetail } from '@/views/TeamMatch/components/PkArenaHeroSlideOver';
 import { formatPkLineForPlayer } from '@/views/TeamMatch/pkSettlement';
 import type { PkPlayerResult, Team } from '@/views/TeamMatch/types';
+import type { TeamMatchLocale } from './i18n';
 
 export type PkArenaHeroPlayerInput = {
   id: string;
@@ -16,6 +17,7 @@ export function buildPkArenaHeroDetail(
   p: PkArenaHeroPlayerInput,
   team: Team,
   currentResults: PkPlayerResult[],
+  locale: TeamMatchLocale,
 ): PkArenaHeroDetail {
   return {
     name: p.name,
@@ -23,7 +25,7 @@ export function buildPkArenaHeroDetail(
     schoolName: p.schoolName,
     teamName: team.name,
     seedScoresLine: p.scoresLine,
-    pkResultLine: formatPkLineForPlayer(currentResults, p.id),
+    pkResultLine: formatPkLineForPlayer(currentResults, p.id, locale),
     playerBattlecry: p.playerBattlecry,
     teamBattlecry: (team.battlecry ?? '').trim(),
     wcaId: p.wcaId,

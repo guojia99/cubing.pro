@@ -1,0 +1,157 @@
+{
+  "locale": "zh-CN",
+  "tips": [
+    {
+      "id": "油温判断技巧",
+      "category": "advanced",
+      "title": "油温判断技巧及常见温度和单位换算表",
+      "description": "介绍不同油温下的观察方法和适用烹调方式，附常见油温对照表及摄氏度、华氏度换算公式。",
+      "categoryName": "进阶",
+      "mdPath": "advanced/油温判断技巧.md"
+    },
+    {
+      "id": "糖色的炒制",
+      "category": "advanced",
+      "title": "糖色的炒制",
+      "description": "以制作糖色为例，详解水炒与油炒的操作步骤、糖浆状态变化，以及挂霜、焦糖和上色等用途。",
+      "categoryName": "进阶",
+      "mdPath": "advanced/糖色的炒制.md"
+    },
+    {
+      "id": "辅料技巧",
+      "category": "advanced",
+      "title": "辅料技巧",
+      "description": "梳理姜、葱、蒜、香料和干辣椒的下锅顺序与煸香要点，并介绍不同菜肴的放盐时机和盐量控制。",
+      "categoryName": "进阶",
+      "mdPath": "advanced/辅料技巧.md"
+    },
+    {
+      "id": "高级专业术语",
+      "category": "advanced",
+      "title": "做菜专业术语",
+      "description": "汇集炒、炝、煎、炸、蒸、炖等烹调术语的读音与含义，帮助理解菜谱中的加工方法和操作要求。",
+      "categoryName": "进阶",
+      "mdPath": "advanced/高级专业术语.md"
+    },
+    {
+      "id": "去腥",
+      "category": "learn",
+      "title": "去腥",
+      "description": "介绍调料、蘸料、炝锅和冷水焯水等去腥方法，以及香料使用和保留食材自身风味的注意事项。",
+      "categoryName": "学习",
+      "mdPath": "learn/去腥.md"
+    },
+    {
+      "id": "学习凉拌",
+      "category": "learn",
+      "title": "凉拌",
+      "description": "介绍凉拌的基本形式、容器选择，以及蔬菜、菌类、肉类和辅料的处理、调味与混合流程。",
+      "categoryName": "学习",
+      "mdPath": "learn/学习凉拌.md"
+    },
+    {
+      "id": "学习炒与煎",
+      "category": "learn",
+      "title": "炒/煎",
+      "description": "介绍炒锅与煎锅的选择、热锅用油和防粘方法，梳理煎炒流程及防止热油飞溅、应对油锅起火的注意事项。",
+      "categoryName": "学习",
+      "mdPath": "learn/学习炒与煎.md"
+    },
+    {
+      "id": "学习焯水",
+      "category": "learn",
+      "title": "焯水",
+      "description": "说明开水锅与冷水锅焯水的区别，介绍蔬菜和肉类的处理方法、火候控制及焯水后的操作要点。",
+      "categoryName": "学习",
+      "mdPath": "learn/学习焯水.md"
+    },
+    {
+      "id": "学习煮",
+      "category": "learn",
+      "title": "煮",
+      "description": "介绍加水、加热和放入食材的基本煮制流程，以及锅盖使用、火力调整和防止溢锅的方法。",
+      "categoryName": "学习",
+      "mdPath": "learn/学习煮.md"
+    },
+    {
+      "id": "学习用刀",
+      "category": "learn",
+      "title": "学习用刀",
+      "description": "面向家庭厨房初学者，讲解刀具选择、握刀护手、各类食材切配、清洁收纳、磨刀维护和分阶段练习。",
+      "categoryName": "学习",
+      "mdPath": "learn/学习用刀.md"
+    },
+    {
+      "id": "学习腌",
+      "category": "learn",
+      "title": "腌（肉）",
+      "description": "介绍烹饪前肉类腌渍的基本概念、手法、容器和时间，整理常用腌料、通用搭配及多种菜品实例。",
+      "categoryName": "学习",
+      "mdPath": "learn/学习腌.md"
+    },
+    {
+      "id": "学习蒸",
+      "category": "learn",
+      "title": "蒸",
+      "description": "介绍使用蒸锅或铁锅配合支架蒸制食物的方法，以及蒸屉摆放、计时和防止烧干的注意事项。",
+      "categoryName": "学习",
+      "mdPath": "learn/学习蒸.md"
+    },
+    {
+      "id": "微波炉",
+      "category": "learn",
+      "title": "使用微波炉",
+      "description": "介绍微波炉的工作原理、不同火力的烹饪用途，以及容器选择、食物加热和防止蒸汽烫伤的注意事项。",
+      "categoryName": "学习",
+      "mdPath": "learn/微波炉.md"
+    },
+    {
+      "id": "空气炸锅",
+      "category": "learn",
+      "title": "使用空气炸锅",
+      "description": "介绍空气炸锅的热风加热原理和操作流程，附常用食物的烹饪参考及预处理、防粘、翻面和上色要点。",
+      "categoryName": "学习",
+      "mdPath": "learn/空气炸锅.md"
+    },
+    {
+      "id": "食品安全",
+      "category": "learn",
+      "title": "食品安全",
+      "description": "汇总食物中毒、过敏、细菌、霉菌毒素和寄生虫等风险，介绍食物中心温度测量及食品与药物联用的注意事项。",
+      "categoryName": "学习",
+      "mdPath": "learn/食品安全.md"
+    },
+    {
+      "id": "高压力锅",
+      "category": "learn",
+      "title": "蒸（米）/炖（使用电饭煲/高压锅/电压力锅）",
+      "description": "介绍压力锅的增压加热原理、蒸炖流程，以及密封圈、阀门、装料水位、排气和开盖的操作注意事项。",
+      "categoryName": "学习",
+      "mdPath": "learn/高压力锅.md"
+    },
+    {
+      "id": "厨房准备",
+      "category": "base",
+      "title": "厨房准备",
+      "description": "整理下厨前需要准备的厨具、清洁用品、常用调料和储备食材，并介绍脂肪酸知识及不同烹饪场景的选油思路。",
+      "categoryName": "基础",
+      "mdPath": "base/厨房准备.md"
+    },
+    {
+      "id": "如何洗碗",
+      "category": "base",
+      "title": "如何洗碗",
+      "description": "详解餐具分类、刮渣浸泡、清洗漂洗、检查干燥和收纳流程，涵盖不同材质与厨房电器的清洁方法及常见误区。",
+      "categoryName": "基础",
+      "mdPath": "base/如何洗碗.md"
+    },
+    {
+      "id": "如何选择现在吃什么",
+      "category": "base",
+      "title": "如何决策吃什么",
+      "description": "根据用餐人数计算菜品总数和荤素搭配，并结合人数、儿童口味、拿手菜及肉类多样性安排菜单。",
+      "categoryName": "基础",
+      "mdPath": "base/如何选择现在吃什么.md"
+    }
+  ]
+}

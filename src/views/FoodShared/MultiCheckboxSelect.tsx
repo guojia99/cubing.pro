@@ -10,6 +10,8 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useMemo } from "react";
+import { useI18n } from "@/contexts/I18nProvider";
+import { getSiteContent } from "@/i18n/messages/site-content";
 
 import { FOOD_FONT_SIZE } from "./foodTokens";
 
@@ -37,16 +39,18 @@ export function MultiCheckboxSelect({
   width = "200px",
   className,
 }: MultiCheckboxSelectProps) {
+  const { locale } = useI18n();
   const label = useMemo(() => {
+    const sc = getSiteContent(locale);
     if (value.length === 0) return placeholder;
     if (value.length <= 2) {
       return options
         .filter((o) => value.includes(o.value))
         .map((o) => o.label)
-        .join("、");
+        .join(sc("siteContent.separator"));
     }
-    return `已选 ${value.length} 项`;
-  }, [value, options, placeholder]);
+    return sc("siteContent.selected", { count: value.length });
+  }, [value, options, placeholder, locale]);
 
   const toggle = (optValue: string, checked: boolean) => {
     if (checked) {
@@ -64,12 +68,12 @@ export function MultiCheckboxSelect({
           variant="outline"
           className={`food-filter-trigger ${className ?? ""}`}
           w={width}
-          minW={width}
+          minW="0"
           maxW={width}
           justifyContent="flex-start"
           fontWeight="normal"
           fontSize={FOOD_FONT_SIZE}
-          h="36px"
+          h="44px"
           borderRadius="lg"
           borderColor="border"
           bg="bg"
@@ -81,12 +85,14 @@ export function MultiCheckboxSelect({
       </Popover.Trigger>
       <Portal>
         <Popover.Positioner>
-          <Popover.Content width="auto" maxH="280px" overflowY="auto" p="3">
+          <Popover.Content width="auto" minW="min(260px, calc(100vw - 2rem))" maxW="calc(100vw - 2rem)" maxH="min(360px, 60dvh)" overflowY="auto" p="4" borderRadius="var(--radius-card)" boxShadow="var(--shadow-float)">
             <VStack align="stretch" gap="1">
               {options.map((opt) => (
                 <Checkbox.Root
                   key={opt.value}
                   checked={value.includes(opt.value)}
+                  colorPalette="brand"
+                  minH="10"
                   onCheckedChange={(e) => toggle(opt.value, !!e.checked)}
                 >
                   <Checkbox.HiddenInput />

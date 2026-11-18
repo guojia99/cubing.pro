@@ -123,7 +123,7 @@ const WCAPlayerEventStatsTab: React.FC<WCAPlayerEventStatsTabProps> = ({
       render: (eventId: string) => (
         <div className="event-stats-event-cell">
           {CubeIcon(eventId, eventId, {})}
-          <strong>{CubesCn(eventId)}</strong>
+          <strong>{CubesCn(eventId, intl.locale)}</strong>
         </div>
       ),
     },

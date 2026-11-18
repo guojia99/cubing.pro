@@ -9,7 +9,8 @@
   right: 20px;
   bottom: 20px;
   z-index: 1100;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--shadow-float);
+  border-radius: 12px;
 }
 
 .competition-scrambles-group-timer-btn-wrap {
@@ -22,11 +23,11 @@
 
 /* 与 ConfigProvider 明暗主题一致，使用 ant token，勿写死浅色（见 table_style.css 说明） */
 .highlight-row > td {
-  background-color: var(--ant-color-warning-bg) !important;
+  background-color: color-mix(in srgb, var(--signal-warning) 12%, var(--card)) !important;
 }
 
 .scramble-text {
-  color: var(--ant-color-text);
+  color: var(--foreground);
 }
 
 .scramble-text--compact {
@@ -46,15 +47,15 @@
   box-sizing: border-box;
   min-width: 0;
   padding: 12px;
-  border: 1px solid var(--ant-color-border);
-  border-radius: 8px;
-  background: var(--ant-color-bg-container);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-card, 1rem);
+  background: var(--card);
 }
 
 /* 高亮行：单元格已是 warning 底，内框透明，边框用 warning 色以免与底色糊成一片 */
 tr.highlight-row .scramble-pair-frame {
   background: transparent;
-  border-color: var(--ant-color-warning-border, var(--ant-color-border));
+  border-color: var(--signal-warning);
 }
 
 .scramble-pair-frame--stack {
@@ -64,14 +65,14 @@ tr.highlight-row .scramble-pair-frame {
 }
 
 .scramble-pair-frame--stack.highlight-row {
-  background: var(--ant-color-warning-bg);
-  border-color: var(--ant-color-warning-border, var(--ant-color-border));
+  background: color-mix(in srgb, var(--signal-warning) 12%, var(--card));
+  border-color: var(--signal-warning);
 }
 
 .scramble-pair-frame__label {
   display: block;
   font-size: 13px;
-  color: var(--ant-color-text-tertiary);
+  color: var(--muted-foreground);
   margin-bottom: 6px;
 }
 
@@ -112,21 +113,23 @@ tr.highlight-row .scramble-pair-frame {
 
 .scramble-group-toolbar {
   position: sticky;
-  top: 0;
+  top: calc(var(--header-height, 4rem) + 24px);
   z-index: 20;
   display: flex;
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
-  padding: 10px 0;
+  padding: 12px 14px;
   margin-bottom: 8px;
-  background: var(--ant-color-bg-layout);
-  border-bottom: 1px solid var(--ant-color-border-secondary);
+  background: var(--card);
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
 }
 
 .scramble-group-toolbar__label {
   font-size: 14px;
-  color: var(--ant-color-text-secondary);
+  color: var(--muted-foreground);
   white-space: nowrap;
 }
 
@@ -161,12 +164,12 @@ tr.highlight-row .scramble-pair-frame {
 
 .scramble-mobile-item__index {
   font-size: 13px;
-  color: var(--ant-color-text-secondary);
+  color: var(--muted-foreground);
   margin-bottom: 8px;
 }
 
 .scramble-image-loading {
-  color: var(--ant-color-text-secondary);
+  color: var(--muted-foreground);
   font-size: 13px;
   padding: 8px 0;
 }
@@ -195,4 +198,14 @@ tr.highlight-row .scramble-pair-frame {
   height: auto;
   max-height: min(280px, 55vh);
   object-fit: contain;
+}
+.competition-workbench .scramble-pair-frame { background: var(--background); border-color: var(--border-default); }
+.competition-workbench tr.highlight-row .scramble-pair-frame { background: transparent; border-color: var(--signal-warning); }
+.scramble-round-title { font-family: var(--font-heading); padding-top: 8px; }
+.competition-scrambles-group-timer-btn, .competition-scrambles-group-timer-btn-wrap { bottom: max(20px, env(safe-area-inset-bottom)); }
+@media (max-width: 640px) {
+  .scramble-group-toolbar { gap: 8px; padding: 10px; }
+  .scramble-group-toolbar__select { flex: 1 1 140px; min-width: 0; }
+  .scramble-mobile-item { min-width: 0; }
+  .competition-scrambles-group-timer-btn, .competition-scrambles-group-timer-btn-wrap { right: 12px; }
 }

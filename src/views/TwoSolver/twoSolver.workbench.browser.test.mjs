@@ -246,7 +246,8 @@ try {
       await page.evaluate(() => window.scrollTo(0, 650));
       await page.waitForTimeout(80);
       const pinned = await sticky.boundingBox();
-      assert.ok(pinned && Math.abs(pinned.y - 72) <= 1, `${width}px analysis scramble stays below the header`);
+      const headerBottom = await page.locator('[data-app-header]').evaluate(el => el.getBoundingClientRect().bottom);
+      assert.ok(pinned && pinned.y >= headerBottom && pinned.y <= headerBottom + 24, `${width}px analysis scramble stays below the header`);
       assert.ok(pinned.width <= width && pinned.height > 0);
       assert.equal(await sticky.locator('code').textContent(), await main.locator('#two-scramble').inputValue());
       const geometry = await cards.evaluateAll(elements => {

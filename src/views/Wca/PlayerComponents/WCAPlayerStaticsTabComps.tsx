@@ -4,11 +4,11 @@ import { Button, Space, Table } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import React, { useEffect, useState } from 'react';
 import { useIntl } from '@/hooks/useIntlMessage';
-import { getLocale } from '@/lib/localeClient';
-import { getCountryNameByIso2 } from '@/views/Wca/PlayerComponents/region/all_contiry';
+import { getCountryDisplayName } from '@/views/Wca/PlayerComponents/region/all_contiry';
 import { getLocationByPinyin } from '@/views/Wca/PlayerComponents/region/china_citys';
 import { findCubingCompetitionByIdentifier } from '@/services/cubing-pro/cubing_china/cubing';
 import { WCACompetition, WCAResult } from '@/services/cubing-pro/wca/types';
+import { formatLocalizedDateRange } from '@/lib/localizedDates';
 
 interface WCACompetitionTableProps {
   competitions: WCACompetition[];
@@ -18,25 +18,12 @@ interface WCACompetitionTableProps {
 // 赛事列表表格组件
 const CompetitionTable: React.FC<WCACompetitionTableProps> = ({ competitions, wcaResults }) => {
   const intl = useIntl();
-  const locale = getLocale() || intl.locale || 'zh-CN';
+  const locale = intl.locale;
   /** 仅简体/繁体等中文界面将中港澳台省市区转为中文；英文、日文等保留 WCA 原文 */
   const translateChinaPlaceNames = locale.toLowerCase().startsWith('zh');
 
   const competitionRegionPrefix = (iso2: string): string => {
-    if (translateChinaPlaceNames) {
-      return getCountryNameByIso2(iso2) || iso2;
-    }
-    const code = iso2.toUpperCase();
-    try {
-      if (typeof Intl !== 'undefined' && typeof Intl.DisplayNames !== 'undefined') {
-        const dn = new Intl.DisplayNames([locale], { type: 'region' });
-        const n = dn.of(code);
-        if (n) return n;
-      }
-    } catch {
-      /* ignore */
-    }
-    return code;
+    return getCountryDisplayName(iso2, undefined, locale);
   };
 
   // 倒序排列（按开始日期倒序）
@@ -70,29 +57,7 @@ const CompetitionTable: React.FC<WCACompetitionTableProps> = ({ competitions, wc
       width: 180,
       sorter: (a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime(),
       render: (_, record) => {
-        const startDate = new Date(record.start_date);
-        const endDate = new Date(record.end_date);
-
-        // 格式化为 YYYY-MM-DD
-        const formatISODate = (date: Date) => {
-          const year = date.getFullYear();
-          const month = String(date.getMonth() + 1).padStart(2, '0');
-          const day = String(date.getDate()).padStart(2, '0');
-          return `${year}-${month}-${day}`;
-        };
-
-        const startStr = formatISODate(startDate);
-        const endStr = formatISODate(endDate);
-
-        if (startStr === endStr) {
-          return <span>{startStr}</span>; // 单天比赛
-        } else {
-          return (
-            <span>
-              {startStr} ~ {endStr}
-            </span>
-          ); // 多天比赛
-        }
+        return <span>{formatLocalizedDateRange(record.start_date, record.end_date, locale)}</span>;
       },
     },
     {

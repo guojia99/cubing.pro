@@ -1,3 +1,4 @@
+import { tm, type TeamMatchLocale } from './i18n';
 import type {
   SeedingAdoptStrategy,
   SeedingEntryPreliminary,
@@ -93,17 +94,8 @@ export function resolveOfficialScores(
   return null;
 }
 
-export const SEEDING_SOURCE_LABEL: Record<SeedingScoreSource, string> = {
-  wca: 'WCA',
-  one: 'One',
-  preliminary: '初赛',
-  manual: '手填',
-};
-
-/** 表格行内跟在成绩后的「」短标签（手动 / wca / one / 初赛） */
-export const SEEDING_SOURCE_INLINE: Record<SeedingScoreSource, string> = {
-  manual: '手动',
-  wca: 'wca',
-  one: 'one',
-  preliminary: '初赛',
-};
+export function seedingSourceLabel(source: SeedingScoreSource, locale: TeamMatchLocale): string {
+  if (source === 'wca') return 'WCA';
+  if (source === 'one') return 'One';
+  return tm(locale, source === 'preliminary' ? 'teamMatch.preliminary' : 'teamMatch.manual');
+}

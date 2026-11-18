@@ -1,10 +1,12 @@
 "use client";
 
-import { Card, Link, Spinner, Text } from "@chakra-ui/react";
+import { Link, Spinner, Text } from "@chakra-ui/react";
+import { SectionHeader, Surface } from "@/components/ui/page";
 import NextLink from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
 import { useI18n } from "@/contexts/I18nProvider";
+import { getSiteContent } from "@/i18n/messages/site-content";
 import { emptyOtherLinks } from "@/services/cubing-pro/otherLinksNormalize";
 import { getOtherLinks } from "@/services/cubing-pro/public/orgs";
 import type { OtherLinks } from "@/services/cubing-pro/public/types";
@@ -14,7 +16,7 @@ import { getTopLinks } from "@/views/ExternalLinks/utils";
 import "./externalLinks.css";
 
 export function ExternalLinksHomeSection() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [data, setData] = useState<OtherLinks | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -42,15 +44,13 @@ export function ExternalLinksHomeSection() {
   }
 
   return (
-    <Card.Root mb="6" borderRadius="xl">
-      <Card.Body p="5">
+    <Surface as="section" p={{ base: "4", md: "5" }}>
         <div className="external-links-home">
-          <div className="external-links-home__head">
-            <div className="external-links-home__title">{t("externalLinks.homeSectionTitle")}</div>
+          <SectionHeader eyebrow={getSiteContent(locale)("siteContent.aroundCommunity")} title={t("externalLinks.homeSectionTitle")} actions={
             <Link asChild fontSize="sm" color="accent">
               <NextLink href="/external-links">{t("externalLinks.viewAll")}</NextLink>
             </Link>
-          </div>
+          } />
           {loading ? (
             <Spinner size="md" color="brand.solid" />
           ) : tops.length > 0 ? (
@@ -65,7 +65,6 @@ export function ExternalLinksHomeSection() {
             </Text>
           )}
         </div>
-      </Card.Body>
-    </Card.Root>
+    </Surface>
   );
 }

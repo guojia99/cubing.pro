@@ -1,4 +1,5 @@
 import type { Player, School, Team, TeamKind, TeamMatchSession } from '@/views/TeamMatch/types';
+import { tm, type TeamMatchLocale } from './i18n';
 
 export type ClassifyResult =
   | { ok: true; kind: TeamKind; schoolId: string }
@@ -17,10 +18,11 @@ export function classifyTeamComposition(
   playerIds: [string, string, string],
   players: Player[],
   schools: School[],
+  locale: TeamMatchLocale = 'zh-CN',
 ): ClassifyResult {
   const flSchoolId = getFreelancerSchoolId(schools);
   const plist = playerIds.map((id) => players.find((p) => p.id === id)).filter(Boolean) as Player[];
-  if (plist.length !== 3) return { ok: false, message: '请选择 3 名选手' };
+  if (plist.length !== 3) return { ok: false, message: tm(locale, 'teamMatch.threePlayersRequired') };
 
   const isFl = (sid: string) => flSchoolId !== undefined && sid === flSchoolId;
 
@@ -47,7 +49,7 @@ export function classifyTeamComposition(
     if (!flSchoolId) {
       return {
         ok: false,
-        message: '三名队员来自三所不同学校，须设为自由人队；请先在「学校」步骤添加类型为「自由人池」的学校',
+        message: tm(locale, 'teamMatch.threeSchoolsNeedPool'),
       };
     }
     return { ok: true, kind: 'freelancer', schoolId: flSchoolId };
@@ -60,18 +62,19 @@ export function classifyTeamComposition(
   if (!flSchoolId) {
     return {
       ok: false,
-      message: '当前组合须作为自由人队，请先在「学校」步骤添加「自由人池」类型学校',
+      message: tm(locale, 'teamMatch.needIndependentPool'),
     };
   }
   return { ok: true, kind: 'freelancer', schoolId: flSchoolId };
 }
 
 /** 默认队名 */
-export function defaultTeamName(kind: TeamKind, schoolId: string, schools: School[]): string {
+export function defaultTeamName(kind: TeamKind, schoolId: string, schools: School[], locale: TeamMatchLocale = 'zh-CN'): string {
   if (kind === 'freelancer') {
-    return schools.find((s) => s.id === schoolId)?.name ? `${schools.find((s) => s.id === schoolId)!.name}队` : '自由人队';
+    const name = schools.find((s) => s.id === schoolId)?.name;
+    return name ? tm(locale, 'teamMatch.namedTeam', { name }) : tm(locale, 'teamMatch.independentTeam');
   }
-  return schools.find((s) => s.id === schoolId)?.name ?? '队伍';
+  return schools.find((s) => s.id === schoolId)?.name ?? tm(locale, 'teamMatch.team');
 }
 
 /**
@@ -84,11 +87,11 @@ export function schoolIdForDrawPairing(session: TeamMatchSession, teamId: string
   return t.schoolId;
 }
 
-export function teamKindLabel(team: Team, schools: School[]): string {
+export function teamKindLabel(team: Team, schools: School[], locale: TeamMatchLocale = 'zh-CN'): string {
   if (team.kind === 'freelancer') {
     const n = schools.find((s) => s.id === team.schoolId)?.name;
-    return n ? `自由人队（${n}）` : '自由人队';
+    return n ? tm(locale, 'teamMatch.independentTeamAffiliation', { name: n }) : tm(locale, 'teamMatch.independentTeam');
   }
   const sn = schools.find((s) => s.id === team.schoolId)?.name ?? '';
-  return sn ? `学校队 · ${sn}` : '学校队';
+  return sn ? tm(locale, 'teamMatch.schoolTeamAffiliation', { name: sn }) : tm(locale, 'teamMatch.schoolTeam');
 }

@@ -6,7 +6,6 @@ import BackButton from "@/components/Buttons/back_button";
 import { Alert, Card, Col, DatePicker, Form, Input, InputNumber, Row, Switch } from "antd";
 import React from "react";
 
-import { CubesCn } from '@/components/CubeIcon/cube';
 import MarkdownEditor from '@/components/Markdown/editer';
 import {
   apiCreateComps,
@@ -32,6 +31,8 @@ import {
 import { Button, Modal, Select, Table, Upload, message } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { useAdminExtra } from './useAdminExtra';
+import { adminExtraZhCN } from '@/i18n/messages/admin-extra';
 
 const { Option } = Select;
 
@@ -49,6 +50,7 @@ const normalizeSchedules = (
   }));
 
 export const EventTable: React.FC<{ value?: CompAPI.Event[]; onChange?: (val: CompAPI.Event[]) => void }> = ({ value, onChange }) => {
+  const { t, text, eventName } = useAdminExtra();
   const [localEvents, setEvents] = useState<CompAPI.Event[]>([]);
   const events = value ?? localEvents;
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -81,14 +83,14 @@ export const EventTable: React.FC<{ value?: CompAPI.Event[]; onChange?: (val: Co
 
   const columns = [
     {
-      title: '序号',
+      title: t('adminExtra.index'),
       dataIndex: 'index',
       key: 'index',
       render: (_: any, __: any, index: number) => index + 1,
       width: 100,
     },
     {
-      title: '项目',
+      title: t('adminExtra.event'),
       dataIndex: 'EventName',
       key: 'EventName',
       width: 150,
@@ -100,21 +102,21 @@ export const EventTable: React.FC<{ value?: CompAPI.Event[]; onChange?: (val: Co
         >
           {eventOptions.map((option) => (
             <Option key={option} value={option}>
-              {CubesCn(option)}
+              {eventName(option)}
             </Option>
           ))}
         </Select>
       ),
     },
     {
-      title: '赛程数',
+      title: t('adminExtra.roundCount'),
       dataIndex: 'Schedule',
       key: 'ScheduleCount',
       render: (schedule: CompAPI.Schedule[]) => schedule.length,
       width: 100,
     },
     {
-      title: '操作',
+      title: t('adminExtra.actions'),
       key: 'action',
       width: 200,
       render: (_: any, record: CompAPI.Event) => (
@@ -125,7 +127,7 @@ export const EventTable: React.FC<{ value?: CompAPI.Event[]; onChange?: (val: Co
             onClick={() => showScheduleModal(record)}
             style={{ marginRight: 8 }}
           >
-            安排赛程
+            {t('adminExtra.schedule')}
           </Button>
 
           <Button
@@ -135,7 +137,7 @@ export const EventTable: React.FC<{ value?: CompAPI.Event[]; onChange?: (val: Co
               () => deleteEvent(record.Key)
             }
           >
-            删除
+            {t('adminExtra.delete')}
           </Button>
         </>
       ),
@@ -144,35 +146,35 @@ export const EventTable: React.FC<{ value?: CompAPI.Event[]; onChange?: (val: Co
 
   const scheduleColumns = [
     {
-      title: '轮次',
+      title: t('adminExtra.round'),
       dataIndex: 'Round',
       key: 'Round',
       width: 100,
       render: (_text: string, _record: CompAPI.Schedule, index: number) =>
-        getRoundName(index, modalSchedules.length),
+        text(getRoundName(index, modalSchedules.length)),
     },
     {
-      title: '参赛资格', key: 'NoRestrictions', width: 210,
-      render: (_: unknown, record: CompAPI.Schedule, index: number) => index === 0 ? '首轮报名资格' : <Select aria-label={`第 ${index + 1} 轮参赛资格`} style={{ width: 190 }} value={roundNoRestrictions(record, index) ? 'unrestricted' : 'qualified'} options={[{ value: 'qualified', label: '按晋级名单' }, { value: 'unrestricted', label: '无限制' }]} onChange={(value) => setModalSchedules((previous) => previous.map((s, i) => i === index ? { ...s, NoRestrictions: value === 'unrestricted' } : s))} />,
+      title: t('adminExtra.eligibility'), key: 'NoRestrictions', width: 210,
+      render: (_: unknown, record: CompAPI.Schedule, index: number) => index === 0 ? t('adminExtra.firstRoundEligibility') : <Select aria-label={t('adminExtra.roundEligibility', { count: index + 1 })} style={{ width: 190 }} value={roundNoRestrictions(record, index) ? 'unrestricted' : 'qualified'} options={[{ value: 'qualified', label: t('adminExtra.byAdvancement') }, { value: 'unrestricted', label: t('adminExtra.unrestricted') }]} onChange={(value) => setModalSchedules((previous) => previous.map((s, i) => i === index ? { ...s, NoRestrictions: value === 'unrestricted' } : s))} />,
     },
     {
-      title: '晋级人数（0 不限）', key: 'Competitors', width: 170,
-      render: (_: unknown, record: CompAPI.Schedule, index: number) => <><InputNumber aria-label={`第 ${index + 1} 轮晋级人数`} min={0} precision={0} value={record.Competitors ?? 0} onChange={(value) => setModalSchedules((previous) => previous.map((s, i) => i === index ? { ...s, Competitors: value ?? 0 } : s))} />{index > 0 && roundNoRestrictions(record, index) && (record.Competitors ?? 0) > 0 && <Alert type="warning" title="无限制不会校验晋级名单；如需限制人数，请选择按晋级名单。" />}</>,
+      title: t('adminExtra.advancementCount'), key: 'Competitors', width: 170,
+      render: (_: unknown, record: CompAPI.Schedule, index: number) => <><InputNumber aria-label={t('adminExtra.roundAdvancement', { count: index + 1 })} min={0} precision={0} value={record.Competitors ?? 0} onChange={(value) => setModalSchedules((previous) => previous.map((s, i) => i === index ? { ...s, Competitors: value ?? 0 } : s))} />{index > 0 && roundNoRestrictions(record, index) && (record.Competitors ?? 0) > 0 && <Alert type="warning" title={t('adminExtra.unrestrictedHint')} />}</>,
     },
     {
-      title: '时限（秒，0 不限）', key: 'TimeLimit', width: 170,
+      title: t('adminExtra.timeLimit'), key: 'TimeLimit', width: 170,
       render: (_: unknown, record: CompAPI.Schedule, index: number) => <InputNumber min={0} value={record.TimeLimit} onChange={(value) => setModalSchedules((previous) => previous.map((s, i) => i === index ? { ...s, TimeLimit: value ?? 0 } : s))} />,
     },
     {
-      title: '及格线（秒，0 无）', key: 'Cutoff', width: 170,
+      title: t('adminExtra.cutoff'), key: 'Cutoff', width: 170,
       render: (_: unknown, record: CompAPI.Schedule, index: number) => <InputNumber min={0} value={record.Cutoff} onChange={(value) => setModalSchedules((previous) => previous.map((s, i) => i === index ? { ...s, Cutoff: value ?? 0 } : s))} />,
     },
     {
-      title: '及格尝试数', key: 'CutoffNumber', width: 130,
+      title: t('adminExtra.cutoffAttempts'), key: 'CutoffNumber', width: 130,
       render: (_: unknown, record: CompAPI.Schedule, index: number) => <InputNumber min={0} max={5} precision={0} value={record.CutoffNumber} onChange={(value) => setModalSchedules((previous) => previous.map((s, i) => i === index ? { ...s, CutoffNumber: value ?? 0 } : s))} />,
     },
     {
-      title: '操作',
+      title: t('adminExtra.actions'),
       key: 'action',
       width: 100,
       render: (_: any, __: any, index: number) => (
@@ -182,7 +184,7 @@ export const EventTable: React.FC<{ value?: CompAPI.Event[]; onChange?: (val: Co
           onClick={() => deleteSchedule(index)}
           disabled={index === 0}
         >
-          删除
+          {t('adminExtra.delete')}
         </Button>
       ),
     },
@@ -220,7 +222,7 @@ export const EventTable: React.FC<{ value?: CompAPI.Event[]; onChange?: (val: Co
     );
 
     if (unusedEvents.length === 0) {
-      message.warning('所有项目已全部加入，无法继续加载').then();
+      message.warning(t('adminExtra.allEventsAdded')).then();
       return;
     }
 
@@ -245,14 +247,19 @@ export const EventTable: React.FC<{ value?: CompAPI.Event[]; onChange?: (val: Co
   };
 
   const getRoundName = (index: number, totalRounds: number) => {
-    if (totalRounds === 1) return '决赛';
-    if (totalRounds === 2) return index === 0 ? '初赛' : '决赛';
-    if (totalRounds === 3) return ['初赛', '复赛', '决赛'][index];
-    if (totalRounds === 4) return ['初赛', '复赛', '半决赛', '决赛'][index];
-    if (index === 0) return '初赛';
-    if (index === totalRounds - 1) return '决赛';
-    if (index === totalRounds - 2) return '半决赛';
-    return `复赛第${index}轮`;
+    // Round names are persisted API data. Keep the original values in every locale.
+    const final = adminExtraZhCN['adminExtra.final'];
+    const preliminary = adminExtraZhCN['adminExtra.preliminary'];
+    const second = adminExtraZhCN['adminExtra.secondRound'];
+    const semiFinal = adminExtraZhCN['adminExtra.semiFinal'];
+    if (totalRounds === 1) return final;
+    if (totalRounds === 2) return index === 0 ? preliminary : final;
+    if (totalRounds === 3) return [preliminary, second, final][index];
+    if (totalRounds === 4) return [preliminary, second, semiFinal, final][index];
+    if (index === 0) return preliminary;
+    if (index === totalRounds - 1) return final;
+    if (index === totalRounds - 2) return semiFinal;
+    return adminExtraZhCN['adminExtra.intermediateRound'].replace('{count}', String(index));
   };
 
   const importEvents = (file: File) => {
@@ -260,7 +267,7 @@ export const EventTable: React.FC<{ value?: CompAPI.Event[]; onChange?: (val: Co
     reader.onload = (e) => {
       try {
         const importedEvents: CompAPI.Event[] = JSON.parse(e.target?.result as string);
-        if (!Array.isArray(importedEvents) || !importedEvents.length || importedEvents.some((event) => !eventOptions.includes(event.EventID) || !Array.isArray(event.Schedule)) || new Set(importedEvents.map((event) => event.EventID)).size !== importedEvents.length) throw new Error('项目配置无效');
+        if (!Array.isArray(importedEvents) || !importedEvents.length || importedEvents.some((event) => !eventOptions.includes(event.EventID) || !Array.isArray(event.Schedule)) || new Set(importedEvents.map((event) => event.EventID)).size !== importedEvents.length) throw new Error(t('adminExtra.invalidEventConfig'));
         updateEvents(
           importedEvents.map((event) => ({
             ...event,
@@ -286,12 +293,12 @@ export const EventTable: React.FC<{ value?: CompAPI.Event[]; onChange?: (val: Co
           })),
         );
 
-        message.success('数据导入成功').then();
+        message.success(t('adminExtra.imported')).then();
       } catch {
-        message.error('数据导入失败，请检查文件格式').then();
+        message.error(t('adminExtra.importFailed')).then();
       }
     };
-    reader.onerror = () => { void message.error('读取文件失败，请重试'); };
+    reader.onerror = () => { void message.error(t('adminExtra.fileReadFailed')); };
     reader.readAsText(file);
     return false;
   };
@@ -309,7 +316,7 @@ export const EventTable: React.FC<{ value?: CompAPI.Event[]; onChange?: (val: Co
 
   const createDefaultSchedule = (eventName: string, roundNum = 1): CompAPI.Schedule => ({
     Event: eventName,
-    Round: '决赛',
+    Round: adminExtraZhCN['adminExtra.final'],
     Stage: '',
     EventName: eventName,
     IsComp: true,
@@ -353,7 +360,7 @@ export const EventTable: React.FC<{ value?: CompAPI.Event[]; onChange?: (val: Co
       return e.EventID === value;
     });
     if (find.length !== 0) {
-      message.warning('已存在' + value + '项目, 无法继续添加').then();
+      message.warning(t('adminExtra.duplicateEvent', { event: value })).then();
       return;
     }
 
@@ -384,15 +391,15 @@ export const EventTable: React.FC<{ value?: CompAPI.Event[]; onChange?: (val: Co
           onClick={addEvent}
           style={{ marginRight: 8 }}
         >
-          添加项目
+          {t('adminExtra.addEvent')}
         </Button>
         <Upload accept=".json" beforeUpload={importEvents} showUploadList={false}>
           <Button icon={<UploadOutlined />} style={{ marginRight: 8 }}>
-            导入赛程安排
+            {t('adminExtra.importSchedule')}
           </Button>
         </Upload>
         <Button icon={<DownloadOutlined />} onClick={exportEvents}>
-          导出赛程安排
+          {t('adminExtra.exportSchedule')}
         </Button>
       </div>
       <Table
@@ -405,19 +412,21 @@ export const EventTable: React.FC<{ value?: CompAPI.Event[]; onChange?: (val: Co
       />
 
       <Modal
-        title="安排赛程"
+        title={t('adminExtra.schedule')}
+        okText={t('adminExtra.confirm')}
+        cancelText={t('adminExtra.cancel')}
         open={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
         width={1000}
       >
         <Form form={form} layout="vertical">
-          <Alert type="info" showIcon title="后续轮次默认按晋级名单；本轮晋级人数由上一轮关闭时计算，0 表示不限制晋级人数。选择无限制会跳过名单校验，已有明确配置不会自动变更。" style={{ marginBottom: 16 }} />
-            <Form.Item name="EventName" label="项目名称">
+          <Alert type="info" showIcon title={t('adminExtra.scheduleHint')} style={{ marginBottom: 16 }} />
+            <Form.Item name="EventName" label={t('adminExtra.eventName')}>
             <Select disabled>
               {eventOptions.map((option) => (
                 <Option key={option} value={option}>
-                  {CubesCn(option)}
+                  {eventName(option)}
                 </Option>
               ))}
             </Select>
@@ -438,7 +447,7 @@ export const EventTable: React.FC<{ value?: CompAPI.Event[]; onChange?: (val: Co
             disabled={modalSchedules.length >= 99}
             style={{ marginTop: 20 }}
           >
-            添加轮次
+            {t('adminExtra.addRound')}
           </Button>
         </Form>
       </Modal>
@@ -447,14 +456,15 @@ export const EventTable: React.FC<{ value?: CompAPI.Event[]; onChange?: (val: Co
 };
 
 const OtherDataForm = () => {
+  const { t } = useAdminExtra();
   return (
     <>
       <Row gutter={16}>
         <Col xs={24} md={12}>
           <Form.Item
             name="startDate"
-            label="开始日期（00:00）"
-            rules={[{ required: true, message: '请选择开始日期！' }]}
+            label={t('adminExtra.startDate')}
+            rules={[{ required: true, message: t('adminExtra.requireStart') }]}
           >
             <DatePicker style={{ width: '100%' }} />
           </Form.Item>
@@ -462,8 +472,8 @@ const OtherDataForm = () => {
         <Col xs={24} md={12}>
           <Form.Item
             name="endDate"
-            label="结束日期（含全天，次日 00:00 截止）"
-            rules={[{ required: true, message: '请选择结束日期！' }]}
+            label={t('adminExtra.endDate')}
+            rules={[{ required: true, message: t('adminExtra.requireEnd') }]}
           >
             <DatePicker style={{ width: '100%' }} />
           </Form.Item>
@@ -474,6 +484,7 @@ const OtherDataForm = () => {
 };
 
 function CreateCompetitionContent() {
+  const { t } = useAdminExtra();
   const [modal, modalContext] = Modal.useModal();
   const router = useRouter();
   const [org, setOrg] = useState<OrganizersAPI.MeOrganizersResp | null>(null);
@@ -499,10 +510,10 @@ function CreateCompetitionContent() {
   // 检查用户是否加入了团队
   useEffect(() => {
     if (org?.data.items === null || org?.data.items?.length === 0) {
-      void message.warning("你还未加入任何团队，请加入后再创建比赛");
+      void message.warning(t('adminExtra.joinBeforeCreate'));
       router.replace("/admin/organizers");
     }
-  }, [org, router]);
+  }, [org, router, t]);
 
   useEffect(() => {
     if (curOrg === 0) {
@@ -528,18 +539,18 @@ function CreateCompetitionContent() {
       .validateFields()
       .then((values) => {
         if (submitLock.current) return;
-        if (!events.length) { void message.warning('至少添加一个比赛项目'); return; }
-        if (values.endDate.format('YYYY-MM-DD') < values.startDate.format('YYYY-MM-DD')) { void message.warning('结束日期不能早于开始日期'); return; }
-        if (!groups?.data.items.some((group) => group.id === values.groupsID)) { void message.warning('请选择当前团队的有效群组'); return; }
+        if (!events.length) { void message.warning(t('adminExtra.requireEvent')); return; }
+        if (values.endDate.format('YYYY-MM-DD') < values.startDate.format('YYYY-MM-DD')) { void message.warning(t('adminExtra.endBeforeStart')); return; }
+        if (!groups?.data.items.some((group) => group.id === values.groupsID)) { void message.warning(t('adminExtra.requireValidGroup')); return; }
         submitLock.current = true;
         modal.confirm({
-          title: '确认提交',
-          okText: '确认创建',
-          cancelText: '取消',
+          title: t('adminExtra.confirmSubmit'),
+          okText: t('adminExtra.confirmCreate'),
+          cancelText: t('adminExtra.cancel'),
           content: (
             <>
-              <p>你确定要提交比赛信息吗？</p>
-              <Alert title="生成打乱可能需要等待 2 ~ 20 秒，请勿重复提交" showIcon type="warning" />
+              <p>{t('adminExtra.submitHint')}</p>
+              <Alert title={t('adminExtra.scrambleWait')} showIcon type="warning" />
             </>
           ),
           onOk: async () => {
@@ -547,7 +558,7 @@ function CreateCompetitionContent() {
             try {
             const configuredEvents = events.map((event) => {
               const base = baseEvents.find((value) => value.id === event.EventID);
-              if (!base) throw new Error(`项目 ${event.EventID} 配置无效`);
+              if (!base) throw new Error(t('adminExtra.invalidNamedEvent', { event: event.EventID }));
               return { ...event, EventRoute: base.base_route_typ, Schedule: event.Schedule.map((s) => ({ ...s, IsRunning: true, ActualStartTime: null, ActualEndTime: null, AdvancedToNextRound: null })) };
             });
             validateEvents(configuredEvents);
@@ -581,7 +592,7 @@ function CreateCompetitionContent() {
               Apply: values.apply,
             };
             await apiCreateComps(values.organizersID, req);
-            void message.success('创建成功；审批通过后即可录入已配置轮次成绩');
+            void message.success(t('adminExtra.created'));
             router.push(`/admin/organizers/comps?orgId=${values.organizersID}`);
             } catch (error) { void message.error(competitionError(error)); throw error; }
             finally { setSubmitting(false); }
@@ -593,7 +604,7 @@ function CreateCompetitionContent() {
         if (errorInfo?.outOfDate) return;
         if (Array.isArray(errorInfo?.errorFields) && errorInfo.errorFields.length) {
           form.scrollToField(errorInfo.errorFields[0].name, { block: 'center' });
-          void message.warning('请完善标红的必填信息后再提交');
+          void message.warning(t('adminExtra.requireFields'));
           return;
         }
         void message.error(competitionError(errorInfo));
@@ -601,36 +612,36 @@ function CreateCompetitionContent() {
   };
 
   return (
-    <GroupCompetitionShell title="创建群赛" description="线上比赛轮次默认全部开放；审批通过后即可录入成绩，不受赛期或结束标记限制。">
+    <GroupCompetitionShell title={t('adminExtra.create')} description={t('adminExtra.createDescription')}>
       {modalContext}
-      {BackButton('返回上层')}
+      {BackButton(t('adminExtra.back'))}
       <Form layout="vertical" form={form} disabled={submitting} initialValues={{ maxParticipants: 500, canPreResult: true, apply: true }}>
-        <Card title={'基础信息'}>
+        <Card title={t('adminExtra.basicInfo')}>
           <>
             <Row gutter={16}>
               <Col xs={24} md={12}>
                 <Form.Item
                   name="competitionName"
-                  label="比赛名称"
-                  rules={[{ required: true, whitespace: true, message: '请输入比赛名称！' }]}
+                  label={t('adminExtra.competitionName')}
+                  rules={[{ required: true, whitespace: true, message: t('adminExtra.requireName') }]}
                 >
                   <Input />
                 </Form.Item>
               </Col>
               <Col xs={24} md={12}>
-                <Form.Item name="maxParticipants" label="最大参与人数">
+                <Form.Item name="maxParticipants" label={t('adminExtra.maxParticipants')}>
                   <InputNumber min={1} precision={0} style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
               <Col xs={24} md={12}>
                 <Form.Item
                   name="organizersID"
-                  label="所在团队"
+                  label={t('adminExtra.yourTeam')}
                   // style={{ width: '50%' }}
-                  rules={[{ required: true, message: '选择所在团队名称' }]}
+                  rules={[{ required: true, message: t('adminExtra.selectTeam') }]}
                 >
                   <Select
-                    placeholder="选择所在团队名称"
+                    placeholder={t('adminExtra.selectTeam')}
                     onChange={(value) => {
                        setGroups(null);
                        form.setFieldValue('groupsID', undefined);
@@ -648,11 +659,11 @@ function CreateCompetitionContent() {
               <Col xs={24} md={12}>
                 <Form.Item
                   name="groupsID"
-                  label="群组"
+                  label={t('adminExtra.group')}
                   // style={{ width: '50%' }}
-                  rules={[{ required: true, message: '选择群组' }]}
+                  rules={[{ required: true, message: t('adminExtra.selectGroup') }]}
                 >
-                  <Select placeholder="选择群组" disabled={!curOrg || !groups} loading={!!curOrg && !groups}>
+                  <Select placeholder={t('adminExtra.selectGroup')} disabled={!curOrg || !groups} loading={!!curOrg && !groups}>
                     {groups?.data.items.map((o) => (
                       <Select.Option key={o.id} value={o.id}>
                         {o.name}
@@ -663,23 +674,23 @@ function CreateCompetitionContent() {
                 {groupError && <Alert type="error" title={groupError} />}
               </Col>
               <Col xs={24} md={12}>
-                <p>比赛类型: 线上</p>
+                <p>{t('adminExtra.onlineType')}</p>
               </Col>
-              <Col xs={24} md={12}><Form.Item name="canPreResult" label="允许玩家 / 机器人预录入" valuePropName="checked"><Switch /></Form.Item></Col>
-              <Col xs={24} md={12}><Form.Item name="apply" label="保存后立即提交审批（关闭则保存草稿）" valuePropName="checked"><Switch /></Form.Item></Col>
+              <Col xs={24} md={12}><Form.Item name="canPreResult" label={t('adminExtra.playerRobotPreEntry')} valuePropName="checked"><Switch /></Form.Item></Col>
+              <Col xs={24} md={12}><Form.Item name="apply" label={t('adminExtra.applyOnSave')} valuePropName="checked"><Switch /></Form.Item></Col>
             </Row>
           </>
         </Card>
-        <Card title={'时间配置'} style={{ marginTop: 20 }}>
-          <Alert type="info" showIcon title="群赛审批通过后，赛前、赛后及标记结束后均可新增、覆盖、修改、删除成绩；配置轮次关闭时也可录入。权限、身份、项目轮次存在及成绩格式仍需校验。" style={{ marginBottom: 16 }} />
-          {OtherDataForm()}
+        <Card title={t('adminExtra.timeConfig')} style={{ marginTop: 20 }}>
+          <Alert type="info" showIcon title={t('adminExtra.timeConfigHint')} style={{ marginBottom: 16 }} />
+          <OtherDataForm />
         </Card>
-        <Card title={'项目配置'} style={{ marginTop: 20 }}>
+        <Card title={t('adminExtra.eventConfig')} style={{ marginTop: 20 }}>
           <Form.Item name="events" valuePropName="value" getValueFromEvent={(e) => e}>
             <EventTable onChange={setEvents} />
           </Form.Item>
         </Card>
-        <Card title={'比赛描述'} style={{ marginTop: 20 }}>
+        <Card title={t('adminExtra.description')} style={{ marginTop: 20 }}>
           <Form.Item name="description" valuePropName={'value'} getValueFromEvent={(e) => e}>
             <MarkdownEditor />
           </Form.Item>
@@ -687,7 +698,7 @@ function CreateCompetitionContent() {
         {/*提交按钮 */}
         <Form.Item style={{ marginTop: 20 }}>
           <Button type="primary" onClick={handleSubmit} loading={submitting} disabled={!baseEvents.length}>
-            提交
+            {t('adminExtra.submit')}
           </Button>
         </Form.Item>
       </Form>

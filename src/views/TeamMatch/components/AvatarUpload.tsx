@@ -1,3 +1,4 @@
+import { useTeamMatchI18n } from '@/views/TeamMatch/i18n';
 import { Button, Modal, Upload } from 'antd';
 import React, { useState } from 'react';
 import ReactCrop, { type Crop, type PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop';
@@ -47,6 +48,7 @@ type Props = {
 };
 
 const AvatarUpload: React.FC<Props> = ({ value, onChange }) => {
+  const { t: tr } = useTeamMatchI18n();
   const [open, setOpen] = useState(false);
   const [src, setSrc] = useState<string | null>(null);
   const [crop, setCrop] = useState<Crop>();
@@ -95,16 +97,15 @@ const AvatarUpload: React.FC<Props> = ({ value, onChange }) => {
             return false;
           }}
         >
-          <Button size="small">选择图片</Button>
+          <Button size="small">{tr('teamMatch.chooseImage')}</Button>
         </Upload>
         {value && (
-          <Button size="small" danger type="link" onClick={() => onChange(null)}>
-            清除
-          </Button>
+          <Button size="small" danger type="link" onClick={() => onChange(null)}>{tr('teamMatch.clear')}</Button>
         )}
       </div>
       <Modal
-        title="裁剪头像"
+        className="tm-workbench-modal"
+        title={tr('teamMatch.cropAvatar')}
         open={open}
         onOk={() => void handleOk()}
         onCancel={() => {

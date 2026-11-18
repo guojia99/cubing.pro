@@ -4,6 +4,7 @@ import { Modal, Table, Typography } from "antd";
 import type { ColumnsType } from "antd/es/table";
 
 import { CubesCn } from "@/components/CubeIcon/cube";
+import { useI18n } from "@/contexts/I18nProvider";
 import { CubeIcon } from "@/components/CubeIcon/cube_icon";
 import { PlayerLink } from "@/components/Link/GcLinks";
 import { WCALinkWithCnName } from "@/components/Link/WcaLinks";
@@ -40,6 +41,7 @@ export function KinchPlayerDetailModal({
   player,
   isSenior,
 }: KinchPlayerDetailModalProps) {
+  const { t, locale } = useI18n();
   const tableData: DetailRow[] = player.Results.map((result, index) => ({
     key: index,
     event: result.Event,
@@ -49,19 +51,19 @@ export function KinchPlayerDetailModal({
 
   const columns: ColumnsType<DetailRow> = [
     {
-      title: "项目",
+      title: t('competitionAdmin.event'),
       dataIndex: "event",
       key: "event",
       align: "center",
       render: (event: string) => (
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
           {CubeIcon(event, `${event}_detail`, {})}
-          <span style={{ marginLeft: 8 }}>{CubesCn(event)}</span>
+          <span style={{ marginLeft: 8 }}>{CubesCn(event, locale)}</span>
         </div>
       ),
     },
     {
-      title: "项目分数",
+      title: t('competitionExtra.eventScore'),
       dataIndex: "eventResult",
       key: "eventResult",
       align: "center",
@@ -72,7 +74,7 @@ export function KinchPlayerDetailModal({
       ),
     },
     {
-      title: "项目详细成绩",
+      title: t('competitionExtra.eventResults'),
       align: "center",
       dataIndex: "bestResultString",
       key: "bestResultString",
@@ -90,7 +92,7 @@ export function KinchPlayerDetailModal({
             <>{PlayerLink(player.CubeId, player.PlayerName, "var(--accent)")}</>
           )}
           <div style={{ marginTop: 8, fontSize: "16px", color: "var(--destructive)" }}>
-            总分: <strong>{player.Result.toFixed(3)}</strong>
+            {t('competitionExtra.totalScore')}: <strong>{player.Result.toFixed(3)}</strong>
           </div>
         </div>
       }

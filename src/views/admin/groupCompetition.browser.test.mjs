@@ -33,6 +33,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { ChakraProvider } from '@chakra-ui/react';
 import { system } from '@/theme';
+import { AntThemeProvider } from '@/components/ui/AntThemeProvider';
 import { usePathname } from 'next/navigation';
 import { AdminCompetitionApprovalsPageView, OrganizersCompsPageView } from '@/views/admin/OrganizersCompsPageView';
 import { OrganizersResultsPageView } from '@/views/admin/OrganizersResultsPageView';
@@ -147,7 +148,7 @@ function App() {
     return <ChakraProvider value={system}><section id="public-list"><Table columns={CompsTableColumns} dataSource={[group, legacy]} rowKey="id" /></section><section id="group-detail"><CompetitionDetail comp={{data:group}} /></section><section id="legacy-detail"><CompetitionDetail comp={{data:legacy}} /></section></ChakraProvider>;
   }
   const view = pathname.includes('/create') ? <OrganizersCreateCompsPageView /> : pathname.includes('/approvals') ? <AdminCompetitionApprovalsPageView /> : pathname.replace(/\\/$/, '').endsWith('/comps') ? <OrganizersCompsPageView /> : <OrganizersResultsPageView admin={pathname.includes('/competition/manage')} />;
-  return <ChakraProvider value={system}><main style={{padding:16, minWidth:0}}>{view}</main></ChakraProvider>;
+  return <ChakraProvider value={system}><AntThemeProvider><main style={{padding:16, minWidth:0}}>{view}</main></AntThemeProvider></ChakraProvider>;
 }
 createRoot(document.getElementById('root')).render(<App />);
 `;
@@ -205,7 +206,7 @@ try {
   await page.locator('.ant-select-item-option:visible').filter({ hasText: /^团队七$/ }).click();
   await page.locator('#groupId').fill('群七');
   await page.locator('.ant-select-item-option:visible').filter({ hasText: /^群七$/ }).click();
-  await page.locator('button').filter({ hasText: /^查询$/ }).click();
+  await page.locator('button').filter({ hasText: /^查\s*询$/ }).click();
   await waitRequest((rows) => rows.some((r) => r.url.endsWith('/approvals/comps') && r.params.orgId === '7' && r.params.groupId === '70'));
   assert.ok((await requests()).some((r) => r.url === '/admin/competition/filters'), 'ordinary admin loads read-only options without super-admin APIs');
   await page.waitForFunction(() => [...document.querySelectorAll('.ant-select-dropdown')].every((el) => getComputedStyle(el).display === 'none'));
@@ -214,7 +215,7 @@ try {
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false, `list overflow ${width}`);
   }
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.getByRole("button", { name: "驳回", exact: true }).click();
+  await page.getByRole("button", { name: /^驳\s*回$/ }).click();
   await page.locator(".ant-modal-confirm textarea").fill("申请材料不完整");
   await page.locator(".ant-modal-confirm").getByRole("button", { name: /驳\s*回/ }).click();
   await waitRequest((rows) => rows.some((r) => r.body?.Ok === false));
@@ -300,7 +301,7 @@ try {
   const prePanel = page.getByRole("tabpanel", { name: "成绩审批" });
   await prePanel.getByText("#101", { exact: true }).waitFor();
   await prePanel.locator("thead input[type=checkbox]").check();
-  await prePanel.getByRole("button", { name: "通过", exact: true }).click();
+  await prePanel.getByRole("button", { name: /^通\s*过$/ }).click();
   await page.locator(".ant-modal-confirm").getByRole("button", { name: /确\s*认/ }).click();
   await prePanel.getByText("已处理 2/2 · 失败 1", { exact: true }).waitFor();
   await page.locator(".ant-modal-confirm").waitFor({ state: "hidden" });
@@ -308,7 +309,7 @@ try {
   assert.equal(await prePanel.getByText("#101", { exact: true }).count(), 0);
   await prePanel.locator("#finish").click();
   await page.locator(".ant-select-item-option").filter({ hasText: "已通过" }).click();
-  await prePanel.locator("button").filter({ hasText: /^查询$/ }).click();
+  await prePanel.locator("button").filter({ hasText: /^查\s*询$/ }).click();
   await prePanel.getByText("#101", { exact: true }).waitFor();
   assert.equal(await prePanel.getByText("#102", { exact: true }).count(), 0);
   assert.ok(page.url().includes("pre_finish=ok"));
@@ -327,6 +328,7 @@ try {
   await page.locator('.ant-select-item-option:visible').filter({ hasText: '另一位选手 · cube-8' }).waitFor();
   const playerRequestCount = (await requests()).filter((r) => r.url === '/public/player/').length;
   await playerInput.fill('另一位');
+  await page.locator('.ant-select-dropdown:visible').filter({has:page.getByText('另一位选手 · cube-8',{exact:true})}).locator('.ant-select-item-option').filter({hasText:'测试选手 · cube-7'}).waitFor({state:'hidden'});
   assert.equal(await page.locator('.ant-select-item-option:visible').count(), 1);
   await playerInput.fill('CUBE-7');
   await page.locator('.ant-select-item-option:visible').filter({ hasText: '测试选手 · cube-7' }).click();
@@ -399,11 +401,11 @@ try {
   assert.deepEqual((await requests()).filter((r) => r.url.endsWith('/result') && r.method === 'get').at(-1).params, { cube_id: 'history-player' });
   console.log('PASS explicitly ended competition can query closed rounds and player results');
   await page.getByRole('tab', { name: '成绩审批' }).click();
-  await prePanel.locator('button').filter({ hasText: /^重置$/ }).click();
+  await prePanel.locator('button').filter({ hasText: /^重\s*置$/ }).click();
   await prePanel.getByText('#102', { exact: true }).waitFor();
   await page.evaluate(() => { window.__retryApprovals = true; });
   await prePanel.locator('tr[data-row-key="102"] input[type=checkbox]').check();
-  await prePanel.getByRole('button', { name: '通过', exact: true }).click();
+  await prePanel.getByRole('button', { name: /^通\s*过$/ }).click();
   await page.locator('.ant-modal-confirm').getByRole('button', { name: /确\s*认/, exact: true }).click();
   await page.locator('.ant-modal-confirm').waitFor({ state: 'hidden' });
   await prePanel.getByText('成绩审批 · 共 0 条', { exact: true }).waitFor();
@@ -421,7 +423,7 @@ try {
     const before = (await requests()).filter((r) => r.url.endsWith('/pre_results')).length;
     await prePanel.locator('#finish').click();
     await page.locator('.ant-select-item-option').filter({ hasText: new RegExp(`^${label}$`) }).click();
-    await prePanel.locator('button').filter({ hasText: /^查询$/ }).click();
+    await prePanel.locator('button').filter({ hasText: /^查\s*询$/ }).click();
     await prePanel.getByText(`成绩审批 · 共 ${expectedTotal} 条`, { exact: true }).waitFor();
     const filtered = (await requests()).filter((r) => r.url.endsWith('/pre_results'));
     assert.equal(filtered.length, before + 1, 'one server page per filter, even when next=true');
@@ -449,10 +451,10 @@ try {
   await page.locator('.ant-modal-confirm').getByRole('button', { name: /确\s*认/, exact: true }).click();
   await page.locator('.ant-modal-confirm').waitFor({ state: 'hidden' });
   await page.getByRole('tab', { name: '成绩审批' }).click();
-  await prePanel.locator('button').filter({ hasText: /^重置$/ }).click();
+  await prePanel.locator('button').filter({ hasText: /^重\s*置$/ }).click();
   await prePanel.getByText('#101', { exact: true }).waitFor();
   await prePanel.locator('tr[data-row-key="101"] input[type=checkbox]').check();
-  await prePanel.getByRole('button', { name: '通过', exact: true }).click();
+  await prePanel.getByRole('button', { name: /^通\s*过$/ }).click();
   await page.locator('.ant-modal-confirm').getByRole('button', { name: /确\s*认/, exact: true }).click();
   await page.locator('.ant-modal-confirm').waitFor({ state: 'hidden' });
   await prePanel.getByText('#101', { exact: true }).waitFor({ state: 'hidden' });
@@ -561,8 +563,8 @@ try {
       assert.equal(posted.body.Round,2);
       assert.deepEqual(posted.body.Results,scores);
     }
-    await freePanel.locator('button').filter({hasText:/^删除$/}).click();
-    await page.locator('.ant-modal-confirm button').filter({hasText:/^删除$/}).click();
+    await freePanel.locator('button').filter({hasText:/^删\s*除$/}).click();
+    await page.locator('.ant-modal-confirm button').filter({hasText:/^删\s*除$/}).click();
     await page.locator('.ant-modal-confirm').waitFor({state:'hidden'});
     assert.ok((await requests()).some((r) => r.method === 'delete' && r.url.endsWith('/result/501')));
     await page.getByRole('tab',{name:'批量录入'}).click();
@@ -573,7 +575,7 @@ try {
     await page.waitForFunction(() => !document.querySelector('.ant-tabs-tabpane-active .ant-btn-loading'));
     await page.getByRole('tab',{name:'比赛管理'}).click();
     await page.locator('button').filter({hasText:/^结束比赛$/}).click();
-    await page.locator('.ant-modal-confirm button').filter({hasText:/^确认$/}).click();
+    await page.locator('.ant-modal-confirm button').filter({hasText:/^确\s*认$/}).click();
     await page.locator('.ant-modal-confirm').waitFor({state:'hidden'});
     await page.getByRole('tab',{name:'单条录入'}).click();
     await queryHistory(freePanel);
@@ -587,8 +589,8 @@ try {
       assert.deepEqual((await requests()).filter((r) => r.url.endsWith('/result') && r.method === 'post').at(-1).body.Results,[offset,offset+1,offset+2,offset+3,offset+4]);
     }
     const deletesBefore = (await requests()).filter((r) => r.method === 'delete').length;
-    await freePanel.locator('button').filter({hasText:/^删除$/}).click();
-    await page.locator('.ant-modal-confirm button').filter({hasText:/^删除$/}).click();
+    await freePanel.locator('button').filter({hasText:/^删\s*除$/}).click();
+    await page.locator('.ant-modal-confirm button').filter({hasText:/^删\s*除$/}).click();
     await page.locator('.ant-modal-confirm').waitFor({state:'hidden'});
     assert.equal((await requests()).filter((r) => r.method === 'delete').length,deletesBefore+1);
     await page.getByRole('tab',{name:'批量录入'}).click();
@@ -620,9 +622,9 @@ try {
 
   await page.goto(`${origin}/admin/organizers/comps/create?auth=2`);
   await page.getByRole("heading", { name: "创建群赛" }).waitFor();
-  await page.getByRole("button", { name: "提交", exact: true }).waitFor({ state: 'visible' });
-  await page.waitForFunction(() => ![...document.querySelectorAll('button')].find((button) => button.textContent.trim() === '提交')?.disabled);
-  await page.getByRole("button", { name: "提交", exact: true }).click();
+  await page.getByRole("button", { name: /^提\s*交$/ }).waitFor({ state: 'visible' });
+  await page.waitForFunction(() => ![...document.querySelectorAll('button')].find((button) => button.textContent.replace(/\s/g, '') === '提交')?.disabled);
+  await page.getByRole("button", { name: /^提\s*交$/ }).click();
   await page.getByText('请完善标红的必填信息后再提交', { exact: true }).waitFor();
   assert.equal(await page.locator('.ant-modal-confirm').count(), 0);
   assert.equal((await requests()).filter((r) => r.url?.match(/\/organizers\/\d+\/comp\/$/) && r.method === 'post').length, 0);
@@ -652,7 +654,7 @@ try {
   await qualification.click();
   await page.locator('.ant-select-item-option:visible').filter({ hasText: /^按晋级名单$/ }).click();
   await createSchedule.locator('.ant-modal-footer button').last().click();
-  await page.getByRole("button", { name: "提交", exact: true }).click();
+  await page.getByRole("button", { name: /^提\s*交$/ }).click();
   await page.locator(".ant-modal-confirm").getByRole("button", { name: "确认创建", exact: true }).click();
   await waitRequest((rows) => rows.some((r) => r.url === "/organizers/8/comp/" && r.method === "post"));
   const create = (await requests()).find((r) => r.url === "/organizers/8/comp/" && r.method === "post");

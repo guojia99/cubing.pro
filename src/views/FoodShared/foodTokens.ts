@@ -3,9 +3,9 @@ export const FOOD_FONT_SIZE = "14px";
 
 export const foodControlProps = {
   fontSize: FOOD_FONT_SIZE,
-  h: "36px",
-  minH: "36px",
-  borderRadius: "lg",
+  h: "44px",
+  minH: "44px",
+  borderRadius: "12px",
 } as const;
 
 export const foodTextProps = {

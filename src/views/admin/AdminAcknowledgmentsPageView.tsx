@@ -1,4 +1,7 @@
 "use client";
+import { useAdminManagement } from "@/views/admin/useAdminManagement";
+import { PageHeader } from "@/components/ui/page";
+import "./admin-ui.css";
 
 import {
   Avatar,
@@ -7,7 +10,6 @@ import {
   Card,
   Dialog,
   Field,
-  Heading,
   HStack,
   Image,
   Input,
@@ -41,6 +43,8 @@ import { useCallback, useEffect, useState } from "react";
 import { AdminGuard } from "@/components/admin/AdminGuard";
 import { toaster } from "@/components/ui/toaster";
 import { useI18n } from "@/contexts/I18nProvider";
+import { getIntlLocale } from "@/i18n/locales";
+import { useAdminDragAccessibility } from "./useAdminDragAccessibility";
 import {
   getAcknowledgmentsWithAdmin,
   setAcknowledgmentsWithAdmin,
@@ -85,8 +89,10 @@ function SortableRow({
   dragLabel: string;
   children: React.ReactNode;
 }) {
+  const m = useAdminManagement();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id,
+    attributes: { roleDescription: m("adminManagement.dragInstructions") },
   });
   return (
     <div
@@ -104,10 +110,11 @@ function SortableRow({
         px="3"
         py="2"
         borderWidth="1px"
-        borderRadius="lg"
-        bg={pinned ? "bg.subtle" : "transparent"}
-        borderColor={pinned ? "border" : "border.subtle"}
-        _hover={{ bg: "bg.subtle" }}
+        borderRadius="var(--radius-card)"
+        bg={pinned ? "var(--accent-soft)" : "var(--card)"}
+        borderColor="var(--border-default)"
+        _hover={{ bg: "var(--muted)" }}
+        flexWrap="wrap"
       >
         <button
           type="button"
@@ -136,6 +143,7 @@ function AvatarUrlField({
   onChange: (v: string) => void;
   onPreview: (url: string) => void;
 }) {
+  const m = useAdminManagement();
   const { t } = useI18n();
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "error">("idle");
   const [fetchingWca, setFetchingWca] = useState(false);
@@ -186,7 +194,7 @@ function AvatarUrlField({
 
   return (
     <Field.Root>
-      <Field.Label>头像 URL（可选）</Field.Label>
+      <Field.Label>{m("adminManagement.avatarUrl")}</Field.Label>
       <HStack align="flex-start" gap="4">
         <Stack gap="2" flex="1" minW="0">
           <Input
@@ -225,7 +233,9 @@ function AvatarUrlField({
 }
 
 export function AdminAcknowledgmentsPageView() {
-  const { t } = useI18n();
+  const m = useAdminManagement();
+  const dragAccessibility = useAdminDragAccessibility();
+  const { t, locale } = useI18n();
   const [list, setList] = useState<Thank[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -246,12 +256,12 @@ export function AdminAcknowledgmentsPageView() {
       const data = await getAcknowledgmentsWithAdmin();
       setList(normalizeThanks(data ?? []));
     } catch {
-      toaster.create({ type: "error", title: "获取赞助列表失败" });
+      toaster.create({ type: "error", title: m("adminManagement.sponsorsFailed") });
       setList([]);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [m]);
 
   useEffect(() => {
     void fetchList();
@@ -305,8 +315,8 @@ export function AdminAcknowledgmentsPageView() {
   };
 
   const handleDelete = (index: number) => {
-    if (!window.confirm(`删除「${list[index].nickname}」？`)) return;
-    void persist(list.filter((_, i) => i !== index), "删除成功");
+    if (!window.confirm(m("adminManagement.deleteSponsor", { name: list[index].nickname }))) return;
+    void persist(list.filter((_, i) => i !== index), m("adminManagement.deleted"));
   };
 
   const openAdd = () => {
@@ -323,7 +333,7 @@ export function AdminAcknowledgmentsPageView() {
 
   const handleSave = () => {
     if (!form.nickname.trim()) {
-      toaster.create({ type: "error", title: "请输入名称" });
+      toaster.create({ type: "error", title: m("adminManagement.nameRequired") });
       return;
     }
     const item: Thank = {
@@ -338,7 +348,7 @@ export function AdminAcknowledgmentsPageView() {
       editIndex >= 0 ? list.map((x, i) => (i === editIndex ? item : x)) : [...list, item],
     );
     setEditOpen(false);
-    void persist(next, editIndex >= 0 ? "修改成功" : "添加成功");
+    void persist(next, editIndex >= 0 ? t("profile.saveOk") : m("adminManagement.added"));
   };
 
   const pinnedCount = list.filter((x) => x.pinned).length;
@@ -398,7 +408,7 @@ export function AdminAcknowledgmentsPageView() {
             {pinned ? t("admin.acknowledgments.unpin") : t("admin.acknowledgments.pin")}
           </Button>
           <Button size="xs" variant="ghost" onClick={() => openEdit(record, index)}>
-            编辑
+            {t("teamMatch.edit")}
           </Button>
           <Button
             size="xs"
@@ -406,7 +416,7 @@ export function AdminAcknowledgmentsPageView() {
             colorPalette="red"
             onClick={() => handleDelete(index)}
           >
-            删除
+            {t("teamMatch.delete")}
           </Button>
         </HStack>
       </SortableRow>
@@ -415,12 +425,12 @@ export function AdminAcknowledgmentsPageView() {
 
   return (
     <AdminGuard>
-      <VStack align="stretch" gap="6">
-        <Heading size="xl">{t("admin.acknowledgments.title")}</Heading>
+      <VStack className="admin-page" align="stretch" gap="6">
+        <PageHeader eyebrow={t("admin.admins.siteManagement")} title={t("admin.acknowledgments.title")} />
 
-        <HStack flexWrap="wrap" gap="2">
+        <HStack className="admin-toolbar" flexWrap="wrap" gap="2">
           <Button colorPalette="brand" onClick={openAdd}>
-            新增
+            {t("teamMatch.add")}
           </Button>
           <Button variant="outline" onClick={() => setPreviewOpen(true)}>
             {t("admin.acknowledgments.preview")}
@@ -443,14 +453,14 @@ export function AdminAcknowledgmentsPageView() {
         {loading ? (
           <Spinner size="lg" color="brand.solid" alignSelf="center" />
         ) : list.length === 0 ? (
-          <Card.Root variant="outline">
+          <Card.Root variant="outline" borderRadius="var(--radius-card)" bg="var(--card)" borderColor="var(--border-default)">
             <Card.Body>
               <Text color="fg.muted">{t("admin.acknowledgments.empty")}</Text>
             </Card.Body>
           </Card.Root>
         ) : (
           <VStack align="stretch" gap="2">
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <DndContext accessibility={dragAccessibility} sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
               <SortableContext
                 items={list.map((_, i) => rowId(i))}
                 strategy={verticalListSortingStrategy}
@@ -479,20 +489,21 @@ export function AdminAcknowledgmentsPageView() {
           <Dialog.Positioner>
             <Dialog.Content maxW="560px">
               <Dialog.Header>
-                <Dialog.Title>{editIndex >= 0 ? "编辑赞助" : "新增赞助"}</Dialog.Title>
+                <Dialog.Title>{editIndex >= 0 ? m("adminManagement.editSponsor") : m("adminManagement.addSponsor")}</Dialog.Title>
               </Dialog.Header>
               <Dialog.Body>
                 <Stack gap="4">
                   <Field.Root required>
-                    <Field.Label>名称</Field.Label>
+                    <Field.Label>{t("competitionAdmin.name")}</Field.Label>
                     <Input
                       value={form.nickname}
                       onChange={(e) => setForm((f) => ({ ...f, nickname: e.target.value }))}
                     />
                   </Field.Root>
                   <Field.Root required>
-                    <Field.Label>金额</Field.Label>
-                    <NumberInput.Root
+                    <Field.Label>{m("adminManagement.amount")}</Field.Label>
+                     <NumberInput.Root
+                       locale={getIntlLocale(locale)}
                       value={String(form.amount)}
                       onValueChange={(e) => setForm((f) => ({ ...f, amount: Number(e.value) || 0 }))}
                     >
@@ -500,7 +511,7 @@ export function AdminAcknowledgmentsPageView() {
                     </NumberInput.Root>
                   </Field.Root>
                   <Field.Root>
-                    <Field.Label>WCA ID（可选）</Field.Label>
+                    <Field.Label>{m("adminManagement.optionalWcaId")}</Field.Label>
                     <Input
                       value={form.wcaID}
                       onChange={(e) => setForm((f) => ({ ...f, wcaID: e.target.value }))}
@@ -513,7 +524,7 @@ export function AdminAcknowledgmentsPageView() {
                     onPreview={setAvatarPreviewUrl}
                   />
                   <Field.Root>
-                    <Field.Label>备注（可选）</Field.Label>
+                    <Field.Label>{m("adminManagement.optionalNotes")}</Field.Label>
                     <Textarea
                       value={form.other}
                       onChange={(e) => setForm((f) => ({ ...f, other: e.target.value }))}
@@ -524,13 +535,13 @@ export function AdminAcknowledgmentsPageView() {
               </Dialog.Body>
               <Dialog.Footer>
                 <Button variant="outline" onClick={() => setEditOpen(false)}>
-                  取消
+                  {t("teamMatch.cancel")}
                 </Button>
                 <Button colorPalette="brand" onClick={handleSave}>
-                  保存
+                  {t("teamMatch.save")}
                 </Button>
               </Dialog.Footer>
-              <Dialog.CloseTrigger />
+              <Dialog.CloseTrigger aria-label={t("competitionAdmin.close")} />
             </Dialog.Content>
           </Dialog.Positioner>
         </Portal>
@@ -552,7 +563,7 @@ export function AdminAcknowledgmentsPageView() {
                 {avatarPreviewUrl && (
                   <Image
                     src={avatarPreviewUrl}
-                    alt="avatar"
+                    alt={t("admin.acknowledgments.avatarPreview")}
                     borderRadius="lg"
                     w="full"
                     maxH="60vh"
@@ -560,7 +571,7 @@ export function AdminAcknowledgmentsPageView() {
                   />
                 )}
               </Dialog.Body>
-              <Dialog.CloseTrigger />
+              <Dialog.CloseTrigger aria-label={t("competitionAdmin.close")} />
             </Dialog.Content>
           </Dialog.Positioner>
         </Portal>
@@ -579,11 +590,11 @@ export function AdminAcknowledgmentsPageView() {
                   <ThanksSection data={list} />
                 ) : (
                   <Text textAlign="center" color="fg.muted" py="8">
-                    暂无赞助数据
+                    {m("adminManagement.noSponsors")}
                   </Text>
                 )}
               </Dialog.Body>
-              <Dialog.CloseTrigger />
+              <Dialog.CloseTrigger aria-label={t("competitionAdmin.close")} />
             </Dialog.Content>
           </Dialog.Positioner>
         </Portal>

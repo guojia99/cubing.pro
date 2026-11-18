@@ -49,8 +49,8 @@ CUBE_API_UPSTREAM=http://127.0.0.1:20000/v3/cube-api
 | 新增页面 | `views` 实现 → APP_ROUTES → catch-all 或显式 page → navigation → Guard/词典 → 静态路径 |
 | 新增动态 URL | 同时检查 useRouteParam、dynamicRoute、staticExportPaths、post-static-export 和 Go gateway 回退 |
 | 修改接口 | 前端 service/types → 后端 routes/Handler/模型 → 调用方响应/错误/权限 → 本地联调 |
-| 修改主题 | tokens.css → theme/index.ts → websiteUiConfig → 图表和局部 Ant Design 主题 |
-| 新增文案 | 中英文对应词典/领域分词典 → t/tf 调用 → 中英文布局检查 |
+| 修改主题 | tokens.css/design-system.css → theme/index.ts → 全局 AntThemeProvider → websiteUiConfig → useThemeColors 图表订阅；避免局部 ConfigProvider 重置共享主题 |
+| 新增文案 | 七语领域词典 → 根 catalogs 接入 → t/tf 与共用 formatMessage → check:i18n / test:i18n → 七语布局检查 |
 | 修改计时器 | 对应状态机/输入捕获 → 保存幂等和错误恢复 → storage → 键盘/触屏浏览器回归 |
 | 修改持久化 | 找所有读写和备份 → 旧数据兼容/迁移 → 配额/事务/失败恢复 → 跨版本导入 |
 | 更新公式 | 后端来源/加载/API → 前端缓存 → 二阶静态数据 → 静态分类页重建 |
@@ -66,6 +66,7 @@ CUBE_API_UPSTREAM=http://127.0.0.1:20000/v3/cube-api
 | --- | --- | --- |
 | TypeScript | `npx tsc --noEmit` | 可能依赖已有 Next 生成声明；区分环境/历史错误 |
 | lint | `npm run lint` | 全仓 eslint；小改动可对实际目标文件运行 eslint |
+| 七语/复数/内容合同 | `npm run test:i18n`、`npm run check:i18n` | 真实根词典、领域 formatter 与 Provider hooks；数量参数用 number；AST 精确例外防倒退；详见 `docs/project/internationalization.md` |
 | 公式计时/历史 | `npm run test:algs` | 状态机、IndexedDB/历史相关 |
 | 图示/动作/setup | `npm run test:puzzles` | 包含部分使用 Playwright 的测试，不是纯 Node 单元集 |
 | 二阶算法/练习/深链接 | `npm run test:two-solver` | engine、统计、格式、i18n、公式链接等 |
@@ -73,11 +74,15 @@ CUBE_API_UPSTREAM=http://127.0.0.1:20000/v3/cube-api
 | 公式练习浏览器 | `npm run test:algs:browser` | 独立浏览器测试入口 |
 | 公式布局 | `npm run test:algs:layout` | 需要正在运行的页面；`ALGS_TEST_URL` 指定站点根地址 |
 | 图示浏览器 | `npm run test:puzzles:browser` | 图示/播放器浏览器回归 |
+| 绘图下载 | `node --test src/views/DrawTools/drawDownload.browser.test.mjs` | 五种绘图三格式、深浅/移动、像素与失败重试；默认隔离真实 View，`DRAW_DOWNLOAD_BASE_URL` 可验证实际 Next 服务 |
+| 公式/对阵图下载 | `node --test src/views/Algs/utils/diagramDownload.browser.test.mjs`、`node src/views/TeamMatch/bracketExportPng.browser.test.mjs` | SVG 栅格化、尺寸、资源清理及 CSS4 颜色的克隆转换；不访问 API |
 | 原生二阶播放器 | `npm run test:puzzles:native` | 生命周期和渲染回归 |
 | 二阶浏览器 | `npm run test:two-solver:browser` | 需要现有服务；`TWO_SOLVER_URL` 是完整工作台 URL |
 | 二阶练习/翻译/公式链接 | `test:two-solver:practice`、`test:two-solver:i18n`、`test:two-solver:formula`（均 npm run） | 同样检查页面 URL/运行服务 |
 
 部分测试未注册 npm script，按改动查 `*.test.ts/*.test.mjs`，如 `src/views/admin/groupCompetition.browser.test.mjs`、团体赛和 FR 局部测试。先阅读测试入口再直接运行；不要假设所有 browser 测试都会自启 Next。
+
+全站视觉迁移测试还包括 `Algs/components/workspaceVisual.browser.test.mjs`、`TeamMatch/components/portalTheme.browser.test.mjs`、`admin/visualMigration.browser.test.mjs`、`FoodShared/foodDrawVisual.browser.test.mjs`。覆盖范围、执行结果和限制详见 `docs/design/frontend-refactor-2026-11-18.md`。`npm run lint` 会扫描生成/上游 public 脚本；定位应用源码问题可使用 `./node_modules/.bin/eslint src --quiet`，不可将其当成全仓 lint 已通过。
 
 Playwright 浏览器缺失时可执行 `npx playwright install chromium`，会下载外部资源。二阶浏览器默认 URL 当前是 3129 端口，不等于 dev 的默认 3000；例如服务已在 3000 时：
 

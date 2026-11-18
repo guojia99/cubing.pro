@@ -1,6 +1,7 @@
 import type { Player, School, Team, TeamMatchSession } from '@/views/TeamMatch/types';
 import { MAX_ROSTER_TEAMS, MIN_TEAMS, TEAM_PLAYERS } from '@/views/TeamMatch/types';
 import { v4 as uuidv4 } from 'uuid';
+import { tm, type TeamMatchLocale } from './i18n';
 
 /**
  * 真实 WCA ID（三阶顶尖选手示例，用于 mock 循环分配）
@@ -36,31 +37,31 @@ export const MOCK_SCHOOL_NAMES = [
  * 满 16 队时：广工 5 队，其余 11 队分布在其他学校（多校多队）
  * 顺序即 append 时的槽位顺序（从第 0 队到第 15 队）
  */
-export const MOCK_TEAM_PLAN_16: { school: string; teamLabel: string }[] = [
-  { school: '广工', teamLabel: '一队' },
-  { school: '广工', teamLabel: '二队' },
-  { school: '广工', teamLabel: '三队' },
-  { school: '广工', teamLabel: '四队' },
-  { school: '广工', teamLabel: '五队' },
-  { school: '中山大学', teamLabel: '一队' },
-  { school: '中山大学', teamLabel: '二队' },
-  { school: '华南理工', teamLabel: '一队' },
-  { school: '华南理工', teamLabel: '二队' },
-  { school: '暨南大学', teamLabel: '一队' },
-  { school: '暨南大学', teamLabel: '二队' },
-  { school: '华师', teamLabel: '一队' },
-  { school: '深大', teamLabel: '一队' },
-  { school: '南方科', teamLabel: '一队' },
-  { school: '广外', teamLabel: '一队' },
-  { school: '南方医科大学', teamLabel: '一队' },
+export const MOCK_TEAM_PLAN_16: { school: string; teamLabel: number }[] = [
+  { school: '广工', teamLabel: 1 },
+  { school: '广工', teamLabel: 2 },
+  { school: '广工', teamLabel: 3 },
+  { school: '广工', teamLabel: 4 },
+  { school: '广工', teamLabel: 5 },
+  { school: '中山大学', teamLabel: 1 },
+  { school: '中山大学', teamLabel: 2 },
+  { school: '华南理工', teamLabel: 1 },
+  { school: '华南理工', teamLabel: 2 },
+  { school: '暨南大学', teamLabel: 1 },
+  { school: '暨南大学', teamLabel: 2 },
+  { school: '华师', teamLabel: 1 },
+  { school: '深大', teamLabel: 1 },
+  { school: '南方科', teamLabel: 1 },
+  { school: '广外', teamLabel: 1 },
+  { school: '南方医科大学', teamLabel: 1 },
 ];
 
 /** MIN_TEAMS 支：每校一队，取前若干校名 */
-const MOCK_TEAM_PLAN_8: { school: string; teamLabel: string }[] = MOCK_SCHOOL_NAMES.slice(0, MIN_TEAMS).map(
-  (school) => ({ school, teamLabel: '一队' }),
+const MOCK_TEAM_PLAN_8: { school: string; teamLabel: number }[] = MOCK_SCHOOL_NAMES.slice(0, MIN_TEAMS).map(
+  (school) => ({ school, teamLabel: 1 }),
 );
 
-function buildFromPlan(plan: { school: string; teamLabel: string }[]): {
+function buildFromPlan(plan: { school: string; teamLabel: number }[], locale: TeamMatchLocale): {
   schools: School[];
   players: Player[];
   teams: Team[];
@@ -101,7 +102,7 @@ function buildFromPlan(plan: { school: string; teamLabel: string }[]): {
       id: uuidv4(),
       schoolId,
       kind: 'school',
-      name: `${row.school}${row.teamLabel}`,
+      name: tm(locale, 'teamMatch.numberedSchoolTeam', { school: row.school, count: row.teamLabel }),
       playerIds: pids,
       disabled: false,
       isSeed: false,
@@ -112,13 +113,13 @@ function buildFromPlan(plan: { school: string; teamLabel: string }[]): {
 }
 
 /** 生成 MIN_TEAMS 支队伍（每校一队，使用前 MIN_TEAMS 个校名） */
-export function buildMockTeamMatchData(): { schools: School[]; players: Player[]; teams: Team[] } {
-  return buildFromPlan(MOCK_TEAM_PLAN_8);
+export function buildMockTeamMatchData(locale: TeamMatchLocale = 'zh-CN'): { schools: School[]; players: Player[]; teams: Team[] } {
+  return buildFromPlan(MOCK_TEAM_PLAN_8, locale);
 }
 
 /** 生成 16 支队伍（广工 5 队 + 其余分布） */
-export function buildMockTeamMatchData16(): { schools: School[]; players: Player[]; teams: Team[] } {
-  return buildFromPlan(MOCK_TEAM_PLAN_16);
+export function buildMockTeamMatchData16(locale: TeamMatchLocale = 'zh-CN'): { schools: School[]; players: Player[]; teams: Team[] } {
+  return buildFromPlan(MOCK_TEAM_PLAN_16, locale);
 }
 
 /**
@@ -127,6 +128,7 @@ export function buildMockTeamMatchData16(): { schools: School[]; players: Player
 export function appendMockGroups(
   session: TeamMatchSession,
   count: number,
+  locale: TeamMatchLocale = 'zh-CN',
 ): { schools: School[]; players: Player[]; teams: Team[] } {
   const n = Math.max(0, Math.min(count, MAX_ROSTER_TEAMS - session.teams.length));
   const start = session.teams.length;
@@ -183,7 +185,7 @@ export function appendMockGroups(
       id: uuidv4(),
       schoolId,
       kind: 'school',
-      name: `${row.school}${row.teamLabel}`,
+      name: tm(locale, 'teamMatch.numberedSchoolTeam', { school: row.school, count: row.teamLabel }),
       playerIds: pids,
       disabled: false,
       isSeed: false,

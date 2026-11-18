@@ -4,6 +4,7 @@ import { Box, Field, Grid, NativeSelect, SimpleGrid, Stack, Text } from "@chakra
 import { useState } from "react";
 
 import { useI18n } from "@/contexts/I18nProvider";
+import { translatePuzzleExtra as extra } from "@/i18n/messages/puzzle-extra";
 import {
   CUBE_COLORS,
   cubeFaceColors,
@@ -14,22 +15,13 @@ import {
   type PuzzlePreferences,
 } from "./preferences";
 
-const COLOR_LABELS: Record<CubeColor, readonly [string, string]> = {
-  white: ["白色", "White"],
-  yellow: ["黄色", "Yellow"],
-  red: ["红色", "Red"],
-  orange: ["橙色", "Orange"],
-  green: ["绿色", "Green"],
-  blue: ["蓝色", "Blue"],
-};
-
 const FACES = [
-  { face: "U", row: 1, column: 2, zh: "上", en: "Up" },
-  { face: "D", row: 3, column: 2, zh: "底", en: "Down" },
-  { face: "F", row: 2, column: 2, zh: "前", en: "Front" },
-  { face: "B", row: 2, column: 4, zh: "后", en: "Back" },
-  { face: "R", row: 2, column: 3, zh: "右", en: "Right" },
-  { face: "L", row: 2, column: 1, zh: "左", en: "Left" },
+  { face: "U", row: 1, column: 2 },
+  { face: "D", row: 3, column: 2 },
+  { face: "F", row: 2, column: 2 },
+  { face: "B", row: 2, column: 4 },
+  { face: "R", row: 2, column: 3 },
+  { face: "L", row: 2, column: 1 },
 ] as const;
 
 function adjacentFrontColors(bottom: CubeColor): CubeColor[] {
@@ -41,12 +33,11 @@ function adjacentFrontColors(bottom: CubeColor): CubeColor[] {
 
 export default function PuzzlePreferencesPanel() {
   const { locale } = useI18n();
-  const zh = locale === "zh-CN";
   const preferences = usePuzzlePreferences();
   const [saveFailed, setSaveFailed] = useState(false);
   const frontColors = adjacentFrontColors(preferences.bottom);
   const colors = cubeFaceColors(preferences);
-  const colorLabel = (color: CubeColor) => COLOR_LABELS[color][zh ? 0 : 1];
+  const colorLabel = (color: CubeColor) => extra(locale, `puzzleExtra.${color}`);
 
   function save(next: PuzzlePreferences) {
     setSaveFailed(!writePuzzlePreferences(next));
@@ -55,11 +46,11 @@ export default function PuzzlePreferencesPanel() {
   return (
     <Stack gap={3}>
       <Text fontSize="sm" fontWeight="semibold">
-        {zh ? "魔方配色与视图" : "Puzzle colors and view"}
+        {extra(locale, "puzzleExtra.colorsView")}
       </Text>
       <SimpleGrid columns={{ base: 1, md: 3 }} gap={3}>
         <Field.Root>
-          <Field.Label fontSize="sm">{zh ? "底色" : "Bottom color"}</Field.Label>
+          <Field.Label fontSize="sm">{extra(locale, "puzzleExtra.bottom")}</Field.Label>
           <NativeSelect.Root width="100%">
             <NativeSelect.Field
               value={preferences.bottom}
@@ -78,7 +69,7 @@ export default function PuzzlePreferencesPanel() {
           </NativeSelect.Root>
         </Field.Root>
         <Field.Root>
-          <Field.Label fontSize="sm">{zh ? "前色" : "Front color"}</Field.Label>
+          <Field.Label fontSize="sm">{extra(locale, "puzzleExtra.front")}</Field.Label>
           <NativeSelect.Root width="100%">
             <NativeSelect.Field
               value={preferences.front}
@@ -92,13 +83,13 @@ export default function PuzzlePreferencesPanel() {
           </NativeSelect.Root>
         </Field.Root>
         <Field.Root>
-          <Field.Label fontSize="sm">{zh ? "默认视图" : "Default view"}</Field.Label>
+          <Field.Label fontSize="sm">{extra(locale, "puzzleExtra.defaultView")}</Field.Label>
           <NativeSelect.Root width="100%">
             <NativeSelect.Field
               value={preferences.view}
               onChange={(event) => save({ ...preferences, view: event.target.value as PuzzlePreferences["view"] })}
             >
-              <option value="auto">{zh ? "自动" : "Auto"}</option>
+              <option value="auto">{extra(locale, "puzzleExtra.auto")}</option>
               <option value="2D">2D</option>
               <option value="3D">3D</option>
             </NativeSelect.Field>
@@ -107,16 +98,14 @@ export default function PuzzlePreferencesPanel() {
         </Field.Root>
       </SimpleGrid>
       <Text fontSize="xs" color="fg.muted">
-        {zh
-          ? "底色与前色必须相邻；更换底色时，如原前色不再相邻，将自动选取相邻色。自动视图按图示场景选择 2D 或 3D。修改后自动保存并在当前页面同步。"
-          : "Bottom and front must be adjacent. Changing the bottom also adjusts an incompatible front. Auto selects 2D or 3D for the diagram context. Changes save automatically and sync across this page."}
+        {extra(locale, "puzzleExtra.colorHint")}
       </Text>
       <Box p={3} borderRadius="lg" borderWidth="1px" borderColor="border" bg="bg.muted">
         <Text fontSize="xs" color="fg.muted" mb={2}>
-          {zh ? "六面配色预览（展开图）" : "Six-face color preview (cube net)"}
+          {extra(locale, "puzzleExtra.colorPreview")}
         </Text>
         <Grid templateColumns="repeat(4, minmax(0, 1fr))" gap={1} maxW="240px" mx="auto">
-          {FACES.map(({ face, row, column, zh: faceZh, en }) => (
+          {FACES.map(({ face, row, column }) => (
             <Box
               key={face}
               gridRow={row}
@@ -131,20 +120,18 @@ export default function PuzzlePreferencesPanel() {
               borderRadius="sm"
             >
               <Text fontSize="xs" fontWeight="semibold" color="#ffffff" bg="#171717" px={1} borderRadius="sm">
-                {face} {zh ? faceZh : en}
+                {face} {extra(locale, `puzzleExtra.face${face}`)}
               </Text>
             </Box>
           ))}
         </Grid>
         <Text fontSize="xs" color="fg.muted" mt={2}>
-          {zh
-            ? `底色 ${colorLabel(preferences.bottom)}，前色 ${colorLabel(preferences.front)}；其余四面按标准实物色序旋转推导，配色不随浅色或深色主题改变。此展开图仅预览配色。`
-            : `Bottom ${colorLabel(preferences.bottom)}, front ${colorLabel(preferences.front)}. The other faces follow the physical cube's color order, independently of light or dark theme. This net previews colors only.`}
+          {extra(locale, "puzzleExtra.colorSummary", { bottom: colorLabel(preferences.bottom), front: colorLabel(preferences.front) })}
         </Text>
       </Box>
       {saveFailed ? (
         <Text role="alert" fontSize="sm" color="fg.error">
-          {zh ? "保存失败，偏好未保存。请检查浏览器存储权限或空间后重试。" : "Save failed. Preferences were not saved. Check browser storage permissions or available space and try again."}
+          {extra(locale, "puzzleExtra.saveFailed")}
         </Text>
       ) : null}
     </Stack>

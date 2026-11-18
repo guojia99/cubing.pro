@@ -26,7 +26,7 @@
 .algs-detail-workbench .algs-detail-content { container: algs-cases / inline-size; }
 .algs-detail-workbench .algs-detail-toolbar { display: flex; align-items: center; gap: 6px; min-width: 0; flex-wrap: wrap; }
 .algs-detail-workbench .algs-detail-toolbar input { flex: 1 1 180px; }
-.algs-detail-workbench .algs-detail-group { scroll-margin-top: 84px; width: 100%; border-radius: 10px; box-shadow: none; }
+.algs-detail-workbench .algs-detail-group { scroll-margin-top: calc(var(--header-height, 4rem) + 20px); width: 100%; border-radius: 10px; box-shadow: none; }
 .algs-detail-workbench .algs-detail-group-heading { min-height: 24px; }
 .algs-detail-workbench .algs-detail-group-heading > :is(h2, p, span) { margin-block: 0; align-self: center; }
 .algs-detail-workbench .algs-detail-group-links { display: grid; gap: 2px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border-default); }
@@ -79,7 +79,7 @@
 .algs-detail-drawer { max-height: 100dvh; }
 @container algs-page (min-width: 880px) {
   .algs-detail-panels { grid-template-columns: var(--algs-filter-width, 288px) 16px minmax(0, 1fr); }
-  .algs-detail-workbench .algs-detail-navigation { display: block; padding: 14px; max-height: calc(100dvh - 96px); overflow-y: auto; overscroll-behavior: contain; position: sticky; top: 80px; border: 1px solid var(--border-default); border-radius: 6px; background: var(--card); }
+  .algs-detail-workbench .algs-detail-navigation { display: block; padding: 14px; max-height: calc(100dvh - var(--header-height, 4rem) - 32px); overflow-y: auto; overscroll-behavior: contain; position: sticky; top: calc(var(--header-height, 4rem) + 16px); border: 1px solid var(--border-default); border-radius: var(--radius-card, 1rem); background: var(--card); }
   .algs-detail-workbench .algs-detail-resizer { display: flex; align-items: center; justify-content: center; align-self: stretch; min-height: 240px; cursor: col-resize; touch-action: none; outline-offset: -3px; }
   .algs-detail-resizer > span { display: block; width: 3px; height: 44px; border-radius: 2px; background: var(--border-default); position: sticky; top: 45vh; transition: background-color 120ms; }
   .algs-detail-resizer:is(:hover, :focus-visible) > span,

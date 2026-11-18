@@ -4,6 +4,7 @@ import { Button, CloseButton, Dialog } from "@chakra-ui/react";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { displayPracticeScramble, hasPracticeScramble, preparePracticeSetups } from "@/components/puzzles/practiceSetup";
 import { useI18n } from "@/contexts/I18nProvider";
+import { translatePuzzleExtra as extra } from "@/i18n/messages/puzzle-extra";
 import type { MessageKey } from "@/i18n";
 import { useReleaseOverlayOnUnmount } from "@/lib/overlayCleanup";
 import {
@@ -434,8 +435,8 @@ function PracticeLibrary({ open, onClose, cube, classId, flatAlgs, timer, setupB
   const detailRecord = detail?.kind === "record" ? detail.value : null;
   const detailImage = detailItem ? detailItem.image || formulaImages.get(detailItem.formulaKey) || "" : "";
   const title = view === "config" ? t("algs.practice.config") : view === "history" ? t("algs.formulaPractice.fullHistory") : view === "detail" ? t(detailRecord ? "algs.practice.recordDetail" : "algs.practice.questionDetail") : t("algs.formulaPractice.title");
-  const setupLoadingText = locale === "en-US" ? "Preparing missing scrambles. Practice will be available when ready." : "正在为缺失打乱的公式准备打乱，完成后可开始练习。";
-  const missingSetupText = locale === "en-US" ? "Some formulas have no usable scramble. You can view or skip them, but cannot start their timer." : "部分公式暂无可用打乱，可查看或切换题目，但不能启动计时。";
+  const setupLoadingText = extra(locale, "puzzleExtra.setupLoading");
+  const missingSetupText = extra(locale, "puzzleExtra.missingSetup");
 
   function renderRecords(list: FormulaPracticeRecord[], from: View) {
     return list.map((record) => <div className="fp-record" key={record.id}>

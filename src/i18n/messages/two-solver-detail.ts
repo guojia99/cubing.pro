@@ -1,3 +1,6 @@
+import { formatMessage } from "../formatMessage";
+import type { Locale } from "../locales";
+
 export const twoSolverDetailZhCN = {
   "two.detail.color.white": "白",
   "two.detail.color.red": "红",
@@ -152,11 +155,13 @@ export const twoSolverDetailEnUS: Record<keyof typeof twoSolverDetailZhCN, strin
   "two.detail.reviewHint": "Click a result to review",
 };
 
-export type DetailLocale = "zh-CN" | "en-US";
+export type DetailLocale = Locale;
 export type DetailMessageKey = keyof typeof twoSolverDetailZhCN;
+export type DetailTranslator = (key: DetailMessageKey) => string;
 
 // Keep pure formatters independent of the app catalog and React provider.
-export function tDetail(locale: DetailLocale, key: DetailMessageKey, params: Record<string, string | number> = {}): string {
-  const text = (locale === "en-US" ? twoSolverDetailEnUS : twoSolverDetailZhCN)[key];
-  return text.replace(/\{([^}]+)\}/g, (placeholder, name: string) => String(params[name] ?? placeholder));
+export function tDetail(locale: DetailLocale, key: DetailMessageKey, params: Record<string, string | number> = {}, translate?: DetailTranslator): string {
+  const text = translate ? translate(key) : (locale === "en-US" ? twoSolverDetailEnUS : twoSolverDetailZhCN)[key];
+  // Without an injected translator this module only has Chinese and English.
+  return formatMessage(translate ? locale : locale === "en-US" ? "en-US" : "zh-CN", key, text, params);
 }

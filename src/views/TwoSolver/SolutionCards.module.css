@@ -8,9 +8,11 @@
 .solutionCard {
   min-width: 0;
   padding: 16px;
-   border: 1px solid color-mix(in srgb, var(--bottom-tint) 38%, var(--border-default));
-  border-radius: 12px;
-   background: color-mix(in srgb, var(--bottom-tint) 16%, var(--card));
+  border: 1px solid color-mix(in srgb, var(--bottom-tint) 22%, var(--border-default));
+  border-top: 3px solid var(--bottom-tint);
+  border-radius: var(--radius-card, 1rem);
+  background: var(--card);
+  box-shadow: var(--shadow-card);
   color: var(--foreground);
 }
 
@@ -31,7 +33,7 @@
 .moveCount strong { font: 500 34px/1 "Outfit", sans-serif; font-variant-numeric: tabular-nums; letter-spacing: -.05em; }
 .moveCount > span { color: var(--muted-foreground); font-size: 10px; }
 
-.completeAlg { margin-bottom: 14px; }
+.completeAlg { margin-bottom: 14px; padding: 12px; border-radius: 10px; background: color-mix(in srgb, var(--bottom-tint) 8%, var(--muted)); }
 .completeAlg code, .annotatedAlg, .playerAlg { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; overflow-wrap: anywhere; user-select: all; }
 .completeAlg code { display: block; font-size: 14px; line-height: 1.75; }
 .steps { display: grid; gap: 4px; margin: 0; }
@@ -73,11 +75,16 @@
 .copyStatus:empty { margin: 0; }
 .srOnly { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
-.dialog { background: var(--card); color: var(--foreground); font-family: "DM Sans", "PingFang SC", "Microsoft YaHei", sans-serif; }
+.dialog { background: var(--card); color: var(--foreground); font-family: var(--font-body, "DM Sans"), "PingFang SC", "Microsoft YaHei", sans-serif; box-shadow: var(--shadow-float); }
 .playerPanel { --muted-ink: var(--muted-foreground); min-width: 0; }
 .solver3DStages { gap: 6px; margin: 14px 0 4px; }
 .solver3DStages .button { border: 1px solid var(--border-default); font-family: inherit; }
 .playerAlg { display: block; margin: 16px 0; font-size: 13px; line-height: 1.8; }
+.methodLine { flex-wrap: wrap; }
+.methodLine h3 { font-family: var(--font-heading, inherit); }
+.button { border-radius: 9px; color: var(--accent); }
+.steps > [data-stage] { border-radius: 7px; }
+.solver3DStages { flex-wrap: wrap; }
 
 @media (max-width: 1199px) {
   .solutionList { grid-template-columns: repeat(2, minmax(0, 1fr)); }

@@ -4,6 +4,9 @@ import { Card } from 'antd';
 import ReactECharts from 'echarts-for-react';
 import React from 'react';
 import { useIntl } from '@/hooks/useIntlMessage';
+import { getChartAxisStyle, getChartTooltipStyle } from '@/theme/chartColors';
+import { color as chartColor } from 'echarts';
+import { useThemeColors } from '@/theme/useThemeColors';
 
 interface ResultDetailWithRankingTimersProps {
   eventID: string;
@@ -36,6 +39,8 @@ const ResultDetailWithRankingTimers: React.FC<ResultDetailWithRankingTimersProps
   wcaRankTimer,
 }) => {
   const intl = useIntl();
+  const theme = useThemeColors();
+  const axisStyle = getChartAxisStyle();
   const rawData = getEventWcaRankTimer(eventID, wcaRankTimer);
 
   if (rawData.length === 0) {
@@ -63,7 +68,11 @@ const ResultDetailWithRankingTimers: React.FC<ResultDetailWithRankingTimersProps
   const interval = rawData.length > 12 ? Math.ceil(rawData.length / 10) : 0;
 
   const option = {
+    color: [theme.accent, theme.signalSuccess, theme.signalWarning, theme.signalInfo, chartColor.lerp(.7, [theme.foreground, theme.accent]), chartColor.lerp(.6, [theme.foreground, theme.signalSuccess])],
+    backgroundColor: 'transparent',
+    textStyle: { color: theme.foreground },
     tooltip: {
+      ...getChartTooltipStyle(),
       trigger: 'axis',
       formatter: (params: any[]) => {
         if (!params || params.length === 0) return '';
@@ -109,9 +118,9 @@ const ResultDetailWithRankingTimers: React.FC<ResultDetailWithRankingTimersProps
             const prevValue = rawData[prevIndex][key] as number
             const diff = prevValue - currentValue; // 注意：排名数字越小越好
             if (diff > 0) {
-              changeText = ` <span style="color:green">↑${diff}</span>`; // 上升（名次变好）
+              changeText = ` <span style="color:${theme.signalSuccess}">↑${diff}</span>`; // 上升（名次变好）
             } else if (diff < 0) {
-              changeText = ` <span style="color:red">↓${Math.abs(diff)}</span>`; // 下降（名次变差）
+              changeText = ` <span style="color:${theme.destructive}">↓${Math.abs(diff)}</span>`; // 下降（名次变差）
             }
           }
 
@@ -122,6 +131,8 @@ const ResultDetailWithRankingTimers: React.FC<ResultDetailWithRankingTimersProps
       },
     },
     legend: {
+      textStyle: { color: theme.mutedForeground },
+      pageTextStyle: { color: theme.mutedForeground },
       data: [
         intl.formatMessage({ id: 'wca.chart.singleNR' }),
         intl.formatMessage({ id: 'wca.chart.singleCR' }),
@@ -143,14 +154,18 @@ const ResultDetailWithRankingTimers: React.FC<ResultDetailWithRankingTimersProps
       containLabel: true,
     },
     xAxis: {
+      ...axisStyle,
       type: 'category',
       data: xData,
       axisLabel: {
+        color: theme.mutedForeground,
         rotate: -45,
         interval: interval,
       },
     },
     yAxis: {
+      ...axisStyle,
+      nameTextStyle: { color: theme.mutedForeground },
       type: 'value',
       name: intl.formatMessage({ id: 'wca.chart.rank' }),
       inverse: false, // 👈 关键：不倒置！0 在底部，大数在顶部
@@ -170,6 +185,8 @@ const ResultDetailWithRankingTimers: React.FC<ResultDetailWithRankingTimersProps
       },
       {
         type: 'slider', // 底部滑块
+        borderColor: theme.border,
+        textStyle: { color: theme.mutedForeground },
         xAxisIndex: 0,
         height: 20,
         bottom: 40,

@@ -1,0 +1,48 @@
+.thanks-person {
+  position: relative;
+  isolation: isolate;
+  background: var(--card);
+  transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.thanks-person::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(ellipse at top left, var(--accent-soft), transparent 80%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease;
+}
+
+.thanks-person-avatar {
+  flex-shrink: 0;
+  transition: transform 240ms ease, box-shadow 200ms ease;
+}
+
+.thanks-person:focus-within {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-card);
+}
+
+.thanks-person:focus-within::before { opacity: 1; }
+
+@media (hover: hover) and (pointer: fine) {
+  .thanks-person:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--accent) 45%, var(--border-default));
+    box-shadow: var(--shadow-float);
+  }
+  .thanks-person:hover::before { opacity: 1; }
+  .thanks-person:hover .thanks-person-avatar {
+    transform: scale(1.08) rotate(-4deg);
+    box-shadow: 0 0 0 3px var(--card), 0 0 0 4px color-mix(in srgb, var(--accent) 35%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .thanks-person, .thanks-person::before, .thanks-person-avatar { transition: none; }
+  .thanks-person:hover, .thanks-person:hover .thanks-person-avatar { transform: none; }
+}

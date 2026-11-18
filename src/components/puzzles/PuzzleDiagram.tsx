@@ -1,10 +1,13 @@
 "use client";
 
+import { localizePuzzleError } from "./localizePuzzleError";
+
 import { useEffect, useRef, useState } from "react";
 import { Box, Button, Flex, Text } from "@chakra-ui/react";
 import dynamic from "next/dynamic";
 import type { PuzzleID } from "cubing/twisty";
 import { useI18n } from "@/contexts/I18nProvider";
+import { translatePuzzleExtra as extra } from "@/i18n/messages/puzzle-extra";
 import { puzzleFaceColors, usePuzzlePreferences } from "./preferences";
 import { displayPracticeScramble } from "./practiceSetup";
 import { usesTwoByTwo3D } from "@/views/Algs/utils/twoByTwoCategories";
@@ -77,7 +80,6 @@ export default function PuzzleDiagram({
   hideSetupDetails = false, onPrepared,
 }: PuzzleDiagramProps) {
   const { locale } = useI18n();
-  const zh = locale === "zh-CN";
   const preferences = usePuzzlePreferences();
   const [override, setOverride] = useState<"2D" | "3D" | null>(null);
   const [netView, setNetView] = useState(false);
@@ -87,7 +89,7 @@ export default function PuzzleDiagram({
   const [visible, setVisible] = useState(false);
   const key = JSON.stringify([cube, classId, setName, groupName, formula, scramble, stateSource, preferences.bottom, preferences.front, netView]);
   const prepared = result?.key === key ? result.prepared : undefined;
-  const error = result?.key === key ? result.error : undefined;
+  const error = result?.key === key ? result.unsupported ? extra(locale, "puzzleExtra.unsupported") : result.error : undefined;
   const twoLayer = prepared?.puzzle === "2x2x2";
   const pbl = twoLayer && usesTwoByTwo3D(classId, setName, groupName);
   const automatic = twoLayer && !pbl ? "2D" : "3D";
@@ -155,14 +157,14 @@ export default function PuzzleDiagram({
       diagramsInFlight.set(key, pending);
     }
     void pending.then((value) => {
-      if (!cancelled) setResult(value ? { key, prepared: value } : { key, unsupported: true, error: zh ? "暂不支持此魔方" : "Unsupported puzzle" });
+      if (!cancelled) setResult(value ? { key, prepared: value } : { key, unsupported: true });
     }).catch((reason: unknown) => {
       if (!cancelled) setResult({ key, error: reason instanceof Error ? reason.message : String(reason) });
     });
     return () => { cancelled = true; };
   // Primitive preferences keep unrelated view changes from rebuilding the state.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key, zh, visible]);
+  }, [key, visible]);
 
   useEffect(() => {
     const element = host.current;
@@ -172,10 +174,10 @@ export default function PuzzleDiagram({
     svg.setAttribute("width", "100%");
     svg.setAttribute("height", "100%");
     svg.setAttribute("role", "img");
-    svg.setAttribute("aria-label", zh ? "公式状态图" : "Algorithm case diagram");
+    svg.setAttribute("aria-label", extra(locale, "puzzleExtra.caseDiagram"));
     element.replaceChildren(document.importNode(svg, true));
     return () => { element.replaceChildren(); };
-  }, [prepared, mode, zh]);
+  }, [prepared, mode, locale]);
 
   const height = interactive && mode === "3D" ? Math.max(260, maxHeight) : maxHeight;
   const colors = puzzleFaceColors(preferences, prepared?.puzzle);
@@ -189,37 +191,37 @@ export default function PuzzleDiagram({
   return <Box ref={wrapper} className="puzzle-diagram" data-puzzle={prepared?.puzzle} data-state-source={stateSource}
     data-view={mode} data-net={netActive ? "true" : undefined}
     w="full" minW={0} maxW={interactive && (mode === "3D" || netActive) ? "full" : `${maxWidth}px`} mx="auto">
-    {interactive && <Flex gap={1} mb={1} justify="center" role="group" aria-label={zh ? "图示视图" : "Diagram view"}>
+    {interactive && <Flex gap={1} mb={1} justify="center" role="group" aria-label={extra(locale, "puzzleExtra.diagramView")}>
       {(["2D", "3D"] as const).map((view) => <Button key={view} type="button" size="xs" variant={mode === view ? "solid" : "ghost"}
         colorPalette="brand" aria-pressed={mode === view} onClick={(event) => { event.stopPropagation(); setOverride(view); }}>{view}</Button>)}
     </Flex>}
-    {netToggleVisible && <Flex gap={1} mb={1} justify="center" role="group" aria-label={zh ? "平面图样式" : "2D layout"}>
+    {netToggleVisible && <Flex gap={1} mb={1} justify="center" role="group" aria-label={extra(locale, "puzzleExtra.layout2d")}>
       <Button type="button" size="xs" variant={mode === "2D" && !netView ? "solid" : "ghost"} colorPalette="brand"
         aria-pressed={mode === "2D" && !netView}
-        onClick={(event) => { event.stopPropagation(); selectNetLayout(false); }}>{zh ? "标准" : "Standard"}</Button>
+        onClick={(event) => { event.stopPropagation(); selectNetLayout(false); }}>{extra(locale, "puzzleExtra.standard")}</Button>
       <Button type="button" size="xs" variant={mode === "2D" && netView ? "solid" : "ghost"} colorPalette="brand"
         aria-pressed={mode === "2D" && netView}
-        onClick={(event) => { event.stopPropagation(); selectNetLayout(true); }}>{zh ? "展开图" : "Net"}</Button>
+        onClick={(event) => { event.stopPropagation(); selectNetLayout(true); }}>{extra(locale, "puzzleExtra.net")}</Button>
     </Flex>}
     {error ? <Box minH={`${Math.min(height, 80)}px`} display="flex" alignItems="center" justifyContent="center">
-      {fallback && (result?.unsupported || (!formula.trim() && !scramble.trim())) ? fallback : <Text role="alert" fontSize="xs" color="fg.muted" overflowWrap="anywhere">{zh ? "无法生成图示：" : "Cannot render: "}{error}</Text>}
-    </Box> : !prepared ? <Box h={`${height}px`} role="status" aria-label={zh ? "正在生成图示" : "Generating diagram"} /> : pbl || (twoLayer && mode === "3D" && interactive) ?
+      {fallback && (result?.unsupported || (!formula.trim() && !scramble.trim())) ? fallback : <Text role="alert" fontSize="xs" color="fg.muted" overflowWrap="anywhere">{extra(locale, "puzzleExtra.cannotRender")}{localizePuzzleError(error, locale)}</Text>}
+    </Box> : !prepared ? <Box h={`${height}px`} role="status" aria-label={extra(locale, "puzzleExtra.generating")} /> : pbl || (twoLayer && mode === "3D" && interactive) ?
       <NativeTwoByTwo key={key} setup={prepared.setup} alg={prepared.alg} colors={colors} height={height} interactive={interactive && mode === "3D"} /> : mode === "3D" && interactive ?
       prepared.puzzle === "square1" ? <Square1Player key={key} setup={prepared.setup} alg={prepared.alg} colors={colors} height={height} /> :
         <TwistyPuzzlePlayer key={key} puzzle={prepared.puzzle} setup={prepared.setup} alg={prepared.alg} colors={colors} stickering={prepared.stickering} height={height} /> :
-      prepared.svgError ? <Text role="alert" fontSize="xs" color="fg.muted" overflowWrap="anywhere">{zh ? "无法生成平面图：" : "Cannot render 2D: "}{prepared.svgError}</Text> :
+      prepared.svgError ? <Text role="alert" fontSize="xs" color="fg.muted" overflowWrap="anywhere">{extra(locale, "puzzleExtra.cannotRender2d")}{localizePuzzleError(prepared.svgError, locale)}</Text> :
         <div ref={host} style={{ width: "100%", height: maxHeight, display: "flex", alignItems: "center", justifyContent: "center" }} />}
     {interactive && prepared?.warning && <Text role="status" mt={2} fontSize="xs" color="fg.muted" overflowWrap="anywhere">
-      {zh ? "图示由标准 setup 生成；当前原公式暂不能播放：" : "Diagram generated from standard setup; original formula playback is unavailable: "}{prepared.warning}
+      {extra(locale, "puzzleExtra.setupWarning")}{localizePuzzleError(prepared.warning, locale)}
     </Text>}
     {interactive && prepared?.annotation && <Text fontSize="xs" color="fg.muted" mt={2}>
-      {zh ? `原始起手提示 ${prepared.annotation}；图示与动画采用正文标准握法。` : `Source starting view ${prepared.annotation}; diagram and playback use the formula body's standard grip.`}
+      {extra(locale, "puzzleExtra.annotation", { annotation: prepared.annotation })}
     </Text>}
     {interactive && prepared && !hideSetupDetails && <Box mt={2} fontSize="xs" color="fg.muted" minW={0}>
       <details open>
-        <summary style={{ cursor: "pointer" }}>{zh ? "图示打乱" : "Diagram setup"}</summary>
+        <summary style={{ cursor: "pointer" }}>{extra(locale, "puzzleExtra.diagramSetup")}</summary>
         <Text as="code" display="block" mt={1} whiteSpace="pre-wrap" overflowWrap="anywhere">
-          {displayPracticeScramble(prepared.setup) || (zh ? "已复原" : "Solved")}
+          {displayPracticeScramble(prepared.setup) || extra(locale, "puzzleExtra.solved")}
         </Text>
       </details>
     </Box>}

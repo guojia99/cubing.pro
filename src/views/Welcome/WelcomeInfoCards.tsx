@@ -1,258 +1,73 @@
 "use client";
 
-import { Card, Heading, Link, SimpleGrid, Stack, Text, VStack } from "@chakra-ui/react";
+import { Box, Image, Link, Text } from "@chakra-ui/react";
 import NextLink from "next/link";
+import type { ReactNode } from "react";
+import { FiArrowUpRight } from "react-icons/fi";
 
+import { SectionHeader, Surface } from "@/components/ui/page";
 import { useI18n } from "@/contexts/I18nProvider";
+import { getSiteContent } from "@/i18n/messages/site-content";
+import { HomeIllustration } from "./HomeIllustration";
 
-type InfoCardItem = {
-  title: string;
-  desc: string;
-  href: string;
-  internal?: boolean;
-  index: number;
-};
+type Entry = { title: string; desc: string; href: string; external?: boolean };
 
-function InfoCard({ title, desc, href, internal, index }: InfoCardItem) {
-  const inner = (
-    <Stack gap="2" h="full">
-      <Stack direction="row" align="center" gap="2">
-        <Text
-          display="inline-flex"
-          alignItems="center"
-          justifyContent="center"
-          w="10"
-          h="10"
-          borderRadius="md"
-          bg="segment.indicator"
-          color="segment.fg.selected"
-          fontWeight="bold"
-          fontSize="sm"
-        >
-          {index}
-        </Text>
-        <Text fontWeight="semibold">{title}</Text>
-      </Stack>
-      <Text fontSize="sm" color="fg.muted" flex="1">
-        {desc}
-      </Text>
-      <LearnMoreLink />
-    </Stack>
-  );
-
-  return (
-    <Card.Root variant="outline" borderRadius="lg" h="full" _hover={{ shadow: "md" }}>
-      <Card.Body>
-        {internal ? (
-          <Link asChild display="block" h="full" _hover={{ textDecoration: "none" }}>
-            <NextLink href={href}>{inner}</NextLink>
-          </Link>
-        ) : (
-          <Link href={href} target="_blank" rel="noreferrer" display="block" h="full">
-            {inner}
-          </Link>
-        )}
-      </Card.Body>
-    </Card.Root>
-  );
-}
-
-function LearnMoreLink() {
-  const { t } = useI18n();
-  return (
-    <Text fontSize="sm" color="brand.fg" fontWeight="medium">
-      {t("home.learnMore")} &gt;
-    </Text>
-  );
-}
-
-function GroupInfoCards({
-  title,
-  desc,
-  items,
-}: {
-  title: string;
-  desc: string;
-  items: Omit<InfoCardItem, "index">[];
+function DirectoryGroup({ title, desc, items, image, footer }: {
+  title: string; desc: string; items: Entry[]; image: ReactNode; footer?: ReactNode;
 }) {
   return (
-    <Card.Root borderRadius="xl" mb="8">
-      <Card.Body>
-        <Heading size="lg" mb="2">
-          {title}
-        </Heading>
-        <Text color="fg.muted" mb="6" maxW="full">
-          {desc}
-        </Text>
-        <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap="4">
-          {items.map((item, index) => (
-            <InfoCard key={item.href} {...item} index={index + 1} />
-          ))}
-        </SimpleGrid>
-      </Card.Body>
-    </Card.Root>
+    <Surface as="section" className="welcome-directory-group" p={{ base: "4", md: "5" }}>
+      <div className="welcome-group-heading">
+        <SectionHeader title={title} description={desc} />
+        <div className="welcome-group-image">{image}</div>
+      </div>
+      <div className="welcome-feature-grid">
+        {items.map((item) => (
+          <Link asChild key={item.href} className="welcome-directory-link" target={item.external ? "_blank" : undefined} rel={item.external ? "noopener noreferrer" : undefined}>
+            <NextLink href={item.href}>
+              <Box minW="0"><Text className="welcome-entry-title" fontWeight="semibold" fontSize="sm">{item.title}</Text><Text className="welcome-entry-description" fontSize="xs" color="fg.muted" mt="1" lineHeight="1.7">{item.desc}</Text></Box>
+              <FiArrowUpRight aria-hidden="true" />
+            </NextLink>
+          </Link>
+        ))}
+      </div>
+      <div className="welcome-group-footer">{footer}</div>
+    </Surface>
   );
 }
 
 export function WelcomeView() {
-  const { t } = useI18n();
-
+  const { t, locale } = useI18n();
+  const sc = getSiteContent(locale);
   return (
-    <VStack align="stretch" gap="0">
-      <GroupInfoCards
-        title={t("home.welcome.title")}
-        desc={t("home.welcome.desc")}
-        items={[
-          {
-            title: t("home.welcome.competitions.title"),
-            desc: t("home.welcome.competitions.desc"),
-            href: "/group-competitions/competitions",
-            internal: true,
-          },
-          {
-            title: t("home.welcome.static.title"),
-            desc: t("home.welcome.static.desc"),
-            href: "/group-competitions/static",
-            internal: true,
-          },
-          {
-            title: t("home.welcome.players.title"),
-            desc: t("home.welcome.players.desc"),
-            href: "/group-competitions/players",
-            internal: true,
-          },
-        ]}
-      />
-
-      <GroupInfoCards
-        title={t("home.welcome.wca.title")}
-        desc={t("home.welcome.wca.desc")}
-        items={[
-          {
-            title: t("home.welcome.wca.statistics.title"),
-            desc: t("home.welcome.wca.statistics.desc"),
-            href: "/wca/statistics",
-            internal: true,
-          },
-          {
-            title: t("home.welcome.wca.players.title"),
-            desc: t("home.welcome.wca.players.desc"),
-            href: "/wca/players",
-            internal: true,
-          },
-          {
-            title: t("home.welcome.wca.comps.title"),
-            desc: t("home.welcome.wca.comps.desc"),
-            href: "/wca/wca-comps",
-            internal: true,
-          },
-        ]}
-      />
-
-      <GroupInfoCards
-        title={t("home.welcome.algs.title")}
-        desc={t("home.welcome.algs.desc")}
-        items={[
-          {
-            title: t("home.welcome.algs.list.title"),
-            desc: t("home.welcome.algs.list.desc"),
-            href: "/algs",
-            internal: true,
-          },
-          {
-            title: t("home.welcome.algs.eg.title"),
-            desc: t("home.welcome.algs.eg.desc"),
-            href: "/algs/222/EG",
-            internal: true,
-          },
-          {
-            title: t("home.welcome.algs.pll.title"),
-            desc: t("home.welcome.algs.pll.desc"),
-            href: "/algs/333/PLL",
-            internal: true,
-          },
-        ]}
-      />
-
-      <GroupInfoCards
-        title={t("home.welcome.practiceTools.title")}
-        desc={t("home.welcome.practiceTools.desc")}
-        items={[
-          {
-            title: t("home.welcome.practiceTools.fr.title"),
-            desc: t("home.welcome.practiceTools.fr.desc"),
-            href: "/tools/floppy-reduction",
-            internal: true,
-          },
-          {
-            title: t("home.welcome.practiceTools.twoSolver.title"),
-            desc: t("home.welcome.practiceTools.twoSolver.desc"),
-            href: "/tools/solver/222",
-            internal: true,
-          },
-        ]}
-      />
-
-      <GroupInfoCards
-        title={t("home.welcome.draw.title")}
-        desc={t("home.welcome.draw.desc")}
-        items={[
-          {
-            title: t("home.welcome.draw.cube.title"),
-            desc: t("home.welcome.draw.cube.desc"),
-            href: "https://visualcubeplus.com/",
-          },
-          {
-            title: t("home.welcome.draw.sq.title"),
-            desc: t("home.welcome.draw.sq.desc"),
-            href: "/draw-tools/sq1-d",
-            internal: true,
-          },
-          {
-            title: t("home.welcome.draw.minx.title"),
-            desc: t("home.welcome.draw.minx.desc"),
-            href: "/draw-tools/minx-d",
-            internal: true,
-          },
-          {
-            title: t("home.welcome.draw.sk.title"),
-            desc: t("home.welcome.draw.sk.desc"),
-            href: "/draw-tools/sk-d",
-            internal: true,
-          },
-          {
-            title: t("home.welcome.draw.py.title"),
-            desc: t("home.welcome.draw.py.desc"),
-            href: "/draw-tools/py-d",
-            internal: true,
-          },
-          {
-            title: t("home.welcome.draw.fto.title"),
-            desc: t("home.welcome.draw.fto.desc"),
-            href: "/draw-tools/fto-d",
-            internal: true,
-          },
-        ]}
-      />
-
-      <GroupInfoCards
-        title={t("home.welcome.recipes.title")}
-        desc={t("home.welcome.recipes.desc")}
-        items={[
-          {
-            title: t("home.welcome.recipes.list.title"),
-            desc: t("home.welcome.recipes.list.desc"),
-            href: "/other/recipes",
-            internal: true,
-          },
-          {
-            title: t("home.welcome.recipes.kitchen.title"),
-            desc: t("home.welcome.recipes.kitchen.desc"),
-            href: "/other/kitchen-skills",
-            internal: true,
-          },
-        ]}
-      />
-    </VStack>
+    <div className="welcome-directory">
+      <DirectoryGroup title={t("nav.groupCompetitions")} desc={sc("siteContent.competitionDirectory")} image={<HomeIllustration variant="competition" />} items={[
+        { title: sc("siteContent.competitions"), desc: sc("siteContent.competitionsDesc"), href: "/group-competitions/competitions" },
+        { title: sc("siteContent.rankings"), desc: sc("siteContent.rankingsDesc"), href: "/group-competitions/static" },
+        { title: sc("siteContent.records"), desc: sc("siteContent.recordsDesc"), href: "/group-competitions/records" },
+        { title: sc("siteContent.players"), desc: sc("siteContent.playersDesc"), href: "/group-competitions/players" },
+      ]} />
+      <DirectoryGroup title={t("home.welcome.wca.title")} desc={sc("siteContent.wcaDirectory")} image={<Image src="/images/wca.svg" alt="WCA" w="full" h="full" objectFit="contain" />} items={[
+        { title: sc("siteContent.competitions"), desc: sc("siteContent.wcaCompetitionsDesc"), href: "/wca/wca-comps" },
+        { title: sc("siteContent.players"), desc: sc("siteContent.wcaPlayersDesc"), href: "/wca/players" },
+        { title: sc("siteContent.statistics"), desc: sc("siteContent.statisticsDesc"), href: "/wca/statistics" },
+        { title: sc("siteContent.proportion"), desc: sc("siteContent.proportionDesc"), href: "/wca/proportion-estimation" },
+      ]} />
+      <DirectoryGroup title={t("home.welcome.algs.title")} desc={sc("siteContent.algsDirectory")} image={<HomeIllustration variant="cube" />} footer={<Link asChild fontSize="xs" color="accent"><NextLink href="/algs">{sc("siteContent.allAlgs")}<FiArrowUpRight /></NextLink></Link>} items={[
+        { title: "CLL", desc: sc("siteContent.cllDesc"), href: "/algs/222/CLL" },
+        { title: "EG-1", desc: sc("siteContent.egDesc"), href: "/algs/222/EG1" },
+        { title: "OLL", desc: sc("siteContent.ollDesc"), href: "/algs/333/OLL" },
+        { title: "PLL", desc: sc("siteContent.pllDesc"), href: "/algs/333/PLL" },
+      ]} />
+      <DirectoryGroup title={t("home.welcome.draw.title")} desc={sc("siteContent.drawDirectory")} image={<HomeIllustration variant="draw" />} footer={<>
+        <Link asChild fontSize="xs" color="accent"><NextLink href="/draw-tools/py-d">Pyraminx<FiArrowUpRight /></NextLink></Link>
+        <Link asChild fontSize="xs" color="accent"><NextLink href="/draw-tools/fto-d">FTO<FiArrowUpRight /></NextLink></Link>
+      </>} items={[
+        { title: sc("siteContent.standardCubes"), desc: sc("siteContent.standardCubesDesc"), href: "https://visualcubeplus.com/", external: true },
+        { title: "SQ-1", desc: sc("siteContent.sqDesc"), href: "/draw-tools/sq1-d" },
+        { title: "Megaminx", desc: sc("siteContent.minxDesc"), href: "/draw-tools/minx-d" },
+        { title: "Skewb", desc: sc("siteContent.skewbDesc"), href: "/draw-tools/sk-d" },
+      ]} />
+    </div>
   );
 }

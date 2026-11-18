@@ -7,6 +7,7 @@ import type { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 import { resolveMarkdownImageSrc } from "./markdownUtils";
+import { useIntlMessage } from "@/hooks/useIntlMessage";
 
 import "@/components/Markdown/github-markdown.css";
 import "@/components/Markdown/detail.css";
@@ -28,6 +29,7 @@ export function MarkdownViewer({
   onInternalLink,
   className,
 }: MarkdownViewerProps) {
+  const { formatMessage: t } = useIntlMessage();
   const headingIndexRef = useRef(0);
   const [previewSrc, setPreviewSrc] = useState<string | null>(null);
 
@@ -50,7 +52,7 @@ export function MarkdownViewer({
                 e.preventDefault();
                 onInternalLink?.(href);
               }}
-              style={{ color: "var(--chakra-colors-accent)" }}
+              style={{ color: "var(--accent)" }}
               {...props}
             >
               {children}
@@ -125,10 +127,10 @@ export function MarkdownViewer({
       <Box
         className={`markdown-body markdown-detail-content ${className ?? ""}`}
         p={{ base: 4, md: 6 }}
-        borderRadius="xl"
-        bg="bg"
+        borderRadius="var(--radius-card)"
+        bg="var(--card)"
         borderWidth="1px"
-        borderColor="border"
+        borderColor="var(--border-default)"
       >
         <ReactMarkdown remarkPlugins={[[remarkGfm, { singleTilde: false }]]} components={components}>
           {content}
@@ -140,13 +142,14 @@ export function MarkdownViewer({
           <Dialog.Backdrop />
           <Dialog.Positioner>
             <Dialog.Content>
+              <Dialog.Title px="4" pt="4">{t({ id: "shared.markdown.preview" })}</Dialog.Title>
               <Dialog.Body textAlign="center" p="4">
                 {previewSrc ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={previewSrc} alt="" style={{ maxWidth: "100%", borderRadius: 8 }} />
                 ) : null}
               </Dialog.Body>
-              <Dialog.CloseTrigger />
+              <Dialog.CloseTrigger aria-label={t({ id: "shared.close" })} />
             </Dialog.Content>
           </Dialog.Positioner>
         </Portal>

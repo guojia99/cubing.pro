@@ -1,6 +1,9 @@
 "use client";
+import { useI18n } from "@/contexts/I18nProvider";
+import { useAdminManagement } from "@/views/admin/useAdminManagement";
 
 import { Switch } from "@chakra-ui/react";
+import { Surface } from "@/components/ui/page";
 import type { OtherLink } from "@/services/cubing-pro/public/types";
 import { ExternalLinkIconMedia } from "@/views/ExternalLinks/ExternalLinkIconMedia";
 import { parseLetterIconKey } from "@/views/ExternalLinks/utils";
@@ -34,6 +37,8 @@ export function ExternalLinkCard({
   admin,
   descMaxChars,
 }: ExternalLinkCardProps) {
+  const { t } = useI18n();
+  const m = useAdminManagement();
   const descDisplay = (() => {
     const raw = (link.desc ?? "").trim();
     if (descMaxChars !== undefined) {
@@ -66,10 +71,10 @@ export function ExternalLinkCard({
             if (!link.url?.trim()) e.preventDefault();
           }}
         >
-          <div className="external-link-card__title">{link.name || "未命名"}</div>
+          <div className="external-link-card__title">{link.name || t("competitionAdmin.unnamed")}</div>
         </a>
       ) : (
-        <div className="external-link-card__title">{link.name || "未命名"}</div>
+        <div className="external-link-card__title">{link.name || t("competitionAdmin.unnamed")}</div>
       )}
       <div
         className={cx(
@@ -86,7 +91,7 @@ export function ExternalLinkCard({
   const mainRow = (
     <div className="external-link-card__row">
       {admin?.dragHandleProps && (
-        <span className="external-link-card__drag" {...admin.dragHandleProps} title="拖动排序">
+        <span className="external-link-card__drag" {...admin.dragHandleProps} title={t("admin.acknowledgments.dragRow")}>
           ⋮⋮
         </span>
       )}
@@ -104,10 +109,11 @@ export function ExternalLinkCard({
       <div className="external-link-card__toolbar">
         {typeof admin.onPinChange === "function" && (
           <span className="external-link-card__pin">
-            <span>首页置顶</span>
+            <span>{m("adminManagement.pinHome")}</span>
             <Switch.Root
               size="sm"
               checked={admin.pinned}
+              aria-label={m("adminManagement.pinHome")}
               disabled={admin.pinDisabled && !admin.pinned}
               onCheckedChange={(e) => admin.onPinChange?.(e.checked)}
             >
@@ -120,37 +126,31 @@ export function ExternalLinkCard({
         )}
         <span className="external-link-card__actions">
           {admin.onMove && (
-            <span
-              role="button"
-              tabIndex={0}
+            <button
+              type="button"
               className="external-link-card__actionBtn"
               onClick={() => admin.onMove?.()}
-              onKeyDown={(e) => e.key === "Enter" && admin.onMove?.()}
             >
-              移动
-            </span>
+              {m("adminManagement.move")}
+            </button>
           )}
           {admin.onEdit && (
-            <span
-              role="button"
-              tabIndex={0}
+            <button
+              type="button"
               className="external-link-card__actionBtn"
               onClick={() => admin.onEdit?.()}
-              onKeyDown={(e) => e.key === "Enter" && admin.onEdit?.()}
             >
-              编辑
-            </span>
+              {t("teamMatch.edit")}
+            </button>
           )}
           {admin.onDelete && (
-            <span
-              role="button"
-              tabIndex={0}
+            <button
+              type="button"
               className="external-link-card__actionBtn"
               onClick={() => admin.onDelete?.()}
-              onKeyDown={(e) => e.key === "Enter" && admin.onDelete?.()}
             >
-              删除
-            </span>
+              {t("teamMatch.delete")}
+            </button>
           )}
         </span>
       </div>
@@ -158,20 +158,20 @@ export function ExternalLinkCard({
 
   if (admin) {
     return (
-      <div className={cx("external-link-card", "external-link-card--admin", className)}>
+      <Surface p="0" className={cx("external-link-card", "external-link-card--admin", className)}>
         <div className="external-link-card__body">
           <div className="external-link-card__main">
-            <div className="external-link-card__openHint">标题可点击在新标签页打开</div>
+            <div className="external-link-card__openHint">{m("adminManagement.openLinkHint")}</div>
             {mainRow}
           </div>
           {toolbar}
         </div>
-      </div>
+      </Surface>
     );
   }
 
   return (
-    <div className={cx("external-link-card", className)}>
+    <Surface p="0" className={cx("external-link-card", className)}>
       <a
         href={link.url || "#"}
         target="_blank"
@@ -185,6 +185,6 @@ export function ExternalLinkCard({
           <div className="external-link-card__main">{mainRow}</div>
         </div>
       </a>
-    </div>
+    </Surface>
   );
 }

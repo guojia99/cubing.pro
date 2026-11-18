@@ -43,6 +43,7 @@ export function TutorialCubeStep({
 
   return (
     <Flex
+      className="fr-tutorial-step"
       gap="3"
       align="flex-start"
       borderWidth="1px"

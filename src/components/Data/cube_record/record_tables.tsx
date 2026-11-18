@@ -1,5 +1,3 @@
-import { CubesCn } from '@/components/CubeIcon/cube';
-import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import { RecordTag } from '@/components/Data/cube_record/record_tag';
 import { eventRouteM } from '@/components/Data/cube_result/event_route';
 import { MRecord, Record } from '@/components/Data/types/record';
@@ -7,6 +5,14 @@ import { resultTimeString } from '@/components/Data/types/result';
 import '@/components/Data/table_fixed_column.css';
 import { CompetitionLink, PlayerLink } from '@/components/Link/GcLinks';
 import { Table } from 'antd';
+import { CompetitionEvent, CompetitionMessage } from '@/components/Data/CompetitionMessage';
+import { useI18n } from '@/contexts/I18nProvider';
+import { formatLocalizedDate } from '@/lib/localizedDates';
+
+function LocalizedRecordDate({ value }: { value: string }) {
+  const { locale } = useI18n();
+  return <>{formatLocalizedDate(value, locale)}</>;
+}
 
 export const RecordsTableKeys: string[] = ['EventId', 'UserName', 'Best', 'Average'];
 
@@ -19,7 +25,7 @@ export const RecordsTable = (
     [
       'Index',
       {
-        title: '序号',
+        title: <CompetitionMessage name="competitionAdmin.index" />,
         dataIndex: 'Index',
         key: 'Index',
         width: 100,
@@ -28,14 +34,14 @@ export const RecordsTable = (
     [
       'EventId',
       {
-        title: '项目',
+        title: <CompetitionMessage name="competitionAdmin.event" />,
         dataIndex: 'EventId',
         key: 'EventId',
         width: 100,
-        render: (value: string, record: Record) => {
+        render: (value: string) => {
           return (
             <>
-              {CubeIcon(value, record.id + "record", {})} {CubesCn(value)}
+              <CompetitionEvent event={value} />
             </>
           );
         },
@@ -44,7 +50,7 @@ export const RecordsTable = (
     [
       'UserName',
       {
-        title: '选手',
+        title: <CompetitionMessage name="competitionAdmin.player" />,
         dataIndex: 'UserName',
         key: 'UserName',
         width: 100,
@@ -56,7 +62,7 @@ export const RecordsTable = (
     [
       'Best',
       {
-        title: '最佳',
+        title: <CompetitionMessage name="competitionAdmin.best" />,
         dataIndex: 'Best',
         key: 'Best',
         width: 150,
@@ -84,7 +90,7 @@ export const RecordsTable = (
     [
       'Average',
       {
-        title: '平均',
+        title: <CompetitionMessage name="competitionAdmin.average" />,
         dataIndex: 'Average',
         key: 'Average',
         width: 150,
@@ -102,7 +108,7 @@ export const RecordsTable = (
     [
       'CompsName',
       {
-        title: '比赛',
+        title: <CompetitionMessage name="competitionAdmin.competition" />,
         dataIndex: 'CompsName',
         key: 'CompsName',
         width: 300,
@@ -114,7 +120,7 @@ export const RecordsTable = (
     [
       'MEventId',
       {
-        title: '项目',
+        title: <CompetitionMessage name="competitionAdmin.event" />,
         dataIndex: 'MEventId',
         key: 'MEventId',
         width: 100,
@@ -124,7 +130,7 @@ export const RecordsTable = (
           }
           return (
             <>
-              {CubeIcon(record.MEventId, `${record.id}record`, {})} {CubesCn(record.MEventId)}
+              <CompetitionEvent event={record.MEventId} />
             </>
           );
         },
@@ -133,22 +139,17 @@ export const RecordsTable = (
     [
       'ResultTime',
       {
-        title: '时间',
+        title: <CompetitionMessage name="competitionAdmin.time" />,
         dataIndex: 'ResultTime',
         key: 'ResultTime',
         width: 200,
-        render: (value: string, record: Record) => {
-          const dateObj = new Date(value);
-          return `${dateObj.getFullYear()}年${(dateObj.getMonth() + 1)
-            .toString()
-            .padStart(2, '0')}月${dateObj.getDate().toString().padStart(2, '0')}日`;
-        },
+        render: (value: string) => <LocalizedRecordDate value={value} />,
       },
     ],
     [
       'BestUserName',
       {
-        title: '选手',
+        title: <CompetitionMessage name="competitionAdmin.player" />,
         dataIndex: 'BestUserName',
         key: 'BestUserName',
         width: 150,
@@ -160,7 +161,7 @@ export const RecordsTable = (
     [
       'AvgUserName',
       {
-        title: '选手',
+        title: <CompetitionMessage name="competitionAdmin.player" />,
         dataIndex: 'AvgUserName',
         key: 'AvgUserName',
         width: 150,

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, Progress, Typography } from 'antd';
-import { getThemeColors, mixCssColors } from '@/theme/chartColors';
+import { useThemeColors } from '@/theme/useThemeColors';
+import { useI18n } from '@/contexts/I18nProvider';
 
 const { Text, Title } = Typography;
 
@@ -15,7 +16,8 @@ const calculateRate = (data: number[]) => {
 };
 
 const SuccessRateBox: React.FC<SuccessRateBoxProps> = ({ data }) => {
-  const theme = getThemeColors();
+  const { t, tf } = useI18n();
+  const theme = useThemeColors();
   const totalCount = data.length;
   const successCount = data.filter(n => n > 0).length;
   const overallRate = calculateRate(data);
@@ -36,13 +38,14 @@ const SuccessRateBox: React.FC<SuccessRateBoxProps> = ({ data }) => {
         variant="borderless"
         style={{
           width: 260,
-          borderRadius: 12,
-          boxShadow: `0 4px 12px ${mixCssColors(theme.foreground, 'transparent', 10)}`,
+          maxWidth: '100%',
+          borderRadius: 'var(--radius-card)',
+          boxShadow: 'var(--shadow-card)',
           textAlign: 'center',
-          padding: 24,
+          padding: 8,
         }}
       >
-        <Title level={5}>成功率</Title>
+        <Title level={5}>{t('competitionAdmin.successRate')}</Title>
         <Progress
           type="circle"
           percent={parseFloat(overallRate.toFixed(1))}
@@ -54,9 +57,9 @@ const SuccessRateBox: React.FC<SuccessRateBoxProps> = ({ data }) => {
         </div>
 
         <div style={{ marginTop: 16, fontSize: 12, color: theme.mutedForeground }}>
-          {rate20 !== null && <div>最近20把：{rate20.toFixed(0)}%</div>}
-          {rate50 !== null && <div>最近50把：{rate50.toFixed(0)}%</div>}
-          {rate100 !== null && <div>最近100把：{rate100.toFixed(0)}%</div>}
+          {rate20 !== null && <div>{tf('competitionAdmin.recentAttempts', { count: 20, rate: rate20.toFixed(0) })}</div>}
+          {rate50 !== null && <div>{tf('competitionAdmin.recentAttempts', { count: 50, rate: rate50.toFixed(0) })}</div>}
+          {rate100 !== null && <div>{tf('competitionAdmin.recentAttempts', { count: 100, rate: rate100.toFixed(0) })}</div>}
         </div>
       </Card>
     </div>

@@ -1,12 +1,15 @@
 import { resultTimeString } from '@/components/Data/types/result';
 import {
+  getChartAxisStyle,
   getChartSeriesColors,
-  getThemeColors,
+  getChartTooltipStyle,
   mixCssColors,
 } from '@/theme/chartColors';
+import { useThemeColors } from '@/theme/useThemeColors';
 import { Card, Col, Row, Typography } from 'antd';
 import React from 'react';
 import ReactECharts from 'echarts-for-react';
+import { useI18n } from '@/contexts/I18nProvider';
 
 const { Text } = Typography;
 
@@ -17,7 +20,6 @@ interface BOBoxProps {
 }
 
 export const BOBox: React.FC<BOBoxProps> = ({ count, data, backgroundColor }) => {
-  const theme = getThemeColors();
   const validData = data.filter((n) => n >= 0).sort((a, b) => a - b); // 从小到大
   const best = validData.slice(0, count);
   const average = best.length > 0 ? best.reduce((a, b) => a + b, 0) / best.length : 0;
@@ -28,8 +30,9 @@ export const BOBox: React.FC<BOBoxProps> = ({ count, data, backgroundColor }) =>
       hoverable
       style={{
         width: 160,
-        borderRadius: 12,
-        boxShadow: `0 4px 12px ${mixCssColors(theme.foreground, 'transparent', 10)}`,
+        maxWidth: '100%',
+        borderRadius: 'var(--radius-card)',
+        boxShadow: 'var(--shadow-card)',
         textAlign: 'center',
         background: backgroundColor,
         display: 'flex',
@@ -55,8 +58,7 @@ interface BOGroupProps {
 // 所有需要支持的 BO 数量
 const boList = [3, 5, 12, 50, 100, 200, 500, 1000];
 
-function buildBoPastelMap(counts: number[]): Record<number, string> {
-  const theme = getThemeColors();
+function buildBoPastelMap(counts: number[], theme: ReturnType<typeof useThemeColors>): Record<number, string> {
   const series = getChartSeriesColors(counts.length);
   return Object.fromEntries(
     counts.map((count, i) => [
@@ -67,12 +69,14 @@ function buildBoPastelMap(counts: number[]): Record<number, string> {
 }
 
 export const BOBestGroup: React.FC<BOGroupProps> = ({ data }) => {
-  const boColors = buildBoPastelMap(boList);
+  const { t } = useI18n();
+  const theme = useThemeColors();
+  const boColors = buildBoPastelMap(boList, theme);
   const validData = data.filter((n) => n >= 0);
   return (
     <Card style={{ marginTop: 24, marginBottom: 24 }}>
       <h3>
-        <strong>最佳平均成绩</strong>
+        <strong>{t('competitionExtra.bestAverages')}</strong>
       </h3>
       <Row gutter={[16, 16]} justify="center">
         {boList
@@ -91,16 +95,17 @@ export const BOBestGroup: React.FC<BOGroupProps> = ({ data }) => {
 const boRecentList = [12, 25, 50, 75, 100];
 
 export const BORecentGroup: React.FC<BOGroupProps> = ({data}) => {
-  const boRecentColors = buildBoPastelMap(boRecentList);
+  const { t } = useI18n();
+  const theme = useThemeColors();
+  const boRecentColors = buildBoPastelMap(boRecentList, theme);
 
   const maxLen = data.length;
   const validData = data.filter((n) => n >= 0).slice(0, maxLen > 100 ? 100: maxLen)
 
-  console.log(validData)
   return (
     <Card style={{ marginTop: 24, marginBottom: 24 }}>
       <h3>
-        <strong>近期有效成绩</strong>
+        <strong>{t('competitionExtra.recentValidResults')}</strong>
       </h3>
       <Row gutter={[16, 16]} justify="center">
         {boRecentList
@@ -124,28 +129,36 @@ interface ScoreRangeChartProps {
 }
 
 export const ScoreRangeChart: React.FC<ScoreRangeChartProps> = ({ data, ranges }) => {
-  const [barColor] = getChartSeriesColors(1);
+  const { t } = useI18n();
+  const theme = useThemeColors();
+  const barColor = theme.accent;
   // 统计每个区间的个数
   const rangeCounts = ranges.map(([min, max]) =>
     data.filter((score) => score >= min && score < max).length
   );
 
   const option = {
+    textStyle: { color: theme.foreground },
     title: {
-      text: '成绩区间统计',
+      textStyle: { color: theme.foreground },
+      text: t('competitionExtra.scoreRanges'),
       left: 'center',
     },
     tooltip: {
+      ...getChartTooltipStyle(),
       trigger: 'axis',
-      formatter: '{b}: {c} 人',
+      formatter: t('competitionAdmin.frequencyTooltip'),
     },
     xAxis: {
+      ...getChartAxisStyle(),
       type: 'category',
       data: ranges.map(([min, max]) => `${min} - ${max}`),
     },
     yAxis: {
+      ...getChartAxisStyle(),
+      nameTextStyle: { color: theme.mutedForeground },
       type: 'value',
-      name: '成绩',
+      name: t('competitionAdmin.frequency'),
     },
     series: [
       {

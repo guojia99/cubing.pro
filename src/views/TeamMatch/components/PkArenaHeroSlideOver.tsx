@@ -3,6 +3,7 @@ import { Button, Typography } from 'antd';
 import classNames from 'classnames';
 import React, { useEffect, useState } from 'react';
 import '../TeamMatch.css';
+import { useTeamMatchI18n } from '../i18n';
 
 export type PkArenaHeroDetail = {
   name: string;
@@ -28,6 +29,7 @@ type Props = {
 };
 
 function PkArenaHeroSlideOver({ open, anchor, onClose, settings, data }: Props) {
+  const { t } = useTeamMatchI18n();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -50,8 +52,8 @@ function PkArenaHeroSlideOver({ open, anchor, onClose, settings, data }: Props) 
   const schoolPx = settings.heroDetailSchoolFontPx;
 
   return (
-    <div className="tmPkArenaHeroRoot" role="dialog" aria-modal="true" aria-label="队员详情">
-      <button type="button" className="tmPkArenaHeroBackdrop" onClick={onClose} aria-label="关闭" />
+    <div className="tmPkArenaHeroRoot" role="dialog" aria-modal="true" aria-label={t('teamMatch.details')}>
+      <button type="button" className="tmPkArenaHeroBackdrop" onClick={onClose} aria-label={t('teamMatch.close')} />
       <div
         className={classNames('tmPkArenaHeroPanel', `tmPkArenaHeroPanel--${anchor}`, {
           tmPkArenaHeroPanelVisible: visible,
@@ -67,7 +69,7 @@ function PkArenaHeroSlideOver({ open, anchor, onClose, settings, data }: Props) 
               {data.teamName}
             </Typography.Text>
             <Button type="text" size="small" onClick={onClose} style={{ color: 'color-mix(in srgb, var(--foreground) 85%, transparent)' }}>
-              关闭
+              {t('teamMatch.close')}
             </Button>
           </div>
 
@@ -119,13 +121,13 @@ function PkArenaHeroSlideOver({ open, anchor, onClose, settings, data }: Props) 
           ) : null}
 
           <div className="tmPkArenaHeroSeed">
-            <Typography.Text style={{ color: 'color-mix(in srgb, var(--foreground) 88%, transparent)', fontSize: seedPx }}>种子：{data.seedScoresLine}</Typography.Text>
+            <Typography.Text style={{ color: 'color-mix(in srgb, var(--foreground) 88%, transparent)', fontSize: seedPx }}>{t('teamMatch.seedLine', { scores: data.seedScoresLine })}</Typography.Text>
           </div>
 
           {(data.teamBattlecry || '').trim() ? (
             <div className="tmPkArenaHeroCryBlock">
               <Typography.Text className="tmPkArenaHeroCryLabel" style={{ fontSize: cryPx }}>
-                队伍宣言
+                {t('teamMatch.teamBattlecry')}
               </Typography.Text>
               <Typography.Paragraph className="tmPkArenaHeroCryText" style={{ fontSize: cryPx, color: 'color-mix(in srgb, var(--foreground) 90%, transparent)' }}>
                 {data.teamBattlecry.trim()}
@@ -136,7 +138,7 @@ function PkArenaHeroSlideOver({ open, anchor, onClose, settings, data }: Props) 
           {(data.playerBattlecry || '').trim() ? (
             <div className="tmPkArenaHeroCryBlock">
               <Typography.Text className="tmPkArenaHeroCryLabel" style={{ fontSize: cryPx }}>
-                个人宣言
+                {t('teamMatch.playerBattlecry')}
               </Typography.Text>
               <Typography.Paragraph className="tmPkArenaHeroCryText" style={{ fontSize: cryPx, color: 'color-mix(in srgb, var(--foreground) 90%, transparent)' }}>
                 {data.playerBattlecry.trim()}

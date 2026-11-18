@@ -1,15 +1,18 @@
 import { resultTimeString } from '@/components/Data/types/result';
-import { getThemeColors } from '@/theme/chartColors';
+import { getChartAxisStyle, getChartTooltipStyle } from '@/theme/chartColors';
+import { useThemeColors } from '@/theme/useThemeColors';
 import ReactECharts from 'echarts-for-react';
 import React, { useState } from 'react';
 import { Select } from 'antd';
+import { useI18n } from '@/contexts/I18nProvider';
 
 interface ScoreRangeChartProps {
   inputData: number[];
 }
 
 const ScoreRangeChart: React.FC<ScoreRangeChartProps> = ({ inputData }) => {
-  const theme = getThemeColors();
+  const { t, tf } = useI18n();
+  const theme = useThemeColors();
   // 过滤掉负数
   const data = inputData.filter((n) => n >= 0);
 
@@ -44,25 +47,32 @@ const ScoreRangeChart: React.FC<ScoreRangeChartProps> = ({ inputData }) => {
     .map(({ index }) => index);
 
   const option = {
+    textStyle: { color: theme.foreground },
     title: {
-      text: `成绩分布图（每 ${selectedInterval} 秒）`,
+      textStyle: { color: theme.foreground, fontSize: 16 },
+      text: tf('competitionAdmin.distribution', { seconds: selectedInterval }),
       left: 'center',
     },
     tooltip: {
+      ...getChartTooltipStyle(),
       trigger: 'axis',
-      formatter: '{b}: {c} 次',
+      formatter: t('competitionAdmin.frequencyTooltip'),
     },
     xAxis: {
+      ...getChartAxisStyle(),
       type: 'category',
       data: ranges.map(([min, max]) => `${resultTimeString(min)} - ${resultTimeString(max)}`),
     },
     yAxis: {
+      ...getChartAxisStyle(),
+      min: 0,
+      nameTextStyle: { color: theme.mutedForeground },
       type: 'value',
-      name: '次数',
+      name: t('competitionAdmin.frequency'),
     },
     series: [
       {
-        name: '人数',
+        name: t('competitionAdmin.players'),
         data: rangeCounts.map((count, idx) => ({
           value: count,
           itemStyle: topThreeIndices.includes(idx)
@@ -76,7 +86,8 @@ const ScoreRangeChart: React.FC<ScoreRangeChartProps> = ({ inputData }) => {
 
   return (
     <div>
-      <label htmlFor="interval-select">选择时间间隔：</label>
+      <div className="competition-toolbar">
+      <label htmlFor="interval-select">{t('competitionAdmin.interval')}</label>
       <Select
         id="interval-select"
         value={selectedInterval}
@@ -85,10 +96,11 @@ const ScoreRangeChart: React.FC<ScoreRangeChartProps> = ({ inputData }) => {
       >
         {intervalOptions.map((option) => (
           <Select.Option key={option} value={option}>
-            {option} 秒
+            {tf('competitionAdmin.seconds', { count: option })}
           </Select.Option>
         ))}
       </Select>
+      </div>
 
       <ReactECharts option={option} style={{ height: 400 }} />
     </div>

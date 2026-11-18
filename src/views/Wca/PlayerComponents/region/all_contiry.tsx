@@ -299,20 +299,19 @@ function isIso3166Alpha2(code: string): boolean {
 }
 
 /**
- * 按当前界面语言显示国家/地区：简体/繁体中文下优先中文（繁体用 ICU + 港澳台覆盖），其它语言沿用原 getCountryNameByIso2 与英文回退。
+ * 优先使用显式界面语言；旧调用保留存储语言默认值。未知代码保留 API 名称。
  */
-export function getCountryDisplayName(iso2Code: string | undefined | null, fallbackName?: string): string {
+export function getCountryDisplayName(iso2Code: string | undefined | null, fallbackName?: string, locale = typeof window !== 'undefined' ? readStoredLocale() : 'zh-CN'): string {
   if (!iso2Code || typeof iso2Code !== 'string') return fallbackName || '';
   const code = iso2Code.toUpperCase().trim();
-  const locale = typeof window !== 'undefined' ? readStoredLocale() : 'zh-CN';
   const lo = locale.toLowerCase();
   const iso2 = isIso3166Alpha2(code);
 
-  if (lo === 'zh-tw' || lo.startsWith('zh-tw')) {
+  if (lo === 'yue-hant-hk' || lo === 'zh-tw' || lo.startsWith('zh-tw')) {
     if (iso2) {
       const tw = ZH_TW_ISO2_OVERRIDE[code];
       if (tw) return tw;
-      const intl = regionNameIntl(code, ['zh-TW']);
+      const intl = regionNameIntl(code, ['zh-Hant-HK']);
       if (intl) return intl;
     }
     const manualSc = countryIso2ToChinese[code];
@@ -330,7 +329,11 @@ export function getCountryDisplayName(iso2Code: string | undefined | null, fallb
     return fallbackName || code;
   }
 
-  return getCountryNameByIso2(code) || fallbackName || code;
+  if (iso2) {
+    const localized = regionNameIntl(code, [locale]);
+    if (localized && localized !== code) return localized;
+  }
+  return fallbackName || code;
 }
 
 export function CountryAvatar(code: string) {

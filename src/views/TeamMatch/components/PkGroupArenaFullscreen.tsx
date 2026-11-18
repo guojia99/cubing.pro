@@ -13,6 +13,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { DarkMode } from '@/components/ui/color-mode';
 import { useHideAppChrome } from '@/hooks/useHideAppChrome';
 import '../TeamMatch.css';
+import { useTeamMatchI18n } from '../i18n';
 
 export type PkGroupArenaPlayerLite = {
   id: string;
@@ -64,6 +65,7 @@ function PkGroupArenaFullscreen({
   currentResults,
   onOpenScoreEntry,
 }: Props) {
+  const { t, locale } = useTeamMatchI18n();
   useHideAppChrome(open);
   const [heroOpen, setHeroOpen] = useState(false);
   const [heroAnchor, setHeroAnchor] = useState<'left' | 'right'>('left');
@@ -116,23 +118,23 @@ function PkGroupArenaFullscreen({
           return null;
         }
         const p = col2.players[nextIdx];
-        setHeroData(buildPkArenaHeroDetail(toHeroInput(p), col2.team, currentResults));
+        setHeroData(buildPkArenaHeroDetail(toHeroInput(p), col2.team, currentResults, locale));
         setProgressTick((x) => x + 1);
         return { ...c, idx: nextIdx };
       });
     }, intervalMs);
     return () => window.clearTimeout(tid);
-  }, [heroOpen, carousel?.colIdx, carousel?.idx, settings.heroCarouselIntervalMs, columns, currentResults]);
+  }, [heroOpen, carousel?.colIdx, carousel?.idx, settings.heroCarouselIntervalMs, columns, currentResults, locale]);
 
   const openHero = useCallback(
     (colIdx: number, col: PkGroupArenaColumn, p: PkGroupArenaPlayerLite) => {
       const anchor: 'left' | 'right' = colIdx % 2 === 0 ? 'left' : 'right';
       setCarousel(null);
       setHeroAnchor(anchor);
-      setHeroData(buildPkArenaHeroDetail(toHeroInput(p), col.team, currentResults));
+      setHeroData(buildPkArenaHeroDetail(toHeroInput(p), col.team, currentResults, locale));
       setHeroOpen(true);
     },
-    [currentResults],
+    [currentResults, locale],
   );
 
   const toggleCarousel = useCallback(
@@ -146,11 +148,11 @@ function PkGroupArenaFullscreen({
       const anchor: 'left' | 'right' = colIdx % 2 === 0 ? 'left' : 'right';
       setCarousel({ colIdx, idx: 0 });
       setHeroAnchor(anchor);
-      setHeroData(buildPkArenaHeroDetail(toHeroInput(col.players[0]), col.team, currentResults));
+      setHeroData(buildPkArenaHeroDetail(toHeroInput(col.players[0]), col.team, currentResults, locale));
       setHeroOpen(true);
       setProgressTick((n) => n + 1);
     },
-    [columns, carousel?.colIdx, closeHero],
+    [columns, carousel?.colIdx, closeHero, currentResults, locale],
   );
 
   const bgStyle = useMemo(
@@ -179,11 +181,11 @@ function PkGroupArenaFullscreen({
         style={{ background: settings.barBg }}
       >
         <Typography.Text strong style={{ color: 'color-mix(in srgb, var(--foreground) 92%, transparent)', fontSize: settings.buttonFontPx }}>
-          预选赛 · 小组全屏
+          {t('teamMatch.groupFullscreen')}
         </Typography.Text>
         <Space wrap>
           <Button type="primary" danger ghost onClick={onClose}>
-            关闭对战
+            {t('teamMatch.closeBattle')}
           </Button>
           <LiveSettingsButton type="default" ghost onClick={onOpenLiveSettings} style={{ fontSize: settings.buttonFontPx }} />
         </Space>
@@ -314,7 +316,7 @@ function PkGroupArenaFullscreen({
       />
       <div className="tmPkArenaFsBottomBar" style={{ background: settings.barBg }}>
         <Button type="primary" size="large" onClick={onOpenScoreEntry} style={{ fontSize: settings.buttonFontPx }}>
-          录入成绩
+          {t('teamMatch.enterScores')}
         </Button>
       </div>
       <PkArenaHeroSlideOver

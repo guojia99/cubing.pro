@@ -47,7 +47,7 @@
   right: 0;
   width: 1px;
   height: 50%;
-  background-color: rgba(220, 220, 220, 0.74);
+  background-color: var(--border-default);
   transform: translateY(-50%);
 }
 

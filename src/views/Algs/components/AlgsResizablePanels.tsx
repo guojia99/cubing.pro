@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { useI18n } from "@/contexts/I18nProvider";
+import { translatePuzzleExtra as extra } from "@/i18n/messages/puzzle-extra";
 
 const WIDTH_KEY = "algs_filter_panel_width";
 const DEFAULT_WIDTH = 288;
@@ -57,8 +58,8 @@ export default function AlgsResizablePanels({ navigation, children }: { navigati
     return () => observer.disconnect();
   }, []);
 
-  const label = locale === "en-US" ? "Resize filter and formula panels" : "调整筛选与公式区域宽度";
-  const hint = locale === "en-US" ? "Drag or use arrow keys. Double-click to reset." : "拖拽或使用左右方向键调整，双击恢复默认宽度";
+  const label = extra(locale, "puzzleExtra.resize");
+  const hint = extra(locale, "puzzleExtra.resizeHint");
   return <div ref={root} className={`algs-detail-panels${dragging ? " algs-detail-panels--resizing" : ""}`} style={{ "--algs-filter-width": `${width}px` } as CSSProperties}>
     {navigation}
     <div
@@ -71,7 +72,7 @@ export default function AlgsResizablePanels({ navigation, children }: { navigati
       aria-valuemin={MIN_WIDTH}
       aria-valuemax={maxWidth}
       aria-valuenow={width}
-      aria-valuetext={locale === "en-US" ? `Filter width ${width} pixels` : `筛选栏宽度 ${width} 像素`}
+      aria-valuetext={extra(locale, "puzzleExtra.filterWidth", { width })}
       title={hint}
       onPointerDown={(event) => {
         if (!event.isPrimary || event.button !== 0) return;

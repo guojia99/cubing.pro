@@ -10,8 +10,9 @@ import {
 } from "@chakra-ui/react";
 import { useCallback, useState } from "react";
 import { LuTag, LuTrash2 } from "react-icons/lu";
+import { useI18n } from "@/contexts/I18nProvider";
+import { getSiteContent } from "@/i18n/messages/site-content";
 
-import { LightMode } from "@/components/ui/color-mode";
 import "@/views/FoodShared/tonight-receipt.css";
 
 export interface TonightReceiptItem {
@@ -50,6 +51,8 @@ export function TonightReceipt({
   toggleIngredientChecked,
   onClear,
 }: TonightReceiptProps) {
+  const { locale } = useI18n();
+  const sc = getSiteContent(locale);
   const [showTags, setShowTags] = useState(true);
   const [clearOpen, setClearOpen] = useState(false);
   const [checkedIngredients, setCheckedIngredients] = useState<Set<string>>(() => getCheckedIngredients());
@@ -70,26 +73,23 @@ export function TonightReceipt({
 
   if (items.length === 0) {
     return (
-      <LightMode>
         <Box className="tonight-receipt tonight-receipt-empty" bg="bg" borderWidth="1px" borderStyle="dashed" borderColor="border" color="fg.muted">
           <div className="tonight-receipt-header">{title}</div>
           <div className="tonight-receipt-body" style={{ padding: 24, textAlign: "center" }}>
             {emptyText}
           </div>
         </Box>
-      </LightMode>
     );
   }
 
   return (
-    <LightMode>
     <>
       <Box
         className="tonight-receipt"
         bg="bg.elevated"
         borderWidth="1px"
         borderColor="border"
-        boxShadow="sm"
+        boxShadow="var(--shadow-card)"
       >
         <div className="tonight-receipt-header">
           <span>{title}</span>
@@ -101,12 +101,11 @@ export function TonightReceipt({
               color={showTags ? "accent" : "fg.muted"}
             >
               <LuTag />
-              {showTags ? "隐藏" : "显示"}
-              {tagLabel}
+              {sc(showTags ? "siteContent.hideTags" : "siteContent.showTags", { label: tagLabel })}
             </Button>
-            <Button variant="ghost" size="xs" colorPalette="red" onClick={() => setClearOpen(true)}>
+            <Button variant="ghost" size="sm" color="signal.destructive" onClick={() => setClearOpen(true)}>
               <LuTrash2 />
-              清空
+              {sc("siteContent.clear")}
             </Button>
           </div>
         </div>
@@ -131,13 +130,12 @@ export function TonightReceipt({
                     color: checked ? "var(--muted-foreground)" : undefined,
                   }}
                 >
-                  <Checkbox.Root checked={checked} onCheckedChange={() => handleToggle(name)} mr="2">
-                    <Checkbox.HiddenInput />
+                  <Checkbox.Root colorPalette="brand" checked={checked} onCheckedChange={() => handleToggle(name)} alignItems="start" w="full" gap="2" minH="11">
+                    <Checkbox.HiddenInput aria-label={name} />
                     <Checkbox.Control>
                       <Checkbox.Indicator />
                     </Checkbox.Control>
-                  </Checkbox.Root>
-                  <Text as="span" fontSize="14px">
+                  <Checkbox.Label fontSize="14px" lineHeight="1.7" cursor="pointer">
                     {name}
                     {count > 1 ? (
                       <Text as="span" color="accent" ml="1">
@@ -146,10 +144,11 @@ export function TonightReceipt({
                     ) : null}
                     {showTags && itemNames.length > 0 ? (
                       <span className="tonight-receipt-tag" style={{ marginLeft: 6 }}>
-                        [{itemNames.join("、")}]
+                        [{itemNames.join(sc("siteContent.separator"))}]
                       </span>
                     ) : null}
-                  </Text>
+                  </Checkbox.Label>
+                  </Checkbox.Root>
                 </div>
               );
             })}
@@ -161,7 +160,7 @@ export function TonightReceipt({
         <Portal>
           <Dialog.Backdrop />
           <Dialog.Positioner>
-            <Dialog.Content>
+            <Dialog.Content mx="4" borderRadius="var(--radius-card)" boxShadow="var(--shadow-float)">
               <Dialog.Header>
                 <Dialog.Title>{clearTitle}</Dialog.Title>
               </Dialog.Header>
@@ -170,10 +169,10 @@ export function TonightReceipt({
               </Dialog.Body>
               <Dialog.Footer>
                 <Button variant="outline" onClick={() => setClearOpen(false)}>
-                  取消
+                  {sc("siteContent.cancel")}
                 </Button>
                 <Button colorPalette="red" onClick={handleClearAll}>
-                  确认清空
+                  {sc("siteContent.confirmClear")}
                 </Button>
               </Dialog.Footer>
             </Dialog.Content>
@@ -181,6 +180,5 @@ export function TonightReceipt({
         </Portal>
       </Dialog.Root>
     </>
-    </LightMode>
   );
 }

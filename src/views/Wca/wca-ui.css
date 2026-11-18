@@ -1,0 +1,27 @@
+@import "../GroupCompetitions/competition-ui.css";
+
+.wca-page { min-width: 0; color: var(--foreground); font-family: var(--font-body); }
+.wca-page .ant-card { background: var(--card); border-color: var(--border-default); border-radius: var(--radius-card); box-shadow: var(--shadow-card); }
+.wca-page .ant-card-head { border-color: var(--border-default); font-family: var(--font-heading); }
+.wca-page .ant-tabs-content-holder, .wca-page .ant-tabs-tabpane, .wca-page .ant-col { min-width: 0; }
+.wca-page .ant-tabs-nav { margin-bottom: 24px; }
+.wca-page .ant-table-content { overflow-x: auto; }
+.wca-page .ant-table-placeholder .ant-table-cell,
+.wca-page .ant-empty-description { color: var(--muted-foreground); }
+.wca-page .ant-table-sticky-holder { top: var(--header-height) !important; }
+.wca-page .ant-table-thead .ant-table-cell.ant-table-cell-fix { background: var(--muted) !important; }
+.wca-page :is(h1, h2, h3, h4) { font-family: var(--font-heading); }
+.wca-page .view-mode-toggle { background: var(--muted); border: 1px solid var(--border-default); border-radius: var(--radius-card); box-shadow: none; flex-wrap: wrap; }
+.wca-page .view-mode-toggle .toggle-option { color: var(--muted-foreground); }
+.wca-page .view-mode-toggle .toggle-option.active { background: var(--card); color: var(--accent); box-shadow: var(--shadow-card); }
+.wca-page .view-mode-toggle .toggle-option:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.wca-page .stats-content > :is(.grand-slam-rank, .historical-rank, .full-rank, .yearly-full-rank, .comp-year-rank, .success-rate-rank, .all-events-achievement-rank, .diy-events-rank) { padding: 0; margin-top: 24px; }
+.wca-page .wca-player-statics-tab > .ant-tabs-nav { padding: 8px 12px; background: var(--muted); border: 1px solid var(--border-default); border-radius: var(--radius-card); }
+.wca-page .wca-result-group-tabs > .ant-tabs-nav { padding-inline: 12px; border: 1px solid var(--border-default); border-radius: var(--radius-card); background: var(--muted); }
+.wca-page .wca-event-tabs > .ant-tabs-nav { padding: 8px 12px; border: 1px solid var(--border-default); border-radius: var(--radius-card); background: var(--accent-soft); }
+.wca-page .wca-event-tabs > .ant-tabs-nav .ant-tabs-nav-wrap { overflow: visible; }
+.wca-page .ant-tabs-nav-wrap { min-width: 0; }
+.wca-page .wca-lit-cities > .ant-space { display: flex; flex-wrap: wrap; padding: 12px; margin-bottom: 20px; border: 1px solid var(--border-default); border-radius: var(--radius-card); background: var(--muted); }
+@media (prefers-reduced-motion: reduce) {
+  .wca-page :is(.stats-tab-item, .wca-comps-card, .toggle-option) { transition: none; }
+}

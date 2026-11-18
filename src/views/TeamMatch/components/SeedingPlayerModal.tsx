@@ -1,5 +1,6 @@
+import { tm, useTeamMatchI18n, type TeamMatchLocale } from '@/views/TeamMatch/i18n';
 import { fetchOneUserGrades, pickBestOneGradeForEvent } from '@/views/TeamMatch/oneGradeApi';
-import { resolveOfficialScores, SEEDING_SOURCE_LABEL } from '@/views/TeamMatch/seedingScorePick';
+import { resolveOfficialScores, seedingSourceLabel } from '@/views/TeamMatch/seedingScorePick';
 import type {
   Player,
   SeedingAdoptStrategy,
@@ -27,9 +28,9 @@ function fmt(v: number | 'DNF' | null) {
   return v === 'DNF' ? 'DNF' : v === null ? '—' : String(v);
 }
 
-function fmtSnapshot(s: SeedingEntrySnapshot | null) {
+function fmtSnapshot(s: SeedingEntrySnapshot | null, locale: TeamMatchLocale) {
   if (!s || (s.single === null && s.average === null)) return '—';
-  return `单次 ${fmt(s.single)} · 平均 ${fmt(s.average)}`;
+  return tm(locale, 'teamMatch.snapshotLine', { p0: fmt(s.single), p1: fmt(s.average) });
 }
 
 function inferAdoptStrategy(e: SeedingEntry): SeedingAdoptStrategy {
@@ -39,6 +40,7 @@ function inferAdoptStrategy(e: SeedingEntry): SeedingAdoptStrategy {
 }
 
 const SeedingPlayerModal: React.FC<Props> = ({ open, onClose, player, eventId, entry, onSave }) => {
+  const { t: tr, locale } = useTeamMatchI18n();
   const [single, setSingle] = useState<number | 'DNF' | null>(null);
   const [average, setAverage] = useState<number | 'DNF' | null>(null);
   const [activeSource, setActiveSource] = useState<SeedingScoreSource>('manual');
@@ -115,7 +117,7 @@ const SeedingPlayerModal: React.FC<Props> = ({ open, onClose, player, eventId, e
   const fetchWca = async () => {
     if (!player) return;
     if (!player.wcaId || player.wcaId.length !== 10) {
-      message.warning('请先填写有效 WCA ID（10 位）');
+      message.warning(tr('teamMatch.validWcaRequired'));
       return;
     }
     setWcaLoading(true);
@@ -124,9 +126,9 @@ const SeedingPlayerModal: React.FC<Props> = ({ open, onClose, player, eventId, e
       const res = await getWCAPersonResults(player.wcaId);
       const b = pickBestForEvent(res, eventId);
       setWcaBest({ single: b.single, average: b.average });
-      message.success('已拉取 WCA 成绩');
+      message.success(tr('teamMatch.wcaScoresFetched'));
     } catch {
-      message.error('拉取失败');
+      message.error(tr('teamMatch.fetchFailed'));
     } finally {
       setWcaLoading(false);
     }
@@ -136,7 +138,7 @@ const SeedingPlayerModal: React.FC<Props> = ({ open, onClose, player, eventId, e
     if (!player) return;
     const uid = (player.oneId ?? '').trim();
     if (!uid || !/^\d+$/.test(uid)) {
-      message.warning('请先在选手资料中填写有效 One ID（数字 uid）');
+      message.warning(tr('teamMatch.validOneRequired'));
       return;
     }
     setOneLoading(true);
@@ -144,9 +146,9 @@ const SeedingPlayerModal: React.FC<Props> = ({ open, onClose, player, eventId, e
       const rows = await fetchOneUserGrades(uid);
       const b = pickBestOneGradeForEvent(rows, eventId);
       setOneBest({ single: b.single, average: b.average });
-      message.success('已拉取 One 成绩');
+      message.success(tr('teamMatch.oneScoresFetched'));
     } catch {
-      message.error('拉取失败（网络、跨域或该项目无记录）');
+      message.error(tr('teamMatch.oneFetchFailed'));
     } finally {
       setOneLoading(false);
     }
@@ -159,9 +161,9 @@ const SeedingPlayerModal: React.FC<Props> = ({ open, onClose, player, eventId, e
       setSingle(r.single);
       setAverage(r.average);
       setActiveSource(r.activeSource);
-      message.success('已切换为「自动：三者最佳平均」并写入');
+      message.success(tr('teamMatch.autoBestApplied'));
     } else {
-      message.warning('请先填写初赛或成功拉取 WCA / One');
+      message.warning(tr('teamMatch.needScoreSource'));
     }
   };
 
@@ -182,14 +184,15 @@ const SeedingPlayerModal: React.FC<Props> = ({ open, onClose, player, eventId, e
     if (v === 'manual') return;
     const r = resolveOfficialScores(v, wcaBest, oneBest, preliminary);
     if (!r) {
-      message.warning('该来源暂无有效成绩，可先拉取或填写对应区块');
+      message.warning(tr('teamMatch.sourceEmpty'));
     }
   };
 
-  const title = player ? `编辑成绩 · ${player.name}` : '编辑成绩';
+  const title = player ? tr('teamMatch.editScoresPlayer', { p0: player.name }) : tr('teamMatch.editScores');
 
   return (
     <Modal
+      className="tm-workbench-modal"
       title={title}
       open={open && !!player && !!entry}
       onCancel={onClose}
@@ -199,15 +202,13 @@ const SeedingPlayerModal: React.FC<Props> = ({ open, onClose, player, eventId, e
     >
       {player && entry && (
         <Space orientation="vertical" style={{ width: '100%' }} size="middle">
-          <Typography.Text type="secondary" style={{ fontSize: 12 }}>
-            初赛 / WCA / One 可并存；<strong>正式成绩采用方式</strong>由下方单选决定。WCA 可能偏旧、选手退步时可改选初赛、One 或手填。
-          </Typography.Text>
+          <Typography.Text type="secondary" style={{ fontSize: 12 }}>{tr('teamMatch.adoptHelp')}</Typography.Text>
 
           <div>
-            <Typography.Text strong>初赛</Typography.Text>
+            <Typography.Text strong>{tr('teamMatch.preliminary')}</Typography.Text>
             <div style={{ marginTop: 8 }}>
               <Space wrap align="center">
-                <Typography.Text type="secondary">单次（秒）</Typography.Text>
+                <Typography.Text type="secondary">{tr('teamMatch.singleSeconds')}</Typography.Text>
                 {preliminary.single === 'DNF' ? (
                   <Typography.Text type="danger">DNF</Typography.Text>
                 ) : (
@@ -222,15 +223,13 @@ const SeedingPlayerModal: React.FC<Props> = ({ open, onClose, player, eventId, e
                   />
                 )}
                 {preliminary.single !== 'DNF' && (
-                  <Button type="link" size="small" onClick={() => setPreliminary((p) => ({ ...p, single: 'DNF' }))}>
-                    单次 DNF
-                  </Button>
+                  <Button type="link" size="small" onClick={() => setPreliminary((p) => ({ ...p, single: 'DNF' }))}>{tr('teamMatch.singleDnf')}</Button>
                 )}
               </Space>
             </div>
             <div style={{ marginTop: 8 }}>
               <Space wrap align="center">
-                <Typography.Text type="secondary">平均（秒）</Typography.Text>
+                <Typography.Text type="secondary">{tr('teamMatch.averageSeconds')}</Typography.Text>
                 {preliminary.average === 'DNF' ? (
                   <Typography.Text type="danger">DNF</Typography.Text>
                 ) : (
@@ -245,9 +244,7 @@ const SeedingPlayerModal: React.FC<Props> = ({ open, onClose, player, eventId, e
                   />
                 )}
                 {preliminary.average !== 'DNF' && (
-                  <Button type="link" size="small" onClick={() => setPreliminary((p) => ({ ...p, average: 'DNF' }))}>
-                    平均 DNF
-                  </Button>
+                  <Button type="link" size="small" onClick={() => setPreliminary((p) => ({ ...p, average: 'DNF' }))}>{tr('teamMatch.averageDnf')}</Button>
                 )}
               </Space>
             </div>
@@ -256,71 +253,59 @@ const SeedingPlayerModal: React.FC<Props> = ({ open, onClose, player, eventId, e
           <div>
             <Space wrap align="center">
               <Typography.Text strong>WCA</Typography.Text>
-              <Typography.Text type="secondary">{fmtSnapshot(wcaBest)}</Typography.Text>
-              <Button size="small" loading={wcaLoading} onClick={() => void fetchWca()}>
-                拉取 WCA
-              </Button>
+              <Typography.Text type="secondary">{fmtSnapshot(wcaBest, locale)}</Typography.Text>
+              <Button size="small" loading={wcaLoading} onClick={() => void fetchWca()}>{tr('teamMatch.fetchWca')}</Button>
             </Space>
           </div>
 
           <div>
             <Space wrap align="center">
               <Typography.Text strong>One</Typography.Text>
-              <Typography.Text type="secondary">{fmtSnapshot(oneBest)}</Typography.Text>
-              <Button size="small" loading={oneLoading} onClick={() => void fetchOne()}>
-                拉取 One
-              </Button>
+              <Typography.Text type="secondary">{fmtSnapshot(oneBest, locale)}</Typography.Text>
+              <Button size="small" loading={oneLoading} onClick={() => void fetchOne()}>{tr('teamMatch.fetchOne')}</Button>
             </Space>
           </div>
 
           <div>
-            <Typography.Text strong>正式成绩采用</Typography.Text>
+            <Typography.Text strong>{tr('teamMatch.adoptResults')}</Typography.Text>
             <Radio.Group
               style={{ display: 'block', marginTop: 8 }}
               value={adoptStrategy}
               onChange={(e) => onStrategyChange(e.target.value as SeedingAdoptStrategy)}
             >
               <Space orientation="vertical" size={4}>
-                <Radio value="best_average">自动：三者最佳平均（初赛 / WCA / One 中比较）</Radio>
-                <Radio value="preliminary">固定采用初赛</Radio>
-                <Radio value="wca">固定采用 WCA（可能偏旧）</Radio>
-                <Radio value="one">固定采用 One</Radio>
-                <Radio value="manual">手填：仅使用下方「当前采用」数字</Radio>
+                <Radio value="best_average">{tr('teamMatch.strategyAuto')}</Radio>
+                <Radio value="preliminary">{tr('teamMatch.strategyPrelim')}</Radio>
+                <Radio value="wca">{tr('teamMatch.strategyWca')}</Radio>
+                <Radio value="one">{tr('teamMatch.strategyOne')}</Radio>
+                <Radio value="manual">{tr('teamMatch.strategyManual')}</Radio>
               </Space>
             </Radio.Group>
           </div>
 
           <Space wrap>
-            <Button size="small" onClick={applyBestClick}>
-              快捷：切到「自动最佳平均」并写入
-            </Button>
-            <Button size="small" onClick={setRowDnf}>
-              当前采用全 DNF
-            </Button>
+            <Button size="small" onClick={applyBestClick}>{tr('teamMatch.applyAutoBest')}</Button>
+            <Button size="small" onClick={setRowDnf}>{tr('teamMatch.officialAllDnf')}</Button>
           </Space>
 
           <Divider style={{ margin: '8px 0' }} />
 
           <div>
             <Space wrap align="center" style={{ marginBottom: 8 }}>
-              <Typography.Text strong>当前采用（种子/排序）</Typography.Text>
+              <Typography.Text strong>{tr('teamMatch.currentAdopted')}</Typography.Text>
               <Tag color={activeSource === 'wca' ? 'blue' : activeSource === 'one' ? 'green' : activeSource === 'preliminary' ? 'orange' : 'default'}>
-                {SEEDING_SOURCE_LABEL[activeSource]}
+                {seedingSourceLabel(activeSource, locale)}
               </Tag>
               {adoptStrategy === 'best_average' && (
-                <Typography.Text type="secondary" style={{ fontSize: 12 }}>
-                  （策略：自动最佳平均）
-                </Typography.Text>
+                <Typography.Text type="secondary" style={{ fontSize: 12 }}>{tr('teamMatch.autoStrategyHint')}</Typography.Text>
               )}
             </Space>
             <div>
-              <Typography.Text type="secondary">单次（秒）</Typography.Text>
+              <Typography.Text type="secondary">{tr('teamMatch.singleSeconds')}</Typography.Text>
               {single === 'DNF' ? (
                 <Space style={{ marginTop: 8, display: 'flex' }}>
                   <Typography.Text type="danger">DNF</Typography.Text>
-                  <Button type="link" size="small" onClick={() => { setSingle(null); markOfficialManual(); }}>
-                    改填数字
-                  </Button>
+                  <Button type="link" size="small" onClick={() => { setSingle(null); markOfficialManual(); }}>{tr('teamMatch.enterNumber')}</Button>
                 </Space>
               ) : (
                 <InputNumber
@@ -335,19 +320,15 @@ const SeedingPlayerModal: React.FC<Props> = ({ open, onClose, player, eventId, e
                 />
               )}
               {single !== 'DNF' && (
-                <Button type="link" size="small" style={{ paddingLeft: 0 }} onClick={() => { setSingle('DNF'); markOfficialManual(); }}>
-                  设为 DNF
-                </Button>
+                <Button type="link" size="small" style={{ paddingLeft: 0 }} onClick={() => { setSingle('DNF'); markOfficialManual(); }}>{tr('teamMatch.setDnf')}</Button>
               )}
             </div>
             <div style={{ marginTop: 12 }}>
-              <Typography.Text type="secondary">平均（秒）</Typography.Text>
+              <Typography.Text type="secondary">{tr('teamMatch.averageSeconds')}</Typography.Text>
               {average === 'DNF' ? (
                 <Space style={{ marginTop: 8, display: 'flex' }}>
                   <Typography.Text type="danger">DNF</Typography.Text>
-                  <Button type="link" size="small" onClick={() => { setAverage(null); markOfficialManual(); }}>
-                    改填数字
-                  </Button>
+                  <Button type="link" size="small" onClick={() => { setAverage(null); markOfficialManual(); }}>{tr('teamMatch.enterNumber')}</Button>
                 </Space>
               ) : (
                 <InputNumber
@@ -362,9 +343,7 @@ const SeedingPlayerModal: React.FC<Props> = ({ open, onClose, player, eventId, e
                 />
               )}
               {average !== 'DNF' && (
-                <Button type="link" size="small" style={{ paddingLeft: 0 }} onClick={() => { setAverage('DNF'); markOfficialManual(); }}>
-                  设为 DNF
-                </Button>
+                <Button type="link" size="small" style={{ paddingLeft: 0 }} onClick={() => { setAverage('DNF'); markOfficialManual(); }}>{tr('teamMatch.setDnf')}</Button>
               )}
             </div>
           </div>

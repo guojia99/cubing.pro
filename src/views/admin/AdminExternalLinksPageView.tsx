@@ -1,4 +1,7 @@
 "use client";
+import { useAdminManagement } from "@/views/admin/useAdminManagement";
+import { PageHeader } from "@/components/ui/page";
+import "./admin-ui.css";
 
 import {
   Button,
@@ -41,6 +44,7 @@ import { v4 as uuidv4 } from "uuid";
 import { AdminGuard } from "@/components/admin/AdminGuard";
 import { toaster } from "@/components/ui/toaster";
 import { useI18n } from "@/contexts/I18nProvider";
+import { useAdminDragAccessibility } from "./useAdminDragAccessibility";
 import {
   getOtherLinksWithAdmin,
   setOtherLinksWithAdmin,
@@ -78,8 +82,10 @@ function linkMapFrom(links: OtherLink[]) {
 }
 
 function SortableGroupRow({ id, children }: { id: string; children: React.ReactNode }) {
+  const m = useAdminManagement();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id,
+    attributes: { roleDescription: m("adminManagement.dragGroups") },
   });
   return (
     <div
@@ -97,11 +103,11 @@ function SortableGroupRow({ id, children }: { id: string; children: React.ReactN
           {...attributes}
           {...listeners}
           style={{ cursor: "grab", border: "none", background: "none", fontSize: 16 }}
-          title="拖动排序分组"
+          title={m("adminManagement.dragGroups")}
         >
           ⋮⋮
         </button>
-        <Text>拖动整组排序</Text>
+        <Text>{m("adminManagement.dragWholeGroup")}</Text>
       </HStack>
       {children}
     </div>
@@ -117,8 +123,10 @@ function SortableLinkWrap({
   link: OtherLink;
   admin: React.ComponentProps<typeof ExternalLinkCard>["admin"];
 }) {
+  const { t } = useI18n();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id,
+    attributes: { roleDescription: t("admin.acknowledgments.dragRow") },
   });
   return (
     <div
@@ -155,6 +163,8 @@ function GroupDropZone({ groupName, children }: { groupName: string; children: R
 }
 
 export function AdminExternalLinksPageView() {
+  const m = useAdminManagement();
+  const dragAccessibility = useAdminDragAccessibility();
   const { t } = useI18n();
   const [data, setData] = useState<OtherLinks>(emptyOtherLinks());
   const [loading, setLoading] = useState(true);
@@ -253,7 +263,7 @@ export function AdminExternalLinksPageView() {
 
   const submitLink = () => {
     if (!linkForm.name.trim() || !linkForm.url.trim()) {
-      toaster.create({ type: "error", title: "请填写名称和 URL" });
+      toaster.create({ type: "error", title: m("adminManagement.linkRequired") });
       return;
     }
     const key = editingKey ?? uuidv4();
@@ -274,12 +284,12 @@ export function AdminExternalLinksPageView() {
       return { ...d, links, group_map };
     });
 
-    toaster.create({ type: "success", title: editingKey ? "已保存修改" : "已添加链接" });
+    toaster.create({ type: "success", title: editingKey ? t("profile.saveOk") : m("adminManagement.linkAdded") });
     setLinkModalOpen(false);
   };
 
   const deleteLink = (group: string, key: string) => {
-    if (!window.confirm("删除该链接？")) return;
+    if (!window.confirm(m("adminManagement.deleteLink"))) return;
     setData((d) => {
       const links = d.links.filter((l) => l.key !== key);
       const tops = d.tops.filter((k) => k !== key);
@@ -291,17 +301,17 @@ export function AdminExternalLinksPageView() {
         group_map: { ...d.group_map, [group]: keys },
       };
     });
-    toaster.create({ type: "success", title: "已删除" });
+    toaster.create({ type: "success", title: m("adminManagement.deleted") });
   };
 
   const addGroup = () => {
     const name = newGroupName.trim();
     if (!name) {
-      toaster.create({ type: "warning", title: "请输入分组名称" });
+      toaster.create({ type: "warning", title: m("adminManagement.groupNameRequired") });
       return;
     }
     if (data.groups.includes(name)) {
-      toaster.create({ type: "warning", title: "分组名称已存在" });
+      toaster.create({ type: "warning", title: m("adminManagement.groupExists") });
       return;
     }
     setData((d) => ({
@@ -311,7 +321,7 @@ export function AdminExternalLinksPageView() {
     }));
     setNewGroupName("");
     setGroupModalOpen(false);
-    toaster.create({ type: "success", title: "已添加分组" });
+    toaster.create({ type: "success", title: m("adminManagement.groupAdded") });
   };
 
   const save = async () => {
@@ -320,10 +330,10 @@ export function AdminExternalLinksPageView() {
       const cleaned = pruneOrphanLinks(data);
       setData(cleaned);
       await setOtherLinksWithAdmin(cleaned);
-      toaster.create({ type: "success", title: "已保存" });
+      toaster.create({ type: "success", title: t("profile.saveOk") });
       void fetchData();
     } catch {
-      toaster.create({ type: "error", title: "保存失败" });
+      toaster.create({ type: "error", title: t("profile.saveFail") });
     } finally {
       setSaving(false);
     }
@@ -334,10 +344,10 @@ export function AdminExternalLinksPageView() {
 
   return (
     <AdminGuard>
-      <VStack align="stretch" gap="6">
-        <Heading size="xl">{t("externalLinks.adminTitle")}</Heading>
+      <VStack className="admin-page" align="stretch" gap="6">
+        <PageHeader eyebrow={t("admin.admins.siteManagement")} title={t("externalLinks.adminTitle")} />
 
-        <HStack flexWrap="wrap" gap="2">
+        <HStack className="admin-toolbar" flexWrap="wrap" gap="2">
           <SegmentGroup.Root
             value={viewMode}
             onValueChange={(e) => setViewMode(e.value as "edit" | "preview")}
@@ -345,24 +355,24 @@ export function AdminExternalLinksPageView() {
           >
             <SegmentGroup.Indicator />
             <SegmentGroup.Item value="edit">
-              <SegmentGroup.ItemText>编辑</SegmentGroup.ItemText>
+              <SegmentGroup.ItemText>{t("teamMatch.edit")}</SegmentGroup.ItemText>
               <SegmentGroup.ItemHiddenInput />
             </SegmentGroup.Item>
             <SegmentGroup.Item value="preview">
-              <SegmentGroup.ItemText>展示</SegmentGroup.ItemText>
+              <SegmentGroup.ItemText>{t("admin.acknowledgments.preview")}</SegmentGroup.ItemText>
               <SegmentGroup.ItemHiddenInput />
             </SegmentGroup.Item>
           </SegmentGroup.Root>
           {viewMode === "edit" && (
             <>
               <Button colorPalette="brand" loading={saving} onClick={() => void save()}>
-                保存到服务器
+                {m("adminManagement.saveToServer")}
               </Button>
               <Button variant="outline" onClick={() => void fetchData()}>
-                重新加载
+                {t("admin.acknowledgments.reload")}
               </Button>
               <Button variant="outline" onClick={() => setGroupModalOpen(true)}>
-                添加分组
+                {m("adminManagement.addGroup")}
               </Button>
             </>
           )}
@@ -372,8 +382,8 @@ export function AdminExternalLinksPageView() {
           <Spinner size="lg" color="brand.solid" alignSelf="center" />
         ) : viewMode === "preview" ? (
           data.groups.length === 0 ? (
-            <Card.Root>
-              <Card.Body>暂无分组，请先切换到「编辑」并添加分组与链接。</Card.Body>
+            <Card.Root borderRadius="var(--radius-card)" bg="var(--card)" borderColor="var(--border-default)">
+              <Card.Body>{m("adminManagement.noGroupsPreview")}</Card.Body>
             </Card.Root>
           ) : (
             <ExternalLinksGroupedView data={data} />
@@ -381,17 +391,17 @@ export function AdminExternalLinksPageView() {
         ) : (
           <>
             {data.groups.length === 0 && (
-              <Card.Root mb="4">
-                <Card.Body>暂无分组，请先点击「添加分组」创建分组，再在各分组下添加链接。</Card.Body>
+              <Card.Root mb="4" borderRadius="var(--radius-card)" bg="var(--card)" borderColor="var(--border-default)">
+                <Card.Body>{m("adminManagement.noGroupsEdit")}</Card.Body>
               </Card.Root>
             )}
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <DndContext accessibility={dragAccessibility} sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
               <SortableContext items={groupSortItems} strategy={verticalListSortingStrategy}>
                 {data.groups.map((g) => {
                   const keys = data.group_map[g] ?? [];
                   return (
                     <SortableGroupRow key={g} id={groupSortId(g)}>
-                      <Card.Root borderRadius="xl">
+                      <Card.Root borderRadius="var(--radius-card)" bg="var(--card)" borderColor="var(--border-default)" boxShadow="var(--shadow-card)">
                         <Card.Header>
                           <HStack justify="space-between" flexWrap="wrap" gap="2">
                             <HStack flexWrap="wrap" gap="2">
@@ -405,7 +415,7 @@ export function AdminExternalLinksPageView() {
                                   setRenameModalOpen(true);
                                 }}
                               >
-                                重命名
+                                {m("adminManagement.rename")}
                               </Button>
                               <Button
                                 size="xs"
@@ -413,18 +423,18 @@ export function AdminExternalLinksPageView() {
                                 colorPalette="red"
                                 onClick={() => {
                                   if (data.groups.length <= 1) {
-                                    toaster.create({ type: "warning", title: "至少保留一个分组" });
+                                    toaster.create({ type: "warning", title: m("adminManagement.keepGroup") });
                                     return;
                                   }
                                   setDeleteGroupName(g);
                                   setDeleteGroupOpen(true);
                                 }}
                               >
-                                删除
+                                {t("teamMatch.delete")}
                               </Button>
                             </HStack>
                             <Button size="sm" colorPalette="brand" onClick={() => openAddLink(g)}>
-                              添加链接
+                              {m("adminManagement.addLink")}
                             </Button>
                           </HStack>
                         </Card.Header>
@@ -454,7 +464,7 @@ export function AdminExternalLinksPageView() {
                                               ) {
                                                 toaster.create({
                                                   type: "warning",
-                                                  title: `首页置顶最多 ${MAX_TOP_LINKS} 个`,
+                                                  title: m("adminManagement.pinLimit", { count: MAX_TOP_LINKS }),
                                                 });
                                                 return d;
                                               }
@@ -468,7 +478,7 @@ export function AdminExternalLinksPageView() {
                                               (x) => findGroupForLinkKey(data, key) !== x,
                                             );
                                             if (candidates.length === 0) {
-                                              toaster.create({ type: "info", title: "没有其他分组可移动" });
+                                              toaster.create({ type: "info", title: m("adminManagement.noMoveGroup") });
                                               return;
                                             }
                                             setMoveKey(key);
@@ -482,7 +492,7 @@ export function AdminExternalLinksPageView() {
                                 </div>
                                 {keys.length === 0 && (
                                   <Text fontSize="sm" color="fg.muted">
-                                    该分组暂无链接（可拖入其他分组的卡片）
+                                    {m("adminManagement.emptyLinkGroup")}
                                   </Text>
                                 )}
                               </GroupDropZone>
@@ -505,19 +515,19 @@ export function AdminExternalLinksPageView() {
           <Dialog.Positioner>
             <Dialog.Content maxW="580px">
               <Dialog.Header>
-                <Dialog.Title>{editingKey ? "编辑链接" : "添加链接"}</Dialog.Title>
+                <Dialog.Title>{editingKey ? m("adminManagement.editLink") : m("adminManagement.addLink")}</Dialog.Title>
               </Dialog.Header>
               <Dialog.Body>
                 <Stack gap="4">
                   <Field.Root required>
-                    <Field.Label>名称</Field.Label>
+                    <Field.Label>{t("competitionAdmin.name")}</Field.Label>
                     <Input
                       value={linkForm.name}
                       onChange={(e) => setLinkForm((f) => ({ ...f, name: e.target.value }))}
                     />
                   </Field.Root>
                   <Field.Root>
-                    <Field.Label>描述</Field.Label>
+                    <Field.Label>{m("adminManagement.description")}</Field.Label>
                     <Textarea
                       rows={3}
                       value={linkForm.desc}
@@ -525,23 +535,23 @@ export function AdminExternalLinksPageView() {
                     />
                   </Field.Root>
                   <Field.Root required>
-                    <Field.Label>链接 URL</Field.Label>
+                    <Field.Label>{m("adminManagement.linkUrl")}</Field.Label>
                     <Input
                       value={linkForm.url}
                       onChange={(e) => setLinkForm((f) => ({ ...f, url: e.target.value }))}
                     />
                   </Field.Root>
                   <Field.Root>
-                    <Field.Label>图标 URL（可选）</Field.Label>
+                    <Field.Label>{m("adminManagement.iconUrl")}</Field.Label>
                     <Input
                       value={linkForm.icon_url}
                       onChange={(e) => setLinkForm((f) => ({ ...f, icon_url: e.target.value }))}
                     />
                   </Field.Root>
                   <Field.Root>
-                    <Field.Label>图标（letter:A 或图片路径）</Field.Label>
+                    <Field.Label>{m("adminManagement.icon")}</Field.Label>
                     <Input
-                      placeholder="letter:A 或 /path/icon.png"
+                      placeholder={m("adminManagement.iconExample")}
                       value={linkForm.icon}
                       onChange={(e) => setLinkForm((f) => ({ ...f, icon: e.target.value }))}
                     />
@@ -550,13 +560,13 @@ export function AdminExternalLinksPageView() {
               </Dialog.Body>
               <Dialog.Footer>
                 <Button variant="outline" onClick={() => setLinkModalOpen(false)}>
-                  取消
+                  {t("teamMatch.cancel")}
                 </Button>
                 <Button colorPalette="brand" onClick={submitLink}>
-                  确定
+                  {t("competitionAdmin.confirm")}
                 </Button>
               </Dialog.Footer>
-              <Dialog.CloseTrigger />
+              <Dialog.CloseTrigger aria-label={t("competitionAdmin.close")} />
             </Dialog.Content>
           </Dialog.Positioner>
         </Portal>
@@ -568,11 +578,11 @@ export function AdminExternalLinksPageView() {
           <Dialog.Positioner>
             <Dialog.Content>
               <Dialog.Header>
-                <Dialog.Title>添加分组</Dialog.Title>
+                <Dialog.Title>{m("adminManagement.addGroup")}</Dialog.Title>
               </Dialog.Header>
               <Dialog.Body>
                 <Input
-                  placeholder="分组名称"
+                  placeholder={m("adminManagement.linkGroupName")}
                   value={newGroupName}
                   onChange={(e) => setNewGroupName(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && addGroup()}
@@ -580,10 +590,10 @@ export function AdminExternalLinksPageView() {
               </Dialog.Body>
               <Dialog.Footer>
                 <Button colorPalette="brand" onClick={addGroup}>
-                  确定
+                  {t("competitionAdmin.confirm")}
                 </Button>
               </Dialog.Footer>
-              <Dialog.CloseTrigger />
+              <Dialog.CloseTrigger aria-label={t("competitionAdmin.close")} />
             </Dialog.Content>
           </Dialog.Positioner>
         </Portal>
@@ -595,7 +605,7 @@ export function AdminExternalLinksPageView() {
           <Dialog.Positioner>
             <Dialog.Content>
               <Dialog.Header>
-                <Dialog.Title>重命名分组</Dialog.Title>
+                <Dialog.Title>{m("adminManagement.renameGroup")}</Dialog.Title>
               </Dialog.Header>
               <Dialog.Body>
                 <Input value={renameValue} onChange={(e) => setRenameValue(e.target.value)} />
@@ -606,18 +616,18 @@ export function AdminExternalLinksPageView() {
                   onClick={() => {
                     const nv = renameValue.trim();
                     if (!nv) {
-                      toaster.create({ type: "warning", title: "请输入新名称" });
+                      toaster.create({ type: "warning", title: m("adminManagement.newName") });
                       return;
                     }
                     setData((d) => renameGroup(d, renameTarget, nv));
                     setRenameModalOpen(false);
-                    toaster.create({ type: "success", title: "已重命名" });
+                    toaster.create({ type: "success", title: m("adminManagement.renamed") });
                   }}
                 >
-                  确定
+                  {t("competitionAdmin.confirm")}
                 </Button>
               </Dialog.Footer>
-              <Dialog.CloseTrigger />
+              <Dialog.CloseTrigger aria-label={t("competitionAdmin.close")} />
             </Dialog.Content>
           </Dialog.Positioner>
         </Portal>
@@ -629,7 +639,7 @@ export function AdminExternalLinksPageView() {
           <Dialog.Positioner>
             <Dialog.Content>
               <Dialog.Header>
-                <Dialog.Title>移动到分组</Dialog.Title>
+                <Dialog.Title>{m("adminManagement.moveGroup")}</Dialog.Title>
               </Dialog.Header>
               <Dialog.Body>
                 <NativeSelect.Root>
@@ -659,13 +669,13 @@ export function AdminExternalLinksPageView() {
                     }
                     setData((d) => moveLinkBetweenGroups(d, moveKey, fg, moveTargetGroup, moveKey));
                     setMoveModalOpen(false);
-                    toaster.create({ type: "success", title: "已移动" });
+                    toaster.create({ type: "success", title: m("adminManagement.moved") });
                   }}
                 >
-                  确定
+                  {t("competitionAdmin.confirm")}
                 </Button>
               </Dialog.Footer>
-              <Dialog.CloseTrigger />
+              <Dialog.CloseTrigger aria-label={t("competitionAdmin.close")} />
             </Dialog.Content>
           </Dialog.Positioner>
         </Portal>
@@ -677,39 +687,39 @@ export function AdminExternalLinksPageView() {
           <Dialog.Positioner>
             <Dialog.Content>
               <Dialog.Header>
-                <Dialog.Title>删除分组「{deleteGroupName}」</Dialog.Title>
+                <Dialog.Title>{m("adminManagement.deleteLinkGroup", { name: deleteGroupName })}</Dialog.Title>
               </Dialog.Header>
               <Dialog.Body>
                 <Text fontSize="sm">
-                  「仅删分组」将把该分组内链接移动到列表中的第一个分组；「删除分组与链接」将移除这些链接。
+                  {m("adminManagement.deleteLinkGroupHint")}
                 </Text>
               </Dialog.Body>
               <Dialog.Footer>
                 <Button variant="outline" onClick={() => setDeleteGroupOpen(false)}>
-                  取消
+                  {t("teamMatch.cancel")}
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => {
                     setData((d) => removeGroup(d, deleteGroupName, false));
                     setDeleteGroupOpen(false);
-                    toaster.create({ type: "success", title: "已删除分组，链接已合并到第一个分组" });
+                    toaster.create({ type: "success", title: m("adminManagement.groupMerged") });
                   }}
                 >
-                  仅删分组
+                  {m("adminManagement.deleteGroupOnly")}
                 </Button>
                 <Button
                   colorPalette="red"
                   onClick={() => {
                     setData((d) => removeGroup(d, deleteGroupName, true));
                     setDeleteGroupOpen(false);
-                    toaster.create({ type: "success", title: "已删除分组及链接" });
+                    toaster.create({ type: "success", title: m("adminManagement.groupAndLinksDeleted") });
                   }}
                 >
-                  删除分组与链接
+                  {m("adminManagement.deleteGroupAndLinks")}
                 </Button>
               </Dialog.Footer>
-              <Dialog.CloseTrigger />
+              <Dialog.CloseTrigger aria-label={t("competitionAdmin.close")} />
             </Dialog.Content>
           </Dialog.Positioner>
         </Portal>

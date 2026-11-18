@@ -10,6 +10,7 @@ import { Card, Divider, Space } from 'antd';
 import React, { useEffect } from 'react';
 import {Record as CubeRecord} from "@/components/Data/types/record";
 import {RouteMaps} from "@/components/Data/cube_result/event_route";
+import { useCompetitionPublicI18n } from '../i18n';
 
 interface CompetitionResultsWithEventsProps {
   comp?: CompAPI.CompResp;
@@ -19,11 +20,11 @@ interface CompetitionResultsWithEventsProps {
 }
 
 const CompetitionResultsWithEvents: React.FC<CompetitionResultsWithEventsProps> = ({
-  comp,
   results,
   events,
   records,
 }) => {
+  const { locale, round } = useCompetitionPublicI18n();
   const pathname = usePathname() ?? '/';
   const router = useRouter();
 
@@ -84,7 +85,7 @@ const CompetitionResultsWithEvents: React.FC<CompetitionResultsWithEventsProps> 
       }
 
       tables.push(
-        <Card key={`${event.id}-round-${i}`} title={data[0].Round} size="small">
+        <Card key={`${event.id}-round-${i}`} title={round(data[0].Round, data[0].RoundNumber)} size="small">
           {ResultsTable(data, key, records)}
         </Card>,
       );
@@ -95,7 +96,7 @@ const CompetitionResultsWithEvents: React.FC<CompetitionResultsWithEventsProps> 
         <Divider titlePlacement="left">
           <h4>
             <strong onClick={handleClick} id={event.id} style={{ cursor: 'pointer' }}>
-              {CubeIcon(event.id, event.id + 'icon', {})} {CubesCn(event.id)}
+              {CubeIcon(event.id, event.id + 'icon', {}, locale)} {CubesCn(event.id, locale)}
             </strong>
           </h4>
         </Divider>

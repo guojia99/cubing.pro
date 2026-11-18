@@ -8,6 +8,7 @@ import PlayerResultsListWithEvent from '@/views/GroupCompetitions/Player/compone
 import { EventsAPI } from '@/services/cubing-pro/events/typings';
 import { PlayersAPI } from '@/services/cubing-pro/players/typings';
 import React, { useEffect, useState } from 'react';
+import { useI18n } from '@/contexts/I18nProvider';
 
 interface PlayerResultsListProps {
   events: EventsAPI.Event[];
@@ -24,6 +25,7 @@ const PlayerResultsList: React.FC<PlayerResultsListProps> = ({
   comps,
   player,
 }) => {
+  const { t } = useI18n();
 
   const [withResult, setWithResult] = useState<Result[]>([])
   const [withComps, setWithComps] = useState<Result[]>([])
@@ -40,7 +42,7 @@ const PlayerResultsList: React.FC<PlayerResultsListProps> = ({
   const items = [
     {
       key: 'with_result',
-      label: '按项目',
+      label: t('competitionAdmin.byEvent'),
       children: (
         <PlayerResultsListWithEvent
           events={events}
@@ -52,7 +54,7 @@ const PlayerResultsList: React.FC<PlayerResultsListProps> = ({
     },
     {
       key: 'with_comps',
-      label: '按比赛',
+      label: t('competitionExtra.byCompetition'),
       children: (
         <PlayerResultsListWithComps
           events={events}
@@ -67,7 +69,9 @@ const PlayerResultsList: React.FC<PlayerResultsListProps> = ({
   return (
     <div style={{ minWidth: 0, maxWidth: '100%' }}>
       {/*<h4 style={{textAlign:"center"}}><strong>成绩列表</strong></h4>*/}
-      <DownloadExcelButton player={player} results={withDownloads} />
+      <div className="competition-toolbar">
+        <DownloadExcelButton player={player} results={withDownloads} />
+      </div>
       <NavTabs
         type="line"
         items={items}

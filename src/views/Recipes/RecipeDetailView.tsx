@@ -1,14 +1,17 @@
 "use client";
 
-import { Box, Button, Flex, Spinner } from "@chakra-ui/react";
+import { Box, Button, Flex, Spinner, Text } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useI18n } from "@/contexts/I18nProvider";
+import { getSiteContent } from "@/i18n/messages/site-content";
 import { LuArrowLeft, LuHeart, LuShoppingCart } from "react-icons/lu";
 
 import { MarkdownAnchorNav } from "@/components/Markdown/MarkdownAnchorNav";
 import { MarkdownViewer } from "@/components/Markdown/MarkdownViewer";
 import { toaster } from "@/components/ui/toaster";
+import { Surface } from "@/components/ui/page";
 
 import { useRecipeMarkdown } from "./hooks/useRecipeMarkdown";
 import {
@@ -19,6 +22,7 @@ import {
 import {
   MAX_RECIPE_FAVORITES,
   MAX_RECIPE_TONIGHT,
+  getRecipeCategoryName,
 } from "./utils/recipeDisplay";
 import {
   addToTonight,
@@ -35,6 +39,8 @@ interface RecipeDetailViewProps {
 }
 
 export function RecipeDetailView({ category, id }: RecipeDetailViewProps) {
+  const { locale } = useI18n();
+  const sc = getSiteContent(locale);
   const router = useRouter();
   const cat = decodeURIComponent(category);
   const rid = decodeURIComponent(id);
@@ -54,7 +60,7 @@ export function RecipeDetailView({ category, id }: RecipeDetailViewProps) {
     } else if (addFavorite(cat, rid)) {
       setFavState(true);
     } else {
-      toaster.create({ type: "warning", title: `最多收藏 ${MAX_RECIPE_FAVORITES} 道菜` });
+      toaster.create({ type: "warning", title: sc("siteContent.favoriteLimit", { count: MAX_RECIPE_FAVORITES }) });
     }
   };
 
@@ -62,12 +68,12 @@ export function RecipeDetailView({ category, id }: RecipeDetailViewProps) {
     if (tonightState) {
       removeFromTonight(cat, rid);
       setTonightState(false);
-      toaster.create({ type: "success", title: "已从今晚吃啥移除" });
+      toaster.create({ type: "success", title: sc("siteContent.recipeRemoved") });
     } else if (addToTonight(cat, rid)) {
       setTonightState(true);
-      toaster.create({ type: "success", title: "已添加到今晚吃啥" });
+      toaster.create({ type: "success", title: sc("siteContent.recipeAdded") });
     } else {
-      toaster.create({ type: "warning", title: `今晚吃啥最多 ${MAX_RECIPE_TONIGHT} 道菜` });
+      toaster.create({ type: "warning", title: sc("siteContent.recipeLimit", { count: MAX_RECIPE_TONIGHT }) });
     }
   };
 
@@ -80,12 +86,12 @@ export function RecipeDetailView({ category, id }: RecipeDetailViewProps) {
   }
 
   return (
-    <Box className="food-page" p={{ base: 4, md: 6 }}>
+    <Box className="food-page food-detail-page" p={{ base: 4, md: 8 }} maxW="1280px" mx="auto">
       <Flex className="food-detail-actions" mb="4" justify="space-between" align="center" flexWrap="wrap" gap="3">
         <Button variant="ghost" size="sm" asChild>
           <NextLink href="/other/recipes">
             <LuArrowLeft />
-            返回列表
+            {sc("siteContent.back")}
           </NextLink>
         </Button>
         <Flex gap="2" flexWrap="wrap">
@@ -96,7 +102,7 @@ export function RecipeDetailView({ category, id }: RecipeDetailViewProps) {
             onClick={handleTonightClick}
           >
             <LuShoppingCart />
-            {tonightState ? "已在今晚吃啥" : "添加到今晚吃啥"}
+            {sc(tonightState ? "siteContent.inMenu" : "siteContent.addMenu")}
           </Button>
           <Button
             size="sm"
@@ -105,13 +111,14 @@ export function RecipeDetailView({ category, id }: RecipeDetailViewProps) {
             onClick={handleFavoriteClick}
           >
             <LuHeart />
-            {favState ? "已收藏" : "收藏"}
+            {sc(favState ? "siteContent.saved" : "siteContent.favorite")}
           </Button>
         </Flex>
       </Flex>
 
       <Box className="markdown-detail-layout">
-        <Box flex="1" minW="0">
+        <Surface className="food-reading-surface" flex="1" minW="0" p={{ base: 5, md: 8 }}>
+          <Text className="food-card-meta" mb="2">{getRecipeCategoryName(cat, locale)}</Text>
           <MarkdownViewer
             content={mdContent}
             imageBase={imageBase}
@@ -125,7 +132,7 @@ export function RecipeDetailView({ category, id }: RecipeDetailViewProps) {
               );
             }}
           />
-        </Box>
+        </Surface>
         <MarkdownAnchorNav headings={headings} />
       </Box>
     </Box>

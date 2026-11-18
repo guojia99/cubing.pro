@@ -2,7 +2,9 @@
 
 import "antd/dist/reset.css";
 
-import { Input, Table, Typography } from "antd";
+import { Input, Table } from "antd";
+import { PageHeader, Surface } from "@/components/ui/page";
+import "../competition-ui.css";
 import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
 import { useCallback, useEffect, useState } from "react";
 
@@ -11,8 +13,9 @@ import { WCALink } from "@/components/Link/WcaLinks";
 import { rowClassNameWithStyleLines } from "@/components/Table/table_style";
 import { apiPlayers } from "@/services/cubing-pro/players/players";
 import type { PlayersAPI } from "@/services/cubing-pro/players/typings";
+import { useI18n } from "@/contexts/I18nProvider";
+import { CompetitionMessage } from "@/components/Data/CompetitionMessage";
 
-const { Title } = Typography;
 
 const columns: ColumnsType<PlayersAPI.Player> = [
   {
@@ -23,7 +26,7 @@ const columns: ColumnsType<PlayersAPI.Player> = [
     render: (value: string, player) => PlayerLink(player.CubeID, value, "var(--foreground)"),
   },
   {
-    title: "名称",
+    title: <CompetitionMessage name="competitionAdmin.name" />,
     dataIndex: "Name",
     key: "Name",
     render: (_value, player) => PlayerLink(player.CubeID, player.Name, "var(--accent)"),
@@ -38,6 +41,7 @@ const columns: ColumnsType<PlayersAPI.Player> = [
 ];
 
 export function GcPlayersView() {
+  const { t } = useI18n();
   const [tableParams, setTableParams] = useState({ page: 1, size: 20, name: "" });
   const [players, setPlayers] = useState<PlayersAPI.Player[]>([]);
   const [total, setTotal] = useState(0);
@@ -72,13 +76,11 @@ export function GcPlayersView() {
   };
 
   return (
-    <>
-      <Title level={2} style={{ marginBottom: 16 }}>
-        选手列表
-      </Title>
-      <div style={{ marginBottom: 16, maxWidth: 400 }}>
+    <div className="competition-page">
+      <PageHeader eyebrow={t('competitionAdmin.player')} title={t('competitionAdmin.playerList')} />
+      <div className="competition-toolbar">
         <Input.Search
-          placeholder="搜索选手名称"
+          placeholder={t('competitionAdmin.searchPlayer')}
           value={searchName}
           onChange={(e) => setSearchName(e.target.value)}
           onSearch={handleSearch}
@@ -86,7 +88,9 @@ export function GcPlayersView() {
           enterButton
         />
       </div>
+      <Surface p={{ base: "3", md: "5" }}>
       <Table<PlayersAPI.Player>
+        scroll={{ x: "max-content" }}
         columns={columns}
         dataSource={players}
         rowKey="CubeID"
@@ -102,6 +106,7 @@ export function GcPlayersView() {
         onChange={handleTableChange}
         sticky
       />
-    </>
+      </Surface>
+    </div>
   );
 }

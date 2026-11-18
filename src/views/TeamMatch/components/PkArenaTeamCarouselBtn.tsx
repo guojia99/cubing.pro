@@ -3,6 +3,7 @@ import { Button, Tooltip } from 'antd';
 import classNames from 'classnames';
 import React from 'react';
 import '../TeamMatch.css';
+import { useTeamMatchI18n } from '../i18n';
 
 type Corner = 'bottom-left' | 'bottom-right' | 'bottom-center';
 
@@ -14,9 +15,10 @@ type Props = {
 };
 
 function PkArenaTeamCarouselBtn({ corner, running, disabled, onClick }: Props) {
+  const { t } = useTeamMatchI18n();
   return (
     <div className={classNames('tmPkArenaTeamCarouselBtn', `tmPkArenaTeamCarouselBtn--${corner}`)}>
-      <Tooltip title={running ? '停止轮播' : '按顺序轮播队员（英雄弹窗）'}>
+      <Tooltip title={running ? t('teamMatch.stopCarousel') : t('teamMatch.carouselTitle')}>
         <Button
           type="default"
           size="small"
@@ -30,7 +32,7 @@ function PkArenaTeamCarouselBtn({ corner, running, disabled, onClick }: Props) {
           }}
           className="tmPkArenaTeamCarouselBtnInner"
         >
-          {running ? '停止' : '队员轮播'}
+          {running ? t('teamMatch.stop') : t('teamMatch.carousel')}
         </Button>
       </Tooltip>
     </div>

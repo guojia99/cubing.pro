@@ -27,7 +27,7 @@ export default function UsageInstructionsModal({
     >
       <Dialog.Backdrop />
       <Dialog.Positioner>
-        <Dialog.Content borderRadius="xl" maxW="420px">
+        <Dialog.Content className="algs-dialog" borderRadius="xl" maxW="420px">
           <Dialog.Header display="flex" justifyContent="space-between" alignItems="center">
             <Dialog.Title fontSize="md" fontWeight="bold">
               {t("algs.usageInstructions.title")}

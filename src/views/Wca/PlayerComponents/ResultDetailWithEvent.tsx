@@ -3,7 +3,7 @@ import './ResultDetailWithEvent.css';
 import {
   getRecordColor,
   roundColorMap,
-  roundNameMap,
+  formatRoundName,
   roundSortOrder,
 } from '@/views/Wca/utils/events';
 import { formatAttempts, resultsTimeFormat } from '@/views/Wca/utils/wca_results';
@@ -15,6 +15,7 @@ import { findCubingCompetitionByIdentifier } from '@/services/cubing-pro/cubing_
 
 import ResultDetailWithRankingTimers from '@/views/Wca/PlayerComponents/ResultWIthEventRankingTimers';
 import { StaticWithTimerRank, WCACompetition, WCAResult } from '@/services/cubing-pro/wca/types';
+import { formatLocalizedDateRange } from '@/lib/localizedDates';
 
 interface ResultDetailWithEventProps {
   eventID: string;
@@ -22,11 +23,6 @@ interface ResultDetailWithEventProps {
   comps: WCACompetition[];
   wcaRankTimer: StaticWithTimerRank[];
 }
-
-// 解析日期范围
-const formatDateRange = (start: string, end: string): string => {
-  return start === end ? start : `${start} ~ ${end}`;
-};
 
 
 
@@ -53,7 +49,7 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
     if (!comp) return null;
     return {
       name: comp.name,
-      dateRange: formatDateRange(comp.start_date, comp.end_date),
+      dateRange: formatLocalizedDateRange(comp.start_date, comp.end_date, intl.locale),
     };
   };
 
@@ -125,7 +121,7 @@ const ResultDetailWithEvent: React.FC<ResultDetailWithEventProps> = ({
       key: 'round',
       width: 80,
       render: (id) => {
-        const name = roundNameMap[id] || id;
+        const name = formatRoundName(id, intl.locale);
         const color = roundColorMap[id] || 'default';
         return (
           <Tag color={color} style={{ margin: 0 }}>

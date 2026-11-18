@@ -1,8 +1,10 @@
 "use client";
 
-import { Heading, Stack, VStack } from "@chakra-ui/react";
+import { VStack } from "@chakra-ui/react";
+import { PageHeader } from "@/components/ui/page";
+import "./admin-ui.css";
 
-import { AdminNavCards } from "@/components/admin/AdminNavCards";
+import { AdminNavigation } from "./AdminNavigation";
 import { OrganizersGuard } from "@/components/admin/OrganizersGuard";
 import { useI18n } from "@/contexts/I18nProvider";
 
@@ -11,24 +13,22 @@ export function OrganizersHomePageView() {
 
   return (
     <OrganizersGuard>
-      <VStack align="stretch" gap="6">
-        <Stack gap="1">
-          <Heading size="xl">{t("nav.admin.organizers")}</Heading>
-        </Stack>
-        <AdminNavCards
+      <VStack className="admin-page" align="stretch" gap="6">
+        <PageHeader eyebrow={t('competitionAdmin.organizerWorkspace')} title={t("nav.admin.organizers")} />
+        <AdminNavigation
           groups={[
             {
-              title: "比赛管理",
+              title: t('competitionAdmin.competitionManagement'),
               children: [
                 {
-                  title: "比赛列表",
-                  description: "展示你的比赛列表，进行操作等",
+                  title: t('competitionAdmin.competitionList'),
+                  description: t('competitionAdmin.manageYourCompetitions'),
                   to: "/admin/organizers/comps",
                   avatar: "📋",
                 },
                 {
-                  title: "创建比赛",
-                  description: "新建一个比赛",
+                  title: t('competitionAdmin.createCompetition'),
+                  description: t('competitionAdmin.createCompetitionHint'),
                   to: "/admin/organizers/comps/create",
                   avatar: "➕",
                 },

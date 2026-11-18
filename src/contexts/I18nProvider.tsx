@@ -9,10 +9,15 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { LocaleProvider } from "@chakra-ui/react";
 
 import {
   readStoredLocale,
   translate,
+  translateWithParams,
+  LOCALE_STORAGE_KEY,
+  isLocale,
+  getIntlLocale,
   writeStoredLocale,
   type Locale,
   type MessageKey,
@@ -32,18 +37,24 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     setLocaleState(readStoredLocale());
+    const syncLocale = (event: StorageEvent) => {
+      if (event.key === LOCALE_STORAGE_KEY || event.key === null) setLocaleState(readStoredLocale());
+    };
+    window.addEventListener("storage", syncLocale);
+    return () => window.removeEventListener("storage", syncLocale);
   }, []);
 
   const setLocale = useCallback((next: Locale) => {
+    if (!isLocale(next)) return;
     writeStoredLocale(next);
     setLocaleState(next);
     if (typeof document !== "undefined") {
-      document.documentElement.lang = next === "en-US" ? "en" : "zh-CN";
+      document.documentElement.lang = next;
     }
   }, []);
 
   useEffect(() => {
-    document.documentElement.lang = locale === "en-US" ? "en" : "zh-CN";
+    document.documentElement.lang = locale;
   }, [locale]);
 
   const t = useCallback(
@@ -53,11 +64,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   const tf = useCallback(
     (key: MessageKey, params: Record<string, string | number>) => {
-      let text = translate(locale, key);
-      for (const [name, value] of Object.entries(params)) {
-        text = text.replaceAll(`{${name}}`, String(value));
-      }
-      return text;
+      return translateWithParams(locale, key, params);
     },
     [locale],
   );
@@ -67,7 +74,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     [locale, setLocale, t, tf],
   );
 
-  return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
+  return <I18nContext.Provider value={value}><LocaleProvider locale={getIntlLocale(locale)}>{children}</LocaleProvider></I18nContext.Provider>;
 }
 
 export function useI18n() {

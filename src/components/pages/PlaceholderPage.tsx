@@ -1,6 +1,11 @@
 "use client";
 
-import { Badge, Box, Heading, Stack, Text } from "@chakra-ui/react";
+import { Badge, Button, Stack, Text } from "@chakra-ui/react";
+import NextLink from "next/link";
+import { FiCompass } from "react-icons/fi";
+import { PageHeader, Surface } from "@/components/ui/page";
+import { useI18n } from "@/contexts/I18nProvider";
+import { getShellRouteKey, translateShell } from "@/i18n/messages/shell";
 
 import type { AppRoute } from "@/config/routes";
 
@@ -9,33 +14,26 @@ interface PlaceholderPageProps {
 }
 
 export function PlaceholderPage({ route }: PlaceholderPageProps) {
+  const { locale } = useI18n();
+  const routeKey = getShellRouteKey(route.id);
   return (
-    <Box
-      borderWidth="1px"
-      borderStyle="dashed"
-      borderColor="border"
-      borderRadius="xl"
-      p={{ base: 6, md: 10 }}
-      bg="bg.muted"
-      textAlign="center"
-    >
-      <Stack gap="4" align="center">
+    <Stack gap="5" maxW="var(--page-max)" mx="auto" w="full">
+      <PageHeader eyebrow="CUBING PRO" title={routeKey ? translateShell(locale, routeKey) : route.name} />
+      <Surface p={{ base: "6", md: "10" }}>
+      <Stack gap="4" align="center" textAlign="center">
+        <Text fontSize="4xl" color="accent" aria-hidden="true"><FiCompass /></Text>
         <Badge colorPalette="brand" size="lg" variant="subtle">
-          预留开发
+          {translateShell(locale, "shell.placeholder.badge")}
         </Badge>
-        <Heading size="lg">{route.name}</Heading>
         <Text color="fg.muted" maxW="md">
-          该页面尚未实现。计划组件：
-          <Text as="code" fontSize="sm" ml="1">
-            src/pages/{route.pageComponent}
-          </Text>
+          {translateShell(locale, "shell.placeholder.description")}
         </Text>
-        <Stack direction="row" gap="2" flexWrap="wrap" justify="center">
-          <Badge variant="outline">{route.implType}</Badge>
-          <Badge variant="outline">{route.renderMode}</Badge>
-          <Badge variant="outline">{route.pattern}</Badge>
+        <Stack direction={{ base: "column", sm: "row" }} gap="2" w={{ base: "full", sm: "auto" }}>
+          <Button asChild colorPalette="brand"><NextLink href="/algs">{translateShell(locale, "shell.algorithms")}</NextLink></Button>
+          <Button asChild variant="outline"><NextLink href="/welcome">{translateShell(locale, "shell.home")}</NextLink></Button>
         </Stack>
       </Stack>
-    </Box>
+      </Surface>
+    </Stack>
   );
 }

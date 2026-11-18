@@ -13,6 +13,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { DarkMode } from '@/components/ui/color-mode';
 import { useHideAppChrome } from '@/hooks/useHideAppChrome';
 import '../TeamMatch.css';
+import { useTeamMatchI18n } from '../i18n';
 
 type PlayerLite = {
   id: string;
@@ -67,6 +68,7 @@ function PkArenaFullscreen({
   currentResults,
   onOpenScoreEntry,
 }: Props) {
+  const { t, locale } = useTeamMatchI18n();
   useHideAppChrome(open);
   const [heroOpen, setHeroOpen] = useState(false);
   const [heroAnchor, setHeroAnchor] = useState<'left' | 'right'>('left');
@@ -121,7 +123,7 @@ function PkArenaFullscreen({
           return null;
         }
         const p = L[nextIdx];
-        setHeroData(buildPkArenaHeroDetail(toHeroInput(p), T, currentResults));
+        setHeroData(buildPkArenaHeroDetail(toHeroInput(p), T, currentResults, locale));
         setProgressTick((x) => x + 1);
         return { ...c, idx: nextIdx };
       });
@@ -137,6 +139,7 @@ function PkArenaFullscreen({
     teamA,
     teamB,
     currentResults,
+    locale,
   ]);
 
   const openHeroA = useCallback(
@@ -144,10 +147,10 @@ function PkArenaFullscreen({
       if (!teamA) return;
       setCarousel(null);
       setHeroAnchor('left');
-      setHeroData(buildPkArenaHeroDetail(toHeroInput(p), teamA, currentResults));
+      setHeroData(buildPkArenaHeroDetail(toHeroInput(p), teamA, currentResults, locale));
       setHeroOpen(true);
     },
-    [teamA, currentResults],
+    [teamA, currentResults, locale],
   );
 
   const openHeroB = useCallback(
@@ -155,10 +158,10 @@ function PkArenaFullscreen({
       if (!teamB) return;
       setCarousel(null);
       setHeroAnchor('right');
-      setHeroData(buildPkArenaHeroDetail(toHeroInput(p), teamB, currentResults));
+      setHeroData(buildPkArenaHeroDetail(toHeroInput(p), teamB, currentResults, locale));
       setHeroOpen(true);
     },
-    [teamB, currentResults],
+    [teamB, currentResults, locale],
   );
 
   const toggleCarouselA = useCallback(() => {
@@ -169,10 +172,10 @@ function PkArenaFullscreen({
     }
     setCarousel({ side: 'A', idx: 0 });
     setHeroAnchor('left');
-    setHeroData(buildPkArenaHeroDetail(toHeroInput(playersA[0]), teamA, currentResults));
+    setHeroData(buildPkArenaHeroDetail(toHeroInput(playersA[0]), teamA, currentResults, locale));
     setHeroOpen(true);
     setProgressTick((n) => n + 1);
-  }, [teamA, playersA, carousel?.side, currentResults, closeHero]);
+  }, [teamA, playersA, carousel?.side, currentResults, closeHero, locale]);
 
   const toggleCarouselB = useCallback(() => {
     if (!teamB || playersB.length === 0) return;
@@ -182,10 +185,10 @@ function PkArenaFullscreen({
     }
     setCarousel({ side: 'B', idx: 0 });
     setHeroAnchor('right');
-    setHeroData(buildPkArenaHeroDetail(toHeroInput(playersB[0]), teamB, currentResults));
+    setHeroData(buildPkArenaHeroDetail(toHeroInput(playersB[0]), teamB, currentResults, locale));
     setHeroOpen(true);
     setProgressTick((n) => n + 1);
-  }, [teamB, playersB, carousel?.side, currentResults, closeHero]);
+  }, [teamB, playersB, carousel?.side, currentResults, closeHero, locale]);
 
   const bgStyle = useMemo(
     () => ({
@@ -211,7 +214,7 @@ function PkArenaFullscreen({
       <div className="tmPkArenaFsTopBar" style={{ background: settings.barBg }}>
         <Space wrap>
           <Button type="primary" danger ghost onClick={onClose}>
-            关闭对战
+            {t('teamMatch.closeBattle')}
           </Button>
           <LiveSettingsButton type="default" ghost onClick={onOpenLiveSettings} style={{ fontSize: settings.buttonFontPx }} />
         </Space>
@@ -236,7 +239,7 @@ function PkArenaFullscreen({
                   className="tmPkArenaFsTeamName"
                   style={{ color: settings.teamNameColor, fontSize: settings.teamNameFontPx }}
                 >
-                  {teamA?.name ?? '待定'}
+                  {teamA?.name ?? t('teamMatch.pending')}
                 </Typography.Text>
                 <PkArenaTeamBattlecry battlecry={teamA?.battlecry} settings={settings} align="left" />
                 <div className="tmPkDiagCol tmPkDiagColLeft">
@@ -328,7 +331,7 @@ function PkArenaFullscreen({
                   className="tmPkArenaFsTeamName"
                   style={{ color: settings.teamNameColor, fontSize: settings.teamNameFontPx }}
                 >
-                  {teamB?.name ?? '待定'}
+                  {teamB?.name ?? t('teamMatch.pending')}
                 </Typography.Text>
                 <PkArenaTeamBattlecry battlecry={teamB?.battlecry} settings={settings} align="right" />
                 <div className="tmPkDiagCol tmPkDiagColRight">
@@ -408,7 +411,7 @@ function PkArenaFullscreen({
       />
       <div className="tmPkArenaFsBottomBar" style={{ background: settings.barBg }}>
         <Button type="primary" size="large" onClick={onOpenScoreEntry} style={{ fontSize: settings.buttonFontPx }}>
-          录入成绩
+          {t('teamMatch.enterScores')}
         </Button>
       </div>
       <PkArenaHeroSlideOver open={heroOpen} anchor={heroAnchor} onClose={closeHero} settings={settings} data={heroData} />

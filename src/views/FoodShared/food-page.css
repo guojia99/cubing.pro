@@ -1,7 +1,9 @@
-/* 生活/菜谱/鸡尾酒：标准正文 14px */
+/* Food pages share the site's editorial hierarchy and surface tokens. */
 .food-page {
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 1.7;
+  font-family: var(--font-body);
+  min-width: 0;
 }
 
 .food-page .food-toolbar {
@@ -9,17 +11,21 @@
   flex-wrap: wrap;
   gap: 12px;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 0;
+  min-width: 0;
 }
+
+.food-filter-panel .food-toolbar { margin-bottom: 0; }
+.food-page .food-toolbar .food-list-modes { order: -1; flex-basis: 100%; margin-bottom: 8px; }
 
 /* 下拉与「原材料筛选」按钮统一外观 */
 .food-page .food-filter-select [data-part="field"],
 .food-page .food-filter-select select,
 .food-page .food-filter-trigger {
   font-size: 14px !important;
-  height: 36px;
-  min-height: 36px;
-  border-radius: 8px;
+  height: 44px;
+  min-height: 44px;
+  border-radius: 12px;
   border: 1px solid var(--chakra-colors-border);
   background: var(--chakra-colors-bg);
   color: var(--chakra-colors-fg);
@@ -72,15 +78,18 @@
 
 /* Segment 与下拉同高 */
 .food-page .food-segment-group {
-  height: 36px;
-  flex-shrink: 0;
+  min-height: 44px;
+  height: auto;
+  max-width: 100%;
+  flex-wrap: wrap;
+  border-radius: 12px;
 }
 
 .food-page .food-segment-group [data-part="item"] {
   font-size: 14px;
   padding-inline: 12px;
   white-space: nowrap;
-  flex-shrink: 0;
+  min-height: 40px;
 }
 
 .food-page .food-segment-group [data-part="item-text"],
@@ -93,9 +102,9 @@
 
 .food-page .food-toolbar .chakra-button {
   font-size: 14px;
-  height: 36px;
-  min-height: 36px;
-  border-radius: 8px;
+  height: 44px;
+  min-height: 44px;
+  border-radius: 12px;
 }
 
 .food-page .food-meta-row {
@@ -109,9 +118,10 @@
 
 .food-page .food-detail-actions .chakra-button {
   font-size: 14px;
-  height: 36px;
-  min-height: 36px;
-  border-radius: 8px;
+  height: auto;
+  min-height: 44px;
+  border-radius: 12px;
+  white-space: normal;
 }
 
 .food-page .food-tonight-receipt-toggle {
@@ -122,13 +132,18 @@
   font-size: 14px;
   color: var(--chakra-colors-fg-muted);
   text-align: center;
-  padding: 32px 16px;
+  padding: 56px 24px;
+  background: var(--chakra-colors-bg-elevated);
+  border: 1px dashed var(--chakra-colors-border);
+  border-radius: var(--radius-card);
 }
 
 .food-page .food-card-title {
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 600;
-  line-height: 1.4;
+  line-height: 1.5;
+  font-family: var(--font-heading);
+  overflow-wrap: anywhere;
 }
 
 .food-page .food-card-desc {
@@ -138,6 +153,56 @@
 }
 
 .food-page .food-card-meta {
-  font-size: 14px;
+  font-size: 12px;
   color: var(--chakra-colors-fg-muted);
+}
+
+.food-page .food-card {
+  min-width: 0;
+  border-radius: var(--radius-card);
+  background: var(--chakra-colors-bg-elevated);
+  border: 1px solid var(--chakra-colors-border);
+  box-shadow: var(--shadow-card);
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.food-page .food-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-float);
+  border-color: var(--chakra-colors-accent);
+}
+
+.food-page .food-card:focus-visible,
+.food-page .food-card a:focus-visible {
+  outline: 2px solid var(--chakra-colors-accent);
+  outline-offset: 4px;
+}
+
+.food-card [data-part="body"] { gap: 0; }
+.food-card [data-part="body"] > :last-child { margin-top: auto; padding-top: 12px; }
+.food-card .food-card-link { color: inherit; text-decoration: none; }
+.food-card .food-card-link::after { content: ""; position: absolute; inset: 0; }
+.food-page .food-detail-actions { padding-bottom: 16px; border-bottom: 1px solid var(--chakra-colors-border); margin-bottom: 24px; }
+.food-page .food-reading-surface { overflow-wrap: anywhere; }
+.food-page .food-reading-surface h1 { font-family: var(--font-heading); line-height: 1.3; }
+.food-page .food-reading-surface img { border-radius: var(--radius-card); }
+.food-page .markdown-detail-anchor { top: calc(var(--header-height) + 24px); }
+.food-page .cocktail-detail-grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 40px; align-items: start; }
+.food-page .cocktail-detail-image { width: 100%; max-height: 560px; object-fit: cover; border-radius: var(--radius-card); }
+.food-page .cocktail-detail-grid ul { padding-inline-start: 20px; line-height: 1.9; }
+
+@media (max-width: 767px) {
+  .food-page .food-filter-select,
+  .food-page .food-filter-trigger { width: 100%; min-width: 0; max-width: 100%; flex: 1 1 100%; }
+  .food-page .food-segment-group { width: 100%; }
+  .food-page .food-segment-group [data-part="item"] { flex: 1 1 auto; padding-inline: 8px; }
+  .food-page .food-detail-actions > div { width: 100%; }
+  .food-page .food-detail-actions > div > button { flex: 1; }
+  .food-page .cocktail-detail-grid { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .food-page .cocktail-detail-image { max-height: 420px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .food-page .food-card { transition: none; }
+  .food-page .food-card:hover { transform: none; }
 }

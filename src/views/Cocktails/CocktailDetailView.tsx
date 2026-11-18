@@ -5,7 +5,6 @@ import {
   Button,
   Dialog,
   Flex,
-  Heading,
   Link,
   List,
   Portal,
@@ -14,15 +13,17 @@ import {
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { useEffect, useState } from "react";
+import { useI18n } from "@/contexts/I18nProvider";
+import { getSiteContent, getCocktailCategoryLabel } from "@/i18n/messages/site-content";
+import { getCocktailDisplayName } from "@/lib/cocktailContent";
 import { LuArrowLeft, LuExternalLink, LuHeart, LuShoppingCart } from "react-icons/lu";
 
 import { toaster } from "@/components/ui/toaster";
+import { PageHeader, SectionHeader, Surface } from "@/components/ui/page";
 
-import { getCategoryLabelZh } from "./categoryZh";
 import { CocktailFirstVisitModal } from "./components/CocktailFirstVisitModal";
-import { getCocktailZhName } from "./cocktailNameZhMap";
-import type { Cocktail } from "./types";
-import { COCKTAILS_JSON, MAX_COCKTAIL_FAVORITES, MAX_COCKTAIL_TONIGHT } from "./types";
+import { useCocktail } from "./hooks/useCocktails";
+import { MAX_COCKTAIL_FAVORITES, MAX_COCKTAIL_TONIGHT } from "./types";
 import {
   addCocktailFavorite,
   isCocktailFavorite,
@@ -41,28 +42,18 @@ interface CocktailDetailViewProps {
 }
 
 export function CocktailDetailView({ slug: slugParam }: CocktailDetailViewProps) {
+  const { locale, t } = useI18n();
+  const sc = getSiteContent(locale);
   const slug = decodeURIComponent(slugParam);
-  const [cocktail, setCocktail] = useState<Cocktail | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { cocktail, loading, error, retry } = useCocktail(slug);
   const [favState, setFavState] = useState(false);
   const [tonightState, setTonightState] = useState(false);
   const [previewSrc, setPreviewSrc] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!slug) {
-      setLoading(false);
-      return;
-    }
     setFavState(isCocktailFavorite(slug));
     setTonightState(isCocktailInTonight(slug));
-    fetch(COCKTAILS_JSON)
-      .then((r) => r.json())
-      .then((data: Cocktail[]) => {
-        const c = Array.isArray(data) ? data.find((x) => x.slug === slug) : undefined;
-        setCocktail(c ?? null);
-      })
-      .catch(() => setCocktail(null))
-      .finally(() => setLoading(false));
+    setPreviewSrc(null);
   }, [slug]);
 
   const handleFavoriteClick = () => {
@@ -73,7 +64,7 @@ export function CocktailDetailView({ slug: slugParam }: CocktailDetailViewProps)
     } else if (addCocktailFavorite(slug)) {
       setFavState(true);
     } else {
-      toaster.create({ type: "warning", title: `最多收藏 ${MAX_COCKTAIL_FAVORITES} 款` });
+      toaster.create({ type: "warning", title: sc("siteContent.drinkFavoriteLimit", { count: MAX_COCKTAIL_FAVORITES }) });
     }
   };
 
@@ -82,12 +73,12 @@ export function CocktailDetailView({ slug: slugParam }: CocktailDetailViewProps)
     if (tonightState) {
       removeCocktailFromTonight(slug);
       setTonightState(false);
-      toaster.create({ type: "success", title: "已从今晚喝什么移除" });
+      toaster.create({ type: "success", title: sc("siteContent.drinkRemoved") });
     } else if (addCocktailToTonight(slug)) {
       setTonightState(true);
-      toaster.create({ type: "success", title: "已添加到今晚喝什么" });
+      toaster.create({ type: "success", title: sc("siteContent.drinkAdded") });
     } else {
-      toaster.create({ type: "warning", title: `今晚喝什么最多 ${MAX_COCKTAIL_TONIGHT} 款` });
+      toaster.create({ type: "warning", title: sc("siteContent.drinkLimit", { count: MAX_COCKTAIL_TONIGHT }) });
     }
   };
 
@@ -102,7 +93,7 @@ export function CocktailDetailView({ slug: slugParam }: CocktailDetailViewProps)
     );
   }
 
-  if (!cocktail) {
+  if (error || !cocktail) {
     return (
       <>
         <CocktailFirstVisitModal />
@@ -110,27 +101,30 @@ export function CocktailDetailView({ slug: slugParam }: CocktailDetailViewProps)
           <Button variant="ghost" size="sm" asChild>
             <NextLink href="/other/cocktails">
               <LuArrowLeft />
-              返回列表
+              {sc("siteContent.back")}
             </NextLink>
           </Button>
-          <Text mt="6">未找到该酒款，请检查链接。</Text>
+          <Text mt="6" role={error ? "alert" : undefined} whiteSpace="pre-line">
+            {error ? sc("siteContent.documentLoadError").replace(/^#\s*/, "") : sc("siteContent.drinkNotFound")}
+          </Text>
+          {error ? <Button mt="4" onClick={retry}>{t("algs.practice.retry")}</Button> : null}
         </Box>
       </>
     );
   }
 
-  const zh = getCocktailZhName(cocktail.slug, cocktail.name);
+  const displayName = getCocktailDisplayName(cocktail, locale);
   const imgSrc = cocktail.image_path ? `/iba/${cocktail.image_path}` : "";
 
   return (
     <>
       <CocktailFirstVisitModal />
-      <Box className="food-page" p={{ base: 4, md: 6 }} maxW="960px" mx="auto">
+      <Box className="food-page food-detail-page" p={{ base: 4, md: 8 }} maxW="1200px" mx="auto">
         <Flex className="food-detail-actions" mb="4" justify="space-between" align="center" flexWrap="wrap" gap="3">
           <Button variant="ghost" size="sm" asChild>
             <NextLink href="/other/cocktails">
               <LuArrowLeft />
-              返回列表
+              {sc("siteContent.back")}
             </NextLink>
           </Button>
           <Flex gap="2" flexWrap="wrap">
@@ -141,7 +135,7 @@ export function CocktailDetailView({ slug: slugParam }: CocktailDetailViewProps)
               onClick={handleTonightClick}
             >
               <LuShoppingCart />
-              {tonightState ? "已在今晚喝什么" : "添加到今晚喝什么"}
+              {sc(tonightState ? "siteContent.inDrinks" : "siteContent.addDrinks")}
             </Button>
             <Button
               size="sm"
@@ -150,56 +144,45 @@ export function CocktailDetailView({ slug: slugParam }: CocktailDetailViewProps)
               onClick={handleFavoriteClick}
             >
               <LuHeart />
-              {favState ? "已收藏" : "收藏"}
+              {sc(favState ? "siteContent.saved" : "siteContent.favorite")}
             </Button>
           </Flex>
         </Flex>
 
-        <Box borderRadius="xl" bg="bg" borderWidth="1px" borderColor="border" p={{ base: 4, md: 6 }}>
-          <Heading size="xl" mb="2">
-            {zh}
-          </Heading>
-          <Text fontSize="14px" color="fg.muted" mb="3">
-            {cocktail.name} · {getCategoryLabelZh(cocktail.category)}
-          </Text>
+        <PageHeader eyebrow={getCocktailCategoryLabel(locale, cocktail.category)} title={displayName} description={cocktail.originalName !== displayName ? cocktail.originalName : undefined} />
+        <Surface p={{ base: 5, md: 8 }}>
+        <Box className="cocktail-detail-grid">
+          <Box>
           {cocktail.source_url ? (
             <Link href={cocktail.source_url} target="_blank" rel="noreferrer" color="accent" display="inline-flex" alignItems="center" gap="1" mb="4">
               <LuExternalLink />
-              IBA 原文
+              {sc("siteContent.ibaSource")}
             </Link>
           ) : null}
 
           {imgSrc ? (
-            <Box mb="6" textAlign="center">
+            <Box asChild w="full" textAlign="center">
+               <button type="button" aria-label={sc("siteContent.enlargeDrink", { name: displayName })} onClick={() => setPreviewSrc(imgSrc)}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={imgSrc}
-                alt={zh}
-                style={{
-                  width: "100%",
-                  maxWidth: 480,
-                  height: 350,
-                  objectFit: "cover",
-                  borderRadius: 8,
-                  cursor: "pointer",
-                }}
-                onClick={() => setPreviewSrc(imgSrc)}
+                alt={displayName}
+                className="cocktail-detail-image"
               />
+              </button>
             </Box>
           ) : null}
+          </Box>
+          <Box minW="0">
 
-          <Heading size="md" mb="2">
-            材料
-          </Heading>
+          <SectionHeader title={sc("siteContent.ingredients")} eyebrow={sc("siteContent.prepStep")} />
           <List.Root gap="1" mb="6" fontSize="14px">
             {(cocktail.ingredients ?? []).map((item) => (
               <List.Item key={item}>{item}</List.Item>
             ))}
           </List.Root>
 
-          <Heading size="md" mb="2">
-            调制方法
-          </Heading>
+          <SectionHeader title={sc("siteContent.method")} eyebrow={sc("siteContent.mixStep")} />
           <List.Root gap="1" mb="6" fontSize="14px">
             {(cocktail.method ?? []).map((item, i) => (
               <List.Item key={`${i}-${item}`}>
@@ -211,26 +194,27 @@ export function CocktailDetailView({ slug: slugParam }: CocktailDetailViewProps)
             ))}
           </List.Root>
 
-          <Heading size="md" mb="2">
-            装饰
-          </Heading>
+          <SectionHeader title={sc("siteContent.garnish")} eyebrow={sc("siteContent.finishStep")} />
           <List.Root gap="1" fontSize="14px">
             {(cocktail.garnish ?? []).map((item) => (
               <List.Item key={item}>{item}</List.Item>
             ))}
           </List.Root>
+          </Box>
         </Box>
+        </Surface>
       </Box>
 
       <Dialog.Root open={!!previewSrc} onOpenChange={(e) => !e.open && setPreviewSrc(null)} size="lg">
         <Portal>
           <Dialog.Backdrop />
           <Dialog.Positioner>
-            <Dialog.Content>
+            <Dialog.Content borderRadius="var(--radius-card)" boxShadow="var(--shadow-float)">
+              <Dialog.Header><Dialog.Title>{displayName}</Dialog.Title></Dialog.Header>
               <Dialog.Body textAlign="center" p="4">
                 {previewSrc ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={previewSrc} alt="" style={{ maxWidth: "100%", borderRadius: 8 }} />
+                  <img src={previewSrc} alt={displayName} style={{ maxWidth: "100%", borderRadius: "var(--radius-card)" }} />
                 ) : null}
               </Dialog.Body>
               <Dialog.CloseTrigger />

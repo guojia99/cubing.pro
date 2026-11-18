@@ -30,7 +30,9 @@ const bundle = await esbuild.build({
     import {importHistory} from '${db}';
     import {renderFromSimpleQuery} from '@/vendor/puzzle-drawing/visualcube/src/preset';
     import '${root}/src/styles/tokens.css';
+    import '${root}/src/styles/design-system.css';
     import '${root}/src/views/Algs/styles/algsDetail.css';
+    import '${root}/src/views/Algs/styles/algsUi.css';
     window.practiceHistory = history; window.importHistory = importHistory;
     window.practiceVendorReference = setup => renderFromSimpleQuery({cubeSize:3,size:240,setup,view:'pll',
       sch:'#ffdd00,#00a651,#e53935,#ffffff,#2266ff,#ff8800'});
@@ -480,6 +482,23 @@ try {
   }
   await interaction.evaluate(() => window.setPracticeLocale('zh-CN'));
   await interactionDialog.getByRole('button', {name: '全屏', exact: true}).waitFor();
+  await timerFocused();
+  const localeQuestion = await interaction.locator('.fp-scramble').textContent();
+  const localeSessionCount = await interaction.evaluate(() => window.practiceTest.creates.length);
+  await interaction.keyboard.down('Space'); await interactionPhase('armed');
+  await interaction.keyboard.up('Space'); await interactionPhase('running');
+  for (const locale of ['en-US', 'ja', 'yue-Hant-HK', 'ko', 'fr', 'es', 'zh-CN']) {
+    await interaction.evaluate(locale => window.setPracticeLocale(locale), locale);
+    await waitInBrowser(interaction, 'seven-locale provider commit', locale => document.documentElement.lang === locale, locale);
+    await interactionPhase('running');
+    assert.equal(await interaction.locator('.fp-scramble').textContent(), localeQuestion, `${locale}: question scramble retained`);
+    assert.equal(await interaction.evaluate(() => window.practiceTest.creates.length), localeSessionCount, `${locale}: session retained`);
+    await assertInteractionSaves();
+  }
+  await interaction.keyboard.down('Space'); await interaction.keyboard.up('Space'); await interactionPhase('ready');
+  interactionSaves++;
+  await assertInteractionSaves();
+  console.log('PASS seven locale changes during an active formula timer preserve running phase/question/session and commit one result');
   await interactionContext.close();
   console.log('PASS zh/en fullscreen and exit labels, denied/unsupported notices, 100dvh fallback and continued timing');
 
@@ -796,6 +815,7 @@ try {
   for (const palette of ['haitian', 'qingdai', 'zheshi', 'zhulu', 'xiangye', 'qinglian', 'rulin', 'doukou']) {
     for (const theme of ['light', 'dark']) {
       await page.evaluate(({ palette, theme }) => { document.documentElement.dataset.palette = palette; document.documentElement.className = theme; }, { palette, theme });
+      await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
       const colors = await dialog.evaluate(element => {
         const probe = document.createElement('span');
         element.appendChild(probe);
@@ -982,8 +1002,8 @@ try {
     for (const grid of grids) {
       assert.equal(grid.overflow, false);
       for (const button of grid.buttons) {
-        assert.equal(button.tag, 'BUTTON'); assert.ok(button.height >= 32);
-        assert.equal(button.radius, '4px'); assert.equal(button.font, '12px');
+        assert.equal(button.tag, 'BUTTON'); assert.ok(button.height >= 34);
+        assert.equal(button.radius, '9px'); assert.equal(button.font, '12px');
         assert.equal(button.border, '1px'); assert.equal(button.shadow, 'none');
         assert.equal(button.check, 'visible');
         assert.ok(Math.abs(button.width - grid.buttons[0].width) < 1, 'filter columns are equal width');
@@ -996,7 +1016,22 @@ try {
   assert.equal(await caseOne.locator('.algs-filter-check').evaluate(element => getComputedStyle(element).visibility), 'hidden');
   await formulaSection.getByRole('button', {name: '全选', exact: true}).click();
   assert.equal(await caseOne.getAttribute('aria-pressed'), 'true');
-  assert.equal(await caseOne.evaluate(element => getComputedStyle(element).backgroundColor), 'rgb(12, 58, 77)', 'selected filter uses the semantic dark accent fill');
+  for (const theme of ['light', 'dark']) {
+    await controls.evaluate(theme => { document.documentElement.className = theme; }, theme);
+    await controls.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+    const colors = await caseOne.evaluate(element => {
+      const actual = getComputedStyle(element);
+      const probe = document.createElement('span');
+      probe.style.cssText = 'background:var(--accent-soft);border:1px solid var(--accent);color:var(--foreground)';
+      element.appendChild(probe);
+      const expected = getComputedStyle(probe);
+      const result = { actual: [actual.backgroundColor, actual.borderTopColor, actual.color], expected: [expected.backgroundColor, expected.borderTopColor, expected.color] };
+      probe.remove();
+      return result;
+    });
+    assert.deepEqual(colors.actual, colors.expected, `${theme}: production selected filter uses accent-soft background, accent border and foreground text`);
+    assert.equal(await caseOne.getAttribute('aria-pressed'), 'true');
+  }
   await controls.getByRole('button', {name: 'Open formula', exact: true}).click();
   const formulaDialog = controls.getByRole('dialog');
   const formulaClose = formulaDialog.getByRole('button', {name: 'Close', exact: true});
@@ -1012,7 +1047,7 @@ try {
   await assertIconClose(controls, formulaClose);
   await controls.keyboard.press('Enter');
   await formulaDialog.waitFor({state: 'hidden'});
-  console.log('PASS native equal-grid filter buttons, 4px corners, keyboard toggles, preserved scope/labels, red icon-only modal closes with keyboard focus');
+  console.log('PASS production CSS equal-grid filter buttons, 9px corners, light/dark accent-soft selection, keyboard toggles, preserved scope/labels and icon-only closes');
   await controls.close();
   assert.deepEqual(errors, []);
   console.log('PASS no browser runtime errors (React StrictMode)');

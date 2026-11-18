@@ -1,4 +1,5 @@
 "use client";
+import { SectionHeader } from "@/components/ui/page";
 
 import { RecordsTable } from "@/components/Data/cube_record/record_tables";
 import type { MRecord, Record as CubeRecord } from "@/components/Data/types/record";
@@ -8,6 +9,7 @@ import { apiPublicCompGroups } from "@/services/cubing-pro/public/orgs";
 import { apiRecords } from "@/services/cubing-pro/statistics/records";
 import { Select } from "antd";
 import { useEffect, useState } from "react";
+import { useI18n } from "@/contexts/I18nProvider";
 
 export type RecordsWithBestProps = {
   groupId: number;
@@ -15,12 +17,13 @@ export type RecordsWithBestProps = {
 };
 
 export function RecordsWithBest({ groupId, onGroupIdChange }: RecordsWithBestProps) {
+  const { t } = useI18n();
   const [events, setEvents] = useState<EventsAPI.Event[]>([]);
   const [bestRecords, setBestRecords] = useState<Record<string, CubeRecord[]> | undefined>();
   const [avgRecords, setAvgRecords] = useState<Record<string, CubeRecord[]> | undefined>();
   const [orgItems, setOrgItems] = useState<{ label: string; key: string; value: number }[]>([]);
 
-  const fetchRecords = () => {
+  useEffect(() => {
     apiRecords({
       GroupId: groupId === 0 ? "" : String(groupId),
       EventId: "",
@@ -28,7 +31,7 @@ export function RecordsWithBest({ groupId, onGroupIdChange }: RecordsWithBestPro
       setAvgRecords(value.data.Average);
       setBestRecords(value.data.Best);
     });
-  };
+  }, [groupId]);
 
   useEffect(() => {
     apiEvents().then((value) => {
@@ -56,10 +59,6 @@ export function RecordsWithBest({ groupId, onGroupIdChange }: RecordsWithBestPro
       setOrgItems(ite);
     });
   }, []);
-
-  useEffect(() => {
-    fetchRecords();
-  }, [groupId]);
 
   useEffect(() => {
     if (orgItems.length === 0) {
@@ -112,16 +111,16 @@ export function RecordsWithBest({ groupId, onGroupIdChange }: RecordsWithBestPro
 
   return (
     <>
-      <h3 style={{ textAlign: "center", marginBottom: "20px" }}>
-        <strong>最佳记录</strong>
-      </h3>
-
+      <SectionHeader title={t('competitionExtra.bestRecords')} />
+      <div className="competition-toolbar">
       <Select
+        aria-label={t('competitionExtra.recordGroup')}
         value={groupId}
-        style={{ marginBottom: "20px", width: "150px" }}
+        style={{ width: "100%", maxWidth: 240 }}
         options={orgItems}
         onChange={(value) => onGroupIdChange(value)}
       />
+      </div>
 
       {RecordsTable(records, ["MEventId", "BestUserName", "Best", "Average", "AvgUserName"], false)}
     </>

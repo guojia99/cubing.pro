@@ -10,7 +10,7 @@
 
 .wca-comps-filter-card {
   margin-bottom: 16px;
-  border-radius: 10px;
+  border-radius: var(--radius-card);
 }
 
 .wca-comps-filter-row {
@@ -29,7 +29,7 @@
 
 .wca-comps-filter-label {
   font-size: 14px;
-  color: rgba(0, 0, 0, 0.65);
+  color: var(--muted-foreground);
   white-space: nowrap;
 }
 
@@ -48,7 +48,7 @@
 .wca-comps-result-meta {
   margin-bottom: 12px;
   font-size: 13px;
-  color: rgba(0, 0, 0, 0.55);
+  color: var(--muted-foreground);
 }
 
 .wca-comps-card-grid {
@@ -76,12 +76,12 @@
 
 .wca-comps-card {
   width: 100%;
-  border-radius: 10px;
+  border-radius: var(--radius-card);
   transition: box-shadow 0.2s ease;
 }
 
 .wca-comps-card:hover {
-  box-shadow: 0 4px 16px rgba(24, 144, 255, 0.12);
+  box-shadow: var(--shadow-float);
 }
 
 .wca-comps-card-title a {
@@ -90,7 +90,7 @@
 }
 
 .wca-comps-card-title a:hover {
-  color: #1890ff;
+  color: var(--accent);
 }
 
 .wca-comps-card-row {

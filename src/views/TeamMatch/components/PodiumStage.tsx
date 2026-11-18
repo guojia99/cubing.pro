@@ -3,8 +3,10 @@ import { useTeamMatchStore } from '@/views/TeamMatch/TeamMatchContext';
 import { Typography } from 'antd';
 import React, { useMemo } from 'react';
 import '../TeamMatch.css';
+import { useTeamMatchI18n } from '../i18n';
 
 const PodiumStage: React.FC = () => {
+  const { t } = useTeamMatchI18n();
   const { state } = useTeamMatchStore();
   const { session } = state;
   const { teams } = session;
@@ -20,7 +22,7 @@ const PodiumStage: React.FC = () => {
     return (
       <div className="tmPodiumRoot">
         <Typography.Text className="tmPodiumEmptyHint">
-          暂无领奖台数据（比赛可能尚未全部结束）。
+          {t('teamMatch.podiumEmpty')}
         </Typography.Text>
       </div>
     );
@@ -31,16 +33,16 @@ const PodiumStage: React.FC = () => {
   return (
     <div className="tmPodiumRoot">
       <Typography.Title level={4} className="tmPodiumTitle">
-        比赛成绩
+        {t('teamMatch.competitionResults')}
       </Typography.Title>
-      <div className="tmPodiumStage" aria-label="领奖台">
+      <div className="tmPodiumStage" aria-label={t('teamMatch.podium')}>
         {/* 左：亚军 · 中：冠军 · 右：季军 — 高度中 > 左 > 右 */}
         <div className="tmPodiumLane tmPodiumLaneSecond">
           <div className="tmPodiumCard">
             <span className="tmPodiumMedal" aria-hidden>
               🥈
             </span>
-            <Typography.Text className="tmPodiumLabel">亚军</Typography.Text>
+            <Typography.Text className="tmPodiumLabel">{t('teamMatch.runnerUp')}</Typography.Text>
             <Typography.Text strong className="tmPodiumTeam">
               {nameOf(silver)}
             </Typography.Text>
@@ -52,7 +54,7 @@ const PodiumStage: React.FC = () => {
             <span className="tmPodiumMedal tmPodiumMedalGold" aria-hidden>
               🥇
             </span>
-            <Typography.Text className="tmPodiumLabel">冠军</Typography.Text>
+            <Typography.Text className="tmPodiumLabel">{t('teamMatch.champion')}</Typography.Text>
             <Typography.Text strong className="tmPodiumTeam">
               {nameOf(gold)}
             </Typography.Text>
@@ -65,7 +67,7 @@ const PodiumStage: React.FC = () => {
               🥉
             </span>
             <Typography.Text className="tmPodiumLabel">
-              {thirdFourthShared ? '第三、四名（并列）' : '季军'}
+              {thirdFourthShared ? t('teamMatch.sharedThird') : t('teamMatch.third')}
             </Typography.Text>
             {thirdFourthShared ? (
               <div className="tmPodiumTeamStack">

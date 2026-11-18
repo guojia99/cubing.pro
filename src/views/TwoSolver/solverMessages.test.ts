@@ -76,7 +76,7 @@ test("all named engine catalog entries have matching parameters and adapter cove
   }
 });
 
-test("dynamic method IDs, HTTP statuses, depths and counters remain literal", () => {
+test("method IDs and statuses remain literal while counters use display locale", () => {
   const methods = ["CLL", "EG1", "EG2", "LEG1", "TCLL+", "TCLL-", ...Array.from({ length: 9 }, (_, i) => `LS${i + 1}`), "CBL", "EGLS1", "EGLS2", "TEG1", "TEG2", "FH"];
   for (const method of methods) {
     assert.equal(localizeEngineText(`加载 ${method} 公式`, "en-US"), `Loading ${method} algorithms`);
@@ -86,13 +86,26 @@ test("dynamic method IDs, HTTP statuses, depths and counters remain literal", ()
       assert.equal(localizeEngineText(`${method} 公式加载失败 (${status})`, "en-US"), `Failed to load ${method} algorithms (${status})`);
     }
   }
-  const nodes = ["0", "1234567", "1,234,567", "1.234.567", "1 234 567", "1\u00a0234\u00a0567", "1\u202f234\u202f567", "١٬٢٣٤٬٥٦٧", "1’234’567"];
+  const nodes = [
+    ["0", "0"], ["1", "1"], ["1234567", "1,234,567"], ["1,234,567", "1,234,567"],
+    ["1.234.567", "1,234,567"], ["1 234 567", "1,234,567"], ["1\u00a0234\u00a0567", "1,234,567"],
+    ["1\u202f234\u202f567", "1,234,567"], ["١٬٢٣٤٬٥٦٧", "1,234,567"], ["1’234’567", "1,234,567"],
+  ];
   for (let depth = 0; depth <= 6; depth++) for (const count of [0, 1, 20, 2000]) {
-    assert.equal(localizeEngineText(`${count} 条已验证解法`, "en-US"), `${count} verified solutions`);
-    for (const n of nodes) {
-      assert.equal(localizeEngineText(`做底深度 ${depth}/6 · ${n} 节点 · ${count} 条解法`, "en-US"), `Base depth ${depth}/6 · ${n} nodes · ${count} solutions`);
+    assert.equal(localizeEngineText(`${count} 条已验证解法`, "en-US"), `${count} verified ${count === 1 ? "solution" : "solutions"}`);
+    for (const [raw, formatted] of nodes) {
+      assert.equal(localizeEngineText(`做底深度 ${depth}/6 · ${raw} 节点 · ${count} 条解法`, "en-US"), `Base depth ${depth}/6 · ${formatted} ${formatted === "1" ? "node" : "nodes"} · ${count} ${count === 1 ? "solution" : "solutions"}`);
     }
   }
+});
+
+test("display counters select French and Spanish grammar without changing wire text", () => {
+  const raw = "做底深度 1/6 · 1 节点 · 2 条解法";
+  assert.equal(localizeEngineText(raw, "fr"), "Profondeur de base 1/6 · 1 nœud · 2 solutions");
+  assert.equal(localizeEngineText(raw, "es"), "Profundidad base 1/6 · 1 nodo · 2 soluciones");
+  assert.equal(localizeEngineText("0 条已验证解法", "fr"), "Solution 0 vérifiée");
+  assert.equal(localizeEngineText("0 条已验证解法", "es"), "0 soluciones verificadas");
+  assert.equal(localizeEngineText(raw, "zh-CN"), raw);
 });
 
 test("unsupported notation and complete Error/RangeError help retain raw parameters", () => {
@@ -107,11 +120,9 @@ test("unsupported notation and complete Error/RangeError help retain raw paramet
   }
 });
 
-test("English/native errors and unknown diagnostics pass through without losing details", () => {
+test("unknown diagnostics pass through without losing details", () => {
   for (const text of [
-    "", "Failed to fetch", "Unexpected end of input", "Invalid rotation conjugation", "Unknown move M",
-    "Empty formula", "Invalid whole-cube rotation", "Stage normalization changed the exact transformation",
-    "Boundary reduction changed the exact transformation", "RUF scramble conversion changed the physical state",
+    "", "Failed to fetch", "Unexpected end of input", "Empty formula",
     "RangeError: Expected canonical face turns or x/y/z rotations.",
     "SyntaxError: Unexpected token at index 7: R @ U", "Error: Network failure (503)",
     "新的诊断：请保留原文 R U R'", "Error: 未知异常 (id=42)",

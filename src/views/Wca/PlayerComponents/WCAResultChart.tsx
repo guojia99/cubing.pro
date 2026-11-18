@@ -1,4 +1,5 @@
-import { roundNameMap } from '@/views/Wca/utils/events';
+import { formatRoundName } from '@/views/Wca/utils/events';
+import { translateWcaPuzzleExtra as extra } from '@/i18n/messages/wca-puzzle-extra';
 import {
   get333MBFResult,
   resultsTimeFormat,
@@ -6,13 +7,15 @@ import {
 } from '@/views/Wca/utils/wca_results';
 import { Card, Select, Slider, Space, Tabs, Tooltip } from 'antd';
 import ReactECharts from 'echarts-for-react';
+import { color as chartColor } from 'echarts';
 import React, { useMemo, useState } from 'react';
 import { useIntl } from '@/hooks/useIntlMessage';
 import { WCACompetition, WCAResult } from '@/services/cubing-pro/wca/types';
 import {
-  getThemeColors,
-  mixCssColors,
+  getChartAxisStyle,
+  getChartTooltipStyle,
 } from '@/theme/chartColors';
+import { useThemeColors } from '@/theme/useThemeColors';
 
 export interface WCAResultChartProps {
   eventId: string;
@@ -69,7 +72,7 @@ function getQuantile(arr: number[], q: number, TrimHeadAndTail: number = 0): num
 
 const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps }) => {
   const intl = useIntl();
-  const theme = getThemeColors();
+  const theme = useThemeColors();
   const [recentCount, setRecentCount] = useState<number>(20);
   const [recentHeadNum, setRecentHeadNum] = useState<number>(0);
   const [recentMin, setRecentMin] = useState<number>(0);
@@ -86,15 +89,6 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
     return intl.formatMessage({ id: 'wca.chart.time' });
   })();
   const reversedData = useMemo(() => [...data].reverse(), [data]);
-
-  // 获取比赛信息
-  const getCompInfo = (id: string) => {
-    const comp = comps.find((c) => c.id === id);
-    if (!comp) return null;
-    return {
-      name: comp.name,
-    };
-  };
 
   const chartData = useMemo(() => {
     const singles: number[] = [];
@@ -127,12 +121,12 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
 
       // 比赛名
       let compsAndRound = '';
-      const comp = getCompInfo(r.competition_id);
+      const comp = comps.find((c) => c.id === r.competition_id);
       if (comp) {
         compsAndRound += comp.name;
       }
       compsAndRound += ' | ';
-      compsAndRound += roundNameMap[r.round_type_id];
+      compsAndRound += formatRoundName(r.round_type_id, intl.locale);
       compWithNameRound.push(compsAndRound);
 
       // 所有单次
@@ -156,10 +150,9 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
     }
 
     return { singles, averages, compWithNameRound, allAttempts };
-  }, [reversedData, eventId, intl]);
+  }, [reversedData, eventId, intl, comps]);
 
   const combinedOption = useMemo(() => {
-    const theme = getThemeColors();
     // ===== 多盲专用逻辑 =====
     if (eventId === '333mbf') {
       let bestScore = -Infinity;
@@ -206,7 +199,10 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
       const sameScoreFaster = intl.formatMessage({ id: 'wca.chart.sameScoreFaster' });
 
       return {
+        color: [theme.accent, theme.signalSuccess, theme.signalWarning, theme.signalInfo, chartColor.lerp(.7, [theme.foreground, theme.accent]), chartColor.lerp(.6, [theme.foreground, theme.signalSuccess])],
+        textStyle: { color: theme.foreground },
         tooltip: {
+          ...getChartTooltipStyle(),
           trigger: 'axis',
           formatter: (params: any[]) => {
             const p = params[0];
@@ -231,11 +227,15 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
         },
         grid: { left: 60, right: 40, bottom: 50, top: 40 },
         xAxis: {
+          ...getChartAxisStyle(),
+          nameTextStyle: { color: theme.mutedForeground },
           type: 'category',
           name: intl.formatMessage({ id: 'wca.chart.compResult' }),
           data: singlePoints.map((_, i) => i),
         },
         yAxis: {
+          ...getChartAxisStyle(),
+          nameTextStyle: { color: theme.mutedForeground },
           type: 'value',
           min: 0,
           name: intl.formatMessage({ id: 'wca.chart.mbfScore' }),
@@ -293,7 +293,10 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
     const progressLabel = intl.formatMessage({ id: 'wca.chart.progress' });
 
     return {
+      color: [theme.accent, theme.signalSuccess, theme.signalWarning, theme.signalInfo, chartColor.lerp(.7, [theme.foreground, theme.accent]), chartColor.lerp(.6, [theme.foreground, theme.signalSuccess])],
+      textStyle: { color: theme.foreground },
       tooltip: {
+        ...getChartTooltipStyle(),
         trigger: 'axis',
         formatter: (params: any[]) => {
           if (!params.length) return '';
@@ -318,15 +321,20 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
       },
       grid: { left: 60, right: 40, bottom: 50, top: 40 },
       xAxis: {
+        ...getChartAxisStyle(),
+        nameTextStyle: { color: theme.mutedForeground },
         type: 'category',
         name: intl.formatMessage({ id: 'wca.chart.solves' }),
         data: Array.from({ length: Math.max(singlePoints.length, avgPoints.length) }, (_, i) => i),
       },
       yAxis: {
+        ...getChartAxisStyle(),
+        nameTextStyle: { color: theme.mutedForeground },
         type: 'value',
         min: 0,
         name: seriesName,
         axisLabel: {
+          color: theme.mutedForeground,
           formatter: (value: number) => {
             if (eventId === '333mbf') {
               // mbf 得分不需要格式化为时间
@@ -366,11 +374,10 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
         },
       ],
     };
-  }, [chartData, eventId, reversedData, intl]);
+  }, [chartData, eventId, reversedData, intl, theme, seriesName]);
 
   // 生成标记点，只显示头尾和当前选中值
   const generateMarks = () => {
-    const theme = getThemeColors();
     const marks = {
       [recentMin]: `${recentMin}%`,
       [recentMax]: `${recentMax}%`,
@@ -413,7 +420,6 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
   const maName = intl.formatMessage({ id: 'wca.chart.maN' }, { n: maWindow });
 
   const distributionOption = useMemo(() => {
-    const theme = getThemeColors();
     const singles = chartData.allAttempts;
     if (singles.length === 0) return {};
 
@@ -449,12 +455,17 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
     }
 
     return {
+      color: [theme.accent, theme.signalSuccess, theme.signalWarning, theme.signalInfo, chartColor.lerp(.7, [theme.foreground, theme.accent]), chartColor.lerp(.6, [theme.foreground, theme.signalSuccess])],
+      textStyle: { color: theme.foreground },
       legend: {
+        textStyle: { color: theme.mutedForeground },
+        pageTextStyle: { color: theme.mutedForeground },
         show: true,
         top: 10,
         type: 'scroll', // 支持滚动，防止图例过多溢出
       },
       tooltip: {
+        ...getChartTooltipStyle(),
         trigger: 'axis',
         formatter: (params: any[]) => {
           const lines = params
@@ -502,15 +513,20 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
       },
       grid: { left: 60, right: 40, bottom: 50, top: 40 },
       xAxis: {
+        ...getChartAxisStyle(),
+        nameTextStyle: { color: theme.mutedForeground },
         type: 'category',
         name: intl.formatMessage({ id: 'wca.chart.solves' }),
         data: singles.map((_, i) => i),
       },
       yAxis: {
+        ...getChartAxisStyle(),
+        nameTextStyle: { color: theme.mutedForeground },
         type: 'value',
         min: 0,
         name: seriesName,
         axisLabel: {
+          color: theme.mutedForeground,
           formatter: (value: number) => {
             if (eventId === '333mbf') return String(value);
             return resultsTimeFormat(value, eventId, false);
@@ -563,7 +579,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
           // 注意：这里 data 是差值，但 tooltip 不显示
           data: q25.map((_, i) => [i, q75[i] - q25[i]]),
           lineStyle: { opacity: 0 },
-          areaStyle: { color: mixCssColors(theme.signalInfo, 'transparent', 15) },
+          areaStyle: { color: theme.signalInfo, opacity: .15 },
           stack: '四分线',
           z: -1,
           // 👇 关键：禁止 tooltip
@@ -616,7 +632,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
           type: 'line',
           data: stdLower.map((_, i) => [i, stdUpper[i] - stdLower[i]]),
           lineStyle: { opacity: 0 },
-          areaStyle: { color: mixCssColors(theme.signalSuccess, 'transparent', 10) },
+          areaStyle: { color: theme.signalSuccess, opacity: .1 },
           stack: 'std',
           z: -2,
           tooltip: { show: false }, // 👈 隐藏
@@ -627,7 +643,7 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
         { type: 'inside', xAxisIndex: 0, start: 0, end: 100 },
       ],
     };
-  }, [chartData, recentCount, eventId, recentHeadNum, intl, resultSeriesName, quartileRangeName, stdDevName, compLabel, maName]);
+  }, [chartData, recentCount, eventId, recentHeadNum, intl, resultSeriesName, quartileRangeName, stdDevName, compLabel, maName, theme, seriesName]);
 
   const getTrimMax = (count: number) => {
     if (count <= 20) return 10; // 最多去除25% (5/20)
@@ -663,10 +679,12 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
       children: (
         <>
           <div
+            className="competition-toolbar"
             style={{
               marginBottom: 8,
               display: 'flex',
               alignItems: 'center',
+              flexWrap: 'wrap',
               gap: 16,
             }}
           >
@@ -674,17 +692,11 @@ const WCAResultChart: React.FC<WCAResultChartProps> = ({ data, eventId, comps })
             <Tooltip
               title={
                 <div style={{ maxWidth: 500, lineHeight: 1.6 }}>
-                  <p>
-                    <b>25%（Q1）</b>：25% 的成绩比它快，代表较好成绩边界。
-                  </p>
-                  <p>
-                    <b>50%（中位数）</b>：一半成绩比它快，反映典型水平。
-                  </p>
-                  <p>
-                    <b>75%（Q3）</b>：75% 的成绩比它快，代表较差成绩边界。
-                  </p>
+                  <p>{extra(intl.locale, 'wcaPuzzleExtra.q1')}</p>
+                  <p>{extra(intl.locale, 'wcaPuzzleExtra.median')}</p>
+                  <p>{extra(intl.locale, 'wcaPuzzleExtra.q3')}</p>
                   <p style={{ fontSize: 12, color: theme.mutedForeground }}>
-                    用于评估魔方成绩的稳定性与分布趋势。
+                    {extra(intl.locale, 'wcaPuzzleExtra.distributionHint')}
                   </p>
                 </div>
               }

@@ -1,3 +1,4 @@
+import { useTeamMatchI18n } from '@/views/TeamMatch/i18n';
 import {
   playersWithWcaId,
   syncCubingAvatarsForPlayers,
@@ -64,6 +65,7 @@ function PersonRow({
 }
 
 const SyncCubingAvatarsButton: React.FC<Props> = ({ session, dispatch }) => {
+  const { t: tr } = useTeamMatchI18n();
   const [busy, setBusy] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [percent, setPercent] = useState(0);
@@ -84,7 +86,7 @@ const SyncCubingAvatarsButton: React.FC<Props> = ({ session, dispatch }) => {
 
   const run = async () => {
     if (!hasWca) {
-      message.warning('没有填写 10 位 WCA ID 的选手');
+      message.warning(tr('teamMatch.noWcaPlayers'));
       return;
     }
     const ac = new AbortController();
@@ -111,13 +113,13 @@ const SyncCubingAvatarsButton: React.FC<Props> = ({ session, dispatch }) => {
       );
       dispatch({ type: 'UPSERT_PLAYERS', players });
       message.success(
-        updatedCount > 0 ? `已更新 ${updatedCount} 人头像` : '已拉取完毕（头像无变化或粗饼无头像）',
+        updatedCount > 0 ? tr('teamMatch.avatarsUpdated', { p0: updatedCount }) : tr('teamMatch.cubingAvatarsUnchanged'),
       );
     } catch (e) {
       if ((e as Error).name === 'AbortError') {
-        message.info('已取消');
+        message.info(tr('teamMatch.cancelled'));
       } else {
-        message.error('同步失败');
+        message.error(tr('teamMatch.syncFailed'));
       }
     } finally {
       setBusy(false);
@@ -133,20 +135,17 @@ const SyncCubingAvatarsButton: React.FC<Props> = ({ session, dispatch }) => {
 
   return (
     <>
-      <Button loading={busy} disabled={!hasWca} onClick={() => void run()}>
-        一键同步粗饼头像
-      </Button>
+      <Button loading={busy} disabled={!hasWca} onClick={() => void run()}>{tr('teamMatch.syncCubingAvatars')}</Button>
       <Modal
-        title="正在同步粗饼头像"
+        className="tm-workbench-modal"
+        title={tr('teamMatch.syncingCubingAvatars')}
         open={modalOpen}
         width={560}
         mask={{ closable: false }}
         closable={false}
         keyboard={false}
         footer={
-          <Button onClick={cancel} disabled={!busy}>
-            取消
-          </Button>
+          <Button onClick={cancel} disabled={!busy}>{tr('teamMatch.cancel')}</Button>
         }
         destroyOnHidden
       >
@@ -154,7 +153,7 @@ const SyncCubingAvatarsButton: React.FC<Props> = ({ session, dispatch }) => {
         <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
           {prev ? (
             <PersonRow
-              label="上一位"
+              label={tr('teamMatch.previousPlayer')}
               name={prev.player.name}
               wcaId={prev.player.wcaId ?? ''}
               avatar={prev.displayAvatar}
@@ -173,14 +172,12 @@ const SyncCubingAvatarsButton: React.FC<Props> = ({ session, dispatch }) => {
                 justifyContent: 'center',
               }}
             >
-              <Typography.Text type="secondary" style={{ fontSize: 12 }}>
-                无上一位
-              </Typography.Text>
+              <Typography.Text type="secondary" style={{ fontSize: 12 }}>{tr('teamMatch.noPreviousPlayer')}</Typography.Text>
             </div>
           )}
           {cur ? (
             <PersonRow
-              label="正在同步"
+              label={tr('teamMatch.syncing')}
               name={cur.name}
               wcaId={cur.wcaId ?? ''}
               avatar={cur.avatarDataUrl}
@@ -199,9 +196,7 @@ const SyncCubingAvatarsButton: React.FC<Props> = ({ session, dispatch }) => {
             />
           )}
         </div>
-        <Typography.Text type="secondary" style={{ fontSize: 12, display: 'block', marginTop: 12, marginBottom: 6 }}>
-          已完成（滚动查看最新）
-        </Typography.Text>
+        <Typography.Text type="secondary" style={{ fontSize: 12, display: 'block', marginTop: 12, marginBottom: 6 }}>{tr('teamMatch.syncHistory')}</Typography.Text>
         <div
           ref={scrollRef}
           style={{
@@ -213,9 +208,7 @@ const SyncCubingAvatarsButton: React.FC<Props> = ({ session, dispatch }) => {
           }}
         >
           {history.length === 0 ? (
-            <Typography.Text type="secondary" style={{ fontSize: 12 }}>
-              尚无
-            </Typography.Text>
+            <Typography.Text type="secondary" style={{ fontSize: 12 }}>{tr('teamMatch.noneYet')}</Typography.Text>
           ) : (
             history.map((row, i) => (
               <div

@@ -3,14 +3,16 @@
 import { Box, Text } from "@chakra-ui/react";
 
 import type { MarkdownHeading } from "./markdownUtils";
+import { useIntlMessage } from "@/hooks/useIntlMessage";
 
 export function MarkdownAnchorNav({ headings }: { headings: MarkdownHeading[] }) {
+  const { formatMessage: t } = useIntlMessage();
   if (headings.length === 0) return null;
 
   return (
     <Box className="markdown-detail-anchor">
       <Text fontSize="14px" fontWeight="semibold" color="fg.muted" mb="2">
-        目录
+        {t({ id: "shared.markdown.contents" })}
       </Text>
       {headings.map((h) => (
         <a

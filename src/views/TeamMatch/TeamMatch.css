@@ -1,8 +1,8 @@
 .tmJsonToolbar {
   flex: 0 0 auto;
   padding: 8px 12px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  background: #f5f5f7;
+  border-bottom: 1px solid var(--border-default);
+  background: var(--muted);
 }
 .tmJsonToolbar--dark {
   border-bottom-color: rgba(255, 255, 255, 0.1);
@@ -10,7 +10,7 @@
 }
 .tmJsonToolbarLabel {
   font-size: 12px;
-  color: rgba(0, 0, 0, 0.55);
+  color: var(--muted-foreground);
 }
 .tmJsonToolbarLabel--dark {
   color: rgba(255, 255, 255, 0.55);
@@ -71,7 +71,7 @@
   transition: box-shadow 0.2s;
 }
 .tmMatchCard:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--shadow-float);
 }
 .tmMatchDone {
   border-color: #52c41a;
@@ -84,7 +84,7 @@
 }
 .tmVs {
   text-align: center;
-  color: #999;
+  color: var(--muted-foreground);
   font-weight: 600;
 }
 .tmLoser {
@@ -224,8 +224,8 @@
   width: 100%;
 }
 .tmDrawCell {
-  border: 1px solid #f0f0f0;
-  border-radius: 8px;
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
   padding: 8px;
   min-height: 88px;
   display: flex;
@@ -236,8 +236,8 @@
   font-size: 12px;
 }
 .tmDrawCellEmpty {
-  color: #bbb;
-  background: #fafafa;
+  color: var(--muted-foreground);
+  background: var(--muted);
 }
 .tmDrawCellSeed {
   border: 2px solid #52c41a;
@@ -251,16 +251,16 @@
   background: rgba(82, 196, 26, 0.08);
 }
 .tmDrawPairBlock {
-  border: 1px solid #e8e8e8;
-  border-radius: 10px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-card, 1rem);
   padding: 10px 12px;
   margin-bottom: 10px;
-  background: #fafafa;
+  background: var(--background);
 }
 .tmDrawPairVs {
   text-align: center;
   font-weight: 700;
-  color: #888;
+  color: var(--muted-foreground);
   font-size: 12px;
   padding: 0 8px;
   flex: 0 0 auto;
@@ -270,8 +270,8 @@
   min-width: 0;
   padding: 8px 10px;
   border-radius: 8px;
-  background: #fff;
-  border: 1px solid #f0f0f0;
+  background: var(--card);
+  border: 1px solid var(--border-default);
 }
 .tmDrawPairSideSeed {
   border-color: #95de64;
@@ -1367,43 +1367,43 @@
 }
 /* 预选赛：与页面背景区分；卡片白底描边 */
 .tmElimStageCard.ant-card {
-  background: #eceef2;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: var(--card);
+  border: 1px solid var(--border-default);
 }
 .tmElimStageCard .ant-card-head {
-  border-bottom-color: rgba(0, 0, 0, 0.08);
+  border-bottom-color: var(--border-default);
 }
 .tmElimStageCard .ant-card-head-title {
-  color: rgba(0, 0, 0, 0.88) !important;
+  color: var(--foreground) !important;
 }
-/* 预选赛内区：固定浅色主题（不要绑正赛 bracketCssVars，否则白字落在白/浅灰底上） */
+/* 预选赛跟随站点主题，独立于现场对阵图的自定义舞台配色。 */
 .tmElimRoot {
   margin-top: 4px;
   padding: 12px;
   border-radius: 8px;
-  background: #e2e5ea;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: var(--muted);
+  border: 1px solid var(--border-default);
   box-sizing: border-box;
   --tm-br-page-bg: transparent;
-  --tm-br-hint-color: rgba(0, 0, 0, 0.48);
-  --tm-br-wing-title-color: rgba(0, 0, 0, 0.55);
-  --tm-br-block-title-color: rgba(0, 0, 0, 0.78);
+  --tm-br-hint-color: var(--muted-foreground);
+  --tm-br-wing-title-color: var(--muted-foreground);
+  --tm-br-block-title-color: var(--foreground);
   --tm-br-team-line-font: 15px;
-  --tm-br-team-line-color: rgba(0, 0, 0, 0.88);
+  --tm-br-team-line-color: var(--foreground);
   --tm-br-vs-font: 13px;
-  --tm-br-vs-color: rgba(0, 0, 0, 0.4);
+  --tm-br-vs-color: var(--muted-foreground);
   --tm-br-match-id-font: 12px;
-  --tm-br-match-id-color: rgba(0, 0, 0, 0.55);
-  --tm-br-card-bg: #ffffff;
-  --tm-br-card-border: rgba(0, 0, 0, 0.12);
-  --tm-br-click-border: #1677ff;
-  --tm-br-bronze-hint-color: rgba(0, 0, 0, 0.45);
+  --tm-br-match-id-color: var(--muted-foreground);
+  --tm-br-card-bg: var(--card);
+  --tm-br-card-border: var(--border-default);
+  --tm-br-click-border: var(--accent);
+  --tm-br-bronze-hint-color: var(--muted-foreground);
 }
 .tmElimRoot .tmElimToolbarHint.ant-typography-secondary {
-  color: rgba(0, 0, 0, 0.52) !important;
+  color: var(--muted-foreground) !important;
 }
 .tmElimRoot .tmElimWaveTitle.ant-typography {
-  color: rgba(0, 0, 0, 0.88) !important;
+  color: var(--foreground) !important;
 }
 .tmElimRoot .tmBracketTeamLine.tmBracketWinner {
   color: #135200 !important;
@@ -1416,16 +1416,16 @@
   text-shadow: none !important;
 }
 .tmElimMatchCard.ant-card {
-  background: #fff !important;
-  border: 1px solid rgba(0, 0, 0, 0.12) !important;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  background: var(--card) !important;
+  border: 1px solid var(--border-default) !important;
+  box-shadow: var(--shadow-card);
 }
 .tmElimRoot .tmElimMatchCard .ant-card-head {
-  border-bottom-color: rgba(0, 0, 0, 0.08) !important;
+  border-bottom-color: var(--border-default) !important;
 }
 .tmElimRoot .tmBracketMatchCard.tmBracketMatchCardClickable:hover {
-  border-color: #1677ff !important;
-  box-shadow: 0 4px 14px rgba(22, 119, 255, 0.2);
+  border-color: var(--accent) !important;
+  box-shadow: var(--shadow-float);
 }
 .tmElimMatchTeams {
   gap: 2px;
@@ -1445,7 +1445,7 @@
 }
 .tmElimWaveBlock {
   padding-bottom: 4px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  border-bottom: 1px solid var(--border-default);
 }
 .tmElimWaveTitle {
   margin-bottom: 12px !important;
@@ -1460,4 +1460,71 @@
 .tmElimMatchCard {
   flex: 1 1 220px;
   max-width: 360px;
+}
+
+/* Setup and administration use the site palette; live arenas keep their own theme. */
+.tm-workbench { display: flex; flex-direction: column; gap: 24px; min-width: 0; color: var(--foreground); font-family: var(--font-body); }
+.tm-workbench > .tmJsonToolbar { padding: 12px 16px; border: 1px solid var(--border-default); border-radius: 12px; background: var(--card); }
+.tm-workbench .ant-card:not(.tmBracketMatchCard), .tm-workbench-modal .ant-card { border-radius: var(--radius-card, 1rem); border-color: var(--border-default); background: var(--card); box-shadow: var(--shadow-card); }
+.tm-workbench > .tm-workbench-main.ant-card { border: 0; background: transparent; box-shadow: none; }
+.tm-workbench .tm-workbench-main > .ant-card-body { padding: 0; }
+.tm-workbench .ant-card-head { min-height: 56px; border-color: var(--border-default); padding-inline: 20px; }
+.tm-workbench .ant-card-head-title { font-family: var(--font-heading); font-weight: 650; }
+.tm-workbench .ant-card-body { padding: 20px; min-width: 0; }
+.tm-workbench :is(.ant-space, .ant-space-item, .ant-flex) { min-width: 0; max-width: 100%; }
+.tm-workbench .ant-steps { padding: 16px; border: 1px solid var(--border-default); border-radius: var(--radius-card, 1rem); background: var(--card); }
+.tm-workbench .ant-form-inline { gap: 12px 0; }
+.tm-workbench .ant-form-item-label > label, .tm-workbench-modal .ant-form-item-label > label { color: var(--muted-foreground); }
+.tm-workbench :is(.ant-input, .ant-input-affix-wrapper, .ant-input-number, .ant-select-selector),
+.tm-workbench-modal :is(.ant-input, .ant-input-affix-wrapper, .ant-input-number, .ant-select-selector) { border-radius: 10px; border-color: var(--border-default); }
+.tm-workbench .ant-btn, .tm-workbench-modal .ant-btn { border-radius: 10px; box-shadow: none; }
+.tm-workbench .ant-btn-default, .tm-workbench-modal .ant-btn-default { background: var(--card); border-color: var(--border-default); }
+.tm-workbench .ant-table-wrapper, .tm-workbench-modal .ant-table-wrapper { min-width: 0; max-width: 100%; border: 1px solid var(--border-default); border-radius: 12px; overflow: hidden; }
+.tm-workbench .ant-table-content, .tm-workbench-modal .ant-table-content { overflow-x: auto; overscroll-behavior-x: contain; }
+.tm-workbench .ant-table-thead > tr > th, .tm-workbench-modal .ant-table-thead > tr > th { background: var(--muted); color: var(--muted-foreground); font-weight: 600; }
+.tm-workbench .ant-table-cell, .tm-workbench-modal .ant-table-cell { font-variant-numeric: tabular-nums; }
+.tm-workbench .ant-radio-button-wrapper, .tm-workbench-modal .ant-radio-button-wrapper { min-height: 36px; height: auto; }
+.tm-workbench .tmDrawCell { background: var(--card); }
+.tm-workbench .tmDrawCellSeed, .tm-workbench .tmDrawPairSideSeed { background: color-mix(in srgb, var(--signal-success) 8%, var(--card)); }
+.tm-workbench .tmElimStageCard.ant-card { background: var(--card); border-color: var(--border-default); }
+.tm-workbench .tmElimStageCard .ant-card-head-title { color: var(--foreground) !important; }
+.tmElimRoot {
+  background: var(--muted); border-color: var(--border-default); border-radius: var(--radius-card, 1rem); padding: 16px;
+}
+.tmElimRoot .tmElimMatchCard.ant-card { border-radius: 12px; background: var(--card) !important; border-color: var(--border-default) !important; box-shadow: var(--shadow-card); }
+.tmElimRoot .tmBracketTeamLine.tmBracketWinner, .tmElimRoot .tmBracketTeamLine.tmBracketWinner .tmBracketTeamName { color: var(--foreground) !important; }
+.tm-workbench-modal { font-family: var(--font-body); max-width: calc(100vw - 24px); }
+.tm-workbench-modal :is(.ant-modal-content, .ant-modal-container) { border-radius: var(--radius-card, 1rem); background: var(--card); box-shadow: var(--shadow-float); padding: 24px; }
+.tm-workbench-modal .ant-modal-header { background: transparent; padding-bottom: 14px; border-bottom: 1px solid var(--border-default); }
+.tm-workbench-modal .ant-modal-title { font-family: var(--font-heading); }
+.tm-workbench-modal .ant-modal-body { max-height: calc(100dvh - 240px); overflow: auto; overscroll-behavior: contain; padding-block: 8px; }
+.tm-workbench-modal .ant-modal-footer { padding-top: 14px; border-top: 1px solid var(--border-default); }
+.tm-workbench-modal .ant-tabs-tab { padding: 10px 14px; border-radius: 10px; }
+.tm-workbench-modal .ant-tabs-tab-active { background: var(--accent-soft); }
+.tm-workbench .ant-card-small .ant-card-body { padding: 14px; }
+.tm-workbench .ant-card-small .ant-card-head { min-height: 48px; }
+.tm-workbench .ant-card-head-wrapper { flex-wrap: wrap; gap: 8px; }
+.tm-workbench .ant-card-head-title { white-space: normal; }
+.tm-workbench :is(button, input, textarea):focus-visible, .tm-workbench-modal :is(button, input, textarea):focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media (max-width: 640px) {
+  .tm-workbench { gap: 16px; }
+  .tm-workbench .ant-card-body { padding: 14px; }
+  .tm-workbench .ant-card-head { padding-inline: 14px; }
+  .tm-workbench .ant-form-inline { flex-direction: column; align-items: stretch; }
+  .tm-workbench .ant-form-inline .ant-form-item { margin-inline-end: 0; }
+  .tm-workbench .ant-form-inline :is(.ant-input, .ant-select) { width: 100% !important; }
+  .tm-workbench .ant-table { font-size: 12px; }
+  .tm-workbench .ant-table-cell { padding: 10px 8px !important; }
+  .tm-workbench-modal :is(.ant-modal-content, .ant-modal-container) { padding: 16px; }
+  .tm-workbench-modal { top: 12px; padding-bottom: 12px; }
+  .tm-workbench-modal .ant-modal-body { max-height: calc(100dvh - 180px); }
+  .tm-workbench :is(input, textarea), .tm-workbench-modal :is(input, textarea) { font-size: 16px; }
+  .tm-workbench .ant-btn, .tm-workbench-modal .ant-btn { min-height: 36px; height: auto; }
+  .tmDrawGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tmElimRoot { padding: 10px; }
+  .tmElimMatchCard { max-width: 100%; }
+  .tmBracketWing { max-width: 100%; overflow-x: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tm-workbench *, .tm-workbench-modal *, .tmPkArenaBg, .tmFistLeft, .tmFistRight { animation: none !important; transition: none !important; }
 }

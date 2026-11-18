@@ -2,6 +2,8 @@
 
 import cityEnglishToProvinceJson from './data/chinaCityEnglishToProvinceMeta.json';
 import { pinyinLookupVariants } from '@/views/Wca/PlayerComponents/region/china_citys';
+import type { Locale } from '@/i18n/locales';
+import { wcaPuzzleExtraZhCN, translateWcaPuzzleExtra, type WcaPuzzleExtraKey } from '@/i18n/messages/wca-puzzle-extra';
 
 export interface ChinaProvinceMeta {
   mapNameZh: string;
@@ -186,7 +188,7 @@ export const MAP_NAME_ZH_TO_EN: Record<string, string> = {
   澳门特别行政区: 'Macau',
 };
 
-export function displayProvinceName(mapNameZh: string, localeZh: boolean): string {
-  if (localeZh) return mapNameZh;
-  return MAP_NAME_ZH_TO_EN[mapNameZh] || mapNameZh;
+export function displayProvinceName(mapNameZh: string, locale: Locale): string {
+  const key = `wcaPuzzleExtra.province.${MAP_NAME_ZH_TO_EN[mapNameZh]}` as WcaPuzzleExtraKey;
+  return Object.hasOwn(wcaPuzzleExtraZhCN, key) ? translateWcaPuzzleExtra(locale, key) : mapNameZh;
 }

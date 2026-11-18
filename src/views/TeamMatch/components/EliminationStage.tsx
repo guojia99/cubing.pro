@@ -17,6 +17,7 @@ import { Card, Space, Typography } from 'antd';
 import classNames from 'classnames';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import '../TeamMatch.css';
+import { useTeamMatchI18n } from '../i18n';
 
 type ElimMatchCardProps = {
   m: EliminationGroupMatch;
@@ -76,6 +77,7 @@ type EliminationStageProps = {
 };
 
 const EliminationStage: React.FC<EliminationStageProps> = ({ liveSettings, onOpenLiveSettings }) => {
+  const { t, locale } = useTeamMatchI18n();
   const { state, dispatch } = useTeamMatchStore();
   const { session } = state;
   const { teams, players, schools, seeding } = session;
@@ -116,7 +118,7 @@ const EliminationStage: React.FC<EliminationStageProps> = ({ liveSettings, onOpe
               name: p.name,
               avatarDataUrl: p.avatarDataUrl,
               schoolName: schoolNameForPlayer(p, schools),
-              scoresLine: formatPlayerSingleAverageLine(entry),
+              scoresLine: formatPlayerSingleAverageLine(entry, locale),
               playerBattlecry: (p.battlecry ?? '').trim(),
               wcaId: p.wcaId ?? null,
             };
@@ -129,7 +131,7 @@ const EliminationStage: React.FC<EliminationStageProps> = ({ liveSettings, onOpe
         };
       })
       .filter(Boolean) as PkGroupArenaColumn[];
-  }, [focused, teams, playerById, seeding, schools, eventId]);
+  }, [focused, teams, playerById, seeding, schools, eventId, locale]);
 
   useEffect(() => {
     if (!pkOpen || !focused?.pk) return;
@@ -165,7 +167,7 @@ const EliminationStage: React.FC<EliminationStageProps> = ({ liveSettings, onOpe
   if (!elim?.matches.length) {
     return (
       <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
-        请先在「淘汰赛抽签」完成随机分组。
+        {t('teamMatch.elimFirst')}
       </Typography.Paragraph>
     );
   }
@@ -175,7 +177,7 @@ const EliminationStage: React.FC<EliminationStageProps> = ({ liveSettings, onOpe
       <div className="tmElimToolbar">
         <Space wrap>
           <Typography.Text type="secondary" className="tmElimToolbarHint">
-            每张卡片 = 一场小组（多队同一次 PK）。点击卡片进入<strong>全屏对战</strong>，再点「录入成绩」打开弹窗。
+            {t('teamMatch.elimCards')}
           </Typography.Text>
           <LiveSettingsButton type="default" size="small" onClick={onOpenLiveSettings} />
         </Space>
@@ -185,8 +187,8 @@ const EliminationStage: React.FC<EliminationStageProps> = ({ liveSettings, onOpe
         {waves.map((row, wi) => (
           <div key={wi} className="tmElimWaveBlock">
             <Typography.Title level={5} className="tmElimWaveTitle">
-              {waves.length > 1 ? `第 ${wi + 1} 波 · ` : ''}
-              {row.length} 场小组
+              {waves.length > 1 ? t('teamMatch.wave', { count: wi + 1 }) : ''}
+              {t('teamMatch.groupMatches', { count: row.length })}
             </Typography.Title>
             <div className="tmElimWaveRow">
               {row.map((m) => (
@@ -218,7 +220,7 @@ const EliminationStage: React.FC<EliminationStageProps> = ({ liveSettings, onOpe
         players={players}
         draft={pkDraft}
         onDraftChange={setPkDraft}
-        modalTitle="预选赛 · 小组录入"
+        modalTitle={t('teamMatch.groupEntry')}
         onSettle={() => {
           dispatch({ type: 'PK_SETTLE', matchId: focused!.id, results: pkDraft });
         }}

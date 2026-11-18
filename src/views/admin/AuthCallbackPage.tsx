@@ -1,6 +1,7 @@
 "use client";
 
-import { Center, Spinner, Text, VStack } from "@chakra-ui/react";
+import { Center, Spinner, Text } from "@chakra-ui/react";
+import { Surface } from "@/components/ui/page";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 
@@ -38,10 +39,10 @@ export function AuthCallbackPage() {
 
   return (
     <Center minH="40vh">
-      <VStack gap="4">
+      <Surface display="flex" flexDirection="column" alignItems="center" gap="4" p="8">
         <Spinner size="lg" color="brand.solid" />
         <Text color="fg.muted">{t("auth.callbackLoading")}</Text>
-      </VStack>
+      </Surface>
     </Center>
   );
 }

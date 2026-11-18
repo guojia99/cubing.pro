@@ -6,7 +6,9 @@ import type { PuzzleID, TwistyPlayer } from "cubing/twisty";
 import type { Material, Mesh } from "three";
 
 import { useI18n } from "@/contexts/I18nProvider";
+import { translatePuzzleExtra as extra } from "@/i18n/messages/puzzle-extra";
 import { CUBE_COLOR_HEX } from "./preferences";
+import { localizePuzzleError } from "./localizePuzzleError";
 
 type Props = {
   puzzle: PuzzleID;
@@ -26,7 +28,6 @@ const PREFERENCE_COLORS = ["white", "green", "red", "blue", "orange", "yellow"] 
 
 export default function TwistyPuzzlePlayer({ puzzle, setup, alg, colors, stickering, height }: Props) {
   const { locale } = useI18n();
-  const zh = locale !== "en-US";
   const host = useRef<HTMLDivElement>(null);
   const player = useRef<TwistyPlayer | null>(null);
   const speed = useRef(1);
@@ -205,17 +206,17 @@ export default function TwistyPuzzlePlayer({ puzzle, setup, alg, colors, sticker
         <Box ref={host} position="absolute" inset="0" visibility={ready ? "visible" : "hidden"} />
         {!ready ? (
           <Flex position="absolute" inset="0" align="center" justify="center" p="4" overflowY="auto">
-            <Text role={error ? "alert" : "status"} fontSize="sm" color={error ? "fg.error" : "fg.muted"} overflowWrap="anywhere">
-              {error ? `${zh ? "无法播放：" : "Cannot play: "}${error}` : zh ? "正在加载 3D..." : "Loading 3D..."}
+            <Text role={error ? "alert" : "status"} title={error} fontSize="sm" color={error ? "fg.error" : "fg.muted"} overflowWrap="anywhere">
+              {error ? `${extra(locale, "puzzleExtra.cannotPlay")}${localizePuzzleError(error, locale)}` : extra(locale, "puzzleExtra.loading3d")}
             </Text>
           </Flex>
         ) : null}
       </Box>
       <Flex align="center" justify="space-between" wrap="wrap" gap="2" p={{ base: "2", md: "3" }} borderTopWidth="1px" borderColor="border.subtle">
         <Flex as="label" align="center" gap="2" fontSize="sm">
-          {zh ? "速度" : "Tempo"}
+          {extra(locale, "puzzleExtra.tempo")}
           <select
-            aria-label={zh ? "播放速度" : "Playback tempo"}
+            aria-label={extra(locale, "puzzleExtra.speed")}
             value={tempo}
             disabled={!ready}
             style={{ color: "inherit", background: "var(--chakra-colors-bg)", border: "1px solid var(--chakra-colors-border)", borderRadius: 6, padding: "6px 8px", minHeight: 36 }}
@@ -232,7 +233,7 @@ export default function TwistyPuzzlePlayer({ puzzle, setup, alg, colors, sticker
         <Button size="sm" variant="outline" disabled={!ready} onClick={() => {
           player.current?.experimentalModel.twistySceneModel.orbitCoordinatesRequest.set("auto");
         }}>
-          {zh ? "重置视角" : "Reset view"}
+          {extra(locale, "puzzleExtra.resetView")}
         </Button>
       </Flex>
     </Box>

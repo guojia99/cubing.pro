@@ -29,6 +29,8 @@
     "test:two-solver:formula": "node src/views/TwoSolver/twoSolver.formula.browser.test.mjs",
     "test:puzzles:native": "node src/components/puzzles/nativeTwoByTwo.regression.test.mjs",
     "test:static-export": "node --test src/lib/staticExportPaths.test.mjs scripts/static-export.test.mjs",
+    "check:i18n": "node scripts/check-i18n.mjs",
+    "test:i18n": "tsx --test src/i18n/catalogs.test.ts src/i18n/plurals.test.ts src/i18n/formatMessage.test.ts src/lib/localizedContent.test.ts",
     "lint": "eslint ."
   },
   "dependencies": {

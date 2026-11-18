@@ -89,6 +89,7 @@ function StepRow({ step, index, isLast }: { step: SolutionStep; index: number; i
 
       <Box
         flex="1"
+        minW="0"
         borderWidth="1px"
         borderColor={borderColor}
         borderRadius="md"
@@ -97,7 +98,7 @@ function StepRow({ step, index, isLast }: { step: SolutionStep; index: number; i
         bg={rowBg}
       >
         <Grid
-          templateColumns={`${MOVE_COL_W} 1fr`}
+          templateColumns={`${MOVE_COL_W} minmax(0, 1fr)`}
           columnGap="3"
           rowGap="2"
           alignItems="center"

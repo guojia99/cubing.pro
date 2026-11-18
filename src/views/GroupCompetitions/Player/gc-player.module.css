@@ -4,9 +4,9 @@
   max-width: 100%;
   min-width: 0;
   box-sizing: border-box;
-  color: var(--ant-color-text, inherit);
-  background: var(--ant-color-bg-layout);
-  border-radius: var(--ant-border-radius-lg, 8px);
+  color: var(--foreground);
+  background: transparent;
+  border-radius: var(--radius-card);
   padding: 12px;
 }
 
@@ -18,15 +18,15 @@
 
 .playerPageRoot :global(.ant-card) {
   max-width: 100%;
-  background: var(--ant-color-bg-elevated, var(--ant-color-bg-container)) !important;
-  border: 2px solid var(--ant-color-border) !important;
-  box-shadow:
-    0 0 0 1px var(--ant-color-border-secondary),
-    var(--ant-box-shadow-secondary, 0 2px 8px rgba(0, 0, 0, 0.08)) !important;
+  background: var(--card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
 }
 
 .playerPageRoot :global(.ant-card .ant-card-body) {
-  background: var(--ant-color-bg-elevated, var(--ant-color-bg-container)) !important;
+  background: transparent;
+  border-radius: inherit;
 }
 
 .playerPageRoot :global(.ant-tabs-nav-wrap) {
@@ -44,70 +44,71 @@
 }
 
 .playerDetailWrap {
-  padding: 12px;
+  margin-bottom: 24px;
+  padding: 0;
   max-width: 100%;
   box-sizing: border-box;
 }
 
 .playerDetailWrap h2,
 .playerDetailWrap h3 {
-  color: var(--ant-color-text-heading, var(--ant-color-text, inherit));
+  color: var(--foreground);
 }
 
 .playerDetailWrap :global(.cube-player-best-table .ant-table),
 .playerDetailWrap :global(.cube-player-detail-meta-table .ant-table) {
-  background: var(--ant-color-bg-container) !important;
-  color: var(--ant-color-text);
+  background: var(--card) !important;
+  color: var(--foreground);
 }
 
 .playerDetailWrap :global(.cube-player-best-table .ant-table-container),
 .playerDetailWrap :global(.cube-player-detail-meta-table .ant-table-container) {
-  background: var(--ant-color-bg-container) !important;
+  background: var(--card) !important;
 }
 
 .playerDetailWrap :global(.cube-player-best-table .ant-table-thead > tr > th),
 .playerDetailWrap :global(.cube-player-detail-meta-table .ant-table-thead > tr > th) {
-  background: var(--ant-color-fill-tertiary) !important;
-  color: var(--ant-color-text) !important;
-  border-bottom-color: var(--ant-color-border-secondary) !important;
+  background: var(--muted) !important;
+  color: var(--foreground) !important;
+  border-bottom-color: var(--border-default) !important;
 }
 
 .playerDetailWrap :global(.cube-player-detail-meta-table .ant-table-tbody > tr > td) {
-  background: var(--ant-color-bg-container) !important;
-  color: var(--ant-color-text) !important;
-  border-color: var(--ant-color-border-secondary);
+  background: var(--card) !important;
+  color: var(--foreground) !important;
+  border-color: var(--border-default);
 }
 
 .playerDetailWrap :global(.cube-player-best-table tr.lightitem > td) {
-  background: var(--ant-color-fill-alter) !important;
-  color: var(--ant-color-text) !important;
+  background: var(--card) !important;
+  color: var(--foreground) !important;
 }
 
 .playerDetailWrap :global(.cube-player-best-table tr.darkitem > td) {
-  background: var(--ant-color-fill-tertiary) !important;
-  color: var(--ant-color-text) !important;
+  background: var(--muted) !important;
+  color: var(--foreground) !important;
 }
 
 .playerDetailWrap :global(.cube-player-best-table .ant-table-tbody > tr:hover > td),
 .playerDetailWrap :global(.cube-player-detail-meta-table .ant-table-tbody > tr:hover > td) {
-  background: var(--ant-color-fill-tertiary) !important;
+  background: var(--muted) !important;
 }
 
 .playerDetailWrap :global(.cube-player-best-table .ant-table-cell-fix-left) {
-  background: var(--ant-color-bg-container) !important;
+  background: var(--card) !important;
 }
 
 .playerDetailWrap :global(.cube-player-best-table tr.lightitem > td.ant-table-cell-fix-left) {
-  background: var(--ant-color-fill-alter) !important;
+  background: var(--card) !important;
 }
 
 .playerDetailWrap :global(.cube-player-best-table tr.darkitem > td.ant-table-cell-fix-left) {
-  background: var(--ant-color-fill-tertiary) !important;
+  background: var(--muted) !important;
 }
 
 @media (min-width: 576px) {
   .playerDetailWrap {
-    padding: 24px;
+    padding: 0;
   }
 }
 

@@ -4,6 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import type { TwistyPlayer } from "cubing/twisty";
 import type { Material, Mesh } from "three";
 import { createNativeQueue } from "./nativeQueue";
+import { useI18n } from "@/contexts/I18nProvider";
+import { translateWcaPuzzleExtra as extra } from "@/i18n/messages/wca-puzzle-extra";
+import { localizePuzzleError } from "./localizePuzzleError";
 
 export type NativeTwoByTwoProps = {
   setup: string;
@@ -403,12 +406,21 @@ function thumbnail(key: string, request: Request) {
 }
 
 export default function NativeTwoByTwo({ setup, alg, colors, height, interactive = false }: NativeTwoByTwoProps) {
+  const { locale } = useI18n();
+  const label = extra(locale, "wcaPuzzleExtra.nativePlayer");
+  const currentLabel = useRef(label);
+  const nativeRoot = useRef<HTMLElement | null>(null);
   const host = useRef<HTMLDivElement>(null);
   const palette = JSON.stringify(FACES.map((face, index) => colors[face] || DEFAULT_COLORS[index]));
   const key = JSON.stringify([setup, alg, palette, interactive]);
   const [result, setResult] = useState<{ key: string; src?: string; error?: string }>();
   const current = result?.key === key ? result : undefined;
   const viewportHeight = Number.isFinite(height) ? Math.max(120, height) : 180;
+
+  useEffect(() => {
+    currentLabel.current = label;
+    nativeRoot.current?.setAttribute("aria-label", label);
+  }, [label]);
 
   useEffect(() => {
     const container = host.current;
@@ -451,7 +463,8 @@ export default function NativeTwoByTwo({ setup, alg, colors, height, interactive
       // Zag follows expanded aria-controls regions, including their shadow DOM.
       slot.root.id = "native-two-by-two-interactive";
       slot.root.setAttribute("role", "region");
-      slot.root.setAttribute("aria-label", "2x2x2 player");
+      nativeRoot.current = slot.root;
+      slot.root.setAttribute("aria-label", currentLabel.current);
       container.setAttribute("aria-controls", slot.root.id);
       container.setAttribute("aria-expanded", "true");
       const dialog = container.closest<HTMLElement>('[role="dialog"]');
@@ -535,6 +548,7 @@ export default function NativeTwoByTwo({ setup, alg, colors, height, interactive
       slot.root.removeAttribute("aria-hidden");
       align();
       release = () => {
+        nativeRoot.current = null;
         cancelAnimationFrame(frame);
         slot.root.removeEventListener("keydown", bridgeTab);
         dialog?.removeEventListener("keydown", bridgeTab);
@@ -569,13 +583,13 @@ export default function NativeTwoByTwo({ setup, alg, colors, height, interactive
       {!interactive && current?.src ? (
         // This is a native canvas PNG, not an external/optimizable image URL.
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={current.src} alt="2x2x2" width={180} height={180} draggable={false}
+        <img src={current.src} alt={extra(locale, "wcaPuzzleExtra.nativeDiagram")} width={180} height={180} draggable={false}
           style={{ display: "block", width: "100%", height: "100%", objectFit: "contain" }} />
       ) : null}
       {!current || current.error ? (
-        <span role={current?.error ? "alert" : "status"}
+        <span role={current?.error ? "alert" : "status"} title={current?.error}
           style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", padding: 8, overflowWrap: "anywhere", fontSize: 12 }}>
-          {current?.error || "Loading 2x2x2..."}
+          {current?.error ? localizePuzzleError(current.error, locale) : extra(locale, "wcaPuzzleExtra.nativeLoading")}
         </span>
       ) : null}
     </div>

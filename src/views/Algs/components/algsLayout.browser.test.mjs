@@ -96,6 +96,11 @@ try {
 
   await page.setViewportSize({ width: 1440, height: 900 });
   const separator = page.getByRole('separator', { name: '调整筛选与公式区域宽度' });
+  await page.waitForFunction(() => {
+    const pane = document.querySelector('.algs-detail-navigation');
+    const divider = document.querySelector('.algs-detail-resizer');
+    return pane.getBoundingClientRect().width >= 280 && Math.abs(pane.getBoundingClientRect().width - Number(divider.getAttribute('aria-valuenow'))) < 1;
+  });
   const paneBefore = await page.locator('.algs-detail-navigation').boundingBox();
   const dividerBefore = await separator.boundingBox();
   await page.mouse.move(dividerBefore.x + dividerBefore.width / 2, 420);

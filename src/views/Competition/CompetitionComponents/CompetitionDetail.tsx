@@ -3,11 +3,12 @@ import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import Markdown from '@/components/Markdown/Markdown';
 import { CompAPI } from '@/services/cubing-pro/comps/typings';
 import { parseDateTime } from '@/utils/time/data_time';
-import { beijingDate, isGroupCompetition, publicCompetitionStatus } from '@/lib/groupCompetition';
+import { beijingDate, competitionWindow, isGroupCompetition } from '@/lib/groupCompetition';
 import { Card, Descriptions, Table, Tag } from 'antd';
 import React from 'react';
 import '@wangeditor/editor/dist/css/style.css';
 import {EditorView} from "@/components/Markdown/editer";
+import { useI18n } from '@/contexts/I18nProvider';
 
 // 定义组件的属性类型
 interface CompetitionDetailProps {
@@ -15,15 +16,16 @@ interface CompetitionDetailProps {
 }
 
 const CompetitionDetail: React.FC<CompetitionDetailProps> = ({ comp }) => {
+  const { t, tf, locale } = useI18n();
   let bodys: React.ReactNode[] = [];
 
   // 比赛类型 todo 抽
   const mp = {
     1: { GenreLabel: 'WCA', GenreColor: 'blue', wca: true },
-    2: { GenreLabel: '线下正式赛', GenreColor: 'green' },
-    3: { GenreLabel: '线上正式赛', GenreColor: 'red' },
-    4: { GenreLabel: '线下赛', GenreColor: 'orange' },
-    5: { GenreLabel: '线上赛', GenreColor: 'purple' },
+    2: { GenreLabel: t('competitionAdmin.officialOffline'), GenreColor: 'green' },
+    3: { GenreLabel: t('competitionAdmin.officialOnline'), GenreColor: 'red' },
+    4: { GenreLabel: t('competitionAdmin.offline'), GenreColor: 'orange' },
+    5: { GenreLabel: t('competitionAdmin.online'), GenreColor: 'purple' },
   };
   const key = comp?.data.Genre + '';
   // @ts-ignore with mp[key]
@@ -40,29 +42,35 @@ const CompetitionDetail: React.FC<CompetitionDetailProps> = ({ comp }) => {
   bodys.push(
     <div key={'__comps_detail_status_key'}>
       <Card style={{ marginBottom: '20px' }}>
-        <Descriptions column={1} title="比赛性质">
-          <Descriptions.Item label="类型">
+        <Descriptions column={1} title={t('competitionAdmin.nature')}>
+          <Descriptions.Item label={t('competitionAdmin.type')}>
             {<Tag color={GenreColor}>{GenreLabel}</Tag>}
           </Descriptions.Item>
-          {comp && isGroupCompetition(comp.data) && <Descriptions.Item label="状态">{publicCompetitionStatus(comp.data)}</Descriptions.Item>}
+          {comp && isGroupCompetition(comp.data) && <Descriptions.Item label={t('competitionAdmin.status')}>
+            {comp.data.Status === 'Running'
+              ? t(comp.data.IsDone || Date.now() >= competitionWindow(comp.data).end
+                ? 'competitionAdmin.ended'
+                : Date.now() < competitionWindow(comp.data).start ? 'competitionAdmin.upcoming' : 'competitionAdmin.ongoing')
+              : t(({ Reviewing: 'competitionAdmin.reviewing', Reject: 'competitionAdmin.rejected', Temporary: 'competitionAdmin.draft', Ban: 'competitionAdmin.banned' } as const)[comp.data.Status as 'Reviewing' | 'Reject' | 'Temporary' | 'Ban'] ?? 'competitionAdmin.other')}
+          </Descriptions.Item>}
 
           {wca && (
-            <Descriptions.Item label="认证">
-              WCA认证
+            <Descriptions.Item label={t('competitionAdmin.certification')}>
+              {t('competitionAdmin.wcaCertified')}
               <img
                 src="/images/wca.svg"
-                alt="wca_icon"
+                alt="WCA"
                 style={{ width: 16, marginLeft: 8 }}
               />
             </Descriptions.Item>
           )}
 
-          <Descriptions.Item label="成绩登记">
-            {comp?.data.CanPreResult ? '可自行上传' : '主办录入'}
+          <Descriptions.Item label={t('competitionAdmin.resultEntry')}>
+            {t(comp?.data.CanPreResult ? 'competitionAdmin.selfUpload' : 'competitionAdmin.organizerEntry')}
           </Descriptions.Item>
 
-          <Descriptions.Item label="自动审批">
-            {comp?.data.AutomaticReview ? '是' : '否'}
+          <Descriptions.Item label={t('competitionAdmin.autoReview')}>
+            {t(comp?.data.AutomaticReview ? 'competitionAdmin.yes' : 'competitionAdmin.no')}
           </Descriptions.Item>
         </Descriptions>
       </Card>
@@ -73,8 +81,8 @@ const CompetitionDetail: React.FC<CompetitionDetailProps> = ({ comp }) => {
   bodys.push(
     <div key={'__comps_detail_city_key'}>
       <Card style={{ marginBottom: '20px' }}>
-        <Descriptions column={1} title="赛场">
-          <Descriptions.Item label="城市">{comp?.data.City}</Descriptions.Item>
+        <Descriptions column={1} title={t('competitionAdmin.venue')}>
+          <Descriptions.Item label={t('competitionAdmin.city')}>{comp?.data.City}</Descriptions.Item>
           {/*<Descriptions.Item label="地点">*/}
           {/*  {"xxx市xxx区xxxx地点"}*/}
           {/*</Descriptions.Item>*/}
@@ -88,16 +96,16 @@ const CompetitionDetail: React.FC<CompetitionDetailProps> = ({ comp }) => {
     bodys.push(
       <div key={'__comps_detail_org_key'}>
         <Card style={{ marginBottom: '20px' }}>
-          <Descriptions column={1} title="主办团队">
-            <Descriptions.Item label="主办">{comp.data.Org.Name}</Descriptions.Item>
+          <Descriptions column={1} title={t('competitionAdmin.organizerTeam')}>
+            <Descriptions.Item label={t('competitionAdmin.organizer')}>{comp.data.Org.Name}</Descriptions.Item>
             {comp.data.Org.Email && (
-              <Descriptions.Item label="邮箱">{comp.data.Org.Email}</Descriptions.Item>
+              <Descriptions.Item label={t('competitionAdmin.email')}>{comp.data.Org.Email}</Descriptions.Item>
             )}
             {comp.data.Group.qq_groups && (
               <Descriptions.Item label="QQ">{comp.data.Group.qq_groups}</Descriptions.Item>
             )}
             {comp.data.Group.name && (
-              <Descriptions.Item label="QQ群">{comp.data.Group.name}</Descriptions.Item>
+              <Descriptions.Item label={t('competitionAdmin.qqGroup')}>{comp.data.Group.name}</Descriptions.Item>
             )}
           </Descriptions>
         </Card>
@@ -111,35 +119,35 @@ const CompetitionDetail: React.FC<CompetitionDetailProps> = ({ comp }) => {
     bodys.push(
       <div key={'__comps_detail_times_key'}>
         <Card style={{ marginBottom: '20px' }}>
-          <Descriptions column={1} title="比赛时间">
-            <Descriptions.Item label={isGroupCompetition(comp.data) ? "开始日（北京时间）" : "开赛时间"}>
+          <Descriptions column={1} title={t('competitionAdmin.competitionTimes')}>
+            <Descriptions.Item label={t(isGroupCompetition(comp.data) ? 'competitionAdmin.startBeijing' : 'competitionAdmin.startTime')}>
               {isGroupCompetition(comp.data) ? `${beijingDate(comp.data.CompStartTime)} 00:00` : parseDateTime(comp.data.CompStartTime)}
             </Descriptions.Item>
 
-            <Descriptions.Item label={isGroupCompetition(comp.data) ? "结束日（北京时间）" : "结束时间"}>
-              {isGroupCompetition(comp.data) ? `${beijingDate(comp.data.CompEndTime)}（含全天，次日 00:00 截止）` : parseDateTime(comp.data.CompEndTime)}
+            <Descriptions.Item label={t(isGroupCompetition(comp.data) ? 'competitionAdmin.endBeijing' : 'competitionAdmin.endTime')}>
+              {isGroupCompetition(comp.data) ? tf('competitionAdmin.inclusiveDay', { date: beijingDate(comp.data.CompEndTime) }) : parseDateTime(comp.data.CompEndTime)}
             </Descriptions.Item>
 
             {comp?.data.RegistrationStartTime && (
-              <Descriptions.Item label="报名开始时间">
+              <Descriptions.Item label={t('competitionAdmin.registrationStart')}>
                 {[parseDateTime(comp?.data.RegistrationStartTime)]}
               </Descriptions.Item>
             )}
 
             {comp?.data.RegistrationEndTime && (
-              <Descriptions.Item label="报名结束时间">
+              <Descriptions.Item label={t('competitionAdmin.registrationEnd')}>
                 {[parseDateTime(comp?.data.RegistrationEndTime)]}
               </Descriptions.Item>
             )}
 
             {comp?.data.RegistrationRestartTime && (
-              <Descriptions.Item label="报名重开时间">
+              <Descriptions.Item label={t('competitionAdmin.registrationRestart')}>
                 {[parseDateTime(comp?.data.RegistrationRestartTime)]}
               </Descriptions.Item>
             )}
 
             {comp?.data.RegistrationCancelDeadlineTime && (
-              <Descriptions.Item label="退赛截止时间">
+              <Descriptions.Item label={t('competitionAdmin.withdrawalDeadline')}>
                 {[parseDateTime(comp?.data.RegistrationCancelDeadlineTime)]}
               </Descriptions.Item>
             )}
@@ -153,12 +161,12 @@ const CompetitionDetail: React.FC<CompetitionDetailProps> = ({ comp }) => {
   bodys.push(
     <div key={'__comps_detail_person_key'}>
       <Card style={{ marginBottom: '20px' }}>
-        <Descriptions column={1} title="参赛人数">
-          <Descriptions.Item label="最大限制数">{comp?.data.Count}</Descriptions.Item>
-          <Descriptions.Item label="已报名人数">
+        <Descriptions column={1} title={t('competitionAdmin.competitorCount')}>
+          <Descriptions.Item label={t('competitionAdmin.competitorLimit')}>{comp?.data.Count}</Descriptions.Item>
+          <Descriptions.Item label={t('competitionAdmin.registeredCount')}>
             {comp?.data.RegisterNum ? comp?.data.RegisterNum : 0 + ' / ' + comp?.data.Count}
           </Descriptions.Item>
-          <Descriptions.Item label="已参赛人数">{comp?.data.CompedNum}</Descriptions.Item>
+          <Descriptions.Item label={t('competitionAdmin.competedCount')}>{comp?.data.CompedNum}</Descriptions.Item>
         </Descriptions>
       </Card>
     </div>,
@@ -169,7 +177,7 @@ const CompetitionDetail: React.FC<CompetitionDetailProps> = ({ comp }) => {
   const events = eventMin
     ? eventMin
         .filter((id) => id !== undefined && id !== '')
-        .map((id, i) => CubeIcon(id, `comp_icon_key_${i}_${id}`, { marginLeft: '5px' }))
+        .map((id, i) => CubeIcon(id, `comp_icon_key_${i}_${id}`, { marginLeft: '5px' }, locale))
     : [];
 
   const eventsTable = [];
@@ -186,7 +194,7 @@ const CompetitionDetail: React.FC<CompetitionDetailProps> = ({ comp }) => {
       // events
       if (evs.Schedule !== undefined) {
         // todo 暂时只有长度大小
-        event.Rounds = evs.Schedule.length  + "轮"
+        event.Rounds = tf('competitionAdmin.roundsCount', { count: evs.Schedule.length });
       }
       eventsTable.push(event);
     }
@@ -195,39 +203,39 @@ const CompetitionDetail: React.FC<CompetitionDetailProps> = ({ comp }) => {
   bodys.push(
     <div key={'__comps_detail_events_key'}>
       <Card style={{ marginBottom: '20px' }}>
-        <Descriptions column={1} title="项目" key={'__comps_detail_events_key_Descriptions'}>
-          <Descriptions.Item label="项目列表">{events}</Descriptions.Item>
-          <Descriptions.Item label="项目简表">
+        <Descriptions column={1} title={t('competitionAdmin.event')} key={'__comps_detail_events_key_Descriptions'}>
+          <Descriptions.Item label={t('competitionAdmin.eventList')}>{events}</Descriptions.Item>
+          <Descriptions.Item label={t('competitionAdmin.eventSummary')}>
             <Table
               dataSource={eventsTable}
               rowKey="EventID"
               // @ts-ignore
               columns={[
                 {
-                  title: '项目',
+                  title: t('competitionAdmin.event'),
                   dataIndex: 'EventID',
                   key: 'EventID',
                   width: 135,
                   render: (value) => {
                     return (
                       <>
-                        {CubeIcon(value, value, {})} {CubesCn(value)}
+                        {CubeIcon(value, value, {}, locale)} {CubesCn(value, locale)}
                       </>
                     );
                   },
                 },
                 {
-                  title: '轮次',
+                  title: t('competitionAdmin.round'),
                   dataIndex: 'Rounds',
                   key: 'Rounds',
                   width: 100,
                 },
                 {
-                  title: '费用',
+                  title: t('competitionAdmin.fee'),
                   dataIndex: 'Cols',
                   key: 'Cols',
                   render: () => {
-                    return '0元';
+                    return t('competitionAdmin.zeroYuan');
                   },
                   width: 100,
                 },
@@ -246,11 +254,11 @@ const CompetitionDetail: React.FC<CompetitionDetailProps> = ({ comp }) => {
     <div key={'__comps_detail_other_key'}>
       <Card
         style={{
-          borderRadius: 8,
+          borderRadius: 'var(--radius-card, 1rem)',
           minWidth: '100%',
         }}
       >
-        <Descriptions column={1} title="其他">
+        <Descriptions column={1} title={t('competitionAdmin.other')}>
           <Markdown md={comp?.data.Illustrate} />
           {EditorView(comp?.data.IllustrateHTML ? comp.data.IllustrateHTML : '')}
         </Descriptions>
@@ -258,7 +266,7 @@ const CompetitionDetail: React.FC<CompetitionDetailProps> = ({ comp }) => {
     </div>,
   );
 
-  return <>{bodys}</>;
+  return <div className="competition-detail-grid">{bodys}</div>;
 };
 
 export default CompetitionDetail;

@@ -1,7 +1,8 @@
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import { CubesCn } from '@/components/CubeIcon/cube';
 import { WCALinkWithCnName } from '@/components/Link/WcaLinks';
-import { CountryList, getWcaCountryLabel } from '@/services/cubing-pro/wca/country';
+import { CountryList } from '@/services/cubing-pro/wca/country';
+import { getLocalizedCountryLabel } from '../utils/countryLabel';
 import { GetAllEventsAchievement } from '@/services/cubing-pro/wca/static';
 import { AllEventAvgPersonResults, Country } from '@/services/cubing-pro/wca/types';
 import { eventOrder, EXCLUDED_EVENTS } from '@/views/Wca/utils/events';
@@ -184,7 +185,7 @@ const AllEventsAchievementRank: React.FC = () => {
                   {missing.map((ev) => (
                     <Space key={ev} size={4} className="missing-event-tag">
                       {CubeIcon(ev, `event_${ev}`, {})}
-                      {CubesCn(ev)}
+                      {CubesCn(ev, intl.locale)}
                     </Space>
                   ))}
                 </div>
@@ -200,7 +201,7 @@ const AllEventsAchievementRank: React.FC = () => {
             dataIndex: 'country',
             key: 'country',
             width: 90,
-            render: (val: string) => getWcaCountryLabel(val, countries),
+            render: (val: string) => getLocalizedCountryLabel(val, countries, intl.locale),
           },
         ]
       : []),
@@ -210,7 +211,7 @@ const AllEventsAchievementRank: React.FC = () => {
     .filter((c) => c?.iso2 && !c.name?.includes('Multiple Countries'))
     .map((c) => ({
       value: c.iso2,
-      label: getWcaCountryLabel(c.id, countries),
+      label: getLocalizedCountryLabel(c.id, countries, intl.locale),
     }));
   const cnOption = filteredCountries.find((c) => c.value === 'CN');
   const otherOptions = filteredCountries.filter((c) => c.value !== 'CN');

@@ -53,10 +53,10 @@
   font-variant-numeric: tabular-nums;
 }
 .diy-event-rank-cell--top10 {
-  color: #cf1322;
+  color: var(--destructive);
   font-weight: 700;
 }
 .diy-event-rank-cell--missing {
-  color: rgba(0, 0, 0, 0.28);
+  color: var(--muted-foreground);
   font-weight: 400;
 }

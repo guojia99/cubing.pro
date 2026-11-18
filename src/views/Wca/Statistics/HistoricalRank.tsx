@@ -3,7 +3,8 @@ import { CubesCn } from '@/components/CubeIcon/cube';
 import { WCALinkWithCnName } from '@/components/Link/WcaLinks';
 import { resultsTimeFormat } from '@/views/Wca/utils/wca_results';
 import { eventOrder } from '@/views/Wca/utils/events';
-import { CountryList, getWcaCountryLabel } from '@/services/cubing-pro/wca/country';
+import { CountryList } from '@/services/cubing-pro/wca/country';
+import { getLocalizedCountryLabel } from '../utils/countryLabel';
 import { GetEventRankTimers } from '@/services/cubing-pro/wca/static';
 import { Country, StaticWithTimerRank } from '@/services/cubing-pro/wca/types';
 import { Select, Table, Spin, Space, Card } from 'antd';
@@ -120,7 +121,7 @@ const HistoricalRank: React.FC = () => {
             dataIndex: 'country',
             key: 'country',
             width: 120,
-            render: (val: string) => getWcaCountryLabel(val, countries),
+            render: (val: string) => getLocalizedCountryLabel(val, countries, intl.locale),
           },
         ]
       : []),
@@ -131,7 +132,7 @@ const HistoricalRank: React.FC = () => {
     label: (
       <Space>
         {CubeIcon(ev, `event_${ev}`, {})}
-        {CubesCn(ev)}
+        {CubesCn(ev, intl.locale)}
       </Space>
     ),
   }));
@@ -140,7 +141,7 @@ const HistoricalRank: React.FC = () => {
     .filter((c) => c?.iso2 && !c.name?.includes('Multiple Countries'))
     .map((c) => ({
       value: c.iso2,
-      label: getWcaCountryLabel(c.id, countries),
+      label: getLocalizedCountryLabel(c.id, countries, intl.locale),
     }));
   const cnOption = filteredCountries.find((c) => c.value === 'CN');
   const otherOptions = filteredCountries.filter((c) => c.value !== 'CN');

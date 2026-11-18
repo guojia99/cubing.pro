@@ -30,12 +30,14 @@ import PlayerResultsComps from '@/views/GroupCompetitions/Player/components/Play
 import PlayerResultsRecord from '@/views/GroupCompetitions/Player/components/PlayerResultRecord';
 import PlayerResultsNemesis from '@/views/GroupCompetitions/Player/components/PlayerResultNemesis';
 import PlayerResultsSor from '@/views/GroupCompetitions/Player/components/PlayerResultSor';
+import { useI18n } from '@/contexts/I18nProvider';
 
 interface PlayerResultsProps {
   player?: PlayersAPI.Player;
 }
 
 const PlayerResults: React.FC<PlayerResultsProps> = ({ player }) => {
+  const { t } = useI18n();
   const [events, setEvents] = useState<EventsAPI.Event[]>([]);
   const [results, setResults] = useState<Result[]>([]);
   const [nemesis, setNemesis] = useState<PlayersAPI.BestResults[]>([]);
@@ -87,7 +89,7 @@ const PlayerResults: React.FC<PlayerResultsProps> = ({ player }) => {
   const items = [
     {
       key: 'result',
-      label: '成绩',
+      label: t('competitionAdmin.result'),
       children: (
         <PlayerResultsList events={events} results={results} records={records} comps={comps} player={player} />
       ),
@@ -95,7 +97,7 @@ const PlayerResults: React.FC<PlayerResultsProps> = ({ player }) => {
     },
     {
       key: 'comps',
-      label: '比赛',
+      label: t('competitionAdmin.competition'),
       children: <PlayerResultsComps comps={comps} />,
       icon: <ProfileOutlined />,
     },
@@ -104,7 +106,7 @@ const PlayerResults: React.FC<PlayerResultsProps> = ({ player }) => {
   if (records && records.length > 0) {
     items.push({
       key: 'record',
-      label: '记录',
+      label: t('competitionAdmin.records'),
       children: <PlayerResultsRecord record={records} />,
       icon: <OrderedListOutlined />,
     });
@@ -113,19 +115,19 @@ const PlayerResults: React.FC<PlayerResultsProps> = ({ player }) => {
   items.push(
     {
       key: 'nemesis',
-      label: '宿敌',
+      label: t('competitionAdmin.nemesis'),
       children: <PlayerResultsNemesis player={player} nemesis={nemesis} />,
       icon: <TeamOutlined />,
     },
     {
       key: 'power',
-      label: '能力图表',
-      children: <>能力</>,
+      label: t('competitionAdmin.abilityChart'),
+      children: <>{t('competitionAdmin.ability')}</>,
       icon: <RadarChartOutlined />,
     },
     {
       key: 'kin_ch_sor',
-      label: '排位分',
+      label: t('competitionAdmin.rankingScore'),
       children: <PlayerResultsSor kinchSor={sor} />,
       icon: <BarChartOutlined />,
     },
@@ -133,7 +135,7 @@ const PlayerResults: React.FC<PlayerResultsProps> = ({ player }) => {
 
   return (
     <>
-      <Card style={{ maxWidth: '100%' }}>
+      <Card className="player-results-panel" style={{ maxWidth: '100%' }}>
         <NavTabs
           type="line"
           items={items}

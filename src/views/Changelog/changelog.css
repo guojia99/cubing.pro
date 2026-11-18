@@ -3,6 +3,11 @@
   display: inline;
 }
 
+.changelog-item-markdown { min-width: 0; overflow-wrap: anywhere; }
+.changelog-item-markdown a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+.changelog-item-markdown ul, .changelog-item-markdown ol { padding-inline-start: 1.2em; }
+.changelog-item-markdown pre { overflow-x: auto; max-width: 100%; }
+
 .changelog-item-markdown code {
   background: var(--chakra-colors-bg-muted);
   padding: 1px 5px;

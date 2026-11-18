@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { PlaceholderPage } from "@/components/pages/PlaceholderPage";
 import { ExportPathMarker } from "@/components/routing/ExportPathMarker";
 import { matchRoute } from "@/config/routes";
+import { getDefaultMetadata } from "@/lib/defaultMetadata";
 import { getAllCatchAllStaticParams } from "@/lib/staticExportPaths";
 import { AlgsListView } from "@/views/Algs/AlgsListView";
 import { AlgsDetailView } from "@/views/Algs/AlgsDetailView";
@@ -73,9 +74,7 @@ export async function generateMetadata({
   const { path } = await params;
   const pathname = `/${path.join("/")}`;
   const route = matchRoute(pathname);
-  return {
-    title: route?.name ?? "页面",
-  };
+  return getDefaultMetadata(route?.id ?? "");
 }
 
 function CatchAllContent({ routeId, path }: { routeId: string; path: string[] }) {

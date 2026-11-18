@@ -3,10 +3,12 @@ import ReactECharts from 'echarts-for-react';
 import React, { useMemo, useState } from 'react';
 import { resultTimeString } from '@/components/Data/types/result';
 import {
-  getThemeColors,
-  mixCssColors,
+  getChartAxisStyle,
+  getChartTooltipStyle,
   readCssVar,
 } from '@/theme/chartColors';
+import { useThemeColors } from '@/theme/useThemeColors';
+import { useI18n } from '@/contexts/I18nProvider';
 
 const { Option } = Select;
 
@@ -26,11 +28,12 @@ export const getQuantile = (sorted: number[], p: number): number => {
 };
 
 const RollingQuantileChart: React.FC<RollingQuantileChartProps> = ({ inputData, baseWindowSize=50 }) => {
-  const theme = getThemeColors();
+  const { t } = useI18n();
+  const theme = useThemeColors();
   const q25Color = theme.signalInfo;
   const q50Color = theme.signalWarning;
   const q75Color = theme.destructive;
-  const data = inputData.filter((n) => n >= 0).reverse();
+  const data = useMemo(() => inputData.filter((n) => n >= 0).reverse(), [inputData]);
 
 
   // 计算最佳成绩点
@@ -44,12 +47,12 @@ const RollingQuantileChart: React.FC<RollingQuantileChartProps> = ({ inputData, 
           yAxis: value,
           symbolSize: 10,
           itemStyle: { color: theme.destructive },
-          name: '最佳成绩',
+          name: t('competitionAdmin.bestResult'),
         };
       }
       return null;
     }).filter(point => point !== null);
-  }, [data]);
+  }, [data, theme.destructive, t]);
 
 
   const [windowSize, setWindowSize] = useState(baseWindowSize);
@@ -76,11 +79,14 @@ const RollingQuantileChart: React.FC<RollingQuantileChartProps> = ({ inputData, 
   }, [data, windowSize]);
 
   const option = {
+    textStyle: { color: theme.foreground },
     title: {
-      text: `滚动分位线`,
+      textStyle: { color: theme.foreground, fontSize: 16 },
+      text: t('competitionAdmin.rollingQuantile'),
       left: 'center',
     },
     tooltip: {
+      ...getChartTooltipStyle(),
       trigger: 'axis',
       formatter: (params: any[]) => {
         const index = params[0].dataIndex + 1;
@@ -101,25 +107,32 @@ const RollingQuantileChart: React.FC<RollingQuantileChartProps> = ({ inputData, 
       },
     },
     legend: {
-      data: ['成绩', '25%', '50%', '75%'],
+      textStyle: { color: theme.mutedForeground },
+      data: [t('competitionAdmin.result'), '25%', '50%', '75%'],
       top: 30,
     },
     xAxis: {
+      ...getChartAxisStyle(),
       type: 'category',
       data: data.map((_, i) => i + 1),
       name: '',
     },
     yAxis: {
+      ...getChartAxisStyle(),
+      nameTextStyle: { color: theme.mutedForeground },
       type: 'value',
-      name: '成绩',
+      name: t('competitionAdmin.result'),
       inverse: false,
       axisLabel: {
+        color: theme.mutedForeground,
         formatter: (value: number) => resultTimeString(value),
       },
     },
     dataZoom: [
       {
         type: 'slider',
+        borderColor: theme.border,
+        textStyle: { color: theme.mutedForeground },
         start: 0,
         end: 100,
         bottom: 10,
@@ -128,11 +141,11 @@ const RollingQuantileChart: React.FC<RollingQuantileChartProps> = ({ inputData, 
     ],
     series: [
       {
-        name: '成绩',
+        name: t('competitionAdmin.result'),
         type: 'line',
         data,
         symbol: 'circle',
-        lineStyle: { color: mixCssColors(theme.signalSuccess, 'transparent', 35) },
+        lineStyle: { color: theme.signalSuccess, opacity: .35 },
         markPoint: {
           symbolSize: 40,
           label: {
@@ -167,9 +180,10 @@ const RollingQuantileChart: React.FC<RollingQuantileChartProps> = ({ inputData, 
 
   return (
     <div>
-      <div style={{ marginBottom: 16 }}>
-        <span>选择百分位成绩计入数: </span>
+      <div className="competition-toolbar">
+        <span>{t('competitionAdmin.quantileWindow')}: </span>
         <Select
+          aria-label={t('competitionAdmin.quantileWindow')}
           value={windowSize}
           onChange={(value) => setWindowSize(value)}
           style={{ width: 120 }}
@@ -194,7 +208,7 @@ const RollingQuantileChart: React.FC<RollingQuantileChartProps> = ({ inputData, 
 
         return (
           <Card
-            title="最新百分位成绩"
+            title={t('competitionAdmin.latestQuantiles')}
             style={{
               marginTop: 16,
               marginBottom: 16,

@@ -31,13 +31,16 @@ Solver results retain the exact library source tuple (set, group, case name and 
 
 ## Internationalization
 
-The workbench uses the site's `I18nProvider`, `zh-CN` / `en-US` catalogs and `cubing_pro_locale` preference. Its named catalogs are split into main UI, details/formatting and engine messages under `src/i18n/messages/two-solver-*.ts`, with typed key and interpolation parity tests. The site language menu and the timer Display-language preference share the same locale; changing it does not invalidate a search, generate a new question or alter saved results.
+The workbench uses the site's `I18nProvider`, seven catalogs (`zh-CN`, `en-US`, `ja`, `yue-Hant-HK`, `ko`, `fr`, `es`) and `cubing_pro_locale` preference. Its named catalogs are split into main UI, details/formatting and engine messages under `src/i18n/messages/two-solver-*.ts`; `wca-puzzle-extra.ts` supplies native error translations. Pure solution/chart formatters also resolve all seven languages when no translator is supplied. The site language menu and the timer Display-language preference share the same locale; changing it does not invalidate a search, generate a new question or alter saved results.
 
 Transient statuses and review labels render from message descriptors. Historical sampling uses language-neutral structured data, with a bounded adapter for previous Chinese descriptions. Worker progress/errors and ergonomic explanations retain their original diagnostic protocol and localize at the presentation boundary via `solverMessages.ts`. Unknown diagnostic text and source case names remain intact. Numbers, dates, chart labels/tooltips, accessibility text, 3D messages and annotated clipboard comments follow the selected locale; cube move notation and numeric score values remain unchanged.
 
 ```sh
 TWO_SOLVER_URL=http://127.0.0.1:3128/tools/solver/222/ npm run test:two-solver:i18n
+npx tsx src/views/Wca/wcaPuzzleI18n.browser.test.mjs
 ```
+
+The second command runs an isolated browser entry with production components, real Worker search/data and native players. It checks all seven locale changes against stable search/question object identities, Worker request counts, running timer state, history, player instances and seek positions. WCA country API responses are deterministic fixtures; it does not verify the live WCA API or Next routing.
 
 Stage normalization also merges turns separated by a rotation frame that commutes with the face: e.g. `U' y U2 -> U y`, `R' x R2 -> R x`. This is applied to the complete finish (pre-AUF + formula + post-AUF) before the bounded base/finish join. Internal cleanup does not consume the cross-stage overlap budget; zero overlap disables cross-stage reduction only. Both smoother alternatives and reduced outputs retain internal cleanup, original-token parentheses, exact frame, and recalculated counts/scores.
 

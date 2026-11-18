@@ -1,7 +1,8 @@
 "use client";
 
-import { Avatar, Button, HStack, Skeleton, Text } from "@chakra-ui/react";
+import { Avatar, Box, Button, Skeleton, Text } from "@chakra-ui/react";
 import NextLink from "next/link";
+import { LuLogIn } from "react-icons/lu";
 
 import { UserMenu } from "@/components/auth/UserMenu";
 import { NAV_FONT_SIZE } from "@/components/layout/navStyles";
@@ -20,8 +21,11 @@ export function HeaderUserActions() {
 
   if (!isLoggedIn(currentUser?.id)) {
     return (
-      <Button asChild size="sm" fontSize={NAV_FONT_SIZE} colorPalette="brand" variant="solid">
-        <NextLink href="/login">{t("user.login")}</NextLink>
+      <Button asChild size="sm" fontSize={NAV_FONT_SIZE} colorPalette="brand" variant="solid" borderRadius="lg" minW={{ base: "9", md: "auto" }} px={{ base: "0", md: "4" }}>
+        <NextLink href="/login" aria-label={t("user.login")}>
+          <Box as="span" display={{ base: "inline-flex", md: "none" }} aria-hidden="true"><LuLogIn size={18} /></Box>
+          <Text as="span" display={{ base: "none", md: "inline" }}>{t("user.login")}</Text>
+        </NextLink>
       </Button>
     );
   }
@@ -30,20 +34,22 @@ export function HeaderUserActions() {
 
   return (
     <UserMenu>
-      <HStack
+      <Button
+        aria-label={currentUser?.Name || t("user.profile")}
+        variant="ghost"
+        size="sm"
         gap="2"
-        cursor="pointer"
         borderRadius="lg"
         px="1"
-        py="0.5"
+        minW="9"
         _hover={{ bg: "bg.muted" }}
       >
         <Text
           fontWeight="semibold"
           fontSize={NAV_FONT_SIZE}
           lineClamp={1}
-          display={{ base: "none", xl: "block" }}
-          maxW="32"
+          display={{ base: "none", "2xl": "block" }}
+          maxW="24"
         >
           {currentUser?.Name}
         </Text>
@@ -53,7 +59,7 @@ export function HeaderUserActions() {
           ) : null}
           <Avatar.Fallback name={currentUser?.Name ?? "U"} />
         </Avatar.Root>
-      </HStack>
+      </Button>
     </UserMenu>
   );
 }

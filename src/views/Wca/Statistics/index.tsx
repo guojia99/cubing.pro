@@ -1,5 +1,7 @@
 "use client";
 
+import { translateWcaPuzzleExtra as extra } from "@/i18n/messages/wca-puzzle-extra";
+
 import "antd/dist/reset.css";
 
 import {
@@ -13,7 +15,8 @@ import {
   TrophyOutlined,
   UnorderedListOutlined,
 } from "@ant-design/icons";
-import { Typography } from "antd";
+import { PageHeader, SectionHeader } from "@/components/ui/page";
+import "../wca-ui.css";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -30,7 +33,6 @@ import SuccessRateRank from "./SuccessRateRank";
 import YearlyFullRank from "./YearlyFullRank";
 import "./index.css";
 
-const { Title } = Typography;
 
 type StatsTabKey =
   | "wcaKinch"
@@ -153,10 +155,8 @@ export function WcaStatisticsView() {
   );
 
   return (
-    <div className="stats-index">
-      <Title level={3} className="stats-page-title">
-        {intl.formatMessage({ id: "wca.stats.title" })}
-      </Title>
+    <div className="stats-index wca-page">
+      <PageHeader eyebrow={extra(intl.locale, "wcaPuzzleExtra.statistics")} title={intl.formatMessage({ id: "wca.stats.title" })} />
       <div
         className="stats-tab-grid"
         role="tablist"
@@ -186,9 +186,7 @@ export function WcaStatisticsView() {
         })}
       </div>
       <div className="stats-content">
-        <h1 className="stats-tab-title">
-          {cards.find((c) => c.key === activeKey)?.title}
-        </h1>
+        <SectionHeader title={cards.find((c) => c.key === activeKey)?.title} />
         {activeKey === "wcaKinch" && <KinCh isSenior isCountry otherDataFn={undefined} />}
         {activeKey === "grandSlam" && <GrandSlamRank />}
         {activeKey === "historical" && <HistoricalRank />}
