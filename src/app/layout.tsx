@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
 
 import { Provider } from "@/components/ui/provider";
+import { getDefaultMetadata } from "@/lib/defaultMetadata";
 import { PALETTE_STORAGE_KEY } from "@/lib/websiteUiConfig";
 
 export const metadata: Metadata = {
+  ...getDefaultMetadata(),
   title: {
     default: "Cubing Pro",
     template: "%s · Cubing Pro",
   },
-  description: "Cubing Pro v4.0.0 — 魔方社区与工具平台",
+  icons: "/CubingProMiniIcon.png",
 };
 
 const palettePrehydrateScript = `(function(){try{var p=localStorage.getItem("${PALETTE_STORAGE_KEY}")||"haitian";document.documentElement.dataset.palette=p;}catch(e){}})();`;

@@ -7,6 +7,7 @@ import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { CubeIcon } from "@/components/CubeIcon/cube_icon";
+import { useI18n } from "@/contexts/I18nProvider";
 import { PlayerLink } from "@/components/Link/GcLinks";
 import { WCALinkWithCnName } from "@/components/Link/WcaLinks";
 import { apiKinch, apiSeniorKinch } from "@/services/cubing-pro/statistics/sor";
@@ -17,7 +18,7 @@ import type {
 import type { StaticAPI } from "@/services/cubing-pro/statistics/typings";
 import {
   CountryAvatar,
-  getCountryNameByIso2,
+  getCountryDisplayName,
 } from "@/views/Wca/PlayerComponents/region/all_contiry";
 
 import { EventSelector, allEvents } from "./EventSelector";
@@ -33,6 +34,7 @@ export type KinChProps = {
 };
 
 export function KinCh({ isSenior, isCountry, otherDataFn, pages = true }: KinChProps) {
+  const { t, locale } = useI18n();
   const [tableParams, setTableParams] = useState<StaticAPI.KinchReq>({
     size: 100,
     page: 1,
@@ -96,7 +98,7 @@ export function KinCh({ isSenior, isCountry, otherDataFn, pages = true }: KinChP
 
   const handleUpdateTable = (selectEvents: string[], nextAge?: number, country?: string[]) => {
     if (selectEvents.length === 0) {
-      void message.warning("请选择至少一个项目！");
+      void message.warning(t('competitionAdmin.selectOne'));
       return;
     }
     const resolvedAge = nextAge ?? 40;
@@ -135,7 +137,7 @@ export function KinCh({ isSenior, isCountry, otherDataFn, pages = true }: KinChP
 
         const find = filter[0];
         const hasValidResult = find.Result !== undefined && find.Result !== 0;
-        const tagLabel = find.UseSingle ? "单次" : "平均";
+        const tagLabel = t(find.UseSingle ? 'competitionAdmin.single' : 'competitionAdmin.average');
         const tagColor = find.UseSingle ? "green" : "blue";
         const tooltipContent = (
           <>
@@ -177,12 +179,12 @@ export function KinCh({ isSenior, isCountry, otherDataFn, pages = true }: KinChP
         return <Tooltip title={tooltipContent}>{displayText}</Tooltip>;
       },
     }));
-  }, [hasEvents, useColor]);
+  }, [hasEvents, useColor, t]);
 
   const columns: ColumnsType<KinChSorResult> = useMemo(() => {
     const base: ColumnsType<KinChSorResult> = [
       {
-        title: "排名",
+        title: t('competitionAdmin.rank'),
         dataIndex: "Rank",
         key: "Rank",
         width: 40,
@@ -191,14 +193,14 @@ export function KinCh({ isSenior, isCountry, otherDataFn, pages = true }: KinChP
 
     if (isCountry) {
       base.push({
-        title: "地区",
+        title: t('competitionExtra.region'),
         dataIndex: "CountryIso2",
         key: "CountryIso2",
         width: 100,
         render: (text: string) => (
           <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
             {CountryAvatar(text)}
-            {getCountryNameByIso2(text)}
+            {getCountryDisplayName(text, undefined, locale)}
           </span>
         ),
       });
@@ -206,7 +208,7 @@ export function KinCh({ isSenior, isCountry, otherDataFn, pages = true }: KinChP
 
     base.push(
       {
-        title: "选手",
+        title: t('competitionAdmin.player'),
         dataIndex: "Name",
         key: "Name",
         width: 100,
@@ -218,7 +220,7 @@ export function KinCh({ isSenior, isCountry, otherDataFn, pages = true }: KinChP
         },
       },
       {
-        title: "总分",
+        title: t('competitionExtra.totalScore'),
         dataIndex: "Result",
         key: "Result",
         width: 75,
@@ -238,7 +240,7 @@ export function KinCh({ isSenior, isCountry, otherDataFn, pages = true }: KinChP
     );
 
     return [...base, ...eventColumns];
-  }, [eventColumns, isCountry, isSenior, otherDataFn, useColor]);
+  }, [eventColumns, isCountry, isSenior, otherDataFn, useColor, t, locale]);
 
   return (
     <>
@@ -252,8 +254,9 @@ export function KinCh({ isSenior, isCountry, otherDataFn, pages = true }: KinChP
       <Card style={{ marginBottom: "20px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <Switch
-            checkedChildren="开启颜色"
-            unCheckedChildren="关闭颜色"
+            checkedChildren={t('competitionExtra.colorsOn')}
+            unCheckedChildren={t('competitionExtra.colorsOff')}
+            aria-label={t('competitionExtra.colorsOn')}
             checked={useColor}
             onChange={setUseColor}
           />

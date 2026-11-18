@@ -2,6 +2,7 @@ import { classifyTeamComposition, getFreelancerSchoolId } from '@/views/TeamMatc
 import type { Player, School, Team, TeamMatchSession } from '@/views/TeamMatch/types';
 import { MAX_ROSTER_TEAMS, TEAM_PLAYERS } from '@/views/TeamMatch/types';
 import { v4 as uuidv4 } from 'uuid';
+import { tm, type TeamMatchLocale } from './i18n';
 
 /** 队名列：队名（学校名）或仅队名；学校名缺省则队员挂靠自由人池并按自由人队处理 */
 export function parseTeamColumn(cell: string): { teamName: string; schoolName: string | null } {
@@ -37,9 +38,9 @@ export function splitPasteLine(line: string): string[] {
     .slice(0, 1 + TEAM_PLAYERS);
 }
 
-function ensureFreelancerSchool(schools: School[]): School[] {
+function ensureFreelancerSchool(schools: School[], locale: TeamMatchLocale): School[] {
   if (getFreelancerSchoolId(schools)) return schools;
-  return [...schools, { id: uuidv4(), name: '自由人', kind: 'freelancer' as const }];
+  return [...schools, { id: uuidv4(), name: tm(locale, 'teamMatch.independentPoolName'), kind: 'freelancer' as const }];
 }
 
 function findOrAddStandardSchool(schools: School[], name: string): { schools: School[]; schoolId: string } {
@@ -60,11 +61,12 @@ function activeFullTeamCount(teams: Team[]): number {
 export function buildTeamRosterPasteImport(
   session: TeamMatchSession,
   text: string,
+  locale: TeamMatchLocale = 'zh-CN',
 ): { ok: true; schools: School[]; players: Player[]; teams: Team[] } | { ok: false; message: string } {
   const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
-  if (lines.length === 0) return { ok: false, message: '内容为空' };
+  if (lines.length === 0) return { ok: false, message: tm(locale, 'teamMatch.emptyPaste') };
 
-  let schools = ensureFreelancerSchool([...session.schools]);
+  let schools = ensureFreelancerSchool([...session.schools], locale);
   const players = [...session.players];
   const newTeams: Team[] = [];
 
@@ -74,16 +76,16 @@ export function buildTeamRosterPasteImport(
     const line = lines[li];
     const cols = splitPasteLine(line);
     if (cols.length < 1 + TEAM_PLAYERS) {
-      return { ok: false, message: `第 ${li + 1} 行：需 1 列队名 + ${TEAM_PLAYERS} 列队员（可用 Tab 或两个以上空格分隔）` };
+      return { ok: false, message: tm(locale, 'teamMatch.rosterColumns', { line: li + 1, count: TEAM_PLAYERS }) };
     }
     const teamCol = cols[0]!;
     const playerCols = cols.slice(1, 1 + TEAM_PLAYERS);
     if (playerCols.length !== TEAM_PLAYERS) {
-      return { ok: false, message: `第 ${li + 1} 行：需要恰好 ${TEAM_PLAYERS} 名队员` };
+      return { ok: false, message: tm(locale, 'teamMatch.rosterPlayerCount', { line: li + 1, count: TEAM_PLAYERS }) };
     }
 
     const { teamName, schoolName } = parseTeamColumn(teamCol);
-    if (!teamName) return { ok: false, message: `第 ${li + 1} 行：队名为空` };
+    if (!teamName) return { ok: false, message: tm(locale, 'teamMatch.rosterEmptyTeam', { line: li + 1 }) };
 
     let targetSchoolId: string;
     if (schoolName) {
@@ -97,7 +99,7 @@ export function buildTeamRosterPasteImport(
     const pids: string[] = [];
     for (let pi = 0; pi < playerCols.length; pi++) {
       const { name, wcaId } = parsePlayerCell(playerCols[pi] ?? '');
-      if (!name) return { ok: false, message: `第 ${li + 1} 行：第 ${pi + 1} 名队员姓名为空` };
+      if (!name) return { ok: false, message: tm(locale, 'teamMatch.rosterEmptyPlayer', { line: li + 1, player: pi + 1 }) };
 
       if (wcaId) {
         const ei = players.findIndex((p) => p.wcaId === wcaId);
@@ -122,17 +124,17 @@ export function buildTeamRosterPasteImport(
     }
 
     if (new Set(pids).size !== TEAM_PLAYERS) {
-      return { ok: false, message: `第 ${li + 1} 行：三名队员须不同（含 WCA 重复会导致同一人占多席）` };
+      return { ok: false, message: tm(locale, 'teamMatch.rosterDuplicatePlayer', { line: li + 1 }) };
     }
 
     const triple = [pids[0]!, pids[1]!, pids[2]!] as [string, string, string];
-    const c = classifyTeamComposition(triple, players, schools);
+    const c = classifyTeamComposition(triple, players, schools, locale);
     if (!c.ok) {
-      return { ok: false, message: `第 ${li + 1} 行（${teamName}）：${c.message}` };
+      return { ok: false, message: tm(locale, 'teamMatch.rosterLineError', { line: li + 1, team: teamName, error: c.message }) };
     }
 
     if (activeFullTeamCount(session.teams) + newTeams.length + 1 > MAX_ROSTER_TEAMS) {
-      return { ok: false, message: `超过最多 ${MAX_ROSTER_TEAMS} 支有效队伍上限` };
+      return { ok: false, message: tm(locale, 'teamMatch.rosterLimit', { count: MAX_ROSTER_TEAMS }) };
     }
 
     newTeams.push({

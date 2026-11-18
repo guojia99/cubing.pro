@@ -1,11 +1,13 @@
 import { eventRouteM } from '@/components/Data/cube_result/event_route';
 import { Result, resultString, resultTimeString } from '@/components/Data/types/result';
 import { PlayersAPI } from '@/services/cubing-pro/players/typings';
-import { Tooltip } from 'antd';
+import { Button, Tooltip } from 'antd';
 import { saveAs } from 'file-saver';
 import React, { useEffect, useState } from 'react';
 import { AiOutlineDownload } from 'react-icons/ai';
 import * as XLSX from 'xlsx';
+import { useI18n } from '@/contexts/I18nProvider';
+import { formatRoundName } from '@/i18n/messages/domain';
 
 interface DownloadExcelButtonProps {
   player?: PlayersAPI.Player;
@@ -13,10 +15,11 @@ interface DownloadExcelButtonProps {
 }
 
 const DownloadExcelButton: React.FC<DownloadExcelButtonProps> = ({ player, results }) => {
+  const { t, tf, locale } = useI18n();
   const [data, setData] = useState<any[]>();
 
   useEffect(() => {
-    const da = results.sort((a: Result, b: Result) => {
+    const da = [...results].sort((a: Result, b: Result) => {
       if (a.CompetitionID !== b.CompetitionID) {
         return a.CompetitionID - b.CompetitionID;
       }
@@ -33,19 +36,19 @@ const DownloadExcelButton: React.FC<DownloadExcelButtonProps> = ({ player, resul
       const resultStrs = resultString(da[i].Result, da[i].EventRoute);
 
       d.push({
-        比赛名称: da[i].CompetitionName,
-        项目: da[i].EventID,
-        轮次: da[i].Round,
-        单次: resultTimeString(da[i].Best, m.integer),
-        平均: resultTimeString(da[i].Average),
+        [t('competitionAdmin.competition')]: da[i].CompetitionName,
+        [t('competitionAdmin.event')]: da[i].EventID,
+        [t('competitionAdmin.round')]: formatRoundName(da[i].Round, locale),
+        [t('competitionAdmin.single')]: resultTimeString(da[i].Best, m.integer),
+        [t('competitionAdmin.average')]: resultTimeString(da[i].Average),
         ...resultStrs.reduce((acc, val, idx) => {
-          acc[`成绩${idx + 1}`] = val;
+          acc[tf('competitionAdmin.attempt', { count: idx + 1 })] = val;
           return acc;
         }, {} as Record<string, string>),
       });
     }
     setData(d);
-  }, [results]);
+  }, [results, t, tf, locale]);
 
   const handleDownload = () => {
     if (!data || !player) {
@@ -60,7 +63,7 @@ const DownloadExcelButton: React.FC<DownloadExcelButtonProps> = ({ player, resul
     // 创建 workbook 并添加 worksheet
     const workbook = XLSX.utils.book_new();
 
-    XLSX.utils.book_append_sheet(workbook, worksheet, '个人成绩');
+    XLSX.utils.book_append_sheet(workbook, worksheet, t('competitionAdmin.personalResults'));
 
     // 写入到 ArrayBuffer
     const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
@@ -71,11 +74,11 @@ const DownloadExcelButton: React.FC<DownloadExcelButtonProps> = ({ player, resul
   };
 
   return (
-    <Tooltip title="点击下载成绩列表">
-      <AiOutlineDownload
+    <Tooltip title={t('competitionAdmin.downloadHint')}>
+      <Button
+        icon={<AiOutlineDownload />}
         onClick={handleDownload}
-        style={{ marginRight: 8, fontSize: 28, cursor: 'pointer' }}
-      />
+      >{t('competitionAdmin.download')}</Button>
     </Tooltip>
   );
 };

@@ -1,9 +1,11 @@
 import { Avatar, Badge, Card, Divider, Image, Space, Table, Typography } from 'antd';
+import { PageHeader } from '@/components/ui/page';
 import 'flag-icons/css/flag-icons.min.css';
 import React from 'react';
 import { useIntl } from '@/hooks/useIntlMessage';
 import './PlayerDetails.css';
-import { getCountryNameByIso2 } from '@/views/Wca/PlayerComponents/region/all_contiry';
+import { getCountryDisplayName } from '@/views/Wca/PlayerComponents/region/all_contiry';
+import { translateWcaPuzzleExtra as extra } from '@/i18n/messages/wca-puzzle-extra';
 import { WcaProfile, WCAResult } from '@/services/cubing-pro/wca/types';
 
 interface WCAPlayerDetailsProps {
@@ -11,7 +13,7 @@ interface WCAPlayerDetailsProps {
   wcaResults: WCAResult[];
 }
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 const WCAPlayerDetails: React.FC<WCAPlayerDetailsProps> = ({ wcaProfile, wcaResults }) => {
   const intl = useIntl();
@@ -59,9 +61,9 @@ const WCAPlayerDetails: React.FC<WCAPlayerDetailsProps> = ({ wcaProfile, wcaResu
             <span
               className={`fi ${ct} fi-3x`}
               style={{ marginRight: 8, minWidth: 20 }}
-              title={getCountryNameByIso2(country_iso2)}
+              title={getCountryDisplayName(country_iso2, undefined, intl.locale)}
             />
-            {getCountryNameByIso2(country_iso2)}
+            {getCountryDisplayName(country_iso2, undefined, intl.locale)}
           </Space>
         );
       },
@@ -88,7 +90,7 @@ const WCAPlayerDetails: React.FC<WCAPlayerDetailsProps> = ({ wcaProfile, wcaResu
           <a href={wcaProfile.thumb_url} target="_blank" rel="noopener noreferrer">
             <Image
               src="/images/wca.svg"
-              alt="WCA Logo"
+              alt={extra(intl.locale, 'wcaPuzzleExtra.wcaProfile')}
               width={16}
               height={16}
               preview={false}
@@ -97,7 +99,7 @@ const WCAPlayerDetails: React.FC<WCAPlayerDetailsProps> = ({ wcaProfile, wcaResu
           <a href={`https://cubing.com/results/person/${wcaProfile.wcaId}`} target="_blank" rel="noopener noreferrer">
             <Image
               src="/images/cubing-logo.png"
-              alt="Cubing China Logo"
+              alt={extra(intl.locale, 'wcaPuzzleExtra.chinaProfile')}
               width={16}
               height={16}
               preview={false}
@@ -162,8 +164,7 @@ const WCAPlayerDetails: React.FC<WCAPlayerDetailsProps> = ({ wcaProfile, wcaResu
   return (
     <div className="wca-player-container">
       <Card
-        hoverable
-        style={{ width: '100%', margin: '0 auto', borderRadius: 16 }}
+        style={{ width: '100%', margin: '0 auto', borderRadius: 'var(--radius-card)' }}
         variant="borderless"
       >
         {/* 头像与姓名 */}
@@ -173,9 +174,7 @@ const WCAPlayerDetails: React.FC<WCAPlayerDetailsProps> = ({ wcaProfile, wcaResu
             alt={intl.formatMessage({ id: 'wca.playerDetails.avatarAlt' }, { name: wcaProfile.name })}
             size={100}
           />
-          <Title level={3} style={{ margin: '8px 0 8px 0' }}>
-            {displayName}
-          </Title>
+          <PageHeader eyebrow={wcaProfile.wcaId} title={displayName} />
         </div>
 
         <Divider style={{ margin: '16px 0' }} />

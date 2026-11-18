@@ -5,10 +5,11 @@ import {
 } from '@/views/TeamMatch/teamMatchJson';
 import type { LiveUISettings } from '@/views/TeamMatch/liveUiSettings';
 import type { TeamMatchSession } from '@/views/TeamMatch/types';
-import { Button, Modal, Space, Typography, message } from 'antd';
+import { App, Button, Space, Typography } from 'antd';
 import classNames from 'classnames';
 import React, { useRef } from 'react';
 import '../TeamMatch.css';
+import { useTeamMatchI18n } from '../i18n';
 
 type Props = {
   session: TeamMatchSession;
@@ -26,6 +27,8 @@ const TeamMatchJsonToolbar: React.FC<Props> = ({
   onImportLiveUI,
   variant = 'light',
 }) => {
+  const { t, locale } = useTeamMatchI18n();
+  const { modal, message } = App.useApp();
   const inputRef = useRef<HTMLInputElement>(null);
   const dark = variant === 'dark';
 
@@ -33,7 +36,7 @@ const TeamMatchJsonToolbar: React.FC<Props> = ({
     const payload = buildTeamMatchJsonFile(session, liveUISettings);
     const base = (session.name.trim() || 'team-match').slice(0, 48);
     downloadTeamMatchJson(`${base}-${session.id.slice(0, 8)}`, payload);
-    message.success('已导出 JSON');
+    message.success(t('teamMatch.exported'));
   };
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,23 +46,25 @@ const TeamMatchJsonToolbar: React.FC<Props> = ({
     const reader = new FileReader();
     reader.onload = () => {
       const text = String(reader.result);
-      Modal.confirm({
-        title: '确认导入',
-        content: '将用文件中的比赛数据替换当前正在编辑的会话，并可选写入界面设置。',
-        okText: '导入',
-        cancelText: '取消',
+      modal.confirm({
+        className: 'tm-workbench-modal',
+        title: t('teamMatch.confirmImport'),
+        content: t('teamMatch.importDescription'),
+        okText: t('teamMatch.import'),
+        cancelText: t('teamMatch.cancel'),
         onOk: () => {
           try {
-            const { session: next, liveUISettings: li } = parseTeamMatchImport(text);
+            const { session: next, liveUISettings: li } = parseTeamMatchImport(text, locale);
             onHydrate(next);
             if (li) onImportLiveUI(li);
-            message.success('已导入');
+            message.success(t('teamMatch.imported'));
           } catch (err) {
-            message.error(err instanceof Error ? err.message : '导入失败');
+            message.error(err instanceof Error ? err.message : t('teamMatch.importFailed'));
           }
         },
       });
     };
+    reader.onerror = () => message.error(t('teamMatch.readFailed'));
     reader.readAsText(file);
   };
 
@@ -67,17 +72,17 @@ const TeamMatchJsonToolbar: React.FC<Props> = ({
     <div
       className={classNames('tmJsonToolbar', { 'tmJsonToolbar--dark': dark })}
       role="region"
-      aria-label="导入导出"
+      aria-label={t('teamMatch.importExport')}
     >
       <Space wrap align="center" size="middle">
         <Typography.Text className={classNames('tmJsonToolbarLabel', { 'tmJsonToolbarLabel--dark': dark })}>
-          备份
+          {t('teamMatch.backup')}
         </Typography.Text>
         <Button size="small" type={dark ? 'default' : 'default'} ghost={dark} onClick={exportJson}>
-          导出 JSON
+          {t('teamMatch.exportJson')}
         </Button>
         <Button size="small" type={dark ? 'default' : 'default'} ghost={dark} onClick={() => inputRef.current?.click()}>
-          导入 JSON
+          {t('teamMatch.importJson')}
         </Button>
         <input
           ref={inputRef}

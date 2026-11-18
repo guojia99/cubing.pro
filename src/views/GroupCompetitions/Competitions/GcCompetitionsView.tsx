@@ -2,7 +2,9 @@
 
 import "antd/dist/reset.css";
 
-import { Input, Table, Typography } from "antd";
+import { Input, Table } from "antd";
+import { PageHeader, Surface } from "@/components/ui/page";
+import "../competition-ui.css";
 import type { TablePaginationConfig } from "antd";
 import { useCallback, useEffect, useState } from "react";
 
@@ -10,10 +12,11 @@ import { CompsTableColumns } from "@/components/Data/cube_comps/comps_tables";
 import type { Comp } from "@/components/Data/types/comps";
 import { rowClassNameWithStyleLines } from "@/components/Table/table_style";
 import { apiComps } from "@/services/cubing-pro/comps/comps";
+import { useI18n } from "@/contexts/I18nProvider";
 
-const { Title } = Typography;
 
 export function GcCompetitionsView() {
+  const { t } = useI18n();
   const [tableParams, setTableParams] = useState({ page: 1, size: 20, name: "" });
   const [comps, setComps] = useState<Comp[]>([]);
   const [total, setTotal] = useState(0);
@@ -57,13 +60,11 @@ export function GcCompetitionsView() {
   };
 
   return (
-    <>
-      <Title level={2} style={{ marginBottom: 16 }}>
-        赛事列表
-      </Title>
-      <div style={{ marginBottom: 16, maxWidth: 400 }}>
+    <div className="competition-page">
+      <PageHeader eyebrow={t('competitionAdmin.competition')} title={t('competitionAdmin.competitionList')} />
+      <div className="competition-toolbar">
         <Input.Search
-          placeholder="搜索赛事名称"
+          placeholder={t('competitionAdmin.searchCompetition')}
           value={searchName}
           onChange={(e) => setSearchName(e.target.value)}
           onSearch={handleSearch}
@@ -71,6 +72,7 @@ export function GcCompetitionsView() {
           enterButton
         />
       </div>
+      <Surface p={{ base: "3", md: "5" }}>
       <Table<Comp>
         size="small"
         columns={CompsTableColumns}
@@ -89,6 +91,7 @@ export function GcCompetitionsView() {
         scroll={{ x: "max-content" }}
         sticky
       />
-    </>
+      </Surface>
+    </div>
   );
 }

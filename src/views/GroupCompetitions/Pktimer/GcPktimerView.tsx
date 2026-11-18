@@ -1,6 +1,8 @@
 "use client";
 
 import "antd/dist/reset.css";
+import { PageHeader, Surface } from "@/components/ui/page";
+import "../competition-ui.css";
 
 import { DownOutlined, UpOutlined } from "@ant-design/icons";
 import { Button, Card, Space, Table, Tag } from "antd";
@@ -9,6 +11,8 @@ import { useEffect, useState } from "react";
 
 import { CubesCn } from "@/components/CubeIcon/cube";
 import { CubeIcon } from "@/components/CubeIcon/cube_icon";
+import { useI18n } from "@/contexts/I18nProvider";
+import { getIntlLocale } from "@/i18n";
 import { resultString, resultTimeString } from "@/components/Data/types/result";
 import {
   GetPKTimer,
@@ -17,6 +21,7 @@ import {
 } from "@/services/cubing-pro/pktimer/pktimer";
 
 export function GcPktimerView() {
+  const { t, locale } = useI18n();
   const [data, setData] = useState<PkTimerGroupRecord[]>([]);
   const [loading, setLoading] = useState(false);
   const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
@@ -64,21 +69,21 @@ export function GcPktimerView() {
     const eventRoute = pkResults?.event?.base_route_typ ?? 0;
 
     const playerColumns: ColumnsType<PkTimerPlayer> = [
-      { title: "玩家", dataIndex: "userName", key: "userName" },
+      { title: t('competitionAdmin.user'), dataIndex: "userName", key: "userName" },
       {
-        title: "单次",
+        title: t('competitionAdmin.single'),
         dataIndex: "best",
         key: "best",
         render: (_value, pp) => resultTimeString(pp.best),
       },
       {
-        title: "平均",
+        title: t('competitionAdmin.average'),
         dataIndex: "average",
         key: "average",
         render: (_value, pp) => resultTimeString(pp.average),
       },
       {
-        title: "成绩列表",
+        title: t('competitionAdmin.resultList'),
         key: "results",
         render: (_value, player) => {
           const results = player.results;
@@ -103,9 +108,9 @@ export function GcPktimerView() {
         size="small"
         style={{
           margin: "8px 16px",
-          backgroundColor: "var(--background)",
-          borderRadius: 8,
-          boxShadow: "0 2px 4px color-mix(in srgb, var(--foreground) 5%, transparent)",
+          backgroundColor: "var(--card)",
+          borderRadius: "var(--radius-card)",
+          boxShadow: "var(--shadow-card)",
         }}
       >
         <Table
@@ -121,34 +126,34 @@ export function GcPktimerView() {
 
   const columns: ColumnsType<PkTimerGroupRecord> = [
     {
-      title: "时间",
+      title: t('competitionAdmin.time'),
       dataIndex: "createdAt",
       key: "createdAt",
       width: 200,
-      render: (date: string) => new Date(date).toLocaleString("zh-CN"),
+      render: (date: string) => new Date(date).toLocaleString(getIntlLocale(locale)),
     },
     {
-      title: "项目",
+      title: t('competitionAdmin.event'),
       key: "event",
       width: 120,
       render: (_value, record) => {
-        const eventName = record.pkResults?.event?.name;
+        const eventName = record.pkResults?.event?.id || record.pkResults?.event?.name;
         if (!eventName) return "-";
         return (
           <>
-            {CubesCn(eventName)} {CubeIcon(eventName, String(record.id), {})}
+            {CubesCn(eventName, locale)} {CubeIcon(eventName, String(record.id), {})}
           </>
         );
       },
     },
     {
-      title: "总把数",
+      title: t('competitionExtra.totalAttempts'),
       dataIndex: ["pkResults", "count"],
       key: "count",
       width: 100,
     },
     {
-      title: "组名",
+      title: t('competitionExtra.groupName'),
       dataIndex: "groupName",
       key: "groupName",
       render: (_value, record) => <Tag color="cyan">{record.groupName}</Tag>,
@@ -156,16 +161,19 @@ export function GcPktimerView() {
   ];
 
   return (
-    <div>
-      <div style={{ marginBottom: 16 }}>
+    <div className="competition-page">
+      <PageHeader eyebrow={t('competitionAdmin.history')} title={t('competitionExtra.pkRecords')} />
+      <div className="competition-toolbar">
         <Space>
           <Button onClick={toggleAll}>
-            {expandedRowKeys.length === data.length ? "收起所有" : "展开所有"}
+            {t(expandedRowKeys.length === data.length ? 'competitionExtra.collapseAll' : 'competitionExtra.expandAll')}
           </Button>
         </Space>
       </div>
 
+      <Surface p={{ base: "3", md: "5" }}>
       <Table<PkTimerGroupRecord>
+        scroll={{ x: "max-content" }}
         columns={columns}
         dataSource={data}
         rowKey="id"
@@ -183,12 +191,13 @@ export function GcPktimerView() {
           expandedRowRender,
           expandIcon: ({ expanded, onExpand, record }) =>
             expanded ? (
-              <UpOutlined onClick={(e) => onExpand(record, e)} />
+              <Button type="text" size="small" aria-label={t('competitionExtra.collapseAll')} icon={<UpOutlined />} onClick={(e) => onExpand(record, e)} />
             ) : (
-              <DownOutlined onClick={(e) => onExpand(record, e)} />
+              <Button type="text" size="small" aria-label={t('competitionExtra.expandAll')} icon={<DownOutlined />} onClick={(e) => onExpand(record, e)} />
             ),
         }}
       />
+      </Surface>
     </div>
   );
 }

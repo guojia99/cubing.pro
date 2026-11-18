@@ -1,3 +1,6 @@
+import { readStoredLocale, type Locale } from '@/i18n/locales';
+import { translateDomain, type DomainMessageKey } from '@/i18n/messages/domain';
+
 export const Not = 0;               // 非比赛项目
 export const OneRound = 1;          // "1_r" 单轮项目
 export const ThreeRoundsBest = 2;   // "3_r_b" 三轮取最佳
@@ -22,23 +25,26 @@ interface RouteMap {
   notComp?: boolean;        // 是否非比赛项目
 }
 
-// @ts-ignore
 export const RouteMaps: Map<number, RouteMap> = new Map<number, RouteMap>([
-  [Not, {name: "非比赛项目", notComp: true}],
-  [OneRound, {name: "一把取最佳", rounds: 1, withBest: true}],
-  [ThreeRoundsBest, {name: "三把取最佳", rounds: 3, withBest: true}],
-  [ThreeRoundsAvgWithInteger, {name: "三把取平均(单次取整)", integer: true, rounds: 3}],
-  [ThreeRoundsAvg, {name: "三把取平均", rounds: 3}],
-  [FiveRoundsBest, {name: "五把取最佳", rounds: 5, withBest: true, headToTailNum: 1}],
-  [FiveRoundsAvg, {name: "五把取平均", rounds: 5, headToTailNum: 0}],
-  [FiveRoundsAvgHT, {name: "五把去头尾取平均", rounds: 5, headToTailNum: 1}],
-  [Repeatedly, {name: "一把多次尝试", repeatedly: true, repeatedlyNum: 1, rounds: 3, withBest: true}],
-  [TwoRepeatedlyBest, {name: "两把多次尝试取最佳", repeatedly: true, repeatedlyNum: 2, rounds: 6, withBest: true}],
-  [ThreeRepeatedlyBest, {name: "三把多次尝试取最佳", repeatedly: true, repeatedlyNum: 3, rounds: 9, withBest: true}],
+  [Not, {get name() { return eventRouteName(Not); }, notComp: true} as RouteMap],
+  [OneRound, {get name() { return eventRouteName(OneRound); }, rounds: 1, withBest: true}],
+  [ThreeRoundsBest, {get name() { return eventRouteName(ThreeRoundsBest); }, rounds: 3, withBest: true}],
+  [ThreeRoundsAvgWithInteger, {get name() { return eventRouteName(ThreeRoundsAvgWithInteger); }, integer: true, rounds: 3}],
+  [ThreeRoundsAvg, {get name() { return eventRouteName(ThreeRoundsAvg); }, rounds: 3}],
+  [FiveRoundsBest, {get name() { return eventRouteName(FiveRoundsBest); }, rounds: 5, withBest: true, headToTailNum: 1}],
+  [FiveRoundsAvg, {get name() { return eventRouteName(FiveRoundsAvg); }, rounds: 5, headToTailNum: 0}],
+  [FiveRoundsAvgHT, {get name() { return eventRouteName(FiveRoundsAvgHT); }, rounds: 5, headToTailNum: 1}],
+  [Repeatedly, {get name() { return eventRouteName(Repeatedly); }, repeatedly: true, repeatedlyNum: 1, rounds: 3, withBest: true}],
+  [TwoRepeatedlyBest, {get name() { return eventRouteName(TwoRepeatedlyBest); }, repeatedly: true, repeatedlyNum: 2, rounds: 6, withBest: true}],
+  [ThreeRepeatedlyBest, {get name() { return eventRouteName(ThreeRepeatedlyBest); }, repeatedly: true, repeatedlyNum: 3, rounds: 9, withBest: true}],
 ])
 
 
-export const eventRouteM = (route: number):RouteMap => {
-  return RouteMaps.get(route) as RouteMap
+export function eventRouteName(route: number, locale: Locale = readStoredLocale()): string {
+  return RouteMaps.has(route) ? translateDomain(locale, `domain.route.${route}` as DomainMessageKey) : String(route);
 }
 
+export const eventRouteM = (route: number, locale?: Locale):RouteMap => {
+  const entry = RouteMaps.get(route) as RouteMap;
+  return entry && locale ? { ...entry, name: eventRouteName(route, locale) } : entry;
+}

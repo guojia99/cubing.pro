@@ -2,7 +2,6 @@
 
 import {
   Box,
-  Card,
   Flex,
   IconButton,
   Input,
@@ -10,11 +9,14 @@ import {
   Slider,
   Text,
 } from "@chakra-ui/react";
-import html2canvas from "html2canvas";
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { BiSolidFileJpg, BiSolidFilePng } from "react-icons/bi";
 
 import { useI18n } from "@/contexts/I18nProvider";
+import { translateFinishing } from "@/i18n/messages/finishing";
+import { downloadSvg, downloadSvgImage } from "@/lib/svgDownload";
+import { toaster } from "@/components/ui/toaster";
+import { SectionHeader, Surface } from "@/components/ui/page";
 import { DRAW_FONT_COLOR, DRAW_NEUTRAL_STICKER } from "@/theme/domainColors";
 import { ColorPalette } from "@/views/DrawTools/components/ColorPalette";
 import {
@@ -87,7 +89,7 @@ export function DrawPalette({
   width = 400,
   height = 400,
 }: DrawPaletteProps) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [colors, setColors] = useState<Record<string, string>>({});
   const [keys, setKeys] = useState<string[]>([]);
   const [selectedColor, setSelectedColor] = useState<string>();
@@ -159,94 +161,81 @@ export function DrawPalette({
     [paintShape],
   );
 
-  const handleSvgDownload = () => {
+  const handleDownload = async (format: "svg" | "png" | "jpeg") => {
     const svg = svgRef.current;
     if (!svg) return;
-    const svgBlob = new Blob([svg.outerHTML], { type: "image/svg+xml" });
-    const svgUrl = URL.createObjectURL(svgBlob);
-    const a = document.createElement("a");
-    a.href = svgUrl;
-    a.download = downloadName
-      ? `${downloadName}.svg`
-      : `${storageKey}_${getFormattedDate()}.svg`;
-    a.click();
-    URL.revokeObjectURL(svgUrl);
-  };
-
-  const handleImageDownload = async (format: "png" | "jpeg") => {
-    const svg = svgRef.current;
-    if (!svg) return;
-
-    const wrapper = document.createElement("div");
-    const clonedSvg = svg.cloneNode(true) as SVGElement;
-    wrapper.appendChild(clonedSvg);
-    document.body.appendChild(wrapper);
-
-    const { width: w, height: h } = clonedSvg.getBoundingClientRect();
-    const canvas = await html2canvas(wrapper, {
-      backgroundColor: null,
-      width: w,
-      height: h,
-      scale: 2,
-    });
-    document.body.removeChild(wrapper);
-
-    const link = document.createElement("a");
-    link.href = canvas.toDataURL(`image/${format}`);
-    link.download = downloadName
-      ? `${downloadName}.${format === "jpeg" ? "jpg" : "png"}`
-      : `${storageKey}_${getFormattedDate()}.${format === "jpeg" ? "jpg" : "png"}`;
-    link.click();
+    const filename = `${downloadName || `${storageKey}_${getFormattedDate()}`}.${format === "jpeg" ? "jpg" : format}`;
+    try {
+      if (format === "svg") downloadSvg(svg, filename, { width, height });
+      else await downloadSvgImage(svg, filename, { format, width, height });
+    } catch {
+      toaster.create({ title: t("teamMatch.exportFailed"), type: "error" });
+    }
   };
 
   return (
-    <Flex direction={{ base: "column", lg: "row" }} gap="6" align="stretch">
-      <Card.Root flex="1">
-        <Card.Body>
-          <Flex gap="1.5" align="center" flexWrap="wrap" mb="4">
+    <Flex direction={{ base: "column", xl: "row" }} gap={{ base: 4, md: 6 }} align="start" minW="0">
+      <Surface flex="1" w="full" minW="0" p={{ base: 4, md: 6 }}>
+          <Flex gap="2" align="center" flexWrap="wrap" mb="5" pb="5" borderBottomWidth="1px" borderColor="border">
             <Input
               value={downloadName}
               onChange={(e) => setDownloadName(e.target.value)}
               placeholder={t("draws.palette.input")}
-              maxW="40"
-              size="xs"
-              fontSize="xs"
+              aria-label={t("draws.palette.input")}
+              flex="1 1 160px"
+              minW="0"
+              maxW={{ base: "full", md: "320px" }}
+              size="sm"
+              minH="44px"
+              borderRadius="12px"
+              fontSize="sm"
             />
             <IconButton
-              aria-label="Download SVG"
+              aria-label={t("algs.modal.downloadSvg")}
               variant="outline"
-              size="xs"
-              colorPalette="gray"
-              onClick={handleSvgDownload}
+              size="sm"
+              minW="44px"
+              minH="44px"
+              borderRadius="12px"
+              colorPalette="brand"
+              onClick={() => void handleDownload("svg")}
             >
               <DownloadIcon />
             </IconButton>
             <IconButton
-              aria-label="Download JPG"
+              aria-label={translateFinishing(locale, "finishing.downloadJpg")}
               variant="outline"
-              size="xs"
-              colorPalette="gray"
-              onClick={() => void handleImageDownload("jpeg")}
+              size="sm"
+              minW="44px"
+              minH="44px"
+              borderRadius="12px"
+              colorPalette="brand"
+              onClick={() => void handleDownload("jpeg")}
             >
               <BiSolidFileJpg size={FILE_DOWNLOAD_ICON_SIZE} />
             </IconButton>
             <IconButton
-              aria-label="Download PNG"
+              aria-label={t("algs.modal.downloadPng")}
               variant="outline"
-              size="xs"
-              colorPalette="gray"
-              onClick={() => void handleImageDownload("png")}
+              size="sm"
+              minW="44px"
+              minH="44px"
+              borderRadius="12px"
+              colorPalette="brand"
+              onClick={() => void handleDownload("png")}
             >
               <BiSolidFilePng size={FILE_DOWNLOAD_ICON_SIZE} />
             </IconButton>
           </Flex>
 
           <Box
-            p="5"
+            p={{ base: 2, md: 6 }}
+            minW="0"
+            minH={{ base: "280px", md: "440px" }}
             display="flex"
             justifyContent="center"
             alignItems="center"
-            borderRadius="lg"
+            borderRadius="var(--radius-card)"
             bg="bg.subtle"
             borderWidth="1px"
             borderColor="border"
@@ -258,6 +247,7 @@ export function DrawPalette({
               viewBox={viewBox}
               ref={svgRef}
               className="draw-palette-canvas"
+              style={{ maxWidth: "100%", height: "auto", flexShrink: 1 }}
               onClick={handleSvgClick}
             >
               {svgPoints.map((elem) => {
@@ -358,16 +348,17 @@ export function DrawPalette({
             </svg>
           </Box>
 
-          {buttons ? <Box mt="6" textAlign="center">{buttons}</Box> : null}
-        </Card.Body>
-      </Card.Root>
+          {buttons ? <Box mt="6" pt="6" borderTopWidth="1px" borderColor="border" minW="0">{buttons}</Box> : null}
+      </Surface>
 
-      <Card.Root w={{ base: "full", lg: "400px" }} flexShrink={0}>
-        <Card.Body>
-          <Text fontSize="sm" fontWeight="semibold" color="fg.muted" mb="3">
-            {t("draws.palette.thickness")}
-          </Text>
+      <Surface w={{ base: "full", xl: "320px" }} flexShrink={0} p={{ base: 5, md: 6 }} position={{ xl: "sticky" }} top="calc(var(--header-height) + 24px)">
+          <SectionHeader title={t("draws.palette.color_setting")} />
+          <Flex justify="space-between" align="center" mb="4" gap="3">
+            <Text fontSize="sm" color="fg.muted">{t("draws.palette.thickness")}</Text>
+            <Text fontSize="sm" fontWeight="semibold" color="accent" fontVariantNumeric="tabular-nums">{strokeWidth}</Text>
+          </Flex>
           <Slider.Root
+            colorPalette="brand"
             min={1}
             max={10}
             step={1}
@@ -379,15 +370,12 @@ export function DrawPalette({
               <Slider.Track>
                 <Slider.Range />
               </Slider.Track>
-              <Slider.Thumb index={0} />
+              <Slider.Thumb index={0} aria-label={t("draws.palette.thickness")} />
             </Slider.Control>
           </Slider.Root>
 
           <Separator borderColor="border" mb="4" />
 
-          <Text fontSize="sm" fontWeight="semibold" color="fg.muted" mb="3">
-            {t("draws.palette.color_setting")}
-          </Text>
           <ColorPalette
             selectedColor={selectedColor}
             onSelectedColorChange={setSelectedColor}
@@ -397,8 +385,7 @@ export function DrawPalette({
             allKeys={keys}
             keyDefaults={keyDefaults}
           />
-        </Card.Body>
-      </Card.Root>
+      </Surface>
     </Flex>
   );
 }

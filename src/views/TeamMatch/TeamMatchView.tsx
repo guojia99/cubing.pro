@@ -16,7 +16,7 @@ import { metaFromSession } from '@/views/TeamMatch/storage';
 import { TeamMatchProvider, useTeamMatchStore } from '@/views/TeamMatch/TeamMatchContext';
 import TeamMatchJsonToolbar from '@/views/TeamMatch/components/TeamMatchJsonToolbar';
 import TeamMatchSteps from '@/views/TeamMatch/TeamMatchSteps';
-import { TEAM_MATCH_WCA_EVENT_OPTIONS } from '@/views/TeamMatch/wcaCubeEvents';
+import { teamMatchEventOptions } from '@/views/TeamMatch/wcaCubeEvents';
 import {
   MAX_ROSTER_TEAMS,
   MIN_TEAMS,
@@ -28,33 +28,35 @@ import {
   WIZARD_STEP_PODIUM,
   type TeamMatchSession,
 } from '@/views/TeamMatch/types';
-import { Button, Card, Flex, Input, InputNumber, Modal, Popconfirm, Select, message, Space, Steps, Typography } from 'antd';
+import { App, Button, Card, Flex, Input, InputNumber, Modal, Popconfirm, Select, Space, Steps, Typography } from 'antd';
 import React from 'react';
 import { DarkMode } from '@/components/ui/color-mode';
+import { PageHeader } from '@/components/ui/page';
 import { useHideAppChrome } from '@/hooks/useHideAppChrome';
 import './TeamMatch.css';
+import { tm, useTeamMatchI18n, type TeamMatchLocale } from './i18n';
 
-const ROSTER_STEP_TITLES = ['学校与选手', '组队', '成绩录入', '队伍确认'] as const;
-
-function buildStepBarTitles(over16: boolean): string[] {
+function buildStepBarTitles(over16: boolean, locale: TeamMatchLocale): string[] {
+  const titles = (['schoolsPlayers', 'teamsStep', 'scoreEntry', 'teamConfirmation'] as const).map((key) => tm(locale, `teamMatch.${key}`));
   if (over16) {
-    return [...ROSTER_STEP_TITLES, '淘汰赛抽签', '淘汰赛', '正赛名单', '正赛抽签', '正赛'];
+    return [...titles, ...(['eliminationDraw', 'elimination', 'mainPool', 'mainDraw', 'main'] as const).map((key) => tm(locale, `teamMatch.${key}`))];
   }
-  return [...ROSTER_STEP_TITLES, '淘汰赛抽签', '正赛名单', '正赛抽签', '正赛'];
+  return [...titles, ...(['eliminationDraw', 'mainPool', 'mainDraw', 'main'] as const).map((key) => tm(locale, `teamMatch.${key}`))];
 }
 
 function MatchEventField() {
+  const { t, locale } = useTeamMatchI18n();
   const { state, dispatch } = useTeamMatchStore();
   const ev = state.session.eventIds[0] ?? '333';
   return (
     <Space wrap align="center">
       <Typography.Text strong type="secondary">
-        比赛项目
+        {t('teamMatch.event')}
       </Typography.Text>
       <Select
         style={{ minWidth: 200 }}
         value={ev}
-        options={TEAM_MATCH_WCA_EVENT_OPTIONS}
+        options={teamMatchEventOptions(locale)}
         onChange={(v) => dispatch({ type: 'SET_EVENT_IDS', eventIds: [v] })}
         showSearch
         optionFilterProp="label"
@@ -64,6 +66,7 @@ function MatchEventField() {
 }
 
 function MatchNameField({ variant = 'default' }: { variant?: 'default' | 'dark' }) {
+  const { t } = useTeamMatchI18n();
   const { state, dispatch } = useTeamMatchStore();
   const [v, setV] = React.useState(state.session.name);
   React.useEffect(() => setV(state.session.name), [state.session.id, state.session.name]);
@@ -73,12 +76,12 @@ function MatchNameField({ variant = 'default' }: { variant?: 'default' | 'dark' 
     <Space wrap align="center">
       {!dark && (
         <Typography.Text strong type="secondary">
-          比赛名称
+          {t('teamMatch.matchName')}
         </Typography.Text>
       )}
       {dark && (
         <Typography.Text style={{ color: 'color-mix(in srgb, var(--foreground) 85%, transparent)' }}>
-          比赛名称
+          {t('teamMatch.matchName')}
         </Typography.Text>
       )}
       <Input
@@ -93,7 +96,7 @@ function MatchNameField({ variant = 'default' }: { variant?: 'default' | 'dark' 
               }
             : {}),
         }}
-        placeholder="填写比赛名称"
+        placeholder={t('teamMatch.matchNamePlaceholder')}
         value={v}
         onChange={(e) => setV(e.target.value)}
         onBlur={commit}
@@ -104,6 +107,8 @@ function MatchNameField({ variant = 'default' }: { variant?: 'default' | 'dark' 
 }
 
 function TeamMatchInner() {
+  const { t, locale } = useTeamMatchI18n();
+  const { message } = App.useApp();
   const { state, dispatch } = useTeamMatchStore();
   const { session } = state;
   const step = session.wizardStep;
@@ -113,7 +118,7 @@ function TeamMatchInner() {
   const [liveSettingsOpen, setLiveSettingsOpen] = React.useState(false);
 
   const over16 = hasOverSixteenFullTeams(session);
-  const stepBarTitles = buildStepBarTitles(over16);
+  const stepBarTitles = buildStepBarTitles(over16, locale);
   const isLiveFullscreen =
     session.status === 'live' && (step === WIZARD_STEP_MAIN_LIVE || step === WIZARD_STEP_PODIUM);
 
@@ -190,12 +195,12 @@ function TeamMatchInner() {
 
   const goToStepBarIndex = (stepIndex: number) => {
     if (!canAccessStepBarIndex(session, stepIndex, over16)) {
-      message.warning('请先完成前置步骤');
+      message.warning(t('teamMatch.prerequisite'));
       return;
     }
     const w = stepBarIndexToWizardStep(stepIndex, over16);
     if (w === WIZARD_STEP_MAIN_LIVE && session.status !== 'live') {
-      message.warning('请先在「正赛抽签」中点击「开始比赛」进入正赛');
+      message.warning(t('teamMatch.startMainHint'));
       return;
     }
     dispatch({ type: 'SET_WIZARD_STEP', step: w });
@@ -211,8 +216,8 @@ function TeamMatchInner() {
   if (session.status === 'live' && (step === WIZARD_STEP_MAIN_LIVE || step === WIZARD_STEP_PODIUM)) {
     const bracketComplete = isBracketFullyComplete(session);
     const podiumBlockHint = session.skipBronzeMatch
-      ? '请完成全部淘汰赛（已跳过季军赛）'
-      : '请完成全部淘汰赛与铜牌战';
+      ? t('teamMatch.finishWithoutBronze')
+      : t('teamMatch.finishWithBronze');
     return (
       <DarkMode>
       <div className="tmFullscreen">
@@ -229,18 +234,18 @@ function TeamMatchInner() {
         >
           <Space wrap align="center" size="middle">
             <Typography.Text style={{ color: 'var(--muted-foreground)' }}>
-              {step === WIZARD_STEP_PODIUM ? '领奖台' : '正赛'}
+              {step === WIZARD_STEP_PODIUM ? t('teamMatch.podium') : t('teamMatch.main')}
             </Typography.Text>
             <MatchNameField variant="dark" />
           </Space>
           <Space wrap>
             {step === WIZARD_STEP_PODIUM ? (
               <Button type="primary" onClick={() => dispatch({ type: 'SET_WIZARD_STEP', step: WIZARD_STEP_MAIN_LIVE })}>
-                返回正赛
+                {t('teamMatch.backMain')}
               </Button>
             ) : (
               <>
-                <Button onClick={() => dispatch({ type: 'SET_WIZARD_STEP', step: WIZARD_STEP_MAIN_DRAW })}>返回抽签</Button>
+                <Button onClick={() => dispatch({ type: 'SET_WIZARD_STEP', step: WIZARD_STEP_MAIN_DRAW })}>{t('teamMatch.backDraw')}</Button>
                 <LiveSettingsButton type="default" ghost onClick={() => setLiveSettingsOpen(true)} />
                 <Button
                   type="primary"
@@ -248,7 +253,7 @@ function TeamMatchInner() {
                   title={!bracketComplete ? podiumBlockHint : undefined}
                   onClick={() => dispatch({ type: 'SET_WIZARD_STEP', step: WIZARD_STEP_PODIUM })}
                 >
-                  下一步：领奖台
+                  {t('teamMatch.nextPodium')}
                 </Button>
               </>
             )}
@@ -278,56 +283,55 @@ function TeamMatchInner() {
   }
 
   return (
-    <>
+    <div className="tm-workbench">
       <TeamMatchJsonToolbar {...jsonToolbarProps} variant="light" />
-      <Card>
+      <PageHeader title={t('teamMatch.title')} description={t('teamMatch.description')} />
+      <Card className="tm-workbench-main">
       <Space orientation="vertical" style={{ width: '100%' }} size="large">
-        <Typography.Title level={4} style={{ margin: 0 }}>
-          组队赛工具
-        </Typography.Title>
         <Space wrap align="center" size="middle">
           <MatchNameField />
           <MatchEventField />
         </Space>
         <Space wrap>
-          <Button onClick={() => dispatch({ type: 'NEW_SESSION' })}>新比赛</Button>
+          <Button onClick={() => dispatch({ type: 'NEW_SESSION' })}>{t('teamMatch.newMatch')}</Button>
           <Popconfirm
-            title="用测试数据覆盖当前比赛？"
-            description="将替换为学校/选手/队伍及随机种子成绩（满16队：广工5队等预设校名）。"
+            title={t('teamMatch.overwriteTest')}
+            description={t('teamMatch.testDescription')}
             onConfirm={() => {
-              dispatch({ type: 'MOCK_FILL_TEST_DATA' });
-              message.success('已填充满16队测试数据');
+              dispatch({ type: 'MOCK_FILL_TEST_DATA', locale });
+              message.success(t('teamMatch.testFilled'));
             }}
-            okText="覆盖"
-            cancelText="取消"
+            okText={t('teamMatch.overwrite')}
+            cancelText={t('teamMatch.cancel')}
           >
-            <Button>一键填充16队测试数据</Button>
+            <Button>{t('teamMatch.fillTest')}</Button>
           </Popconfirm>
-          <Button onClick={() => setMockModalOpen(true)}>追加测试分组</Button>
+          <Button onClick={() => setMockModalOpen(true)}>{t('teamMatch.appendTest')}</Button>
           <Modal
-            title="追加测试分组"
+            className="tm-workbench-modal"
+            title={t('teamMatch.appendTest')}
             open={mockModalOpen}
             onCancel={() => setMockModalOpen(false)}
             onOk={() => {
               const n = Math.max(1, Math.floor(mockGroupCount));
               const room = MAX_ROSTER_TEAMS - session.teams.length;
               if (room <= 0) {
-                message.warning(`队伍已达上限 ${MAX_ROSTER_TEAMS}，无法继续添加`);
+                message.warning(t('teamMatch.teamLimit', { count: MAX_ROSTER_TEAMS }));
                 return;
               }
               const add = Math.min(n, room);
-              dispatch({ type: 'MOCK_APPEND_GROUPS', count: add });
-              message.success(`已追加 ${add} 组（学校+选手+队伍），并写入随机种子成绩`);
+              dispatch({ type: 'MOCK_APPEND_GROUPS', count: add, locale });
+              message.success(t('teamMatch.appended', { count: add }));
               setMockModalOpen(false);
             }}
-            okText="追加"
+            okText={t('teamMatch.append')}
+            cancelText={t('teamMatch.cancel')}
           >
             <Typography.Paragraph type="secondary" style={{ marginBottom: 12 }}>
-              按预设校名顺序追加（与「一键填充16队」同一套校名表；满16队时广工共5队）。当前队伍{' '}
-              {session.teams.length}/{MAX_ROSTER_TEAMS}。
+              {t('teamMatch.appendHint', { count: session.teams.length, max: MAX_ROSTER_TEAMS })}
             </Typography.Paragraph>
             <Space align="center">
-              <Typography.Text>组数</Typography.Text>
+              <Typography.Text>{t('teamMatch.groupCount')}</Typography.Text>
               <InputNumber
                 min={1}
                 max={Math.max(1, MAX_ROSTER_TEAMS - session.teams.length)}
@@ -348,12 +352,12 @@ function TeamMatchInner() {
           }}
         >
           <div style={{ padding: '8px 16px', background: 'var(--muted)' }}>
-            <Typography.Text strong>最近 {state.root.historyIds.length} 场</Typography.Text>
+            <Typography.Text strong>{t('teamMatch.recent', { count: state.root.historyIds.length })}</Typography.Text>
           </div>
           {state.root.historyIds.map((id) => {
             const s = state.root.sessions[id];
             if (!s) return null;
-            const meta = metaFromSession(s);
+            const meta = metaFromSession(s, locale);
             return (
               <Flex
                 key={id}
@@ -369,16 +373,16 @@ function TeamMatchInner() {
                   <Typography.Text strong>{meta.name}</Typography.Text>
                   <div>
                     <Typography.Text type="secondary">
-                      {meta.summary} · {new Date(meta.updatedAt).toLocaleString()}
+                      {meta.summary} · {new Date(meta.updatedAt).toLocaleString(locale)}
                     </Typography.Text>
                   </div>
                 </div>
                 <Space size="small" wrap>
                   <Button type="link" size="small" onClick={() => dispatch({ type: 'LOAD_SESSION', id })}>
-                    打开
+                    {t('teamMatch.open')}
                   </Button>
                   <Button type="link" danger size="small" onClick={() => dispatch({ type: 'DELETE_SESSION', id })}>
-                    删除
+                    {t('teamMatch.delete')}
                   </Button>
                 </Space>
               </Flex>
@@ -393,22 +397,24 @@ function TeamMatchInner() {
         <TeamMatchSteps liveUISettings={liveUISettings} onLiveUISettingsChange={setLiveUISettings} />
         <Space>
           <Button disabled={step === 0} onClick={prev}>
-            上一步
+            {t('teamMatch.previous')}
           </Button>
           <Button type="primary" disabled={step >= 5 || !canNext()} onClick={next}>
-            下一步
+            {t('teamMatch.next')}
           </Button>
         </Space>
       </Space>
     </Card>
-    </>
+    </div>
   );
 }
 
 export function TeamMatchView() {
   return (
+    <App>
     <TeamMatchProvider>
       <TeamMatchInner />
     </TeamMatchProvider>
+    </App>
   );
 }

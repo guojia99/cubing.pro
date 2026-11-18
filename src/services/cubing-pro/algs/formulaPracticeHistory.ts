@@ -1,3 +1,4 @@
+import { ClientMessageError } from '../clientError';
 import {
   deleteScope, historyScope, historyTransaction, migrateHistoryScope,
   type RecordRow,
@@ -50,11 +51,11 @@ export interface AppendRecordInput {
   algs: string[];
 }
 
-export class PracticeSessionMissingError extends Error {
+export class PracticeSessionMissingError extends ClientMessageError {
   readonly code = 'PRACTICE_SESSION_MISSING' as const;
 
   constructor(public readonly sessionId: string) {
-    super(`Practice session not found: ${sessionId}`);
+    super('shared.error.sessionMissing');
     this.name = 'PracticeSessionMissingError';
   }
 }
@@ -83,12 +84,12 @@ export async function appendFormulaPracticeRecord(
   cube: string, classId: string, sessionId: string, input: AppendRecordInput,
 ): Promise<FormulaPracticeRecord> {
   if (!sessionId) throw new PracticeSessionMissingError(sessionId);
-  if (!Number.isFinite(input.timeMs) || input.timeMs < 0) throw new Error('Invalid practice time');
+  if (!Number.isFinite(input.timeMs) || input.timeMs < 0) throw new ClientMessageError('shared.error.invalidHistory');
   if (input.id !== undefined && (typeof input.id !== 'string' || !input.id.trim())) {
-    throw new Error('Invalid practice record ID');
+    throw new ClientMessageError('shared.error.invalidHistory');
   }
   if (input.createdAt !== undefined && (!Number.isFinite(input.createdAt) || input.createdAt < 0)) {
-    throw new Error('Invalid practice record timestamp');
+    throw new ClientMessageError('shared.error.invalidHistory');
   }
   const explicitCreatedAt = input.createdAt !== undefined;
   // Snapshot pending input before any await so caller mutations cannot alter the write.
@@ -111,7 +112,7 @@ export async function appendFormulaPracticeRecord(
               fields.some((field) => existing[field] !== record[field]) ||
               existing.algs.length !== record.algs.length ||
               existing.algs.some((alg, index) => alg !== record.algs[index])) {
-            failure = new Error(`Practice record ID conflict: ${record.id}`);
+            failure = new ClientMessageError('shared.error.historyConflict');
             tx.abort();
             return;
           }
@@ -169,7 +170,7 @@ export async function getFormulaPracticeHistoryPage(
   cube: string, classId: string, page: number, pageSize: number = PAGE_SIZE,
 ): Promise<HistoryPageResult> {
   if (!Number.isSafeInteger(page) || page < 1 || !Number.isSafeInteger(pageSize) || pageSize < 1 ||
-      !Number.isSafeInteger((page - 1) * pageSize)) throw new Error('Invalid history pagination');
+      !Number.isSafeInteger((page - 1) * pageSize)) throw new ClientMessageError('shared.error.invalidHistory');
   const { db, scope } = await library(cube, classId);
   return historyTransaction(db, 'readonly', (tx, done) => {
     const count = tx.objectStore('records').index('scope').count(scope);

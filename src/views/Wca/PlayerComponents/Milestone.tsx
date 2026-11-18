@@ -222,6 +222,7 @@ const MilestoneTimelines: React.FC<MilestoneTimelineProps> = ({
       comps,
       improvementNumber,
       (descriptor, values) => intl.formatMessage(descriptor, values),
+      intl.locale,
     );
     setAllMilestones(milestones);
     const sortedMilestones = sortMilestones(milestones, ascending);

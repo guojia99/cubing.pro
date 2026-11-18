@@ -1,6 +1,7 @@
 "use client";
 
 import "antd/dist/reset.css";
+import { useCompetitionPublicI18n } from './i18n';
 
 import Pagination from "@/components/Buttons/pagination_button";
 import { NotFoundStatus } from "@/components/Status/NotFoundStatus";
@@ -14,13 +15,15 @@ import {
   ProfileOutlined,
   TableOutlined,
 } from "@ant-design/icons";
-import { Skeleton } from "antd";
+import { Alert, Button, Skeleton } from "antd";
 import NextLink from "next/link";
 import { useRouteParam } from "@/hooks/useRouteParam";
 import { useSearchParams } from "next/navigation";
 import React, { lazy, Suspense, useEffect, useState } from "react";
 
 import CompetitionScrambles from "@/views/Competition/CompetitionComponents/CompetitionScrambles";
+import { PageHeader } from "@/components/ui/page";
+import "./Competition.css";
 
 const CompetitionDetail = lazy(
   () => import("@/views/Competition/CompetitionComponents/CompetitionDetail"),
@@ -44,11 +47,14 @@ function TabContent({ loading, children }: { loading: boolean; children: React.R
 }
 
 export function CompetitionView() {
+  const { t, p } = useCompetitionPublicI18n();
   const id = useRouteParam("id");
   const searchParams = useSearchParams();
 
   const [loading, setLoading] = useState(true);
   const [is404, setIs404] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const [request, setRequest] = useState(0);
   const [comp, setComp] = useState<CompAPI.CompResp>();
 
   useEffect(() => {
@@ -58,6 +64,9 @@ export function CompetitionView() {
 
     const controller = new AbortController();
     setLoading(true);
+    setFailed(false);
+    setIs404(false);
+    setComp(undefined);
 
     apiComp(id, { signal: controller.signal })
       .then((value) => {
@@ -72,12 +81,16 @@ export function CompetitionView() {
         if (isRequestCanceled(error)) {
           return;
         }
-        setIs404(true);
+        console.error('Competition load failed', error);
+        const notFound = typeof error === 'object' && error !== null && 'response' in error
+          && (error.response as { status?: number } | undefined)?.status === 404;
+        setIs404(notFound);
+        setFailed(!notFound);
         setLoading(false);
       });
 
     return () => controller.abort();
-  }, [id]);
+  }, [id, request]);
 
   useEffect(() => {
     if (comp?.data?.Name && typeof document !== "undefined") {
@@ -88,7 +101,7 @@ export function CompetitionView() {
   const items = [
     {
       key: "detail",
-      label: "详情",
+      label: t("competitionAdmin.details"),
       children: (
         <TabContent loading={loading}>
           <Suspense fallback={<Skeleton active />}>
@@ -100,7 +113,7 @@ export function CompetitionView() {
     },
     {
       key: "regulations",
-      label: "规则",
+      label: t("competitionAdmin.rules"),
       children: (
         <TabContent loading={loading}>
           <Suspense fallback={<Skeleton active />}>
@@ -112,7 +125,7 @@ export function CompetitionView() {
     },
     {
       key: "results",
-      label: "赛果",
+      label: t("competitionAdmin.results"),
       children: (
         <TabContent loading={loading}>
           <Suspense fallback={<Skeleton active />}>
@@ -124,7 +137,7 @@ export function CompetitionView() {
     },
     {
       key: "scrambles",
-      label: "打乱",
+      label: t("competitionAdmin.scramble"),
       children: (
         <TabContent loading={loading}>
           <CompetitionScrambles comp={comp} />
@@ -140,14 +153,14 @@ export function CompetitionView() {
   let latest: React.ReactNode = null;
   let earliest: React.ReactNode = null;
 
-  if (comp?.data.EarliestID !== 0) {
+  if (comp && comp.data.EarliestID !== 0) {
     earliest = (
       <NextLink href={`/competition/${comp?.data.EarliestID}${searchSuffix}`}>
         {"<"} {comp?.data.EarliestName}{" "}
       </NextLink>
     );
   }
-  if (comp?.data.LatestID !== 0) {
+  if (comp && comp.data.LatestID !== 0) {
     latest = (
       <NextLink href={`/competition/${comp?.data.LatestID}${searchSuffix}`}>
         {" "}
@@ -157,12 +170,16 @@ export function CompetitionView() {
   }
 
   if (is404) {
-    return <NotFoundStatus title="比赛不存在" />;
+    return <NotFoundStatus title={t("competitionAdmin.notFound")} />;
+  }
+
+  if (failed) {
+    return <Alert type="error" title={p('competitionPublic.competitionFailed')} action={<Button onClick={() => setRequest((n) => n + 1)}>{t('competitionAdmin.retry')}</Button>} />;
   }
 
   return (
-    <>
-      <h1 style={{ textAlign: "center" }}>{comp ? comp.data.Name : "比赛加载中"}</h1>
+    <div className="competition-workbench">
+      <PageHeader title={comp ? comp.data.Name : t("competitionAdmin.loading")} />
       <NavTabs
         type="line"
         items={items}
@@ -170,6 +187,6 @@ export function CompetitionView() {
         indicator={{ size: (origin: number) => origin - 20, align: "center" }}
       />
       <Pagination Latest={latest} Earliest={earliest} />
-    </>
+    </div>
   );
 }

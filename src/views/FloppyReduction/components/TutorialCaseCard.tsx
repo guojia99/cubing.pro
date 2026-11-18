@@ -3,6 +3,8 @@
 import { Badge, Box, Flex, Text } from "@chakra-ui/react";
 import dynamic from "next/dynamic";
 
+import { useI18n } from "@/contexts/I18nProvider";
+import { translateTutorialExtra } from "@/i18n/messages/tutorial-extra";
 import { FR_COLORS } from "@/views/FloppyReduction/utils/constants";
 import type { TutorialCaseItem } from "@/views/FloppyReduction/utils/caseData";
 
@@ -24,24 +26,17 @@ function parseAlg(alg: string): string[] {
   return alg.trim().split(/\s+/).filter(Boolean);
 }
 
-const TIER_LABEL: Record<TutorialCaseItem["tier"], { zh: string; en: string }> = {
-  simple: { zh: "简单", en: "Simple" },
-  hard: { zh: "较难", en: "Harder" },
-  special: { zh: "策略", en: "Strategy" },
-};
-
 export function TutorialCaseCard({
   item,
-  zh,
 }: {
   item: TutorialCaseItem;
-  zh: boolean;
 }) {
+  const { locale } = useI18n();
   const solution = parseAlg(item.alg);
-  const tier = TIER_LABEL[item.tier];
 
   return (
     <Box
+      className="fr-tutorial-case"
       borderWidth="1px"
       borderRadius="md"
       p="3"
@@ -62,7 +57,7 @@ export function TutorialCaseCard({
           display="inline-flex"
           alignItems="center"
         >
-          {zh ? tier.zh : tier.en}
+          {translateTutorialExtra(locale, `tutorialExtra.fr.tier.${item.tier}`)}
         </Badge>
         <Text
           as="span"
@@ -92,7 +87,7 @@ export function TutorialCaseCard({
           />
         </Box>
         <Text fontSize="sm" color="fg.muted" lineHeight="1.7" flex="1">
-          {zh ? item.zh : item.en}
+          {translateTutorialExtra(locale, item.descriptionKey)}
         </Text>
       </Flex>
     </Box>

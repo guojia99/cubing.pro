@@ -2,6 +2,8 @@
 
 import { NativeSelect } from "@chakra-ui/react";
 import type { ReactNode } from "react";
+import { useI18n } from "@/contexts/I18nProvider";
+import { getSiteContent } from "@/i18n/messages/site-content";
 
 import { foodControlProps } from "./foodTokens";
 
@@ -12,9 +14,11 @@ interface FoodFilterSelectProps {
   minW?: string;
   w?: string;
   className?: string;
+  label?: string;
 }
 
-export function FoodFilterSelect({ value, onChange, children, minW, w, className }: FoodFilterSelectProps) {
+export function FoodFilterSelect({ value, onChange, children, minW, w, className, label }: FoodFilterSelectProps) {
+  const { locale } = useI18n();
   return (
     <NativeSelect.Root
       size="sm"
@@ -25,11 +29,13 @@ export function FoodFilterSelect({ value, onChange, children, minW, w, className
     >
       <NativeSelect.Field
         {...foodControlProps}
+        aria-label={label ?? getSiteContent(locale)("siteContent.categoryFilter")}
         value={value}
         onChange={(e) => onChange(e.target.value)}
       >
         {children}
       </NativeSelect.Field>
+      <NativeSelect.Indicator />
     </NativeSelect.Root>
   );
 }

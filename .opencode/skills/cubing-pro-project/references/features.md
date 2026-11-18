@@ -82,6 +82,8 @@ FR 链路在 `FloppyReduction/fr/`，入口 `analyzeScramble` 验证 HTR，再�
 
 手工绘图 `DrawTools/components/DrawPalette` 提供颜色、路径、文字与导出；它和“公式解析成实际状态”的图示链用途不同。
 
+绘图与公式图示下载复用 `lib/svgDownload.ts`：仅序列化 SVG 并交给浏览器栅格化，不解析页面 CSS；绘图 PNG 透明、JPEG 白底，按原画布尺寸 2× 输出，公式 PNG 保持 viewBox 尺寸 2× 白底。团体赛 HTML 对阵图必须走 `lib/html2canvasColors.ts` 的截图克隆颜色转换，不能直接调用 html2canvas 1.4.1 解析主题的 `color()` / `color-mix()` 等值。该转换只改克隆文档并清理本次 iframe，不得全局改写主题或用户画布。
+
 ## 4. 群赛、计时与后台
 
 公开比赛 `CompetitionView` 拉取详情，规则/结果等局部懒加载；共享展示依赖 `components/Data`。打乱在 `CompetitionScrambles.tsx`，采用 cstimer 图示链，与公式库本地图示链不同。`scrambleSegments.ts` 处理连拧/多盲，无法可靠拆分时保留原文。

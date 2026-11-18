@@ -1,3 +1,4 @@
+import { useTeamMatchI18n } from '@/views/TeamMatch/i18n';
 import type { Player, School, Team, TeamKind } from '@/views/TeamMatch/types';
 import { MAX_ROSTER_TEAMS, TEAM_PLAYERS } from '@/views/TeamMatch/types';
 import { classifyTeamComposition, defaultTeamName, getFreelancerSchoolId } from '@/views/TeamMatch/teamClassify';
@@ -37,6 +38,7 @@ const TeamEditModal: React.FC<Props> = ({
   activeTeamCount,
   onSave,
 }) => {
+  const { t: tr, locale } = useTeamMatchI18n();
   const [form] = Form.useForm<FormVals>();
 
   const playerOptions = useMemo(
@@ -67,47 +69,53 @@ const TeamEditModal: React.FC<Props> = ({
     }
   }, [open, editing, form]);
 
+  useEffect(() => {
+    if (!open) return;
+    const invalid = form.getFieldsError().filter(field => field.errors.length).map(field => field.name);
+    if (invalid.length) void form.validateFields(invalid).catch(() => {});
+  }, [locale, open, form]);
+
   const handleOk = () => {
     void form.validateFields().then((v: FormVals) => {
       const ids = [v.p0, v.p1, v.p2].filter(Boolean);
       if (new Set(ids).size !== TEAM_PLAYERS) {
-        message.warning('请选择 3 名不同选手');
+        message.warning(tr('teamMatch.threeDifferentPlayers'));
         return;
       }
       if (ids.some((id) => usedPlayerIds.has(id))) {
-        message.warning('所选选手已被其他队伍占用');
+        message.warning(tr('teamMatch.playerAlreadyAssigned'));
         return;
       }
       if (!editing && activeTeamCount >= MAX_ROSTER_TEAMS) {
-        message.warning(`最多 ${MAX_ROSTER_TEAMS} 支有效队伍（可先删除部分队伍或在队伍确认步骤将队伍标为缺席）`);
+        message.warning(tr('teamMatch.activeTeamLimit', { p0: MAX_ROSTER_TEAMS }));
         return;
       }
 
       /** 尚无自由人池时自动补一条，便于自由人队分类与保存（名称默认「自由人」） */
       let schoolsForClassify = schools;
       if (!getFreelancerSchoolId(schools)) {
-        const autoFl: School = { id: uuidv4(), name: '自由人', kind: 'freelancer' };
+        const autoFl: School = { id: uuidv4(), name: tr('teamMatch.independentPoolName'), kind: 'freelancer' };
         schoolsForClassify = [...schools, autoFl];
       }
 
-      const c = classifyTeamComposition([v.p0, v.p1, v.p2], players, schoolsForClassify);
+      const c = classifyTeamComposition([v.p0, v.p1, v.p2], players, schoolsForClassify, locale);
       if (!c.ok) {
         message.warning(c.message);
         return;
       }
       if (v.teamMode === 'school' && c.kind !== 'school') {
         message.warning(
-          '当前队员组合不符合学校队（需至少两名队员来自同一普通学校，且不能三人三校各一人）；请改为自由人队或调整队员',
+          tr('teamMatch.invalidSchoolTeam'),
         );
         return;
       }
       if (v.teamMode === 'freelancer' && c.kind !== 'freelancer') {
-        message.warning('当前队员组合不符合自由人队；请改为学校队或调整队员');
+        message.warning(tr('teamMatch.invalidIndependentTeam'));
         return;
       }
 
       const nameTrim = v.name?.trim();
-      const name = nameTrim || defaultTeamName(c.kind, c.schoolId, schoolsForClassify);
+      const name = nameTrim || defaultTeamName(c.kind, c.schoolId, schoolsForClassify, locale);
 
       const base = {
         schoolId: c.schoolId,
@@ -127,58 +135,53 @@ const TeamEditModal: React.FC<Props> = ({
         });
       }
       onClose();
-    });
+    }, () => {});
   };
 
   return (
     <Modal
-      title={editing ? '编辑队伍' : '添加队伍'}
+      className="tm-workbench-modal"
+      title={editing ? tr('teamMatch.editTeam') : tr('teamMatch.addTeam')}
       open={open}
       onCancel={onClose}
       width={560}
       footer={
         <Space>
-          <Button onClick={onClose}>取消</Button>
-          <Button type="primary" onClick={() => void handleOk()}>
-            保存
-          </Button>
+          <Button onClick={onClose}>{tr('teamMatch.cancel')}</Button>
+          <Button type="primary" onClick={() => void handleOk()}>{tr('teamMatch.save')}</Button>
         </Space>
       }
       destroyOnHidden
     >
-      <Typography.Paragraph type="secondary" style={{ marginBottom: 12 }}>
-        <strong>学校队</strong>：至少两名队员来自同一所普通学校（可含其他校或自由人池选手作外援）。
-        <strong>自由人队</strong>：如三人来自三所不同学校、或两名及以上挂靠自由人池等无法形成「同校两人」的组合。若尚未在「学校」步骤添加自由人池，保存自由人队时将<strong>自动创建</strong>默认「自由人」学校。自由人队
-        <strong>不参与</strong>抽签中的同校首轮避战。
-      </Typography.Paragraph>
+      <Typography.Paragraph type="secondary" style={{ marginBottom: 12 }}>{tr('teamMatch.teamRulesHelp')}</Typography.Paragraph>
       <Form form={form} layout="vertical" initialValues={{ teamMode: 'school' as TeamKind }}>
-        <Form.Item name="teamMode" label="组队类型" rules={[{ required: true }]}>
+        <Form.Item name="teamMode" label={tr('teamMatch.teamType')} rules={[{ required: true }]}>
           <Radio.Group
             options={[
-              { label: '学校队', value: 'school' },
-              { label: '自由人队', value: 'freelancer' },
+              { label: tr('teamMatch.schoolTeam'), value: 'school' },
+              { label: tr('teamMatch.independentTeam'), value: 'freelancer' },
             ]}
           />
         </Form.Item>
-        <Form.Item name="name" label="队名（可空，将按学校或自由人池自动默认）">
+        <Form.Item name="name" label={tr('teamMatch.teamNameOptional')}>
           <Input />
         </Form.Item>
-        <Form.Item name="battlecry" label="作战宣言（可选）">
-          <Input.TextArea rows={2} placeholder="全屏对战点击队员时放大展示" maxLength={200} showCount />
+        <Form.Item name="battlecry" label={tr('teamMatch.battlecryOptional')}>
+          <Input.TextArea rows={2} placeholder={tr('teamMatch.battlecryHint')} maxLength={200} showCount />
         </Form.Item>
-        <Form.Item name="p0" label="队员 1" rules={[{ required: true, message: '请选择队员' }]}>
+        <Form.Item name="p0" label={tr('teamMatch.memberOne')} rules={[{ required: true, message: tr('teamMatch.selectMemberRequired') }]}>
           <Select
             showSearch
             optionFilterProp="label"
             options={playerOptions}
-            placeholder="选择选手（不限学校）"
+            placeholder={tr('teamMatch.selectAnyPlayer')}
           />
         </Form.Item>
-        <Form.Item name="p1" label="队员 2" rules={[{ required: true, message: '请选择队员' }]}>
-          <Select showSearch optionFilterProp="label" options={playerOptions} placeholder="选择选手" />
+        <Form.Item name="p1" label={tr('teamMatch.memberTwo')} rules={[{ required: true, message: tr('teamMatch.selectMemberRequired') }]}>
+          <Select showSearch optionFilterProp="label" options={playerOptions} placeholder={tr('teamMatch.selectPlayer')} />
         </Form.Item>
-        <Form.Item name="p2" label="队员 3" rules={[{ required: true, message: '请选择队员' }]}>
-          <Select showSearch optionFilterProp="label" options={playerOptions} placeholder="选择选手" />
+        <Form.Item name="p2" label={tr('teamMatch.memberThree')} rules={[{ required: true, message: tr('teamMatch.selectMemberRequired') }]}>
+          <Select showSearch optionFilterProp="label" options={playerOptions} placeholder={tr('teamMatch.selectPlayer')} />
         </Form.Item>
       </Form>
     </Modal>

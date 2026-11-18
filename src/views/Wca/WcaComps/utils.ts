@@ -1,4 +1,5 @@
 import type { WcaCompetitionIndexItem } from '@/services/cubing-pro/wca/competition_index';
+import { getIntlLocale, type Locale } from '@/i18n/locales';
 
 export type RegistrationStatus = 'notStarted' | 'open' | 'closed' | 'unknown';
 
@@ -35,8 +36,8 @@ export function compDurationDays(start: string, end: string): number {
   return Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24)) + 1;
 }
 
-export function formatToBeijingTime(utcString: string): string {
-  return new Date(utcString).toLocaleString('zh-CN', {
+export function formatToBeijingTime(utcString: string, locale: Locale = 'zh-CN'): string {
+  return new Date(utcString).toLocaleString(getIntlLocale(locale), {
     timeZone: 'Asia/Shanghai',
     hour12: false,
     year: 'numeric',

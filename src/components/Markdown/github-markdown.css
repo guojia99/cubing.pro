@@ -8,120 +8,91 @@
   --fontStack-monospace: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  .markdown-body,
-  [data-theme="dark"] {
-    /*dark*/
-    color-scheme: dark;
-    --focus-outlineColor: #1f6feb;
-    --fgColor-default: #e6edf3;
-    --fgColor-muted: #8d96a0;
-    --fgColor-accent: #4493f8;
-    --fgColor-success: #3fb950;
-    --fgColor-attention: #d29922;
-    --fgColor-danger: #f85149;
-    --fgColor-done: #ab7df8;
-    --bgColor-default: #0d1117;
-    --bgColor-muted: #161b22;
-    --bgColor-neutral-muted: #6e768166;
-    --bgColor-attention-muted: #bb800926;
-    --borderColor-default: #30363d;
-    --borderColor-muted: #30363db3;
-    --borderColor-neutral-muted: #6e768166;
-    --borderColor-accent-emphasis: #1f6feb;
-    --borderColor-success-emphasis: #238636;
-    --borderColor-attention-emphasis: #9e6a03;
-    --borderColor-danger-emphasis: #da3633;
-    --borderColor-done-emphasis: #8957e5;
-    --color-prettylights-syntax-comment: #8b949e;
-    --color-prettylights-syntax-constant: #79c0ff;
-    --color-prettylights-syntax-constant-other-reference-link: #a5d6ff;
-    --color-prettylights-syntax-entity: #d2a8ff;
-    --color-prettylights-syntax-storage-modifier-import: #c9d1d9;
-    --color-prettylights-syntax-entity-tag: #7ee787;
-    --color-prettylights-syntax-keyword: #ff7b72;
-    --color-prettylights-syntax-string: #a5d6ff;
-    --color-prettylights-syntax-variable: #ffa657;
-    --color-prettylights-syntax-brackethighlighter-unmatched: #f85149;
-    --color-prettylights-syntax-brackethighlighter-angle: #8b949e;
-    --color-prettylights-syntax-invalid-illegal-text: #f0f6fc;
-    --color-prettylights-syntax-invalid-illegal-bg: #8e1519;
-    --color-prettylights-syntax-carriage-return-text: #f0f6fc;
-    --color-prettylights-syntax-carriage-return-bg: #b62324;
-    --color-prettylights-syntax-string-regexp: #7ee787;
-    --color-prettylights-syntax-markup-list: #f2cc60;
-    --color-prettylights-syntax-markup-heading: #1f6feb;
-    --color-prettylights-syntax-markup-italic: #c9d1d9;
-    --color-prettylights-syntax-markup-bold: #c9d1d9;
-    --color-prettylights-syntax-markup-deleted-text: #ffdcd7;
-    --color-prettylights-syntax-markup-deleted-bg: #67060c;
-    --color-prettylights-syntax-markup-inserted-text: #aff5b4;
-    --color-prettylights-syntax-markup-inserted-bg: #033a16;
-    --color-prettylights-syntax-markup-changed-text: #ffdfb6;
-    --color-prettylights-syntax-markup-changed-bg: #5a1e02;
-    --color-prettylights-syntax-markup-ignored-text: #c9d1d9;
-    --color-prettylights-syntax-markup-ignored-bg: #1158c7;
-    --color-prettylights-syntax-meta-diff-range: #d2a8ff;
-    --color-prettylights-syntax-sublimelinter-gutter-mark: #484f58;
-  }
+html.dark .markdown-body {
+  color-scheme: dark;
+  --fgColor-success: #3fb950;
+  --fgColor-attention: #d29922;
+  --fgColor-danger: #f85149;
+  --fgColor-done: #ab7df8;
+  --bgColor-attention-muted: #bb800926;
+  --borderColor-success-emphasis: #238636;
+  --borderColor-attention-emphasis: #9e6a03;
+  --borderColor-danger-emphasis: #da3633;
+  --borderColor-done-emphasis: #8957e5;
+  --color-prettylights-syntax-entity: #d2a8ff;
+  --color-prettylights-syntax-entity-tag: #7ee787;
+  --color-prettylights-syntax-keyword: #ff7b72;
+  --color-prettylights-syntax-variable: #ffa657;
+  --color-prettylights-syntax-brackethighlighter-unmatched: #f85149;
+  --color-prettylights-syntax-invalid-illegal-bg: #8e1519;
+  --color-prettylights-syntax-carriage-return-bg: #b62324;
+  --color-prettylights-syntax-string-regexp: #7ee787;
+  --color-prettylights-syntax-markup-list: #f2cc60;
+  --color-prettylights-syntax-markup-deleted-text: #ffdcd7;
+  --color-prettylights-syntax-markup-deleted-bg: #67060c;
+  --color-prettylights-syntax-markup-inserted-text: #aff5b4;
+  --color-prettylights-syntax-markup-inserted-bg: #033a16;
+  --color-prettylights-syntax-markup-changed-text: #ffdfb6;
+  --color-prettylights-syntax-markup-changed-bg: #5a1e02;
+  --color-prettylights-syntax-meta-diff-range: #d2a8ff;
 }
 
-@media (prefers-color-scheme: light) {
-  .markdown-body,
-  [data-theme="light"] {
-    /*light*/
-    color-scheme: light;
-    --focus-outlineColor: #0969da;
-    --fgColor-default: #1f2328;
-    --fgColor-muted: #636c76;
-    --fgColor-accent: #0969da;
-    --fgColor-success: #1a7f37;
-    --fgColor-attention: #9a6700;
-    --fgColor-danger: #d1242f;
-    --fgColor-done: #8250df;
-    --bgColor-default: #ffffff;
-    --bgColor-muted: #f6f8fa;
-    --bgColor-neutral-muted: #afb8c133;
-    --bgColor-attention-muted: #fff8c5;
-    --borderColor-default: #d0d7de;
-    --borderColor-muted: #d0d7deb3;
-    --borderColor-neutral-muted: #afb8c133;
-    --borderColor-accent-emphasis: #0969da;
-    --borderColor-success-emphasis: #1a7f37;
-    --borderColor-attention-emphasis: #bf8700;
-    --borderColor-danger-emphasis: #cf222e;
-    --borderColor-done-emphasis: #8250df;
-    --color-prettylights-syntax-comment: #57606a;
-    --color-prettylights-syntax-constant: #0550ae;
-    --color-prettylights-syntax-constant-other-reference-link: #0a3069;
-    --color-prettylights-syntax-entity: #6639ba;
-    --color-prettylights-syntax-storage-modifier-import: #24292f;
-    --color-prettylights-syntax-entity-tag: #0550ae;
-    --color-prettylights-syntax-keyword: #cf222e;
-    --color-prettylights-syntax-string: #0a3069;
-    --color-prettylights-syntax-variable: #953800;
-    --color-prettylights-syntax-brackethighlighter-unmatched: #82071e;
-    --color-prettylights-syntax-brackethighlighter-angle: #57606a;
-    --color-prettylights-syntax-invalid-illegal-text: #f6f8fa;
-    --color-prettylights-syntax-invalid-illegal-bg: #82071e;
-    --color-prettylights-syntax-carriage-return-text: #f6f8fa;
-    --color-prettylights-syntax-carriage-return-bg: #cf222e;
-    --color-prettylights-syntax-string-regexp: #116329;
-    --color-prettylights-syntax-markup-list: #3b2300;
-    --color-prettylights-syntax-markup-heading: #0550ae;
-    --color-prettylights-syntax-markup-italic: #24292f;
-    --color-prettylights-syntax-markup-bold: #24292f;
-    --color-prettylights-syntax-markup-deleted-text: #82071e;
-    --color-prettylights-syntax-markup-deleted-bg: #ffebe9;
-    --color-prettylights-syntax-markup-inserted-text: #116329;
-    --color-prettylights-syntax-markup-inserted-bg: #dafbe1;
-    --color-prettylights-syntax-markup-changed-text: #953800;
-    --color-prettylights-syntax-markup-changed-bg: #ffd8b5;
-    --color-prettylights-syntax-markup-ignored-text: #eaeef2;
-    --color-prettylights-syntax-markup-ignored-bg: #0550ae;
-    --color-prettylights-syntax-meta-diff-range: #8250df;
-    --color-prettylights-syntax-sublimelinter-gutter-mark: #8c959f;
-  }
+html:not(.dark) .markdown-body {
+  color-scheme: light;
+  --fgColor-success: #1a7f37;
+  --fgColor-attention: #9a6700;
+  --fgColor-danger: #d1242f;
+  --fgColor-done: #8250df;
+  --bgColor-attention-muted: #fff8c5;
+  --borderColor-success-emphasis: #1a7f37;
+  --borderColor-attention-emphasis: #bf8700;
+  --borderColor-danger-emphasis: #cf222e;
+  --borderColor-done-emphasis: #8250df;
+  --color-prettylights-syntax-entity: #6639ba;
+  --color-prettylights-syntax-entity-tag: #0550ae;
+  --color-prettylights-syntax-keyword: #cf222e;
+  --color-prettylights-syntax-variable: #953800;
+  --color-prettylights-syntax-brackethighlighter-unmatched: #82071e;
+  --color-prettylights-syntax-invalid-illegal-bg: #82071e;
+  --color-prettylights-syntax-carriage-return-bg: #cf222e;
+  --color-prettylights-syntax-string-regexp: #116329;
+  --color-prettylights-syntax-markup-list: #3b2300;
+  --color-prettylights-syntax-markup-deleted-text: #82071e;
+  --color-prettylights-syntax-markup-deleted-bg: #ffebe9;
+  --color-prettylights-syntax-markup-inserted-text: #116329;
+  --color-prettylights-syntax-markup-inserted-bg: #dafbe1;
+  --color-prettylights-syntax-markup-changed-text: #953800;
+  --color-prettylights-syntax-markup-changed-bg: #ffd8b5;
+  --color-prettylights-syntax-meta-diff-range: #8250df;
+}
+
+/* Site surfaces and accents follow the selected html theme and palette. */
+html .markdown-body {
+  --focus-outlineColor: var(--accent);
+  --fgColor-default: var(--foreground);
+  --fgColor-muted: var(--muted-foreground);
+  --fgColor-accent: var(--accent);
+  --bgColor-default: var(--card);
+  --bgColor-muted: var(--muted);
+  --bgColor-neutral-muted: var(--muted);
+  --borderColor-default: var(--border-default);
+  --borderColor-muted: var(--border-default);
+  --borderColor-neutral-muted: var(--border-default);
+  --borderColor-accent-emphasis: var(--accent);
+  --color-prettylights-syntax-comment: var(--faint-foreground);
+  --color-prettylights-syntax-constant: var(--accent);
+  --color-prettylights-syntax-constant-other-reference-link: var(--accent);
+  --color-prettylights-syntax-storage-modifier-import: var(--foreground);
+  --color-prettylights-syntax-string: var(--accent);
+  --color-prettylights-syntax-brackethighlighter-angle: var(--muted-foreground);
+  --color-prettylights-syntax-invalid-illegal-text: var(--foreground);
+  --color-prettylights-syntax-carriage-return-text: var(--foreground);
+  --color-prettylights-syntax-markup-heading: var(--accent);
+  --color-prettylights-syntax-markup-italic: var(--foreground);
+  --color-prettylights-syntax-markup-bold: var(--foreground);
+  --color-prettylights-syntax-markup-ignored-text: var(--foreground);
+  --color-prettylights-syntax-markup-ignored-bg: var(--accent-soft);
+  --color-prettylights-syntax-sublimelinter-gutter-mark: var(--faint-foreground);
 }
 
 .markdown-body {
@@ -130,7 +101,7 @@
   margin: 0;
   color: var(--fgColor-default);
   background-color: var(--bgColor-default);
-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
+  font-family: var(--font-body);
   font-size: 16px;
   line-height: 1.5;
   word-wrap: break-word;
@@ -401,6 +372,8 @@
   margin-bottom: 16px;
   font-weight: var(--base-text-weight-semibold, 600);
   line-height: 1.25;
+  font-family: var(--font-heading);
+  scroll-margin-top: calc(var(--header-height) + 1rem);
 }
 
 .markdown-body h2 {

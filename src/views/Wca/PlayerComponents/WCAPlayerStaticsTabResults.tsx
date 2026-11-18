@@ -46,6 +46,7 @@ const WCAPlayerStaticsTabResults: React.FC<WCAPlayerStaticsTabResultsProps> = ({
 
   return (
     <Tabs
+      className="wca-result-group-tabs"
       defaultActiveKey="with_event"
       size="large"
       tabBarStyle={{ fontSize: 16, fontWeight: 'bold', paddingLeft: 16 }}

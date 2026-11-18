@@ -5,7 +5,7 @@
   --ink: var(--foreground);
   --muted-ink: var(--muted-foreground);
   color: var(--ink);
-  font-family: "DM Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-family: var(--font-body, "DM Sans"), "PingFang SC", "Microsoft YaHei", sans-serif;
 }
 .workbench { width: min(1440px, 100%); margin: 0 auto; padding: 18px 28px 60px; }
 .practiceFullscreen { position: fixed; inset: 0; z-index: 1000; width: 100%; height: 100dvh; margin: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; background: var(--background, var(--card)); padding-inline: max(28px, calc((100vw - 1384px) / 2)); }
@@ -19,8 +19,8 @@
 .workbench button, .workbench summary, .configDialog button, .configDialog select, .configDialog input[type="checkbox"], .configDialog input[type="radio"] { cursor: pointer; }
 .workbench button:disabled, .workbench select:disabled, .workbench textarea:disabled, .configDialog button:disabled, .configDialog select:disabled, .configDialog fieldset:disabled { cursor: not-allowed; opacity: .5; }
 .workbench :is(button, input, select, textarea, summary):focus-visible, .configDialog :is(button, input, select):focus-visible { outline: 2px solid var(--ring, var(--accent)); outline-offset: 3px; }
-.toolbar { display: flex; align-items: center; gap: 24px; min-height: 54px; padding-bottom: 16px; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
-.toolbar h1 { font-size: 21px; line-height: 1.2; font-weight: 650; letter-spacing: -.03em; }
+.toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 16px 24px; min-height: 80px; padding: 20px 24px; border: 1px solid var(--line); border-radius: var(--radius-card, 1rem); background: var(--surface); box-shadow: var(--shadow-card); margin-bottom: 24px; }
+.toolbar h1 { font-family: var(--font-heading, inherit); font-size: clamp(22px, 2.4vw, 30px); line-height: 1.2; font-weight: 650; letter-spacing: -.03em; }
 .tabs { display: inline-flex; padding: 3px; gap: 3px; border-radius: 7px; background: var(--subtle); border: 1px solid var(--line); }
 .tabs button { min-height: 30px; min-width: 62px; padding: 4px 15px; border: 1px solid transparent; border-radius: 4px; background: transparent; color: var(--muted-ink); font-size: 12px; font-weight: 500; }
 .tabs .activeTab { background: var(--surface); border-color: var(--line); color: var(--ink); }
@@ -70,7 +70,7 @@
 .emptyState p { color: var(--muted-ink); font-size: 12px; line-height: 1.8; margin: 8px 0 14px; }
 .emptyPrompt { padding: 16px 0; text-align: center; color: var(--muted-ink); font-size: 12px; }
 .practice { min-width: 0; }
-.practiceScramble { position: sticky; top: 72px; z-index: 20; flex-shrink: 0; width: 100%; text-align: center; margin: 0; padding: 10px 12px 12px; background: var(--background, var(--card)); border-bottom: 1px solid var(--line); }
+.practiceScramble { position: sticky; top: calc(var(--header-height, 4rem) + 24px); z-index: 20; flex-shrink: 0; width: 100%; text-align: center; margin: 0; padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-card, 1rem); box-shadow: var(--shadow-card); }
 .practiceFullscreen .practiceScramble { top: 0; }
 .practiceScramble code { display: block; margin-top: 8px; font-size: clamp(16px, 2vw, 21px); line-height: 1.8; letter-spacing: .02em; }
 .practiceStage { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; min-height: 370px; }
@@ -156,6 +156,31 @@
 .samplingFields { border: 0; padding: 0; min-width: 0; }
 .solverCube { position: relative; width: 100%; min-width: 0; isolation: isolate; }
 .solverCubeStatus { position: absolute; inset: 0; display: grid; place-items: center; padding: 12px; color: var(--muted-foreground); font-size: 11px; line-height: 1.8; text-align: center; overflow-wrap: anywhere; }
+.scramblePanel, .historyPanel, .reviewEditor { padding: 20px; border: 1px solid var(--line); border-radius: var(--radius-card, 1rem); background: var(--surface); box-shadow: var(--shadow-card); }
+.scramblePanel { gap: 24px; }
+.scrambleLabel, .scrambleLabel + .small { font-size: 12px; }
+.scrambleInput { border-radius: 12px; background: var(--subtle); }
+.tabs, .segment { border: 0; border-radius: 12px; padding: 4px; background: var(--muted); }
+.tabs button, .segment span { min-height: 36px; border-radius: 9px; }
+.tabs .activeTab, .segment input:checked + span { color: var(--accent); border-color: transparent; box-shadow: var(--shadow-card); }
+.configButton, .button, .primaryButton, .timerButton, .stopTimer, .loadMore, .penaltyControl select { border-radius: 10px; min-height: 38px; }
+.configButton, .button, .primaryButton { transition: background-color 150ms, border-color 150ms, box-shadow 150ms; }
+.primaryButton { box-shadow: 0 3px 10px color-mix(in srgb, var(--accent) 18%, transparent); }
+.statusPanel { padding: 4px 4px 0; }
+.statusRow { min-height: 32px; }
+.resultsHeading { margin: 8px 0 14px; flex-wrap: wrap; }
+.resultsHeading h2, .workbench h2 { font-family: var(--font-heading, inherit); }
+.practiceStage { margin-top: 12px; border-radius: var(--radius-card, 1rem); background: var(--surface); }
+.practiceActions { padding: 14px; border: 1px solid var(--line); border-radius: var(--radius-card, 1rem); background: var(--surface); }
+.emptyState, .emptyPrompt { border: 1px dashed var(--line); border-radius: var(--radius-card, 1rem); background: var(--surface); padding: 32px 16px; }
+.sessionStats { flex-wrap: wrap; }
+.configDialog { border-radius: 24px; box-shadow: var(--shadow-float); }
+.configTabs { overflow-x: auto; }
+.configTabs button { white-space: nowrap; min-height: 44px; }
+.chip span, .colorChoice, .field input:not([type="range"]), .field select { border-radius: 9px; }
+.fieldset legend { color: var(--accent); }
+.fieldset + .fieldset { padding-top: 20px; border-top: 1px solid var(--line); }
+.configIntro { padding: 12px 14px; background: var(--accent-soft); border-radius: 12px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 @media (max-width: 1100px) {
   .practiceCube { justify-content: center; margin-top: 0; }
@@ -164,7 +189,8 @@
 }
 @media (max-width: 640px) {
   .workbench { padding: 14px 14px 36px; }
-  .toolbar { flex-wrap: wrap; gap: 12px 16px; margin-bottom: 16px; padding-bottom: 12px; }
+  .scramblePanel { padding: 16px; }
+  .toolbar { flex-wrap: wrap; gap: 12px 16px; margin-bottom: 16px; padding: 16px; }
   .toolbarActions { width: 100%; gap: 6px; }
   .toolbarActions .textButton { margin-right: auto; }
   .toolbar h1 { font-size: 19px; }

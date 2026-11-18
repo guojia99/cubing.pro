@@ -1,6 +1,10 @@
 "use client";
 
 import "antd/dist/reset.css";
+import "../competition-ui.css";
+import { Surface } from "@/components/ui/page";
+import { Spin } from "antd";
+import { useI18n } from "@/contexts/I18nProvider";
 
 import { useRouteParam } from "@/hooks/useRouteParam";
 import { useEffect, useState } from "react";
@@ -15,6 +19,7 @@ import PlayerResults from "./components/PlayerResults";
 import styles from "./gc-player.module.css";
 
 export function GcPlayerView() {
+  const { t } = useI18n();
   const id = useRouteParam("id");
   const [loading, setLoading] = useState(true);
   const [is404, setIs404] = useState(false);
@@ -49,15 +54,15 @@ export function GcPlayerView() {
   }, [id]);
 
   if (is404) {
-    return <NotFoundStatus title="玩家不存在" />;
+    return <NotFoundStatus title={t('competitionExtra.playerNotFound')} />;
   }
 
   if (loading) {
-    return <div>加载中...</div>;
+    return <Surface p="10" textAlign="center"><Spin description={t('competitionExtra.loading')} /></Surface>;
   }
 
   return (
-    <div className={styles.playerPageRoot}>
+    <div className={`${styles.playerPageRoot} competition-page`}>
       <PlayerDetail player={player} />
       <PlayerResults player={player} />
     </div>

@@ -1,4 +1,7 @@
 import { exportHistory, importHistory, normalizeHistory } from './formulaPracticeHistoryDb';
+import { ClientMessageError, clientErrorMessage } from '../clientError';
+import { readStoredLocale } from '@/i18n';
+import { translateShared } from '@/i18n/messages/shared';
 import {
   DEFAULT_PUZZLE_PREFERENCES,
   PUZZLE_PREFERENCES_KEY,
@@ -75,16 +78,18 @@ export async function exportPracticeConfig(): Promise<PracticeConfigExport> {
 
 function entries(value: unknown): [string, unknown][] {
   if (value === undefined) return [];
-  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Invalid backup section');
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new ClientMessageError('shared.error.backupFormat');
   return Object.entries(value);
 }
 
-export async function importPracticeConfig(jsonStr: string): Promise<{ success: boolean; message?: string }> {
+export async function importPracticeConfig(jsonStr: string, locale: string = readStoredLocale()): Promise<{ success: boolean; message?: string }> {
   const previous = new Map<string, string | null>();
   try {
-    const data = JSON.parse(jsonStr) as Partial<PracticeConfigExport>;
-    if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('Invalid format');
-    if (data.version !== 1 && data.version !== 2) throw new Error('Unsupported version');
+    let data: Partial<PracticeConfigExport>;
+    try { data = JSON.parse(jsonStr); }
+    catch { throw new ClientMessageError('shared.error.backupFormat'); }
+    if (!data || typeof data !== 'object' || Array.isArray(data)) throw new ClientMessageError('shared.error.backupFormat');
+    if (data.version !== 1 && data.version !== 2) throw new ClientMessageError('shared.error.backupFormat');
 
     const writes = new Map<string, string>();
     for (const [prefix, section] of [
@@ -107,7 +112,7 @@ export async function importPracticeConfig(jsonStr: string): Promise<{ success: 
       if (data.version === 1) {
         for (const [key, formulas] of entries(data.customFormulas)) {
           if (!Array.isArray(formulas) || formulas.some((formula) => typeof formula !== 'string')) {
-            throw new Error('Invalid custom formulas');
+            throw new ClientMessageError('shared.error.backupFormat');
           }
           writes.set(`${PREFIX_CUSTOM}${key}`, JSON.stringify(formulas));
         }
@@ -120,7 +125,7 @@ export async function importPracticeConfig(jsonStr: string): Promise<{ success: 
     for (const [key, value] of writes) {
       previous.set(key, localStorage.getItem(key));
       localStorage.setItem(key, value);
-      if (localStorage.getItem(key) !== value) throw new Error(`Storage verification failed: ${key}`);
+      if (localStorage.getItem(key) !== value) throw new ClientMessageError('shared.error.storageVerification');
     }
     // importHistory resolves at DB commit; legacy-key cleanup is best-effort after that boundary.
     if (Object.keys(histories).length) await importHistory(histories);
@@ -137,7 +142,7 @@ export async function importPracticeConfig(jsonStr: string): Promise<{ success: 
     }
     return {
       success: false,
-      message: `${error instanceof Error ? error.message : 'Import failed'}${rollbackFailed ? '; settings rollback failed' : ''}`,
+      message: `${clientErrorMessage(error, locale, 'shared.error.import')}${rollbackFailed ? `; ${translateShared(locale, 'shared.error.rollback')}` : ''}`,
     };
   }
 }

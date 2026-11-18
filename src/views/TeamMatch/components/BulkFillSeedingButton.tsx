@@ -1,3 +1,4 @@
+import { useTeamMatchI18n } from '@/views/TeamMatch/i18n';
 import { bulkFillSeedingScores, canBulkFillSeeding } from '@/views/TeamMatch/bulkFillSeeding';
 import type { TeamMatchStoreAction } from '@/views/TeamMatch/TeamMatchContext';
 import type { TeamMatchSession } from '@/views/TeamMatch/types';
@@ -10,6 +11,7 @@ type Props = {
 };
 
 const BulkFillSeedingButton: React.FC<Props> = ({ session, dispatch }) => {
+  const { t: tr } = useTeamMatchI18n();
   const [busy, setBusy] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [percent, setPercent] = useState(0);
@@ -22,7 +24,7 @@ const BulkFillSeedingButton: React.FC<Props> = ({ session, dispatch }) => {
 
   const run = async () => {
     if (disabled) {
-      message.warning('请至少为一名选手填写 WCA ID 或 One ID');
+      message.warning(tr('teamMatch.needAnyId'));
       return;
     }
     const ac = new AbortController();
@@ -33,12 +35,12 @@ const BulkFillSeedingButton: React.FC<Props> = ({ session, dispatch }) => {
     try {
       const seeding = await bulkFillSeedingScores(session, session.eventIds, setPercent, { signal: ac.signal });
       dispatch({ type: 'SET_SEEDING', seeding });
-      message.success('已按顺序拉取并合并 WCA / One 成绩');
+      message.success(tr('teamMatch.bulkScoresDone'));
     } catch (e) {
       if ((e as Error).name === 'AbortError') {
-        message.info('已取消');
+        message.info(tr('teamMatch.cancelled'));
       } else {
-        message.error('批量填充失败');
+        message.error(tr('teamMatch.bulkScoresFailed'));
       }
     } finally {
       setBusy(false);
@@ -50,19 +52,16 @@ const BulkFillSeedingButton: React.FC<Props> = ({ session, dispatch }) => {
 
   return (
     <Space orientation="vertical" size="small" style={{ width: '100%', maxWidth: 420 }}>
-      <Button type="default" loading={busy} disabled={disabled} onClick={() => void run()}>
-        一键填充 WCA / One 成绩
-      </Button>
+      <Button type="default" loading={busy} disabled={disabled} onClick={() => void run()}>{tr('teamMatch.bulkScores')}</Button>
       <Modal
-        title="正在拉取 WCA / One 成绩"
+        className="tm-workbench-modal"
+        title={tr('teamMatch.fetchingScores')}
         open={modalOpen}
         mask={{ closable: false }}
         closable={false}
         keyboard={false}
         footer={
-          <Button onClick={cancel} disabled={!busy}>
-            取消
-          </Button>
+          <Button onClick={cancel} disabled={!busy}>{tr('teamMatch.cancel')}</Button>
         }
         destroyOnHidden
       >

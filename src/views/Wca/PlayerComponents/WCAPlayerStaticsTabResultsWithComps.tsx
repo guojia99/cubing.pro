@@ -1,13 +1,14 @@
 import React from 'react';
 import { Tag, Space, Card, Typography, Table } from 'antd';
 import { useIntl } from '@/hooks/useIntlMessage';
-import { roundNameMap, roundSortOrder } from '@/views/Wca/utils/events';
+import { formatRoundName, roundSortOrder } from '@/views/Wca/utils/events';
 import { ColumnsType } from 'antd/es/table';
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import { CubesCn } from '@/components/CubeIcon/cube';
 import { formatAttempts, resultsTimeFormat } from '@/views/Wca/utils/wca_results';
 import { findCubingCompetitionByIdentifier } from '@/services/cubing-pro/cubing_china/cubing';
 import { WCACompetition, WCAResult } from '@/services/cubing-pro/wca/types';
+import { formatLocalizedDate, formatLocalizedDateRange } from '@/lib/localizedDates';
 import './WCAPlayerStaticsTabResultsWithComps.css';
 
 const { Title } = Typography;
@@ -19,17 +20,13 @@ interface WCAPlayerStaticsTabResultsWithCompProps {
   comps: WCACompetition[]
 }
 
-const formatDate = (date: string): string => {
-  return date.split('T')[0];
-};
-
 const WCAPlayerStaticsTabResultsWithComp: React.FC<WCAPlayerStaticsTabResultsWithCompProps> = ({ wcaResults, comps }) => {
   const intl = useIntl();
   if (!wcaResults || wcaResults.length === 0) {
     return (
       <div
         style={{
-          color: 'var(--ant-color-text-tertiary)',
+          color: 'var(--muted-foreground)',
           textAlign: 'center',
           padding: '16px',
         }}
@@ -205,7 +202,7 @@ const WCAPlayerStaticsTabResultsWithComp: React.FC<WCAPlayerStaticsTabResultsWit
           return (
             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               {CubeIcon(eventId, eventId, {})}
-              <strong>{CubesCn(eventId)}</strong>
+              <strong>{CubesCn(eventId, intl.locale)}</strong>
             </div>
           );
         }
@@ -219,7 +216,7 @@ const WCAPlayerStaticsTabResultsWithComp: React.FC<WCAPlayerStaticsTabResultsWit
       key: 'round',
       width: 100,
       render: (id) => {
-        const name = roundNameMap[id] || id;
+        const name = formatRoundName(id, intl.locale);
         const color = ['f', 'c', 'b'].includes(id) ? 'geekblue' : 'default';
         return <Tag color={color} style={{ margin: 0 }}>{name}</Tag>;
       },
@@ -338,11 +335,11 @@ const WCAPlayerStaticsTabResultsWithComp: React.FC<WCAPlayerStaticsTabResultsWit
     }
     return <>
       <div>
-        <Title level={4} style={{ margin: 0, color: 'var(--ant-color-text-heading)' }}>
+        <Title level={4} style={{ margin: 0, color: 'var(--foreground)' }}>
           {cpName}
         </Title>
-        <div style={{ fontSize: '14px', color: 'var(--ant-color-text-secondary)' }}>
-          {formatDate(comp.startDate)} ~ {formatDate(comp.endDate)} | {city}
+        <div style={{ fontSize: '14px', color: 'var(--muted-foreground)' }}>
+          {formatLocalizedDateRange(comp.startDate, comp.endDate, intl.locale)} | {city}
         </div>
       </div>
     </>
@@ -356,7 +353,7 @@ const WCAPlayerStaticsTabResultsWithComp: React.FC<WCAPlayerStaticsTabResultsWit
   return (
     <div className="wca-by-comp-root" style={{ marginTop: 16 }}>
       {sortedComps.length === 0 ? (
-        <div style={{ color: 'var(--ant-color-text-tertiary)' }}>
+        <div style={{ color: 'var(--muted-foreground)' }}>
           {intl.formatMessage({ id: 'wca.results.noValidData' })}
         </div>
       ) : (
@@ -399,9 +396,9 @@ const WCAPlayerStaticsTabResultsWithComp: React.FC<WCAPlayerStaticsTabResultsWit
                         key={idx}
                         style={{
                           padding: '10px 12px',
-                          backgroundColor: 'var(--ant-color-bg-elevated)',
-                          borderRadius: 8,
-                          border: '1px solid var(--ant-color-border-secondary)',
+                          backgroundColor: 'var(--card)',
+                          borderRadius: 'var(--radius-card)',
+                          border: '1px solid var(--border-default)',
                           fontSize: 13,
                           lineHeight: 1.6,
                         }}
@@ -411,7 +408,7 @@ const WCAPlayerStaticsTabResultsWithComp: React.FC<WCAPlayerStaticsTabResultsWit
                           <Tag color="volcano" style={{ marginLeft: 4 }}>
                             {getCompDisplayName(b.breakComp)}
                           </Tag>
-                          <Tag color="default">{formatDate(b.breakComp.startDate)}</Tag>
+                          <Tag color="default">{formatLocalizedDate(b.breakComp.startDate, intl.locale)}</Tag>
                           {intl.formatMessage({ id: 'wca.results.prStreakBreakAtSuffix' })}
                         </div>
                         <div>
@@ -424,7 +421,7 @@ const WCAPlayerStaticsTabResultsWithComp: React.FC<WCAPlayerStaticsTabResultsWit
                           </Tag>
                           {intl.formatMessage({ id: 'wca.results.prStreakBreakPrevSuffix' })}
                           <Tag color="blue" style={{ marginLeft: 4 }}>
-                            {formatDate(b.streakEndComp.startDate)} ~ {formatDate(b.streakStartComp.startDate)}
+                            {formatLocalizedDateRange(b.streakEndComp.startDate, b.streakStartComp.startDate, intl.locale)}
                           </Tag>
                         </div>
                       </div>

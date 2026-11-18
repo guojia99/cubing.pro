@@ -2,16 +2,18 @@
 
 import "antd/dist/reset.css";
 
-import { Alert, Input, Spin, Table, Typography } from "antd";
+import { Alert, Input, Spin, Table } from "antd";
+import { PageHeader, Surface } from "@/components/ui/page";
+import "./wca-ui.css";
 import { useEffect, useRef, useState } from "react";
 
 import { WCALink, WCALinkWithCnName } from "@/components/Link/WcaLinks";
 import { useI18n } from "@/contexts/I18nProvider";
-import { getCountryNameByIso2 } from "@/views/Wca/PlayerComponents/region/all_contiry";
+import { getLocalizedCountryLabel } from "./utils/countryLabel";
+import { translateWcaPuzzleExtra as extra } from "@/i18n/messages/wca-puzzle-extra";
 import { getWCAPersons } from "@/services/cubing-pro/wca/player";
 import type { WCAPerson } from "@/services/cubing-pro/wca/types";
 
-const { Title } = Typography;
 
 function isValidWCAPersonArray(data: unknown): data is WCAPerson[] {
   if (!Array.isArray(data)) return false;
@@ -29,13 +31,13 @@ const inputStyle: React.CSSProperties = {
   maxWidth: 600,
   fontSize: "18px",
   padding: "12px 16px",
-  borderRadius: "8px",
+  borderRadius: "var(--radius-card)",
   border: "1px solid var(--border-default)",
-  boxShadow: "0 2px 8px color-mix(in srgb, var(--foreground) 8%, transparent)",
+  boxShadow: "var(--shadow-card)",
 };
 
 export function WcaPlayersSearchView() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<WCAPerson[]>([]);
   const [loading, setLoading] = useState(false);
@@ -105,7 +107,7 @@ export function WcaPlayersSearchView() {
       key: "iso2",
       width: 120,
       render: (text: string, record: WCAPerson) => (
-        <>{getCountryNameByIso2(text || record.country_id)}</>
+        <>{getLocalizedCountryLabel(text || record.country_id, undefined, locale)}</>
       ),
     },
     {
@@ -136,7 +138,7 @@ export function WcaPlayersSearchView() {
   const isEmptyState = !query && results.length === 0 && !loading && !error;
 
   return (
-    <div
+    <div className="wca-page"
       style={{
         padding: "24px",
         maxWidth: 1000,
@@ -149,11 +151,10 @@ export function WcaPlayersSearchView() {
         boxSizing: "border-box",
       }}
     >
-      <Title level={2} style={{ textAlign: "center", marginBottom: 24 }}>
-        {t("wca.players.title")}
-      </Title>
+      <PageHeader eyebrow={extra(locale, "wcaPuzzleExtra.players")} title={t("wca.players.title")} />
 
       <Input
+        aria-label={t("wca.players.title")}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder={t("wca.players.placeholder")}
@@ -182,14 +183,15 @@ export function WcaPlayersSearchView() {
       )}
 
       {results.length > 0 && (
-        <div style={{ marginTop: 24, width: "100%" }}>
+        <Surface mt="6" w="full" p={{ base: "3", md: "5" }}>
           <Table
+            scroll={{ x: "max-content" }}
             dataSource={results}
             columns={columns}
             rowKey={(record) => record.wca_id}
             pagination={{ pageSize: 10, showSizeChanger: true }}
           />
-        </div>
+        </Surface>
       )}
     </div>
   );

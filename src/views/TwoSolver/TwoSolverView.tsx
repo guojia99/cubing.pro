@@ -3,7 +3,7 @@
 import { cloneElement, isValidElement, useEffect, useId, useRef, useState, type CSSProperties, type ReactElement, type ReactNode } from "react";
 import { CloseButton, Dialog, Portal } from "@chakra-ui/react";
 import { useI18n } from "@/contexts/I18nProvider";
-import type { Locale } from "@/i18n";
+import { SUPPORTED_LOCALES, type Locale } from "@/i18n";
 import type { twoSolverMainZhCN } from "@/i18n/messages/two-solver-main";
 import { parseMoves } from "./engine/state";
 import { METHODS, DEFAULT_METHODS, DEFAULT_FAMILY_DEPTHS, COLORS, familyOf, type FamilyDepths, type MethodFamily, type MethodId, type SearchOptions, type SearchResult, type Solution } from "./engine/types";
@@ -760,7 +760,7 @@ export default function TwoSolverView() {
             </fieldset>}
 
             {configPanel === "display" && <fieldset className={styles.fieldset} disabled={timer.isTiming}><legend>{t("two.main.timerDisplay")}</legend><div className={styles.configGrid}>
-              <Field label={t("two.main.language")}><select value={draftLocale} onChange={event => setDraftLocale(event.target.value as Locale)}><option value="zh-CN">{t("two.main.language.zh")}</option><option value="en-US">{t("two.main.language.en")}</option></select></Field>
+              <Field label={t("two.main.language")}><select value={draftLocale} onChange={event => setDraftLocale(event.target.value as Locale)}>{SUPPORTED_LOCALES.map(item => <option key={item.key} value={item.key}>{t(item.labelKey)}</option>)}</select></Field>
               <Field label={tf("two.main.timerFont", { size: number.format(draftDisplay.timerFont) })}><input type="range" min={80} max={200} step={1} value={draftDisplay.timerFont} onChange={event => setDraftDisplay(value => ({ ...value, timerFont: Number(event.target.value) }))} /></Field>
               <Field label={t("two.main.decimalPlaces")}><select value={draftDisplay.precision} onChange={event => setDraftDisplay(value => ({ ...value, precision: Number(event.target.value) as Display["precision"] }))}>{[0, 1, 2, 3].map(n => <option key={n} value={n}>{tf("two.main.digits", { count: number.format(n) })}</option>)}</select></Field>
               <Field label={t("two.main.runningDisplay")}><select value={draftDisplay.runningDisplay} onChange={event => setDraftDisplay(value => ({ ...value, runningDisplay: event.target.value as Display["runningDisplay"] }))}><option value="live">{t("two.main.liveTimer")}</option><option value="seconds">{t("two.main.wholeSeconds")}</option><option value="hidden">{t("two.main.hideTime")}</option></select></Field>

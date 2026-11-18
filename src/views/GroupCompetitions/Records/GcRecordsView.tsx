@@ -2,14 +2,16 @@
 
 import "antd/dist/reset.css";
 
-import { Switch, Typography } from "antd";
+import { Switch } from "antd";
+import { PageHeader, Surface } from "@/components/ui/page";
+import "../competition-ui.css";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useMemo } from "react";
 
 import { RecordsWithBest } from "./RecordWithBest";
 import { RecordsWithEvents } from "./RecordWithEvents";
+import { useI18n } from "@/contexts/I18nProvider";
 
-const { Title } = Typography;
 
 export const RECORDS_QUERY_MODE = "mode";
 export const RECORDS_QUERY_GROUP = "group";
@@ -27,6 +29,7 @@ function parseGroupId(raw: string | null): number {
 }
 
 export function GcRecordsView() {
+  const { t } = useI18n();
   const router = useRouter();
   const pathname = usePathname() ?? "/group-competitions/records";
   const searchParams = useSearchParams();
@@ -88,18 +91,17 @@ export function GcRecordsView() {
   );
 
   return (
-    <>
-      <Title level={2} style={{ textAlign: "center", marginBottom: 16 }}>
-        记录
-      </Title>
+    <div className="competition-page">
+      <PageHeader eyebrow={t('competitionAdmin.records')} title={t('competitionAdmin.records')} actions={
       <Switch
         checked={isBest}
-        checkedChildren="总榜"
-        unCheckedChildren="历史"
+        checkedChildren={t('competitionExtra.overall')}
+        unCheckedChildren={t('competitionExtra.history')}
         onChange={setBestMode}
-        style={{ float: "right" }}
+        aria-label={t('competitionExtra.recordMode')}
       />
-      <br />
+      } />
+      <Surface p={{ base: "3", md: "6" }}>
       {isBest ? (
         <RecordsWithBest groupId={groupId} onGroupIdChange={setGroupId} />
       ) : (
@@ -110,6 +112,7 @@ export function GcRecordsView() {
           onEventIdChange={setEventId}
         />
       )}
-    </>
+      </Surface>
+    </div>
   );
 }

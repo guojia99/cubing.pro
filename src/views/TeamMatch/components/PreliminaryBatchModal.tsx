@@ -1,3 +1,4 @@
+import { useTeamMatchI18n } from '@/views/TeamMatch/i18n';
 import { resolveOfficialScores } from '@/views/TeamMatch/seedingScorePick';
 import type {
   Player,
@@ -67,13 +68,12 @@ function PrelimCell({
   value: number | 'DNF' | null;
   onChange: (v: number | 'DNF' | null) => void;
 }) {
+  const { t: tr } = useTeamMatchI18n();
   if (value === 'DNF') {
     return (
       <Space size={4}>
         <Typography.Text type="danger">DNF</Typography.Text>
-        <Button type="link" size="small" onClick={() => onChange(null)}>
-          数字
-        </Button>
+        <Button type="link" size="small" onClick={() => onChange(null)}>{tr('teamMatch.number')}</Button>
       </Space>
     );
   }
@@ -89,6 +89,7 @@ function PrelimCell({
 }
 
 const PreliminaryBatchModal: React.FC<Props> = ({ open, onClose, session, eventId, dispatch }) => {
+  const { t: tr } = useTeamMatchI18n();
   const [draft, setDraft] = useState<Record<string, SeedingEntryPreliminary>>({});
 
   useLayoutEffect(() => {
@@ -120,7 +121,8 @@ const PreliminaryBatchModal: React.FC<Props> = ({ open, onClose, session, eventI
 
   return (
     <Modal
-      title="初赛批量录入"
+      className="tm-workbench-modal"
+      title={tr('teamMatch.prelimBatchTitle')}
       open={open}
       onCancel={onClose}
       onOk={handleOk}
@@ -134,10 +136,10 @@ const PreliminaryBatchModal: React.FC<Props> = ({ open, onClose, session, eventI
         scroll={{ y: 480, x: 560 }}
         dataSource={dataSource}
         columns={[
-          { title: '姓名', dataIndex: 'name', width: 100, ellipsis: true },
-          { title: '学校', dataIndex: '_school', width: 120, ellipsis: true },
+          { title: tr('teamMatch.name'), dataIndex: 'name', width: 100, ellipsis: true },
+          { title: tr('teamMatch.school'), dataIndex: '_school', width: 120, ellipsis: true },
           {
-            title: '初赛单次',
+            title: tr('teamMatch.prelimSingle'),
             key: 'ps',
             width: 140,
             render: (_, r: Player) => (
@@ -155,7 +157,7 @@ const PreliminaryBatchModal: React.FC<Props> = ({ open, onClose, session, eventI
             ),
           },
           {
-            title: '初赛平均',
+            title: tr('teamMatch.prelimAverage'),
             key: 'pa',
             width: 140,
             render: (_, r: Player) => (

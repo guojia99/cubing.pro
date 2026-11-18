@@ -47,7 +47,7 @@ test('practice configuration rejects invalid values and failed writes instead of
   storage.failWrite = true;
   try { assert.throws(() => config.saveFormulaPracticeConfig('3', 'config', { trimRatio: 10 }), /QuotaExceededError/); }
   finally { storage.failWrite = false; }
-  assert.throws(() => config.saveFormulaPracticeConfig('3', 'config', { trimRatio: NaN }), /Invalid practice configuration/);
+  assert.throws(() => config.saveFormulaPracticeConfig('3', 'config', { trimRatio: NaN }), { messageKey: 'shared.error.practiceConfig' });
   config.saveFormulaPracticeConfig('3', 'config', { trimRatio: 10, remindProficiency: false });
   assert.deepEqual(config.getFormulaPracticeConfig('3', 'config'), { trimRatio: 10, remindProficiency: false });
 });
@@ -151,7 +151,7 @@ test('append does not scan/rewrite history, missing sessions reject, aborted wri
   try {
     const saved = await history.appendFormulaPracticeRecord('3', 'write', id, input);
     assert.equal(saved.image, input.image);
-    await assert.rejects(history.appendFormulaPracticeRecord('3', 'write', 'missing', input), /not found/);
+    await assert.rejects(history.appendFormulaPracticeRecord('3', 'write', 'missing', input), { code: 'PRACTICE_SESSION_MISSING' });
   } finally { fake.IDBIndex.prototype.openCursor = cursor; }
   const add = fake.IDBObjectStore.prototype.add;
   fake.IDBObjectStore.prototype.add = function (...args) {
@@ -316,10 +316,10 @@ test('conflicting input or session for an existing scope/ID rejects without over
     { algs: ['other'] }, { algs: [...input.algs, 'other'] }, { createdAt: 101 },
   ]) {
     await assert.rejects(history.appendFormulaPracticeRecord('3', 'id-conflict', sessionId,
-      { ...pending, ...change }), /ID conflict/);
+      { ...pending, ...change }), { messageKey: 'shared.error.historyConflict' });
   }
   const other = await history.createPracticeSession('3', 'id-conflict', { mode: 'random', selectedFormulas: [] });
-  await assert.rejects(history.appendFormulaPracticeRecord('3', 'id-conflict', other, pending), /ID conflict/);
+  await assert.rejects(history.appendFormulaPracticeRecord('3', 'id-conflict', other, pending), { messageKey: 'shared.error.historyConflict' });
   assert.deepEqual(await history.getFormulaPracticeHistory('3', 'id-conflict'), [saved]);
 });
 
@@ -335,7 +335,7 @@ test('concurrent identical IDs commit once, concurrent conflicting IDs reject on
     history.appendFormulaPracticeRecord('3', 'id-concurrent', sessionId, { ...input, id: 'race', timeMs: 2 }),
   ]);
   assert.equal(conflicts.filter((r) => r.status === 'fulfilled').length, 1);
-  assert.match(conflicts.find((r) => r.status === 'rejected').reason.message, /ID conflict/);
+  assert.equal(conflicts.find((r) => r.status === 'rejected').reason.messageKey, 'shared.error.historyConflict');
   assert.equal(await history.getFormulaPracticeHistoryCount('3', 'id-concurrent'), 2);
 });
 
@@ -362,7 +362,7 @@ test('invalid optional IDs/timestamps reject before writing', async () => {
   for (const change of [{ id: '' }, { id: ' ' }, { id: 1 },
     { createdAt: NaN }, { createdAt: Infinity }, { createdAt: -1 }]) {
     await assert.rejects(history.appendFormulaPracticeRecord('3', 'invalid-input', 'session',
-      { ...input, ...change }), /Invalid practice record/);
+      { ...input, ...change }), { messageKey: 'shared.error.invalidHistory' });
   }
 });
 
@@ -527,7 +527,7 @@ test('normal v2 session metadata conflicts still reject migration/import', async
   await assert.rejects(history.getFormulaPracticeHistory('3', 'real-session-conflict'));
   assert.notEqual(storage.getItem(legacyKey), null);
   storage.removeItem(legacyKey);
-  await assert.rejects(dbApi.importHistory({ [scope]: first, '3:real-session-conflict': second }), /session metadata/);
+  await assert.rejects(dbApi.importHistory({ [scope]: first, '3:real-session-conflict': second }), { messageKey: 'shared.error.historyConflict' });
   assert.equal(await history.getFormulaPracticeHistoryCount('3', 'real-session-conflict'), 1);
 });
 
@@ -565,8 +565,8 @@ test('no IndexedDB rejects reads/exports and import returns failure', () => {
       const backupModule = await import('./src/services/cubing-pro/algs/practiceConfigExport.ts');
       const { exportPracticeConfig, importPracticeConfig } = backupModule.default ?? backupModule;
       globalThis.localStorage = { length: 0, getItem: () => null };
-      await assert.rejects(getFormulaPracticeHistory('3', 'x'), /unavailable/);
-      await assert.rejects(exportPracticeConfig(), /unavailable/);
+      await assert.rejects(getFormulaPracticeHistory('3', 'x'), { messageKey: 'shared.error.databaseUnavailable' });
+      await assert.rejects(exportPracticeConfig(), { messageKey: 'shared.error.databaseUnavailable' });
       assert.equal((await importPracticeConfig(JSON.stringify({ version: 2,
         formulaPracticeHistory: { '3-x': { version: 2, sessions: [] } }
       }))).success, false);

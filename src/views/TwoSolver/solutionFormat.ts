@@ -1,5 +1,6 @@
 import type { Solution } from "./engine/types";
-import { tDetail, type DetailLocale } from "../../i18n/messages/two-solver-detail";
+import { tDetail, type DetailLocale, type DetailTranslator } from "../../i18n/messages/two-solver-detail";
+import { translate as translateSite } from "@/i18n";
 
 export type StageId = "orientation" | "base" | "preAuf" | "algorithm" | "postAuf";
 export type StagePart = { text: string; cancelled: boolean };
@@ -60,13 +61,14 @@ export function formatFullSolution(solution: Solution): string {
   return compactNotation([solution.orientation, solution.execution].filter(Boolean).join(" "));
 }
 
-export function formatSolutionStages(solution: Solution, locale: DetailLocale = "zh-CN") {
+export function formatSolutionStages(solution: Solution, locale: DetailLocale = "zh-CN", translate?: DetailTranslator) {
+  const t = (key: Parameters<typeof tDetail>[1]) => tDetail(locale, key, {}, translate ?? (key => translateSite(locale, key)));
   const definitions: { id: StageId; label: string; annotation: string; value: string }[] = [
-    { id: "orientation", label: tDetail(locale, "two.detail.stage.orientation"), annotation: tDetail(locale, "two.detail.stage.orientation"), value: solution.orientation },
-    { id: "base", label: tDetail(locale, "two.detail.stage.base"), annotation: tDetail(locale, "two.detail.stage.base"), value: solution.base },
-    { id: "preAuf", label: tDetail(locale, "two.detail.stage.preAuf"), annotation: "AUF", value: solution.preAuf },
-    { id: "algorithm", label: tDetail(locale, "two.detail.stage.algorithm"), annotation: solution.method, value: solution.algorithm },
-    { id: "postAuf", label: tDetail(locale, "two.detail.stage.postAuf"), annotation: "AUF", value: solution.postAuf },
+    { id: "orientation", label: t("two.detail.stage.orientation"), annotation: t("two.detail.stage.orientation"), value: solution.orientation },
+    { id: "base", label: t("two.detail.stage.base"), annotation: t("two.detail.stage.base"), value: solution.base },
+    { id: "preAuf", label: t("two.detail.stage.preAuf"), annotation: "AUF", value: solution.preAuf },
+    { id: "algorithm", label: t("two.detail.stage.algorithm"), annotation: solution.method, value: solution.algorithm },
+    { id: "postAuf", label: t("two.detail.stage.postAuf"), annotation: "AUF", value: solution.postAuf },
   ];
   let rightOffset = 0, cumulative = 0;
   return definitions.map(stage => {
@@ -90,13 +92,14 @@ export function formatSolutionStages(solution: Solution, locale: DetailLocale = 
   });
 }
 
-export function formatAnnotatedSolution(solution: Solution, locale: DetailLocale = "zh-CN"): string {
-  const stages = formatSolutionStages(solution, locale);
+export function formatAnnotatedSolution(solution: Solution, locale: DetailLocale = "zh-CN", translate?: DetailTranslator): string {
+  const t = (key: Parameters<typeof tDetail>[1], params: Record<string, string | number> = {}) => tDetail(locale, key, params, translate ?? (key => translateSite(locale, key)));
+  const stages = formatSolutionStages(solution, locale, translate);
   const originalMoves = stages.at(-1)!.cumulative;
   return [
-    tDetail(locale, "two.detail.annotationSummary", { method: solution.method, originalMoves, moves: solution.moves }),
-    tDetail(locale, "two.detail.annotationOverlap"),
+    t("two.detail.annotationSummary", { method: solution.method, originalMoves, moves: solution.moves }),
+    t("two.detail.annotationOverlap"),
     ...stages.map(stage => `${stage.text}${stage.text ? " " : ""}//${stage.annotation} ${stage.count}/${stage.cumulative}`),
-    tDetail(locale, "two.detail.annotationFull", { solution: formatFullSolution(solution) || tDetail(locale, "two.detail.noMoves") }),
+    t("two.detail.annotationFull", { solution: formatFullSolution(solution) || t("two.detail.noMoves") }),
   ].join("\n");
 }

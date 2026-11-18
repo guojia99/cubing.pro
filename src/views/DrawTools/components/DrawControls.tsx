@@ -1,15 +1,16 @@
 "use client";
 
-import { Button, Flex, NativeSelect, Text, type ButtonProps } from "@chakra-ui/react";
-import type { ReactNode } from "react";
+import { Button, Field, NativeSelect, type ButtonProps } from "@chakra-ui/react";
+import { useId, type ReactNode } from "react";
 
-export const DRAW_BUTTON_SIZE = "xs" as const;
+export const DRAW_BUTTON_SIZE = "sm" as const;
 
 export const drawSelectFieldProps = {
-  fontSize: "xs",
-  h: "28px",
-  minH: "28px",
-  px: "2",
+  fontSize: "sm",
+  h: "44px",
+  minH: "44px",
+  borderRadius: "12px",
+  px: "3",
   w: "full",
 } as const;
 
@@ -18,13 +19,14 @@ interface DrawSelectProps {
   onChange: (value: string) => void;
   children: ReactNode;
   w?: ButtonProps["w"];
+  id?: string;
 }
 
 /** 绘图工具下拉框：移动端占满宽度，避免 flex 内漂移 */
-export function DrawSelect({ value, onChange, children, w }: DrawSelectProps) {
+export function DrawSelect({ value, onChange, children, w, id }: DrawSelectProps) {
   return (
     <NativeSelect.Root
-      size="xs"
+      size="sm"
       w={w ?? { base: "full", sm: "132px" }}
       maxW="100%"
       minW="0"
@@ -33,11 +35,13 @@ export function DrawSelect({ value, onChange, children, w }: DrawSelectProps) {
     >
       <NativeSelect.Field
         {...drawSelectFieldProps}
+        id={id}
         value={value}
         onChange={(e) => onChange(e.target.value)}
       >
         {children}
       </NativeSelect.Field>
+      <NativeSelect.Indicator />
     </NativeSelect.Root>
   );
 }
@@ -49,20 +53,20 @@ interface DrawControlFieldProps {
 
 /** 标签 + 控件行：小屏纵向排列，避免下拉框与文字错位 */
 export function DrawControlField({ label, children }: DrawControlFieldProps) {
+  const id = useId();
   return (
-    <Flex
-      direction={{ base: "column", sm: "row" }}
-      align={{ base: "stretch", sm: "center" }}
-      gap="1"
+    <Field.Root
+      id={id}
+      gap="2"
       w={{ base: "full", sm: "auto" }}
       minW="0"
       flex={{ base: "1 1 100%", sm: "0 1 auto" }}
     >
-      <Text fontSize="xs" fontWeight="medium" color="fg.muted" whiteSpace="nowrap" flexShrink={0}>
+      <Field.Label fontSize="sm" fontWeight="medium" color="fg.muted">
         {label}
-      </Text>
+      </Field.Label>
       {children}
-    </Flex>
+    </Field.Root>
   );
 }
 
@@ -74,8 +78,10 @@ export function DrawActionButton(props: DrawButtonProps) {
       size={DRAW_BUTTON_SIZE}
       variant="outline"
       colorPalette="brand"
-      fontSize="xs"
-      px="2.5"
+      fontSize="sm"
+      minH="44px"
+      borderRadius="12px"
+      px="3"
       {...props}
     />
   );
@@ -86,9 +92,12 @@ export function DrawMutedButton(props: DrawButtonProps) {
     <Button
       size={DRAW_BUTTON_SIZE}
       variant="outline"
-      colorPalette="gray"
-      fontSize="xs"
-      px="2.5"
+      colorPalette="brand"
+      color="fg.muted"
+      fontSize="sm"
+      minH="44px"
+      borderRadius="12px"
+      px="3"
       {...props}
     />
   );
@@ -102,10 +111,12 @@ export function DrawToggleButton({
     <Button
       size={DRAW_BUTTON_SIZE}
       variant={selected ? "solid" : "outline"}
-      colorPalette={selected ? "brand" : "gray"}
-      fontSize="xs"
-      px="2"
-      minH="28px"
+      colorPalette="brand"
+      aria-pressed={!!selected}
+      fontSize="sm"
+      borderRadius="12px"
+      px="3"
+      minH="44px"
       h="auto"
       py="1"
       whiteSpace="normal"

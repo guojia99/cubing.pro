@@ -5,15 +5,20 @@ const AUTH_TOKEN_KEY = "authToken_cubing_pro";
 const REFRESH_INTERVAL = 5 * 60 * 1000;
 
 export function saveToken(token: Token) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(AUTH_TOKEN_KEY, JSON.stringify(token));
+  try {
+    if (typeof window === "undefined") throw new Error("Browser storage is unavailable");
+    window.localStorage.setItem(AUTH_TOKEN_KEY, JSON.stringify(token));
+  } catch (cause) {
+    // Callers must not continue a login after persistence fails.
+    throw new Error("Unable to save authentication token", { cause });
+  }
 }
 
 export function getToken(): Token | null {
   if (typeof window === "undefined") return null;
-  const str = localStorage.getItem(AUTH_TOKEN_KEY);
-  if (!str) return null;
   try {
+    const str = window.localStorage.getItem(AUTH_TOKEN_KEY);
+    if (!str) return null;
     return JSON.parse(str) as Token;
   } catch {
     return null;
@@ -21,8 +26,12 @@ export function getToken(): Token | null {
 }
 
 export function removeToken() {
-  if (typeof window === "undefined") return;
-  localStorage.removeItem(AUTH_TOKEN_KEY);
+  try {
+    if (typeof window === "undefined") throw new Error("Browser storage is unavailable");
+    window.localStorage.removeItem(AUTH_TOKEN_KEY);
+  } catch (cause) {
+    throw new Error("Unable to remove authentication token", { cause });
+  }
 }
 
 export function AuthHeader(): Record<string, string> {

@@ -3,6 +3,7 @@
 import { apiAdminPlayers } from "@/services/cubing-pro/auth/admin";
 import type { PlayersAPI } from "@/services/cubing-pro/players/typings";
 import { Select, Spin } from "antd";
+import { useI18n } from "@/contexts/I18nProvider";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 function pickItems(resp: unknown): PlayersAPI.Player[] {
@@ -12,9 +13,9 @@ function pickItems(resp: unknown): PlayersAPI.Player[] {
   return Array.isArray(items) ? items : [];
 }
 
-function playerLabel(p: PlayersAPI.Player): string {
+function playerLabel(p: PlayersAPI.Player, unnamed: string): string {
   const wca = p.WcaID ? ` WCA:${p.WcaID}` : "";
-  return `${p.Name || "未命名"}（${p.CubeID}）${wca}`;
+  return `${p.Name || unnamed} (${p.CubeID})${wca}`;
 }
 
 export type AdminUserSearchSelectProps = {
@@ -34,12 +35,13 @@ export function AdminUserSearchSelect({
   onChange,
   onPlayerChange,
   mode,
-  placeholder = "输入姓名、CubeID 或 WCA ID 搜索",
+  placeholder,
   allowClear = true,
   disabled,
   style,
   className,
 }: AdminUserSearchSelectProps) {
+  const { t } = useI18n();
   const [loading, setLoading] = useState(false);
   const [searchOptions, setSearchOptions] = useState<
     { value: string; label: string; player: PlayersAPI.Player }[]
@@ -64,7 +66,7 @@ export function AdminUserSearchSelect({
       setSearchOptions(
         items.map((p) => ({
           value: p.CubeID,
-          label: playerLabel(p),
+           label: playerLabel(p, t("competitionAdmin.unnamed")),
           player: p,
         })),
       );
@@ -73,7 +75,7 @@ export function AdminUserSearchSelect({
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   const debouncedSearch = useCallback(
     (q: string) => {
@@ -133,7 +135,7 @@ export function AdminUserSearchSelect({
         style={style}
         disabled={disabled}
         allowClear={allowClear}
-        placeholder={placeholder}
+        placeholder={placeholder ?? t("competitionAdmin.searchUser")}
         showSearch
         filterOption={false}
         onSearch={debouncedSearch}
@@ -154,7 +156,7 @@ export function AdminUserSearchSelect({
       style={style}
       disabled={disabled}
       allowClear={allowClear}
-      placeholder={placeholder}
+      placeholder={placeholder ?? t("competitionAdmin.searchUser")}
       showSearch
       filterOption={false}
       onSearch={debouncedSearch}

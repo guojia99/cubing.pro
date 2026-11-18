@@ -1,3 +1,4 @@
+import { useTeamMatchI18n } from '@/views/TeamMatch/i18n';
 import AvatarUpload from '@/views/TeamMatch/components/AvatarUpload';
 import type { Player, School } from '@/views/TeamMatch/types';
 import { fetchWcaAvatarThumbUrl } from '@/views/TeamMatch/utils/wcaAvatar';
@@ -15,6 +16,7 @@ type Props = {
 };
 
 const PlayerEditModal: React.FC<Props> = ({ open, onClose, editing, schools, onSave }) => {
+  const { t: tr, locale } = useTeamMatchI18n();
   const [form] = Form.useForm();
   const [avatarDraft, setAvatarDraft] = React.useState<string | null>(null);
   /** 本次弹窗内已成功拉取过 WCA 头像，避免重复请求；WCA ID 变化或清空头像时重置 */
@@ -54,21 +56,19 @@ const PlayerEditModal: React.FC<Props> = ({ open, onClose, editing, schools, onS
     }
   }, [open, editing, form]);
 
+  useEffect(() => {
+    if (!open) return;
+    const invalid = form.getFieldsError().filter(field => field.errors.length).map(field => field.name);
+    if (invalid.length) void form.validateFields(invalid).catch(() => {});
+  }, [locale, open, form]);
+
   const handleOk = () => {
     void form
       .validateFields()
       .then((v: { schoolId: string; name: string; wcaId: string; oneId: string; battlecry?: string }) => {
       const wca = v.wcaId?.trim() || null;
-      if (wca && wca.length !== 10) {
-        form.setFields([{ name: 'wcaId', errors: ['WCA ID 须为 10 位或留空'] }]);
-        return;
-      }
       const oneRaw = v.oneId?.trim() || '';
       const oneId = oneRaw === '' ? null : oneRaw;
-      if (oneId && !/^\d+$/.test(oneId)) {
-        form.setFields([{ name: 'oneId', errors: ['One ID 须为数字或留空'] }]);
-        return;
-      }
       const base = {
         schoolId: v.schoolId,
         name: v.name.trim(),
@@ -91,13 +91,13 @@ const PlayerEditModal: React.FC<Props> = ({ open, onClose, editing, schools, onS
         });
       }
       onClose();
-    });
+    }, () => {});
   };
 
   const handleFetchWcaAvatar = async () => {
     const wca = (form.getFieldValue('wcaId') as string | undefined)?.trim() ?? '';
     if (wca.length !== 10) {
-      message.warning('请先填写 10 位 WCA ID');
+      message.warning(tr('teamMatch.wcaIdRequired'));
       return;
     }
     if (wcaAvatarFetchedOnce) return;
@@ -105,14 +105,14 @@ const PlayerEditModal: React.FC<Props> = ({ open, onClose, editing, schools, onS
     try {
       const url = await fetchWcaAvatarThumbUrl(wca);
       if (!url) {
-        message.warning('WCA 资料中未找到头像');
+        message.warning(tr('teamMatch.noWcaAvatar'));
         return;
       }
       setAvatarDraft(url);
       setWcaAvatarFetchedOnce(true);
-      message.success('已获取 WCA 头像');
+      message.success(tr('teamMatch.wcaAvatarFetched'));
     } catch {
-      message.error('获取失败，请检查网络或 WCA ID');
+      message.error(tr('teamMatch.avatarFetchFailed'));
     } finally {
       setWcaAvatarLoading(false);
     }
@@ -120,36 +120,37 @@ const PlayerEditModal: React.FC<Props> = ({ open, onClose, editing, schools, onS
 
   return (
     <Modal
-      title={editing ? '编辑选手' : '新增选手'}
+      className="tm-workbench-modal"
+      title={editing ? tr('teamMatch.editPlayer') : tr('teamMatch.addPlayer')}
       open={open}
       onCancel={onClose}
       width={480}
       footer={
         <Space>
-          <Button onClick={onClose}>取消</Button>
-          <Button type="primary" onClick={() => void handleOk()}>
-            保存
-          </Button>
+          <Button onClick={onClose}>{tr('teamMatch.cancel')}</Button>
+          <Button type="primary" onClick={() => void handleOk()}>{tr('teamMatch.save')}</Button>
         </Space>
       }
       destroyOnHidden
     >
       <Form form={form} layout="vertical">
-        <Form.Item name="schoolId" label="学校" rules={[{ required: true, message: '请选择学校' }]}>
+        <Form.Item name="schoolId" label={tr('teamMatch.school')} rules={[{ required: true, message: tr('teamMatch.selectSchoolRequired') }]}>
           <Select
             options={schools.map((s) => ({ label: s.name, value: s.id }))}
-            placeholder="选择学校"
+            placeholder={tr('teamMatch.selectSchool')}
           />
         </Form.Item>
-        <Form.Item name="name" label="姓名" rules={[{ required: true, message: '请输入姓名' }]}>
+        <Form.Item name="name" label={tr('teamMatch.name')} rules={[{ required: true, message: tr('teamMatch.nameRequired') }]}>
           <Input />
         </Form.Item>
-        <Form.Item name="battlecry" label="作战宣言（可选）">
-          <Input.TextArea rows={2} placeholder="全屏对战点击队员时放大展示" maxLength={200} showCount />
+        <Form.Item name="battlecry" label={tr('teamMatch.battlecryOptional')}>
+          <Input.TextArea rows={2} placeholder={tr('teamMatch.battlecryHint')} maxLength={200} showCount />
         </Form.Item>
-        <Form.Item name="wcaId" label="WCA ID（可选）">
+        <Form.Item name="wcaId" label={tr('teamMatch.wcaIdOptional')} rules={[{
+          validator: (_, value?: string) => !value?.trim() || value.trim().length === 10 ? Promise.resolve() : Promise.reject(new Error(tr('teamMatch.wcaIdValidation'))),
+        }]}>
           <Input
-            placeholder="10 位"
+            placeholder={tr('teamMatch.tenCharacters')}
             maxLength={10}
             onChange={(e) => {
               const v = e.target.value.trim();
@@ -157,10 +158,12 @@ const PlayerEditModal: React.FC<Props> = ({ open, onClose, editing, schools, onS
             }}
           />
         </Form.Item>
-        <Form.Item name="oneId" label="One ID（可选）">
-          <Input placeholder="数字 uid，用于拉取 One 平台成绩" inputMode="numeric" />
+        <Form.Item name="oneId" label={tr('teamMatch.oneIdOptional')} rules={[{
+          validator: (_, value?: string) => !value?.trim() || /^\d+$/.test(value.trim()) ? Promise.resolve() : Promise.reject(new Error(tr('teamMatch.oneIdValidation'))),
+        }]}>
+          <Input placeholder={tr('teamMatch.oneIdHint')} inputMode="numeric" />
         </Form.Item>
-        <Form.Item label="头像">
+        <Form.Item label={tr('teamMatch.avatar')}>
           <Space orientation="vertical" size="small" style={{ width: '100%' }}>
             <AvatarUpload
               value={avatarDraft}
@@ -177,11 +180,9 @@ const PlayerEditModal: React.FC<Props> = ({ open, onClose, editing, schools, onS
                 disabled={wcaAvatarFetchedOnce || wcaIdLen !== 10}
                 onClick={() => void handleFetchWcaAvatar()}
               >
-                {wcaAvatarFetchedOnce ? '已获取 WCA 头像' : '获取 WCA 头像'}
+                {wcaAvatarFetchedOnce ? tr('teamMatch.wcaAvatarFetched') : tr('teamMatch.fetchWcaAvatar')}
               </Button>
-              <Typography.Text type="secondary" style={{ fontSize: 12 }}>
-                与首页致谢栏相同：调用 WCA API 读取缩略图地址，不会自动拉取；成功一次后请改 WCA ID 或清空头像可再次获取。
-              </Typography.Text>
+              <Typography.Text type="secondary" style={{ fontSize: 12 }}>{tr('teamMatch.wcaAvatarHelp')}</Typography.Text>
             </Space>
           </Space>
         </Form.Item>

@@ -12,14 +12,14 @@
 .grand-slam-rank .grand-slam-definition {
   font-size: 12px;
   line-height: 1.5;
-  color: rgba(0, 0, 0, 0.55);
+  color: var(--muted-foreground);
   margin: 0 0 16px 0;
 }
 .grand-slam-rank .section-title {
   font-size: 14px;
   font-weight: 500;
   margin: 20px 0 12px 0;
-  color: rgba(0, 0, 0, 0.85);
+  color: var(--foreground);
 }
 .grand-slam-rank .section-title:first-of-type {
   margin-top: 0;
@@ -31,9 +31,9 @@
   align-items: center;
   padding: 12px 16px;
   margin-bottom: 0;
-  background: rgba(0, 0, 0, 0.02);
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  border-radius: 8px;
+  background: var(--muted);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-card);
 }
 .grand-slam-rank .filter-row .filter-item {
   display: flex;
@@ -55,8 +55,11 @@
 }
 .grand-slam-rank .table-section {
   margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 20px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-card);
+  background: var(--card);
+  box-shadow: var(--shadow-card);
 }
 .grand-slam-rank .table-wrapper {
   font-size: 12px;

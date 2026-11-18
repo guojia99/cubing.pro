@@ -21,11 +21,13 @@ export const ResultGraphChart = (
     value: number | null;
     type: 'best' | 'average';
     round: string;
+    competition?: string;
     valueStr?: string;
   }[] = [];
 
   for (let i = dataSource.length - 1; i >= 0; i--) {
-    const round = dataSource[i].CompetitionName + dataSource[i].Round;
+    const round = dataSource[i].Round;
+    const competition = dataSource[i].CompetitionName;
 
     const bestValue = !DBest(dataSource[i]) ? dataSource[i].Best : null;
     data.push({
@@ -33,6 +35,7 @@ export const ResultGraphChart = (
       value: bestValue,
       type: 'best',
       round,
+      competition,
       // valueStr:
     });
 
@@ -43,6 +46,7 @@ export const ResultGraphChart = (
         value: avgValue,
         type: 'average',
         round,
+        competition,
         // valueStr: recordsMap?.[dataSource[i].ID]?.AverageStr, // 同上
       });
     }

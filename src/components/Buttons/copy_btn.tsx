@@ -1,7 +1,11 @@
+"use client";
+
+import { useIntlMessage } from '@/hooks/useIntlMessage';
 import { CopyOutlined } from '@ant-design/icons';
 import { Button, notification } from 'antd';
 
 const CopyButton = ({ textToCopy }: { textToCopy: string }) => {
+  const { formatMessage: t } = useIntlMessage();
   const [api, contextHolder] = notification.useNotification();
 
   const handleCopy = () => {
@@ -9,14 +13,14 @@ const CopyButton = ({ textToCopy }: { textToCopy: string }) => {
       // 使用 navigator.clipboard 复制
       navigator.clipboard.writeText(textToCopy).then(() => {
         api.open({
-          title: '拷贝成功',
+          title: t({ id: 'shared.copy.success' }),
           duration: 2,
         });
       }).catch((err) => {
         console.error('Copy failed', err);
         api.open({
-          title: '拷贝失败',
-          description: '请手动复制',
+          title: t({ id: 'shared.copy.failed' }),
+          description: t({ id: 'shared.copy.manual' }),
           duration: 2,
         });
       });
@@ -29,18 +33,21 @@ const CopyButton = ({ textToCopy }: { textToCopy: string }) => {
         textarea.style.opacity = '0';
         document.body.appendChild(textarea);
         textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
+        try {
+          if (!document.execCommand('copy')) throw new Error('Copy command failed');
+        } finally {
+          document.body.removeChild(textarea);
+        }
 
         api.open({
-          title: '拷贝成功',
+          title: t({ id: 'shared.copy.success' }),
           duration: 2,
         });
       } catch (err) {
         console.error('Fallback copy failed', err);
         api.open({
-          title: '拷贝失败',
-          description: '请手动复制',
+          title: t({ id: 'shared.copy.failed' }),
+          description: t({ id: 'shared.copy.manual' }),
           duration: 2,
         });
       }
@@ -53,6 +60,8 @@ const CopyButton = ({ textToCopy }: { textToCopy: string }) => {
       <Button
         type="primary"
         icon={<CopyOutlined />}
+        aria-label={t({ id: 'shared.copy' })}
+        title={t({ id: 'shared.copy' })}
         onClick={handleCopy}
         style={{
           float: 'right',

@@ -1,3 +1,5 @@
+import { ClientMessageError } from '../clientError';
+
 /** WCA 官方 competition_index 接口返回的赛事条目 */
 export interface WcaCompetitionIndexItem {
   id: string;
@@ -50,7 +52,7 @@ export async function fetchWcaCompetitionIndex(
 
   const res = await fetch(`${WCA_COMPETITION_INDEX}?${params}`);
   if (!res.ok) {
-    throw new Error(`WCA API ${res.status}`);
+    throw new ClientMessageError('shared.error.http', { status: res.status });
   }
   const data = (await res.json()) as WcaCompetitionIndexItem[];
   return Array.isArray(data) ? data : [];

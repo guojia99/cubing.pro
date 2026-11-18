@@ -137,7 +137,7 @@ export default function FormulaProficiencyCard({
       >
         <Dialog.Backdrop />
         <Dialog.Positioner>
-          <Dialog.Content borderRadius="xl" maxW="760px" maxH="90vh">
+          <Dialog.Content className="algs-dialog" borderRadius="xl" maxW="760px" maxH="90vh">
             <Dialog.Header display="flex" justifyContent="space-between" alignItems="center">
               <Dialog.Title fontSize="md" fontWeight="bold">
                 {t("algs.proficiencyCard.modalTitle")}

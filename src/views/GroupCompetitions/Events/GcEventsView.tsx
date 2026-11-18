@@ -2,37 +2,47 @@
 
 import "antd/dist/reset.css";
 
-import { Divider, Table } from "antd";
+import { Table } from "antd";
+import { PageHeader, SectionHeader, Surface } from "@/components/ui/page";
+import "../competition-ui.css";
 import type { ColumnsType } from "antd/es/table";
 import { useEffect, useMemo, useState } from "react";
 
 import { CubeIcon } from "@/components/CubeIcon/cube_icon";
 import { CubesCn } from "@/components/CubeIcon/cube";
-import { eventRouteM } from "@/components/Data/cube_result/event_route";
+import { useI18n } from "@/contexts/I18nProvider";
 import { apiEvents } from "@/services/cubing-pro/events/events";
 import type { EventsAPI } from "@/services/cubing-pro/events/typings";
 
-const columns: ColumnsType<EventsAPI.Event> = [
+const getColumns = (t: ReturnType<typeof useI18n>['t'], locale: ReturnType<typeof useI18n>['locale']): ColumnsType<EventsAPI.Event> => [
   {
-    title: "Icon",
+    title: t('competitionExtra.icon'),
     dataIndex: "icon",
     key: "icon",
     render: (_value, event) => CubeIcon(event.name, event.name, {}),
   },
   {
-    title: "名",
+    title: t('competitionAdmin.name'),
     dataIndex: "id",
     key: "id",
-    render: (value: string) => CubesCn(value),
+    render: (value: string) => CubesCn(value, locale),
   },
   {
-    title: "项目类型",
+    title: t('competitionExtra.eventType'),
     dataIndex: "base_route_typ",
     key: "base_route_typ",
-    render: (value: number) => eventRouteM(value).name,
+    render: (value: number) => {
+      const formats = [
+        'competitionExtra.route0', 'competitionExtra.route1', 'competitionExtra.route2',
+        'competitionExtra.route3', 'competitionExtra.route4', 'competitionExtra.route5',
+        'competitionExtra.route6', 'competitionExtra.route7', 'competitionExtra.route8',
+        'competitionExtra.route9', 'competitionExtra.route10',
+      ] as const;
+      return formats[value] ? t(formats[value]) : String(value);
+    },
   },
   {
-    title: "别名",
+    title: t('competitionExtra.aliases'),
     dataIndex: "otherNames",
     key: "otherNames",
     render: (value: string) => {
@@ -52,7 +62,7 @@ const columns: ColumnsType<EventsAPI.Event> = [
     },
   },
   {
-    title: "打乱",
+    title: t('competitionAdmin.scramble'),
     dataIndex: "scrambleValue",
     key: "scrambleValue",
     render: (_value, event) => {
@@ -77,6 +87,8 @@ const columns: ColumnsType<EventsAPI.Event> = [
 ];
 
 export function GcEventsView() {
+  const { t, locale } = useI18n();
+  const columns = getColumns(t, locale);
   const [events, setEvents] = useState<EventsAPI.Event[]>([]);
 
   useEffect(() => {
@@ -90,19 +102,16 @@ export function GcEventsView() {
   const notWca = useMemo(() => events.filter((event) => !event.isWCA), [events]);
 
   return (
-    <>
-      <Divider titlePlacement="start">
-        <h4>
-          <strong>WCA项目</strong>
-        </h4>
-      </Divider>
-      <Table dataSource={wca} columns={columns} pagination={false} rowKey="id" />
-      <Divider titlePlacement="start">
-        <h4>
-          <strong>趣味项目</strong>
-        </h4>
-      </Divider>
-      <Table dataSource={notWca} columns={columns} pagination={false} rowKey="id" />
-    </>
+    <div className="competition-page">
+      <PageHeader eyebrow={t('competitionAdmin.event')} title={t('competitionExtra.competitionEvents')} />
+      <Surface p={{ base: "4", md: "6" }} mb="6">
+        <SectionHeader title={t('competitionExtra.wcaEvents')} />
+        <Table dataSource={wca} columns={columns} pagination={false} rowKey="id" scroll={{ x: "max-content" }} />
+      </Surface>
+      <Surface p={{ base: "4", md: "6" }}>
+        <SectionHeader title={t('competitionExtra.funEvents')} />
+        <Table dataSource={notWca} columns={columns} pagination={false} rowKey="id" scroll={{ x: "max-content" }} />
+      </Surface>
+    </div>
   );
 }

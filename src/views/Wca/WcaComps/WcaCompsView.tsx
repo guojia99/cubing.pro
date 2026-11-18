@@ -1,6 +1,8 @@
 "use client";
 
 import "antd/dist/reset.css";
+import { PageHeader } from "@/components/ui/page";
+import "../wca-ui.css";
 
 import {
   AppstoreOutlined,
@@ -29,12 +31,15 @@ import {
   fetchWcaCompetitionIndex,
   type WcaCompetitionIndexItem,
 } from "@/services/cubing-pro/wca/competition_index";
-import { CountryList, getWcaCountryLabel } from "@/services/cubing-pro/wca/country";
+import { CountryList } from "@/services/cubing-pro/wca/country";
+import { getLocalizedCountryLabel } from "../utils/countryLabel";
+import { translateWcaPuzzleExtra as extra } from "@/i18n/messages/wca-puzzle-extra";
+import type { Locale } from "@/i18n/locales";
 import type { Country } from "@/services/cubing-pro/wca/types";
 import EventSelectorEventsOnly from "@/views/Static/EventSelectorEventsOnly";
 import {
   CountryAvatar,
-  getCountryNameByIso2,
+  getCountryDisplayName,
 } from "@/views/Wca/PlayerComponents/region/all_contiry";
 import { eventOrder } from "@/views/Wca/utils/events";
 
@@ -51,7 +56,7 @@ import {
 } from "./utils";
 import "./WcaComps.css";
 
-const { Title, Text, Link } = Typography;
+const { Text, Link } = Typography;
 
 type CountryScope = "nearby" | "all";
 type ViewMode = "table" | "card";
@@ -63,12 +68,12 @@ const REGISTRATION_TAG_COLOR: Record<string, string> = {
   unknown: "default",
 };
 
-function countryOptionLabel(iso2: string, countries: Country[]): string {
+function countryOptionLabel(iso2: string, countries: Country[], locale: Locale): string {
   const fromList = countries.find((c) => (c.iso2 || "").toUpperCase() === iso2.toUpperCase());
   if (fromList) {
-    return getWcaCountryLabel(fromList.id, countries);
+    return getLocalizedCountryLabel(fromList.id, countries, locale);
   }
-  return getCountryNameByIso2(iso2) || iso2;
+  return getCountryDisplayName(iso2, undefined, locale) || iso2;
 }
 
 export function WcaCompsView() {
@@ -100,15 +105,15 @@ export function WcaCompsView() {
     const unique = [...new Set(isoList)];
     if (countryScope === "all") {
       unique.sort((a, b) =>
-        countryOptionLabel(a, allCountries).localeCompare(countryOptionLabel(b, allCountries)),
+        countryOptionLabel(a, allCountries, intl.locale).localeCompare(countryOptionLabel(b, allCountries, intl.locale), intl.locale),
       );
     }
 
     return unique.map((iso2) => ({
       value: iso2,
-      label: countryOptionLabel(iso2, allCountries),
+      label: countryOptionLabel(iso2, allCountries, intl.locale),
     }));
-  }, [countryScope, allCountries]);
+  }, [countryScope, allCountries, intl.locale]);
 
   const loadComps = useCallback(async () => {
     setLoading(true);
@@ -142,8 +147,8 @@ export function WcaCompsView() {
 
   const sortedComps = useMemo(() => sortCompsByStartDate(comps), [comps]);
 
-  const registrationLabel = (status: ReturnType<typeof getRegistrationStatus>) =>
-    intl.formatMessage({ id: `wca.comps.registration.${status}` });
+  const registrationLabel = useCallback((status: ReturnType<typeof getRegistrationStatus>) =>
+    intl.formatMessage({ id: `wca.comps.registration.${status}` }), [intl]);
 
   const columns: ColumnsType<WcaCompetitionIndexItem> = useMemo(
     () => [
@@ -220,7 +225,7 @@ export function WcaCompsView() {
         },
       },
     ],
-    [intl],
+    [intl, registrationLabel],
   );
 
   const renderCardItem = (item: WcaCompetitionIndexItem) => {
@@ -270,8 +275,8 @@ export function WcaCompsView() {
         {item.registration_open && item.registration_close ? (
           <div className="wca-comps-card-row">
             <Text strong>{intl.formatMessage({ id: "wca.comps.registrationWindow" })}：</Text>
-            {formatToBeijingTime(item.registration_open)} ~{" "}
-            {formatToBeijingTime(item.registration_close)}
+            {formatToBeijingTime(item.registration_open, intl.locale)} ~{" "}
+            {formatToBeijingTime(item.registration_close, intl.locale)}
           </div>
         ) : null}
         <div className="wca-comps-card-row">
@@ -283,13 +288,8 @@ export function WcaCompsView() {
   };
 
   return (
-    <div className="wca-comps-page">
-      <div className="wca-comps-header">
-        <Title level={3} style={{ marginBottom: 4 }}>
-          {intl.formatMessage({ id: "wca.comps.title" })}
-        </Title>
-        <Text type="secondary">{intl.formatMessage({ id: "wca.comps.subtitle" })}</Text>
-      </div>
+    <div className="wca-comps-page wca-page">
+      <PageHeader eyebrow={extra(intl.locale, "wcaPuzzleExtra.competitions")} title={intl.formatMessage({ id: "wca.comps.title" })} description={intl.formatMessage({ id: "wca.comps.subtitle" })} />
 
       <Card size="small" className="wca-comps-filter-card">
         <div className="wca-comps-filter-row">

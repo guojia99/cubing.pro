@@ -13,6 +13,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { toaster } from "@/components/ui/toaster";
 import { useI18n } from "@/contexts/I18nProvider";
+import { translateTutorialExtra, type TutorialExtraKey } from "@/i18n/messages/tutorial-extra";
 import { SQ1_STICKER_PALETTE } from "@/theme/domainColors";
 import {
   DrawActionButton,
@@ -26,6 +27,7 @@ import type { PathSvg } from "@/views/DrawTools/types";
 
 const DOUBLE_SQ_TEXT_SIZE = 6;
 
+// Existing preset values stay stable; only the displayed labels are translated.
 const cspMap = new Map([
   ["星 Star", "cccccc"],
   ["风筝 Kite", "ececcece"],
@@ -78,10 +80,37 @@ const rotatePoint = "35.01322 38.0901";
 
 const baseMinxColor = [...SQ1_STICKER_PALETTE];
 
-type SelectOption = { value: string; label: string };
+const presetLabelKeys: Record<string, TutorialExtraKey> = {
+  "星 Star": "tutorialExtra.sq1.star",
+  "风筝 Kite": "tutorialExtra.sq1.kite",
+  "方 Square": "tutorialExtra.sq1.square",
+  "贝壳 Scallop": "tutorialExtra.sq1.scallop",
+  "蘑菇 Mushroom": "tutorialExtra.sq1.mushroom",
+  "右爪 R Paw": "tutorialExtra.sq1.rightPaw",
+  "左爪 L Paw": "tutorialExtra.sq1.leftPaw",
+  "右拳 R Fist": "tutorialExtra.sq1.rightFist",
+  "左拳 L Fist": "tutorialExtra.sq1.leftFist",
+  "盾 Shield": "tutorialExtra.sq1.shield",
+  "桶 Barrel": "tutorialExtra.sq1.barrel",
+  "对 Twins": "tutorialExtra.sq1.twins",
+};
+
+const presetValues = [...cspMap.keys()];
+
+function complementaryPresets(preset: string): string[] {
+  const shape = cspMap.get(preset);
+  if (!shape) return [];
+  const wantE = 8 - (shape.split("e").length - 1);
+  const wantC = 8 - (shape.split("c").length - 1);
+  return presetValues.filter((value) => {
+    const candidate = cspMap.get(value)!;
+    return candidate.split("e").length - 1 === wantE &&
+      candidate.split("c").length - 1 === wantC;
+  });
+}
 
 function SimpleSq1Draw() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [num, setNum] = useState(0);
   const [corner, setCorner] = useState(0);
   const [edge, setEdge] = useState(0);
@@ -90,7 +119,6 @@ function SimpleSq1Draw() {
   const [svgPoints, setSvgPoints] = useState<PathSvg[]>([]);
   const [linePoint, setLinePoint] = useState<PathSvg[]>([]);
   const [cubes, setCubes] = useState<string[]>([]);
-  const [cpsOpt, setCpsOpt] = useState<SelectOption[]>([]);
   const [defaultVal, setDefaultVal] = useState("");
   const [axisLine, setAxisLine] = useState("30");
 
@@ -275,13 +303,6 @@ function SimpleSq1Draw() {
 
   useEffect(() => {
     resetLineReg(30);
-    const opt: SelectOption[] = [
-      { value: "", label: `- ${t("draws.sq1.None")} -` },
-    ];
-    cspMap.forEach((_value, key) => {
-      opt.push({ value: key, label: key });
-    });
-    setCpsOpt(opt);
     setDefault("星 Star");
     // eslint-disable-next-line react-hooks/exhaustive-deps -- mount init
   }, []);
@@ -345,9 +366,10 @@ function SimpleSq1Draw() {
                 onChange={setDefault}
                 w={{ base: "full", sm: "148px" }}
               >
-                {cpsOpt.map((opt) => (
-                  <option key={opt.value || "none"} value={opt.value}>
-                    {opt.label}
+                <option value="">{`- ${t("draws.sq1.None")} -`}</option>
+                {presetValues.map((value) => (
+                  <option key={value} value={value}>
+                    {presetLabelKeys[value] ? translateTutorialExtra(locale, presetLabelKeys[value]) : value}
                   </option>
                 ))}
               </DrawSelect>
@@ -381,24 +403,23 @@ function SimpleSq1Draw() {
 }
 
 function DoubleSq1Draw() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [topReg, setTopReg] = useState(0);
   const [svgPointsTop, setSvgPointsTop] = useState<PathSvg[]>([]);
   const [linePointTop, setLinePointTop] = useState<PathSvg[]>([]);
-  const [topCspOption, setTopCspOptions] = useState<SelectOption[]>([]);
   const [topAxisLine, setTopAxisLine] = useState("30");
 
   const [downReg, setDownReg] = useState(0);
   const [downDefaultVal, setDownDefaultVal] = useState("");
   const [svgPointsDown, setSvgPointsDown] = useState<PathSvg[]>([]);
   const [linePointDown, setLinePointDown] = useState<PathSvg[]>([]);
-  const [downCspOption, setDownCspOptions] = useState<SelectOption[]>([]);
   const [downAxisLine, setDownAxisLine] = useState("-30");
 
   const [useFont, setUseFont] = useState(false);
   const [fontsTop, setFontsTop] = useState<string[]>([]);
   const [fontsDown, setFontsDown] = useState<string[]>([]);
   const [topPreset, setTopPreset] = useState("星 Star");
+  const downPresetValues = complementaryPresets(topPreset);
 
   const handleSetFontSwitch = (showFont: boolean) => {
     setUseFont(showFont);
@@ -579,20 +600,8 @@ function DoubleSq1Draw() {
     setTopPreset(preset);
     const result = applyDraws(preset, "top");
     if (!result) return;
-    const [curE, curC] = result;
-    const wantE = 8 - curE;
-    const wantC = 8 - curC;
-    const opt: SelectOption[] = [];
-    cspMap.forEach((value, key) => {
-      const eCount = value.split("e").length - 1;
-      const cCount = value.split("c").length - 1;
-      if (eCount === wantE && cCount === wantC) {
-        opt.push({ value: key, label: key });
-      }
-    });
-    setDownCspOptions(opt);
     setSvgPointsDown([]);
-    const first = opt[0]?.value;
+    const first = complementaryPresets(preset)[0];
     if (first) {
       setDownDefaultVal(first);
       applyDraws(first, "down");
@@ -618,11 +627,6 @@ function DoubleSq1Draw() {
     resetLineReg(30, true);
     resetLineReg(-30, false);
 
-    const opt: SelectOption[] = [];
-    cspMap.forEach((_value, key) => {
-      opt.push({ value: key, label: key });
-    });
-    setTopCspOptions(opt);
     setDownDefaultVal("8");
 
     applyDraws("星 Star", "top");
@@ -648,13 +652,13 @@ function DoubleSq1Draw() {
         <>
           <Flex gap="3" align="center" mb="4">
             <Text fontSize="xs" fontWeight="semibold" color="fg.muted">
-              文字
+              {translateTutorialExtra(locale, "tutorialExtra.sq1.text")}
             </Text>
             <Switch.Root
               checked={useFont}
               onCheckedChange={(e) => handleSetFontSwitch(e.checked === true)}
             >
-              <Switch.HiddenInput />
+              <Switch.HiddenInput aria-label={translateTutorialExtra(locale, "tutorialExtra.sq1.text")} />
               <Switch.Control>
                 <Switch.Thumb />
               </Switch.Control>
@@ -667,17 +671,17 @@ function DoubleSq1Draw() {
             alignItems="end"
             mb="4"
           >
-            <DrawControlField label="顶层">
+            <DrawControlField label={translateTutorialExtra(locale, "tutorialExtra.sq1.top")}>
               <DrawSelect value={topPreset} onChange={handleUpdateTopOpt}>
-                {topCspOption.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
+                {presetValues.map((value) => (
+                  <option key={value} value={value}>
+                    {presetLabelKeys[value] ? translateTutorialExtra(locale, presetLabelKeys[value]) : value}
                   </option>
                 ))}
               </DrawSelect>
             </DrawControlField>
 
-            <DrawControlField label="中轴线">
+            <DrawControlField label={t("draws.sq1.Central_axis")}>
               <DrawSelect
                 value={topAxisLine}
                 onChange={(v) => resetLineReg(Number(v), true)}
@@ -715,7 +719,7 @@ function DoubleSq1Draw() {
           {useFont && fontsTop.length > 0 ? (
             <Box mb="4">
               <Text fontSize="xs" fontWeight="semibold" color="fg.muted" mb="2">
-                顶层文字
+                {translateTutorialExtra(locale, "tutorialExtra.sq1.topText")}
               </Text>
               <Grid templateColumns="repeat(3, 1fr)" gap="2">
                 {fontsTop.map((font, index) => (
@@ -725,7 +729,8 @@ function DoubleSq1Draw() {
                     maxLength={1}
                     size="sm"
                     onChange={(e) => handleTopFontChange(index, e.target.value)}
-                    placeholder="Enter Value"
+                    placeholder={translateTutorialExtra(locale, "tutorialExtra.sq1.enterValue")}
+                    aria-label={`${translateTutorialExtra(locale, "tutorialExtra.sq1.topText")} ${index + 1}`}
                   />
                 ))}
               </Grid>
@@ -739,17 +744,17 @@ function DoubleSq1Draw() {
             mt="4"
             mb="4"
           >
-            <DrawControlField label="底层">
+            <DrawControlField label={translateTutorialExtra(locale, "tutorialExtra.sq1.bottom")}>
               <DrawSelect value={downDefaultVal} onChange={handleUpdateDownOpt}>
-                {downCspOption.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
+                {downPresetValues.map((value) => (
+                  <option key={value} value={value}>
+                    {presetLabelKeys[value] ? translateTutorialExtra(locale, presetLabelKeys[value]) : value}
                   </option>
                 ))}
               </DrawSelect>
             </DrawControlField>
 
-            <DrawControlField label="中轴线">
+            <DrawControlField label={t("draws.sq1.Central_axis")}>
               <DrawSelect
                 value={downAxisLine}
                 onChange={(v) => resetLineReg(Number(v), false)}
@@ -787,7 +792,7 @@ function DoubleSq1Draw() {
           {useFont && fontsDown.length > 0 ? (
             <Box>
               <Text fontSize="xs" fontWeight="semibold" color="fg.muted" mb="2">
-                底层文字
+                {translateTutorialExtra(locale, "tutorialExtra.sq1.bottomText")}
               </Text>
               <Grid templateColumns="repeat(3, 1fr)" gap="2">
                 {fontsDown.map((font, index) => (
@@ -799,7 +804,8 @@ function DoubleSq1Draw() {
                     onChange={(e) =>
                       handleDownFontChange(index, e.target.value)
                     }
-                    placeholder="Enter Value"
+                    placeholder={translateTutorialExtra(locale, "tutorialExtra.sq1.enterValue")}
+                    aria-label={`${translateTutorialExtra(locale, "tutorialExtra.sq1.bottomText")} ${index + 1}`}
                   />
                 ))}
               </Grid>
@@ -817,6 +823,8 @@ export function SQ1DrawView() {
   return (
     <DrawNavTabs
       tabsKey="sq1_draw_tabs"
+      title={t("home.welcome.draw.sq.title")}
+      description={t("home.welcome.draw.sq.desc")}
       items={[
         {
           key: "simple_sq",

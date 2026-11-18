@@ -1,8 +1,12 @@
 "use client";
+import { useI18n } from "@/contexts/I18nProvider";
+import { useAdminManagement } from "@/views/admin/useAdminManagement";
 
 import "antd/dist/reset.css";
 
-import { Heading, VStack } from "@chakra-ui/react";
+import { VStack } from "@chakra-ui/react";
+import { PageHeader } from "@/components/ui/page";
+import "./admin-ui.css";
 import { DeleteOutlined, EditOutlined, PlusOutlined, TeamOutlined } from "@ant-design/icons";
 import {
   Button,
@@ -43,19 +47,6 @@ import type { OrganizersStatus } from "@/services/cubing-pro/auth/typings";
 import type { PlayersAPI } from "@/services/cubing-pro/players/typings";
 
 const MAX_GROUPS_PER_ORG = 3;
-
-const STATUS_OPTIONS: { label: string; value: OrganizersStatus }[] = [
-  { label: "未使用", value: "NotUse" },
-  { label: "已过期", value: "Expired" },
-  { label: "使用中", value: "Using" },
-  { label: "申请中", value: "Applying" },
-  { label: "驳回申请", value: "RejectApply" },
-  { label: "申诉中", value: "UnderAppeal" },
-  { label: "驳回申诉", value: "RejectAppeal" },
-  { label: "禁用", value: "Disable" },
-  { label: "永久禁用", value: "PermanentlyDisabled" },
-  { label: "解散", value: "Disband" },
-];
 
 type OrgMemberRow = { cubeId: string; display: string };
 
@@ -121,16 +112,18 @@ function OrgMembersTableBlock({
   pickKey: number;
   bumpPickKey: () => void;
 }) {
+  const { t } = useI18n();
+  const m = useAdminManagement();
   const tryAdd = (player: PlayersAPI.Player | null) => {
     if (!player?.CubeID) return;
     if (rows.some((r) => r.cubeId === player.CubeID)) {
-      void message.warning("该用户已在成员列表中");
+      void message.warning(m("adminManagement.memberExists"));
       bumpPickKey();
       return;
     }
     setRows((prev) => [
       ...prev,
-      { cubeId: player.CubeID, display: `${player.Name || "未命名"}（${player.CubeID}）` },
+      { cubeId: player.CubeID, display: `${player.Name || t("competitionAdmin.unnamed")}（${player.CubeID}）` },
     ]);
     bumpPickKey();
   };
@@ -142,18 +135,18 @@ function OrgMembersTableBlock({
         pagination={false}
         rowKey="cubeId"
         scroll={{ x: "max-content" }}
-        locale={{ emptyText: "暂无成员" }}
+        locale={{ emptyText: m("adminManagement.noMembers") }}
         columns={[
           {
-            title: "序号",
+            title: t("competitionAdmin.index"),
             width: 56,
             align: "center",
             render: (_1, _2, index) => index + 1,
           },
-          { title: "用户", dataIndex: "display", ellipsis: true },
+          { title: m("adminManagement.userName"), dataIndex: "display", ellipsis: true },
           { title: "CubeID", dataIndex: "cubeId", width: 120 },
           {
-            title: "操作",
+            title: t("teamMatch.actions"),
             width: 72,
             align: "center",
             render: (_, row) => (
@@ -163,7 +156,7 @@ function OrgMembersTableBlock({
                 danger
                 onClick={() => setRows((prev) => prev.filter((r) => r.cubeId !== row.cubeId))}
               >
-                移除
+                {m("adminManagement.remove")}
               </Button>
             ),
           },
@@ -172,11 +165,11 @@ function OrgMembersTableBlock({
       />
       <div style={{ marginTop: 10 }}>
         <div style={{ marginBottom: 6, color: "var(--muted-foreground)", fontSize: 12 }}>
-          添加成员：在下方搜索并点选用户，将加入上表
+          {m("adminManagement.addMemberHint")}
         </div>
         <AdminUserSearchSelect
           key={pickKey}
-          placeholder="输入姓名或 CubeID 搜索用户"
+          placeholder={m("adminManagement.searchMember")}
           onPlayerChange={(p) => tryAdd(p)}
         />
       </div>
@@ -185,6 +178,21 @@ function OrgMembersTableBlock({
 }
 
 export function AdminOrganizersPageView() {
+  const { t } = useI18n();
+  const m = useAdminManagement();
+  const statusOptions: { label: string; value: OrganizersStatus }[] = [
+    { label: m("adminManagement.statusNotUse"), value: "NotUse" },
+    { label: m("adminManagement.statusExpired"), value: "Expired" },
+    { label: m("adminManagement.statusUsing"), value: "Using" },
+    { label: m("adminManagement.statusApplying"), value: "Applying" },
+    { label: m("adminManagement.statusRejectApply"), value: "RejectApply" },
+    { label: m("adminManagement.statusUnderAppeal"), value: "UnderAppeal" },
+    { label: m("adminManagement.statusRejectAppeal"), value: "RejectAppeal" },
+    { label: t("competitionAdmin.banned"), value: "Disable" },
+    { label: m("adminManagement.statusPermanent"), value: "PermanentlyDisabled" },
+    { label: m("adminManagement.statusDisband"), value: "Disband" },
+  ];
+  const statusLabel = (status: string) => statusOptions.find((option) => option.value === status)?.label ?? status;
   const [organizers, setOrganizers] = useState<AdminOrganizer[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -251,11 +259,11 @@ export function AdminOrganizersPageView() {
       setDetailOrganizer(res.organizer);
       setDetailGroups(res.groups || []);
     } catch {
-      void message.error("加载详情失败");
+      void message.error(m("adminManagement.detailsFailed"));
     } finally {
       setDetailLoading(false);
     }
-  }, []);
+  }, [m]);
 
   const openDetail = (org: AdminOrganizer) => {
     setDetailOrgId(org.id);
@@ -282,7 +290,7 @@ export function AdminOrganizersPageView() {
         admin_message: v.admin_message,
         ass_cube_ids: createMemberRows.map((r) => r.cubeId),
       });
-      void message.success("已创建主办团队");
+      void message.success(m("adminManagement.organizerCreated"));
       createForm.resetFields();
       setCreateOpen(false);
       void loadOrganizers();
@@ -323,7 +331,7 @@ export function AdminOrganizersPageView() {
         admin_message: v.admin_message,
         ass_cube_ids: editMemberRows.map((r) => r.cubeId),
       });
-      void message.success("已更新");
+      void message.success(m("adminManagement.updated"));
       setEditOpen(false);
       setEditing(null);
       void loadOrganizers();
@@ -346,7 +354,7 @@ export function AdminOrganizersPageView() {
         cube_id: (v.cube_id as string).trim(),
         grant_auth: !!v.grant_auth,
       });
-      void message.success("已添加成员");
+      void message.success(m("adminManagement.memberAdded"));
       memberForm.resetFields();
       await reloadDetail(detailOrgId);
     } finally {
@@ -359,7 +367,7 @@ export function AdminOrganizersPageView() {
     setSubmitLoading(true);
     try {
       await apiAdminRemoveOrganizerMember(detailOrgId, cubeId);
-      void message.success("已移出成员");
+      void message.success(m("adminManagement.memberRemoved"));
       await reloadDetail(detailOrgId);
     } finally {
       setSubmitLoading(false);
@@ -384,14 +392,14 @@ export function AdminOrganizersPageView() {
     try {
       if (groupModal?.mode === "create") {
         if (detailGroups.length >= MAX_GROUPS_PER_ORG) {
-          void message.error(`每个主办团队最多 ${MAX_GROUPS_PER_ORG} 个比赛群组`);
+          void message.error(m("adminManagement.groupsLimit", { count: MAX_GROUPS_PER_ORG }));
           return;
         }
         await apiAdminCreateGroup(detailOrgId, body);
-        void message.success("已创建群组");
+        void message.success(m("adminManagement.groupCreated"));
       } else if (groupModal?.group) {
         await apiAdminUpdateGroup(groupModal.group.id, body);
-        void message.success("已更新群组");
+        void message.success(m("adminManagement.groupUpdated"));
       }
       setGroupModal(null);
       await reloadDetail(detailOrgId);
@@ -405,32 +413,32 @@ export function AdminOrganizersPageView() {
       setSubmitLoading(true);
       try {
         await apiAdminDeleteGroup(g.id);
-        void message.success("已删除群组");
+        void message.success(m("adminManagement.groupDeleted"));
         if (detailOrgId) await reloadDetail(detailOrgId);
       } finally {
         setSubmitLoading(false);
       }
     },
-    [detailOrgId, reloadDetail],
+    [detailOrgId, reloadDetail, m],
   );
 
   const groupColumns = useMemo(
     () => [
-      { title: "名称", dataIndex: "name", key: "name" },
+      { title: t("competitionAdmin.name"), dataIndex: "name", key: "name" },
       {
-        title: "QQ 群",
+        title: t("competitionAdmin.qqGroup"),
         key: "qq",
         render: (_: unknown, r: AdminCompetitionGroup) =>
           asStringList(r.qq_groups).join("、") || "—",
       },
       {
-        title: "微信",
+        title: m("adminManagement.wechat"),
         key: "wx",
         render: (_: unknown, r: AdminCompetitionGroup) =>
           asStringList(r.wechat_groups).join("、") || "—",
       },
       {
-        title: "操作",
+        title: t("teamMatch.actions"),
         key: "op",
         render: (_: unknown, r: AdminCompetitionGroup) => (
           <Space>
@@ -439,33 +447,33 @@ export function AdminOrganizersPageView() {
               size="small"
               onClick={() => setGroupModal({ mode: "edit", group: r })}
             >
-              编辑
+              {t("teamMatch.edit")}
             </Button>
-            <Popconfirm title="确定删除该群组？" onConfirm={() => void deleteGroup(r)}>
+            <Popconfirm title={m("adminManagement.deleteCompetitionGroup")} onConfirm={() => void deleteGroup(r)}>
               <Button type="link" size="small" danger>
-                删除
+                {t("teamMatch.delete")}
               </Button>
             </Popconfirm>
           </Space>
         ),
       },
     ],
-    [deleteGroup],
+    [deleteGroup, m, t],
   );
 
   const columns: ColumnsType<AdminOrganizer> = [
     { title: "ID", dataIndex: "id", width: 70 },
-    { title: "团队名称", dataIndex: "Name", ellipsis: true },
+    { title: m("adminManagement.teamName"), dataIndex: "Name", ellipsis: true },
     {
-      title: "状态",
+      title: t("competitionAdmin.status"),
       dataIndex: "Status",
       width: 120,
-      render: (status: string) => <Tag>{status}</Tag>,
+      render: (status: string) => <Tag>{statusLabel(status)}</Tag>,
       filteredValue: statusFilter ? [statusFilter] : null,
-      filters: STATUS_OPTIONS.map((o) => ({ text: o.label, value: o.value })),
+      filters: statusOptions.map((o) => ({ text: o.label, value: o.value })),
     },
     {
-      title: "组长 CubeID",
+      title: m("adminManagement.leaderCubeId"),
       dataIndex: "LeaderID",
       width: 130,
       render: (_, r) =>
@@ -475,32 +483,32 @@ export function AdminOrganizersPageView() {
           <span style={{ color: "var(--faint-foreground)" }}>—</span>
         ),
     },
-    { title: "联系邮箱", dataIndex: "Email", ellipsis: true },
+    { title: m("adminManagement.contactEmail"), dataIndex: "Email", ellipsis: true },
     {
-      title: "操作",
+      title: t("teamMatch.actions"),
       width: 220,
       render: (_, r) => (
         <Space>
           <Button type="link" size="small" icon={<TeamOutlined />} onClick={() => openDetail(r)}>
-            详情
+            {t("competitionAdmin.details")}
           </Button>
           <Button type="link" size="small" icon={<EditOutlined />} onClick={() => openEdit(r)}>
-            编辑
+            {t("teamMatch.edit")}
           </Button>
           <Popconfirm
-            title="仅当团队下无比赛时可删除；删除会同时移除该团队下全部比赛群组。"
+            title={m("adminManagement.deleteOrganizerHint")}
             onConfirm={async () => {
               try {
                 await apiAdminDeleteOrganizer(r.id);
-                void message.success("已删除");
+                void message.success(m("adminManagement.deleted"));
                 void loadOrganizers();
               } catch {
-                void message.error("删除失败");
+                void message.error(m("adminManagement.deleteFailed"));
               }
             }}
           >
             <Button type="link" size="small" danger icon={<DeleteOutlined />}>
-              删除
+              {t("teamMatch.delete")}
             </Button>
           </Popconfirm>
         </Space>
@@ -510,25 +518,25 @@ export function AdminOrganizersPageView() {
 
   const orgBaseFormItems = () => (
     <>
-      <Form.Item name="name" label="团队名称" rules={[{ required: true, message: "必填" }]}>
-        <Input placeholder="唯一名称" />
+      <Form.Item name="name" label={m("adminManagement.teamName")} rules={[{ required: true, message: m("adminManagement.required") }]}>
+        <Input placeholder={m("adminManagement.uniqueName")} />
       </Form.Item>
-      <Form.Item name="status" label="状态" rules={[{ required: true }]}>
-        <Select options={STATUS_OPTIONS} placeholder="选择状态" />
+      <Form.Item name="status" label={t("competitionAdmin.status")} rules={[{ required: true, message: m("adminManagement.selectStatus") }]}>
+        <Select options={statusOptions} placeholder={m("adminManagement.selectStatus")} />
       </Form.Item>
-      <Form.Item name="introduction" label="介绍">
-        <Input.TextArea rows={3} placeholder="支持 Markdown" />
+      <Form.Item name="introduction" label={m("adminManagement.introduction")}>
+        <Input.TextArea rows={3} placeholder={m("adminManagement.markdownSupported")} />
       </Form.Item>
-      <Form.Item name="email" label="联系邮箱">
+      <Form.Item name="email" label={m("adminManagement.contactEmail")}>
         <Input />
       </Form.Item>
-      <Form.Item name="leader_cube_id" label="组长">
-        <AdminUserSearchSelect allowClear placeholder="搜索姓名或 CubeID 选择组长（可空）" />
+      <Form.Item name="leader_cube_id" label={m("adminManagement.leader")}>
+        <AdminUserSearchSelect allowClear placeholder={m("adminManagement.selectLeader")} />
       </Form.Item>
-      <Form.Item name="leader_remark" label="组长备注">
+      <Form.Item name="leader_remark" label={m("adminManagement.leaderNotes")}>
         <Input.TextArea rows={2} />
       </Form.Item>
-      <Form.Item name="admin_message" label="管理员留言">
+      <Form.Item name="admin_message" label={m("adminManagement.adminMessage")}>
         <Input.TextArea rows={2} />
       </Form.Item>
     </>
@@ -546,16 +554,17 @@ export function AdminOrganizersPageView() {
 
   return (
     <AdminGuard>
-      <VStack align="stretch" gap="6">
-        <Heading size="xl">主办团队管理</Heading>
+      <VStack className="admin-page" align="stretch" gap="6">
+        <PageHeader eyebrow={t("nav.admin.admins")} title={m("adminManagement.organizersTitle")} />
 
         <div style={{ marginBottom: 8 }}>
           <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateOpen(true)}>
-            新建团队
+            {m("adminManagement.newTeam")}
           </Button>
         </div>
 
         <Table<AdminOrganizer>
+          scroll={{ x: "max-content" }}
           rowKey="id"
           columns={columns}
           dataSource={organizers}
@@ -570,7 +579,7 @@ export function AdminOrganizersPageView() {
         />
 
         <Modal
-          title="新建主办团队"
+          title={m("adminManagement.createOrganizer")}
           open={createOpen}
           onCancel={() => setCreateOpen(false)}
           onOk={() => void handleCreate()}
@@ -585,7 +594,7 @@ export function AdminOrganizersPageView() {
             initialValues={{ status: "Using" }}
           >
             {orgBaseFormItems()}
-            <Form.Item label="成员" colon={false}>
+            <Form.Item label={m("adminManagement.members")} colon={false}>
               <OrgMembersTableBlock
                 rows={createMemberRows}
                 setRows={setCreateMemberRows}
@@ -597,7 +606,7 @@ export function AdminOrganizersPageView() {
         </Modal>
 
         <Modal
-          title="编辑主办团队"
+          title={m("adminManagement.editOrganizer")}
           open={editOpen}
           onCancel={() => setEditOpen(false)}
           onOk={() => void handleEdit()}
@@ -614,7 +623,7 @@ export function AdminOrganizersPageView() {
               initialValues={organizerFormInitialValues(editing)}
             >
               {orgBaseFormItems()}
-              <Form.Item label="成员" colon={false}>
+              <Form.Item label={m("adminManagement.members")} colon={false}>
                 <OrgMembersTableBlock
                   rows={editMemberRows}
                   setRows={setEditMemberRows}
@@ -627,7 +636,7 @@ export function AdminOrganizersPageView() {
         </Modal>
 
         <Drawer
-          title={detailOrganizer ? `主办团队：${detailOrganizer.Name}` : "主办详情"}
+          title={detailOrganizer ? m("adminManagement.organizerName", { name: detailOrganizer.Name }) : m("adminManagement.organizerDetails")}
           size={720}
           open={detailOpen}
           onClose={() => {
@@ -637,25 +646,25 @@ export function AdminOrganizersPageView() {
           destroyOnHidden
         >
           {detailLoading && !detailOrganizer ? (
-            <div>加载中…</div>
+            <div>{t("algs.loading")}</div>
           ) : detailOrganizer ? (
             <Tabs
               items={[
                 {
                   key: "info",
-                  label: "基本信息",
+                  label: m("adminManagement.basicInfo"),
                   children: (
                     <Descriptions column={1} bordered size="small">
                       <Descriptions.Item label="ID">{detailOrganizer.id}</Descriptions.Item>
-                      <Descriptions.Item label="名称">{detailOrganizer.Name}</Descriptions.Item>
-                      <Descriptions.Item label="状态">
-                        <Tag>{detailOrganizer.Status}</Tag>
+                      <Descriptions.Item label={t("competitionAdmin.name")}>{detailOrganizer.Name}</Descriptions.Item>
+                      <Descriptions.Item label={t("competitionAdmin.status")}>
+                        <Tag>{statusLabel(detailOrganizer.Status)}</Tag>
                       </Descriptions.Item>
-                      <Descriptions.Item label="组长">
+                      <Descriptions.Item label={m("adminManagement.leader")}>
                         {detailOrganizer.LeaderID || "—"}
                       </Descriptions.Item>
-                      <Descriptions.Item label="邮箱">{detailOrganizer.Email || "—"}</Descriptions.Item>
-                      <Descriptions.Item label="介绍">
+                      <Descriptions.Item label={t("competitionAdmin.email")}>{detailOrganizer.Email || "—"}</Descriptions.Item>
+                      <Descriptions.Item label={m("adminManagement.introduction")}>
                         {detailOrganizer.Introduction || "—"}
                       </Descriptions.Item>
                     </Descriptions>
@@ -663,17 +672,17 @@ export function AdminOrganizersPageView() {
                 },
                 {
                   key: "members",
-                  label: "成员",
+                  label: m("adminManagement.members"),
                   children: (
                     <div>
                       <Space wrap style={{ marginBottom: 16 }} align="start">
                         <Form form={memberForm} layout="inline" style={{ flex: 1 }}>
                           <Form.Item
                             name="cube_id"
-                            rules={[{ required: true, message: "请选择成员" }]}
+                            rules={[{ required: true, message: m("adminManagement.selectMember") }]}
                             style={{ marginBottom: 0, minWidth: 280 }}
                           >
-                            <AdminUserSearchSelect placeholder="搜索并选择成员" />
+                            <AdminUserSearchSelect placeholder={m("adminManagement.searchSelectMember")} />
                           </Form.Item>
                           <Form.Item
                             name="grant_auth"
@@ -682,14 +691,14 @@ export function AdminOrganizersPageView() {
                           >
                             <Select
                               options={[
-                                { label: "同时授予主办权限", value: true },
-                                { label: "仅加入团队", value: false },
+                                { label: m("adminManagement.grantOrganizer"), value: true },
+                                { label: m("adminManagement.joinTeamOnly"), value: false },
                               ]}
                             />
                           </Form.Item>
                         </Form>
                         <Button type="primary" loading={submitLoading} onClick={() => void addMember()}>
-                          添加成员
+                          {m("adminManagement.addMember")}
                         </Button>
                       </Space>
                       <Table
@@ -702,7 +711,7 @@ export function AdminOrganizersPageView() {
                                 {
                                   key: "leader",
                                   cube: detailOrganizer.LeaderID,
-                                  role: "组长",
+                                  role: m("adminManagement.leader"),
                                   canRemove: false,
                                 },
                               ]
@@ -710,25 +719,25 @@ export function AdminOrganizersPageView() {
                           ...parseAssUsers(detailOrganizer.AssOrganizerUsers).map((cube) => ({
                             key: cube,
                             cube,
-                            role: "成员",
+                            role: m("adminManagement.members"),
                             canRemove: true,
                           })),
                         ]}
                         columns={[
                           { title: "CubeID", dataIndex: "cube", key: "cube" },
-                          { title: "角色", dataIndex: "role", width: 100 },
+                          { title: m("adminManagement.role"), dataIndex: "role", width: 100 },
                           {
-                            title: "操作",
+                            title: t("teamMatch.actions"),
                             key: "op",
                             width: 100,
                             render: (_, row: { cube: string; canRemove: boolean }) =>
                               row.canRemove ? (
                                 <Popconfirm
-                                  title="移出该成员？"
+                                  title={m("adminManagement.removeMember")}
                                   onConfirm={() => void removeMember(row.cube)}
                                 >
                                   <Button type="link" size="small" danger>
-                                    移出
+                                    {m("adminManagement.remove")}
                                   </Button>
                                 </Popconfirm>
                               ) : (
@@ -742,7 +751,7 @@ export function AdminOrganizersPageView() {
                 },
                 {
                   key: "groups",
-                  label: `比赛群组（最多 ${MAX_GROUPS_PER_ORG} 个）`,
+                  label: m("adminManagement.groupsTab", { count: MAX_GROUPS_PER_ORG }),
                   children: (
                     <div>
                       <Button
@@ -751,7 +760,7 @@ export function AdminOrganizersPageView() {
                         disabled={detailGroups.length >= MAX_GROUPS_PER_ORG}
                         onClick={() => setGroupModal({ mode: "create" })}
                       >
-                        新建群组
+                        {m("adminManagement.newGroup")}
                       </Button>
                       <Table
                         size="small"
@@ -769,7 +778,7 @@ export function AdminOrganizersPageView() {
         </Drawer>
 
         <Modal
-          title={groupModal?.mode === "edit" ? "编辑比赛群组" : "新建比赛群组"}
+          title={groupModal?.mode === "edit" ? m("adminManagement.editCompetitionGroup") : m("adminManagement.createCompetitionGroup")}
           open={!!groupModal}
           onCancel={() => setGroupModal(null)}
           onOk={() => void submitGroup()}
@@ -788,17 +797,17 @@ export function AdminOrganizersPageView() {
                   : undefined
               }
             >
-            <Form.Item name="name" label="群组名称" rules={[{ required: true }]}>
+            <Form.Item name="name" label={m("adminManagement.groupName")} rules={[{ required: true, message: m("adminManagement.nameRequired") }]}>
               <Input />
             </Form.Item>
-            <Form.Item name="qq_groups" label="QQ 群号">
-              <Select mode="tags" placeholder="输入后回车" tokenSeparators={[","]} />
+            <Form.Item name="qq_groups" label={m("adminManagement.qqGroupNumbers")}>
+              <Select mode="tags" placeholder={m("adminManagement.enterTags")} tokenSeparators={[","]} />
             </Form.Item>
-            <Form.Item name="qq_group_uid" label="QQ 群 UID">
-              <Select mode="tags" placeholder="输入后回车" tokenSeparators={[","]} />
+            <Form.Item name="qq_group_uid" label={m("adminManagement.qqGroupUid")}>
+              <Select mode="tags" placeholder={m("adminManagement.enterTags")} tokenSeparators={[","]} />
             </Form.Item>
-            <Form.Item name="wechat_groups" label="微信群">
-              <Select mode="tags" placeholder="输入后回车" tokenSeparators={[","]} />
+            <Form.Item name="wechat_groups" label={m("adminManagement.wechatGroups")}>
+              <Select mode="tags" placeholder={m("adminManagement.enterTags")} tokenSeparators={[","]} />
             </Form.Item>
             </Form>
           ) : null}

@@ -1,0 +1,24 @@
+{
+  "locale": "ja",
+  "tips": [
+    { "id": "油温判断技巧", "category": "advanced", "title": "油の温度の見分け方と温度・単位換算表", "description": "油の状態から温度の目安を見分け、揚げ物や炒め物に合う温度と摂氏・華氏の換算を確認します。", "categoryName": "応用", "mdPath": "advanced/油温判断技巧.md" },
+    { "id": "糖色的炒制", "category": "advanced", "title": "料理の色付け用カラメルの作り方", "description": "水または油を使って色付け用カラメルを200ml作る手順と、糖液の状態ごとの用途を紹介します。", "categoryName": "応用", "mdPath": "advanced/糖色的炒制.md" },
+    { "id": "辅料技巧", "category": "advanced", "title": "香味野菜と香辛料の使い方", "description": "しょうが、ねぎ、にんにく、香辛料を加える順番と、料理に応じた塩の量や加えるタイミングを学びます。", "categoryName": "応用", "mdPath": "advanced/辅料技巧.md" },
+    { "id": "高级专业术语", "category": "advanced", "title": "中国料理の専門用語", "description": "炒める、蒸す、煮込むなどの加熱方法から、下ごしらえやとろみ付けまで、中国料理の専門用語を解説します。", "categoryName": "応用", "mdPath": "advanced/高级专业术语.md" },
+    { "id": "去腥", "category": "learn", "title": "食材の臭みを取る", "description": "調味料、つけだれ、香味野菜、水からの下ゆでを使い、食材本来の風味を残しながら臭みを抑える方法です。", "categoryName": "基本技術", "mdPath": "learn/去腥.md" },
+    { "id": "学习凉拌", "category": "learn", "title": "和え物", "description": "野菜、きのこ、肉の下処理から薬味作り、混ぜ合わせ、食べ方まで、冷たい和え物の工程と注意点を説明します。", "categoryName": "基本技術", "mdPath": "learn/学习凉拌.md" },
+    { "id": "学习炒与煎", "category": "learn", "title": "炒める・焼く", "description": "鍋の選び方、食材をくっつきにくくする方法、加熱の流れと熱い油を扱う際の注意点を紹介します。", "categoryName": "基本技術", "mdPath": "learn/学习炒与煎.md" },
+    { "id": "学习焯水", "category": "learn", "title": "下ゆで", "description": "湯からゆでる方法と水からゆでる方法の違い、野菜や肉に適した手順、ゆでた後の処理を学びます。", "categoryName": "基本技術", "mdPath": "learn/学习焯水.md" },
+    { "id": "学习煮", "category": "learn", "title": "煮る", "description": "水を沸かして食材を加える基本の流れと、ふたや火加減を調整して吹きこぼれを防ぐ方法を紹介します。", "categoryName": "基本技術", "mdPath": "learn/学习煮.md" },
+    { "id": "学习用刀", "category": "learn", "title": "包丁の使い方", "description": "家庭の初心者向けに、安全な持ち方、野菜や肉の切り方、洗浄・収納、研ぎ方、けがへの対応まで詳しく説明します。", "categoryName": "基本技術", "mdPath": "learn/学习用刀.md" },
+    { "id": "学习腌", "category": "learn", "title": "肉の下味の付け方", "description": "肉に下味を付ける基本、材料別の扱い、漬け込む容器と時間、調味料の役割と具体的な配合例を紹介します。", "categoryName": "基本技術", "mdPath": "learn/学习腌.md" },
+    { "id": "学习蒸", "category": "learn", "title": "蒸す", "description": "蒸し器や中華鍋で蒸気を使って加熱する方法と、水の量や空だきに注意するポイントを紹介します。", "categoryName": "基本技術", "mdPath": "learn/学习蒸.md" },
+    { "id": "微波炉", "category": "learn", "title": "電子レンジを使う", "description": "電子レンジの仕組み、出力別に適した調理、加熱むらや破裂、容器の選択に関する注意点を説明します。", "categoryName": "基本技術", "mdPath": "learn/微波炉.md" },
+    { "id": "空气炸锅", "category": "learn", "title": "ノンフライヤーを使う", "description": "熱風調理の仕組みと操作方法、食品別の温度・時間の目安、下処理や焼き色を調整するコツを紹介します。", "categoryName": "基本技術", "mdPath": "learn/空气炸锅.md" },
+    { "id": "食品安全", "category": "learn", "title": "食品の安全", "description": "食中毒、アレルギー、細菌、かび毒、寄生虫のリスクと、食品の中心温度や薬との組み合わせについて説明します。", "categoryName": "基本技術", "mdPath": "learn/食品安全.md" },
+    { "id": "高压力锅", "category": "learn", "title": "炊飯・煮込み：炊飯器と圧力鍋", "description": "圧力鍋の構造と加熱の仕組み、密閉、排気、ふたの開け方、パッキンや投入量の注意点を学びます。", "categoryName": "基本技術", "mdPath": "learn/高压力锅.md" },
+    { "id": "厨房准备", "category": "base", "title": "台所の準備", "description": "調理に必要な道具、常備する調味料や食材をそろえ、脂肪酸の種類と調理方法に応じた油の選び方を確認します。", "categoryName": "準備と基本", "mdPath": "base/厨房准备.md" },
+    { "id": "如何洗碗", "category": "base", "title": "食器の洗い方", "description": "食器の分類、浸け置き、洗浄、すすぎ、乾燥、収納までの流れと、材質別・家電別のお手入れ方法を紹介します。", "categoryName": "準備と基本", "mdPath": "base/如何洗碗.md" },
+    { "id": "如何选择现在吃什么", "category": "base", "title": "何を食べるか決めるには", "description": "人数から料理の総数と肉料理・野菜料理の数を計算し、食べる人や食材の組み合わせを考えて献立を選びます。", "categoryName": "準備と基本", "mdPath": "base/如何选择现在吃什么.md" }
+  ]
+}

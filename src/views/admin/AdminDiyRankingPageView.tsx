@@ -1,8 +1,12 @@
 "use client";
+import { useI18n } from "@/contexts/I18nProvider";
+import { useAdminManagement } from "@/views/admin/useAdminManagement";
 
 import "antd/dist/reset.css";
 
-import { Heading, VStack } from "@chakra-ui/react";
+import { VStack } from "@chakra-ui/react";
+import { PageHeader } from "@/components/ui/page";
+import "./admin-ui.css";
 import { Button, Form, Input, List, Modal, Spin, Table, Tag, Typography, message } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { useCallback, useEffect, useState } from "react";
@@ -28,6 +32,8 @@ function UpdatePersonModal({
   onClose: () => void;
   kv?: StaticAPI.DiyRankKeyValue;
 }) {
+  const { t } = useI18n();
+  const m = useAdminManagement();
   const [persons, setPersons] = useState<string[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [description, setDescription] = useState("");
@@ -50,7 +56,7 @@ function UpdatePersonModal({
   const handleAddPerson = () => {
     if (!inputValue.trim()) return;
     if (!isValidPersonCode(inputValue)) {
-      void message.error("编号格式不正确，应为类似 2025ABCD01");
+      void message.error(m("adminManagement.invalidPersonCode"));
       return;
     }
     setPersons((prev) => [...prev, inputValue]);
@@ -61,7 +67,7 @@ function UpdatePersonModal({
     const uniquePersons = Array.from(new Set(persons));
     for (const person of uniquePersons) {
       if (!isValidPersonCode(person)) {
-        void message.error(`编号 ${person} 不符合格式要求`);
+        void message.error(m("adminManagement.invalidPerson", { person }));
         return;
       }
     }
@@ -69,10 +75,10 @@ function UpdatePersonModal({
     setLoading(true);
     try {
       await apiUpdateRankingWithKey(kv.id, description, uniquePersons);
-      void message.success("更新成功");
+      void message.success(t("profile.saveOk"));
       onClose();
     } catch {
-      void message.error("更新失败，请稍后再试");
+      void message.error(m("adminManagement.updateFailed"));
     } finally {
       setLoading(false);
     }
@@ -80,40 +86,40 @@ function UpdatePersonModal({
 
   return (
     <Modal
-      title={`修改 ${kv?.Description} 名单列表`}
+      title={m("adminManagement.editRanking", { name: kv?.Description ?? "" })}
       open={open}
       onCancel={onClose}
       footer={[
         <Button key="back" onClick={onClose}>
-          取消
+          {t("teamMatch.cancel")}
         </Button>,
         <Button key="submit" type="primary" loading={loading} onClick={() => void handleSubmit()}>
-          提交
+          {t("competitionAdmin.submit")}
         </Button>,
       ]}
     >
       <Spin spinning={loading}>
         <div style={{ marginBottom: 16 }}>
           <label>
-            描述：
+            {m("adminManagement.description")}
             <Input
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="请输入描述信息"
+              placeholder={m("adminManagement.enterDescription")}
               style={{ width: "100%", marginTop: 4 }}
             />
           </label>
         </div>
         <div style={{ marginBottom: 16 }}>
           <Input
-            placeholder="请输入人员编号（例如：2025JIAY01）"
+            placeholder={m("adminManagement.personCode")}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onPressEnter={handleAddPerson}
             style={{ width: "70%", marginRight: 8 }}
           />
           <Button type="primary" onClick={handleAddPerson}>
-            添加
+            {t("teamMatch.add")}
           </Button>
         </div>
         <div
@@ -131,7 +137,7 @@ function UpdatePersonModal({
               <List.Item
                 actions={[
                   <a key="delete" onClick={() => setPersons((prev) => prev.filter((_, i) => i !== index))}>
-                    删除
+                    {t("teamMatch.delete")}
                   </a>,
                 ]}
               >
@@ -156,6 +162,8 @@ function CreateRankingModal({
   onCancel: () => void;
   onOk?: () => void;
 }) {
+  const { t } = useI18n();
+  const m = useAdminManagement();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
@@ -167,8 +175,8 @@ function CreateRankingModal({
       onOk?.();
       onCancel();
     } catch (error) {
-      console.error("创建失败", error);
-      void message.error("创建失败");
+      console.error(m("adminManagement.createFailed"), error);
+      void message.error(m("adminManagement.createFailed"));
     } finally {
       setLoading(false);
     }
@@ -176,7 +184,7 @@ function CreateRankingModal({
 
   return (
     <Modal
-      title="新建排名项"
+      title={m("adminManagement.createRanking")}
       open={open}
       onCancel={() => {
         form.resetFields();
@@ -187,28 +195,28 @@ function CreateRankingModal({
     >
       <Form form={form} layout="vertical" onFinish={(v) => void handleFinish(v)}>
         <Form.Item
-          label="Key"
+          label={m("adminManagement.key")}
           name="key"
           rules={[
-            { required: true, message: "请输入 Key" },
-            { max: 50, message: "Key 不能超过 50 个字符" },
+            { required: true, message: m("adminManagement.keyRequired") },
+            { max: 50, message: m("adminManagement.keyMax") },
           ]}
         >
-          <Input placeholder="例如：rank_2025" />
+          <Input placeholder={m("adminManagement.keyExample")} />
         </Form.Item>
         <Form.Item
-          label="描述"
+          label={m("adminManagement.description")}
           name="description"
           rules={[
-            { required: true, message: "请输入描述" },
-            { max: 100, message: "描述不能超过 100 个字符" },
+            { required: true, message: m("adminManagement.descriptionRequired") },
+            { max: 100, message: m("adminManagement.descriptionMax") },
           ]}
         >
-          <Input.TextArea rows={3} placeholder="请输入该项的描述信息" />
+          <Input.TextArea rows={3} placeholder={m("adminManagement.rankingDescription")} />
         </Form.Item>
         <div style={{ textAlign: "right" }}>
           <Button type="primary" htmlType="submit" loading={loading}>
-            提交
+            {t("competitionAdmin.submit")}
           </Button>
         </div>
       </Form>
@@ -217,6 +225,8 @@ function CreateRankingModal({
 }
 
 export function AdminDiyRankingPageView() {
+  const { t } = useI18n();
+  const m = useAdminManagement();
   const [keys, setKeys] = useState<StaticAPI.DiyRankKeyValue[]>([]);
   const [loading, setLoading] = useState(true);
   const [updateModalOpen, setUpdateModalOpen] = useState(false);
@@ -239,20 +249,20 @@ export function AdminDiyRankingPageView() {
 
   const columns: ColumnsType<StaticAPI.DiyRankKeyValue> = [
     {
-      title: "名称",
+      title: t("competitionAdmin.name"),
       dataIndex: "Description",
       key: "Description",
       align: "center",
     },
     {
-      title: "Key",
+      title: m("adminManagement.key"),
       dataIndex: "id",
       key: "id",
       align: "center",
       render: (text: string) => <Tag color="orange">{text}</Tag>,
     },
     {
-      title: "人数",
+      title: t("competitionAdmin.players"),
       dataIndex: "Value",
       key: "Value",
       align: "center",
@@ -266,7 +276,7 @@ export function AdminDiyRankingPageView() {
       },
     },
     {
-      title: "操作",
+      title: t("teamMatch.actions"),
       key: "Option",
       align: "center",
       render: (_, val) => (
@@ -278,7 +288,7 @@ export function AdminDiyRankingPageView() {
             setUpdateModalOpen(true);
           }}
         >
-          修改
+          {t("teamMatch.edit")}
         </Button>
       ),
     },
@@ -286,14 +296,15 @@ export function AdminDiyRankingPageView() {
 
   return (
     <AdminGuard>
-      <VStack align="stretch" gap="6">
-        <Heading size="xl">DIY 榜单管理</Heading>
+      <VStack className="admin-page" align="stretch" gap="6">
+        <PageHeader eyebrow={t("nav.admin.admins")} title={m("adminManagement.rankingTitle")} />
         <div style={{ textAlign: "right" }}>
           <Button type="primary" onClick={() => setNewModalOpen(true)}>
-            添加
+            {t("teamMatch.add")}
           </Button>
         </div>
         <Table
+          scroll={{ x: "max-content" }}
           dataSource={keys}
           columns={columns}
           rowKey="id"

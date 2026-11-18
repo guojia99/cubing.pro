@@ -4,30 +4,21 @@ import type { IconButtonProps } from "@chakra-ui/react";
 import { ClientOnly, IconButton, Skeleton, Span } from "@chakra-ui/react";
 import { ThemeProvider, useTheme } from "next-themes";
 import type { ThemeProviderProps } from "next-themes";
-import { useMemo, type ReactNode } from "react";
+import type { ReactNode } from "react";
+import { useI18n } from "@/contexts/I18nProvider";
+import { translateShell } from "@/i18n/messages/shell";
 
 export interface ColorModeProviderProps extends ThemeProviderProps {
   children: ReactNode;
 }
 
 export function ColorModeProvider(props: ColorModeProviderProps) {
-  // React 19.2（Next 15.5 内置）对 Client Component 内渲染的 <script> 在水合与重挂载时
-  // 会特殊处理并报错/告警。服务端保持可执行脚本（防主题闪烁），客户端渲染为惰性 data block，
-  // React 会将其视作普通元素；type 差异由 next-themes 自带的 suppressHydrationWarning 覆盖。
-  // 见 https://github.com/pacocoursey/next-themes/issues/397
-  const scriptProps = useMemo(
-    () =>
-      ({
-        type: typeof window === "undefined" ? undefined : "application/json",
-      }) as const,
-    []
-  );
+  // Keep next-themes' pre-hydration script identical on the server and client.
   return (
     <ThemeProvider
       attribute="class"
       disableTransitionOnChange
       storageKey="cubing-pro-theme"
-      scriptProps={scriptProps}
       {...props}
     />
   );
@@ -84,12 +75,15 @@ type ColorModeButtonProps = Omit<IconButtonProps, "aria-label">;
 
 export const ColorModeButton = (props: ColorModeButtonProps) => {
   const { toggleColorMode } = useColorMode();
+  const { locale } = useI18n();
+  const label = translateShell(locale, "shell.colorMode.toggle");
   return (
     <ClientOnly fallback={<Skeleton boxSize="9" />}>
       <IconButton
         onClick={toggleColorMode}
         variant="ghost"
-        aria-label="切换颜色模式"
+        aria-label={label}
+        title={label}
         size="sm"
         {...props}
         css={{

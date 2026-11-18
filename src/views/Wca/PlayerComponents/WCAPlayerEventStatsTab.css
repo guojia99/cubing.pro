@@ -10,7 +10,9 @@
   flex-shrink: 0;
 }
 .event-stats-empty {
+  padding: 32px 16px;
+  border-radius: var(--radius-card);
+  background: var(--muted);
   text-align: center;
-  color: #999;
-  padding: 32px 0;
+  color: var(--muted-foreground);
 }

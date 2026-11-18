@@ -24,17 +24,17 @@
 .light,
 [data-palette="haitian"].light,
 [data-palette="haitian"] .light {
-  --background: #f7fafb;
+  --background: #f8fafb;
   --card: #ffffff;
   --popover: #ffffff;
   --muted: #eef4f6;
-  --foreground: #0c3a4d;
-  --muted-foreground: #156d8c;
-  --faint-foreground: #4aafc9;
+  --foreground: #203d49;
+  --muted-foreground: #526e7a;
+  --faint-foreground: #6b8490;
   --accent: #1a8aad;
   --accent-foreground: #ffffff;
   --accent-soft: color-mix(in srgb, var(--accent) 8%, transparent);
-  --border-default: color-mix(in srgb, var(--foreground) 12%, transparent);
+  --border-default: color-mix(in srgb, var(--foreground) 8%, transparent);
   --border-strong: color-mix(in srgb, var(--foreground) 22%, transparent);
 }
 
@@ -42,13 +42,13 @@
 .dark,
 [data-palette="haitian"].dark,
 [data-palette="haitian"] .dark {
-  --background: #082533;
-  --card: #0c3a4d;
-  --popover: #0e3f54;
-  --muted: #0e4458;
+  --background: #101b23;
+  --card: #172730;
+  --popover: #1b2e38;
+  --muted: #20343f;
   --foreground: #eef9fb;
   --muted-foreground: #a9e0eb;
-  --faint-foreground: #4a8aa0;
+  --faint-foreground: #829eab;
   --accent: #22a8cb;
   --accent-foreground: #082533;
   --accent-soft: color-mix(in srgb, var(--accent) 18%, transparent);

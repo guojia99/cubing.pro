@@ -1,3 +1,4 @@
+import { useTeamMatchI18n } from '@/views/TeamMatch/i18n';
 import { buildTeamRosterPasteImport } from '@/views/TeamMatch/teamRosterPasteImport';
 import type { TeamMatchStoreAction } from '@/views/TeamMatch/TeamMatchContext';
 import type { TeamMatchSession } from '@/views/TeamMatch/types';
@@ -14,11 +15,12 @@ const EXAMPLE = `广城理队（广州城市理工学院）\t许根进2017XUGE01
 二师培正联队\t饶诗颖\t彭扬懿2024PENG08\t吴旭涛`;
 
 const TeamRosterPasteCard: React.FC<Props> = ({ session, dispatch }) => {
+  const { t: tr, locale } = useTeamMatchI18n();
   const [open, setOpen] = useState(false);
   const [text, setText] = useState('');
 
   const apply = () => {
-    const r = buildTeamRosterPasteImport(session, text);
+    const r = buildTeamRosterPasteImport(session, text, locale);
     if (!r.ok) {
       message.warning(r.message);
       return;
@@ -27,18 +29,17 @@ const TeamRosterPasteCard: React.FC<Props> = ({ session, dispatch }) => {
     dispatch({ type: 'UPSERT_SCHOOLS', schools: r.schools });
     dispatch({ type: 'UPSERT_PLAYERS', players: r.players });
     dispatch({ type: 'UPSERT_TEAMS', teams: r.teams });
-    message.success(`已添加 ${n} 支队伍及相关学校与选手`);
+    message.success(tr('teamMatch.rosterAdded', { p0: n }));
     setText('');
     setOpen(false);
   };
 
   return (
     <>
-      <Button type="primary" onClick={() => setOpen(true)}>
-        粘贴导入（学校、选手、队伍）
-      </Button>
+      <Button type="primary" onClick={() => setOpen(true)}>{tr('teamMatch.pasteRoster')}</Button>
       <Modal
-        title="粘贴导入（学校、选手、队伍）"
+        className="tm-workbench-modal"
+        title={tr('teamMatch.pasteRoster')}
         open={open}
         onCancel={() => setOpen(false)}
         width={920}
@@ -46,10 +47,7 @@ const TeamRosterPasteCard: React.FC<Props> = ({ session, dispatch }) => {
         destroyOnHidden
         styles={{ body: { paddingTop: 12 } }}
       >
-        <Typography.Paragraph type="secondary" style={{ marginBottom: 12 }}>
-          每行：队名（学校名）或仅队名，Tab 或两个以上空格分隔，其后 {TEAM_PLAYERS}{' '}
-          名队员。姓名后可紧跟 10 位 WCA ID。无学校时队员挂靠自由人池，队伍按自由人队规则生成。
-        </Typography.Paragraph>
+        <Typography.Paragraph type="secondary" style={{ marginBottom: 12 }}>{tr('teamMatch.pasteRosterHelp', { p0: TEAM_PLAYERS })}</Typography.Paragraph>
         <Input.TextArea
           rows={18}
           value={text}
@@ -58,13 +56,9 @@ const TeamRosterPasteCard: React.FC<Props> = ({ session, dispatch }) => {
           style={{ fontFamily: 'monospace', fontSize: 13 }}
         />
         <Space style={{ marginTop: 16 }} wrap>
-          <Button type="primary" onClick={apply}>
-            解析并添加
-          </Button>
-          <Button onClick={() => setText(EXAMPLE)}>填入示例</Button>
-          <Button type="link" onClick={() => setOpen(false)}>
-            关闭
-          </Button>
+          <Button type="primary" onClick={apply}>{tr('teamMatch.parseAdd')}</Button>
+          <Button onClick={() => setText(EXAMPLE)}>{tr('teamMatch.fillExample')}</Button>
+          <Button type="link" onClick={() => setOpen(false)}>{tr('teamMatch.close')}</Button>
         </Space>
       </Modal>
     </>

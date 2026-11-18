@@ -1,5 +1,6 @@
 import cstimer from 'cstimer_module';
 import React, { useEffect, useState } from 'react';
+import { useCompetitionPublicI18n } from '../../i18n';
 
 const cstImageMap = new Map<string, string>([
   ['clock', 'clkwca'],
@@ -24,11 +25,13 @@ const svgToPngUrl = (svg: string): Promise<string> => {
         URL.revokeObjectURL(svgUrl);
         resolve(pngBase64);
       } else {
-        reject('Canvas 2d context not available');
+        URL.revokeObjectURL(svgUrl);
+        reject(new Error('Canvas 2d context not available'));
       }
     };
     img.onerror = (error) => {
-      reject(`Error loading SVG image: ${error}`);
+      URL.revokeObjectURL(svgUrl);
+      reject(new Error(`Error loading SVG image: ${error}`));
     };
     img.src = svgUrl;
   });
@@ -37,19 +40,29 @@ const svgToPngUrl = (svg: string): Promise<string> => {
 type Props = { scramble: string; puzzleId: string; className?: string };
 
 export const ScrambleImageMini: React.FC<Props> = ({ scramble, puzzleId, className }) => {
+  const { p } = useCompetitionPublicI18n();
   const [pngData, setPngData] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
   useEffect(() => {
-    const cstEv = cstImageMap.get(puzzleId) ? cstImageMap.get(puzzleId) : puzzleId;
-    const svgString = cstimer.getImage(scramble, cstEv!);
-    svgToPngUrl(svgString).then(setPngData).catch(() => setPngData(null));
+    let active = true;
+    setPngData(null);
+    setFailed(false);
+    void Promise.resolve().then(() => cstimer.getImage(scramble, cstImageMap.get(puzzleId) ?? puzzleId))
+      .then(svgToPngUrl)
+      .then((data) => { if (active) setPngData(data); })
+      .catch((error) => {
+        console.error('Group timer diagram failed', error);
+        if (active) setFailed(true);
+      });
+    return () => { active = false; };
   }, [scramble, puzzleId]);
 
   if (!pngData) {
-    return <div className={className}>…</div>;
+    return <div className={className} role="status">{p(failed ? 'competitionPublic.diagramFailed' : 'competitionPublic.loadingDiagram')}</div>;
   }
   return (
     <div className={className}>
-      <img src={pngData} alt="" style={{ maxWidth: '100%', height: 'auto' }} />
+      <img src={pngData} alt={p('competitionPublic.diagramAlt', { scramble })} style={{ maxWidth: '100%', height: 'auto' }} />
     </div>
   );
 };

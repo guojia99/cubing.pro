@@ -1,11 +1,21 @@
 import { createSystem, defaultConfig, defineConfig } from "@chakra-ui/react";
+import { cardAnatomy, dialogAnatomy, menuAnatomy, tabsAnatomy } from "@chakra-ui/react/anatomy";
 
 const config = defineConfig({
   theme: {
     tokens: {
       fonts: {
-        heading: { value: '"Outfit", "PingFang SC", "Microsoft YaHei", sans-serif' },
-        body: { value: '"DM Sans", "PingFang SC", "Microsoft YaHei", sans-serif' },
+        heading: { value: "var(--font-heading)" },
+        body: { value: "var(--font-body)" },
+      },
+      radii: {
+        lg: { value: "0.75rem" },
+        xl: { value: "1rem" },
+        "2xl": { value: "1.5rem" },
+      },
+      shadows: {
+        sm: { value: "var(--shadow-card)" },
+        md: { value: "var(--shadow-float)" },
       },
       colors: {
         /** Legacy raw scales — internal / recipe reference only */
@@ -43,6 +53,8 @@ const config = defineConfig({
           DEFAULT: { value: "var(--background)" },
           muted: { value: "var(--muted)" },
           elevated: { value: "var(--card)" },
+          panel: { value: "var(--card)" },
+          emphasized: { value: "var(--muted)" },
           subtle: {
             value: "color-mix(in srgb, var(--foreground) 4%, var(--card))",
           },
@@ -51,6 +63,7 @@ const config = defineConfig({
           DEFAULT: { value: "var(--foreground)" },
           muted: { value: "var(--muted-foreground)" },
           faint: { value: "var(--faint-foreground)" },
+          subtle: { value: "var(--muted-foreground)" },
         },
         accent: {
           DEFAULT: { value: "var(--accent)" },
@@ -66,6 +79,8 @@ const config = defineConfig({
         border: {
           DEFAULT: { value: "var(--border-default)" },
           strong: { value: "var(--border-strong)" },
+          muted: { value: "var(--border-default)" },
+          subtle: { value: "var(--border-default)" },
         },
         signal: {
           success: { value: "var(--signal-success)" },
@@ -146,6 +161,19 @@ const config = defineConfig({
           },
         },
       },
+    },
+    recipes: {
+      button: {
+        base: { colorPalette: "brand", borderRadius: "lg", fontWeight: "600", transition: "background 160ms, box-shadow 160ms, transform 160ms", _active: { transform: "scale(.98)" }, _motionReduce: { transition: "none", _active: { transform: "none" } } },
+      },
+      input: { base: { borderRadius: "lg", bg: "bg.elevated" } },
+      textarea: { base: { borderRadius: "lg", bg: "bg.elevated" } },
+    },
+    slotRecipes: {
+      card: { slots: cardAnatomy.keys(), base: { root: { borderRadius: "xl", borderColor: "border", boxShadow: "var(--shadow-card)" } } },
+      menu: { slots: menuAnatomy.keys(), base: { content: { borderRadius: "xl", bg: "bg.elevated", borderWidth: "1px", borderColor: "border", boxShadow: "var(--shadow-float)", p: "1.5" }, item: { borderRadius: "lg", _highlighted: { bg: "accent.soft", color: "accent" } } } },
+      dialog: { slots: dialogAnatomy.keys(), base: { content: { borderRadius: "2xl", bg: "bg.elevated", borderWidth: "1px", borderColor: "border", boxShadow: "var(--shadow-float)" }, backdrop: { backdropFilter: "blur(4px)" } } },
+      tabs: { slots: tabsAnatomy.keys(), base: { trigger: { fontWeight: "600", _selected: { color: "accent" } } } },
     },
   },
   globalCss: {

@@ -6,9 +6,9 @@ import './MilestoneContent.css';
 import { useIntl } from '@/hooks/useIntlMessage';
 import {
   getChartSeriesColors,
-  getThemeColors,
   mixCssColors,
 } from '@/theme/chartColors';
+import { useThemeColors } from '@/theme/useThemeColors';
 import { MEDAL_COLORS } from '@/theme/domainColors';
 import { Milestone, MilestoneType, getCompName } from './player_milestone';
 
@@ -58,11 +58,10 @@ function bubbleStyle(accent: string, background: string, text: string) {
 }
 
 // 气泡颜色映射（随主题派生）
-export function getBubbleColorMap(): Record<
+export function getBubbleColorMap(c: ReturnType<typeof useThemeColors>): Record<
   MilestoneType,
   { bg: string; border: string; text: string }
 > {
-  const c = getThemeColors();
   const s = getChartSeriesColors(14);
   const text = (color: string) => mixCssColors(color, c.foreground, 70);
   return {
@@ -90,8 +89,8 @@ interface MilestoneItemContentProps {
 
 const MilestoneItemContent: React.FC<MilestoneItemContentProps> = ({ milestone, isLeft }) => {
   const intl = useIntl();
-  const theme = getThemeColors();
-  const bubbleStyleMap = getBubbleColorMap();
+  const theme = useThemeColors();
+  const bubbleStyleMap = getBubbleColorMap(theme);
   const bubbleStyleEntry = bubbleStyleMap[milestone.type] || {
     bg: mixCssColors(theme.foreground, theme.background, 4),
     border: theme.border,
@@ -103,6 +102,7 @@ const MilestoneItemContent: React.FC<MilestoneItemContentProps> = ({ milestone, 
       ? getCountryDisplayName(
           milestone.overseas_country_iso2,
           milestone.overseas_country_id,
+          intl.locale,
         ).trim()
       : '';
 
@@ -112,7 +112,8 @@ const MilestoneItemContent: React.FC<MilestoneItemContentProps> = ({ milestone, 
       style={{
         backgroundColor: bubbleStyleEntry.bg,
         border: `1px solid ${bubbleStyleEntry.border}`,
-        borderRadius: '12px',
+        borderRadius: 'var(--radius-card)',
+        boxShadow: 'var(--shadow-card)',
         padding: '12px 16px',
         position: 'relative',
         wordBreak: 'break-word',

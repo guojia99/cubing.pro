@@ -1,15 +1,19 @@
 "use client";
+import { useAdminManagement } from "@/views/admin/useAdminManagement";
 
-import { Heading, Stack, VStack } from "@chakra-ui/react";
+import { VStack } from "@chakra-ui/react";
+import { PageHeader } from "@/components/ui/page";
+import "./admin-ui.css";
 import { useMemo } from "react";
 
 import { AdminGuard } from "@/components/admin/AdminGuard";
-import { AdminNavCards } from "@/components/admin/AdminNavCards";
+import { AdminNavigation } from "./AdminNavigation";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useI18n } from "@/contexts/I18nProvider";
 import { Auth, hasAuth } from "@/lib/auth";
 
 export function AdminHomePageView() {
+  const m = useAdminManagement();
   const { t } = useI18n();
   const { currentUser } = useAuth();
   const isSuperAdmin = hasAuth(currentUser?.Auth ?? 0, Auth.AuthSuperAdmin);
@@ -20,8 +24,8 @@ export function AdminHomePageView() {
         title: t("admin.admins.siteManagement"),
         children: [
           {
-            title: "网站设置",
-            description: "设置网站主页内容、网站图标、网站名等",
+            title: m("adminManagement.siteSettings"),
+            description: m("adminManagement.siteSettingsDesc"),
             avatar: "⚙️",
             disabled: true,
           },
@@ -38,147 +42,145 @@ export function AdminHomePageView() {
             avatar: "🔗",
           },
           {
-            title: "报表",
-            description: "网站使用详细报表",
+            title: m("adminManagement.reports"),
+            description: m("adminManagement.reportsDesc"),
             avatar: "📊",
             disabled: true,
           },
           {
-            title: "机器人设置",
-            description: "设置机器人权限、群组使用机器人情况",
+            title: m("adminManagement.botSettings"),
+            description: m("adminManagement.botSettingsDesc"),
             avatar: "🤖",
             disabled: true,
           },
           {
-            title: "通知管理",
-            description: "发布网站通知、修改通知等",
+            title: m("adminManagement.notices"),
+            description: m("adminManagement.noticesDesc"),
             avatar: "📢",
             disabled: true,
           },
           {
-            title: "发言管理",
-            description: "处理发言、禁言等",
+            title: m("adminManagement.comments"),
+            description: m("adminManagement.commentsDesc"),
             avatar: "💬",
             disabled: true,
           },
           {
-            title: "话题管理",
-            description: "添加和修改话题等",
+            title: m("adminManagement.topics"),
+            description: m("adminManagement.topicsDesc"),
             avatar: "🏷️",
             disabled: true,
           },
         ],
       },
     ],
-    [t],
+    [t, m],
   );
 
   const groups = useMemo(
     () => [
       {
-        title: "申请列表",
+        title: m("adminManagement.applications"),
         children: [
           {
-            title: "群赛审批",
-            description: "全局筛选群赛、审批申请与成绩",
+            title: m("adminManagement.competitionReview"),
+            description: m("adminManagement.competitionReviewDesc"),
             avatar: "📝",
             to: "/admin/competition/approvals",
           },
           {
-            title: "主办申请",
-            description: "审批主办团队申请",
+            title: m("adminManagement.organizerApplications"),
+            description: m("adminManagement.organizerApplicationsDesc"),
             avatar: "✅",
             disabled: true,
           },
         ],
       },
       {
-        title: "运动专区",
+        title: m("adminManagement.sports"),
         children: [
           {
-            title: "运动成绩录入",
-            description: "录入运动的成绩",
+            title: m("adminManagement.sportsEntry"),
+            description: m("adminManagement.sportsEntryDesc"),
             avatar: "⏱️",
             disabled: true,
           },
           {
-            title: "运动项目管理",
-            description: "管理运动相关项目",
+            title: m("adminManagement.sportsEvents"),
+            description: m("adminManagement.sportsEventsDesc"),
             avatar: "🏃",
             disabled: true,
           },
         ],
       },
       {
-        title: "资源管理",
+        title: m("adminManagement.resources"),
         children: [
           {
-            title: "用户管理",
-            description: "管理用户",
+            title: m("adminManagement.usersTitle"),
+            description: m("adminManagement.usersDesc"),
             to: "/admin/users",
             avatar: "👥",
           },
           {
-            title: "比赛管理",
-            description: "比赛列表、详情和修改",
+            title: t("competitionAdmin.competitionManagement"),
+            description: m("adminManagement.competitionsDesc"),
             avatar: "📋",
             to: "/admin/competition/approvals?status=all",
           },
           {
-            title: "主办团队管理",
-            description: "主办团队管理、详情与修改",
+            title: m("adminManagement.organizersTitle"),
+            description: m("adminManagement.organizersDesc"),
             to: "/admin/manage/organizers",
             avatar: "🏢",
           },
           {
-            title: "比赛群组管理",
-            description: "比赛群组创建、编辑与删除",
+            title: m("adminManagement.groupsTitle"),
+            description: m("adminManagement.groupsDesc"),
             to: "/admin/manage/groups",
             avatar: "👨‍👩‍👧‍👦",
           },
           {
-            title: "项目管理",
-            description: "新增和管理对应项目",
+            title: m("adminManagement.events"),
+            description: m("adminManagement.eventsDesc"),
             avatar: "📁",
             disabled: true,
           },
           {
-            title: "成绩管理",
-            description: "管理你的成绩",
+            title: m("adminManagement.results"),
+            description: m("adminManagement.resultsDesc"),
             avatar: "🏆",
             disabled: true,
           },
           {
-            title: "相册管理",
-            description: "管理用户上传的图片",
+            title: m("adminManagement.albums"),
+            description: m("adminManagement.albumsDesc"),
             avatar: "🖼️",
             disabled: true,
           },
         ],
       },
       {
-        title: "自定义 WCA 榜单",
+        title: m("adminManagement.customWcaRankings"),
         children: [
           {
-            title: "榜单管理",
-            description: "自定义 WCA 榜单管理",
+            title: m("adminManagement.rankingManagement"),
+            description: m("adminManagement.rankingDesc"),
             to: "/admin/diy-ranking",
             avatar: "📈",
           },
         ],
       },
     ],
-    [],
+    [t, m],
   );
 
   return (
     <AdminGuard>
-      <VStack align="stretch" gap="6">
-        <Stack gap="1">
-          <Heading size="xl">{t("nav.admin.admins")}</Heading>
-        </Stack>
-        {isSuperAdmin ? <AdminNavCards groups={superGroups} /> : null}
-        <AdminNavCards groups={groups} />
+      <VStack className="admin-page" align="stretch" gap="6">
+        <PageHeader eyebrow={t("admin.admins.siteManagement")} title={t("nav.admin.admins")} />
+        {isSuperAdmin ? <AdminNavigation groups={superGroups} /> : null}
+        <AdminNavigation groups={groups} />
       </VStack>
     </AdminGuard>
   );

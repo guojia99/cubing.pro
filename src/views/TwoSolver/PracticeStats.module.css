@@ -1,4 +1,4 @@
-.panel { min-width: 0; padding: 18px 0; color: var(--ink, var(--foreground)); border-top: 1px solid var(--line, var(--border-default)); }
+.panel { min-width: 0; padding: 20px; color: var(--ink, var(--foreground)); border: 1px solid var(--line, var(--border-default)); border-radius: var(--radius-card, 1rem); background: var(--card); box-shadow: var(--shadow-card); }
 .heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; }
 .heading h2 { margin: 0; font-size: 16px; font-weight: 600; }
 .source, .hint, .footnote { color: var(--muted-ink, var(--muted-foreground)); font-size: 11px; line-height: 1.8; }
@@ -19,7 +19,12 @@
 .review button:hover { border-color: var(--accent, #1696a6); }
 .panel :is(input, select, button):focus-visible { outline: 2px solid var(--ring, var(--accent, #1696a6)); outline-offset: 3px; }
 .footnote { margin: 12px 0 0 !important; }
+.metrics > div { padding: 12px; min-width: 0; border-radius: 12px; background: var(--muted); }
+.heading h2 { font-family: var(--font-heading, inherit); }
+.review select, .review button { border-radius: 10px; min-height: 40px; }
 @media (max-width: 640px) {
+  .panel { padding: 14px; }
+  .metrics > div { padding: 10px 8px; }
   .metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 10px; }
   .controls > .hint { flex-basis: 100%; }
   .review > label { flex-basis: 100%; }

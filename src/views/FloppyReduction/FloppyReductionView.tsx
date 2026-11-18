@@ -15,6 +15,8 @@ import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useI18n } from "@/contexts/I18nProvider";
+import { PageHeader } from "@/components/ui/page";
+import "./FloppyReduction.css";
 import { AxisResultCard } from "@/views/FloppyReduction/components/AxisResultCard";
 import { FrHelpDialog } from "@/views/FloppyReduction/components/FrHelpDialog";
 import { FrTutorialPanel } from "@/views/FloppyReduction/components/FrTutorialPanel";
@@ -184,17 +186,8 @@ export function FloppyReductionView() {
   const [historyKey, setHistoryKey] = useState(0);
 
   return (
-    <VStack align="stretch" gap="6">
-      <Box>
-        <Text fontSize="2xl" fontWeight="bold" mb="1">
-          {t("fr.title")}
-        </Text>
-        <Text fontSize="sm" color={FR_COLORS.fgMuted} mb="1">
-          {t("fr.fullName")}
-        </Text>
-        <Text fontSize="sm" color={FR_COLORS.fgMuted} mb="4">
-          {t("fr.subtitle")}
-        </Text>
+    <VStack className="fr-workbench" align="stretch" gap="6">
+      <PageHeader eyebrow={t("fr.fullName")} title={t("fr.title")} description={t("fr.subtitle")}>
         <SegmentGroup.Root
           value={mode}
           onValueChange={(e) => {
@@ -217,7 +210,7 @@ export function FloppyReductionView() {
             <SegmentGroup.ItemHiddenInput />
           </SegmentGroup.Item>
         </SegmentGroup.Root>
-      </Box>
+      </PageHeader>
 
       {mode === "analyze" && (
         <AnalyzePanel helpOpen={helpOpen} onHelpOpenChange={setHelpOpen} />

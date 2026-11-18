@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { useId, useState } from "react";
 import type { EChartsOption, LineSeriesOption } from "echarts";
 import { useI18n } from "@/contexts/I18nProvider";
+import { getChartAxisStyle, getChartTooltipStyle, getThemeColors, readCssVar } from "@/theme/chartColors";
 import { buildPracticeStats, formatPracticeDate, formatPracticeTooltip, formatStatistic } from "./practiceStatistics";
 import { adjustedTime, formatTime, type PracticeRecord } from "./uiPractice";
 import styles from "./PracticeStats.module.css";
@@ -32,6 +33,8 @@ export default function PracticeStats({ records, precision, onReview, windowSize
   const [showAo5, setShowAo5] = useState(true);
   const [showAo12, setShowAo12] = useState(true);
   const [selectedId, setSelectedId] = useState("");
+  const colors = getThemeColors();
+  const axisStyle = getChartAxisStyle();
   const stats = buildPracticeStats(records, windowSize);
   const selected = records.find((record) => record.id === selectedId) ?? records[0];
   const pointById = new Map(stats.points.map((point) => [point.record.id, point]));
@@ -55,16 +58,16 @@ export default function PracticeStats({ records, precision, onReview, windowSize
       recordId: point.record.id,
     })),
   });
-  const series: EChartsOption["series"] = [line(t("two.detail.single"), "single", "#1696a6")];
-  if (showAo5) series.push(line("ao5", "ao5", "#bf851b"));
-  if (showAo12) series.push(line("ao12", "ao12", "#9875cf"));
+  const series: EChartsOption["series"] = [line(t("two.detail.single"), "single", colors.accent)];
+  if (showAo5) series.push(line("ao5", "ao5", colors.signalWarning));
+  if (showAo12) series.push(line("ao12", "ao12", colors.signalInfo));
   series.push({
     name: "DNF",
     type: "scatter",
     symbol: "diamond",
     symbolSize: 10,
-    itemStyle: { color: "#d85564" },
-    label: { show: true, formatter: "DNF", position: "top", color: "#d85564", fontSize: 10 },
+    itemStyle: { color: colors.destructive },
+    label: { show: true, formatter: "DNF", position: "top", color: colors.destructive, fontSize: 10 },
     data: stats.points.filter((point) => point.single === null).map((point) => ({
       value: [String(point.number), dnfCap], recordId: point.record.id,
     })),
@@ -73,28 +76,31 @@ export default function PracticeStats({ records, precision, onReview, windowSize
     animation: false,
     backgroundColor: "transparent",
     grid: { left: 56, right: 22, top: 40, bottom: 66 },
-    legend: { top: 0, textStyle: { color: "#8795a1", fontSize: 11 }, selectedMode: false },
+    textStyle: { fontFamily: readCssVar("--font-body", "sans-serif"), color: colors.foreground },
+    legend: { top: 0, textStyle: { color: colors.mutedForeground, fontSize: 11 }, selectedMode: false },
     xAxis: {
       type: "category", name: t("two.detail.attemptAxis"), boundaryGap: true,
       data: stats.points.map((point) => String(point.number)),
-      axisLabel: { color: "#8795a1", hideOverlap: true },
-      axisLine: { lineStyle: { color: "#8795a1" } },
+      nameTextStyle: { color: colors.mutedForeground },
+      axisLabel: { ...axisStyle.axisLabel, hideOverlap: true },
+      axisLine: axisStyle.axisLine,
       axisTick: { alignWithLabel: true },
     },
     yAxis: {
       type: "value", name: t("two.detail.secondsAxis"), min: 0,
       max: stats.points.some((point) => point.single === null) ? dnfCap * 1.15 : undefined,
-      nameTextStyle: { color: "#8795a1" },
-      axisLabel: { color: "#8795a1", formatter: (value: number) => value.toFixed(places) },
-      splitLine: { lineStyle: { color: "rgba(135,149,161,0.18)" } },
+      nameTextStyle: { color: colors.mutedForeground },
+      axisLabel: { ...axisStyle.axisLabel, formatter: (value: number) => value.toFixed(places) },
+      splitLine: axisStyle.splitLine,
     },
     tooltip: {
+      ...getChartTooltipStyle(),
       trigger: "item", confine: true, renderMode: "richText",
-      textStyle: { fontSize: 12, width: 240 },
+      textStyle: { color: colors.foreground, fontSize: 12, width: 240 },
       formatter: (params) => {
         const data = (Array.isArray(params) ? params[0] : params)?.data as { recordId?: string } | undefined;
         const point = data?.recordId ? pointById.get(data.recordId) : undefined;
-        return point ? formatPracticeTooltip(point, precision, locale) : "";
+        return point ? formatPracticeTooltip(point, precision, locale, t) : "";
       },
     },
     dataZoom: [

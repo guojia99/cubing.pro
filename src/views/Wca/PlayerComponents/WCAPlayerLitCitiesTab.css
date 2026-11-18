@@ -7,7 +7,7 @@
   min-height: 100vh;
   padding: 16px 20px 24px;
   overflow: auto;
-  background: var(--ant-color-bg-container, #fff);
+  background: var(--card);
 }
 .wca-lit-cities-container:fullscreen .wca-lit-cities {
   /* 为左上角全屏标题留出一行空间，避免与 Segmented / 全屏按钮重叠 */
@@ -19,12 +19,12 @@
   left: 20px;
   z-index: 10;
   font-size: 16px;
-  color: var(--ant-color-text, rgba(0, 0, 0, 0.88));
-  text-shadow: 0 0 8px var(--ant-color-bg-container, #fff);
+  color: var(--foreground);
+  text-shadow: 0 0 8px var(--card);
   pointer-events: none;
 }
 .app-content-wrapper[data-ant-content-theme='dark'] .wca-lit-cities-container:fullscreen {
-  background: var(--ant-color-bg-container, #141414);
+  background: var(--card);
 }
 .wca-lit-cities {
   padding: 8px 0 16px;

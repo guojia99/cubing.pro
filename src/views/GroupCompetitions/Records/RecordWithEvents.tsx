@@ -1,4 +1,5 @@
 "use client";
+import { SectionHeader } from "@/components/ui/page";
 
 import { CubesCn } from "@/components/CubeIcon/cube";
 import { CubeIcon } from "@/components/CubeIcon/cube_icon";
@@ -10,6 +11,7 @@ import { apiPublicCompGroups } from "@/services/cubing-pro/public/orgs";
 import { apiRecords } from "@/services/cubing-pro/statistics/records";
 import { Select } from "antd";
 import { useEffect, useState } from "react";
+import { useI18n } from "@/contexts/I18nProvider";
 
 export type RecordsWithEventsProps = {
   groupId: number;
@@ -24,12 +26,13 @@ export function RecordsWithEvents({
   onGroupIdChange,
   onEventIdChange,
 }: RecordsWithEventsProps) {
+  const { t, locale } = useI18n();
   const [events, setEvents] = useState<EventsAPI.Event[]>([]);
   const [orgItems, setOrgItems] = useState<{ label: string; key: string; value: number }[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [records, setRecords] = useState<Record[]>([]);
 
-  const fetchRecords = () => {
+  useEffect(() => {
     setLoading(true);
     apiRecords({
       GroupId: groupId === 0 ? "" : String(groupId),
@@ -43,7 +46,7 @@ export function RecordsWithEvents({
       .finally(() => {
         setLoading(false);
       });
-  };
+  }, [eventId, groupId]);
 
   useEffect(() => {
     apiEvents().then((value) => {
@@ -100,25 +103,21 @@ export function RecordsWithEvents({
       value: item.id,
       label: (
         <>
-          {CubeIcon(item.id, `${item.id}__menu`, {})} {CubesCn(item.id)}
+          {CubeIcon(item.id, `${item.id}__menu`, {})} {CubesCn(item.id, locale)}
         </>
       ),
     }));
   };
 
-  useEffect(() => {
-    fetchRecords();
-  }, [eventId, groupId]);
-
   const items = [
     {
-      label: "WCA项目",
-      title: "WCA项目",
+      label: t('competitionExtra.wcaEvents'),
+      title: t('competitionExtra.wcaEvents'),
       options: GroupChildren(events.filter((value) => value.isWCA && value.isComp)),
     },
     {
-      label: "趣味项目",
-      title: "趣味项目",
+      label: t('competitionExtra.funEvents'),
+      title: t('competitionExtra.funEvents'),
       options: GroupChildren(events.filter((value) => !value.isWCA && value.isComp)),
     },
   ];
@@ -130,25 +129,26 @@ export function RecordsWithEvents({
 
   return (
     <>
-      <h3 style={{ textAlign: "center" }}>
-        <strong>历史记录</strong>
-      </h3>
-
+      <SectionHeader title={t('competitionExtra.historicalRecords')} />
+      <div className="competition-toolbar">
       <Select
+        aria-label={t('competitionExtra.recordEvent')}
         value={eventId}
-        style={{ marginBottom: "20px", width: "150px" }}
+        style={{ width: "100%", maxWidth: 240 }}
         loading={loading}
         options={items}
         onChange={(value) => onEventIdChange(value)}
       />
 
       <Select
+        aria-label={t('competitionExtra.recordGroup')}
         value={groupId}
-        style={{ marginBottom: "20px", marginLeft: "20px", width: "150px" }}
+        style={{ width: "100%", maxWidth: 240 }}
         loading={loading}
         options={orgItems}
         onChange={(value) => onGroupIdChange(value)}
       />
+      </div>
 
       {RecordsTable(rc, ["Index", "UserName", "Best", "Average", "ResultTime", "CompsName"])}
     </>

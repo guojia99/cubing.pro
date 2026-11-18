@@ -1,4 +1,5 @@
 import type { WcaProfilePerson } from "@/services/cubing-pro/wca/types";
+import { ClientMessageError } from "../clientError";
 
 async function fetchWithRetry<T>(
   url: string,
@@ -14,7 +15,7 @@ async function fetchWithRetry<T>(
       }
 
       if (!response.ok) {
-        throw new Error(`请求失败: ${response.status}`);
+        throw new ClientMessageError("shared.error.http", { status: response.status });
       }
 
       return (await response.json()) as T;
@@ -32,13 +33,13 @@ async function fetchWithRetry<T>(
       }
     }
   }
-  throw new Error("未知错误");
+  throw new ClientMessageError("shared.error.unknown");
 }
 
 export async function apiGetWCAPersonProfile(
   wcaID: string,
 ): Promise<WcaProfilePerson> {
-  if (wcaID.length !== 10) throw new Error("WCAID错误");
+  if (wcaID.length !== 10) throw new ClientMessageError("shared.error.wcaId");
   const url = `https://www.worldcubeassociation.org/api/v0/persons/${wcaID}`;
   return fetchWithRetry<WcaProfilePerson>(url);
 }

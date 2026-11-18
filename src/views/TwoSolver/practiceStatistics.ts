@@ -1,5 +1,6 @@
 import { adjustedTime, formatTime, type PracticeRecord } from "./uiPractice";
-import { tDetail, type DetailLocale } from "../../i18n/messages/two-solver-detail";
+import { tDetail, type DetailLocale, type DetailTranslator } from "../../i18n/messages/two-solver-detail";
+import { translate as translateSite } from "@/i18n";
 
 /** Milliseconds; null means an incomplete window, Infinity means DNF. */
 export type PracticeStatistic = number | null;
@@ -51,17 +52,18 @@ export function buildPracticeStats(records: readonly PracticeRecord[], windowSiz
 }
 
 /** Plain text only: the chart must use ECharts' richText tooltip renderer. */
-export function formatPracticeTooltip(point: ReturnType<typeof buildPracticeStats>["points"][number], precision: number, locale: DetailLocale = "zh-CN"): string {
+export function formatPracticeTooltip(point: ReturnType<typeof buildPracticeStats>["points"][number], precision: number, locale: DetailLocale = "zh-CN", translate?: DetailTranslator): string {
+  const t = (key: Parameters<typeof tDetail>[1], params: Record<string, string | number> = {}) => tDetail(locale, key, params, translate ?? (key => translateSite(locale, key)));
   const { record } = point;
   // Avoid user text becoming rich-text tokens or additional tooltip lines.
   const text = (value: string) => value.replace(/\{/g, "（").replace(/\}/g, "）").replace(/[\r\n\t]/g, " ");
   return [
-    `${tDetail(locale, "two.detail.attempt", { number: point.number })} · ${formatTime(adjustedTime(record), precision)}${record.penalty === "+2" ? " (+2)" : ""}`,
-    tDetail(locale, "two.detail.rawTime", { time: formatTime(record.elapsedMs, precision) }),
-    tDetail(locale, "two.detail.averages", { ao5: formatStatistic(point.ao5, precision), ao12: formatStatistic(point.ao12, precision) }),
-    tDetail(locale, "two.detail.date", { date: text(formatPracticeDate(record.date, locale)) }),
-    tDetail(locale, "two.detail.scramble", { scramble: text(record.scramble) }),
-    tDetail(locale, "two.detail.reviewHint"),
+    `${t("two.detail.attempt", { number: point.number })} · ${formatTime(adjustedTime(record), precision)}${record.penalty === "+2" ? " (+2)" : ""}`,
+    t("two.detail.rawTime", { time: formatTime(record.elapsedMs, precision) }),
+    t("two.detail.averages", { ao5: formatStatistic(point.ao5, precision), ao12: formatStatistic(point.ao12, precision) }),
+    t("two.detail.date", { date: text(formatPracticeDate(record.date, locale)) }),
+    t("two.detail.scramble", { scramble: text(record.scramble) }),
+    t("two.detail.reviewHint"),
   ].join("\n");
 }
 

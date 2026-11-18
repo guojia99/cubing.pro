@@ -1,3 +1,4 @@
+import { tm, type TeamMatchLocale } from './i18n';
 import type {
   PkComputedSummary,
   PkMultiTeamComputedSummary,
@@ -127,8 +128,8 @@ export function formatResultValue(v: ResultValue): string {
 }
 
 /** 本场 PK 已录入时用于英雄详情一行展示 */
-export function formatPkLineForPlayer(results: PkPlayerResult[], playerId: string): string | null {
+export function formatPkLineForPlayer(results: PkPlayerResult[], playerId: string, locale: TeamMatchLocale): string | null {
   const r = results.find((x) => x.playerId === playerId);
   if (!r) return null;
-  return `本场成绩 ${formatResultValue(r.value)}`;
+  return tm(locale, 'teamMatch.currentResultValue', { value: formatResultValue(r.value) });
 }

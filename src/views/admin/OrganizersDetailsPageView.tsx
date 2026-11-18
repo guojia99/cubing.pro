@@ -1,7 +1,12 @@
 "use client";
+import { useAdminManagement } from "@/views/admin/useAdminManagement";
+import { useI18n } from "@/contexts/I18nProvider";
 
 import { Text } from "@chakra-ui/react";
+import { PageHeader, Surface } from "@/components/ui/page";
 
 export function OrganizersDetailsPageView() {
-  return <Text color="fg.muted">比赛详情页暂未开放，请从比赛列表进入。</Text>;
+  const m = useAdminManagement();
+  const { t } = useI18n();
+  return <><PageHeader eyebrow={t("competitionAdmin.organizerWorkspace")} title={m("adminManagement.competitionDetails")} /><Surface p="6"><Text color="var(--muted-foreground)">{m("adminManagement.competitionDetailsHint")}</Text></Surface></>;
 }

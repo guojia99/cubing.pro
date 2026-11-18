@@ -4,9 +4,7 @@ import {
   Badge,
   Box,
   Button,
-  Card,
   Flex,
-  Heading,
   SegmentGroup,
   Spinner,
   Stack,
@@ -18,9 +16,12 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 import { useI18n } from "@/contexts/I18nProvider";
+import { getSiteContent } from "@/i18n/messages/site-content";
+import { PageHeader, Surface } from "@/components/ui/page";
 import {
   formatChangelogDate,
-  parseChangelog,
+  getChangelogLoadError,
+  loadChangelog,
   type ChangelogEntry,
 } from "@/views/Changelog/parseChangelog";
 
@@ -78,13 +79,13 @@ function ChangelogEntryCard({
   entry: ChangelogEntry;
   scopeFilter: ScopeFilter;
 }) {
-  const { t, tf } = useI18n();
+  const { tf, locale } = useI18n();
   const frontendItems = entry.items.filter((i) => i.scope === "frontend");
   const backendItems = entry.items.filter((i) => i.scope === "backend");
 
   return (
-    <Card.Root borderRadius="lg" overflow="hidden">
-      <Card.Header
+    <Surface as="article" p="0" overflow="hidden" borderLeftWidth="3px" borderLeftColor="accent">
+      <Box
         py="3.5"
         px="5"
         borderBottomWidth="1px"
@@ -94,7 +95,7 @@ function ChangelogEntryCard({
           <Flex align="center" gap="2" color="fg.muted">
             <Box as={BiCalendar} boxSize="4" aria-hidden />
             <Text fontSize="md" fontWeight="semibold" color="fg">
-              {formatChangelogDate(entry.date)}
+              {formatChangelogDate(entry.date, locale)}
             </Text>
           </Flex>
           <Text fontSize="sm" color="fg.muted">
@@ -115,34 +116,47 @@ function ChangelogEntryCard({
             </Flex>
           ) : null}
         </Flex>
-      </Card.Header>
-      <Card.Body py="3" px="5">
+      </Box>
+      <Box py="3" px={{ base: "3", md: "5" }}>
         <Stack gap="1">
           {entry.items.map((item, idx) => (
             <ChangelogItemRow key={`${entry.date}-${idx}`} scope={item.scope} text={item.text} />
           ))}
         </Stack>
-      </Card.Body>
-    </Card.Root>
+      </Box>
+    </Surface>
   );
 }
 
 export function ChangelogPageView() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [entries, setEntries] = useState<ChangelogEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadedLocale, setLoadedLocale] = useState<string | null>(null);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [scopeFilter, setScopeFilter] = useState<ScopeFilter>("all");
   const [yearFilter, setYearFilter] = useState<string>("all");
 
   useEffect(() => {
-    fetch("/CHANGELOG.md")
-      .then((r) => r.text())
-      .then((md) => {
-        setEntries(parseChangelog(md));
+    const controller = new AbortController();
+    setLoading(true);
+    setEntries([]);
+    setLoadFailed(false);
+    loadChangelog(locale, controller.signal)
+      .then((nextEntries) => {
+        if (controller.signal.aborted) return;
+        setEntries(nextEntries);
+        setLoadedLocale(locale);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
-  }, []);
+      .catch(() => {
+        if (controller.signal.aborted) return;
+        setLoadFailed(true);
+        setLoadedLocale(locale);
+        setLoading(false);
+      });
+    return () => controller.abort();
+  }, [locale]);
 
   const years = useMemo(() => {
     const set = new Set<string>();
@@ -173,19 +187,24 @@ export function ChangelogPageView() {
   ];
 
   return (
-    <Stack align="stretch" gap="6">
-      <Heading size="lg">{t("nav.more.changelog")}</Heading>
+    <Stack align="stretch" gap="5" maxW="var(--page-max)" mx="auto" w="full">
+      <PageHeader eyebrow={getSiteContent(locale)("siteContent.releaseNotes")} title={t("nav.more.changelog")} />
 
-      <Flex
+      <Surface p={{ base: "3", md: "4" }}><Flex
         align={{ base: "stretch", md: "center" }}
         gap="4"
         flexWrap="wrap"
         flexDirection={{ base: "column", md: "row" }}
       >
-        <SegmentGroup.Root
+        <Box maxW="full" minW="0"><SegmentGroup.Root
+           display="flex"
+           flexWrap="wrap"
+           maxW="full"
+           minW="0"
           value={yearFilter}
           onValueChange={(e) => setYearFilter(e.value ?? "all")}
-          size="sm"
+           size="sm"
+           aria-label={t("changelog.allYears")}
         >
           <SegmentGroup.Indicator />
           <SegmentGroup.Item value="all">
@@ -198,7 +217,7 @@ export function ChangelogPageView() {
               <SegmentGroup.ItemHiddenInput />
             </SegmentGroup.Item>
           ))}
-        </SegmentGroup.Root>
+        </SegmentGroup.Root></Box>
 
         <Flex gap="2" ml={{ md: "auto" }} flexWrap="wrap">
           {scopeOptions.map(({ key, label }) => (
@@ -209,19 +228,22 @@ export function ChangelogPageView() {
               variant={scopeFilter === key ? "solid" : "outline"}
               colorPalette={scopeFilter === key ? "brand" : "gray"}
               onClick={() => setScopeFilter(key)}
+              aria-pressed={scopeFilter === key}
             >
               {label}
             </Button>
           ))}
         </Flex>
-      </Flex>
+      </Flex></Surface>
 
-      {loading ? (
+      {loading || loadedLocale !== locale ? (
         <Flex justify="center" py="20">
           <Spinner size="lg" />
         </Flex>
+      ) : loadFailed ? (
+        <Text role="alert">{getChangelogLoadError(locale)}</Text>
       ) : (
-        <Stack gap="5">
+        <Stack gap="4">
           {filteredEntries.map((entry) => (
             <ChangelogEntryCard
               key={entry.date}

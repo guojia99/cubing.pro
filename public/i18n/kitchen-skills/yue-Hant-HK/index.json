@@ -1,0 +1,157 @@
+{
+  "locale": "yue-Hant-HK",
+  "tips": [
+    {
+      "id": "油温判断技巧",
+      "category": "advanced",
+      "title": "點判斷油溫：常用溫度同單位換算表",
+      "description": "教你睇油泡、油煙同油面變化嚟判斷油溫，揀啱唔同煮法嘅溫度，仲有常用溫度同單位換算表。",
+      "categoryName": "進階技巧",
+      "mdPath": "advanced/油温判断技巧.md"
+    },
+    {
+      "id": "糖色的炒制",
+      "category": "advanced",
+      "title": "點炒糖色",
+      "description": "由糖受熱嘅變化講起，逐步教你用水炒法或者油炒法炒出糖色，掌握火候同加水嗰陣要注意嘅地方。",
+      "categoryName": "進階技巧",
+      "mdPath": "advanced/糖色的炒制.md"
+    },
+    {
+      "id": "辅料技巧",
+      "category": "advanced",
+      "title": "落配料嘅技巧",
+      "description": "薑、蔥、蒜同香料應該幾時落鑊？教你按含水量同受熱情況安排次序，煸出香味又唔會炒燶。",
+      "categoryName": "進階技巧",
+      "mdPath": "advanced/辅料技巧.md"
+    },
+    {
+      "id": "高级专业术语",
+      "category": "advanced",
+      "title": "煮餸專業術語",
+      "description": "逐個解釋炒、熗、焯、煎、炸、燉等煮餸術語，等你睇食譜嗰陣明白每種手法點做。",
+      "categoryName": "進階技巧",
+      "mdPath": "advanced/高级专业术语.md"
+    },
+    {
+      "id": "去腥",
+      "category": "learn",
+      "title": "點去腥",
+      "description": "介紹用調味料、蘸醬、起鑊爆香同凍水汆水去腥嘅方法，亦提醒你避免去腥過度，令食材失去本身風味。",
+      "categoryName": "學煮餸",
+      "mdPath": "learn/去腥.md"
+    },
+    {
+      "id": "学习凉拌",
+      "category": "learn",
+      "title": "學整涼拌餸",
+      "description": "由揀食材、前期處理到調味拌勻，逐步學整涼拌餸，並留意生熟處理同食用時嘅注意事項。",
+      "categoryName": "學煮餸",
+      "mdPath": "learn/学习凉拌.md"
+    },
+    {
+      "id": "学习炒与煎",
+      "category": "learn",
+      "title": "學炒同煎",
+      "description": "學識炒同煎嘅基本做法，掌握熱鑊、落油、落食材同翻動嘅時機，了解唔同鑊具嘅用法。",
+      "categoryName": "學煮餸",
+      "mdPath": "learn/学习炒与煎.md"
+    },
+    {
+      "id": "学习焯水",
+      "category": "learn",
+      "title": "學汆水",
+      "description": "講解汆水有咩用、凍水落定滾水落，以及蔬菜同肉類點樣處理，幫你保住色澤同去走唔需要嘅味道。",
+      "categoryName": "學煮餸",
+      "mdPath": "learn/学习焯水.md"
+    },
+    {
+      "id": "学习煮",
+      "category": "learn",
+      "title": "學用水煮",
+      "description": "介紹加水、開火同水滾後落食材嘅基本步驟，講解冚蓋加熱同防止滾瀉嘅注意事項，亦提到可以按需要凍水落料。",
+      "categoryName": "學煮餸",
+      "mdPath": "learn/学习煮.md"
+    },
+    {
+      "id": "学习用刀",
+      "category": "learn",
+      "title": "學用菜刀",
+      "description": "由安全企位、握刀同護住手指開始，學切唔同食材，重點係切得穩、大小啱用，同埋保持清潔安全。",
+      "categoryName": "學煮餸",
+      "mdPath": "learn/学习用刀.md"
+    },
+    {
+      "id": "学习腌",
+      "category": "learn",
+      "title": "學醃肉",
+      "description": "講解醃肉用料、份量、手勢、容器同時間，並提供唔同肉類嘅醃料配搭同菜式例子，幫你預先醃到入味。",
+      "categoryName": "學煮餸",
+      "mdPath": "learn/学习腌.md"
+    },
+    {
+      "id": "学习蒸",
+      "category": "learn",
+      "title": "學蒸餸",
+      "description": "介紹用蒸煲或者鐵鑊配蒸架蒸食物嘅方法，講解加水、擺食材同加熱步驟，並提醒你留意水量，避免燒乾水。",
+      "categoryName": "學煮餸",
+      "mdPath": "learn/学习蒸.md"
+    },
+    {
+      "id": "微波炉",
+      "category": "learn",
+      "title": "點用微波爐",
+      "description": "介紹微波爐嘅運作原理、唔同火力嘅用途同容器選擇，並講解加熱水、雞蛋、完整水果同打開密實袋時嘅注意事項。",
+      "categoryName": "學煮餸",
+      "mdPath": "learn/微波炉.md"
+    },
+    {
+      "id": "空气炸锅",
+      "category": "learn",
+      "title": "點用氣炸鍋",
+      "description": "講解氣炸鍋點樣加熱、用之前要準備啲乜，同埋溫度時間點掌握，附有唔同食物嘅做法參考。",
+      "categoryName": "學煮餸",
+      "mdPath": "learn/空气炸锅.md"
+    },
+    {
+      "id": "食品安全",
+      "category": "learn",
+      "title": "食物安全",
+      "description": "介紹食物中毒、敏感、沙門氏菌、霉菌毒素同寄生蟲等風險，列出食物中心溫度要求，並提醒你留意食物同藥物一齊用嘅風險。",
+      "categoryName": "學煮餸",
+      "mdPath": "learn/食品安全.md"
+    },
+    {
+      "id": "高压力锅",
+      "category": "learn",
+      "title": "用電飯煲／壓力煲／電壓力煲煮飯同燉餸",
+      "description": "介紹壓力煲嘅運作原理、優點同基本用法，講解密封、加壓、排氣、水位同閥門檢查，以及開蓋前要確認嘅事項。",
+      "categoryName": "學煮餸",
+      "mdPath": "learn/高压力锅.md"
+    },
+    {
+      "id": "厨房准备",
+      "category": "base",
+      "title": "廚房準備",
+      "description": "開伙之前備齊廚具、常用食材同調味料，再認識各款食油嘅特性，按炒、煎炸同涼拌等煮法揀油。",
+      "categoryName": "基本功",
+      "mdPath": "base/厨房准备.md"
+    },
+    {
+      "id": "如何洗碗",
+      "category": "base",
+      "title": "點樣洗碗",
+      "description": "由分類、刮走餸渣、清洗同沖淨，到晾乾收好，詳細教你洗碗，亦講解唔同廚具同物料點樣清潔。",
+      "categoryName": "基本功",
+      "mdPath": "base/如何洗碗.md"
+    },
+    {
+      "id": "如何选择现在吃什么",
+      "category": "base",
+      "title": "點決定食乜嘢",
+      "description": "唔知煮幾多個餸、點配肉類同素菜？用人數計出餸嘅數量，再按食飯嘅人同食材種類揀餸。",
+      "categoryName": "基本功",
+      "mdPath": "base/如何选择现在吃什么.md"
+    }
+  ]
+}

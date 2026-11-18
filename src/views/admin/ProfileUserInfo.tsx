@@ -129,8 +129,8 @@ export function ProfileUserInfo({
   ];
 
   return (
-    <VStack gap="4" align="stretch">
-      <Card.Root>
+    <VStack gap="6" align="stretch" minW="0">
+      <Card.Root bg="var(--card)" borderColor="var(--border-default)" borderRadius="var(--radius-card)" boxShadow="var(--shadow-card)">
         <Card.Header>
           <Heading size="md">{t("profile.infoTitle")}</Heading>
         </Card.Header>
@@ -154,7 +154,7 @@ export function ProfileUserInfo({
               <Text fontSize="xs" color="fg.muted">
                 {t("profile.field.qqUni")}
               </Text>
-              <Text fontFamily="mono" fontSize="sm">
+              <Text fontFamily="mono" fontSize="sm" overflowWrap="anywhere">
                 {user.QQUniID || "—"}
               </Text>
             </Box>
@@ -169,7 +169,7 @@ export function ProfileUserInfo({
         </Card.Body>
       </Card.Root>
 
-      <Card.Root>
+      <Card.Root bg="var(--card)" borderColor="var(--border-default)" borderRadius="var(--radius-card)" boxShadow="var(--shadow-card)">
         <Card.Header>
           <Heading size="md">{t("profile.editTitle")}</Heading>
           <Text fontSize="sm" color="fg.muted" mt="1">

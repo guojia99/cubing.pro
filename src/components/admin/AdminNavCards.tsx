@@ -3,6 +3,7 @@
 import { Card, Heading, SimpleGrid, Stack, Text } from "@chakra-ui/react";
 import NextLink from "next/link";
 import type { ReactNode } from "react";
+import { useI18n } from "@/contexts/I18nProvider";
 
 export type AdminNavItem = {
   title: string;
@@ -18,6 +19,7 @@ export type AdminNavGroup = {
 };
 
 function NavCard({ item }: { item: AdminNavItem }) {
+  const { t } = useI18n();
   const card = (
     <Card.Root
       variant="outline"
@@ -37,7 +39,7 @@ function NavCard({ item }: { item: AdminNavItem }) {
             {item.title}
             {item.disabled ? (
               <Text as="span" fontSize="xs" color="fg.subtle" ml="2">
-                开发中
+                {t("competitionAdmin.development")}
               </Text>
             ) : null}
           </Text>

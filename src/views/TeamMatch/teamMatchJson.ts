@@ -2,6 +2,7 @@ import { getDefaultBracketPageSettings, type LiveUISettings } from '@/views/Team
 import { getDefaultPkArenaSettings } from '@/views/TeamMatch/pkArenaSettings';
 import { normalizeSession } from '@/views/TeamMatch/sessionFactory';
 import type { TeamMatchSession } from '@/views/TeamMatch/types';
+import { tm, type TeamMatchLocale } from './i18n';
 
 export const TEAM_MATCH_JSON_FORMAT = 'cubing-pro-team-match' as const;
 export const TEAM_MATCH_JSON_VERSION = 1;
@@ -40,17 +41,17 @@ export function buildTeamMatchJsonFile(session: TeamMatchSession, liveUISettings
   };
 }
 
-export function parseTeamMatchImport(text: string): { session: TeamMatchSession; liveUISettings?: LiveUISettings } {
+export function parseTeamMatchImport(text: string, locale: TeamMatchLocale = 'zh-CN'): { session: TeamMatchSession; liveUISettings?: LiveUISettings } {
   let raw: unknown;
   try {
     raw = JSON.parse(text) as unknown;
   } catch {
-    throw new Error('不是合法的 JSON');
+    throw new Error(tm(locale, 'teamMatch.invalidJson'));
   }
 
   if (isRecord(raw) && raw.format === TEAM_MATCH_JSON_FORMAT && raw.session) {
     if (!isTeamMatchSessionShape(raw.session)) {
-      throw new Error('JSON 中 session 字段不完整');
+      throw new Error(tm(locale, 'teamMatch.incompleteSession'));
     }
     const session = normalizeSession(raw.session);
     let liveUISettings: LiveUISettings | undefined;
@@ -68,7 +69,7 @@ export function parseTeamMatchImport(text: string): { session: TeamMatchSession;
     return { session: normalizeSession(raw) };
   }
 
-  throw new Error('无法识别：需要 cubing-pro-team-match 格式，或裸 TeamMatchSession 对象');
+  throw new Error(tm(locale, 'teamMatch.unknownFormat'));
 }
 
 export function downloadTeamMatchJson(filenameBase: string, payload: TeamMatchJsonFile): void {

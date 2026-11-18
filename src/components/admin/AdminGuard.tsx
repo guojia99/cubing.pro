@@ -1,6 +1,8 @@
 "use client";
 
-import { Spinner, Text } from "@chakra-ui/react";
+import { Button, Spinner, Stack, Text } from "@chakra-ui/react";
+import NextLink from "next/link";
+import { Surface } from "@/components/ui/page";
 import { useRouter } from "next/navigation";
 import { useEffect, type ReactNode } from "react";
 
@@ -30,15 +32,15 @@ export function AdminGuard({
   }, [currentUser?.id, loading, router]);
 
   if (loading) {
-    return <Spinner size="lg" color="brand.solid" />;
+    return <Surface py="12" textAlign="center"><Spinner size="lg" color="brand.solid" /></Surface>;
   }
 
   if (!currentUser || !isLoggedIn(currentUser.id)) {
-    return <Text color="fg.muted">{t("auth.needLogin")}</Text>;
+    return <Surface py="12" textAlign="center"><Text color="fg.muted" role="status">{t("auth.needLogin")}</Text></Surface>;
   }
 
   if (!hasAnyAuth(currentUser.Auth, required)) {
-    return <Text color="fg.muted">{t("auth.noPermission")}</Text>;
+    return <Surface py="12"><Stack gap="5" align="center"><Text color="fg.muted" role="status">{t("auth.noPermission")}</Text><Button asChild variant="outline"><NextLink href="/">{t("nav.home")}</NextLink></Button></Stack></Surface>;
   }
 
   return children;

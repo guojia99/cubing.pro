@@ -28,11 +28,12 @@ export function ScrambleInput({
   const { t } = useI18n();
 
   return (
-    <VStack align="stretch" gap="3">
+    <VStack className="fr-input-panel" align="stretch" gap="3">
       <Textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={t("fr.input.placeholder")}
+        aria-label={t("fr.input.placeholder")}
         rows={3}
         fontFamily="mono"
         resize="vertical"
@@ -40,7 +41,7 @@ export function ScrambleInput({
           if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) onAnalyze();
         }}
       />
-      <HStack gap="2" flexWrap="wrap">
+      <HStack className="fr-input-actions" gap="2" flexWrap="wrap">
         <Button colorPalette={FR_COLORS.palette} onClick={onAnalyze}>
           {t("fr.btn.analyze")}
         </Button>

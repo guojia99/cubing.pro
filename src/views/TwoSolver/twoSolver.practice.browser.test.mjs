@@ -280,11 +280,13 @@ async function stickyGeometry(expected, pinned = true) {
       zIndex: getComputedStyle(element).zIndex, full: getComputedStyle(main).position === 'fixed',
       owner: owner === main ? 'main' : owner === document.body || owner === document.documentElement || !owner ? 'document' : owner.tagName,
       sibling: element.parentElement?.id === 'practice-panel' && element.nextElementSibling?.getAttribute('aria-label') === '计时练习',
+      headerBottom: document.querySelector('[data-app-header]')?.getBoundingClientRect().bottom ?? 0,
       width: innerWidth, height: innerHeight, codeWidth: code.clientWidth, codeScroll: code.scrollWidth, lines };
   });
   assert.equal(geometry.text, expected);
   assert.equal(geometry.position, 'sticky');
-  assert.equal(geometry.offset, geometry.full ? '0px' : '72px');
+  if (geometry.full) assert.equal(geometry.offset, '0px');
+  else assert.ok(parseFloat(geometry.offset) >= geometry.headerBottom && parseFloat(geometry.offset) <= geometry.headerBottom + 24, 'normal sticky clears the app header');
   assert.equal(geometry.zIndex, '20', 'sticky remains below settings (1400) and native 3D (2000)');
   assert.equal(geometry.owner, geometry.full ? 'main' : 'document');
   assert.equal(geometry.sibling, true, 'sticky is a top-level tabpanel sibling of practice');
@@ -292,7 +294,7 @@ async function stickyGeometry(expected, pinned = true) {
   assert.ok(geometry.codeScroll <= geometry.codeWidth + 1 && geometry.lines.length > 0, JSON.stringify(geometry));
   for (const line of geometry.lines) assert.ok(line.visible && line.top >= geometry.top && line.bottom <= geometry.bottom
     && line.left >= geometry.left && line.right <= geometry.right, JSON.stringify(geometry));
-  if (pinned) assert.ok(Math.abs(geometry.top - (geometry.full ? 0 : 72)) <= 1, JSON.stringify(geometry));
+  if (pinned) assert.ok(Math.abs(geometry.top - parseFloat(geometry.offset)) <= 1, JSON.stringify(geometry));
   return geometry;
 }
 async function hitTest(locator) {
@@ -817,8 +819,8 @@ try {
            if (width <= 390) assert.ok(new Set(geometry.lines.map(line => Math.round(line.top))).size > 1, 'long notation actually wraps');
            await noOverflow();
            try {
-             assert.ok(Math.abs(geometry.top - (full ? 0 : 72)) <= 1,
-               `${width}px ${full ? 'fullscreen' : 'normal'} scroll ${fraction}: expected top ${full ? 0 : 72}, got ${geometry.top}; ${JSON.stringify(scroll)}`);
+              assert.ok(Math.abs(geometry.top - parseFloat(geometry.offset)) <= 1,
+                `${width}px ${full ? 'fullscreen' : 'normal'} scroll ${fraction}: expected top ${geometry.offset}, got ${geometry.top}; ${JSON.stringify(scroll)}`);
            } catch (error) { failures.push(error.message); }
            positions.push({ fraction, scroll, geometry });
          }

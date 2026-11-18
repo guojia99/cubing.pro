@@ -1,11 +1,14 @@
 "use client";
 
-import { Box, Button, Flex, Spinner } from "@chakra-ui/react";
+import { Box, Button, Flex, Spinner, Text } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
+import { useI18n } from "@/contexts/I18nProvider";
+import { getSiteContent } from "@/i18n/messages/site-content";
 
 import { MarkdownAnchorNav } from "@/components/Markdown/MarkdownAnchorNav";
 import { MarkdownViewer } from "@/components/Markdown/MarkdownViewer";
+import { PageHeader, Surface } from "@/components/ui/page";
 
 import { useKitchenSkillMarkdown } from "./hooks/useKitchenSkillMarkdown";
 
@@ -18,10 +21,14 @@ interface KitchenSkillDetailViewProps {
 }
 
 export function KitchenSkillDetailView({ category, id }: KitchenSkillDetailViewProps) {
+  const { locale } = useI18n();
   const router = useRouter();
   const cat = decodeURIComponent(category);
   const rid = decodeURIComponent(id);
-  const { mdContent, loading, headings, imageBase } = useKitchenSkillMarkdown(cat, rid);
+  const { mdContent, loading, headings, imageBase, tip, error } = useKitchenSkillMarkdown(cat, rid);
+  // The index supplies the page title; keep the remaining article headings and their IDs.
+  const content = mdContent.replace(/^#\s+[^\r\n]*(?:\r?\n|$)/m, "");
+  const bodyHeadings = headings.slice(1);
 
   if (loading) {
     return (
@@ -32,29 +39,30 @@ export function KitchenSkillDetailView({ category, id }: KitchenSkillDetailViewP
   }
 
   return (
-    <Box className="food-page" p={{ base: 4, md: 6 }}>
+    <Box className="food-page food-detail-page" p={{ base: 4, md: 8 }} maxW="1280px" mx="auto">
       <Button variant="ghost" size="sm" mb="4" asChild>
-        <NextLink href="/other/kitchen-skills">← 返回列表</NextLink>
+        <NextLink href="/other/kitchen-skills">{getSiteContent(locale)("siteContent.back")}</NextLink>
       </Button>
 
-      <Box className="markdown-detail-layout">
-        <Box flex="1" minW="0">
-          <MarkdownViewer
-            content={mdContent}
-            imageBase={imageBase}
-            headingIds={headings.map((h) => h.id)}
-            isInternalLink={(href) => /tips\/[^/]+\/[^/]+\.md$/.test(href)}
-            onInternalLink={(href) => {
-              const match = href.match(/tips\/([^/]+)\/([^/]+)\.md$/);
-              if (!match) return;
-              router.push(
-                `/other/kitchen-skills/${encodeURIComponent(match[1])}/${encodeURIComponent(match[2])}`,
-              );
-            }}
-          />
-        </Box>
-        <MarkdownAnchorNav headings={headings} />
-      </Box>
+      {error ? (
+        <Text role="alert">{mdContent}</Text>
+      ) : tip ? (
+        <>
+          <PageHeader title={tip.title} description={tip.description} eyebrow={tip.categoryName} />
+          <Box className="markdown-detail-layout">
+            <Surface className="food-reading-surface" flex="1" minW="0" p={{ base: 5, md: 8 }}>
+              <MarkdownViewer
+                content={content}
+                imageBase={imageBase}
+                headingIds={bodyHeadings.map((h) => h.id)}
+                isInternalLink={(href) => href.startsWith("/other/kitchen-skills/")}
+                onInternalLink={(href) => router.push(href)}
+              />
+            </Surface>
+            <MarkdownAnchorNav headings={bodyHeadings} />
+          </Box>
+        </>
+      ) : null}
     </Box>
   );
 }

@@ -1,5 +1,7 @@
 import { eventRouteM, RouteMaps } from '@/components/Data/cube_result/event_route';
 import React from "react";
+import { readStoredLocale, type Locale } from '@/i18n/locales';
+import { translateDomain } from '@/i18n/messages/domain';
 
 export const DNF = -10000;
 
@@ -237,7 +239,7 @@ export const resultStringPro = (results: number[], eventRoute: number): string[]
   return outs;
 };
 
-export const resultToBest = (result: Result): string => {
+export const resultToBest = (result: Result, locale: Locale = readStoredLocale()): string => {
   const m = eventRouteM(result.EventRoute);
   if (m.repeatedly) {
     return (
@@ -253,7 +255,7 @@ export const resultToBest = (result: Result): string => {
     return resultTimeString(result.Best);
   }
   if (DAvg(result)) {
-    return resultTimeString(result.Best) + '[单次]';
+    return resultTimeString(result.Best) + '[' + translateDomain(locale, 'domain.data.single') + ']';
   }
 
   return resultTimeString(result.Average);

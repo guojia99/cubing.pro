@@ -81,6 +81,8 @@ export function AxisResultCard({
 
   return (
     <Card.Root
+      className="fr-axis-card"
+      data-active={active}
       borderRadius="xl"
       variant="outline"
       cursor="pointer"
@@ -90,10 +92,10 @@ export function AxisResultCard({
       transition="border-color 0.15s"
     >
       <Card.Body p="4">
-        <Flex justify="space-between" align="center" mb="3">
-          <Text fontWeight="bold" fontSize="lg">
+        <Flex className="fr-axis-heading" justify="space-between" align="center" mb="3">
+          <button type="button" className="fr-axis-select" aria-pressed={active} onClick={(e) => { e.stopPropagation(); onSelect(); }}>
             {AXIS_LABEL[result.axisKey]} {t("fr.axisSuffix")}
-          </Text>
+          </button>
           <CaseBadge
             result={result}
             alreadyFrLabel={t("fr.alreadyFr")}

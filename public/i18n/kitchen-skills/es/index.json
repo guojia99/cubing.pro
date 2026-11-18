@@ -1,0 +1,157 @@
+{
+  "locale": "es",
+  "tips": [
+    {
+      "id": "油温判断技巧",
+      "category": "advanced",
+      "title": "Cómo estimar la temperatura del aceite y tabla de temperaturas y conversiones",
+      "description": "Aprende a estimar la temperatura del aceite mediante sus señales y consulta las equivalencias entre grados Celsius y Fahrenheit.",
+      "categoryName": "Técnicas avanzadas",
+      "mdPath": "advanced/油温判断技巧.md"
+    },
+    {
+      "id": "糖色的炒制",
+      "category": "advanced",
+      "title": "Preparar caramelo para dar color a los platos",
+      "description": "Preparación del caramelo colorante con agua o aceite, etapas de transformación del azúcar y usos de cada estado del almíbar.",
+      "categoryName": "Técnicas avanzadas",
+      "mdPath": "advanced/糖色的炒制.md"
+    },
+    {
+      "id": "辅料技巧",
+      "category": "advanced",
+      "title": "Consejos para los ingredientes aromáticos y complementarios",
+      "description": "Orden de incorporación de los ingredientes aromáticos, momento de añadir la sal y control de las cantidades según la preparación.",
+      "categoryName": "Técnicas avanzadas",
+      "mdPath": "advanced/辅料技巧.md"
+    },
+    {
+      "id": "高级专业术语",
+      "category": "advanced",
+      "title": "Terminología culinaria",
+      "description": "Glosario de métodos de cocción, preparaciones previas, técnicas de acabado, temperaturas del aceite y tipos de caldo.",
+      "categoryName": "Técnicas avanzadas",
+      "mdPath": "advanced/高级专业术语.md"
+    },
+    {
+      "id": "去腥",
+      "category": "learn",
+      "title": "Eliminar los olores fuertes",
+      "description": "Procedimientos para reducir los olores fuertes con condimentos, salsas, ingredientes aromáticos y escaldado desde agua fría.",
+      "categoryName": "Aprendizaje",
+      "mdPath": "learn/去腥.md"
+    },
+    {
+      "id": "学习凉拌",
+      "category": "learn",
+      "title": "Preparaciones frías aliñadas",
+      "description": "Preparación, corte, aliñado y mezcla de verduras, hongos, carnes y otros ingredientes para platos fríos, con sus precauciones.",
+      "categoryName": "Aprendizaje",
+      "mdPath": "learn/学习凉拌.md"
+    },
+    {
+      "id": "学习炒与煎",
+      "category": "learn",
+      "title": "Saltear y freír en sartén",
+      "description": "Utensilios, métodos para evitar que la comida se pegue y precauciones al calentar aceite, saltear y freír en sartén.",
+      "categoryName": "Aprendizaje",
+      "mdPath": "learn/学习炒与煎.md"
+    },
+    {
+      "id": "学习焯水",
+      "category": "learn",
+      "title": "Escaldar",
+      "description": "Cómo escaldar desde agua hirviendo o fría y qué cuidados requieren las carnes, las verduras y los líquidos de cocción.",
+      "categoryName": "Aprendizaje",
+      "mdPath": "learn/学习焯水.md"
+    },
+    {
+      "id": "学习煮",
+      "category": "learn",
+      "title": "Hervir",
+      "description": "Procedimiento básico para hervir alimentos y controlar el calentamiento, la tapa y el riesgo de desbordamiento.",
+      "categoryName": "Aprendizaje",
+      "mdPath": "learn/学习煮.md"
+    },
+    {
+      "id": "学习用刀",
+      "category": "learn",
+      "title": "Aprender a usar el cuchillo",
+      "description": "Guía completa de seguridad, elección y agarre del cuchillo, cortes de alimentos, limpieza, afilado y actuación ante cortes accidentales.",
+      "categoryName": "Aprendizaje",
+      "mdPath": "learn/学习用刀.md"
+    },
+    {
+      "id": "学习腌",
+      "category": "learn",
+      "title": "Marinar carne",
+      "description": "Fundamentos del marinado, técnicas, recipientes, tiempos, ingredientes habituales y fórmulas con cantidades para distintos platos.",
+      "categoryName": "Aprendizaje",
+      "mdPath": "learn/学习腌.md"
+    },
+    {
+      "id": "学习蒸",
+      "category": "learn",
+      "title": "Cocinar al vapor",
+      "description": "Métodos para cocinar al vapor con vaporera o wok de hierro y precauciones para controlar el agua y evitar el calentamiento en seco.",
+      "categoryName": "Aprendizaje",
+      "mdPath": "learn/学习蒸.md"
+    },
+    {
+      "id": "微波炉",
+      "category": "learn",
+      "title": "Utilizar el microondas",
+      "description": "Origen y funcionamiento del microondas, usos de cada nivel de potencia y precauciones con alimentos, vapor y recipientes.",
+      "categoryName": "Aprendizaje",
+      "mdPath": "learn/微波炉.md"
+    },
+    {
+      "id": "空气炸锅",
+      "category": "learn",
+      "title": "Utilizar la freidora de aire",
+      "description": "Funcionamiento y manejo de la freidora de aire, tabla de alimentos con temperaturas y tiempos, y consejos de preparación y dorado.",
+      "categoryName": "Aprendizaje",
+      "mdPath": "learn/空气炸锅.md"
+    },
+    {
+      "id": "食品安全",
+      "category": "learn",
+      "title": "Seguridad alimentaria",
+      "description": "Riesgos de intoxicación, alergias, infecciones, toxinas y parásitos, tablas de temperaturas e interacciones entre alimentos y medicamentos.",
+      "categoryName": "Aprendizaje",
+      "mdPath": "learn/食品安全.md"
+    },
+    {
+      "id": "高压力锅",
+      "category": "learn",
+      "title": "Cocinar arroz al vapor y guisar con arrocera, olla a presión u olla a presión eléctrica",
+      "description": "Funcionamiento de la olla a presión, cocción, liberación del vapor y cuidados de las válvulas, la junta y el nivel de llenado.",
+      "categoryName": "Aprendizaje",
+      "mdPath": "learn/高压力锅.md"
+    },
+    {
+      "id": "厨房准备",
+      "category": "base",
+      "title": "Preparar la cocina",
+      "description": "Utensilios e ingredientes que conviene tener disponibles y explicación de los tipos de grasas y la elección de aceites para cocinar.",
+      "categoryName": "Fundamentos",
+      "mdPath": "base/厨房准备.md"
+    },
+    {
+      "id": "如何洗碗",
+      "category": "base",
+      "title": "Cómo lavar los platos",
+      "description": "Guía completa de clasificación, remojo, lavado, aclarado, secado y almacenamiento, con cuidados por material y limpieza de electrodomésticos.",
+      "categoryName": "Fundamentos",
+      "mdPath": "base/如何洗碗.md"
+    },
+    {
+      "id": "如何选择现在吃什么",
+      "category": "base",
+      "title": "Cómo decidir qué comer",
+      "description": "Calcula cuántos platos de carne y de verduras preparar según el número de comensales y elige una combinación variada.",
+      "categoryName": "Fundamentos",
+      "mdPath": "base/如何选择现在吃什么.md"
+    }
+  ]
+}

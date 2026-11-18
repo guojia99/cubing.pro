@@ -1,4 +1,5 @@
 import { CubesCn } from '@/components/CubeIcon/cube';
+import { SectionHeader } from '@/components/ui/page';
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import { RouteMaps } from '@/components/Data/cube_result/event_route';
 import { ResultGraphChart } from '@/components/Data/cube_result/result_chat';
@@ -14,6 +15,8 @@ import SuccessRateBox from '@/views/GroupCompetitions/Player/components/SuccessR
 import { EventsAPI } from '@/services/cubing-pro/events/typings';
 import { Tabs } from 'antd';
 import React from 'react';
+import { useI18n } from '@/contexts/I18nProvider';
+import { formatRoundName } from '@/i18n/messages/domain';
 
 interface PlayerEventResultPanelProps {
   event: EventsAPI.Event;
@@ -26,10 +29,11 @@ export const PlayerEventResultPanel: React.FC<PlayerEventResultPanelProps> = ({
   results,
   records,
 }) => {
+  const { t, locale } = useI18n();
   const eventId = event.id;
   const resultNums: number[] = [];
   const m = RouteMaps.get(event.base_route_typ);
-  const res = [...results]; // 避免修改原数组
+  const res = results.map((result) => ({ ...result, Round: formatRoundName(result.Round, locale) }));
   res.sort((a, b) => {
     if (a.CompetitionID === b.CompetitionID) {
       return a.RoundNumber > b.RoundNumber ? -1 : 1;
@@ -54,9 +58,7 @@ export const PlayerEventResultPanel: React.FC<PlayerEventResultPanelProps> = ({
 
   return (
     <div style={{ minWidth: 0, maxWidth: '100%' }}>
-      <h3 style={{ textAlign: 'center', marginBottom: '10px' }}>
-        <strong>{CubesCn(eventId)}</strong>
-      </h3>
+      <SectionHeader title={CubesCn(eventId, locale)} />
 
       {ResultGraphChart(eventId, res, records)}
 
@@ -64,15 +66,13 @@ export const PlayerEventResultPanel: React.FC<PlayerEventResultPanelProps> = ({
 
       {!m?.repeatedly && (
         <div style={{ marginBottom: 24, marginTop: 16 }}>
-          <h2>
-            <strong>统计</strong>
-          </h2>
+          <SectionHeader title={t('competitionExtra.statistics')} />
           <Tabs
             defaultActiveKey="success"
             items={[
               {
                 key: 'success',
-                label: '成功率',
+                label: t('competitionAdmin.successRate'),
                 children: (
                   <div style={{ padding: 16 }}>
                     <SuccessRateBox data={resultNums} />
@@ -81,7 +81,7 @@ export const PlayerEventResultPanel: React.FC<PlayerEventResultPanelProps> = ({
               },
               {
                 key: 'recent_chart',
-                label: '成绩分位(单次)',
+                label: t('competitionExtra.singleQuantiles'),
                 children: (
                   <div style={{ padding: 16 }}>
                     <RollingQuantileChart inputData={resultNums} baseWindowSize={50} />
@@ -90,7 +90,7 @@ export const PlayerEventResultPanel: React.FC<PlayerEventResultPanelProps> = ({
               },
               {
                 key: 'recent_chart_avg',
-                label: '成绩分位(平均)',
+                label: t('competitionExtra.averageQuantiles'),
                 children: (
                   <div style={{ padding: 16 }}>
                     <RollingQuantileChart inputData={avgResultNums} baseWindowSize={12} />
@@ -99,7 +99,7 @@ export const PlayerEventResultPanel: React.FC<PlayerEventResultPanelProps> = ({
               },
               {
                 key: 'result_ton',
-                label: '成绩分布',
+                label: t('competitionExtra.resultDistribution'),
                 children: (
                   <div style={{ padding: 16 }}>
                     <ScoreRangeChart inputData={resultNums} />
@@ -108,7 +108,7 @@ export const PlayerEventResultPanel: React.FC<PlayerEventResultPanelProps> = ({
               },
               {
                 key: 'recent',
-                label: '平均成绩',
+                label: t('competitionExtra.averageResults'),
                 children: (
                   <div style={{ padding: 16 }}>
                     <BORecentGroup data={resultNums} />
@@ -144,6 +144,7 @@ const PlayerResultsListWithEvent: React.FC<PlayerResultsListWithEventProps> = ({
   records,
   comps,
 }) => {
+  const { locale } = useI18n();
   let items = [];
 
   // 1. 从成绩列表中迭代推出每个event的数据
@@ -171,7 +172,7 @@ const PlayerResultsListWithEvent: React.FC<PlayerResultsListWithEventProps> = ({
 
     items.push({
       key: eventId,
-      label: CubesCn(eventId),
+      label: CubesCn(eventId, locale),
       children: <PlayerEventResultPanel event={events[i]} results={res} records={records} />,
       icon: <>{CubeIcon(eventId, eventId, {})}</>,
     });

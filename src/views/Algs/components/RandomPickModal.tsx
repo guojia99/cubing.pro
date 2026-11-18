@@ -216,7 +216,7 @@ export default function RandomPickModal({
     >
       <Dialog.Backdrop />
       <Dialog.Positioner>
-        <Dialog.Content borderRadius="2xl" maxW="460px">
+        <Dialog.Content className="algs-dialog" borderRadius="2xl" maxW="460px">
           <Dialog.Header display="flex" justifyContent="space-between" alignItems="center">
             <Dialog.Title fontSize="md" fontWeight="bold">
               {t("algs.randomPick.title")}

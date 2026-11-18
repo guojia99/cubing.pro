@@ -19,7 +19,6 @@ import {
   WcaProfile,
   WCAResult,
 } from '@/services/cubing-pro/wca/types';
-import { getThemeColors } from '@/theme/chartColors';
 import { MEDAL_COLORS } from '@/theme/domainColors';
 
 interface WCAPlayerResultTableProps {
@@ -62,7 +61,6 @@ type HistoricalSortMode = 'withNR' | 'withCR' | 'withWR' | 'best';
 
 // 排名转带样式的节点
 const renderRank = (rank: number | string) => {
-  const theme = getThemeColors();
   if (rank === undefined || rank === 0) {
     return <></>;
   }
@@ -74,14 +72,14 @@ const renderRank = (rank: number | string) => {
   let textColor: string | undefined = undefined;
 
   if (rank <= 3) {
-    tagColor = theme.destructive;
-    textColor = theme.card;
+    tagColor = 'var(--destructive)';
+    textColor = 'var(--card)';
   } else if (rank <= 10) {
-    tagColor = theme.signalSuccess;
-    textColor = theme.card;
+    tagColor = 'var(--signal-success)';
+    textColor = 'var(--card)';
   } else if (rank <= 100) {
-    tagColor = theme.accent;
-    textColor = theme.card;
+    tagColor = 'var(--accent)';
+    textColor = 'var(--card)';
   } else {
     return <Tag color="default">{rank}</Tag>;
   }
@@ -238,7 +236,7 @@ ${intl.formatMessage({ id: 'wca.resultTable.competitionCount' })}: ${wcaProfile.
     const single = resultsTimeFormat(getBestSingle(eventId), eventId, false);
     const average = resultsTimeFormat(getBestAverage(eventId), eventId, true);
 
-    copyResult += `${CubesCn(eventId)} ${single}`;
+    copyResult += `${CubesCn(eventId, intl.locale)} ${single}`;
     if (average) copyResult += `  || ${average}`;
     copyResult += `\n`;
 
@@ -453,7 +451,7 @@ const WCAPlayerResultTable: React.FC<WCAPlayerResultTableProps> = ({
         fixed: 'left',
         render: (text: string) => (
           <>
-            {CubeIcon(text, text, {})} {CubesCn(text)}
+            {CubeIcon(text, text, {})} {CubesCn(text, intl.locale)}
           </>
         ),
       },
@@ -719,12 +717,11 @@ const WCAPlayerResultTable: React.FC<WCAPlayerResultTableProps> = ({
 
   return (
     <Card
-      hoverable
-      style={{ width: '100%', margin: '0 auto', borderRadius: 16 }}
+      style={{ width: '100%', margin: '0 auto', borderRadius: 'var(--radius-card)' }}
       variant="borderless"
       className="wca-result-table-card"
     >
-      <div style={{ position: 'absolute', top: 12, right: 12, zIndex: 10, display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
+      <div className="competition-toolbar" style={{ justifyContent: 'flex-end' }}>
         <ViewModeToggle
           mode={viewMode}
           onChange={handleModeChange}
@@ -740,6 +737,7 @@ const WCAPlayerResultTable: React.FC<WCAPlayerResultTableProps> = ({
           <Button
             type="default"
             icon={<CopyOutlined />}
+            aria-label={intl.formatMessage({ id: 'wca.resultTable.copyTooltip' })}
             size="small"
             onClick={handleCopy}
             disabled={isHistorical}

@@ -5,6 +5,8 @@ import { useState, type ReactNode } from "react";
 
 import { toaster } from "@/components/ui/toaster";
 import { getUserKv, setUserKv } from "@/services/cubing-pro/user/user_kv";
+import { clientErrorMessage } from "@/services/cubing-pro/clientError";
+import { useIntlMessage } from "@/hooks/useIntlMessage";
 
 export type UserCloudKvPanelProps = {
   kvKey: string;
@@ -30,9 +32,10 @@ export function UserCloudKvPanel({
   embedded = false,
   getPayloadForUpload,
   applyCloudPayload,
-  uploadOkText = "已上传",
-  syncOkText = "已同步",
+  uploadOkText,
+  syncOkText,
 }: UserCloudKvPanelProps) {
+  const { locale, formatMessage: t } = useIntlMessage();
   const [uploadPercent, setUploadPercent] = useState<number | undefined>();
   const [busy, setBusy] = useState<"upload" | "sync" | null>(null);
 
@@ -45,10 +48,10 @@ export function UserCloudKvPanel({
         onUploadProgress: (p) => setUploadPercent(p),
       });
       setUploadPercent(100);
-      toaster.create({ title: uploadOkText, type: "success" });
+      toaster.create({ title: uploadOkText ?? t({ id: "shared.cloud.uploaded" }), type: "success" });
     } catch (e) {
       toaster.create({
-        title: e instanceof Error ? e.message : "上传失败",
+        title: clientErrorMessage(e, locale, "shared.cloud.uploadFailed"),
         type: "error",
       });
       setUploadPercent(undefined);
@@ -63,10 +66,10 @@ export function UserCloudKvPanel({
     try {
       const rec = await getUserKv(kvKey);
       await applyCloudPayload(rec.value);
-      toaster.create({ title: syncOkText, type: "success" });
+      toaster.create({ title: syncOkText ?? t({ id: "shared.cloud.synced" }), type: "success" });
     } catch (e) {
       toaster.create({
-        title: e instanceof Error ? e.message : "同步失败",
+        title: clientErrorMessage(e, locale, "shared.cloud.syncFailed"),
         type: "error",
       });
     } finally {
@@ -108,7 +111,7 @@ export function UserCloudKvPanel({
         ) : null}
         {actions}
         {uploadPercent !== undefined ? (
-          <Progress.Root value={uploadPercent} size="xs">
+          <Progress.Root value={uploadPercent} size="xs" aria-label={t({ id: "shared.cloud.progress" })}>
             <Progress.Track>
               <Progress.Range />
             </Progress.Track>
@@ -132,7 +135,7 @@ export function UserCloudKvPanel({
       ) : null}
       {actions}
       {uploadPercent !== undefined ? (
-        <Progress.Root value={uploadPercent} size="sm">
+        <Progress.Root value={uploadPercent} size="sm" aria-label={t({ id: "shared.cloud.progress" })}>
           <Progress.Track>
             <Progress.Range />
           </Progress.Track>

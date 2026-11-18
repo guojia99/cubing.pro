@@ -2,7 +2,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 20px 0;
   width: 100%;
 
   &.single {
@@ -11,25 +13,41 @@
 }
 
 .pagination-button {
-  background-color: rgb(159, 231, 255); /* 按钮背景颜色 */
+  background-color: var(--card);
   padding: 10px 20px;
-  border-radius: 25px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  color: white;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  color: var(--accent);
+  font-family: var(--font-body);
   font-size: 16px;
   cursor: pointer;
   display: flex;
   align-items: center;
-  transition: background-color 0.3s ease;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
   z-index: 1;
   text-align: center;
 
   &:hover {
-    background-color: rgb(0, 193, 241); /* 悬停时的背景色 */
+    background-color: var(--accent-soft);
+    border-color: var(--accent);
   }
 
   a{
-    color: white;
+    color: inherit;
+  }
+
+  &:focus-within {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
   }
 
   & i {
@@ -37,10 +55,20 @@
   }
 }
 
-.earliest {
-  margin-left: 20px;
+.pagination-container .earliest {
+  margin-right: auto;
 }
 
-.latest {
-  margin-right: 20px;
+.pagination-container .latest {
+  margin-left: auto;
+}
+
+.pagination-container.single .pagination-button {
+  margin-inline: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pagination-button {
+    transition: none;
+  }
 }

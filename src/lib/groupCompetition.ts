@@ -1,4 +1,10 @@
 import type { CompAPI } from "@/services/cubing-pro/comps/typings";
+import { readStoredLocale, translateWithParams } from "@/i18n";
+import type { competitionAdminZhCN } from "@/i18n/messages/competition-admin";
+
+function message(key: keyof typeof competitionAdminZhCN, params: Record<string, string | number> = {}) {
+  return translateWithParams(readStoredLocale(), key, params);
+}
 
 export type BatchItem = { key: number; event: string; round: number; values: number[]; error: string; line: string };
 
@@ -9,10 +15,10 @@ export function roundNoRestrictions(schedule: Pick<CompAPI.Schedule, "NoRestrict
 
 // Calendar dates from DatePicker are explicitly interpreted in Beijing time.
 export function beijingDateStart(date: string): string {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) throw new Error("日期格式应为 YYYY-MM-DD");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) throw new Error(message("competitionAdmin.dateFormat"));
   const iso = `${date}T00:00:00+08:00`;
   const value = Date.parse(iso);
-  if (!Number.isFinite(value) || beijingDate(iso) !== date) throw new Error("日期无效");
+  if (!Number.isFinite(value) || beijingDate(iso) !== date) throw new Error(message("competitionAdmin.invalidDate"));
   return iso;
 }
 
@@ -34,7 +40,7 @@ export function canEnterResults(comp: { Status: string; Genre?: number; GroupId?
 export function competitionEditTimes(comp: { Genre?: number; GroupId?: number; CompStartTime: string; CompEndTime: string }, startDate: string, endDate: string) {
   if (!isGroupCompetition(comp)) return { CompStartTime: comp.CompStartTime, CompEndTime: comp.CompEndTime };
   const start = beijingDateStart(startDate), end = beijingDateStart(endDate);
-  if (endDate < startDate) throw new Error("结束日期不能早于开始日期");
+  if (endDate < startDate) throw new Error(message("competitionAdmin.endBeforeStart"));
   return { CompStartTime: start, CompEndTime: end };
 }
 
@@ -48,7 +54,7 @@ export function preResultReviewFilter(value: string): { finish: "false" | "true"
   if (value === "not") return { finish: "true", review_status: "rejected" };
   if (value === "timeout") return { finish: "true", finishDetail: "timeout" };
   if (value === "false" || value === "true" || value === "all") return { finish: value };
-  throw new Error("无效的成绩审批筛选状态");
+  throw new Error(message("competitionAdmin.invalidReviewFilter"));
 }
 
 export function competitionStatus(comp: { Status: string; IsDone: boolean; CompStartTime: string; CompEndTime: string }, now = Date.now()): string {
@@ -91,37 +97,37 @@ export function parseScore(value: string): number {
   const text = value.trim().replaceAll("：", ":").replaceAll("。", ".").toUpperCase();
   if (text === "DNF" || text === "D") return -10000;
   if (text === "DNS") return -10001;
-  if (!/^\d+(?:\.\d{1,3})?$/.test(text) && !/^\d+:\d{2}(?:\.\d{1,3})?$/.test(text) && !/^\d+:\d{2}:\d{2}(?:\.\d{1,3})?$/.test(text)) throw new Error(`成绩格式错误：${value}`);
+  if (!/^\d+(?:\.\d{1,3})?$/.test(text) && !/^\d+:\d{2}(?:\.\d{1,3})?$/.test(text) && !/^\d+:\d{2}:\d{2}(?:\.\d{1,3})?$/.test(text)) throw new Error(message("competitionAdmin.scoreFormat", { value }));
   const parts = text.split(":").map(Number);
-  if (parts.slice(1).some((part) => part >= 60)) throw new Error(`分秒必须小于 60：${value}`);
+  if (parts.slice(1).some((part) => part >= 60)) throw new Error(message("competitionAdmin.minutesSeconds", { value }));
   const seconds = parts.reduce((total, part) => total * 60 + part, 0);
-  if (!Number.isFinite(seconds) || seconds <= 0) throw new Error(`成绩必须大于 0：${value}`);
+  if (!Number.isFinite(seconds) || seconds <= 0) throw new Error(message("competitionAdmin.positiveScore", { value }));
   return seconds;
 }
 
 export function parseAttempts(value: string, route: number): number[] {
   const count = attemptCount(route);
-  if (!count) throw new Error("项目成绩类型无效");
+  if (!count) throw new Error(message("competitionAdmin.invalidRoute"));
   const text = value.trim().replaceAll("：", ":").replaceAll("。", ".").replace(/\s*\/\s*/g, "/").replace(/[,，]/g, " ");
   const tokens = text.split(/\s+/).filter(Boolean);
   if (route >= 8 && route <= 10) {
-    if (tokens.length !== count * 2) throw new Error(`需要 ${count} 组 a/b 时间`);
+    if (tokens.length !== count * 2) throw new Error(message("competitionAdmin.mbfGroups", { count }));
     const results: number[] = [];
     for (let i = 0; i < tokens.length; i += 2) {
       const match = tokens[i].match(/^(\d+)\/(\d+)$/);
-      if (!match) throw new Error("多盲格式为 a/b 时间");
+      if (!match) throw new Error(message("competitionAdmin.mbfFormat"));
       const solved = Number(match[1]), attempted = Number(match[2]);
-      if (!Number.isSafeInteger(solved) || !Number.isSafeInteger(attempted) || solved > attempted) throw new Error("多盲复原数和尝试数必须为非负整数，复原数不能超过尝试数");
+      if (!Number.isSafeInteger(solved) || !Number.isSafeInteger(attempted) || solved > attempted) throw new Error(message("competitionAdmin.mbfCounts"));
       const special: Record<string, number> = { DNF: -10000, DNS: -10001, DNP: -10002, DNT: -10003 };
       const token = tokens[i + 1].toUpperCase();
       const numericSpecial = /^-1000[0-3]$/.test(token) ? Number(token) : undefined;
       const time = special[token] ?? numericSpecial ?? parseScore(token);
-      if (attempted === 0 && time !== -10001) throw new Error("0 次尝试仅允许 0/0 DNS");
+      if (attempted === 0 && time !== -10001) throw new Error(message("competitionAdmin.zeroAttempts"));
       results.push(solved, attempted, time);
     }
     return results;
   }
-  if (tokens.length !== count) throw new Error(`需要 ${count} 个成绩，当前 ${tokens.length} 个`);
+  if (tokens.length !== count) throw new Error(message("competitionAdmin.expectedScores", { count, actual: tokens.length }));
   return tokens.map(parseScore);
 }
 
@@ -146,37 +152,37 @@ export function parseBatchResults(text: string, events: CompAPI.Event[], require
     const row: BatchItem = { key, line, event: "", round: 1, values: [], error: "" };
     try {
       const match = line.replaceAll("【", "[").replaceAll("】", "]").match(/^([^\s\[\]]+)(?:\[(\d+)\])?\s+(.+)$/);
-      if (!match) throw new Error("格式：333[1] 1 2 3 4 5");
+      if (!match) throw new Error(message("competitionAdmin.batchFormat"));
       const event = events.find((ev) => ev.EventID === match[1] || ev.EventName === match[1]);
-      if (!event) throw new Error("本场比赛无此项目，请使用项目 ID");
+      if (!event) throw new Error(message("competitionAdmin.missingEvent"));
       row.event = event.EventID; row.round = Number(match[2] || 1);
       const schedule = event.Schedule.find((s) => s.RoundNum === row.round);
-      if (!schedule) throw new Error(`${row.event} 第 ${row.round} 轮不存在`);
-      if (requireOpen && !schedule.IsRunning) throw new Error(`${row.event} 第 ${row.round} 轮未开放`);
+      if (!schedule) throw new Error(message("competitionAdmin.missingRound", { event: row.event, round: row.round }));
+      if (requireOpen && !schedule.IsRunning) throw new Error(message("competitionAdmin.closedRound", { event: row.event, round: row.round }));
       const identity = `${row.event}:${row.round}`;
-      if (seen.has(identity)) throw new Error("同一选手的项目轮次重复，请合并为一行");
+      if (seen.has(identity)) throw new Error(message("competitionAdmin.duplicateRound"));
       seen.add(identity);
       row.values = parseAttempts(match[3], event.EventRoute);
-    } catch (e) { row.error = e instanceof Error ? e.message : "格式错误"; }
+    } catch (e) { row.error = e instanceof Error ? e.message : message("competitionAdmin.formatError"); }
     return row;
   });
 }
 
 export function validateEvents(events: CompAPI.Event[]) {
-  if (!Array.isArray(events) || !events.length) throw new Error("至少配置一个比赛项目");
+  if (!Array.isArray(events) || !events.length) throw new Error(message("competitionAdmin.configureEvent"));
   const ids = new Set<string>();
   for (const event of events) {
-    if (!event.EventID || ids.has(event.EventID) || !Array.isArray(event.Schedule) || !event.Schedule.length) throw new Error("项目不可重复，每个项目至少配置一轮");
+    if (!event.EventID || ids.has(event.EventID) || !Array.isArray(event.Schedule) || !event.Schedule.length) throw new Error(message("competitionAdmin.uniqueEvents"));
     ids.add(event.EventID);
-    if (!attemptCount(event.EventRoute)) throw new Error(`${event.EventID} 的成绩类型无效`);
+    if (!attemptCount(event.EventRoute)) throw new Error(message("competitionAdmin.invalidEventRoute", { event: event.EventID }));
     event.Schedule.forEach((round, index) => {
-      if (round.RoundNum !== index + 1) throw new Error(`${event.EventID} 轮次编号必须从 1 连续递增`);
+      if (round.RoundNum !== index + 1) throw new Error(message("competitionAdmin.sequentialRounds", { event: event.EventID }));
       for (const key of ["Competitors", "TimeLimit", "Cutoff", "CutoffNumber"] as const) {
         // Go omitempty omits valid zero-valued round settings.
         const value = round[key] ?? 0;
-        if (!Number.isFinite(value) || value < 0) throw new Error(`${event.EventID} 的晋级人数、时限和及格配置不能为负数或空值`);
+        if (!Number.isFinite(value) || value < 0) throw new Error(message("competitionAdmin.nonnegativeSettings", { event: event.EventID }));
       }
-      if (!Number.isInteger(round.Competitors ?? 0) || !Number.isInteger(round.CutoffNumber ?? 0)) throw new Error("人数与尝试次数必须为整数");
+      if (!Number.isInteger(round.Competitors ?? 0) || !Number.isInteger(round.CutoffNumber ?? 0)) throw new Error(message("competitionAdmin.integerCounts"));
     });
   }
 }
