@@ -1,15 +1,15 @@
 "use client";
 
 import { Box, Card, Text } from "@chakra-ui/react";
+import { useState } from "react";
+import { useI18n } from "@/contexts/I18nProvider";
+import { getSiteContent } from "@/i18n/messages/site-content";
 
 import { CardActionButtons } from "@/views/FoodShared/CardActionButtons";
 import { FOOD_FONT_SIZE } from "@/views/FoodShared/foodTokens";
 
 import type { Recipe } from "../types";
-import { getRecipeDisplayName } from "../utils/recipeDisplay";
-
-const PLACEHOLDER_IMG =
-  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Crect fill='%23f5f5f5' width='200' height='200'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23999' font-size='14'%3E暂无图片%3C/text%3E%3C/svg%3E";
+import { getRecipeCategoryName, getRecipeDisplayName } from "../utils/recipeDisplay";
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -30,6 +30,9 @@ export function RecipeCard({
   onTonightChange,
   inTonightMode,
 }: RecipeCardProps) {
+  const { locale } = useI18n();
+  const sc = getSiteContent(locale);
+  const [imageFailed, setImageFailed] = useState(false);
   const hasImage = recipe.hasImage && recipe.coverImage;
   const coverImg = hasImage ? `/HowToCook/${recipe.coverImage}` : "";
   const displayName = getRecipeDisplayName(recipe);
@@ -43,13 +46,12 @@ export function RecipeCard({
         cursor="pointer"
         position="relative"
         height="100%"
-        onClick={onClick}
       >
         <CardActionButtons
           isFavorite={isFav}
           isInTonight={isInTonight}
           inTonightMode={inTonightMode}
-          tonightTitle="添加到今晚吃啥"
+          tonightTitle={sc("siteContent.addMenu")}
           onFavoriteClick={(e) => {
             e.stopPropagation();
             onFavoriteChange();
@@ -59,21 +61,19 @@ export function RecipeCard({
             onTonightChange();
           }}
         />
-        {coverImg ? (
+        {coverImg && !imageFailed ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={coverImg}
             alt={recipe.title}
             loading="lazy"
             decoding="async"
-            style={{ width: "100%", height: 160, objectFit: "cover" }}
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = PLACEHOLDER_IMG;
-            }}
+            style={{ width: "100%", aspectRatio: "16 / 10", objectFit: "cover" }}
+            onError={() => setImageFailed(true)}
           />
         ) : (
           <Box
-            h="160px"
+            aspectRatio="16 / 10"
             bg="bg.muted"
             display="flex"
             alignItems="center"
@@ -84,18 +84,19 @@ export function RecipeCard({
             🍳
           </Box>
         )}
-        <Card.Body p="4" flex="1" display="flex" flexDirection="column">
-          <Text className="food-card-title" fontWeight="semibold" mb="2">
-            {displayName}
+        <Card.Body p="5" flex="1" display="flex" flexDirection="column">
+          <Text className="food-card-meta" mb="2">{getRecipeCategoryName(recipe.category, locale, recipe.categoryName)}</Text>
+          <Text as="h3" className="food-card-title" fontWeight="semibold" mb="2">
+            <a className="food-card-link" href={`/other/recipes/${encodeURIComponent(recipe.category)}/${encodeURIComponent(recipe.id)}`} onClick={(event) => { if (!event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) { event.preventDefault(); onClick(); } }}>{displayName}</a>
           </Text>
           <Text className="food-card-desc" lineClamp={2} minH="42px">
-            {recipe.description || "暂无描述"}
+            {recipe.description || sc("siteContent.noDescription")}
           </Text>
-          <Text mt="2" color="orange.solid" fontSize={FOOD_FONT_SIZE}>
+          <Text mt="2" color="accent" fontSize={FOOD_FONT_SIZE}>
             {"★".repeat(recipe.difficulty)}
             {"☆".repeat(5 - recipe.difficulty)}
             <Text as="span" ml="1.5" className="food-card-meta">
-              {recipe.difficulty}星
+              {sc("siteContent.stars", { count: recipe.difficulty })}
             </Text>
           </Text>
         </Card.Body>

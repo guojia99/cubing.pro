@@ -87,14 +87,17 @@ export function ColorPalette({
 
     return (
       <Box
+        asChild
         key={color}
-        w="7"
-        h="7"
+        w="full"
+        minW="0"
+        h="11"
         borderRadius="md"
         borderWidth="2px"
         borderColor={isSelected ? "fg" : "border"}
         bg={isTransparent ? "transparent" : color}
         cursor="pointer"
+        _focusVisible={{ outline: "2px solid", outlineColor: "accent", outlineOffset: "3px" }}
         display="flex"
         alignItems="center"
         justifyContent="center"
@@ -105,24 +108,23 @@ export function ColorPalette({
         }
         backgroundSize="8px 8px"
         backgroundPosition="0 0, 4px 4px"
-        onClick={() => onSelectedColorChange(color)}
-        aria-label={color}
-        role="button"
       >
+        <button type="button" onClick={() => onSelectedColorChange(color)} aria-label={color} aria-pressed={isSelected}>
         {isSelected ? (
-          <Box color={isTransparent ? "fg" : "white"} lineHeight={0}>
+          <Box color="fg" bg="bg.elevated" borderRadius="full" p="0.5" lineHeight={0}>
             <svg viewBox="0 0 24 24" width="1rem" height="1rem" fill="currentColor" aria-hidden>
               <path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" />
             </svg>
           </Box>
         ) : null}
+        </button>
       </Box>
     );
   };
 
   return (
     <Flex direction="column" gap="3">
-      <Box display="grid" gridTemplateColumns="repeat(7, 1fr)" gap="1.5">
+      <Box display="grid" gridTemplateColumns="repeat(auto-fit, minmax(36px, 1fr))" gap="2">
         {presetColors.map(renderColorBlock)}
       </Box>
 
@@ -133,7 +135,7 @@ export function ColorPalette({
       </Text>
 
       {historyColors.length > 0 ? (
-        <Box display="grid" gridTemplateColumns="repeat(7, 1fr)" gap="1.5">
+        <Box display="grid" gridTemplateColumns="repeat(auto-fit, minmax(36px, 1fr))" gap="2">
           {historyColors.map(renderColorBlock)}
         </Box>
       ) : null}
@@ -146,10 +148,11 @@ export function ColorPalette({
         </Popover.Trigger>
         <Portal>
           <Popover.Positioner>
-            <Popover.Content p="3" w="auto" maxW="calc(100vw - 2rem)">
+            <Popover.Content p="4" w="auto" maxW="calc(100vw - 2rem)" borderRadius="var(--radius-card)" boxShadow="var(--shadow-float)">
               <Flex direction="column" gap="2">
                 <Input
                   type="color"
+                  aria-label={t("draws.color.custom_color")}
                   value={customColor}
                   onChange={(e) => setCustomColor(e.target.value)}
                   p="0"

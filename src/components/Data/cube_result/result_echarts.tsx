@@ -1,5 +1,7 @@
 import React from "react";
 import ReactECharts from "echarts-for-react";
+import { useI18n } from "@/contexts/I18nProvider";
+import { formatRoundName } from '@/i18n/messages/domain';
 
 import {
   getChartAxisStyle,
@@ -14,6 +16,7 @@ interface ScoreData {
   value: number | null;
   type: ScoreType;
   round: string;
+  competition?: string;
   valueStr?: string;
 }
 
@@ -23,6 +26,7 @@ interface Props {
 }
 
 const ScoreLineChart: React.FC<Props> = ({ data, renderScore }) => {
+  const { t, locale } = useI18n();
   const seriesColors = getChartSeriesColors(2);
   const axisStyle = getChartAxisStyle();
   const tooltipStyle = getChartTooltipStyle();
@@ -54,7 +58,7 @@ const ScoreLineChart: React.FC<Props> = ({ data, renderScore }) => {
 
     const series = [
       {
-        name: "Best",
+        name: t('competitionAdmin.best'),
         type: "line",
         data: formatSeriesData(bestData),
         itemStyle: { color: seriesColors[0] },
@@ -65,7 +69,7 @@ const ScoreLineChart: React.FC<Props> = ({ data, renderScore }) => {
 
     if (averageData.length > 0) {
       series.push({
-        name: "Average",
+        name: t('competitionAdmin.average'),
         type: "line",
         data: formatSeriesData(averageData),
         itemStyle: { color: seriesColors[1] },
@@ -80,25 +84,26 @@ const ScoreLineChart: React.FC<Props> = ({ data, renderScore }) => {
 
   const option = {
     title: {
-      text: "成绩轨迹",
+      text: t('competitionAdmin.trajectory'),
     },
     tooltip: {
       trigger: "axis",
       ...tooltipStyle,
       formatter: (params: any[]) => {
         const idx = params[0].dataIndex;
-        const round = bestData[idx]?.round || averageData[idx]?.round;
+        const round = formatRoundName(bestData[idx]?.round || averageData[idx]?.round || '', locale);
 
         const best = bestData[idx];
         const avg = averageData[idx];
 
-        const lines: string[] = [`场次: ${round}`];
+        const competition = bestData[idx]?.competition || averageData[idx]?.competition || '';
+        const lines: string[] = [`${t('competitionAdmin.round')}: ${competition}${round}`];
 
         if (best) {
-          lines.push(`Best: ${getLabel(best)}`);
+          lines.push(`${t('competitionAdmin.best')}: ${getLabel(best)}`);
         }
         if (avg) {
-          lines.push(`Average: ${getLabel(avg)}`);
+          lines.push(`${t('competitionAdmin.average')}: ${getLabel(avg)}`);
         }
 
         return lines.join("<br/>");
@@ -106,17 +111,17 @@ const ScoreLineChart: React.FC<Props> = ({ data, renderScore }) => {
     },
 
     legend: {
-      data: ["Best", ...(averageData.length > 0 ? ["Average"] : [])],
+      data: [t('competitionAdmin.best'), ...(averageData.length > 0 ? [t('competitionAdmin.average')] : [])],
     },
     xAxis: {
       type: "category",
       data: xAxisData.map((x) => `#${x.value}`),
-      name: "Index",
+      name: t('competitionAdmin.index'),
       ...axisStyle,
     },
     yAxis: {
       type: "value",
-      name: "成绩",
+      name: t('competitionAdmin.result'),
       ...axisStyle,
     },
     series: getSeries(),

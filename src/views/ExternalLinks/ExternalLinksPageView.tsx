@@ -1,9 +1,11 @@
 "use client";
 
-import { EmptyState, Heading, Input, Spinner, Stack, Text, VStack } from "@chakra-ui/react";
+import { EmptyState, Input, Spinner, VStack } from "@chakra-ui/react";
+import { PageHeader, SectionHeader, Surface } from "@/components/ui/page";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useI18n } from "@/contexts/I18nProvider";
+import { getSiteContent } from "@/i18n/messages/site-content";
 import { emptyOtherLinks } from "@/services/cubing-pro/otherLinksNormalize";
 import { getOtherLinks } from "@/services/cubing-pro/public/orgs";
 import type { OtherLinks } from "@/services/cubing-pro/public/types";
@@ -47,16 +49,14 @@ export function ExternalLinksGroupedView({
     <div className="external-links-page">
       {sections.map((s) => (
         <section key={s.title} className="external-links-group">
-          <div className="external-links-group-shell">
-            <Heading as="h2" size="md" className="external-links-groupTitle" mb="3">
-              {s.title}
-            </Heading>
+          <Surface p={{ base: "3", md: "5" }}>
+            <SectionHeader title={s.title} />
             <div className="external-links-grid external-links-grid--max4">
               {s.links.map((l) => (
                 <ExternalLinkCard key={l.key} link={l} descMaxChars={EXTERNAL_LINKS_LIST_DESC_MAX} />
               ))}
             </div>
-          </div>
+          </Surface>
         </section>
       ))}
     </div>
@@ -64,7 +64,7 @@ export function ExternalLinksGroupedView({
 }
 
 export function ExternalLinksPageView() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [data, setData] = useState<OtherLinks | null>(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -88,11 +88,8 @@ export function ExternalLinksPageView() {
   const empty = data !== null && buildGroupSections(data, false).length === 0;
 
   return (
-    <VStack align="stretch" gap="6">
-      <Stack gap="1">
-        <Heading size="xl">{t("externalLinks.title")}</Heading>
-        <Text color="fg.muted">{t("externalLinks.subtitle")}</Text>
-      </Stack>
+    <VStack align="stretch" gap="5" maxW="var(--page-max)" w="full" mx="auto">
+      <PageHeader eyebrow={getSiteContent(locale)("siteContent.aroundCommunity")} title={t("externalLinks.title")} description={t("externalLinks.subtitle")} />
 
       {loading ? (
         <Spinner size="lg" color="brand.solid" alignSelf="center" />
@@ -108,6 +105,8 @@ export function ExternalLinksPageView() {
             <Input
               className="external-links-page__search"
               placeholder={t("externalLinks.searchPlaceholder")}
+              aria-label={t("externalLinks.searchPlaceholder")}
+              type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />

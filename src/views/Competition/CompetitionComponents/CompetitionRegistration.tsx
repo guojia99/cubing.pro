@@ -1,5 +1,6 @@
 import React from "react";
 import {CompAPI} from "@/services/cubing-pro/comps/typings";
+import { useCompetitionPublicI18n } from '../i18n';
 
 // 定义组件的属性类型
 interface CompetitionRegistrationProps {
@@ -7,12 +8,13 @@ interface CompetitionRegistrationProps {
 }
 
 const CompetitionRegistration: React.FC<CompetitionRegistrationProps> = ({ comp }) => {
+  const { t, p } = useCompetitionPublicI18n();
   return (
     <>
       {comp ? (
-        <div>{"注册选手界面， 未开发"}</div>
+        <div>{p('competitionPublic.registrationUnavailable')}</div>
       ) : (
-        <p>没有找到比赛信息。</p>
+        <p>{t('competitionAdmin.noCompetition')}</p>
       )}
     </>
   );

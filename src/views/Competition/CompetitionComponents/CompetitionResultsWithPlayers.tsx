@@ -17,7 +17,6 @@ interface CompetitionResultsWithPlayersProps {
 }
 
 const CompetitionResultsWithPlayers: React.FC<CompetitionResultsWithPlayersProps> = ({
-  comp,
   results,
   events,
   records,

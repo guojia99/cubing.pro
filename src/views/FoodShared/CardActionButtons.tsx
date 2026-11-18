@@ -2,6 +2,8 @@
 
 import { IconButton } from "@chakra-ui/react";
 import { LuHeart, LuShoppingCart } from "react-icons/lu";
+import { useI18n } from "@/contexts/I18nProvider";
+import { getSiteContent } from "@/i18n/messages/site-content";
 
 interface CardActionButtonsProps {
   isFavorite: boolean;
@@ -16,12 +18,12 @@ const actionBtnProps = {
   position: "absolute" as const,
   top: "12px",
   zIndex: 2,
-  width: "36px",
-  height: "36px",
-  minW: "36px",
+  width: "44px",
+  height: "44px",
+  minW: "44px",
   borderRadius: "full",
   bg: "color-mix(in srgb, var(--card) 92%, transparent)",
-  boxShadow: "sm",
+  boxShadow: "var(--shadow-card)",
   variant: "ghost" as const,
   size: "sm" as const,
 };
@@ -34,11 +36,11 @@ export function CardActionButtons({
   onTonightClick,
   tonightTitle,
 }: CardActionButtonsProps) {
-  const tonightLabel = inTonightMode
-    ? "从清单移除"
-    : isInTonight
-      ? tonightTitle?.replace("添加", "从") ?? "从清单移除"
-      : tonightTitle ?? "添加到清单";
+  const { locale } = useI18n();
+  const sc = getSiteContent(locale);
+  const tonightLabel = inTonightMode || isInTonight
+    ? sc("siteContent.removeList")
+    : tonightTitle ?? sc("siteContent.addList");
 
   return (
     <>
@@ -47,17 +49,19 @@ export function CardActionButtons({
         title={tonightLabel}
         onClick={onTonightClick}
         {...actionBtnProps}
-        right="54px"
+        right="62px"
+        aria-pressed={isInTonight}
         color={isInTonight ? "accent" : "fg.muted"}
       >
         <LuShoppingCart size={18} />
       </IconButton>
       <IconButton
-        aria-label={isFavorite ? "取消收藏" : "收藏"}
-        title={isFavorite ? "取消收藏" : "收藏"}
+        aria-label={sc(isFavorite ? "siteContent.unfavorite" : "siteContent.favorite")}
+        title={sc(isFavorite ? "siteContent.unfavorite" : "siteContent.favorite")}
         onClick={onFavoriteClick}
         {...actionBtnProps}
         right="12px"
+        aria-pressed={isFavorite}
         color={isFavorite ? "signal.destructive" : "fg.muted"}
       >
         <LuHeart size={18} fill={isFavorite ? "var(--destructive)" : "none"} />

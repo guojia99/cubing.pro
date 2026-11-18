@@ -1,14 +1,18 @@
 .markdown-detail-layout {
   display: flex;
   gap: 24px;
+  min-width: 0;
 }
 
 .markdown-detail-anchor {
   width: 200px;
   flex-shrink: 0;
   position: sticky;
-  top: 80px;
+  top: calc(var(--header-height) + 1rem);
   align-self: flex-start;
+  max-height: calc(100dvh - var(--header-height) - 2rem);
+  overflow-y: auto;
+  font-family: var(--font-body);
 }
 
 @media (max-width: 768px) {
@@ -22,12 +26,23 @@
   font-size: 14px;
   line-height: 1.5;
   padding: 4px 0;
-  color: var(--chakra-colors-fg-muted);
+  color: var(--muted-foreground);
   text-decoration: none;
 }
 
 .markdown-detail-anchor-link:hover {
-  color: var(--chakra-colors-accent);
+  color: var(--accent);
+}
+
+.markdown-detail-anchor-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.markdown-detail-content {
+  min-width: 0;
+  max-width: 100%;
+  box-shadow: var(--shadow-card);
 }
 
 .markdown-detail-content img {

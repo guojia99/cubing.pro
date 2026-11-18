@@ -14,11 +14,13 @@ import { buildPkTemplateRows } from '@/views/TeamMatch/sessionReducer';
 import { useTeamMatchStore } from '@/views/TeamMatch/TeamMatchContext';
 import type { BracketMatch, PkPlayerResult, Team } from '@/views/TeamMatch/types';
 import { DownloadOutlined } from '@ant-design/icons';
-import { Button, Card, message, Space, Switch, Typography } from 'antd';
+import { Button, Card, Space, Switch, Typography } from 'antd';
 import classNames from 'classnames';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { LightMode } from '@/components/ui/color-mode';
+import { toaster } from '@/components/ui/toaster';
 import '../TeamMatch.css';
+import { useTeamMatchI18n } from '../i18n';
 
 type TeamMedal = 'gold' | 'silver' | 'bronze';
 
@@ -47,7 +49,8 @@ function computeTeamMedals(
 }
 
 function MedalMark({ kind }: { kind: TeamMedal }) {
-  const title = kind === 'gold' ? '金牌' : kind === 'silver' ? '银牌' : '铜牌';
+  const { t } = useTeamMatchI18n();
+  const title = t(`teamMatch.${kind}`);
   return (
     <span className={classNames('tmBracketMedal', `tmBracketMedal-${kind}`)} title={title} aria-label={title}>
       {kind === 'gold' ? '🥇' : kind === 'silver' ? '🥈' : '🥉'}
@@ -64,10 +67,11 @@ type MatchRenderProps = {
 };
 
 function BracketMatchCard({ m, teams, onOpenArena, compact, teamMedals }: MatchRenderProps) {
+  const { t } = useTeamMatchI18n();
   if (!m) {
     return (
       <Card size="small" className="tmBracketMatchCard tmBracketMatchCardEmpty tmBracketMatchCardDisabled">
-        <Typography.Text className="tmBracketEmptyCardPrimary">待定</Typography.Text>
+        <Typography.Text className="tmBracketEmptyCardPrimary">{t('teamMatch.pending')}</Typography.Text>
       </Card>
     );
   }
@@ -111,7 +115,7 @@ function BracketMatchCard({ m, teams, onOpenArena, compact, teamMedals }: MatchR
           />
           {medalA ? <MedalMark kind={medalA} /> : null}
           {m.byeWinnerId === m.teamAId ? (
-            <span className="tmBracketByeHint">{done ? '轮空晋级' : '待决出'}</span>
+            <span className="tmBracketByeHint">{done ? t('teamMatch.byeAdvance') : t('teamMatch.awaitingWinner')}</span>
           ) : null}
         </div>
         <div className="tmVs tmBracketVs">VS</div>
@@ -129,7 +133,7 @@ function BracketMatchCard({ m, teams, onOpenArena, compact, teamMedals }: MatchR
           />
           {medalB ? <MedalMark kind={medalB} /> : null}
           {m.byeWinnerId === m.teamBId ? (
-            <span className="tmBracketByeHint">{done ? '轮空晋级' : '待决出'}</span>
+            <span className="tmBracketByeHint">{done ? t('teamMatch.byeAdvance') : t('teamMatch.awaitingWinner')}</span>
           ) : null}
         </div>
       </div>
@@ -166,6 +170,7 @@ type BracketStageProps = {
 };
 
 const BracketStage: React.FC<BracketStageProps> = ({ liveSettings, onOpenLiveSettings }) => {
+  const { t, locale } = useTeamMatchI18n();
   const { state, dispatch } = useTeamMatchStore();
   const { session } = state;
   const { rounds, teams, players, schools, seeding, uiFocusMatchId, bronzeMatch, skipBronzeMatch } = session;
@@ -227,20 +232,20 @@ const BracketStage: React.FC<BracketStageProps> = ({ liveSettings, onOpenLiveSet
   const handleExportBracketPng = useCallback(async () => {
     const el = bracketExportRef.current;
     if (!el) {
-      message.warning('无法导出');
+      toaster.create({ title: t('teamMatch.exportUnavailable'), type: 'warning' });
       return;
     }
     setExportingPng(true);
     try {
       await exportBracketElementToPng(el, formatBracketExportFilename(session.name));
-      message.success('已下载对战图 PNG');
+      toaster.create({ title: t('teamMatch.pngDownloaded'), type: 'success' });
     } catch (e) {
       console.error(e);
-      message.error('导出失败，请重试');
+      toaster.create({ title: t('teamMatch.exportFailed'), type: 'error' });
     } finally {
       setExportingPng(false);
     }
-  }, [session.name]);
+  }, [session.name, t]);
 
   const teamMedals = useMemo(
     () => computeTeamMedals(rounds, bronzeMatch, skipBronzeMatch),
@@ -277,13 +282,13 @@ const BracketStage: React.FC<BracketStageProps> = ({ liveSettings, onOpenLiveSet
             name: p!.name,
             avatarDataUrl: p!.avatarDataUrl,
             schoolName: schoolNameForPlayer(p!, schools),
-            scoresLine: formatPlayerSingleAverageLine(entry),
+            scoresLine: formatPlayerSingleAverageLine(entry, locale),
             playerBattlecry: (p!.battlecry ?? '').trim(),
             wcaId: p!.wcaId ?? null,
           };
         }) ?? []
     );
-  }, [focused, teams, playerById, seeding, schools, eventId]);
+  }, [focused, teams, playerById, seeding, schools, eventId, locale]);
 
   const focusedPlayersB = useMemo(() => {
     if (!focused?.pk?.teamBId) return [];
@@ -299,13 +304,13 @@ const BracketStage: React.FC<BracketStageProps> = ({ liveSettings, onOpenLiveSet
             name: p!.name,
             avatarDataUrl: p!.avatarDataUrl,
             schoolName: schoolNameForPlayer(p!, schools),
-            scoresLine: formatPlayerSingleAverageLine(entry),
+            scoresLine: formatPlayerSingleAverageLine(entry, locale),
             playerBattlecry: (p!.battlecry ?? '').trim(),
             wcaId: p!.wcaId ?? null,
           };
         }) ?? []
     );
-  }, [focused, teams, playerById, seeding, schools, eventId]);
+  }, [focused, teams, playerById, seeding, schools, eventId, locale]);
 
   return (
     <div className="tmBracketRoot" style={bracketCssVars}>
@@ -319,7 +324,7 @@ const BracketStage: React.FC<BracketStageProps> = ({ liveSettings, onOpenLiveSet
             loading={exportingPng}
             onClick={handleExportBracketPng}
           >
-            导出 PNG
+            {t('teamMatch.exportPng')}
           </Button>
           <LiveSettingsButton type="default" ghost size="small" onClick={onOpenLiveSettings} />
         </Space>
@@ -331,14 +336,14 @@ const BracketStage: React.FC<BracketStageProps> = ({ liveSettings, onOpenLiveSet
               onChange={(v) => dispatch({ type: 'SET_SKIP_BRONZE_MATCH', value: v })}
             />
             <Typography.Text className="tmBracketSkipBronzeLabel">
-              跳过季军赛（领奖台第三、四名并列）
+              {t('teamMatch.skipBronze')}
             </Typography.Text>
           </Space>
         </Space>
         <Typography.Text className="tmBracketLrHint">
           {skipBronzeMatch
-            ? '左右半区由外向内收拢；中间为决赛。已跳过季军赛，半决赛负者将在领奖台并列第三、四名。'
-            : '左右半区由外向内收拢：左为签位 1–8、右为签位 9–16 对应首轮；中间为决赛，铜牌单独占一格。'}
+            ? t('teamMatch.bracketHintSkipped')
+            : t('teamMatch.bracketHint')}
         </Typography.Text>
       </div>
 
@@ -357,7 +362,7 @@ const BracketStage: React.FC<BracketStageProps> = ({ liveSettings, onOpenLiveSet
         <div className="tmBracketLrRow">
           {/* 左半区：由外向内 — (r0-m0,m1)→r1-m0、(m2,m3)→r1-m1 → r2-m0 居中于两场 8 强之间 */}
           <div className="tmBracketWing tmBracketWingLeft">
-            <Typography.Text className="tmBracketWingTitle">左半区（签位 1–8）</Typography.Text>
+            <Typography.Text className="tmBracketWingTitle">{t('teamMatch.leftHalf')}</Typography.Text>
             <div className="tmBracketWingCluster">
               <div className="tmBracketWingClusterLeaves">
                 <BracketPairRow
@@ -378,27 +383,27 @@ const BracketStage: React.FC<BracketStageProps> = ({ liveSettings, onOpenLiveSet
           {/* 中间：冠军 + 铜牌（独立占格） */}
           <div className="tmBracketCenterColumn">
             <div className="tmBracketCenterChamp">
-              <Typography.Text className="tmBracketBlockTitle">冠军战</Typography.Text>
+              <Typography.Text className="tmBracketBlockTitle">{t('teamMatch.final')}</Typography.Text>
               <div className="tmBracketFinalSlot">{renderMatch(3, 0)}</div>
             </div>
             <div className="tmBracketCenterBronze">
               <Typography.Text className="tmBracketBlockTitle">
-                {skipBronzeMatch ? '第三、四名（并列）' : '铜牌战'}
+                {skipBronzeMatch ? t('teamMatch.sharedThird') : t('teamMatch.bronzeMatch')}
               </Typography.Text>
               <div className="tmBracketFinalSlot">
                 {skipBronzeMatch ? (
                   <Card size="small" className="tmBracketMatchCard tmBracketMatchCardEmpty tmBracketSkipBronzeCard">
-                    <Typography.Text className="tmBracketEmptyCardPrimary">不进行季军 PK</Typography.Text>
+                    <Typography.Text className="tmBracketEmptyCardPrimary">{t('teamMatch.noBronze')}</Typography.Text>
                     <div className="tmBracketBronzeHint">
-                      两场半决赛结束后，两名负者在领奖台并列第三、四名。
+                      {t('teamMatch.sharedHint')}
                     </div>
                   </Card>
                 ) : bronzeMatch ? (
                   <BracketMatchCard m={bronzeMatch} teams={teams} teamMedals={teamMedals} onOpenArena={openArenaBronze} />
                 ) : (
                   <Card size="small" className="tmBracketMatchCard tmBracketMatchCardEmpty">
-                    <Typography.Text className="tmBracketEmptyCardPrimary">待定</Typography.Text>
-                    <div className="tmBracketBronzeHint">两场半决赛均决出胜负后产生</div>
+                    <Typography.Text className="tmBracketEmptyCardPrimary">{t('teamMatch.pending')}</Typography.Text>
+                    <div className="tmBracketBronzeHint">{t('teamMatch.semifinalPending')}</div>
                   </Card>
                 )}
               </div>
@@ -407,7 +412,7 @@ const BracketStage: React.FC<BracketStageProps> = ({ liveSettings, onOpenLiveSet
 
           {/* 右半区：由内向外 — r2-m1 居中于两场 8 强之间；(m4,m5)→r1-m2、(m6,m7)→r1-m3 */}
           <div className="tmBracketWing tmBracketWingRight">
-            <Typography.Text className="tmBracketWingTitle">右半区（签位 9–16）</Typography.Text>
+            <Typography.Text className="tmBracketWingTitle">{t('teamMatch.rightHalf')}</Typography.Text>
             <div className="tmBracketWingCluster">
               <div className="tmBracketPairAdvance tmBracketSemiSlot">{renderMatch(2, 1)}</div>
               <div className="tmBracketWingClusterLeaves">

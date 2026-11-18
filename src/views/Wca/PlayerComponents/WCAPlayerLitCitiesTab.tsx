@@ -1,6 +1,6 @@
 import type { CompGeo } from '@/services/cubing-pro/wca/types';
 import { useIntl } from '@/hooks/useIntlMessage';
-import { getLocale } from '@/lib/localeClient';
+import { getLocalizedCountryLabel } from '../utils/countryLabel';
 import { CompressOutlined, FullscreenOutlined } from '@ant-design/icons';
 import { Button, Empty, Segmented, Space, Table, Typography } from 'antd';
 import * as echarts from 'echarts';
@@ -20,12 +20,7 @@ import { normalizeTaiwanCountyGeoJson, TAIWAN_COUNTY_GEOJSON_URL } from './litCi
 import { safeGeoCount } from './litCities/safeCount';
 import { wcaCountryIdToWorldMapName } from './litCities/worldCountryMap';
 import { resolveWcaCityToChinese } from '@/views/Wca/PlayerComponents/region/china_citys';
-import {
-  getChartSeriesColors,
-  getHeatmapScale,
-  getThemeColors,
-  mixCssColors,
-} from '@/theme/chartColors';
+import { useThemeColors } from '@/theme/useThemeColors';
 import './WCAPlayerLitCitiesTab.css';
 
 /** 省级详图列表：中文界面下将 WCA 英文城市转为中文；省级用 resolveChinaProvinceMeta 推断，供 Suzhou/Taizhou 等消歧 */
@@ -114,7 +109,8 @@ function isElementFullscreen(el: HTMLElement | null): boolean {
 
 const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos, playerDisplayName = '' }) => {
   const intl = useIntl();
-  const locale = getLocale() || intl.locale || 'zh-CN';
+  const theme = useThemeColors();
+  const locale = intl.locale;
   const localeZh = locale.startsWith('zh');
 
   const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
@@ -271,32 +267,37 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos, pla
   }, [mapDataMerged, scatterPieces]);
 
   const worldOption = useMemo(() => {
-    const theme = getThemeColors();
-    const heatmap = getHeatmapScale();
-    const [scatterColor] = getChartSeriesColors(4).slice(3, 4);
+    // ECharts interpolates these colors itself and cannot parse CSS color-mix().
+    const heatmap = [echarts.color.lerp(.08, [theme.background, theme.accent]), theme.accent];
+    const scatterColor = theme.signalInfo;
     const scatterData = scatterPieces.map(s => ({
       name: wcaCountryIdToWorldMapName(s.name),
       value: [s.coord[0], s.coord[1], safeGeoCount(s.value)] as [number, number, number],
     }));
     return {
+      textStyle: { color: theme.foreground },
       tooltip: {
+        backgroundColor: theme.card,
+        borderColor: theme.border,
+        textStyle: { color: theme.foreground },
         trigger: 'item',
         formatter: (p: { seriesType?: string; name?: string; value?: unknown; data?: { name?: string } }) => {
           if (p.seriesType === 'map') {
             const raw = typeof p.value === 'number' ? p.value : (p.value as { value?: number })?.value;
             const v = safeGeoCount(raw);
-            return `${p.name}<br/>${intl.formatMessage({ id: 'wca.litCities.count' })}: ${v}`;
+            return `${getLocalizedCountryLabel(p.name, undefined, locale)}<br/>${intl.formatMessage({ id: 'wca.litCities.count' })}: ${v}`;
           }
           if (p.seriesType === 'scatter' || p.seriesType === 'effectScatter') {
             const raw = Array.isArray(p.value) ? p.value[2] : p.value;
             const val = safeGeoCount(raw);
             const nm = p.data?.name || p.name;
-            return `${nm}<br/>${intl.formatMessage({ id: 'wca.litCities.count' })}: ${val}`;
+            return `${getLocalizedCountryLabel(nm, undefined, locale)}<br/>${intl.formatMessage({ id: 'wca.litCities.count' })}: ${val}`;
           }
           return '';
         },
       },
       visualMap: {
+        textStyle: { color: theme.mutedForeground },
         min: 0,
         max: maxWorldVal,
         seriesIndex: 0,
@@ -313,7 +314,7 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos, pla
         roam: true,
         emphasis: { disabled: false, label: { show: false } },
         itemStyle: {
-          areaColor: mixCssColors(theme.foreground, theme.background, 4),
+          areaColor: echarts.color.lerp(.04, [theme.background, theme.foreground]),
           borderColor: theme.border,
         },
       },
@@ -342,7 +343,7 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos, pla
         },
       ],
     };
-  }, [mapDataMerged, scatterPieces, maxWorldVal, intl]);
+  }, [mapDataMerged, scatterPieces, maxWorldVal, intl, theme, locale]);
 
   const maxChinaVal = useMemo(() => {
     const vals = [...byChinaProvince.values()].map(safeGeoCount);
@@ -358,19 +359,23 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos, pla
 
   const chinaOption = useMemo(
     () => {
-      const theme = getThemeColors();
       return {
+      textStyle: { color: theme.foreground },
       tooltip: {
+        backgroundColor: theme.card,
+        borderColor: theme.border,
+        textStyle: { color: theme.foreground },
         trigger: 'item',
         formatter: (p: { name?: string; value?: unknown }) => {
           const raw = typeof p.value === 'number' ? p.value : (p.value as { value?: number })?.value;
           const v = safeGeoCount(raw);
           const zh = p.name || '';
-          const label = displayProvinceName(zh, localeZh);
+          const label = displayProvinceName(zh, locale);
           return `${label}<br/>${intl.formatMessage({ id: 'wca.litCities.count' })}: ${v}`;
         },
       },
       visualMap: {
+        textStyle: { color: theme.mutedForeground },
         min: 0,
         max: maxChinaVal,
         text: [
@@ -381,7 +386,7 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos, pla
         calculable: true,
         inRange: {
           color: [
-            mixCssColors(theme.signalWarning, theme.background, 95),
+            echarts.color.lerp(.95, [theme.background, theme.signalWarning]),
             theme.signalWarning,
           ],
         },
@@ -392,13 +397,13 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos, pla
           type: 'map',
           map: 'china',
           roam: true,
-          emphasis: { label: { show: true } },
+          emphasis: { label: { show: true, formatter: (p: { name: string }) => displayProvinceName(p.name, locale) } },
           data: chinaMapData,
         },
       ],
     };
     },
-    [chinaMapData, maxChinaVal, intl, localeZh],
+    [chinaMapData, maxChinaVal, intl, locale, theme],
   );
 
   const provinceGeosFiltered = useMemo(
@@ -474,13 +479,16 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos, pla
 
   const provinceDetailOption = useMemo(() => {
     if (!provinceDrill || !provinceMapReady || !provinceGeo) return undefined;
-    const theme = getThemeColors();
     const data = provincePrefectureData
       .filter(d => d.name !== '__other__' && safeGeoCount(d.value) > 0)
       .map(d => ({ name: d.name, value: safeGeoCount(d.value) }));
     const other = provincePrefectureData.find(d => d.name === '__other__');
     return {
+      textStyle: { color: theme.foreground },
       tooltip: {
+        backgroundColor: theme.card,
+        borderColor: theme.border,
+        textStyle: { color: theme.foreground },
         trigger: 'item',
         formatter: (p: { name?: string; value?: unknown }) => {
           const raw = typeof p.value === 'number' ? p.value : (p.value as { value?: number })?.value;
@@ -489,6 +497,7 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos, pla
         },
       },
       visualMap: {
+        textStyle: { color: theme.mutedForeground },
         show: data.length > 0,
         min: 0,
         max: maxProvinceDetail,
@@ -500,7 +509,7 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos, pla
         calculable: true,
         inRange: {
           color: [
-            mixCssColors(theme.signalSuccess, theme.background, 95),
+            echarts.color.lerp(.95, [theme.background, theme.signalSuccess]),
             theme.signalSuccess,
           ],
         },
@@ -529,7 +538,7 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos, pla
           ]
         : [],
     };
-  }, [provinceDrill, provinceMapReady, provinceGeo, provincePrefectureData, maxProvinceDetail, intl]);
+  }, [provinceDrill, provinceMapReady, provinceGeo, provincePrefectureData, maxProvinceDetail, intl, theme]);
 
   const onChinaChartClick = useCallback(
     (params: { componentType?: string; name?: string }) => {
@@ -569,11 +578,11 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos, pla
       .map(([mapNameZh, count]) => ({
         key: mapNameZh,
         mapNameZh,
-        label: displayProvinceName(mapNameZh, localeZh),
+        label: displayProvinceName(mapNameZh, locale),
         count: safeGeoCount(count),
       }))
       .sort((a, b) => b.count - a.count);
-  }, [byChinaProvince, localeZh]);
+  }, [byChinaProvince, locale]);
 
   const empty = !geos?.length;
 
@@ -642,7 +651,7 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos, pla
               title: intl.formatMessage({ id: 'wca.litCities.country' }),
               dataIndex: 'countryId',
               render: (_: unknown, r: (typeof worldListRows)[0]) =>
-                localeZh ? r.countryId : r.worldName,
+                getLocalizedCountryLabel(r.countryId, undefined, locale),
             },
             {
               title: intl.formatMessage({ id: 'wca.litCities.count' }),
@@ -720,7 +729,7 @@ const WCAPlayerLitCitiesTab: React.FC<WCAPlayerLitCitiesTabProps> = ({ geos, pla
       {!empty && viewMode === 'map' && scope === 'china' && unlockedChina && provinceDrill && (
         <div>
           <Typography.Title level={5} style={{ marginTop: 0 }}>
-            {displayProvinceName(provinceDrill.nameZh, localeZh)}{' '}
+            {displayProvinceName(provinceDrill.nameZh, locale)}{' '}
             {intl.formatMessage({ id: 'wca.litCities.provinceDetail' })}
           </Typography.Title>
           {provinceDetailOption && (

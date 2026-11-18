@@ -10,6 +10,7 @@ import { CompAPI } from '@/services/cubing-pro/comps/typings';
 import { EventsAPI } from '@/services/cubing-pro/events/typings';
 import { Divider } from 'antd';
 import React from 'react';
+import { useCompetitionPublicI18n } from '../i18n';
 
 interface CompetitionResultsWithTopProps {
   comp?: CompAPI.CompResp;
@@ -22,7 +23,6 @@ interface CompetitionResultsWithTopProps {
 }
 
 const CompetitionResultsWithTop: React.FC<CompetitionResultsWithTopProps> = ({
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   comp,
   results,
   events,
@@ -31,6 +31,7 @@ const CompetitionResultsWithTop: React.FC<CompetitionResultsWithTopProps> = ({
   records,
   with_best,
 }) => {
+  const { locale, p } = useCompetitionPublicI18n();
   if (events === undefined) {
     return <></>;
   }
@@ -39,12 +40,10 @@ const CompetitionResultsWithTop: React.FC<CompetitionResultsWithTopProps> = ({
   let resultMap = resultsToMap(resultData);
   let dataSource: Result[] = [];
 
-  // eslint-disable-next-line array-callback-return
-  events.map((value) => {
+  events.forEach((value) => {
     let res = resultMap.withEvent.get(value.id);
 
     if (res === undefined || res.length === 0) {
-      // eslint-disable-next-line array-callback-return
       return
     }
 
@@ -81,7 +80,6 @@ const CompetitionResultsWithTop: React.FC<CompetitionResultsWithTopProps> = ({
 
     let best = res[0];
     if (DBest(best)) {
-      // eslint-disable-next-line array-callback-return
       return;
     }
     dataSource.push(best);
@@ -108,21 +106,22 @@ const CompetitionResultsWithTop: React.FC<CompetitionResultsWithTopProps> = ({
     );
   }
 
+  if (dataSource.length === 0) return null;
+
   let body: React.JSX.Element[] = [];
   let last_idx = 0;
-  let copyMsg = comp?.data.Name + ' 各项目排名: \n';
+  let copyMsg = p('competitionPublic.rankingsHeading', { competition: comp?.data.Name ?? '' }) + '\n';
 
   // 这里处理的是上一个项目
   const push_body = (idx: number) => {
-    console.log("push_body", idx,  dataSource[last_idx].EventID);
     let key = 'CompetitionResultsWithTop_' + dataSource[last_idx].EventID;
     body.push(
       <div key={key}>
         <Divider titlePlacement="left">
           <h4>
             <strong>
-              {CubeIcon(dataSource[last_idx].EventID, key + 'icon', {})}{' '}
-              {CubesCn(dataSource[last_idx].EventID)}
+              {CubeIcon(dataSource[last_idx].EventID, key + 'icon', {}, locale)}{' '}
+              {CubesCn(dataSource[last_idx].EventID, locale)}
             </strong>
           </h4>
         </Divider>
@@ -136,7 +135,7 @@ const CompetitionResultsWithTop: React.FC<CompetitionResultsWithTopProps> = ({
 
     let this_msg = '';
     let cut = dataSource.slice(last_idx, idx);
-    this_msg += CubesCn(cut[0].EventID) + ':\t';
+    this_msg += CubesCn(cut[0].EventID, locale) + ':\t';
     for (let i = 0; i < cut.length; i++) {
       this_msg += cut[i].PersonName + '(' + resultToBest(cut[i]) + ') \t';
     }

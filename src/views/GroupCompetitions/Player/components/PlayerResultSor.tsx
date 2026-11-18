@@ -5,25 +5,28 @@ import styles from '@/views/GroupCompetitions/Player/gc-player.module.css';
 import { KinChSorResult } from '@/services/cubing-pro/statistics/typings';
 import { Button, Popover, Table } from 'antd';
 import React from 'react';
+import { SectionHeader } from '@/components/ui/page';
+import { useI18n } from '@/contexts/I18nProvider';
 
 interface PlayerResultsSorProps {
   kinchSor?: KinChSorResult;
 }
 
 const PlayerResultsSor: React.FC<PlayerResultsSorProps> = ({ kinchSor }) => {
+  const { t, locale } = useI18n();
   if (!kinchSor) {
     return null;
   }
   const kinchSorCol = [
     {
-      title: '排名',
+      title: t('competitionAdmin.rank'),
       dataIndex: 'Rank',
       key: 'Rank',
       width: 60,
       fixed: 'left' as const,
     },
     {
-      title: '分数',
+      title: t('competitionExtra.score'),
       dataIndex: 'Value',
       key: 'Value',
       width: 200,
@@ -32,21 +35,21 @@ const PlayerResultsSor: React.FC<PlayerResultsSorProps> = ({ kinchSor }) => {
 
   const kinchSorWithCol = [
     {
-      title: '项目',
+      title: t('competitionAdmin.event'),
       dataIndex: 'Event',
       key: 'Event',
       fixed: 'left' as const,
       render: (value: string) => {
         return (
           <>
-            {CubeIcon(value, value, {})} {CubesCn(value)}{' '}
+            {CubeIcon(value, value, {})} {CubesCn(value, locale)}{' '}
           </>
         );
       },
       width: 150,
     },
     {
-      title: '分数',
+      title: t('competitionExtra.score'),
       dataIndex: 'Value',
       key: 'Value',
       width: 200,
@@ -65,21 +68,19 @@ const PlayerResultsSor: React.FC<PlayerResultsSorProps> = ({ kinchSor }) => {
 
   const content = (
     <div>
-      <p>计时项目: (全网最佳 / 最佳分) × 100 </p>
-      <p>多盲等多次尝试项目: 多盲分+(60-用时)/60</p>
+      <p>{t('competitionExtra.sorTimed')}</p>
+      <p>{t('competitionExtra.sorRepeated')}</p>
     </div>
   );
 
   return (
     <>
-      <Popover content={content} title="KinChSor 算法说明" trigger="hover">
-        <Button style={{fontSize: 10, width: "4em", padding: 0, height: "2.5em", background: "var(--muted)"}}>说明</Button>
+      <Popover content={content} title={t('competitionExtra.sorAlgorithm')} trigger="hover">
+        <Button size="small" style={{ background: "var(--muted)", color: "var(--accent)" }}>{t('competitionExtra.explanation')}</Button>
       </Popover>
 
 
-      <h3 style={{ marginTop: '20px', marginBottom: '20px' }}>
-        <strong>总分</strong>
-      </h3>
+      <SectionHeader title={t('competitionExtra.totalScore')} />
 
       <div className={styles.playerTableScroll}>
         <Table
@@ -99,9 +100,7 @@ const PlayerResultsSor: React.FC<PlayerResultsSorProps> = ({ kinchSor }) => {
         />
       </div>
 
-      <h3 style={{ marginTop: '20px', marginBottom: '20px' }}>
-        <strong>项目分</strong>
-      </h3>
+      <SectionHeader title={t('competitionExtra.eventScore')} />
       <div className={styles.playerTableScroll}>
         <Table
           // @ts-ignore

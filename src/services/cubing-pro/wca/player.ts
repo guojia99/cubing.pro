@@ -4,6 +4,7 @@
 
 import { Request } from '@/services/cubing-pro/request';
 import { AuthHeader } from '@/services/cubing-pro/auth/token';
+import { ClientMessageError } from '../clientError';
 import { PersonBestRanks, StaticWithTimerRank, WCACompetition, WCAPerson, WcaProfile, WCAResult } from './types';
 
 
@@ -25,7 +26,7 @@ export async function GetPlayerRankTimers(personID: string): Promise<StaticWithT
 
 // --------- 改造后的函数 ---------
 export async function getWCAPersonProfile(wcaID: string): Promise<WcaProfile> {
-  if (wcaID.length !== 10) throw new Error('WCAID错误');
+  if (wcaID.length !== 10) throw new ClientMessageError('shared.error.wcaId');
   const response = await Request.get<WcaProfile>(
     `/wca/player/${wcaID}`,
     {
@@ -37,7 +38,7 @@ export async function getWCAPersonProfile(wcaID: string): Promise<WcaProfile> {
 }
 
 export async function getWCAPersonCompetitions(wcaID: string): Promise<WCACompetition[]> {
-  if (wcaID.length !== 10) throw new Error('WCAID错误');
+  if (wcaID.length !== 10) throw new ClientMessageError('shared.error.wcaId');
   const response = await Request.get<WCACompetition[]>(
     `/wca/player/${wcaID}/competitions`,
     {
@@ -49,7 +50,7 @@ export async function getWCAPersonCompetitions(wcaID: string): Promise<WCACompet
 }
 
 export async function getWCAPersonResults(wcaID: string): Promise<WCAResult[]> {
-  if (wcaID.length !== 10) throw new Error('WCAID错误');
+  if (wcaID.length !== 10) throw new ClientMessageError('shared.error.wcaId');
   const response = await Request.get<WCAResult[]>(
     `/wca/player/${wcaID}/results`,
     {
@@ -61,7 +62,7 @@ export async function getWCAPersonResults(wcaID: string): Promise<WCAResult[]> {
 
 
 export async function getWCAPersons(query: string): Promise<WCAPerson[]> {
-  if (query.length >= 32) throw new Error('内容太长');
+  if (query.length >= 32) throw new ClientMessageError('shared.error.queryLength');
   const response = await Request.get<WCAPerson[]>(
     `/wca/players/${query}`,
     {
@@ -73,7 +74,7 @@ export async function getWCAPersons(query: string): Promise<WCAPerson[]> {
 
 
 export async function getPersonBestRanks(wcaID: string): Promise<PersonBestRanks> {
-  if (wcaID.length !== 10) throw new Error('WCAID错误');
+  if (wcaID.length !== 10) throw new ClientMessageError('shared.error.wcaId');
   const response = await Request.get<PersonBestRanks>(
     `/wca/player/${wcaID}/best_ranks`,
     {

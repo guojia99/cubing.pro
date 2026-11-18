@@ -1,3 +1,5 @@
+import { ClientMessageError } from '../clientError';
+
 const LS_KEY_PREFIX = 'algs:formula_practice_selection:';
 
 export interface FormulaPracticeSelection {
@@ -40,7 +42,7 @@ export function getFormulaPracticeSelection(
           };
           saveFormulaPracticeSelection(cube, classId, migrated);
           if (localStorage.getItem(getStorageKey(cube, classId)) !== JSON.stringify(migrated)) {
-            throw new Error('Selection migration verification failed');
+            throw new ClientMessageError('shared.error.storageVerification');
           }
           if (localStorage.getItem(getLegacyStorageKey(cube, classId)) === raw) {
             localStorage.removeItem(getLegacyStorageKey(cube, classId));

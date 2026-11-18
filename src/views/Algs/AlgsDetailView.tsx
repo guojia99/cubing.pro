@@ -1,5 +1,8 @@
 "use client";
 
+import { translateShared } from "@/i18n/messages/shared";
+import { translateWcaPuzzleExtra } from "@/i18n/messages/wca-puzzle-extra";
+
 import {
   Badge,
   Box,
@@ -27,6 +30,7 @@ import { useSearchParams } from "next/navigation";
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 
 import { useI18n } from "@/contexts/I18nProvider";
+import { translatePuzzleExtra as extra } from "@/i18n/messages/puzzle-extra";
 import {
   getAlgCubeClass,
   type AlgClassDetail,
@@ -83,6 +87,7 @@ import { getCustomAlgs } from "@/services/cubing-pro/algs/customAlgs";
 import { collectVisibleFormulaKeys } from "./utils/algsFormulaFilter";
 import { parseFormulaDeepLink, resolveFormulaDeepLink } from "./utils/formulaDeepLink";
 import "./styles/algsDetail.css";
+import "./styles/algsUi.css";
 
 interface ModalState {
   items: FormulaItem[];
@@ -743,7 +748,7 @@ export function AlgsDetailView({ cube, classId }: Props) {
         <AlgsResizablePanels navigation={<Box as="aside" id="algs-filter-pane" className="algs-detail-navigation">
           <Heading as="h2" fontSize="xs" mb={2}>{t("algs.detail.filterPanel")}</Heading>
           <Text fontSize="11px" color="fg.muted" mb={3}>
-            {locale === "en-US" ? "Choose your practice scope" : "选择分组与公式，设置本次练习范围"}
+            {extra(locale, "puzzleExtra.practiceScope")}
           </Text>
               <AlgsFilterPanel
                 data={data}
@@ -771,15 +776,15 @@ export function AlgsDetailView({ cube, classId }: Props) {
 
         <VStack ref={contentRef} id="algs-formula-pane" className="algs-detail-content" align="stretch" gap={3} minW={0}>
           <Box className="algs-detail-toolbar">
-            <Input type="search" size="sm" fontSize="xs" aria-label={locale === "en-US" ? "Search current formulas" : "搜索本页公式"}
-              placeholder={locale === "en-US" ? "Search names, groups or formulas…" : "搜索名称、分组或公式…"}
+            <Input type="search" size="sm" fontSize="xs" aria-label={extra(locale, "puzzleExtra.searchFormulas")}
+              placeholder={extra(locale, "puzzleExtra.searchPlaceholder")}
               value={search} onChange={(event) => setSearch(event.target.value)} minW={0} bg="bg.elevated" />
             <Button size="sm" fontSize="xs" className="algs-detail-mobile-filter" variant="outline" onClick={() => setFilterDrawerOpen(true)}>{t("algs.detail.filterPanel")}</Button>
             <Button size="sm" fontSize="xs" variant="outline" onClick={() => setPageSettingsOpen(true)}>{t("algs.config")}</Button>
           </Box>
           <Flex gap={2} justify="space-between" flexWrap="wrap" fontSize="11px" color="fg.muted" aria-live="polite">
             <Text>{displayedCount} / {totalFormulas} {t("algs.detail.statFormulas")}</Text>
-            <Text>{locale === "en-US" ? "Search changes this view; practice uses your selected scope." : "搜索仅影响展示，练习使用已选范围。"}</Text>
+            <Text>{extra(locale, "puzzleExtra.searchHint")}</Text>
           </Flex>
 
         {displayedGroups.length === 0 && (
@@ -807,7 +812,7 @@ export function AlgsDetailView({ cube, classId }: Props) {
                 persistHiddenFormulaKeys(cube, classId, []);
               }}
             >
-              {locale === "en-US" ? (search ? "Clear search" : "Reset filters") : (search ? "清除搜索" : "重置筛选")}
+              {extra(locale, search ? "puzzleExtra.clearSearch" : "puzzleExtra.resetFilters")}
             </Button>
           </Box>
         )}
@@ -969,7 +974,7 @@ export function AlgsDetailView({ cube, classId }: Props) {
       >
         <Dialog.Backdrop />
         <Dialog.Positioner>
-          <Dialog.Content borderRadius="2xl" maxH="90vh">
+          <Dialog.Content className="algs-dialog" borderRadius="2xl" maxH="90vh">
             <Dialog.Header>
               <Dialog.Title>
                 {t("algs.practice.stats")}
@@ -1037,7 +1042,7 @@ export function AlgsDetailView({ cube, classId }: Props) {
                         {proficiencyStats.mastered}
                       </Text>
                       <Text fontSize="2xs" color="fg.muted">
-                        Mastered
+                        {translateShared(locale, "shared.proficiency.mastered")}
                       </Text>
                     </Box>
                     <Box
@@ -1054,7 +1059,7 @@ export function AlgsDetailView({ cube, classId }: Props) {
                         {proficiencyStats.skilled}
                       </Text>
                       <Text fontSize="2xs" color="fg.muted">
-                        Skilled
+                        {translateShared(locale, "shared.proficiency.skilled")}
                       </Text>
                     </Box>
                     <Box
@@ -1071,7 +1076,7 @@ export function AlgsDetailView({ cube, classId }: Props) {
                         {proficiencyStats.average}
                       </Text>
                       <Text fontSize="2xs" color="fg.muted">
-                        Average
+                        {translateShared(locale, "shared.proficiency.average")}
                       </Text>
                     </Box>
                     <Box
@@ -1088,7 +1093,7 @@ export function AlgsDetailView({ cube, classId }: Props) {
                         {proficiencyStats.unskilled}
                       </Text>
                       <Text fontSize="2xs" color="fg.muted">
-                        Unskilled
+                        {translateShared(locale, "shared.proficiency.unskilled")}
                       </Text>
                     </Box>
                     <Box
@@ -1105,7 +1110,7 @@ export function AlgsDetailView({ cube, classId }: Props) {
                         {proficiencyStats.unknown}
                       </Text>
                       <Text fontSize="2xs" color="fg.muted">
-                        Unknown
+                        {translateShared(locale, "shared.proficiency.unknown")}
                       </Text>
                     </Box>
                     <Box
@@ -1122,7 +1127,7 @@ export function AlgsDetailView({ cube, classId }: Props) {
                         {proficiencyStats.total}
                       </Text>
                       <Text fontSize="2xs" color="fg.muted">
-                        Tracked
+                        {translateWcaPuzzleExtra(locale, "wcaPuzzleExtra.tracked")}
                       </Text>
                     </Box>
                   </SimpleGrid>
@@ -1154,7 +1159,7 @@ export function AlgsDetailView({ cube, classId }: Props) {
                             </Badge>
                           </HStack>
                           <Text fontSize="xs" color="fg.muted">
-                            {gNames.length} groups ▾
+                            {translateWcaPuzzleExtra(locale, "wcaPuzzleExtra.groups", { count: gNames.length })} ▾
                           </Text>
                         </Button>
                       </Collapsible.Trigger>

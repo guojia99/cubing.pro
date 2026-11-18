@@ -1,4 +1,11 @@
 import type { Recipe } from "../types";
+import type { Locale } from "@/i18n/locales";
+import { isFinishingKey, translateFinishing } from "@/i18n/messages/finishing";
+
+export function getRecipeCategoryName(category: string, locale: Locale, fallback = category): string {
+  const key = `finishing.recipeCategory.${category}`;
+  return isFinishingKey(key) ? translateFinishing(locale, key) : fallback;
+}
 
 export function getRecipeDisplayName(recipe: Recipe): string {
   return recipe.title.replace(/的做法$/, "");

@@ -14,6 +14,7 @@ const bundle = await build({
     import {createRoot} from 'react-dom/client';
     import {flushSync} from 'react-dom';
     import Native from './src/components/puzzles/NativeTwoByTwo';
+    import {I18nProvider, useI18n} from './src/contexts/I18nProvider';
     import {TwistyPlayer} from 'cubing/twisty';
     window.calls = {thumbnail:0, interactive:0};
     window.initFailures = {thumbnail:1, interactive:1};
@@ -46,6 +47,7 @@ const bundle = await build({
     };
     const colors = {U:'#ffdd00',F:'#e53935',R:'#00a651',B:'#ff8800',L:'#2266ff',D:'#ffffff'};
     function Host() {
+      const {setLocale} = useI18n(); window.setNativeLocale = setLocale;
       const [cards, setCards] = useState([]);
       const [player, setPlayer] = useState(null);
       window.cards = value => flushSync(() => setCards(value));
@@ -62,7 +64,7 @@ const bundle = await build({
         </div>}
       </>;
     }
-    createRoot(document.getElementById('root')).render(<React.StrictMode><Host/></React.StrictMode>);
+    createRoot(document.getElementById('root')).render(<React.StrictMode><I18nProvider><Host/></I18nProvider></React.StrictMode>);
     window.native = async role => {
       const player = document.querySelector('[data-native-two-by-two="'+role+'"] > twisty-player');
       const [vantage] = await player.experimentalCurrentVantages();
@@ -160,6 +162,7 @@ try {
       observers:observers.size,contexts:contexts.size,createdContexts,createdObservers});
   });
   await page.goto(`http://127.0.0.1:${server.address().port}`);
+  await page.evaluate(() => window.setNativeLocale('en-US'));
   await poll(() => page.evaluate(() => !!window.cards), 'React host');
   await page.evaluate(() => window.cards([{id:'first'},{id:'waiting',setup:'R'}]));
   await poll(() => page.locator('#cards [role="alert"]').count().then(n => n === 2), 'first init rejects all affected subscribers');
@@ -327,6 +330,28 @@ try {
     return white;
   });
   assert.ok(white>100,'white D palette survives native wrapper/context recovery: '+white);
+  await page.evaluate(async () => {
+    const {player} = await window.native('interactive');
+    window.localePlayer = player;
+    player.alg = 'R U R\' U\' R U R\' U\'';
+    player.timestamp = 300;
+  });
+  const localeResources = await bounded();
+  const callsBeforeLocale = await page.evaluate(() => ({...window.calls}));
+  for (const [locale, label] of [
+    ['zh-CN','二阶魔方播放器'], ['en-US','2x2x2 player'], ['ja','2x2x2 プレーヤー'],
+    ['yue-Hant-HK','二階魔方播放器'], ['ko','2x2x2 플레이어'], ['fr','Lecteur 2x2x2'], ['es','Reproductor 2x2x2'],
+  ]) {
+    await page.evaluate(locale => window.setNativeLocale(locale), locale);
+    await poll(() => page.locator('[data-native-two-by-two="interactive"]').getAttribute('aria-label').then(value => value === label), 'localized native aria label');
+    assert.equal(await page.evaluate(async () => {
+      const player = document.querySelector('[data-native-two-by-two="interactive"] > twisty-player');
+      return player === window.localePlayer && await player.experimentalGet.timestamp() === 300;
+    }), true, `${locale}: native player identity and timestamp`);
+  }
+  assert.deepEqual(await page.evaluate(() => window.calls), callsBeforeLocale, 'locale changes do not reconfigure the native pool');
+  assert.deepEqual(await bounded(), localeResources, 'locale changes allocate no observers or contexts');
+  console.log('PASS seven locales preserve native player identity, timestamp, pool calls, observers and WebGL contexts');
   assert.deepEqual(errors,[],'no unhandled async faults');
   console.log('PASS latest-state/cache stress, white D palette and fixed two-tree/context/observer pool', final);
 } finally {

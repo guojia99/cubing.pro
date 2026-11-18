@@ -9,9 +9,9 @@
     width: 320px;
     flex-shrink: 0;
     position: sticky;
-    top: 80px;
+    top: calc(var(--header-height) + 24px);
     align-self: flex-start;
-    max-height: calc(100vh - 120px);
+    max-height: calc(100dvh - var(--header-height) - 48px);
     display: flex;
     flex-direction: column;
   }
@@ -39,7 +39,7 @@
 
   .food-list-page .food-tonight-receipt-wrap {
     order: 1;
-    border-radius: 8px;
+    border-radius: var(--radius-card);
     border: 1px solid var(--chakra-colors-border);
     overflow: hidden;
   }
@@ -61,8 +61,8 @@
 
 .food-grid-responsive {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+  gap: 24px;
   align-items: stretch;
 }
 
@@ -75,19 +75,19 @@
 
 @media (min-width: 768px) {
   .food-grid-responsive {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (min-width: 1200px) {
   .food-grid-responsive {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
 @media (min-width: 1600px) {
   .food-grid-responsive {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
@@ -99,10 +99,4 @@
 
 .food-card-wrapper .food-card {
   width: 100%;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.food-card-wrapper .food-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--chakra-shadows-lg);
 }

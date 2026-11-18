@@ -9,7 +9,7 @@
 ```text
 src/app/layout.tsx
   └─ src/components/ui/provider.tsx
-       └─ ChakraProvider / ColorModeProvider / I18nProvider / AuthProvider
+       └─ ChakraProvider / ColorModeProvider / I18nProvider / AntThemeProvider / AuthProvider
             ├─ src/app/page.tsx → AppShell → WelcomePageView
             └─ src/app/(main)/layout.tsx → AppShell
                  ├─ 显式 page.tsx：登录、回调、个人中心、设置等
@@ -68,7 +68,7 @@ src/app/layout.tsx
 | `src/lib/` | 权限、导航、URL、用户解析、外观、群赛规则、静态路径等应用辅助 |
 | `src/i18n/index.ts`、`src/i18n/messages/` | 语言存储、翻译回退、中英文主词典与领域分词典 |
 | `src/services/cubing-pro/` | HTTP 封装、数据类型和部分浏览器数据存储 |
-| `src/styles/tokens.css`、`app-chrome.css` | 全局颜色变量、沉浸布局样式 |
+| `src/styles/tokens.css`、`design-system.css`、`app-chrome.css` | 全局颜色变量、尺寸/字体/阴影与 Ant 视觉规则、沉浸布局样式 |
 | `src/theme/` | Chakra system、图表颜色、魔方贴纸与奖牌等领域色 |
 | `src/utils/time/`、`src/utils/types/` | 通用日期和数值判断；领域工具主要就近放在业务目录 |
 | `src/vendor/puzzle-drawing/` | 本地 SVG 绘图源码、来源/版本/许可证，保留上游资料 |
@@ -87,6 +87,10 @@ src/app/layout.tsx
 | `routing/` | 静态导出页面标记与真实浏览器 URL 同步 |
 | `pages/` | `PlaceholderPage` 通用预留页 |
 | `UserData/` | 用户云 KV 上传/应用面板，不能替代尚未实现的 KV 列表页 |
+
+全站视觉公共组件位于 `components/ui/page.tsx`：`PageHeader`、`SectionHeader`、`Surface`、`FeatureLink`。Chakra recipes 和 AntThemeProvider 共同消费 CSS 语义色；新增组件优先接入这些结构，避免另建一套页头/卡片规范。图表使用 `theme/useThemeColors.ts` 订阅实际主题与配色，不能仅在 memo 中读取 `getThemeColors()` 快照。ECharts 热力图插值使用数值颜色，不能直接传入 `color-mix()` 字符串。
+
+2026-11-18 全站视觉迁移、64 条路由覆盖和验收边界见 `docs/design/frontend-refactor-2026-11-18.md`。首页使用紧凑功能布局；练习区仅公式/求解/FR，群赛、WCA、公式、绘图四组等高入口，生活栏目独立。
 
 `src/services/cubing-pro/` 的主要分工：
 
@@ -126,7 +130,7 @@ src/app/layout.tsx
 
 配色链为 `tokens.css` → `theme/index.ts` 语义 token → Chakra；`websiteUiConfig.ts` 定义八套 palette、字号和偏好；`chartColors.ts` 将主题转成图表可用颜色。`domainColors.ts` 中贴纸等颜色有领域意义。明暗由 next-themes 管理；不要认为一次云外观读取必然同步所有状态。
 
-语言支持 `zh-CN/en-US`；key 类型来自中文词典，英文主词典对应 `Record<MessageKey, string>`。翻译按当前语言 → 中文 → key 回退。`useIntlMessage` 是旧调用兼容。已有页面仍有中文硬编码和 Ant Design 固定中文 locale，不能宣称全站完成双语。
+语言注册表为 `src/i18n/locales.ts`，支持 `zh-CN/en-US/ja/yue-Hant-HK/ko/fr/es`；根 `catalogs` 合并各领域词典并推导 `MessageKey`，Chakra、Ant Design、dayjs 与语言菜单同步。`formatMessage.ts` 统一复数选择与单次参数插值，`plurals.ts` 使用 `Intl.PluralRules`，不能用中英二选一或 `count === 1` 替代。静态首屏使用统一中文 metadata，客户端按 locale/path 更新，保留现有 URL。`useIntlMessage` 是旧调用兼容。菜谱正文保留源文；厨房技巧、鸡尾酒和日志译文在 `public/i18n`。动态 API 正文当前仍是单语言，`localizedContent.ts` 仅有读侧合同/helper 尚未生产接线；完整边界、校验和命令见 `docs/project/internationalization*.md`，不能把 UI 七语等同全部 API 内容七语。
 
 权限位在 `src/lib/auth.ts`，Player、Organizers、Delegates、Admin、SuperAdmin 是独立 bit。`AdminGuard` 默认允许 Admin/SuperAdmin；`OrganizersGuard` 允许主办/Admin/SuperAdmin。菜单可见、前端 Guard 和后端授权必须分别核对，不用数值大小推导继承。
 

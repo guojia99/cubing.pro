@@ -23,9 +23,10 @@
 .stats-index .stats-tab-item {
   margin: 0;
   padding: 0;
-  border: 1px solid #d9d9d9;
-  border-radius: 8px;
-  background: #fff;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-card);
+  background: var(--card);
+  box-shadow: var(--shadow-card);
   cursor: pointer;
   text-align: left;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
@@ -33,22 +34,22 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 6px;
-  padding: 12px 14px;
+  padding: 16px 18px;
   min-height: 88px;
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
 }
 .stats-index .stats-tab-item:hover {
-  border-color: #40a9ff;
+  border-color: var(--accent);
 }
 .stats-index .stats-tab-item:focus-visible {
-  outline: 2px solid #1890ff;
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 .stats-index .stats-tab-item.active {
-  border-color: #1890ff;
-  background: rgba(24, 144, 255, 0.06);
-  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.15);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: inset 0 0 0 1px var(--accent);
 }
 .stats-index .stats-tab-item .stats-tab-item-head {
   display: flex;
@@ -59,21 +60,21 @@
 }
 .stats-index .stats-tab-item .stats-tab-icon {
   font-size: 18px;
-  color: #1890ff;
+  color: var(--accent);
   flex-shrink: 0;
   line-height: 1;
 }
 .stats-index .stats-tab-item .stats-tab-title-text {
   font-size: 14px;
   font-weight: 600;
-  color: rgba(0, 0, 0, 0.88);
+  color: var(--foreground);
   line-height: 1.35;
   flex: 1;
   min-width: 0;
 }
 .stats-index .stats-tab-item .stats-tab-desc {
   font-size: 12px;
-  color: rgba(0, 0, 0, 0.45);
+  color: var(--muted-foreground);
   line-height: 1.45;
   width: 100%;
   display: -webkit-box;
@@ -89,7 +90,7 @@
   font-weight: 600;
   text-align: center;
   margin: 0 0 16px 0;
-  color: rgba(0, 0, 0, 0.85);
+  color: var(--foreground);
 }
 @media (max-width: 768px) {
   .stats-index {
@@ -108,7 +109,7 @@
   .stats-index .stats-tab-item {
     min-height: 0;
     padding: 10px 10px;
-    border-radius: 6px;
+    border-radius: var(--radius-card);
     /* 小屏省略说明，减少纵向占用 */
   }
   .stats-index .stats-tab-item .stats-tab-icon {

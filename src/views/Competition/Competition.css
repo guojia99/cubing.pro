@@ -1,0 +1,39 @@
+.competition-workbench { min-width: 0; display: flex; flex-direction: column; gap: 24px; color: var(--foreground); font-family: var(--font-body); }
+.competition-workbench > *, .competition-workbench .ant-tabs-content-holder, .competition-workbench .ant-tabs-tabpane { min-width: 0; }
+.competition-workbench .ant-card { border-radius: var(--radius-card, 1rem); border-color: var(--border-default); background: var(--card); box-shadow: var(--shadow-card); }
+.competition-workbench .ant-card-body { padding: clamp(16px, 2.4vw, 24px); min-width: 0; }
+.competition-workbench .ant-descriptions-title, .competition-workbench :is(h2, h3, h4, h5) { font-family: var(--font-heading); }
+.competition-workbench .ant-descriptions-item-label { color: var(--muted-foreground); }
+.competition-workbench .ant-descriptions-item-content { overflow-wrap: anywhere; min-width: 0; }
+.competition-workbench .ant-descriptions-item-content > .ant-table-wrapper { width: 100%; }
+.competition-workbench .competition-detail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+.competition-detail-grid > div { min-width: 0; }
+.competition-detail-grid > div > .ant-card { margin-bottom: 0 !important; }
+.competition-detail-grid > div:last-child { grid-column: 1 / -1; }
+.competition-workbench .competition-results-card { min-width: 0; }
+.competition-workbench .competition-regulations { padding: clamp(16px, 2.4vw, 24px); border: 1px solid var(--border-default); border-radius: var(--radius-card, 1rem); background: var(--card); box-shadow: var(--shadow-card); }
+.competition-workbench .ant-tabs-top > .ant-tabs-nav { margin-bottom: 20px; }
+.competition-workbench .ant-tabs-nav::before { border-color: var(--border-default); }
+.competition-workbench .ant-tabs-nav-list { gap: 6px; }
+.competition-workbench .ant-tabs-tab { margin: 0 !important; padding: 10px 16px; border: 0 !important; border-radius: 10px !important; background: transparent !important; }
+.competition-workbench .ant-tabs-tab-active { background: var(--accent-soft) !important; }
+.competition-workbench .ant-tabs-tab-active .ant-tabs-tab-btn { color: var(--accent); }
+.competition-workbench .ant-tabs-tab-btn { min-height: 24px; display: flex; align-items: center; }
+.competition-workbench .ant-tabs-ink-bar { display: none; }
+.competition-workbench .ant-table-wrapper { min-width: 0; max-width: 100%; border: 1px solid var(--border-default); border-radius: 12px; overflow: hidden; }
+.competition-workbench .ant-table-content { overflow-x: auto; overscroll-behavior-x: contain; }
+.competition-workbench .ant-table-thead > tr > th { background: var(--muted); color: var(--muted-foreground); font-weight: 600; }
+.competition-workbench .ant-table-cell { font-variant-numeric: tabular-nums; }
+.competition-workbench .ant-btn { border-radius: 10px; box-shadow: none; }
+.competition-workbench :is(.ant-input, .ant-input-affix-wrapper, .ant-select-selector) { border-radius: 10px; }
+.competition-workbench [id] { scroll-margin-top: calc(var(--header-height, 4rem) + 20px); }
+.competition-workbench .ant-divider { border-color: var(--border-default); }
+.competition-workbench :is(button, a, input):focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media (max-width: 640px) {
+  .competition-workbench { gap: 16px; }
+  .competition-workbench .competition-detail-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .competition-workbench .ant-tabs-tab { padding: 10px 12px; }
+  .competition-workbench .ant-table { font-size: 12px; }
+  .competition-workbench .ant-table-cell { padding: 10px 8px !important; }
+  .competition-workbench :is(input, textarea) { font-size: 16px; }
+}

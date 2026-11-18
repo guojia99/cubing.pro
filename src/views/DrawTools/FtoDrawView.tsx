@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Box } from "@chakra-ui/react";
+import { PageHeader } from "@/components/ui/page";
+import { useI18n } from "@/contexts/I18nProvider";
 
 import { FTO_STICKER_PALETTE } from "@/theme/domainColors";
 import { DrawPalette } from "@/views/DrawTools/components/DrawPalette";
@@ -85,6 +88,7 @@ const ftoPoints: PathSvg[] = [
 ];
 
 export function FtoDrawView() {
+  const { t } = useI18n();
   const [ftoPointsM, setFtoPointsM] = useState<PathSvg[]>([]);
 
   useEffect(() => {
@@ -92,6 +96,8 @@ export function FtoDrawView() {
   }, []);
 
   return (
+    <Box maxW="1440px" mx="auto" py={{ base: 4, md: 8 }} minW="0">
+    <PageHeader eyebrow={t("nav.tools.draw")} title={t("home.welcome.draw.fto.title")} description={t("home.welcome.draw.fto.desc")} />
     <DrawPalette
       svgPoints={ftoPointsM}
       presetColors={baseFtoColor}
@@ -101,5 +107,6 @@ export function FtoDrawView() {
       width={400}
       height={432}
     />
+    </Box>
   );
 }

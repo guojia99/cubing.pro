@@ -8,10 +8,11 @@ import { CompAPI, CompResultAPI } from '@/services/cubing-pro/comps/typings';
 import { apiEvents } from '@/services/cubing-pro/events/events';
 import { EventsAPI } from '@/services/cubing-pro/events/typings';
 import { ProductOutlined, TrophyOutlined } from '@ant-design/icons';
-import { Card, Typography } from 'antd';
+import { Alert, Button, Card, Typography } from 'antd';
 import React, { lazy, useEffect, useState } from 'react';
 import { BsPeople } from 'react-icons/bs';
 import { SiBytedance, SiCodeforces } from 'react-icons/si';
+import { useCompetitionPublicI18n } from '../i18n';
 
 const CompetitionResultsWithEvents = lazy(
   () => import('@/views/Competition/CompetitionComponents/CompetitionResultsWithEvents'),
@@ -34,27 +35,35 @@ interface CompetitionResultProps {
 }
 
 const CompetitionResult: React.FC<CompetitionResultProps> = ({ comp }) => {
+  const { t, p } = useCompetitionPublicI18n();
   const [result, setResult] = useState<CompResultAPI.CompResultResp>();
   const [events, setEvents] = useState<EventsAPI.EventsResponse>();
   const [records, setRecords] = useState<Record[]>();
-  const fetchResult = () => {
-    if (comp !== undefined) {
-      apiEvents().then((value) => {
-        setEvents(value);
-      });
-      apiCompResult(comp.data.id).then((value) => {
-        setResult(value);
-      });
-      apiCompRecord(comp.data.id).then((value) => {
-        setRecords(value.data);
-      });
-    }
-  };
+  const [failed, setFailed] = useState(false);
+  const [request, setRequest] = useState(0);
+  const compId = comp?.data.id;
 
   // 动态加载数据
   useEffect(() => {
-    fetchResult();
-  }, [comp]);
+    if (compId === undefined) return;
+    let active = true;
+    setFailed(false);
+    setResult(undefined);
+    setEvents(undefined);
+    setRecords(undefined);
+    void Promise.all([apiEvents(), apiCompResult(compId), apiCompRecord(compId)])
+      .then(([nextEvents, nextResult, nextRecords]) => {
+        if (!active) return;
+        setEvents(nextEvents);
+        setResult(nextResult);
+        setRecords(nextRecords.data);
+      })
+      .catch((error) => {
+        console.error('Competition results failed', error);
+        if (active) setFailed(true);
+      });
+    return () => { active = false; };
+  }, [compId, request]);
 
   const items = [];
   if (result !== undefined) {
@@ -62,7 +71,7 @@ const CompetitionResult: React.FC<CompetitionResultProps> = ({ comp }) => {
       items.push(
         {
           key: 'trophy',
-          label: '冠军',
+          label: t('competitionAdmin.champion'),
           children: (
             <CompetitionResultsWithTop
               comp={comp}
@@ -78,7 +87,7 @@ const CompetitionResult: React.FC<CompetitionResultProps> = ({ comp }) => {
         },
         {
           key: 'top3',
-          label: '前三',
+          label: t('competitionAdmin.topThree'),
           children: (
             <CompetitionResultsWithTop
               comp={comp}
@@ -94,7 +103,7 @@ const CompetitionResult: React.FC<CompetitionResultProps> = ({ comp }) => {
         },
         {
           key: 'record',
-          label: '记录',
+          label: t('competitionAdmin.records'),
           children: (
             <CompetitionResultsWithRecord
               comp={comp}
@@ -110,7 +119,7 @@ const CompetitionResult: React.FC<CompetitionResultProps> = ({ comp }) => {
     items.push(
       {
         key: 'events',
-        label: '各项',
+        label: t('competitionAdmin.byEvent'),
         children: (
           <CompetitionResultsWithEvents
             comp={comp}
@@ -123,7 +132,7 @@ const CompetitionResult: React.FC<CompetitionResultProps> = ({ comp }) => {
       },
       {
         key: 'best_events',
-        label: '最佳各项',
+        label: t('competitionAdmin.bestByEvent'),
         children: (
           <CompetitionResultsWithTop
             comp={comp}
@@ -139,7 +148,7 @@ const CompetitionResult: React.FC<CompetitionResultProps> = ({ comp }) => {
       },
       {
         key: 'players',
-        label: '玩家',
+        label: t('competitionAdmin.user'),
         children: (
           <CompetitionResultsWithPlayers
             comp={comp}
@@ -152,7 +161,7 @@ const CompetitionResult: React.FC<CompetitionResultProps> = ({ comp }) => {
       },
       {
         key: 'best_top3',
-        label: '最佳前三',
+        label: t('competitionAdmin.bestTopThree'),
         children: (
           <CompetitionResultsWithTop
             comp={comp}
@@ -171,15 +180,16 @@ const CompetitionResult: React.FC<CompetitionResultProps> = ({ comp }) => {
 
   return (
     <>
+      {failed ? <Alert type="error" title={p('competitionPublic.resultsFailed')} action={<Button onClick={() => setRequest((n) => n + 1)}>{t('competitionAdmin.retry')}</Button>} /> : null}
       <Typography.Title level={5}>
-        成绩
+        {t('competitionAdmin.result')}
         {!comp?.data.IsDone ? (
           <Typography.Text type="secondary" style={{ fontSize: 14, fontWeight: 400, marginLeft: 8 }}>
-            比赛任在进行中,不代表最终结果
+            {t('competitionAdmin.provisional')}
           </Typography.Text>
         ) : null}
       </Typography.Title>
-      <Card style={{ borderRadius: 8, minWidth: '100%' }}>
+      <Card className="competition-results-card">
         <NavTabs
           type="card"
           items={items}

@@ -17,6 +17,7 @@ import { appendMockGroups, buildMockTeamMatchData16 } from '@/views/TeamMatch/mo
 import { computeMultiTeamPkSettlement, computePkSettlement } from '@/views/TeamMatch/pkSettlement';
 import { allRankedActiveTeamIds, pickSeedTeamIds } from '@/views/TeamMatch/seedingMath';
 import { createEmptySession, normalizeSession } from '@/views/TeamMatch/sessionFactory';
+import { tm, type TeamMatchLocale } from './i18n';
 import type {
   BracketMatch,
   EliminationGroupMatch,
@@ -38,8 +39,8 @@ import {
 } from '@/views/TeamMatch/types';
 export type TeamMatchAction =
   | { type: 'RESET_SESSION'; session: TeamMatchSession }
-  | { type: 'MOCK_FILL_TEST_DATA' }
-  | { type: 'MOCK_APPEND_GROUPS'; count: number }
+  | { type: 'MOCK_FILL_TEST_DATA'; locale?: TeamMatchLocale }
+  | { type: 'MOCK_APPEND_GROUPS'; count: number; locale?: TeamMatchLocale }
   | { type: 'SET_NAME'; name: string }
   | { type: 'SET_WIZARD_STEP'; step: number }
   | { type: 'SET_STATUS'; status: TeamMatchSession['status'] }
@@ -200,7 +201,7 @@ export function reduceSession(session: TeamMatchSession, action: TeamMatchAction
       next = { ...next, name: action.name };
       break;
     case 'MOCK_FILL_TEST_DATA': {
-      const { schools, players, teams } = buildMockTeamMatchData16();
+      const { schools, players, teams } = buildMockTeamMatchData16(action.locale);
       let seeding = mergeSeeding([], players, next.eventIds);
       seeding = seeding.map((e) => ({
         ...e,
@@ -209,7 +210,7 @@ export function reduceSession(session: TeamMatchSession, action: TeamMatchAction
       }));
       next = {
         ...next,
-        name: next.name?.trim() ? next.name : '测试比赛',
+        name: next.name?.trim() ? next.name : tm(action.locale ?? 'zh-CN', 'teamMatch.testMatchName'),
         schools,
         players,
         teams,
@@ -235,6 +236,7 @@ export function reduceSession(session: TeamMatchSession, action: TeamMatchAction
       const { schools: addSchools, players: addPlayers, teams: addTeams } = appendMockGroups(
         next,
         action.count,
+        action.locale,
       );
       if (addTeams.length === 0) break;
       const newIds = new Set(addPlayers.map((p) => p.id));

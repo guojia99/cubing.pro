@@ -7,11 +7,17 @@ import type { ColumnsType } from "antd/es/table";
 import NextLink from "next/link";
 import { Fragment } from "react";
 
-import { CubeIcon } from "@/components/CubeIcon/cube_icon";
 import type { Comp } from "@/components/Data/types/comps";
 import { getThemeColors } from "@/theme/chartColors";
 import { beijingDate, isGroupCompetition, publicCompetitionStatus } from "@/lib/groupCompetition";
 import { parseDateTime } from "@/utils/time/data_time";
+import { CompetitionEvent, CompetitionMessage } from "@/components/Data/CompetitionMessage";
+
+const statusMessages = {
+  已结束: "competitionAdmin.ended", 未开始: "competitionAdmin.upcoming", 进行中: "competitionAdmin.ongoing",
+  待结束: "competitionAdmin.awaitingEnd", 审批中: "competitionAdmin.reviewing", 驳回: "competitionAdmin.rejected",
+  编辑中: "competitionAdmin.draft", 禁用: "competitionAdmin.banned",
+} as const;
 
 export function getStatusProp(result: Comp) {
   const theme = getThemeColors();
@@ -52,7 +58,7 @@ export function getStatusProp(result: Comp) {
 
 export const CompsTableColumns: ColumnsType<Comp> = [
   {
-    title: "序号",
+    title: <CompetitionMessage name="competitionAdmin.index" />,
     dataIndex: "Index",
     key: "Index",
     width: 65,
@@ -67,56 +73,56 @@ export const CompsTableColumns: ColumnsType<Comp> = [
     },
   },
   {
-    title: "日期",
+    title: <CompetitionMessage name="competitionAdmin.date" />,
     dataIndex: "CompStartTime",
     key: "CompStartTime",
     width: 130,
     render: (_text, result: Comp) => {
       if (isGroupCompetition(result)) {
         const start = beijingDate(result.CompStartTime), end = beijingDate(result.CompEndTime);
-        return <>{start}{end && end !== start ? ` 至 ${end}` : ""}（北京）</>;
+        return <CompetitionMessage name="competitionAdmin.beijingRange" params={{ start, end: end || start }} />;
       }
       const days = Math.floor((Date.parse(result.CompEndTime) - Date.parse(result.CompStartTime)) / 86400_000);
-      return <>{parseDateTime(result.CompStartTime)}{days > 1 ? `(${days}天)` : ""}</>;
+      return <>{parseDateTime(result.CompStartTime)}{days > 1 ? <>(<CompetitionMessage name="competitionAdmin.days" params={{ count: days }} />)</> : ""}</>;
     },
   },
   {
-    title: "类型",
+    title: <CompetitionMessage name="competitionAdmin.type" />,
     dataIndex: "Genre",
     key: "Genre",
     width: 80,
     render: (_text, result: Comp) => {
-      const mp: Record<string, { label: string; color: string; icon?: string }> = {
+      const mp: Record<string, { label: React.ReactNode; color: string; icon?: string }> = {
         "1": { label: "WCA", color: "blue", icon: "/images/wca.svg" },
-        "2": { label: "线下正式赛", color: "green" },
-        "3": { label: "线上正式赛", color: "red" },
-        "4": { label: "线下赛", color: "orange" },
-        "5": { label: "线上赛", color: "purple" },
+        "2": { label: <CompetitionMessage name="competitionAdmin.officialOffline" />, color: "green" },
+        "3": { label: <CompetitionMessage name="competitionAdmin.officialOnline" />, color: "red" },
+        "4": { label: <CompetitionMessage name="competitionAdmin.offline" />, color: "orange" },
+        "5": { label: <CompetitionMessage name="competitionAdmin.online" />, color: "purple" },
       };
       const key = String(result.Genre);
       const { label, color, icon } = mp[key] ?? { label: "", color: "default" };
       return (
         <>
           <Tag color={color}>{label}</Tag>
-          {icon && <img src={icon} alt="icon" style={{ width: 16, marginRight: 8 }} />}
+          {icon && <img src={icon} alt="WCA" style={{ width: 16, marginRight: 8 }} />}
         </>
       );
     },
   },
   {
-    title: "名称",
+    title: <CompetitionMessage name="competitionAdmin.name" />,
     dataIndex: "Name",
     key: "Name",
     width: 360,
     render: (_text, result: Comp) => (
       <>
-        <NextLink href={`/competition/${result.id}`} style={{ color: "var(--ant-color-link)" }}>
+        <NextLink href={`/competition/${result.id}`} style={{ color: "var(--accent)" }}>
           {result.Name}
         </NextLink>
         {result.logo && (
           <img
             src={result.logo}
-            alt="logo"
+            alt={result.Name}
             style={{ width: "1em", height: "1em", marginLeft: "0.5em", verticalAlign: "middle" }}
           />
         )}
@@ -124,32 +130,32 @@ export const CompsTableColumns: ColumnsType<Comp> = [
     ),
   },
   {
-    title: "人数",
+    title: <CompetitionMessage name="competitionAdmin.players" />,
     dataIndex: "Count",
     key: "Count",
     width: 70,
   },
   {
-    title: "项目",
+    title: <CompetitionMessage name="competitionAdmin.event" />,
     dataIndex: "EventMin",
     key: "EventMin",
     width: 150,
     render: (text: string, result: Comp) => {
       const l = (text ?? "").split(";");
       if (!text) {
-        return <>暂无项目</>;
+        return <CompetitionMessage name="competitionAdmin.noEvents" />;
       }
       const body: React.ReactNode[] = [];
       for (let i = 0; i < l.length; i++) {
         body.push(
           <Fragment key={`${result.id}-event-${l[i]}-${i}`}>
-            {CubeIcon(l[i], `comp_icon_key${result.id}-${l[i]}`, { marginLeft: "3px" })}
+            <CompetitionEvent event={l[i]} iconOnly style={{ marginLeft: "3px" }} />
           </Fragment>,
         );
         if (l[i] === "") break;
         if (i >= 4) {
           body.push(
-            <Fragment key={`${result.id}-event-more`}> 等共{l.length - 1}个项目</Fragment>,
+            <Fragment key={`${result.id}-event-more`}><CompetitionMessage name="competitionAdmin.eventCount" params={{ count: l.length - 1 }} /></Fragment>,
           );
           break;
         }
@@ -158,13 +164,14 @@ export const CompsTableColumns: ColumnsType<Comp> = [
     },
   },
   {
-    title: "状态",
+    title: <CompetitionMessage name="competitionAdmin.status" />,
     dataIndex: "Status",
     key: "Status",
     width: 70,
     render: (_text, result: Comp) => {
       const status = getStatusProp(result);
-      return <Tag color={status.color}>{status.status}</Tag>;
+      const key = statusMessages[status.status as keyof typeof statusMessages];
+      return <Tag color={status.color}>{key ? <CompetitionMessage name={key} /> : status.status}</Tag>;
     },
   },
 ];

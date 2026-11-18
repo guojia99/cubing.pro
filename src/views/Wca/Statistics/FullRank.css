@@ -54,12 +54,12 @@
 .full-rank .attempts-cell .attempts-toggle {
   flex-shrink: 0;
   cursor: pointer;
-  color: rgba(0, 0, 0, 0.45);
+  color: var(--muted-foreground);
   font-size: 10px;
   padding: 2px 0;
 }
 .full-rank .attempts-cell .attempts-toggle:hover {
-  color: rgba(0, 0, 0, 0.85);
+  color: var(--foreground);
 }
 .full-rank .attempts-cell .attempts-single-line {
   flex: 1;

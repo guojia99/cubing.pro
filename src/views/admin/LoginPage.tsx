@@ -1,6 +1,7 @@
 "use client";
 
-import { Box, Button, Heading, Image, Text, VStack } from "@chakra-ui/react";
+import { Box, Button, Image } from "@chakra-ui/react";
+import { PageHeader, Surface } from "@/components/ui/page";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
@@ -39,30 +40,26 @@ export function LoginPage() {
       py="12"
       px="4"
     >
-      <VStack gap="6" maxW="md" textAlign="center">
+      <Surface display="flex" flexDirection="column" alignItems="center" gap="6" w="full" maxW="lg" p={{ base: "6", md: "10" }}>
         <Image
           src="/images/wca.svg"
           alt="WCA"
-          w="40"
-          h="40"
+          w="24"
+          h="24"
           objectFit="contain"
         />
-        <Heading size="lg" fontWeight="medium">
-          {t("auth.loginTitle")}
-        </Heading>
-        <Text color="fg.muted" fontSize="sm">
-          {t("auth.loginHint")}
-        </Text>
+        <PageHeader eyebrow="CUBING PRO" title={t("auth.loginTitle")} description={t("auth.loginHint")} />
         <Button
           size="lg"
-          colorPalette="green"
-          bg="signal.success"
-          _hover={{ bg: "accent.emphasis" }}
+          w="full"
+          bg="var(--accent)"
+          color="var(--accent-foreground)"
+          _hover={{ filter: "brightness(1.08)" }}
           onClick={handleWcaLogin}
         >
           {t("auth.loginButton")}
         </Button>
-      </VStack>
+      </Surface>
     </Box>
   );
 }

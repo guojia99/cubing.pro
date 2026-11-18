@@ -1,0 +1,45 @@
+.fr-workbench {
+  min-width: 0;
+  color: var(--foreground);
+  font-family: var(--font-body);
+}
+.fr-workbench > *, .fr-workbench .chakra-card__root, .fr-workbench .chakra-card__body { min-width: 0; }
+.fr-workbench .chakra-card__root,
+.fr-input-panel, .fr-tutorial > section {
+  background: var(--card);
+  border-radius: var(--radius-card, 1rem);
+  box-shadow: var(--shadow-card);
+}
+.fr-workbench .chakra-card__body { padding: clamp(16px, 2vw, 24px); }
+.fr-input-panel, .fr-tutorial > section { border: 1px solid var(--border-default); padding: clamp(16px, 2vw, 24px); }
+.fr-workbench :is(textarea, select, input:not([type="checkbox"]):not([type="radio"])) {
+  border-radius: 12px;
+  background: var(--background);
+  line-height: 1.8;
+}
+.fr-workbench textarea { padding: 14px 16px; }
+.fr-workbench button { border-radius: 10px; }
+.fr-workbench [data-scope="segment-group"][data-part="root"] { padding: 4px; max-width: 100%; border-radius: 12px; background: var(--muted); }
+.fr-workbench [data-scope="segment-group"][data-part="item"] { min-height: 40px; padding-inline: 16px; }
+.fr-workbench [data-scope="segment-group"][data-part="indicator"] { border-radius: 9px; box-shadow: var(--shadow-card); background: var(--card); }
+.fr-workbench [data-scope="segment-group"][data-part="item"][data-state="checked"] { color: var(--accent); }
+.fr-axis-card { overflow-wrap: anywhere; }
+.fr-axis-card[data-active="true"] { background: color-mix(in srgb, var(--accent) 4%, var(--card)); box-shadow: 0 0 0 1px var(--accent), var(--shadow-card); }
+.fr-axis-heading { flex-wrap: wrap; gap: 10px; }
+.fr-axis-select { font-family: var(--font-heading); text-align: left; color: inherit; font-weight: 700; font-size: 1.125rem; cursor: pointer; }
+.fr-tutorial > section > h2 { font-family: var(--font-heading); color: var(--foreground); font-size: 1.125rem; margin-bottom: 12px; }
+.fr-tutorial-step, .fr-tutorial-case, .fr-history-row { border-radius: 12px; border-color: var(--border-default); }
+.fr-tutorial-step, .fr-tutorial-case { padding: 16px; background: var(--background); }
+.fr-workbench :is(p, code) { overflow-wrap: anywhere; }
+.fr-help-dialog { border: 1px solid var(--border-default); border-radius: 24px; box-shadow: var(--shadow-float); background: var(--card); color: var(--foreground); font-family: var(--font-body); }
+.fr-help-dialog [data-part="header"] { border-bottom: 1px solid var(--border-default); }
+.fr-help-dialog [data-part="body"] { line-height: 1.8; }
+.fr-workbench :is(button, textarea, input):focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media (max-width: 640px) {
+  .fr-workbench [data-scope="segment-group"][data-part="item"] { padding-inline: 12px; }
+  .fr-workbench :is(textarea, select) { font-size: 16px; }
+  .fr-input-panel > [data-scope="stack"] { gap: 8px; }
+  .fr-workbench .fr-input-actions > button { flex: 1 1 auto; min-height: 44px; }
+  .fr-workbench .fr-input-actions > .chakra-spacer { display: none; }
+  .fr-help-dialog { max-width: calc(100vw - 20px); max-height: calc(100dvh - 24px); }
+}

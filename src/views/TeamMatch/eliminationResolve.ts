@@ -4,6 +4,7 @@ import {
 } from '@/views/TeamMatch/seedingMath';
 import type { TeamMatchSession } from '@/views/TeamMatch/types';
 import { BRACKET_TEAM_COUNT } from '@/views/TeamMatch/types';
+import type { TeamMatchKey } from './i18n';
 
 /**
  * 正赛 16 强 id：跳过预选赛或未定 elimination 时与成绩排名前 16 一致；
@@ -45,7 +46,7 @@ export type MainPoolDisplayRow = {
   /** 若进入正赛 16 强则为 1-based 名次 */
   mainBracketRank: number | null;
   /** 展示用标签（保送、小组赛晋级、轮空进池、预选赛淘汰、正赛16强、晋级池未出线 等） */
-  roleTags: string[];
+  roleTags: TeamMatchKey[];
 };
 
 /**
@@ -63,7 +64,7 @@ export function buildMainPoolDisplayRows(session: TeamMatchSession): MainPoolDis
   if (!elim || elim.skipped) {
     const mainSet = new Set(main16);
     return ranked.map((id, i) => {
-      const roleTags: string[] = mainSet.has(id) ? ['正赛16强'] : ['未进正赛16强'];
+      const roleTags: TeamMatchKey[] = mainSet.has(id) ? ['teamMatch.mainSixteen'] : ['teamMatch.outsideSixteen'];
       return {
         teamId: id,
         rankInList: i + 1,
@@ -103,17 +104,17 @@ export function buildMainPoolDisplayRows(session: TeamMatchSession): MainPoolDis
   ];
 
   return orderedIds.map((id) => {
-    const roleTags: string[] = [];
-    if (byeSet.has(id)) roleTags.push('保送');
-    if (naturalSet.has(id)) roleTags.push('轮空进池');
-    if (wonGroup.has(id)) roleTags.push('小组赛晋级');
-    if (eliminated.has(id)) roleTags.push('预选赛淘汰');
-    if (pendingGroup.has(id) && !wonGroup.has(id) && !eliminated.has(id)) roleTags.push('小组赛待定');
+    const roleTags: TeamMatchKey[] = [];
+    if (byeSet.has(id)) roleTags.push('teamMatch.directEntry');
+    if (naturalSet.has(id)) roleTags.push('teamMatch.naturalBye');
+    if (wonGroup.has(id)) roleTags.push('teamMatch.groupQualified');
+    if (eliminated.has(id)) roleTags.push('teamMatch.prelimEliminated');
+    if (pendingGroup.has(id) && !wonGroup.has(id) && !eliminated.has(id)) roleTags.push('teamMatch.groupPending');
     const inMain = mainRankById.has(id);
-    if (inMain) roleTags.push('正赛16强');
-    else if (poolSet.has(id) && !eliminated.has(id)) roleTags.push('晋级池未出线');
+    if (inMain) roleTags.push('teamMatch.mainSixteen');
+    else if (poolSet.has(id) && !eliminated.has(id)) roleTags.push('teamMatch.poolNotQualified');
 
-    if (roleTags.length === 0) roleTags.push('未编入预选赛');
+    if (roleTags.length === 0) roleTags.push('teamMatch.notInPrelim');
 
     return {
       teamId: id,

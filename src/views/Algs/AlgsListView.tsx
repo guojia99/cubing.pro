@@ -26,8 +26,11 @@ import { useRouter } from "next/navigation";
 
 import { UserCloudKvPanel } from "@/components/UserData/UserCloudKvPanel";
 import { toaster } from "@/components/ui/toaster";
+import { PageHeader } from "@/components/ui/page";
+import "./styles/algsUi.css";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useI18n } from "@/contexts/I18nProvider";
+import { translatePuzzleExtra as extra } from "@/i18n/messages/puzzle-extra";
 import {
   exportPracticeConfig,
   importPracticeConfig,
@@ -77,6 +80,9 @@ function AlgsSetCard({
       transition="all 0.2s ease"
       overflow="hidden"
       onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); onClick(); } }}
     >
       <Card.Body p="3">
         <VStack gap="2" align="stretch">
@@ -162,6 +168,9 @@ function ToolMiniCard({
       }
       transition="all 0.2s ease"
       onClick={onClick}
+      role={interactive ? "button" : undefined}
+      tabIndex={interactive ? 0 : undefined}
+      onKeyDown={interactive ? (event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); onClick?.(); } } : undefined}
     >
       <Card.Body p="4" display="flex" flexDirection="column" gap="3" h="full">
         <Text fontWeight="semibold" fontSize="sm" color="fg">
@@ -234,7 +243,8 @@ export function AlgsListView() {
       URL.revokeObjectURL(url);
       toaster.create({ title: t("algs.practiceConfig.exportSuccess"), type: "success" });
     } catch (error) {
-      toaster.create({ title: error instanceof Error ? error.message : "Export failed", type: "error" });
+      console.error("[AlgsListView] Practice config export failed", error);
+      toaster.create({ title: t("teamMatch.exportFailed"), type: "error" });
     }
   }, [t]);
 
@@ -276,10 +286,8 @@ export function AlgsListView() {
   }
 
   return (
-    <VStack align="stretch" gap="6">
-      <Heading size="xl" color="fg">
-        {t("algs.title")}
-      </Heading>
+    <VStack className="algs-library" align="stretch" gap="6">
+      <PageHeader title={t("algs.title")} />
 
       <Flex align="center" gap="3" flexWrap="wrap">
         <NativeSelect.Root maxW={{ base: "full", md: "220px" }} size="sm">
@@ -439,7 +447,7 @@ export function AlgsListView() {
                     <VStack align="stretch" gap="6">
                     {groups.map((group) => <Box key={group.id} as="section" data-algs-subcategory={cube === "222" ? group.id : undefined}>
                       {cube === "222" && <Heading as="h3" size="sm" mb="3" color="fg.muted">
-                        {group.label || (locale === "zh-CN" ? "其他" : "Other")}
+                        {group.label || extra(locale, "puzzleExtra.other")}
                       </Heading>}
                     <Grid templateColumns="repeat(auto-fill, minmax(min(180px, 100%), 1fr))" gap="4">
                       {group.items.map((item) => (
@@ -468,23 +476,6 @@ export function AlgsListView() {
         </>
       )}
 
-      <style jsx global>{`
-        @keyframes algsCardFloat {
-          0%,
-          100% {
-            transform: translateY(0);
-          }
-          50% {
-            transform: translateY(-2px);
-          }
-        }
-        .algs-card-float {
-          animation: algsCardFloat 3s ease-in-out infinite;
-        }
-        .algs-card-float:hover {
-          animation: none;
-        }
-      `}</style>
     </VStack>
   );
 }

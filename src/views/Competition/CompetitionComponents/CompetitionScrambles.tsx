@@ -7,7 +7,7 @@ import { NavTabs } from '@/components/Tabs/NavTabs';
 import { CompAPI } from '@/services/cubing-pro/comps/typings';
 import { apiEvents } from '@/services/cubing-pro/events/events';
 import { EventsAPI } from '@/services/cubing-pro/events/typings';
-import { Button, Grid, message, Select, Table, Tooltip } from 'antd';
+import { Alert, Button, Grid, message, Select, Table, Tooltip } from 'antd';
 import dynamic from 'next/dynamic';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
@@ -20,6 +20,7 @@ import {
   shouldHideScrambleImage,
 } from './scrambleSegments';
 import './CompetitionScrambles.css';
+import { useCompetitionPublicI18n } from '../i18n';
 
 import cstimer from 'cstimer_module';
 
@@ -53,11 +54,13 @@ const svgToPngUrl = (svg: string): Promise<string> => {
         URL.revokeObjectURL(svgUrl);
         resolve(pngBase64);
       } else {
-        reject('Canvas 2d context not available');
+        URL.revokeObjectURL(svgUrl);
+        reject(new Error('Canvas 2d context not available'));
       }
     };
     img.onerror = (error) => {
-      reject(`Error loading SVG image: ${error}`);
+      URL.revokeObjectURL(svgUrl);
+      reject(new Error(`Error loading SVG image: ${error}`));
     };
     img.src = svgUrl;
   });
@@ -69,22 +72,30 @@ interface ScrambleImageProps {
 }
 
 const ScrambleImage: React.FC<ScrambleImageProps> = ({ sc, ev }) => {
+  const { p } = useCompetitionPublicI18n();
   const [pngData, setPngData] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
   useEffect(() => {
-    const cstEv = cstImageMap.get(ev) ? cstImageMap.get(ev) : ev;
-    const svgString = cstimer.getImage(sc, cstEv);
-    svgToPngUrl(svgString).then((data) => {
-      setPngData(data);
-    });
+    let active = true;
+    setPngData(null);
+    setFailed(false);
+    void Promise.resolve().then(() => cstimer.getImage(sc, cstImageMap.get(ev) ?? ev))
+      .then(svgToPngUrl)
+      .then((data) => { if (active) setPngData(data); })
+      .catch((error) => {
+        console.error('Scramble diagram failed', error);
+        if (active) setFailed(true);
+      });
+    return () => { active = false; };
   }, [sc, ev]);
 
   if (!pngData) {
-    return <div className="scramble-image-loading">Loading...</div>;
+    return <div role="status" className="scramble-image-loading">{p(failed ? 'competitionPublic.diagramFailed' : 'competitionPublic.loadingDiagram')}</div>;
   }
 
   return (
     <div className={'svg-container'}>
-      <img src={pngData} alt={sc} />
+      <img src={pngData} alt={p('competitionPublic.diagramAlt', { scramble: sc })} />
     </div>
   );
 };
@@ -119,6 +130,7 @@ const ScrambleEventRounds: React.FC<ScrambleEventRoundsProps> = ({
   rowClassName,
   isCompact,
 }) => {
+  const { t, p } = useCompetitionPublicI18n();
   const [roundIndex, setRoundIndex] = useState(0);
   const [groupIndex, setGroupIndex] = useState(0);
 
@@ -146,10 +158,10 @@ const ScrambleEventRounds: React.FC<ScrambleEventRoundsProps> = ({
       <div className="scramble-mobile-list">
         {tb.map((row, idx) => (
           <div key={`${row.Index}-${idx}`} className="scramble-mobile-item">
-            <div className="scramble-mobile-item__index">序号：{row.Index}</div>
+            <div className="scramble-mobile-item__index">{t('competitionAdmin.index')}: {row.Index}</div>
             <div className={`scramble-pair-frame scramble-pair-frame--stack ${rowClassName(row)}`.trim()}>
               <div className="scramble-pair-frame__text">
-                <span className="scramble-pair-frame__label">打乱</span>
+                <span className="scramble-pair-frame__label">{t('competitionAdmin.scramble')}</span>
                 {row.Scramble}
               </div>
               <div className="scramble-pair-frame__image">{row.ScrambleImage}</div>
@@ -167,7 +179,7 @@ const ScrambleEventRounds: React.FC<ScrambleEventRoundsProps> = ({
         scroll={{ x: 'max-content' }}
         columns={[
           {
-            title: '序号',
+            title: t('competitionAdmin.index'),
             dataIndex: 'Index',
             key: 'index',
             width: 60,
@@ -175,7 +187,7 @@ const ScrambleEventRounds: React.FC<ScrambleEventRoundsProps> = ({
             onCell: () => ({ style: { verticalAlign: 'top' } }),
           },
           {
-            title: '打乱',
+            title: t('competitionAdmin.scramble'),
             key: 'scramblePair',
             minWidth: 400,
             onCell: () => ({ style: { verticalAlign: 'top' } }),
@@ -197,8 +209,9 @@ const ScrambleEventRounds: React.FC<ScrambleEventRoundsProps> = ({
         <div className="scramble-group-toolbar scramble-toolbar-combo">
           {showRoundSelect ? (
             <>
-              <span className="scramble-group-toolbar__label">赛程</span>
+              <span className="scramble-group-toolbar__label">{p('competitionPublic.schedule')}</span>
               <Select
+                aria-label={p('competitionPublic.schedule')}
                 className="scramble-group-toolbar__select"
                 value={safeRoundIdx}
                 onChange={setRoundIndex}
@@ -209,8 +222,9 @@ const ScrambleEventRounds: React.FC<ScrambleEventRoundsProps> = ({
           ) : null}
           {showGroupSelect ? (
             <>
-              <span className="scramble-group-toolbar__label scramble-toolbar-combo__gap">打乱组</span>
+              <span className="scramble-group-toolbar__label scramble-toolbar-combo__gap">{p('competitionPublic.scrambleGroup')}</span>
               <Select
+                aria-label={p('competitionPublic.scrambleGroup')}
                 className="scramble-group-toolbar__select"
                 value={safeGroupIdx}
                 onChange={setGroupIndex}
@@ -234,7 +248,10 @@ const ScrambleEventRounds: React.FC<ScrambleEventRoundsProps> = ({
 };
 
 const CompetitionScrambles: React.FC<CompetitionScramblesProps> = ({ comp }) => {
+  const { t, p, locale, round } = useCompetitionPublicI18n();
   const [baseEvents, setBaseEvents] = useState<EventsAPI.Event[]>([]);
+  const [eventsFailed, setEventsFailed] = useState(false);
+  const [eventsRequest, setEventsRequest] = useState(0);
   const [groupTimerOpen, setGroupTimerOpen] = useState(false);
   const [portalReady, setPortalReady] = useState(false);
   const pathname = usePathname() ?? '/';
@@ -274,10 +291,16 @@ const CompetitionScrambles: React.FC<CompetitionScramblesProps> = ({ comp }) => 
   }, []);
 
   useEffect(() => {
+    let active = true;
+    setEventsFailed(false);
     apiEvents().then((value) => {
-      setBaseEvents(value.data.Events);
+      if (active) setBaseEvents(value.data.Events);
+    }).catch((error) => {
+      console.error('Competition event data failed', error);
+      if (active) setEventsFailed(true);
     });
-  }, []);
+    return () => { active = false; };
+  }, [eventsRequest]);
 
   /** 登录回跳或地址栏带 groupTimer=1：打开群赛计时器；保留 groupTimer=1 直至关闭计时器 */
   useEffect(() => {
@@ -292,7 +315,7 @@ const CompetitionScrambles: React.FC<CompetitionScramblesProps> = ({ comp }) => 
     if (comp.data.IsDone) {
       sp.delete('groupTimer');
       router.replace(`${pathname}?${sp.toString()}`);
-      message.info('比赛已结束，群赛计时器不可用');
+      message.info(t('competitionAdmin.timerEnded'));
       return;
     }
     if (baseEvents.length === 0) {
@@ -307,9 +330,9 @@ const CompetitionScrambles: React.FC<CompetitionScramblesProps> = ({ comp }) => 
     if (needNav) {
       router.replace(`${pathname}?${sp.toString()}`);
     }
-  }, [comp, baseEvents.length, pathname, locationSearch, router]);
+  }, [comp, baseEvents.length, pathname, locationSearch, router, t]);
   if (!comp) {
-    return <p>没有找到比赛信息。</p>;
+    return <p>{t('competitionAdmin.noCompetition')}</p>;
   }
 
   const scrambleValue = (sc: string, compact: boolean) => {
@@ -456,7 +479,7 @@ const CompetitionScrambles: React.FC<CompetitionScramblesProps> = ({ comp }) => 
           continue;
         }
         groups.push({
-          label: '打乱组' + (j + 1),
+          label: p('competitionPublic.scrambleGroupNumber', { count: j + 1 }),
           tb: built,
         });
       }
@@ -467,13 +490,13 @@ const CompetitionScrambles: React.FC<CompetitionScramblesProps> = ({ comp }) => 
 
       scheduleRounds.push({
         roundKey: `${ev.EventID}-${i}-${sc.Round}`,
-        roundTitle: sc.Round,
+        roundTitle: round(sc.Round, sc.RoundNum || i + 1),
         groups,
       });
     }
 
     if (scheduleRounds.length === 0) {
-      return <>暂无打乱</>;
+      return <>{p('competitionPublic.noScrambles')}</>;
     }
 
     return (
@@ -496,14 +519,15 @@ const CompetitionScrambles: React.FC<CompetitionScramblesProps> = ({ comp }) => 
 
     items.push({
       key: 's_' + ev?.EventID,
-      label: <>{CubesCn(ev?.EventID)}</>,
+      label: <>{CubesCn(ev?.EventID, locale)}</>,
       children: <>{scrambleTable(ev)}</>,
-      icon: <>{CubeIcon(ev?.EventID, ev?.EventID, {})}</>,
+      icon: <>{CubeIcon(ev?.EventID, ev?.EventID, {}, locale)}</>,
     });
   }
 
   return (
     <>
+      {eventsFailed ? <Alert type="error" title={p('competitionPublic.eventsFailed')} action={<Button onClick={() => setEventsRequest((n) => n + 1)}>{t('competitionAdmin.retry')}</Button>} /> : null}
       <NavTabs
         type="line"
         items={items}
@@ -516,9 +540,9 @@ const CompetitionScrambles: React.FC<CompetitionScramblesProps> = ({ comp }) => 
               {(() => {
                 const groupTimerDisabled = baseEvents.length === 0 || comp.data.IsDone;
                 const tip = comp.data.IsDone
-                  ? '比赛已结束，无法使用群赛计时器'
+                  ? t('competitionAdmin.timerEnded')
                   : baseEvents.length === 0
-                    ? '项目数据加载中…'
+                    ? p(eventsFailed ? 'competitionPublic.eventsFailed' : 'competitionPublic.loadingEvents')
                     : undefined;
                 const openGroupTimer = () => {
                   const sp = new URLSearchParams(locationSearch);
@@ -534,7 +558,7 @@ const CompetitionScrambles: React.FC<CompetitionScramblesProps> = ({ comp }) => 
                     disabled={groupTimerDisabled}
                     onClick={openGroupTimer}
                   >
-                    群赛计时器
+                    {p('competitionPublic.groupTimer')}
                   </Button>
                 );
                 return tip ? (

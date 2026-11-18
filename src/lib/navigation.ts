@@ -3,14 +3,13 @@ import type { MessageKey } from "@/i18n";
 export interface NavLinkDef {
   labelKey: MessageKey;
   href?: string;
+  /** Related detail routes that live outside the navigation link's URL. */
+  activePaths?: string[];
   children?: NavLinkDef[];
 }
 
-export interface NavGroupDef {
+export interface NavGroupDef extends NavLinkDef {
   id: string;
-  labelKey: MessageKey;
-  href?: string;
-  children?: NavLinkDef[];
 }
 
 export const MAIN_NAV: NavGroupDef[] = [
@@ -19,21 +18,23 @@ export const MAIN_NAV: NavGroupDef[] = [
   {
     id: "group-competitions",
     labelKey: "nav.groupCompetitions",
+    activePaths: ["/group-competitions"],
     children: [
       { labelKey: "nav.gc.static", href: "/group-competitions/static" },
       { labelKey: "nav.gc.records", href: "/group-competitions/records" },
       { labelKey: "nav.gc.events", href: "/group-competitions/events" },
-      { labelKey: "nav.gc.competitions", href: "/group-competitions/competitions" },
-      { labelKey: "nav.gc.players", href: "/group-competitions/players" },
+      { labelKey: "nav.gc.competitions", href: "/group-competitions/competitions", activePaths: ["/competition"] },
+      { labelKey: "nav.gc.players", href: "/group-competitions/players", activePaths: ["/player"] },
       { labelKey: "nav.gc.pktimer", href: "/group-competitions/pktimer" },
     ],
   },
   {
     id: "wca",
     labelKey: "nav.wca",
+    activePaths: ["/wca"],
     children: [
       { labelKey: "nav.wca.comps", href: "/wca/wca-comps" },
-      { labelKey: "nav.wca.players", href: "/wca/players" },
+      { labelKey: "nav.wca.players", href: "/wca/players", activePaths: ["/wca/player"] },
       { labelKey: "nav.wca.statistics", href: "/wca/statistics" },
       { labelKey: "nav.wca.proportion", href: "/wca/proportion-estimation" },
     ],
@@ -41,6 +42,7 @@ export const MAIN_NAV: NavGroupDef[] = [
   {
     id: "tools",
     labelKey: "nav.tools",
+    activePaths: ["/tools", "/draw-tools", "/other"],
     children: [
       { labelKey: "nav.tools.teamMatch", href: "/tools/team-match" },
       { labelKey: "nav.tools.fr", href: "/tools/floppy-reduction" },
@@ -78,17 +80,16 @@ export const MAIN_NAV: NavGroupDef[] = [
 ];
 
 export function isNavLinkActive(pathname: string, item: NavLinkDef): boolean {
-  if (item.href) {
-    return pathname === item.href || pathname.startsWith(`${item.href}/`);
-  }
+  const path = pathname.replace(/\/+$/, "") || "/";
+  if (item.href === "/welcome" && path === "/") return true;
+  if ([item.href, ...(item.activePaths ?? [])].some((href) =>
+    href && (path === href || (href !== "/" && path.startsWith(`${href}/`))),
+  )) return true;
   return item.children?.some((child) => isNavLinkActive(pathname, child)) ?? false;
 }
 
 export function isNavGroupActive(pathname: string, group: NavGroupDef): boolean {
-  if (group.href) {
-    return pathname === group.href || pathname.startsWith(`${group.href}/`);
-  }
-  return group.children?.some((item) => isNavLinkActive(pathname, item)) ?? false;
+  return isNavLinkActive(pathname, group);
 }
 
 export function buildMainNav(): NavGroupDef[] {

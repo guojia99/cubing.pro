@@ -1,5 +1,6 @@
 import { CubesCn } from '@/components/CubeIcon/cube';
-import { eventOrder, roundNameMap } from '@/views/Wca/utils/events';
+import { eventOrder, formatRoundName } from '@/views/Wca/utils/events';
+import { readStoredLocale, type Locale } from '@/i18n/locales';
 import { resultsTimeFormat } from '@/views/Wca/utils/wca_results';
 import { findCubingCompetitionByIdentifier } from '@/services/cubing-pro/cubing_china/cubing';
 import { WCACompetition, WcaProfile, WCAResult } from '@/services/cubing-pro/wca/types';
@@ -157,6 +158,7 @@ export function createFirst333AverageSub10Milestone(
   results: WCAResult[],
   compMap: Map<string, WCACompetition>,
   formatMessage: FormatMessageFn,
+  locale: Locale = readStoredLocale(),
 ): Milestone[] {
   const r333 = results.filter((r) => r.event_id === '333');
   if (r333.length === 0) return [];
@@ -176,7 +178,7 @@ export function createFirst333AverageSub10Milestone(
     const res = sorted[i];
     const c = compMap.get(res.competition_id);
     if (!c) continue;
-    const roundLabel = roundNameMap[res.round_type_id] ?? res.round_type_id;
+    const roundLabel = formatRoundName(res.round_type_id, locale);
     const avgStr =
       res.average > 0
         ? resultsTimeFormat(res.average, '333', true)
@@ -504,6 +506,7 @@ export function createSignificantImprovementMilestones(
   compMap: Map<string, WCACompetition>,
   improvementNumber: number = 33,
   formatMessage: FormatMessageFn,
+  locale: Locale = readStoredLocale(),
 ): Milestone[] {
   // 临时存储：key = `${competition_id}-${event_id}`
   const tempMap = new Map<string, {
@@ -598,7 +601,7 @@ export function createSignificantImprovementMilestones(
       description = formatMessage(
         { id: 'wca.milestone.desc.improvement_both' },
         {
-          event: CubesCn(eventId),
+          event: CubesCn(eventId, locale),
           singlePercent: single.percent.toFixed(2),
           avgPercent: average.percent.toFixed(2),
         },
@@ -616,7 +619,7 @@ export function createSignificantImprovementMilestones(
     } else if (single) {
       description = formatMessage(
         { id: 'wca.milestone.desc.improvement_single' },
-        { event: CubesCn(eventId), percent: single.percent.toFixed(2) },
+        { event: CubesCn(eventId, locale), percent: single.percent.toFixed(2) },
       );
       old_best_time = single.old;
       new_best_time = single.new;
@@ -626,7 +629,7 @@ export function createSignificantImprovementMilestones(
     } else if (average) {
       description = formatMessage(
         { id: 'wca.milestone.desc.improvement_avg' },
-        { event: CubesCn(eventId), percent: average.percent.toFixed(2) },
+        { event: CubesCn(eventId, locale), percent: average.percent.toFixed(2) },
       );
       old_best_time = average.old;
       new_best_time = average.new;
@@ -781,6 +784,7 @@ export function createFirstBlindfoldedSuccessMilestones(
   results: WCAResult[],
   compMap: Map<string, WCACompetition>,
   formatMessage: FormatMessageFn,
+  locale: Locale = readStoredLocale(),
 ): Milestone[] {
   // 记录每个 event 的首次 single/average 信息
   const firstRecords: Record<
@@ -845,7 +849,7 @@ export function createFirstBlindfoldedSuccessMilestones(
         description: formatMessage(
           { id: 'wca.milestone.desc.bld_single' },
           {
-            event: CubesCn(eventId),
+            event: CubesCn(eventId, locale),
             time: resultsTimeFormat(single.result, eventId, false),
           },
         ),
@@ -864,7 +868,7 @@ export function createFirstBlindfoldedSuccessMilestones(
         description: formatMessage(
           { id: 'wca.milestone.desc.bld_avg' },
           {
-            event: CubesCn(eventId),
+            event: CubesCn(eventId, locale),
             time: resultsTimeFormat(average.result, eventId, true),
           },
         ),
@@ -884,7 +888,7 @@ export function createFirstBlindfoldedSuccessMilestones(
         description: formatMessage(
           { id: 'wca.milestone.desc.bld_both' },
           {
-            event: CubesCn(eventId),
+            event: CubesCn(eventId, locale),
             singleTime: resultsTimeFormat(single.result, eventId, false),
             avgTime: resultsTimeFormat(average.result, eventId, true),
           },
@@ -937,6 +941,7 @@ export function createFirstPodiumMilestones(
   results: WCAResult[],
   compMap: Map<string, WCACompetition>,
   formatMessage: FormatMessageFn,
+  locale: Locale = readStoredLocale(),
 ): Milestone[] {
   const milestones: Milestone[] = [];
   const firstPodiumAchieved = new Set<string>(); // 首次领奖台成就
@@ -973,7 +978,7 @@ export function createFirstPodiumMilestones(
         type: 'first_podium',
         description: formatMessage(
           { id: 'wca.milestone.desc.podium_gold' },
-          { result: resultStr, event: CubesCn(eventId) },
+          { result: resultStr, event: CubesCn(eventId, locale) },
         ),
         event_id: eventId,
         competition_id: res.competition_id,
@@ -990,7 +995,7 @@ export function createFirstPodiumMilestones(
         type: 'first_podium',
         description: formatMessage(
           { id: 'wca.milestone.desc.podium_other' },
-          { result: resultStr, event: CubesCn(eventId) },
+          { result: resultStr, event: CubesCn(eventId, locale) },
         ),
         event_id: eventId,
         competition_id: res.competition_id,
@@ -1008,6 +1013,7 @@ export function createRecordBreakerMilestones(
   results: WCAResult[],
   compMap: Map<string, WCACompetition>,
   formatMessage: FormatMessageFn,
+  locale: Locale = readStoredLocale(),
 ): Milestone[] {
   const milestones: Milestone[] = [];
 
@@ -1021,7 +1027,7 @@ export function createRecordBreakerMilestones(
         description: formatMessage(
           { id: 'wca.milestone.desc.record_single' },
           {
-            event: CubesCn(res.event_id),
+            event: CubesCn(res.event_id, locale),
             time: resultsTimeFormat(res.best, res.event_id, false),
             record: res.regional_single_record,
           },
@@ -1039,7 +1045,7 @@ export function createRecordBreakerMilestones(
         description: formatMessage(
           { id: 'wca.milestone.desc.record_avg' },
           {
-            event: CubesCn(res.event_id),
+            event: CubesCn(res.event_id, locale),
             time: resultsTimeFormat(res.average, res.event_id, false),
             record: res.regional_average_record,
           },
@@ -1062,6 +1068,7 @@ export function GetMilestones(
   comps: WCACompetition[],
   improvementNumber: number = 33,
   formatMessage: FormatMessageFn,
+  locale: Locale = readStoredLocale(),
 ): Milestone[] {
   if (comps.length === 0) return [];
 
@@ -1099,26 +1106,26 @@ export function GetMilestones(
 
   // 3. 成绩突破
   milestones.push(
-    ...createSignificantImprovementMilestones(wcaResultMap, compMap, improvementNumber, formatMessage),
+    ...createSignificantImprovementMilestones(wcaResultMap, compMap, improvementNumber, formatMessage, locale),
   );
 
   // 4. 全项目达成（原大满贯：全官方项目序列内按要求集齐首次成绩）
   milestones.push(...createGrandSlamMilestone(wcaResults, compMap, formatMessage));
 
   // 5. 盲拧有效成绩
-  milestones.push(...createFirstBlindfoldedSuccessMilestones(wcaResults, compMap, formatMessage));
+  milestones.push(...createFirstBlindfoldedSuccessMilestones(wcaResults, compMap, formatMessage, locale));
 
   // 6. 回归
   milestones.push(...createComebackMilestone(sortedComps, formatMessage));
 
   // 7. 首次领奖台
-  milestones.push(...createFirstPodiumMilestones(sortedResults, compMap, formatMessage));
+  milestones.push(...createFirstPodiumMilestones(sortedResults, compMap, formatMessage, locale));
 
   // 8. 记录
-  milestones.push(...createRecordBreakerMilestones(sortedResults, compMap, formatMessage));
+  milestones.push(...createRecordBreakerMilestones(sortedResults, compMap, formatMessage, locale));
 
   // 9. 首次三阶平均 sub-10（附此前各轮次）
-  milestones.push(...createFirst333AverageSub10Milestone(wcaResults, compMap, formatMessage));
+  milestones.push(...createFirst333AverageSub10Milestone(wcaResults, compMap, formatMessage, locale));
 
   // 10. 首次单届 ≥3 领奖台
   milestones.push(

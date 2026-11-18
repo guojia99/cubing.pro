@@ -2,14 +2,22 @@
  * 统计排行子页：antd Card 包裹筛选区 / 表格区时的布局与移动端适配
  */
 .stats-rank-filter-card {
-  margin-bottom: 16px;
+  margin-bottom: 24px;
+  background: var(--muted);
+  border-radius: var(--radius-card);
+  border-color: var(--border-default);
 }
 .stats-rank-filter-card .ant-card-body {
-  padding: 12px 16px;
+  padding: 20px;
 }
 .stats-rank-table-card .ant-card-body {
-  padding: 16px;
+  padding: 20px;
 }
+.stats-rank-table-card { background: var(--card); border-radius: var(--radius-card); border-color: var(--border-default); box-shadow: var(--shadow-card); }
+.wca-page .stats-rank-filter-card { background: var(--muted); box-shadow: none; }
+.stats-rank-filter-card .filter-row { gap: 16px; }
+.stats-rank-filter-card .filter-label { color: var(--muted-foreground); }
+.stats-rank-filter-card .filter-item { min-width: 0; flex-wrap: wrap; }
 .stats-rank-table-card .table-wrapper {
   width: 100%;
 }

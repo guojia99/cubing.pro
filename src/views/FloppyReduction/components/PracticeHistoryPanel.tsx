@@ -29,7 +29,7 @@ const AXIS_LABEL: Record<AxisKey, string> = {
 };
 
 function formatTime(ts: number, locale: string): string {
-  return new Date(ts).toLocaleString(locale === "zh-CN" ? "zh-CN" : "en-US", {
+  return new Date(ts).toLocaleString(locale, {
     month: "short",
     day: "numeric",
     hour: "2-digit",
@@ -42,6 +42,7 @@ function HistoryRow({ record, locale }: { record: FrPracticeRecord; locale: stri
 
   return (
     <Box
+      className="fr-history-row"
       borderWidth="1px"
       borderColor={FR_COLORS.border}
       borderRadius="md"

@@ -9,6 +9,8 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useI18n } from "@/contexts/I18nProvider";
+import { getSiteContent } from "@/i18n/messages/site-content";
 
 import { FOOD_FONT_SIZE } from "./foodTokens";
 
@@ -43,6 +45,8 @@ export function RandomPickModal<T>({
   filterSlot,
   onResult,
 }: RandomPickModalProps<T>) {
+  const { locale } = useI18n();
+  const sc = getSiteContent(locale);
   const [phase, setPhase] = useState<"filter" | "spinning" | "result">("filter");
   const [displayName, setDisplayName] = useState("");
   const [resultItem, setResultItem] = useState<T | null>(null);
@@ -103,7 +107,7 @@ export function RandomPickModal<T>({
       <Portal>
         <Dialog.Backdrop />
         <Dialog.Positioner>
-          <Dialog.Content>
+          <Dialog.Content mx="4" borderRadius="var(--radius-card)" boxShadow="var(--shadow-float)" maxH="calc(100dvh - 32px)" overflowY="auto">
             <Dialog.Header>
               <Dialog.Title>{title}</Dialog.Title>
             </Dialog.Header>
@@ -121,11 +125,11 @@ export function RandomPickModal<T>({
                     onClick={startSpin}
                     disabled={items.length === 0}
                   >
-                    开始随机
+                    {sc("siteContent.random")}
                   </Button>
                 </VStack>
               ) : (
-                <Box className="random-pick-result">
+                <Box className="random-pick-result" role="status" aria-live={phase === "result" ? "polite" : "off"}>
                   <Box
                     className={`random-pick-name ${phase === "spinning" ? "spinning" : ""}`}
                     fontSize="2xl"
@@ -140,7 +144,7 @@ export function RandomPickModal<T>({
                   {phase === "result" && resultItem ? (
                     <Box display="flex" gap="3" justifyContent="center" flexWrap="wrap">
                       <Button variant="outline" fontSize={FOOD_FONT_SIZE} onClick={() => setPhase("filter")}>
-                        再选一次
+                        {sc("siteContent.again")}
                       </Button>
                       <Button
                         colorPalette="brand"

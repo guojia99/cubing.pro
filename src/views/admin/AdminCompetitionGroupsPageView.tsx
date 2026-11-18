@@ -1,8 +1,12 @@
 "use client";
+import { useI18n } from "@/contexts/I18nProvider";
+import { useAdminManagement } from "@/views/admin/useAdminManagement";
 
 import "antd/dist/reset.css";
 
-import { Heading, VStack } from "@chakra-ui/react";
+import { VStack } from "@chakra-ui/react";
+import { PageHeader } from "@/components/ui/page";
+import "./admin-ui.css";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import {
   Button,
@@ -60,6 +64,8 @@ function groupFormInitialValues(group: AdminCompetitionGroup) {
 }
 
 export function AdminCompetitionGroupsPageView() {
+  const { t, tf } = useI18n();
+  const m = useAdminManagement();
   const [orgOptions, setOrgOptions] = useState<{ label: string; value: number }[]>([]);
   const [orgLoading, setOrgLoading] = useState(false);
   const [selectedOrgId, setSelectedOrgId] = useState<number | undefined>();
@@ -84,7 +90,7 @@ export function AdminCompetitionGroupsPageView() {
         const res = await apiAdminOrganizersList({ page: 1, size: 100 });
         setOrgOptions(
           res.items.map((o) => ({
-            label: `${o.Name}（id: ${o.id}）`,
+            label: o.Name,
             value: o.id,
           })),
         );
@@ -115,7 +121,7 @@ export function AdminCompetitionGroupsPageView() {
     setSubmitLoading(true);
     try {
       await apiAdminDeleteGroup(g.id);
-      void message.success("已删除");
+      void message.success(m("adminManagement.deleted"));
       void loadGroups();
     } finally {
       setSubmitLoading(false);
@@ -124,9 +130,9 @@ export function AdminCompetitionGroupsPageView() {
 
   const columns: ColumnsType<AdminCompetitionGroup> = [
     { title: "ID", dataIndex: "id", width: 72 },
-    { title: "名称", dataIndex: "name", ellipsis: true },
+    { title: t("competitionAdmin.name"), dataIndex: "name", ellipsis: true },
     {
-      title: "QQ 群",
+      title: t("competitionAdmin.qqGroup"),
       ellipsis: true,
       render: (_, r) => asStringList(r.qq_groups).join("、") || "—",
     },
@@ -136,12 +142,12 @@ export function AdminCompetitionGroupsPageView() {
       render: (_, r) => asStringList(r.qq_group_uid).join("、") || "—",
     },
     {
-      title: "微信群",
+      title: m("adminManagement.wechatGroups"),
       ellipsis: true,
       render: (_, r) => asStringList(r.wechat_groups).join("、") || "—",
     },
     {
-      title: "操作",
+      title: t("teamMatch.actions"),
       width: 160,
       render: (_, r) => (
         <Space>
@@ -151,11 +157,11 @@ export function AdminCompetitionGroupsPageView() {
             icon={<EditOutlined />}
             onClick={() => setGroupModal({ mode: "edit", group: r })}
           >
-            编辑
+            {t("teamMatch.edit")}
           </Button>
-          <Popconfirm title="确定删除该群组？" onConfirm={() => void deleteGroup(r)}>
+          <Popconfirm title={m("adminManagement.deleteCompetitionGroup")} onConfirm={() => void deleteGroup(r)}>
             <Button type="link" size="small" danger icon={<DeleteOutlined />}>
-              删除
+              {t("teamMatch.delete")}
             </Button>
           </Popconfirm>
         </Space>
@@ -181,14 +187,14 @@ export function AdminCompetitionGroupsPageView() {
     try {
       if (groupModal?.mode === "create") {
         if (groupTotal >= MAX_GROUPS_PER_ORG) {
-          void message.error(`每个主办团队最多 ${MAX_GROUPS_PER_ORG} 个比赛群组`);
+          void message.error(m("adminManagement.groupsLimit", { count: MAX_GROUPS_PER_ORG }));
           return;
         }
         await apiAdminCreateGroup(selectedOrgId, body);
-        void message.success("已创建");
+        void message.success(m("adminManagement.created"));
       } else if (groupModal?.group) {
         await apiAdminUpdateGroup(groupModal.group.id, body);
-        void message.success("已更新");
+        void message.success(m("adminManagement.updated"));
       }
       setGroupModal(null);
       void loadGroups();
@@ -204,18 +210,21 @@ export function AdminCompetitionGroupsPageView() {
 
   return (
     <AdminGuard>
-      <VStack align="stretch" gap="6">
-        <Heading size="xl">比赛群组管理</Heading>
+      <VStack className="admin-page" align="stretch" gap="6">
+        <PageHeader eyebrow={t("nav.admin.admins")} title={m("adminManagement.groupsTitle")} />
         <Space orientation="vertical" style={{ width: "100%" }} size="middle">
-          <Space wrap>
-            <span>选择主办团队：</span>
+          <Space wrap className="admin-toolbar" style={{ width: "100%" }}>
+            <span>{m("adminManagement.chooseOrganizer")}</span>
             <Select
               showSearch
               optionFilterProp="label"
               loading={orgLoading}
-              placeholder="请选择"
-              style={{ minWidth: 320 }}
-              options={orgOptions}
+              placeholder={m("adminManagement.select")}
+              style={{ width: "min(320px, 65vw)" }}
+              options={orgOptions.map((option) => ({
+                ...option,
+                label: tf("finishing.organizerOption", { name: option.label, id: option.value }),
+              }))}
               value={selectedOrgId}
               onChange={(v) => {
                 setSelectedOrgId(v);
@@ -227,7 +236,7 @@ export function AdminCompetitionGroupsPageView() {
 
           {!selectedOrgId ? (
             <div style={{ color: "var(--faint-foreground)" }}>
-              请先选择主办团队以查看与管理该团队下的比赛群组。
+              {m("adminManagement.chooseOrganizerHint")}
             </div>
           ) : (
             <>
@@ -238,10 +247,11 @@ export function AdminCompetitionGroupsPageView() {
                   disabled={groupTotal >= MAX_GROUPS_PER_ORG}
                   onClick={() => setGroupModal({ mode: "create" })}
                 >
-                  新建群组
+                  {m("adminManagement.newGroup")}
                 </Button>
               </div>
               <Table<AdminCompetitionGroup>
+                scroll={{ x: "max-content" }}
                 rowKey="id"
                 columns={columns}
                 dataSource={groups}
@@ -259,7 +269,7 @@ export function AdminCompetitionGroupsPageView() {
         </Space>
 
         <Modal
-          title={groupModal?.mode === "edit" ? "编辑比赛群组" : "新建比赛群组"}
+          title={groupModal?.mode === "edit" ? m("adminManagement.editCompetitionGroup") : m("adminManagement.createCompetitionGroup")}
           open={!!groupModal}
           onCancel={() => setGroupModal(null)}
           onOk={() => void submitGroup()}
@@ -278,17 +288,17 @@ export function AdminCompetitionGroupsPageView() {
                   : undefined
               }
             >
-              <Form.Item name="name" label="群组名称" rules={[{ required: true }]}>
+              <Form.Item name="name" label={m("adminManagement.groupName")} rules={[{ required: true, message: m("adminManagement.nameRequired") }]}>
                 <Input />
               </Form.Item>
-              <Form.Item name="qq_groups" label="QQ 群号">
-                <Select mode="tags" placeholder="输入后回车" tokenSeparators={[","]} />
+              <Form.Item name="qq_groups" label={m("adminManagement.qqGroupNumbers")}>
+                <Select mode="tags" placeholder={m("adminManagement.enterTags")} tokenSeparators={[","]} />
               </Form.Item>
-              <Form.Item name="qq_group_uid" label="QQ 群 UID">
-                <Select mode="tags" placeholder="输入后回车" tokenSeparators={[","]} />
+              <Form.Item name="qq_group_uid" label={m("adminManagement.qqGroupUid")}>
+                <Select mode="tags" placeholder={m("adminManagement.enterTags")} tokenSeparators={[","]} />
               </Form.Item>
-              <Form.Item name="wechat_groups" label="微信群">
-                <Select mode="tags" placeholder="输入后回车" tokenSeparators={[","]} />
+              <Form.Item name="wechat_groups" label={m("adminManagement.wechatGroups")}>
+                <Select mode="tags" placeholder={m("adminManagement.enterTags")} tokenSeparators={[","]} />
               </Form.Item>
             </Form>
           ) : null}

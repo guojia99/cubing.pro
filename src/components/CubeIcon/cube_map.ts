@@ -1,3 +1,6 @@
+import { CubesCn } from './cube';
+import { readStoredLocale, type Locale } from '@/i18n/locales';
+
 // Cubes Map Start
 export enum Cubes {
   // 特殊
@@ -36,7 +39,7 @@ export enum Cubes {
 // Cubes Map End
 export type CubesAttributes = {
   Cubes: Cubes; // 项目
-  Cn: string; // 中文名
+  Cn: string; // Legacy display-name field, localized at access time.
   DrawSeq: boolean; // 是否展示公式
   DrawSize: number; // 绘制打乱列表图像阶数，目前只有正阶用到了
   SeqNumber: number; // 打乱数
@@ -49,7 +52,7 @@ export const CubesAttributesList: CubesAttributes[] = [
   // WCA正阶
   {
     Cubes: Cubes.Cube333,
-    Cn: '三阶',
+    get Cn() { return CubesCn(this.Cubes); },
     DrawSize: 3,
     SeqNumber: 5,
     SpareSeqNumber: 2,
@@ -58,7 +61,7 @@ export const CubesAttributesList: CubesAttributes[] = [
   },
   {
     Cubes: Cubes.Cube222,
-    Cn: '二阶',
+    get Cn() { return CubesCn(this.Cubes); },
     DrawSize: 2,
     SeqNumber: 5,
     SpareSeqNumber: 2,
@@ -67,7 +70,7 @@ export const CubesAttributesList: CubesAttributes[] = [
   },
   {
     Cubes: Cubes.Cube444,
-    Cn: '四阶',
+    get Cn() { return CubesCn(this.Cubes); },
     DrawSize: 4,
     SeqNumber: 5,
     SpareSeqNumber: 2,
@@ -76,7 +79,7 @@ export const CubesAttributesList: CubesAttributes[] = [
   },
   {
     Cubes: Cubes.Cube555,
-    Cn: '五阶',
+    get Cn() { return CubesCn(this.Cubes); },
     DrawSize: 5,
     SeqNumber: 5,
     SpareSeqNumber: 2,
@@ -85,7 +88,7 @@ export const CubesAttributesList: CubesAttributes[] = [
   },
   {
     Cubes: Cubes.Cube666,
-    Cn: '六阶',
+    get Cn() { return CubesCn(this.Cubes); },
     DrawSize: 6,
     SeqNumber: 3,
     SpareSeqNumber: 2,
@@ -94,7 +97,7 @@ export const CubesAttributesList: CubesAttributes[] = [
   },
   {
     Cubes: Cubes.Cube777,
-    Cn: '七阶',
+    get Cn() { return CubesCn(this.Cubes); },
     DrawSize: 7,
     SeqNumber: 3,
     SpareSeqNumber: 2,
@@ -103,7 +106,7 @@ export const CubesAttributesList: CubesAttributes[] = [
   },
   {
     Cubes: Cubes.CubeSk,
-    Cn: '斜转',
+    get Cn() { return CubesCn(this.Cubes); },
     DrawSize: 0,
     SeqNumber: 5,
     SpareSeqNumber: 2,
@@ -112,7 +115,7 @@ export const CubesAttributesList: CubesAttributes[] = [
   },
   {
     Cubes: Cubes.CubePy,
-    Cn: '金字塔',
+    get Cn() { return CubesCn(this.Cubes); },
     DrawSize: 0,
     SeqNumber: 5,
     SpareSeqNumber: 2,
@@ -121,7 +124,7 @@ export const CubesAttributesList: CubesAttributes[] = [
   },
   {
     Cubes: Cubes.CubeSq1,
-    Cn: 'SQ1',
+    get Cn() { return CubesCn(this.Cubes); },
     DrawSize: 0,
     SeqNumber: 5,
     SpareSeqNumber: 2,
@@ -130,7 +133,7 @@ export const CubesAttributesList: CubesAttributes[] = [
   },
   {
     Cubes: Cubes.CubeMinx,
-    Cn: '五魔方',
+    get Cn() { return CubesCn(this.Cubes); },
     DrawSize: 0,
     SeqNumber: 5,
     SpareSeqNumber: 2,
@@ -139,7 +142,7 @@ export const CubesAttributesList: CubesAttributes[] = [
   },
   {
     Cubes: Cubes.CubeMegaminx,
-    Cn: '五魔',
+    get Cn() { return CubesCn(this.Cubes); },
     DrawSize: 0,
     SeqNumber: 5,
     SpareSeqNumber: 2,
@@ -148,7 +151,7 @@ export const CubesAttributesList: CubesAttributes[] = [
   },
   {
     Cubes: Cubes.CubeClock,
-    Cn: '魔表',
+    get Cn() { return CubesCn(this.Cubes); },
     DrawSize: 0,
     SeqNumber: 5,
     SpareSeqNumber: 2,
@@ -157,7 +160,7 @@ export const CubesAttributesList: CubesAttributes[] = [
   },
   {
     Cubes: Cubes.Cube333OH,
-    Cn: '单手',
+    get Cn() { return CubesCn(this.Cubes); },
     DrawSize: 3,
     SeqNumber: 5,
     SpareSeqNumber: 2,
@@ -166,7 +169,7 @@ export const CubesAttributesList: CubesAttributes[] = [
   },
   {
     Cubes: Cubes.Cube333FM,
-    Cn: '最少步',
+    get Cn() { return CubesCn(this.Cubes); },
     DrawSize: 3,
     SeqNumber: 3,
     SpareSeqNumber: 0,
@@ -175,7 +178,7 @@ export const CubesAttributesList: CubesAttributes[] = [
   },
   {
     Cubes: Cubes.Cube333BF,
-    Cn: '三盲',
+    get Cn() { return CubesCn(this.Cubes); },
     DrawSize: 3,
     SeqNumber: 5,
     SpareSeqNumber: 2,
@@ -184,7 +187,7 @@ export const CubesAttributesList: CubesAttributes[] = [
   },
   {
     Cubes: Cubes.Cube444BF,
-    Cn: '四盲',
+    get Cn() { return CubesCn(this.Cubes); },
     DrawSize: 4,
     SeqNumber: 3,
     SpareSeqNumber: 2,
@@ -193,7 +196,7 @@ export const CubesAttributesList: CubesAttributes[] = [
   },
   {
     Cubes: Cubes.Cube555BF,
-    Cn: '五盲',
+    get Cn() { return CubesCn(this.Cubes); },
     DrawSize: 5,
     SeqNumber: 3,
     SpareSeqNumber: 2,
@@ -202,7 +205,7 @@ export const CubesAttributesList: CubesAttributes[] = [
   },
   {
     Cubes: Cubes.Cube333MBF,
-    Cn: '多盲',
+    get Cn() { return CubesCn(this.Cubes); },
     DrawSize: 3,
     SeqNumber: 0, // 0 代表没有上限
     SpareSeqNumber: 0,
@@ -213,7 +216,7 @@ export const CubesAttributesList: CubesAttributes[] = [
   // -
   {
     Cubes: Cubes.Cube333Ft,
-    Cn: '脚拧',
+    get Cn() { return CubesCn(this.Cubes); },
     DrawSize: 3,
     SeqNumber: 5,
     SpareSeqNumber: 2,
@@ -222,7 +225,7 @@ export const CubesAttributesList: CubesAttributes[] = [
   },
   {
     Cubes: Cubes.CubeFTO,
-    Cn: 'FTO',
+    get Cn() { return CubesCn(this.Cubes); },
     DrawSize: 3,
     SeqNumber: 5,
     SpareSeqNumber: 2,
@@ -231,7 +234,7 @@ export const CubesAttributesList: CubesAttributes[] = [
   },
   {
     Cubes: Cubes.XCube333MBFUnlimited,
-    Cn: '无限多盲',
+    get Cn() { return CubesCn(this.Cubes); },
     DrawSize: 3,
     SeqNumber: 999,
     SpareSeqNumber: 999,
@@ -240,7 +243,7 @@ export const CubesAttributesList: CubesAttributes[] = [
   },
   {
     Cubes: Cubes.XCube27Relay,
-    Cn: '正阶连拧',
+    get Cn() { return CubesCn(this.Cubes); },
     DrawSize: 0,
     SeqNumber: 6,
     SpareSeqNumber: 6,
@@ -249,7 +252,7 @@ export const CubesAttributesList: CubesAttributes[] = [
   },
   {
     Cubes: Cubes.XCubeAlienRelay,
-    Cn: '异形连拧',
+    get Cn() { return CubesCn(this.Cubes); },
     DrawSize: 0,
     SeqNumber: 5, //  塔 斜 表 五 SQ1
     SpareSeqNumber: 5,
@@ -260,7 +263,7 @@ export const CubesAttributesList: CubesAttributes[] = [
     // 除 最少步 / 盲 外的所有项目
     // 按 234567 单 塔斜表五SQ1  排序
     Cubes: Cubes.XCube27AlienRelayAll,
-    Cn: '全项目连拧',
+    get Cn() { return CubesCn(this.Cubes); },
     DrawSize: 0,
     SeqNumber: 12,
     SpareSeqNumber: 12,
@@ -279,3 +282,7 @@ const cubesAttributesMapFn = (): Map<Cubes, CubesAttributes> => {
 };
 
 export const CubesAttributesMap: Map<string, CubesAttributes> = cubesAttributesMapFn();
+
+export function getCubesAttributes(locale: Locale = readStoredLocale()): CubesAttributes[] {
+  return CubesAttributesList.map(attributes => ({ ...attributes, Cn: CubesCn(attributes.Cubes, locale) }));
+}

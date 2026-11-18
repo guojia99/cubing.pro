@@ -1,8 +1,10 @@
 import type { CSSProperties } from "react";
+import { CubesCn } from './cube';
+import { readStoredLocale, type Locale } from '@/i18n/locales';
 
 import "./cube_icon.css";
 
-export const CubeIcon = (c: string, key: string, styles: CSSProperties) => {
+export const CubeIcon = (c: string, key: string, styles: CSSProperties, locale: Locale = readStoredLocale()) => {
   if (c === '' || c === undefined) {
     return <span aria-hidden />;
   }
@@ -22,7 +24,8 @@ export const CubeIcon = (c: string, key: string, styles: CSSProperties) => {
       className={'cubing-icon ' + name}
       data-toggle="tooltip"
       data-placement="top"
-      title={cc}
+      title={CubesCn(c, locale)}
+      aria-label={CubesCn(c, locale)}
       style={{
         ...styles,
         display: 'inline-block',

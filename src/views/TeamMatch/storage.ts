@@ -1,5 +1,6 @@
 import type { ArchivedSessionMeta, TeamMatchSession, TeamMatchStorageRoot } from '@/views/TeamMatch/types';
 import { HISTORY_LIMIT, STORAGE_KEY } from '@/views/TeamMatch/types';
+import { tm, type TeamMatchLocale } from './i18n';
 
 const emptyRoot = (): TeamMatchStorageRoot => ({
   version: 1,
@@ -53,14 +54,14 @@ export function deleteSession(root: TeamMatchStorageRoot, id: string): TeamMatch
   };
 }
 
-export function metaFromSession(s: TeamMatchSession): ArchivedSessionMeta {
+export function metaFromSession(s: TeamMatchSession, locale: TeamMatchLocale = 'zh-CN'): ArchivedSessionMeta {
   const teamCount = s.teams.filter((t) => !t.disabled).length;
   return {
     id: s.id,
-    name: s.name || '未命名',
+    name: s.name || tm(locale, 'teamMatch.unnamed'),
     updatedAt: s.updatedAt,
     status: s.status,
-    summary: `${teamCount} 队 · ${s.status}`,
+    summary: tm(locale, 'teamMatch.sessionSummary', { count: teamCount, status: tm(locale, s.status === 'completed' ? 'teamMatch.finished' : s.status === 'live' ? 'teamMatch.live' : 'teamMatch.setup') }),
   };
 }
 

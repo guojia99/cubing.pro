@@ -4,6 +4,7 @@ import { Tabs } from "antd";
 import type { TabsProps } from "antd";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import "./NavTabs.css";
 
 export type NavTabsProps = {
   type?: TabsProps["type"];
@@ -62,6 +63,7 @@ export function NavTabs(props: NavTabsProps) {
 
   return (
     <Tabs
+      className="nav-tabs"
       tabPlacement={props.tabPlacement}
       centered={props.centered}
       activeKey={activeKey}

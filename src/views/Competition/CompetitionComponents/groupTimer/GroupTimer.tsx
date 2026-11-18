@@ -75,6 +75,8 @@ import {
 import { shouldHideScrambleImage } from '../scrambleSegments';
 import { ScrambleImageMini } from './ScrambleImageMini';
 import './GroupTimer.css';
+import { useI18n } from '@/contexts/I18nProvider';
+import { useCompetitionPublicI18n } from '../../i18n';
 
 const { Text, Paragraph: TypographyParagraph } = Typography;
 
@@ -152,6 +154,7 @@ function consumedExtraLineIndices(eventId: string, solves: Record<string, SolveR
 }
 
 const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
+  const { t, tf, p, locale, round } = useCompetitionPublicI18n();
   const pathname = usePathname() ?? '/';
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -424,7 +427,7 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
         if (mbfPhase === 'time') {
           const attempted = parseInt(mbfAttemptedStr, 10);
           if (Number.isNaN(attempted) || attempted < 1) {
-            message.error('请先填写尝试魔方数');
+            message.error(t('competitionAdmin.attemptedRequired'));
             return;
           }
           setMbfPhase('solved');
@@ -452,7 +455,7 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
         const att = parseInt(mbfAttemptedStr, 10);
         const sol = parseInt(mbfSolvedStr, 10);
         if (mbfPhase !== 'solved' || Number.isNaN(att) || Number.isNaN(sol)) {
-          message.error('请完成多盲步骤');
+          message.error(t('competitionAdmin.completeMbf'));
           return;
         }
         rec.mbf = { attempted: att, solved: sol };
@@ -468,6 +471,7 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
       mbfSolvedStr,
       pendingSpare,
       commitRecord,
+      t,
     ],
   );
 
@@ -532,7 +536,7 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
       if (mbfPhase === 'time') {
         const ms = parseManualTimeToMs(manualRaw);
         if (ms === null) {
-          message.error('时间格式无效');
+          message.error(t('competitionAdmin.invalidTimeFormat'));
           return;
         }
         setDisplayMs(ms);
@@ -542,13 +546,13 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
       if (mbfPhase === 'solved') {
         const ms = displayMs || parseManualTimeToMs(manualRaw);
         if (ms === null) {
-          message.error('时间无效');
+          message.error(t('competitionAdmin.invalidTime'));
           return;
         }
         const sol = parseInt(mbfSolvedStr, 10);
         const att = parseInt(mbfAttemptedStr, 10);
         if (Number.isNaN(sol) || Number.isNaN(att)) {
-          message.error('请输入还原数量');
+          message.error(t('competitionAdmin.solvedRequired'));
           return;
         }
         const scramble = pendingSpare ? pendingSpare.spareScramble : currentRow.scramble;
@@ -570,7 +574,7 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
     }
     const ms = parseManualTimeToMs(manualRaw);
     if (ms === null) {
-      message.error('时间格式无效');
+      message.error(t('competitionAdmin.invalidTimeFormat'));
       return;
     }
     const scramble = pendingSpare ? pendingSpare.spareScramble : currentRow.scramble;
@@ -629,7 +633,7 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
     delete nextSolves[slotKey];
     setStore((s) => ({ ...s, solves: nextSolves }));
     setPendingSpare(null);
-    message.success('已清除本条');
+    message.success(t('competitionAdmin.cleared'));
   };
 
   const onDns = () => {
@@ -688,9 +692,9 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
     setInspectionCounting(false);
     setInspectionElapsedMs(0);
     setTimerHoldOverlay(false);
-    message.warning('观察超过 17 秒，已记为 DNF');
+    message.warning(t('competitionAdmin.inspectionDnf'));
     onDnfRef.current();
-  }, [open, running, inInspectionCountingPhase, inspectionElapsedMs]);
+  }, [open, running, inInspectionCountingPhase, inspectionElapsedMs, t]);
 
   /** 长按松手后启动计时 */
   const beginTimerFromHold = useCallback(() => {
@@ -1042,7 +1046,7 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
     }
     const rec = store.solves[slotKey];
     if (!rec || rec.dns || rec.dnf || rec.timeMs === null) {
-      message.info('请先完成有效成绩后再使用 +2');
+      message.info(t('competitionAdmin.plus2RequiresResult'));
       return;
     }
     setStore((s) => ({
@@ -1075,7 +1079,7 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
     setInspectionCounting(false);
     setInspectionElapsedMs(0);
     inspectionAutoDnfDoneRef.current = false;
-    message.success('已重试');
+    message.success(t('competitionAdmin.retried'));
   };
 
   const onSpare = () => {
@@ -1087,14 +1091,14 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
     }
     if (pendingSpare) {
       setPendingSpare(null);
-      message.info('已取消备打');
+      message.info(t('competitionAdmin.spareCanceled'));
       return;
     }
     const extras = getExtraRows(rows);
     const used = consumedExtraLineIndices(eventId, store.solves);
     const free = extras.find((ex) => !used.has(ex.lineIndex));
     if (!free) {
-      message.error('无可用备打');
+      message.error(t('competitionAdmin.noSpare'));
       return;
     }
     setPendingSpare({
@@ -1102,7 +1106,7 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
       spareScramble: free.scramble,
       originalScramble: currentRow!.scramble,
     });
-    message.success('已选用备打，本把以备打乱为准');
+    message.success(t('competitionAdmin.spareSelected'));
   };
 
   const openExport = () => {
@@ -1129,21 +1133,25 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
     setExportOpen(true);
   };
 
-  const copyExportText = () => {
-    void navigator.clipboard.writeText(exportDraft).then(() => {
-      message.success('已复制到剪贴板');
-    });
+  const copyExportText = async () => {
+    try {
+      await navigator.clipboard.writeText(exportDraft);
+      message.success(t('competitionAdmin.copied'));
+      return true;
+    } catch (error) {
+      console.error('Group timer export copy failed', error);
+      message.error(p('competitionPublic.copyFailed'));
+      return false;
+    }
   };
 
-  const confirmExportAndRecord = () => {
+  const confirmExportAndRecord = async () => {
     const selected = Object.keys(exportCheckedRounds).filter((k) => exportCheckedRounds[k]);
     if (selected.length === 0) {
-      message.warning('请至少勾选一项');
+      message.warning(t('competitionAdmin.selectOne'));
       return;
     }
-    void navigator.clipboard.writeText(exportDraft).then(() => {
-      message.success('已复制到剪贴板');
-    });
+    if (!await copyExportText()) return;
     const now = new Date().toISOString();
     const perEvent: Record<string, { keys: string[]; rounds: string[] }> = {};
     const sorted = selected.slice().sort();
@@ -1225,13 +1233,13 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
         try {
           await setUserKv(USER_KV_KEYS.group_timer_ui_config, JSON.stringify(cfg), 3);
         } catch {
-          message.warning('已应用本机设置，云端同步失败');
+          message.warning(t('competitionAdmin.cloudFailed'));
         }
       }
     } catch {
       /* 校验未通过时不写入 */
     }
-  }, [uiForm]);
+  }, [uiForm, t]);
 
   const scheduleUiSettingsPersist = useCallback(() => {
     if (uiPersistTimerRef.current) {
@@ -1270,8 +1278,9 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
     if (!ctx) {
       return '';
     }
-    return ctx.scheduleRounds.find((r) => r.scheduleIdx === statsScheduleIdx)?.roundTitle ?? '';
-  }, [ctx, statsScheduleIdx]);
+    const sr = ctx.scheduleRounds.find((r) => r.scheduleIdx === statsScheduleIdx);
+    return sr ? round(sr.roundTitle, sr.scheduleIdx + 1) : '';
+  }, [ctx, statsScheduleIdx, round]);
 
   const roundRecords = useMemo(() => {
     if (!ctx) {
@@ -1394,7 +1403,7 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
             eventId: eid,
             scheduleIdx: sr.scheduleIdx,
             lineIndex: li,
-            heading: `${CubesCn(eid)} · ${sr.roundTitle} · 第 ${att} 把`,
+            heading: `${CubesCn(eid, locale)} · ${round(sr.roundTitle, sr.scheduleIdx + 1)} · ${tf('competitionAdmin.attempt', { count: att })}`,
             result: formatResultLine(rec, eid),
             recordedAtLabel: formatHistoryRecordedAt(rec.updatedAt),
             isCurrent:
@@ -1415,7 +1424,7 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
       return b.key.localeCompare(a.key);
     });
     return out;
-  }, [contexts, store.solves, store.cursor.eventId, store.cursor.scheduleIdx, store.cursor.lineIndex]);
+  }, [contexts, store.solves, store.cursor.eventId, store.cursor.scheduleIdx, store.cursor.lineIndex, tf, locale, round]);
 
   const currentRoundMains = useMemo(() => {
     if (!ctx) {
@@ -1432,9 +1441,9 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
     return createPortal(
       <div className="group-timer-fs">
         <Button className="group-timer-exit" type="primary" danger size="middle" onClick={onClose}>
-          退出
+          {t('competitionAdmin.exit')}
         </Button>
-        <p className="group-timer-muted">比赛已结束，无法使用群赛计时器。</p>
+        <p className="group-timer-muted">{t('competitionAdmin.timerEnded')}</p>
       </div>,
       document.body,
     );
@@ -1444,9 +1453,9 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
     return createPortal(
       <div className="group-timer-fs">
         <Button className="group-timer-exit" type="primary" danger size="middle" onClick={onClose}>
-          退出
+          {t('competitionAdmin.exit')}
         </Button>
-        <p className="group-timer-muted">暂无可比赛项目或缺少项目元数据</p>
+        <p className="group-timer-muted">{t('competitionAdmin.timerNoEvents')}</p>
       </div>,
       document.body,
     );
@@ -1459,8 +1468,8 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
     if (pendingSpare) {
       return (
         <>
-          <div>打乱：{pendingSpare.originalScramble}</div>
-          <div className="group-timer-spare-label">备打：{pendingSpare.spareScramble}</div>
+          <div>{t('competitionAdmin.scramble')}: {pendingSpare.originalScramble}</div>
+          <div className="group-timer-spare-label">{t('competitionAdmin.spare')}: {pendingSpare.spareScramble}</div>
         </>
       );
     }
@@ -1492,28 +1501,28 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
                       : [
                           {
                             key: 'login',
-                            label: '登录',
+                            label: t('competitionAdmin.login'),
                             onClick: goToLoginWithRedirect,
                           },
                         ]),
                     {
                       key: 'progress',
-                      label: '项目进度',
+                      label: t('competitionAdmin.progress'),
                       onClick: () => setEventOverviewOpen(true),
                     },
                     {
                       key: 'export',
-                      label: '导出成绩',
+                      label: t('competitionAdmin.export'),
                       onClick: openExport,
                     },
                     {
                       key: 'list',
-                      label: '成绩列表',
+                      label: t('competitionAdmin.resultList'),
                       onClick: () => setListOpen(true),
                     },
                     {
                       key: 'settings',
-                      label: '设置',
+                      label: t('competitionAdmin.settings'),
                       onClick: () => setSettingsOpen(true),
                     },
                   ],
@@ -1522,11 +1531,11 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
                 trigger={['click']}
               >
                 <Button type="default" size="middle" icon={<MoreOutlined />}>
-                  更多
+                  {t('competitionAdmin.more')}
                 </Button>
               </Dropdown>
               <Button type="primary" danger size="middle" onClick={onClose}>
-                退出全屏
+                {t('competitionAdmin.exitFullscreen')}
               </Button>
             </div>
           </>
@@ -1551,7 +1560,7 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
               {secondTimeFormat(displayMs / 1000, false)}
             </div>
             <Text type="secondary" className="group-timer-running__hint">
-              任意键或点击结束
+              {t('competitionAdmin.stopHint')}
             </Text>
           </div>
         ) : (
@@ -1571,6 +1580,7 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
               <div className="group-timer-meta-bar" style={{ fontSize: uiConfig.metaFontPx }}>
                 <div className="group-timer-meta-bar__row">
                   <Select
+                    aria-label={t('competitionAdmin.event')}
                     className="group-timer-meta-select"
                     value={store.cursor.eventId}
                     onChange={(ev) => {
@@ -1588,7 +1598,7 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
                       setEventDone(false);
                     }}
                     options={contexts.map((c) => ({
-                      label: CubesCn(c.event.EventID),
+                      label: CubesCn(c.event.EventID, locale),
                       value: c.event.EventID,
                     }))}
                     {...selectPopupProps}
@@ -1596,6 +1606,7 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
                     popupMatchSelectWidth={false}
                   />
                   <Select
+                    aria-label={t('competitionAdmin.round')}
                     className="group-timer-meta-select"
                     value={store.cursor.scheduleIdx}
                     onChange={(sch) => {
@@ -1615,13 +1626,14 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
                     options={
                       findContextByEventId(contexts, store.cursor.eventId)?.scheduleRounds
                         .filter((r) => !r.skipped)
-                        .map((r) => ({ label: r.roundTitle, value: r.scheduleIdx })) ?? []
+                        .map((r) => ({ label: round(r.roundTitle, r.scheduleIdx + 1), value: r.scheduleIdx })) ?? []
                     }
                     {...selectPopupProps}
                     getPopupContainer={() => document.body}
                     popupMatchSelectWidth={false}
                   />
                   <Select
+                    aria-label={p('competitionPublic.attemptSelector')}
                     className="group-timer-meta-select group-timer-meta-select--attempt"
                     value={
                       currentRoundMains.includes(store.cursor.lineIndex)
@@ -1636,7 +1648,7 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
                       }));
                     }}
                     options={currentRoundMains.map((li, idx) => ({
-                      label: `第 ${idx + 1} 把`,
+                      label: tf('competitionAdmin.attempt', { count: idx + 1 }),
                       value: li,
                     }))}
                     {...selectPopupProps}
@@ -1660,10 +1672,11 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
                 <div className="group-timer-mbf">
                   {!mbfPhase && (
                     <>
-                      <Text type="secondary">多盲：先输入本次尝试魔方数</Text>
+                      <Text type="secondary">{t('competitionAdmin.mbfFirst')}</Text>
                       <Input
+                        aria-label={t('competitionAdmin.attemptedCount')}
                         inputMode="numeric"
-                        placeholder="尝试个数"
+                        placeholder={t('competitionAdmin.attemptedCount')}
                         value={mbfAttemptedStr}
                         disabled={inputLocked}
                         onChange={(e) => setMbfAttemptedStr(e.target.value.replace(/\D/g, ''))}
@@ -1674,30 +1687,31 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
                         onClick={() => {
                           const n = parseInt(mbfAttemptedStr, 10);
                           if (Number.isNaN(n) || n < 1) {
-                            message.error('请输入有效的魔方数量');
+                            message.error(t('competitionAdmin.validCubeCount'));
                             return;
                           }
                           setMbfPhase('time');
                         }}
                       >
-                        下一步（计时）
+                        {t('competitionAdmin.nextTiming')}
                       </Button>
                     </>
                   )}
                   {mbfPhase === 'time' && (
                     <>
-                      <Text>尝试 {mbfAttemptedStr} 个魔方，请输入或计时成绩</Text>
+                      <Text>{tf('competitionAdmin.mbfTiming', { count: mbfAttemptedStr })}</Text>
                       {mode === 'manual' ? (
                         <div className="group-timer-input-row group-timer-input-row--inline">
                           <Input
+                            aria-label={t('competitionAdmin.time')}
                             value={manualRaw}
                             disabled={inputLocked}
                             onChange={(e) => setManualRaw(e.target.value)}
-                            placeholder="时间"
+                            placeholder={t('competitionAdmin.time')}
                             onPressEnter={onManualConfirm}
                           />
                           <Button type="primary" disabled={inputLocked} onClick={onManualConfirm}>
-                            确认时间
+                            {t('competitionAdmin.confirmTime')}
                           </Button>
                         </div>
                       ) : (
@@ -1712,9 +1726,9 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
                           onPointerCancel={onTimerTapPointerCancel}
                         >
                           {!running ? (
-                            <Text className="group-timer-tap-area__label">按住 · 松手开始计时</Text>
+                            <Text className="group-timer-tap-area__label">{t('competitionAdmin.holdStart')}</Text>
                           ) : (
-                            <Text type="secondary">计时中…</Text>
+                            <Text type="secondary">{t('competitionAdmin.timing')}</Text>
                           )}
                         </div>
                       )}
@@ -1722,8 +1736,9 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
                   )}
                   {mbfPhase === 'solved' && (
                     <>
-                      <Text>还原个数（已成功）</Text>
+                      <Text>{t('competitionAdmin.solvedCount')}</Text>
                       <Input
+                        aria-label={t('competitionAdmin.solvedCount')}
                         inputMode="numeric"
                         value={mbfSolvedStr}
                         disabled={inputLocked}
@@ -1743,7 +1758,7 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
                           onManualConfirm();
                         }}
                       >
-                        提交本把
+                        {t('competitionAdmin.submitAttempt')}
                       </Button>
                     </>
                   )}
@@ -1763,15 +1778,16 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
                   {mode === 'manual' ? (
                     <>
                       <Input
+                        aria-label={t('competitionAdmin.enterTime')}
                         size="large"
                         value={manualRaw}
                         disabled={inputLocked}
                         onChange={(e) => setManualRaw(e.target.value)}
-                        placeholder="输入时间"
+                        placeholder={t('competitionAdmin.enterTime')}
                         onPressEnter={onManualConfirm}
                       />
                       <Button type="primary" size="large" disabled={inputLocked} onClick={onManualConfirm}>
-                        确认
+                        {t('competitionAdmin.confirm')}
                       </Button>
                     </>
                   ) : (
@@ -1805,17 +1821,17 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
                                 )}
                               </div>
                               <Text type="secondary" className="group-timer-inspection__hint">
-                                长按开始计时
+                                {t('competitionAdmin.longPressStart')}
                               </Text>
                             </div>
                           ) : (
-                            <Text className="group-timer-tap-area__label">点击计时区开始观察</Text>
+                            <Text className="group-timer-tap-area__label">{t('competitionAdmin.tapInspection')}</Text>
                           )
                         ) : (
-                          <Text className="group-timer-tap-area__label">按住 · 松手开始计时</Text>
+                          <Text className="group-timer-tap-area__label">{t('competitionAdmin.holdStart')}</Text>
                         )
                       ) : (
-                        <Text type="secondary">计时中…</Text>
+                        <Text type="secondary">{t('competitionAdmin.timing')}</Text>
                       )}
                     </div>
                   )}
@@ -1857,7 +1873,7 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
                   </Button>
                 )}
                 <Button size="small" disabled={!inputLocked || isMbf} onClick={onRetry}>
-                  重试
+                  {t('competitionAdmin.retry')}
                 </Button>
                 {!isMbf && (
                   <Button
@@ -1865,7 +1881,7 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
                     disabled={inputLocked || !hasAnyRecordInCursorRound}
                     onClick={onSpare}
                   >
-                    {pendingSpare ? '取消备打' : '使用备打'}
+                    {t(pendingSpare ? 'competitionAdmin.cancelSpare' : 'competitionAdmin.useSpare')}
                   </Button>
                 )}
               </Space>
@@ -1886,14 +1902,14 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
                     icon={<UnorderedListOutlined />}
                     onClick={() => setHistoryModalOpen(true)}
                   >
-                    成绩收纳
+                    {t('competitionAdmin.storedResults')}
                     {historyEntries.length > 0 ? `（${historyEntries.length}）` : ''}
                   </Button>
                 </div>
 
                 <div className="group-timer-bl group-timer-bl--stats">
                   <div>
-                    本轮最佳：{rb != null ? formatMsForDisplay(rb, eventId) : '—'}
+                    {t('competitionAdmin.roundBest')}: {rb != null ? formatMsForDisplay(rb, eventId) : '—'}
                     {statsScheduleIdx !== store.cursor.scheduleIdx && statsRoundTitle ? (
                       <Text type="secondary" style={{ marginLeft: 6 }}>
                         （{statsRoundTitle}）
@@ -1901,7 +1917,7 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
                     ) : null}
                   </div>
                   <div className="group-timer-small">
-                    本轮成绩：
+                    {t('competitionAdmin.roundResults')}:
                     {roundRecords.length === 0
                       ? '—'
                       : roundRecords.map((x) => formatResultLine(x.rec, eventId)).join('，')}
@@ -1910,7 +1926,7 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
                     ) : null}
                   </div>
                   <div className="group-timer-small">
-                    本场该项目平均：{eventAvg ?? '—'}
+                    {t('competitionAdmin.eventAverage')}: {eventAvg ?? '—'}
                   </div>
                 </div>
 
@@ -1926,7 +1942,7 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
                         }))
                       }
                     >
-                      回到最新一把
+                      {t('competitionAdmin.backLatest')}
                     </Button>
                   </div>
                 ) : null}
@@ -1935,7 +1951,7 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
               {currentRow &&
                 ctx &&
                 !shouldHideScrambleImage(eventId, ctx.baseEvent) && (
-                  <aside className="group-timer-side-row__right" aria-label="打乱图示">
+                  <aside className="group-timer-side-row__right" aria-label={t('competitionAdmin.scrambleDiagram')}>
                     <div className="group-timer-scramble-preview">
                       <ScrambleImageMini
                         key={`${eventId}-${store.cursor.scheduleIdx}-${store.cursor.lineIndex}-${(pendingSpare ? pendingSpare.spareScramble : currentRow.scramble).slice(0, 32)}`}
@@ -1953,13 +1969,13 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
         )}
         {timerHoldOverlay && !running && (
           <div className="group-timer-hold-overlay" aria-hidden>
-            <span className="group-timer-hold-overlay__text">松手开始计时</span>
+            <span className="group-timer-hold-overlay__text">{t('competitionAdmin.releaseStart')}</span>
           </div>
         )}
       </div>
 
       <Drawer
-        title="群赛计时 · 设置"
+        title={t('competitionAdmin.timerSettings')}
         placement="right"
         open={settingsOpen}
         onClose={() => setSettingsOpen(false)}
@@ -1968,57 +1984,57 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
         rootClassName="group-timer-popup-z"
         footer={
           <Button type="primary" block onClick={() => setSettingsOpen(false)}>
-            关闭
+            {t('competitionAdmin.close')}
           </Button>
         }
       >
         <TypographyParagraph type="secondary" style={{ marginBottom: 12 }}>
-          修改即时生效并写入本机；已登录时将自动同步到云端。
+          {t('competitionAdmin.settingsHint')}
         </TypographyParagraph>
         <Form form={uiForm} layout="vertical" onValuesChange={() => scheduleUiSettingsPersist()}>
-          <Form.Item label="成绩录入方式" name="inputMode" rules={[{ required: true }]}>
+          <Form.Item label={t('competitionAdmin.inputMode')} name="inputMode" rules={[{ required: true }]}>
             <Radio.Group>
-              <Radio value="timer">计时器（按住松手计时）</Radio>
-              <Radio value="manual">手动输入时间</Radio>
+              <Radio value="timer">{t('competitionAdmin.timerMode')}</Radio>
+              <Radio value="manual">{t('competitionAdmin.manualMode')}</Radio>
             </Radio.Group>
           </Form.Item>
-          <Card title="观察时间" size="small" style={{ marginBottom: 16 }}>
-            <Form.Item label="观察阶段（15s 规则）" name="inspectionEnabled" valuePropName="checked">
+          <Card title={t('competitionAdmin.inspection')} size="small" style={{ marginBottom: 16 }}>
+            <Form.Item label={t('competitionAdmin.inspectionRule')} name="inspectionEnabled" valuePropName="checked">
               <Checkbox />
             </Form.Item>
-            <Form.Item label="观察时间显示" name="inspectionDisplayMode" rules={[{ required: true }]}>
+            <Form.Item label={t('competitionAdmin.inspectionDisplay')} name="inspectionDisplayMode" rules={[{ required: true }]}>
               <Select
                 style={{ width: '100%' }}
                 options={[
-                  { value: 'countdown', label: '倒数 15.0→0' },
-                  { value: 'countup', label: '正计 0.0→…' },
+                  { value: 'countdown', label: t('competitionAdmin.countdown') },
+                  { value: 'countup', label: t('competitionAdmin.countup') },
                 ]}
                 getPopupContainer={() => document.body}
                 {...selectPopupProps}
               />
             </Form.Item>
-            <Form.Item label="显示精度" name="inspectionPrecision" rules={[{ required: true }]}>
+            <Form.Item label={t('competitionAdmin.precision')} name="inspectionPrecision" rules={[{ required: true }]}>
               <Select
                 style={{ width: '100%' }}
                 options={[
-                  { value: 'tenth', label: '0.1 秒' },
-                  { value: 'second', label: '精确到秒' },
+                  { value: 'tenth', label: tf('competitionAdmin.seconds', { count: 0.1 }) },
+                  { value: 'second', label: t('competitionAdmin.wholeSeconds') },
                 ]}
                 getPopupContainer={() => document.body}
                 {...selectPopupProps}
               />
             </Form.Item>
-            <Form.Item label="盲拧项目不观察" name="blindSkipInspection" valuePropName="checked">
+            <Form.Item label={t('competitionAdmin.skipBlindInspection')} name="blindSkipInspection" valuePropName="checked">
               <Checkbox />
             </Form.Item>
           </Card>
-          <Form.Item label="打乱区字号（px）" name="scrambleFontPx" rules={[{ required: true }]}>
+          <Form.Item label={t('competitionAdmin.scrambleFont')} name="scrambleFontPx" rules={[{ required: true }]}>
             <InputNumber min={12} max={32} step={1} style={{ width: '100%' }} />
           </Form.Item>
           <Form.Item
-            label="全屏背景色"
+            label={t('competitionAdmin.background')}
             name="fullscreenBg"
-            extra="留空则使用主题默认；可点清除恢复默认"
+            extra={t('competitionAdmin.backgroundHint')}
             getValueFromEvent={(color) => {
               if (color == null) {
                 return '';
@@ -2038,7 +2054,7 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
                   if (/^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/.test(String(val).trim())) {
                     return Promise.resolve();
                   }
-                  return Promise.reject(new Error('格式应为 #RRGGBB 或留空'));
+                  return Promise.reject(new Error(t('competitionAdmin.hexFormat')));
                 },
               },
             ]}
@@ -2051,7 +2067,7 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
               style={{ width: '100%' }}
               presets={[
                 {
-                  label: '浅色',
+                  label: t('competitionAdmin.light'),
                   colors: [
                     'var(--card)',
                     'var(--muted)',
@@ -2061,7 +2077,7 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
                   ],
                 },
                 {
-                  label: '深色',
+                  label: t('competitionAdmin.dark'),
                   colors: [
                     'color-mix(in srgb, var(--foreground) 8%, var(--background))',
                     'color-mix(in srgb, var(--foreground) 12%, var(--background))',
@@ -2073,10 +2089,10 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
               ]}
             />
           </Form.Item>
-          <Form.Item label="计时区最小高度（vh）" name="timerTapMinVh" rules={[{ required: true }]}>
+          <Form.Item label={t('competitionAdmin.timerHeight')} name="timerTapMinVh" rules={[{ required: true }]}>
             <InputNumber min={18} max={70} step={1} style={{ width: '100%' }} />
           </Form.Item>
-          <Form.Item label="项目/轮次信息字号（px）" name="metaFontPx" rules={[{ required: true }]}>
+          <Form.Item label={t('competitionAdmin.metaFont')} name="metaFontPx" rules={[{ required: true }]}>
             <InputNumber min={12} max={24} step={1} style={{ width: '100%' }} />
           </Form.Item>
           <Button
@@ -2090,18 +2106,18 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
               const tok = getToken();
               if (tok?.token) {
                 void setUserKv(USER_KV_KEYS.group_timer_ui_config, JSON.stringify(cfg), 3).catch(() => {
-                  message.warning('已恢复默认（本机），云端同步失败');
+                  message.warning(t('competitionAdmin.resetCloudFailed'));
                 });
               }
             }}
           >
-            恢复默认
+            {t('competitionAdmin.reset')}
           </Button>
         </Form>
       </Drawer>
 
       <Drawer
-        title="成绩列表（点击成绩跳转）"
+        title={t('competitionAdmin.listJump')}
         open={listOpen}
         onClose={() => setListOpen(false)}
         size={480}
@@ -2112,14 +2128,14 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
           const eid = c.event.EventID;
           return (
             <div key={eid} className="group-timer-list-event">
-              <div className="group-timer-list-event-title">{CubesCn(eid)}</div>
+              <div className="group-timer-list-event-title">{CubesCn(eid, locale)}</div>
               {c.scheduleRounds
                 .filter((r) => !r.skipped)
                 .map((sr) => {
                   const mains = getMainIndicesForRound(c, sr.scheduleIdx);
                   return (
                     <div key={sr.scheduleIdx} className="group-timer-list-round">
-                      <span className="group-timer-list-round-label">{sr.roundTitle}</span>
+                      <span className="group-timer-list-round-label">{round(sr.roundTitle, sr.scheduleIdx + 1)}</span>
                       <div className="group-timer-list-scores">
                         {mains.map((li) => {
                           const k = makeSlotKey(eid, sr.scheduleIdx, li);
@@ -2139,7 +2155,7 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
                                 setListOpen(false);
                               }}
                             >
-                              成绩{att}：{label}
+                              {tf('competitionAdmin.attempt', { count: att })}: {label}
                               {rec?.usedSpare ? <TagSpare /> : null}
                             </button>
                           );
@@ -2156,9 +2172,9 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
       <Modal
         title={
           <span className="group-timer-history-modal__title">
-            历史成绩
+            {t('competitionAdmin.history')}
             <Text type="secondary" className="group-timer-history-modal__title-hint">
-              按还原时间倒序 · 点击切换
+              {t('competitionAdmin.historyHint')}
             </Text>
           </span>
         }
@@ -2173,10 +2189,10 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
                 setListOpen(true);
               }}
             >
-              完整成绩列表…
+              {t('competitionAdmin.fullList')}
             </Button>
             <Button type="primary" size="small" onClick={() => setHistoryModalOpen(false)}>
-              关闭
+              {t('competitionAdmin.close')}
             </Button>
           </div>
         }
@@ -2197,7 +2213,7 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
         }}
       >
         {historyEntries.length === 0 ? (
-          <div className="group-timer-muted group-timer-history-empty">暂无已录成绩</div>
+          <div className="group-timer-muted group-timer-history-empty">{t('competitionAdmin.noResults')}</div>
         ) : (
           <div className="group-timer-history-modal__list">
             {historyEntries.map((h) => (
@@ -2231,21 +2247,21 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
       </Modal>
 
       <Modal
-        title="本项目全部轮次已完成"
+        title={t('competitionAdmin.eventDone')}
         open={eventDoneGuideOpen}
         onOk={dismissEventDoneGuide}
         onCancel={dismissEventDoneGuide}
-        okText="知道了"
+        okText={t('competitionAdmin.understood')}
         cancelButtonProps={{ style: { display: 'none' } }}
         zIndex={3100}
         rootClassName="group-timer-popup-z"
         width={480}
       >
-        <p>您当前项目的所有轮次、所有把次均已录入成绩。</p>
+        <p>{t('competitionAdmin.eventDoneBody')}</p>
         {incompleteOtherIds.length > 0 ? (
           <div style={{ marginTop: 12 }}>
             <p style={{ marginBottom: 8 }}>
-              您可通过顶部项目下拉框或「更多」里的「成绩列表」切换至尚未完成的其它项目：
+              {t('competitionAdmin.switchIncomplete')}
             </p>
             <Space wrap>
               {incompleteOtherIds.map((id) => (
@@ -2266,28 +2282,28 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
                     }
                   }}
                 >
-                  {CubesCn(id)}
+                  {CubesCn(id, locale)}
                 </Button>
               ))}
             </Space>
           </div>
         ) : (
           <p className="group-timer-muted" style={{ marginTop: 12 }}>
-            本场暂无其它未完成项目。
+            {t('competitionAdmin.noIncomplete')}
           </p>
         )}
       </Modal>
 
       <Modal
-        title="导出成绩（全部项目）"
+        title={t('competitionAdmin.exportAll')}
         open={exportOpen}
         onCancel={() => setExportOpen(false)}
         footer={
           <Space>
-            <Button onClick={() => setExportOpen(false)}>关闭</Button>
-            <Button onClick={copyExportText}>一键复制</Button>
+            <Button onClick={() => setExportOpen(false)}>{t('competitionAdmin.close')}</Button>
+            <Button onClick={copyExportText}>{t('competitionAdmin.copy')}</Button>
             <Button type="primary" onClick={confirmExportAndRecord}>
-              复制并标记已导出
+              {t('competitionAdmin.copyMark')}
             </Button>
           </Space>
         }
@@ -2328,13 +2344,13 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
                   ).length;
                   return (
                     <Checkbox key={k} value={k}>
-                      {CubesCn(eid)} · {r.roundTitle}（第 {getRoundExportNumber(r.scheduleIdx)} 轮）
+                      {CubesCn(eid, locale)} · {round(r.roundTitle, r.scheduleIdx + 1)} ({tf('competitionAdmin.roundNumber', { count: getRoundExportNumber(r.scheduleIdx) })})
                       {miss ? (
                         <span className="group-timer-muted">
                           （{filledCount}/{mains.length}）
                         </span>
                       ) : null}
-                      {exp ? <span className="group-timer-muted">（曾导出）</span> : null}
+                      {exp ? <span className="group-timer-muted">({t('competitionAdmin.previouslyExported')})</span> : null}
                     </Checkbox>
                   );
                 });
@@ -2342,25 +2358,26 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
           </Checkbox.Group>
         </div>
         <Input.TextArea
+          aria-label={t('competitionAdmin.exportPreview')}
           style={{ marginTop: 12, fontFamily: 'ui-monospace, monospace' }}
           rows={10}
           value={exportDraft}
           onChange={(e) => setExportDraft(e.target.value)}
           placeholder={
             hasExportableRoundAnyEvent
-              ? '勾选轮次后在此预览，可编辑后再复制'
-              : '请先在任意轮次录入至少一把成绩（含 DNF）'
+              ? t('competitionAdmin.exportPreview')
+              : t('competitionAdmin.exportNeedsResult')
           }
         />
         {!hasExportableRoundAnyEvent ? (
           <p className="group-timer-muted" style={{ marginTop: 8 }}>
-            请先在任意轮次录入至少一把成绩（含 DNF）后，该轮才会出现在导出列表中。
+            {t('competitionAdmin.exportNeedsResultHint')}
           </p>
         ) : null}
       </Modal>
 
       <Modal
-        title="项目进度（点击切换项目）"
+        title={t('competitionAdmin.progressJump')}
         open={eventOverviewOpen}
         onCancel={() => setEventOverviewOpen(false)}
         footer={null}
@@ -2376,11 +2393,11 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
           const id = c.event.EventID;
           const started = hasStartedEvent(c, store.solves, id);
           const done = isEventFullyRecorded(c, store.solves, id);
-          let statusText = '未开始';
+          let statusText = t('competitionAdmin.upcoming');
           if (done) {
-            statusText = '已完成';
+            statusText = t('competitionAdmin.complete');
           } else if (started) {
-            statusText = '进行中';
+            statusText = t('competitionAdmin.ongoing');
           }
           const rowTone = done
             ? 'group-timer-overview-row--done'
@@ -2418,7 +2435,7 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
               }}
             >
               <div className="group-timer-overview-row__inner">
-                <Text strong>{CubesCn(id)}</Text>
+                <Text strong>{CubesCn(id, locale)}</Text>
                 <Text type="secondary">{statusText}</Text>
                 <div className="group-timer-overview-rounds">
                   {c.scheduleRounds
@@ -2429,9 +2446,9 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
                       const total = mains.length;
                       return (
                         <div key={sr.scheduleIdx} className="group-timer-overview-round-line">
-                          {sr.roundTitle}（第 {getRoundExportNumber(sr.scheduleIdx)} 轮）：已录 {filled}/{total} 把
+                          {round(sr.roundTitle, sr.scheduleIdx + 1)} ({tf('competitionAdmin.roundNumber', { count: getRoundExportNumber(sr.scheduleIdx) })}): {tf('competitionAdmin.recordedCount', { filled, total })}
                           {filled === total && total > 0 ? (
-                            <span className="group-timer-overview-round-done"> · 已满</span>
+                            <span className="group-timer-overview-round-done"> · {t('competitionAdmin.full')}</span>
                           ) : null}
                         </div>
                       );
@@ -2449,7 +2466,8 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
 };
 
 function TagSpare() {
-  return <span className="group-timer-spare-tag">备打</span>;
+  const { t } = useI18n();
+  return <span className="group-timer-spare-tag">{t('competitionAdmin.spare')}</span>;
 }
 
 export default GroupTimer;

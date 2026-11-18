@@ -5,6 +5,7 @@ import { RecordsTable, RecordsTableKeys } from '@/components/Data/cube_record/re
 import { Divider, Skeleton } from 'antd';
 import React from 'react';
 import {MergeRecords} from "@/components/Data/cube_record/record_utils";
+import { useI18n } from '@/contexts/I18nProvider';
 
 interface CompetitionResultsWithRecordProps {
   comp?: CompAPI.CompResp;
@@ -13,22 +14,21 @@ interface CompetitionResultsWithRecordProps {
 }
 
 const CompetitionResultsWithRecord: React.FC<CompetitionResultsWithRecordProps> = ({
-  comp,
   events,
   records,
 }) => {
+  const { t } = useI18n();
   if (events === undefined) {
     return <Skeleton active />;
   }
   if (records === null || records === undefined || records.length === 0) {
     return (
       <>
-        <Divider style={{ borderColor: "var(--signal-success)" }}>本场比赛无记录产生</Divider>
+        <Divider style={{ borderColor: "var(--signal-success)" }}>{t('competitionAdmin.noRecords')}</Divider>
       </>
     );
   }
 
-  // eslint-disable-next-line no-param-reassign
   records = MergeRecords(records)
 
   const recordMap = records.reduce<Map<string, Record[]>>((map, record) => {

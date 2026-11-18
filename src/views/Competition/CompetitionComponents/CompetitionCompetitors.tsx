@@ -1,5 +1,6 @@
 import React from "react";
 import {CompAPI} from "@/services/cubing-pro/comps/typings";
+import { useI18n } from '@/contexts/I18nProvider';
 
 // 定义组件的属性类型
 interface CompetitionCompetitorsProps {
@@ -7,6 +8,7 @@ interface CompetitionCompetitorsProps {
 }
 
 const CompetitionCompetitors :React.FC<CompetitionCompetitorsProps> = ({ comp }) => {
+  const { t } = useI18n();
   return (
     <>
       {comp ? (
@@ -16,7 +18,7 @@ const CompetitionCompetitors :React.FC<CompetitionCompetitorsProps> = ({ comp })
           {/* 根据 comp 的内容进行更多渲染 */}
         </div>
       ) : (
-        <p>没有找到比赛信息。</p>
+        <p>{t('competitionAdmin.noCompetition')}</p>
       )}
     </>
   );

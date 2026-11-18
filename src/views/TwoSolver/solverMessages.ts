@@ -1,4 +1,9 @@
-import { twoSolverEngineEnUS, twoSolverEngineZhCN } from "../../i18n/messages/two-solver-engine";
+import { twoSolverEngineZhCN } from "../../i18n/messages/two-solver-engine";
+import { translate, type Locale } from "@/i18n";
+import { applyPlural } from "@/i18n/plurals";
+import { formatMessage } from "@/i18n/formatMessage";
+import { getIntlLocale } from "@/i18n/locales";
+import { translateWcaPuzzleExtra as extra, type WcaPuzzleExtraKey } from "@/i18n/messages/wca-puzzle-extra";
 
 type EngineMessageKey = keyof typeof twoSolverEngineZhCN;
 type DynamicMessage = readonly [pattern: RegExp, key: EngineMessageKey, params: readonly string[]];
@@ -8,8 +13,8 @@ type DynamicMessage = readonly [pattern: RegExp, key: EngineMessageKey, params: 
 // (indexing), ergonomics.ts (notes), solver.worker.ts (loading/errors), and the
 // hook/practice state. cancellation.ts and scramble.ts currently throw English.
 // Keep these anchored patterns in sync with those sources without changing the
-// worker protocol, result objects, or search timing. Native English errors and
-// unknown text pass through verbatim so diagnostic details are never discarded.
+// worker protocol, result objects, or search timing. Unknown diagnostic text
+// passes through verbatim; known native errors are translated below.
 const dynamicMessages: readonly DynamicMessage[] = [
   [/^(\d+) 条已验证解法$/, "two.engine.progress.verified", ["count"]],
   [/^加载 (\S+) 公式$/, "two.engine.progress.loading", ["method"]],
@@ -28,20 +33,47 @@ const exactMessages = new Map<string, EngineMessageKey>(
     .map(key => [twoSolverEngineZhCN[key], key]),
 );
 
-export function localizeEngineText(text: string, locale: "zh-CN" | "en-US"): string {
-  if (locale === "zh-CN" || !text) return text;
+const nativeMessages: Record<string, WcaPuzzleExtraKey> = {
+  "Invalid transition rotation setting": "wcaPuzzleExtra.transitionInvalid",
+  "Invalid whole-cube rotation": "wcaPuzzleExtra.rotationInvalid",
+  "Invalid rotation conjugation": "wcaPuzzleExtra.rotationInvalid",
+  "RUF scramble conversion changed the physical state": "wcaPuzzleExtra.stateMismatch",
+  "Stage normalization changed the exact transformation": "wcaPuzzleExtra.stateMismatch",
+  "Boundary reduction changed the exact transformation": "wcaPuzzleExtra.stateMismatch",
+};
+
+export function localizeEngineText(text: string, locale: Locale): string {
+  if (!text) return text;
   // Error.toString() prefixes also occur in diagnostics; retain the full prefix.
   const prefix = text.match(/^(?:(?:Error|RangeError|SyntaxError|TypeError|AbortError):[ \t]*)+/)?.[0] ?? "";
   const message = text.slice(prefix.length);
+  if (Object.hasOwn(nativeMessages, message)) return prefix + extra(locale, nativeMessages[message]);
+  const unknownMove = /^Unknown move (.+)$/.exec(message);
+  if (unknownMove) return prefix + extra(locale, "wcaPuzzleExtra.unsupportedMove", { puzzle: "2×2×2", move: unknownMove[1] });
   const exact = exactMessages.get(message);
-  if (exact) return prefix + twoSolverEngineEnUS[exact];
+  if (exact) return prefix + translate(locale, exact);
   for (const [pattern, key, names] of dynamicMessages) {
     const match = pattern.exec(message);
     if (!match) continue;
     const params = Object.fromEntries(names.map((name, i) => [name, match[i + 1]]));
+    const quantities: Record<string, string | number> = { ...params };
+    // Only protocol counters select grammar; move strings and method IDs remain literal.
+    if (Object.hasOwn(params, "count")) quantities.count = Number(params.count);
+    if (params.nodes) {
+      const digits = params.nodes.normalize("NFKC")
+        .replace(/[٠-٩]/g, digit => String(digit.charCodeAt(0) - 0x660))
+        .replace(/[۰-۹]/g, digit => String(digit.charCodeAt(0) - 0x6f0))
+        .replace(/[.,'’\s٬٫]/g, "");
+      if (/^\d+$/.test(digits)) {
+        params.nodes = new Intl.NumberFormat(getIntlLocale(locale)).format(BigInt(digits));
+        const nodes = Number(digits);
+        if (Number.isSafeInteger(nodes)) quantities.nodes = nodes;
+      }
+    }
     // One pass with a callback keeps formulas, dollar signs, and braces literal.
-    // Import catalogs directly: the site i18n root imports this catalog itself.
-    return prefix + twoSolverEngineEnUS[key].replace(/\{(\w+)\}/g, (placeholder, name: string) => params[name] ?? placeholder);
+    // Translate only at display time; retain the original worker message.
+    const template = applyPlural(locale, key, translate(locale, key), quantities);
+    return prefix + formatMessage(locale, key, template, params);
   }
   return text;
 }

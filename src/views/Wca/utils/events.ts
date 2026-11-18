@@ -1,4 +1,8 @@
 import { WCAResult } from '@/services/cubing-pro/wca/types';
+import { readStoredLocale, type Locale } from '@/i18n/locales';
+import { formatRoundName, type RoundCode } from '@/i18n/messages/domain';
+
+export { formatRoundName } from '@/i18n/messages/domain';
 
 
 /** 已移除/停办的项目，不参与统计和展示 */
@@ -48,20 +52,14 @@ export function getCompsEvents(wcaResults: WCAResult[]): Map<string, string[]> {
 }
 
 // https://github.com/thewca/worldcubeassociation.org/blob/d865d73de590e330a4500fb8881607953c35efe7/config/locales/zh-CN.yml#L168
-// 轮次类型中文映射
-export const roundNameMap: Record<string, string> = {
-  '0': '资格赛',
-  '1': '初赛',
-  '2': '复赛',
-  '3': '半决赛',
-  b: 'B组决赛',
-  c: '组合制决赛',
-  d: '组合制初赛',
-  e: '组合制复赛',
-  f: '决赛',
-  g: '组合制半决赛',
-  h: '组合制资格赛',
-};
+export function getRoundNameMap(locale: Locale = readStoredLocale()): Record<string, string> {
+  return Object.fromEntries(Object.keys(roundNameMap).map(code => [code, formatRoundName(code, locale)]));
+}
+
+// Lazy access preserves old consumers without freezing the language at module load.
+export const roundNameMap: Record<string, string> = Object.defineProperties({},
+  Object.fromEntries((['0', '1', '2', '3', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] satisfies RoundCode[])
+    .map(code => [code, { enumerable: true, get: () => formatRoundName(code) }])));
 
 // 轮次排序优先级：从早到晚
 // 轮次排序优先级：从 高 到 低（决赛在最前）

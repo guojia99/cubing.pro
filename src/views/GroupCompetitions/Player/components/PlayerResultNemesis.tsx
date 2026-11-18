@@ -4,6 +4,7 @@ import styles from '@/views/GroupCompetitions/Player/gc-player.module.css';
 import { PlayersAPI } from '@/services/cubing-pro/players/typings';
 import { Divider, Table } from 'antd';
 import React from 'react';
+import { useI18n } from '@/contexts/I18nProvider';
 
 interface PlayerResultsNemesisProps {
   nemesis: PlayersAPI.BestResults[];
@@ -11,10 +12,11 @@ interface PlayerResultsNemesisProps {
 }
 
 const PlayerResultsNemesis: React.FC<PlayerResultsNemesisProps> = ({ nemesis, player }) => {
+  const { t, tf } = useI18n();
   if (!nemesis || nemesis.length === 0) {
     return (
       <>
-        <Divider style={{ borderColor: "var(--destructive)" }}>{player?.Name} 无宿敌!</Divider>
+        <Divider style={{ borderColor: "var(--destructive)" }}>{tf('competitionExtra.noNemesis', { name: player?.Name ?? '' })}</Divider>
       </>
     );
   }
@@ -25,14 +27,14 @@ const PlayerResultsNemesis: React.FC<PlayerResultsNemesisProps> = ({ nemesis, pl
 
   const columns = [
     {
-      title: '序号',
+      title: t('competitionAdmin.index'),
       dataIndex: 'Index',
       key: 'Index',
       width: 80,
       fixed: 'left' as const,
     },
     {
-      title: '宿敌',
+      title: t('competitionAdmin.nemesis'),
       dataIndex: 'PlayerName',
       key: 'PlayerName',
       render: (value: string, nemesis: PlayersAPI.BestResults) => {

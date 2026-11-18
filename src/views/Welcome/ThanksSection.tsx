@@ -5,9 +5,7 @@ import {
   Badge,
   Box,
   Button,
-  Card,
   Grid,
-  Heading,
   Link,
   SimpleGrid,
   Text,
@@ -17,17 +15,17 @@ import NextLink from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useI18n } from "@/contexts/I18nProvider";
+import { getSiteContent } from "@/i18n/messages/site-content";
+import { SectionHeader, Surface } from "@/components/ui/page";
 import { getAcknowledgments } from "@/services/cubing-pro/public/orgs";
 import type { Thank } from "@/services/cubing-pro/public/types";
 import { apiGetWCAPersonProfile } from "@/services/cubing-pro/wca/wca_api";
-
-const DEFAULT_AVATAR =
-  "https://assets.worldcubeassociation.org/assets/062b138/assets/missing_avatar_thumb-d77f478a307a91a9d4a083ad197012a391d5410f6dd26cb0b0e3118a5de71438.png";
+import "./thanks.css";
 
 const VISIBLE_ROWS = 3;
 const MAX_COLUMNS = 5;
-const MIN_CARD_WIDTH = 170;
-const GRID_GAP = 16;
+const MIN_CARD_WIDTH = 150;
+const GRID_GAP = 12;
 
 function columnsForWidth(width: number): number {
   return Math.min(MAX_COLUMNS, Math.max(1, Math.floor((width + GRID_GAP) / (MIN_CARD_WIDTH + GRID_GAP))));
@@ -55,19 +53,19 @@ function thankToThanksPerson(t: Thank): ThanksPerson {
   };
 }
 
-function getAvatarUrl(person: ThanksPerson, avatarCache: Record<string, string>): string {
+function getAvatarUrl(person: ThanksPerson, avatarCache: Record<string, string>): string | undefined {
   if (person.avatar) return person.avatar;
   if (avatarCache[person.wcaID]) return avatarCache[person.wcaID];
-  return DEFAULT_AVATAR;
+  return undefined;
 }
 
 export function ThanksSection({ data }: { data?: Thank[] }) {
-  const { t, tf } = useI18n();
+  const { t, tf, locale } = useI18n();
   const [expanded, setExpanded] = useState(false);
   const [avatarCache, setAvatarCache] = useState<Record<string, string>>({});
   const [thanksList, setThanksList] = useState<ThanksPerson[]>([]);
   const [loading, setLoading] = useState(true);
-  const [columns, setColumns] = useState(4);
+  const [columns, setColumns] = useState(1);
   const gridRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -79,7 +77,7 @@ export function ThanksSection({ data }: { data?: Thank[] }) {
     });
     observer.observe(el);
     return () => observer.disconnect();
-  }, []);
+  }, [loading, thanksList.length]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -122,33 +120,27 @@ export function ThanksSection({ data }: { data?: Thank[] }) {
   if (loading || sortedList.length === 0) return null;
 
   return (
-    <Card.Root mb="6" borderRadius="xl">
-      <Card.Body p="5">
-        <Heading size="lg" mb="2">
-          {t("home.thanks.title")}
-        </Heading>
-        <Text fontSize="sm" color="fg.muted" mb="6">
-          {t("home.thanks.sponsorNote")}
-          {" · "}
-          {tf("home.thanks.count", { count: sortedList.length })}
-        </Text>
-        <Box ref={gridRef}>
-          <SimpleGrid columns={columns} gap="4">
+    <Surface as="section" p={{ base: "4", md: "5" }}>
+        <SectionHeader eyebrow={getSiteContent(locale)("siteContent.withThanks")} title={t("home.thanks.title")} description={t("home.thanks.sponsorNote")} actions={<Text fontSize="xs" color="fg.muted">{tf("home.thanks.count", { count: sortedList.length })}</Text>} />
+        <Box ref={gridRef} mt="4">
+          <SimpleGrid templateColumns={`repeat(${columns}, minmax(0, 1fr))`} gap="3">
           {displayList.map((person, index) => (
-            <Card.Root
+            <Box
               key={hasValidWcaId(person.wcaID) ? person.wcaID : `anon-${person.nickname}-${index}`}
-              variant="outline"
-              borderRadius="lg"
-              _hover={{ shadow: "md" }}
+              className="thanks-person"
+              borderWidth="1px"
+              borderColor="border"
+              borderRadius="xl"
+              minW="0"
             >
-              <Card.Body display="flex" flexDirection="column" alignItems="center" gap="2" py="5">
-                <Avatar.Root size="lg">
-                  <Avatar.Image src={getAvatarUrl(person, avatarCache)} alt={person.nickname} />
+              <Box display="flex" alignItems="center" gap="2.5" p="3">
+                <Avatar.Root size="sm" className="thanks-person-avatar">
+                  {getAvatarUrl(person, avatarCache) ? <Avatar.Image src={getAvatarUrl(person, avatarCache)} alt={person.nickname} /> : null}
                   <Avatar.Fallback name={person.nickname} />
                 </Avatar.Root>
-                <VStack gap="0" textAlign="center" maxW="100%">
+                <VStack gap="0" align="start" minW="0" flex="1">
                   {hasValidWcaId(person.wcaID) ? (
-                    <Link asChild color="accent" fontWeight="medium" fontSize="sm" truncate>
+                    <Link asChild color="accent" fontWeight="medium" fontSize="sm" truncate maxW="100%">
                       <NextLink href={`/wca/player/${person.wcaID}`}>{person.nickname}</NextLink>
                     </Link>
                   ) : (
@@ -165,7 +157,9 @@ export function ThanksSection({ data }: { data?: Thank[] }) {
                     <Link
                       asChild
                       fontSize="2xs"
-                      fontFamily="mono"
+                       fontFamily="mono"
+                       maxW="100%"
+                       overflowWrap="anywhere"
                       color="fg.muted"
                       _hover={{ color: "accent" }}
                     >
@@ -178,8 +172,8 @@ export function ThanksSection({ data }: { data?: Thank[] }) {
                     </Text>
                   )}
                 </VStack>
-              </Card.Body>
-            </Card.Root>
+              </Box>
+            </Box>
           ))}
         </SimpleGrid>
         </Box>
@@ -192,7 +186,6 @@ export function ThanksSection({ data }: { data?: Thank[] }) {
             </Button>
           </Grid>
         )}
-      </Card.Body>
-    </Card.Root>
+    </Surface>
   );
 }

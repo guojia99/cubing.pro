@@ -150,12 +150,12 @@ export default function AlgsFloatButtons({
         )}
 
         {onOpenUsageInstructions && (
-          <FloatIconButton label="?" onClick={onOpenUsageInstructions}>
+          <FloatIconButton label={t("algs.usageInstructions.title")} onClick={onOpenUsageInstructions}>
             <HelpIcon />
           </FloatIconButton>
         )}
 
-        <FloatIconButton label="Scroll to top" onClick={onScrollTop}>
+        <FloatIconButton label={t("algs.detail.scrollTop")} onClick={onScrollTop}>
           <ArrowUpIcon />
         </FloatIconButton>
       </VStack>

@@ -10,9 +10,9 @@
 | `CHANGELOG.md` | 文档 | `Changelog/index.tsx`（`fetch('/CHANGELOG.md')`） | 是 |
 | `recipes.json` | 数据 | `Recipes/RecipeList.tsx`（`fetch('/recipes.json')`） | 是 |
 | `tips.json` | 数据 | `KitchenSkills/KitchenSkillList.tsx`（`fetch('/tips.json')`） | 是 |
-| `favicon.ico` | 图标 | 浏览器标签 | 是 |
-| `logo.svg` | 品牌 | 页脚/布局 | 是 |
-| `pro_icon.svg` | 品牌 | PWA 图标 | 是 |
+| `CubingProMiniIcon.png` | 图标 | `src/app/layout.tsx` 的 metadata.icons，浏览器标签直接使用原 PNG | 是 |
+| `CubingProLogo.png` | 品牌 | `BrandLogo` 顶栏和首页主视觉 | 是 |
+| `pro_icon.svg` | 资源 | 外链卡片默认图标，不是站点 favicon/PWA 配置 | 否 |
 | `CNAME` | 部署 | 自定义域名 | 是 |
 | `404.svg` / `404.webp` | 资源 | 404 页面 | 否 |
 | `coffee-icon.svg` | 资源 | 赞助页 | 否 |
@@ -41,9 +41,9 @@
 
 页面通过 `` `/geo/bound/${file}` `` 拉取；台湾细节另可能请求外部 GeoJSON URL（见组件内常量）。
 
-## icons/
+## 首页图形与照片
 
-PWA 图标（128x128、192x192、512x512）。
+`src/views/Welcome/HomeIllustration.tsx` 提供静态 SVG 插画；WCA 分组使用 `images/wca.svg`。独立生活栏目复用 HowToCook 已有菜谱照片与 `iba/images/negroni.webp`，不加载首页 3D 引擎。未新增 PWA manifest 或独立 PWA 安装流程。
 
 ## images/team-match/
 

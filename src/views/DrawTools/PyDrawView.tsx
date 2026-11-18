@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Box } from "@chakra-ui/react";
+import { PageHeader } from "@/components/ui/page";
+import { useI18n } from "@/contexts/I18nProvider";
 
 import { DrawPalette } from "@/views/DrawTools/components/DrawPalette";
 import { PYRAMINX_STICKER_PALETTE } from "@/theme/domainColors";
@@ -30,6 +33,7 @@ const pyPoints = [
 ];
 
 export function PyDrawView() {
+  const { t } = useI18n();
   const [pyPointsM, setPyPointsM] = useState<PathSvg[]>([]);
 
   useEffect(() => {
@@ -42,6 +46,8 @@ export function PyDrawView() {
   }, []);
 
   return (
+    <Box maxW="1440px" mx="auto" py={{ base: 4, md: 8 }} minW="0">
+    <PageHeader eyebrow={t("nav.tools.draw")} title={t("home.welcome.draw.py.title")} description={t("home.welcome.draw.py.desc")} />
     <DrawPalette
       svgPoints={pyPointsM}
       presetColors={basePyColor}
@@ -49,5 +55,6 @@ export function PyDrawView() {
       viewBox="0 0 471.31 604.31"
       strokeWidthNum={10}
     />
+    </Box>
   );
 }

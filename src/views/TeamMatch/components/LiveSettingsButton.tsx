@@ -1,12 +1,16 @@
 import { Button, type ButtonProps } from 'antd';
 import React from 'react';
+import { useTeamMatchI18n } from '../i18n';
 
 /** 正赛顶栏与全屏对战共用的「正赛与对战设置」按钮 */
-const LiveSettingsButton = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => (
+const LiveSettingsButton = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
+  const { t } = useTeamMatchI18n();
+  return (
   <Button ref={ref} {...props}>
-    正赛与对战设置
+    {t('teamMatch.settings')}
   </Button>
-));
+  );
+});
 
 LiveSettingsButton.displayName = 'LiveSettingsButton';
 

@@ -3,14 +3,15 @@ import { CubesCn } from '@/components/CubeIcon/cube';
 import { WCALinkWithCnName } from '@/components/Link/WcaLinks';
 import { eventOrder, EXCLUDED_EVENTS } from '@/views/Wca/utils/events';
 import { resultsTimeFormat } from '@/views/Wca/utils/wca_results';
-import { CountryList, getWcaCountryLabel } from '@/services/cubing-pro/wca/country';
+import { CountryList } from '@/services/cubing-pro/wca/country';
+import { getLocalizedCountryLabel } from '../utils/countryLabel';
 import { GetAllEventChampionshipsPodium } from '@/services/cubing-pro/wca/static';
 import { AllEventChampionshipsPodium, Country } from '@/services/cubing-pro/wca/types';
 import { Input, Modal, Select, Table, Spin, Space, Switch, Button, Tag } from 'antd';
 import { RightOutlined } from '@ant-design/icons';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useIntlMessage } from '@/hooks/useIntlMessage';
-import { getThemeColors, mixCssColors } from '@/theme/chartColors';
+import { mixCssColors } from '@/theme/chartColors';
 import { MEDAL_COLORS, MEDAL_RGB } from '@/theme/domainColors';
 import './GrandSlamRank.css';
 
@@ -25,9 +26,8 @@ const TYPE_ALPHA: Record<string, number> = {
 
 /** 根据奖牌和锦标赛类型计算 Tag 背景色 */
 function getTagBgColor(rank: number, type: 'world' | 'continent' | 'country'): string {
-  const theme = getThemeColors();
   const rgb = MEDAL_RGB[rank];
-  if (!rgb) return mixCssColors(theme.foreground, 'transparent', 6);
+  if (!rgb) return mixCssColors('var(--foreground)', 'transparent', 6);
   const alpha = TYPE_ALPHA[type] ?? 0.15;
   return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
 }
@@ -121,7 +121,7 @@ const GrandSlamRank: React.FC = () => {
       .filter((c) => c?.id && countryIdsInData.has(c.id) && !c.name?.includes('Multiple Countries'))
       .map((c) => ({
         value: c.id,
-        label: getWcaCountryLabel(c.id, countries),
+        label: getLocalizedCountryLabel(c.id, countries, intl.locale),
       }))
       .sort((a, b) => (a.label || '').localeCompare(b.label || ''));
     return [
@@ -194,7 +194,7 @@ const GrandSlamRank: React.FC = () => {
         label: (
           <Space>
             {CubeIcon(ev, `event_${ev}`, {})}
-            {CubesCn(ev)}
+            {CubesCn(ev, intl.locale)}
           </Space>
         ),
       })),
@@ -233,7 +233,7 @@ const GrandSlamRank: React.FC = () => {
       render: (val: string) => (
         <Space size={4}>
           {CubeIcon(val, `event_${val}`, {})}
-          {CubesCn(val)}
+          {CubesCn(val, intl.locale)}
         </Space>
       ),
     },
@@ -256,13 +256,12 @@ const GrandSlamRank: React.FC = () => {
       key: 'hasWR',
       width: 56,
       render: (_: unknown, record: AllEventChampionshipsPodium) => {
-        const theme = getThemeColors();
         return record.hasWR ? (
           <Tag
             style={{
-              backgroundColor: mixCssColors(theme.destructive, 'transparent', 25),
-              borderColor: theme.destructive,
-              color: theme.destructive,
+              backgroundColor: mixCssColors('var(--destructive)', 'transparent', 25),
+              borderColor: 'var(--destructive)',
+              color: 'var(--destructive)',
             }}
           >
             WR
@@ -306,7 +305,7 @@ const GrandSlamRank: React.FC = () => {
       dataIndex: 'country',
       key: 'playerCountry',
       width: 120,
-      render: (val: string) => getWcaCountryLabel(val, countries),
+      render: (val: string) => getLocalizedCountryLabel(val, countries, intl.locale),
     },
   ];
 
@@ -369,7 +368,7 @@ const GrandSlamRank: React.FC = () => {
       dataIndex: 'country',
       key: 'country',
       width: 120,
-      render: (val: string) => getWcaCountryLabel(val, countries),
+      render: (val: string) => getLocalizedCountryLabel(val, countries, intl.locale),
     },
   ];
 

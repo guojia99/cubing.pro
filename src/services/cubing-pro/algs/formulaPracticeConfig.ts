@@ -2,6 +2,8 @@
  * 公式练习器配置
  */
 
+import { ClientMessageError } from '../clientError';
+
 const LS_KEY_PREFIX = 'algs:formula_practice_config:';
 
 export interface FormulaPracticeConfig {
@@ -42,11 +44,11 @@ export function saveFormulaPracticeConfig(
   classId: string,
   config: Partial<FormulaPracticeConfig>,
 ): void {
-  if (!cube || !classId) throw new Error('cube and classId are required');
+  if (!cube || !classId) throw new ClientMessageError('shared.error.practiceConfig');
   const current = getFormulaPracticeConfig(cube, classId);
   const next = { ...current, ...config };
   if (!Number.isFinite(next.trimRatio) || next.trimRatio < 0 || next.trimRatio > 50 || typeof next.remindProficiency !== 'boolean') {
-    throw new Error('Invalid practice configuration');
+    throw new ClientMessageError('shared.error.practiceConfig');
   }
   localStorage.setItem(getStorageKey(cube, classId), JSON.stringify(next));
 }

@@ -17,6 +17,11 @@ function readLocalizedField(alg: AlgItem, keys: string[]): string | undefined {
 
 /** 中文名优先字段；无则回退英文名 / `name`。 */
 export function getAlgDisplayName(alg: AlgItem, locale: Locale): string {
+  const language = locale === "yue-Hant-HK" ? "yue" : locale.split("-")[0];
+  const localized = readLocalizedField(alg, [
+    `name_${locale}`, `name_${language}`, `name${language[0].toUpperCase()}${language.slice(1)}`,
+  ]);
+  if (localized) return localized;
   const zh = readLocalizedField(alg, [
     "name_zh",
     "nameZh",
@@ -33,7 +38,7 @@ export function getAlgDisplayName(alg: AlgItem, locale: Locale): string {
   ]);
   const fallback = pickString(alg.name) ?? "";
 
-  if (locale === "zh-CN") {
+  if (locale === "zh-CN" || locale === "yue-Hant-HK") {
     return zh ?? en ?? fallback;
   }
   return en ?? zh ?? fallback;

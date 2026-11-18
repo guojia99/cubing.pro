@@ -17,8 +17,8 @@
   justify-content: space-between;
   padding: 8px 12px;
   border-radius: 8px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid var(--border-default);
+  background: var(--muted);
   cursor: pointer;
 }
 
@@ -31,7 +31,7 @@
 .batch-custom-formula-modal .batch-custom-fill-top {
   text-align: center;
   padding: 8px 0 16px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid var(--border-default);
   margin-bottom: 16px;
 }
 
@@ -88,19 +88,19 @@
   border-radius: 8px;
   font-size: 14px;
   word-break: break-all;
-  border: 2px solid rgba(34, 168, 203, 0.35);
-  background: rgba(34, 168, 203, 0.08);
+  border: 1px solid var(--border-default);
+  background: var(--card);
   cursor: pointer;
   transition: border-color 0.15s, background 0.15s;
 }
 
 .batch-custom-formula-modal .batch-custom-formula-item:hover {
-  border-color: rgba(34, 168, 203, 0.75);
+  border-color: var(--accent);
 }
 
 .batch-custom-formula-modal .batch-custom-formula-item--selected {
-  border-color: rgb(82, 196, 26);
-  background: rgba(82, 196, 26, 0.15);
+  border-color: var(--signal-success);
+  background: color-mix(in srgb, var(--signal-success) 12%, var(--card));
 }
 
 .batch-custom-formula-modal .batch-custom-formula-item--custom {

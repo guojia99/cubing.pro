@@ -143,11 +143,10 @@ const WCAPlayerStaticsTab: React.FC<WCAPlayerStaticsTabProps> = ({
 
   return (
     <Card
-      hoverable
       style={{
         width: "100%",
         margin: "0 auto",
-        borderRadius: 16,
+        borderRadius: 'var(--radius-card)',
         marginTop: 16,
       }}
       variant="borderless"

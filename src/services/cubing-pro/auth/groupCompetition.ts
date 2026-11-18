@@ -3,6 +3,9 @@ import type { CompAPI } from "@/services/cubing-pro/comps/typings";
 import { AuthHeader } from "./token";
 import { getApiErrorDisplayMessage, Request } from "../request";
 import { beijingDate, isGroupCompetition } from "@/lib/groupCompetition";
+import { ClientMessageError, clientErrorMessage } from "../clientError";
+import { readStoredLocale } from "@/i18n";
+import { translateShared } from "@/i18n/messages/shared";
 
 export type CompetitionMode = "admin" | "organizer";
 export type CompetitionItem = Pick<CompAPI.Data, "id" | "Name" | "Status" | "IsDone" | "OrganizersID" | "CompStartTime" | "CompEndTime" | "EventMin" | "CanPreResult" | "Count" | "Genre"> & {
@@ -31,12 +34,12 @@ export type CompetitionFiltersPage = CompetitionFilters & {
 };
 type Envelope<T> = { code: string | number; data: T; error?: string; msg?: string };
 
-export function competitionError(error: unknown): string {
+export function competitionError(error: unknown, locale: string = readStoredLocale()): string {
   if (typeof error === "object" && error !== null && "response" in error) {
     const response = (error as { response?: { data?: unknown } }).response;
-    return getApiErrorDisplayMessage(response?.data) ?? (typeof response?.data === "object" && response.data !== null && "msg" in response.data && typeof response.data.msg === "string" ? response.data.msg : "请求失败，请稍后重试");
+    return getApiErrorDisplayMessage(response?.data) ?? (typeof response?.data === "object" && response.data !== null && "msg" in response.data && typeof response.data.msg === "string" ? response.data.msg : translateShared(locale, "shared.error.request"));
   }
-  return error instanceof Error ? error.message : "请求失败，请稍后重试";
+  return clientErrorMessage(error, locale, "shared.error.request");
 }
 
 async function call<T>(method: "get" | "post" | "put" | "delete", url: string, data?: unknown, params?: Query, signal?: AbortSignal): Promise<T> {
@@ -48,7 +51,10 @@ async function call<T>(method: "get" | "post" | "put" | "delete", url: string, d
     throw new Error(competitionError(error));
   }
   const body = response.data;
-  if (String(body.code) !== "200") throw new Error(getApiErrorDisplayMessage(body) ?? body.msg ?? "请求失败");
+  if (String(body.code) !== "200") {
+    const message = getApiErrorDisplayMessage(body) ?? body.msg;
+    throw message ? new Error(message) : new ClientMessageError("shared.error.request");
+  }
   return body.data;
 }
 
@@ -69,8 +75,8 @@ export function competitionService(mode: CompetitionMode, orgId: string, compId:
     preResults: (params: Query, signal?: AbortSignal) => call<PageData<PreResult>>("get", `${base}/pre_results`, undefined, params, signal),
     approveResult: (id: number, FinishDetail: string) => call<null>("post", `${base}/pre_results/${id}/approval`, { FinishDetail }),
     confirmHistoricalResult: (id: number, reason: string) => {
-      if (mode !== "admin") return Promise.reject(new Error("人工核查确认仅限管理员专用接口"));
-      if (!reason.trim()) return Promise.reject(new Error("人工核查理由不能为空"));
+      if (mode !== "admin") return Promise.reject(new ClientMessageError("shared.error.adminOnly"));
+      if (!reason.trim()) return Promise.reject(new ClientMessageError("shared.error.reviewReason"));
       return call<null>("post", `${base}/pre_results/${id}/approval`, { FinishDetail: "ok", HistoricalConfirmed: true, ReviewReason: reason.trim() });
     },
     round: (EventID: string, RoundNumber: number, Open: boolean) => call<null>("put", `${base}/refresh_event`, { EventID, RoundNumber, Open }),

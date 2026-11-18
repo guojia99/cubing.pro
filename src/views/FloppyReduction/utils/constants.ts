@@ -18,5 +18,5 @@ export const FR_COLORS = {
   destructiveFg: "signal.destructiveFg",
   successSoft: "color-mix(in srgb, var(--signal-success) 14%, transparent)",
   warningSoft: "color-mix(in srgb, var(--signal-warning) 14%, transparent)",
-  destructiveSoft: "color-mix(in srgb, var(--signal-destructive) 14%, transparent)",
+  destructiveSoft: "color-mix(in srgb, var(--destructive) 14%, transparent)",
 } as const;

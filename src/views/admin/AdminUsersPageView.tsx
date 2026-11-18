@@ -1,8 +1,12 @@
 "use client";
+import { useI18n } from "@/contexts/I18nProvider";
+import { useAdminManagement } from "@/views/admin/useAdminManagement";
 
 import "antd/dist/reset.css";
 
-import { Heading, VStack } from "@chakra-ui/react";
+import { VStack } from "@chakra-ui/react";
+import { PageHeader } from "@/components/ui/page";
+import "./admin-ui.css";
 import {
   CopyOutlined,
   DeleteOutlined,
@@ -57,13 +61,13 @@ import { getApiErrorDisplayMessage } from "@/services/cubing-pro/request";
 
 import "./admin_users_table.css";
 
-const AUTH_MANAGE_BITS: { label: string; value: Auth }[] = [
-  { label: "选手", value: Auth.AuthPlayer },
-  { label: "主办", value: Auth.AuthOrganizers },
-  { label: "代表", value: Auth.AuthDelegates },
-  { label: "管理员", value: Auth.AuthAdmin },
-  { label: "超级管理员", value: Auth.AuthSuperAdmin },
-];
+const AUTH_MANAGE_BITS = [
+  { label: "competitionAdmin.player", value: Auth.AuthPlayer },
+  { label: "competitionAdmin.organizer", value: Auth.AuthOrganizers },
+  { label: "competitionAdmin.delegate", value: Auth.AuthDelegates },
+  { label: "competitionAdmin.admin", value: Auth.AuthAdmin },
+  { label: "competitionAdmin.superAdmin", value: Auth.AuthSuperAdmin },
+] as const;
 
 function authToChecked(auth: number): number[] {
   return AUTH_MANAGE_BITS.filter((b) => hasAuth(auth, b.value)).map((b) => b.value);
@@ -78,11 +82,11 @@ function isDeletedUser(player: PlayersAPI.Player): boolean {
   return true;
 }
 
-function showApiError(err: unknown) {
+function showApiError(err: unknown, fallback: string) {
+  if (err && typeof err === "object" && "errorFields" in err) return;
   const ax = err as { response?: { data?: unknown } };
   const text = getApiErrorDisplayMessage(ax.response?.data);
-  if (text) void message.error(text);
-  else if (err instanceof Error) void message.error(err.message);
+  void message.error(text || fallback);
 }
 
 type UserRowActionsProps = {
@@ -108,6 +112,8 @@ function UserRowActions({
   onSoftDelete,
   onPurge,
 }: UserRowActionsProps) {
+  const { t } = useI18n();
+  const m = useAdminManagement();
   if (isDeletedUser(player)) {
     return (
       <Button
@@ -118,7 +124,7 @@ function UserRowActions({
         className="admin-user-action-btn"
         onClick={() => onPurge(player)}
       >
-        彻底删除
+        {m("adminManagement.purge")}
       </Button>
     );
   }
@@ -127,25 +133,25 @@ function UserRowActions({
     {
       key: "name",
       icon: <UserOutlined />,
-      label: "修改名称",
+      label: m("adminManagement.editName"),
       onClick: () => onEditName(player),
     },
     {
       key: "cube",
       icon: <IdcardOutlined />,
-      label: "修改 CubeID",
+      label: m("adminManagement.editCubeId"),
       onClick: () => onEditCubeId(player),
     },
     {
       key: "wca",
       icon: <IdcardOutlined />,
-      label: "修改 WCA ID",
+      label: m("adminManagement.editWcaId"),
       onClick: () => onEditWca(player),
     },
     {
       key: "qq",
       icon: <QqOutlined />,
-      label: "修改 QQ",
+      label: m("adminManagement.editQq"),
       onClick: () => onEditQq(player),
     },
   ];
@@ -159,7 +165,7 @@ function UserRowActions({
     >
       <Dropdown menu={{ items: editMenu }} trigger={["click"]}>
         <Button type="link" size="small" icon={<EditOutlined />} className="admin-user-action-btn">
-          编辑资料
+          {m("adminManagement.editProfile")}
         </Button>
       </Dropdown>
       <Button
@@ -169,7 +175,7 @@ function UserRowActions({
         className="admin-user-action-btn"
         onClick={() => onAuth(player)}
       >
-        权限
+        {t("profile.field.auth")}
       </Button>
       <Button
         type="link"
@@ -178,7 +184,7 @@ function UserRowActions({
         className="admin-user-action-btn"
         onClick={() => onMerge(player)}
       >
-        合并
+        {m("adminManagement.merge")}
       </Button>
       <Button
         type="link"
@@ -188,13 +194,16 @@ function UserRowActions({
         className="admin-user-action-btn"
         onClick={() => onSoftDelete(player)}
       >
-        软删除
+        {m("adminManagement.softDelete")}
       </Button>
     </Space>
   );
 }
 
 export function AdminUsersPageView() {
+  const { t } = useI18n();
+  const m = useAdminManagement();
+  const [modal, modalContext] = Modal.useModal();
   const [players, setPlayers] = useState<PlayersAPI.Player[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -267,13 +276,13 @@ export function AdminUsersPageView() {
       const values = await createForm.validateFields();
       setConfirmLoading(true);
       await apiAdminCreatePlayer(values);
-      void message.success("用户创建成功");
+      void message.success(m("adminManagement.userCreated"));
       createForm.resetFields();
       setCreateUserModalOpen(false);
       void loadPlayers();
     } catch (err) {
       if (err instanceof Error) {
-        void message.error(err.message);
+        showApiError(err, t("shared.error.request"));
       }
     } finally {
       setConfirmLoading(false);
@@ -289,12 +298,12 @@ export function AdminUsersPageView() {
         new_name: values.name,
         wca_id: "",
       });
-      void message.success("用户更名成功");
+      void message.success(m("adminManagement.userRenamed"));
       updateNameForm.resetFields();
       setUpdatePlayerNameModal(false);
       void loadPlayers();
     } catch (err: unknown) {
-      showApiError(err);
+      showApiError(err, t("shared.error.request"));
     } finally {
       setConfirmLoading(false);
     }
@@ -308,12 +317,12 @@ export function AdminUsersPageView() {
         cube_id: curUpdatePlayer?.CubeID || "",
         new_cube_id: values.new_cube_id,
       });
-      void message.success("CubeID 修改成功");
+      void message.success(m("adminManagement.cubeIdUpdated"));
       updateCubeIdForm.resetFields();
       setUpdatePlayerCubeIdModal(false);
       void loadPlayers();
     } catch (err: unknown) {
-      showApiError(err);
+      showApiError(err, t("shared.error.request"));
     } finally {
       setConfirmLoading(false);
     }
@@ -328,12 +337,12 @@ export function AdminUsersPageView() {
         new_name: "",
         wca_id: values.wca_id,
       });
-      void message.success("用户更改WCAID成功");
+      void message.success(m("adminManagement.wcaIdUpdated"));
       updateWCAForm.resetFields();
       setUpdatePlayerWcaModal(false);
       void loadPlayers();
     } catch (err: unknown) {
-      showApiError(err);
+      showApiError(err, t("shared.error.request"));
     } finally {
       setConfirmLoading(false);
     }
@@ -349,31 +358,31 @@ export function AdminUsersPageView() {
         qq: values.qq ?? "",
         qq_uni_id: values.qq_uni_id ?? "",
       });
-      void message.success("QQ 信息已更新");
+      void message.success(m("adminManagement.qqUpdated"));
       updateQqForm.resetFields();
       setUpdatePlayerQqModal(false);
       void loadPlayers();
     } catch (err: unknown) {
-      showApiError(err);
+      showApiError(err, t("shared.error.request"));
     } finally {
       setConfirmLoading(false);
     }
   };
 
   const handleSoftDelete = (player: PlayersAPI.Player) => {
-    Modal.confirm({
-      title: "软删除用户",
-      content: `确认软删除用户 ${player.Name}（ID: ${player.id}）？软删除后可彻底删除。`,
-      okText: "软删除",
+    modal.confirm({
+      title: m("adminManagement.softDeleteUser"),
+      content: m("adminManagement.softDeleteConfirm", { name: player.Name, id: player.id }),
+      okText: m("adminManagement.softDelete"),
       okButtonProps: { danger: true },
-      cancelText: "取消",
+      cancelText: t("teamMatch.cancel"),
       onOk: async () => {
         try {
           await apiAdminSoftDeleteUser({ user_id: player.id, cube_id: player.CubeID });
-          void message.success("用户已软删除");
+          void message.success(m("adminManagement.userSoftDeleted"));
           void loadPlayers();
         } catch (err: unknown) {
-          showApiError(err);
+          showApiError(err, t("shared.error.request"));
           throw err;
         }
       },
@@ -381,19 +390,19 @@ export function AdminUsersPageView() {
   };
 
   const handlePurge = (player: PlayersAPI.Player) => {
-    Modal.confirm({
-      title: "彻底删除用户",
-      content: `确认从数据库永久删除用户 ${player.Name}（ID: ${player.id}）？此操作不可恢复。`,
-      okText: "彻底删除",
+    modal.confirm({
+      title: m("adminManagement.purgeUser"),
+      content: m("adminManagement.purgeConfirm", { name: player.Name, id: player.id }),
+      okText: m("adminManagement.purge"),
       okButtonProps: { danger: true },
-      cancelText: "取消",
+      cancelText: t("teamMatch.cancel"),
       onOk: async () => {
         try {
           await apiAdminPurgeUser({ user_id: player.id, cube_id: player.CubeID });
-          void message.success("用户已彻底删除");
+          void message.success(m("adminManagement.userPurged"));
           void loadPlayers();
         } catch (err: unknown) {
-          showApiError(err);
+          showApiError(err, t("shared.error.request"));
           throw err;
         }
       },
@@ -453,11 +462,11 @@ export function AdminUsersPageView() {
           });
         }
       }
-      void message.success("权限已更新");
+      void message.success(m("adminManagement.permissionsUpdated"));
       setAuthModalOpen(false);
       void loadPlayers();
     } catch (err: unknown) {
-      showApiError(err);
+      showApiError(err, t("shared.error.request"));
     } finally {
       setConfirmLoading(false);
     }
@@ -470,12 +479,12 @@ export function AdminUsersPageView() {
     const revokingOrg =
       hasAuth(oldA, Auth.AuthOrganizers) && !hasAuth(newA, Auth.AuthOrganizers);
     if (revokingOrg) {
-      Modal.confirm({
-        title: "撤销主办权限",
+      modal.confirm({
+        title: m("adminManagement.revokeOrganizer"),
         content:
-          "若该用户仍在任一主办团队中担任组长或成员，服务端将拒绝。请先在主办管理中移出成员或变更组长后再撤销。",
-        okText: "仍要提交",
-        cancelText: "取消",
+          m("adminManagement.revokeOrganizerHint"),
+        okText: m("adminManagement.submitAnyway"),
+        cancelText: t("teamMatch.cancel"),
         onOk: () => applyAuthDiff(),
       });
       return;
@@ -491,13 +500,13 @@ export function AdminUsersPageView() {
         base_user_cube_id: curUpdatePlayer?.CubeID || "",
         merged_user_cube_id: values.other_cube_id,
       });
-      void message.success("用户合并成功");
+      void message.success(m("adminManagement.userMerged"));
       mergePlayerForm.resetFields();
       setMergePlayerWcaModal(false);
       void loadPlayers();
     } catch (err) {
       if (err instanceof Error) {
-        void message.error(err.message);
+        showApiError(err, t("shared.error.request"));
       }
     } finally {
       setConfirmLoading(false);
@@ -513,11 +522,11 @@ export function AdminUsersPageView() {
   const columns: ColumnsType<PlayersAPI.Player> = [
     { title: "ID", dataIndex: "id", key: "id", width: 70 },
     {
-      title: "状态",
+      title: t("competitionAdmin.status"),
       key: "status",
       width: 80,
       render: (_v, player) =>
-        isDeletedUser(player) ? <Tag color="red">已删除</Tag> : <Tag color="green">正常</Tag>,
+        isDeletedUser(player) ? <Tag color="red">{m("adminManagement.deleted")}</Tag> : <Tag color="green">{m("adminManagement.activeUser")}</Tag>,
     },
     {
       title: "CubeID",
@@ -527,7 +536,7 @@ export function AdminUsersPageView() {
       render: (value: string, player) => PlayerLink(player.CubeID, value, "var(--foreground)"),
     },
     {
-      title: "名称",
+      title: t("competitionAdmin.name"),
       dataIndex: "Name",
       key: "Name",
       width: 150,
@@ -564,11 +573,12 @@ export function AdminUsersPageView() {
             </span>
             <Button
               size="small"
-              style={{ color: "blueviolet", flexShrink: 0 }}
+              aria-label={m("adminManagement.copyQqId")}
+              style={{ color: "var(--accent)", flexShrink: 0 }}
               icon={<CopyOutlined />}
               onClick={() => {
                 void navigator.clipboard.writeText(value).then(() => {
-                  void message.success("复制成功");
+                  void message.success(t("shared.copy.success"));
                 });
               }}
             />
@@ -577,7 +587,7 @@ export function AdminUsersPageView() {
       },
     },
     {
-      title: "认领密码",
+      title: m("adminManagement.claimPassword"),
       dataIndex: "InitPassword",
       key: "InitPassword",
       render: (value: string | undefined) => {
@@ -589,11 +599,12 @@ export function AdminUsersPageView() {
             </Tooltip>
             <Button
               size="small"
-              style={{ color: "blueviolet" }}
+              aria-label={m("adminManagement.copyClaimPassword")}
+              style={{ color: "var(--accent)" }}
               icon={<CopyOutlined />}
               onClick={() => {
                 void navigator.clipboard.writeText(value).then(() => {
-                  void message.success("复制成功");
+                  void message.success(t("shared.copy.success"));
                 });
               }}
             />
@@ -602,14 +613,14 @@ export function AdminUsersPageView() {
       },
     },
     {
-      title: "权限",
+      title: t("profile.field.auth"),
       dataIndex: "Auth",
       key: "Auth",
       width: 100,
       render: (a: number) => authTags(a),
     },
     {
-      title: "操作",
+      title: t("teamMatch.actions"),
       key: "option",
       width: 280,
       fixed: "right",
@@ -632,13 +643,14 @@ export function AdminUsersPageView() {
 
   return (
     <AdminGuard>
-      <VStack align="stretch" gap="6">
-        <Heading size="xl">用户管理</Heading>
+      {modalContext}
+      <VStack className="admin-page" align="stretch" gap="6">
+        <PageHeader eyebrow={t("nav.admin.admins")} title={m("adminManagement.usersTitle")} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
+        <div className="admin-toolbar" style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center", flex: 1 }}>
             <Input.Search
-              placeholder="搜索名称、CubeID 或用户 ID"
+              placeholder={m("adminManagement.searchUsers")}
               value={searchName}
               onChange={(e) => setSearchName(e.target.value)}
               onSearch={handleSearch}
@@ -653,7 +665,7 @@ export function AdminUsersPageView() {
                   setTableParams((prev) => ({ ...prev, page: 1, includeDeleted: checked }))
                 }
               />
-              包含已删除
+              {m("adminManagement.includeDeleted")}
             </label>
             <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13 }}>
               <Switch
@@ -662,7 +674,7 @@ export function AdminUsersPageView() {
                   setTableParams((prev) => ({ ...prev, page: 1, onlyDeleted: checked }))
                 }
               />
-              仅已删除
+              {m("adminManagement.onlyDeleted")}
             </label>
           </div>
           <Button
@@ -671,7 +683,7 @@ export function AdminUsersPageView() {
             size="small"
             onClick={() => setCreateUserModalOpen(true)}
           >
-            创建用户
+            {m("adminManagement.createUser")}
           </Button>
         </div>
 
@@ -696,32 +708,32 @@ export function AdminUsersPageView() {
         />
 
         <Modal
-          title="创建用户"
+          title={m("adminManagement.createUser")}
           open={createUserModalOpen}
           onCancel={() => setCreateUserModalOpen(false)}
           onOk={() => void handleCreateUser()}
           confirmLoading={confirmLoading}
-          okText="提交"
-          cancelText="取消"
+          okText={t("competitionAdmin.submit")}
+          cancelText={t("teamMatch.cancel")}
         >
           <Form form={createForm} layout="vertical">
-            <Form.Item name="name" label="用户名" rules={[{ required: true, message: "请输入用户名" }]}>
-              <Input placeholder="请输入用户名" />
+            <Form.Item name="name" label={m("adminManagement.username")} rules={[{ required: true, message: m("adminManagement.usernameRequired") }]}>
+              <Input placeholder={m("adminManagement.usernameRequired")} />
             </Form.Item>
             <Form.Item name="qq" label="QQ">
-              <Input placeholder="请输入 QQ 号" />
+              <Input placeholder={m("adminManagement.enterQq")} />
             </Form.Item>
-            <Form.Item name="actualName" label="真实姓名">
-              <Input placeholder="请输入真实姓名" />
+            <Form.Item name="actualName" label={m("adminManagement.realName")}>
+              <Input placeholder={m("adminManagement.enterRealName")} />
             </Form.Item>
             <Form.Item name="wca_id" label="WCA ID">
-              <Input placeholder="请输入 WCA ID" />
+              <Input placeholder={m("adminManagement.enterWcaId")} />
             </Form.Item>
           </Form>
         </Modal>
 
         <Modal
-          title="修改用户名称"
+          title={m("adminManagement.editUserName")}
           open={updatePlayerNameModal}
           onOk={() => void handleUpdateName()}
           confirmLoading={confirmLoading}
@@ -730,18 +742,18 @@ export function AdminUsersPageView() {
         >
           <Form form={updateNameForm} layout="vertical" preserve={false}>
             <Form.Item
-              label="用户名称"
+              label={m("adminManagement.userName")}
               name="name"
               initialValue={curUpdatePlayer?.Name}
-              rules={[{ required: true, message: "请输入新名称" }]}
+              rules={[{ required: true, message: m("adminManagement.newName") }]}
             >
-              <Input placeholder="请输入新名称" />
+              <Input placeholder={m("adminManagement.newName")} />
             </Form.Item>
           </Form>
         </Modal>
 
         <Modal
-          title={`修改用户 ${curUpdatePlayer?.Name} 的 CubeID`}
+          title={m("adminManagement.userCubeIdTitle", { name: curUpdatePlayer?.Name ?? "" })}
           open={updatePlayerCubeIdModal}
           onOk={() => void handleUpdateCubeID()}
           confirmLoading={confirmLoading}
@@ -749,24 +761,24 @@ export function AdminUsersPageView() {
           destroyOnHidden
         >
           <Form form={updateCubeIdForm} layout="vertical" preserve={false}>
-            <Form.Item label="当前 CubeID">
+            <Form.Item label={m("adminManagement.currentCubeId")}>
               <Input value={curUpdatePlayer?.CubeID} disabled />
             </Form.Item>
             <Form.Item
-              label="新 CubeID"
+              label={m("adminManagement.newCubeId")}
               name="new_cube_id"
               rules={[
-                { required: true, message: "请输入新 CubeID" },
-                { len: 10, message: "CubeID 长度须为 10" },
+                { required: true, message: m("adminManagement.enterNewCubeId") },
+                { len: 10, message: m("adminManagement.cubeIdLength") },
               ]}
             >
-              <Input placeholder="请输入 10 位 CubeID" maxLength={10} />
+              <Input placeholder={m("adminManagement.enterCubeId")} maxLength={10} />
             </Form.Item>
           </Form>
         </Modal>
 
         <Modal
-          title={`修改用户 ${curUpdatePlayer?.Name} 的 QQ`}
+          title={m("adminManagement.userQqTitle", { name: curUpdatePlayer?.Name ?? "" })}
           open={updatePlayerQqModal}
           onOk={() => void handleUpdateQQ()}
           confirmLoading={confirmLoading}
@@ -775,16 +787,16 @@ export function AdminUsersPageView() {
         >
           <Form form={updateQqForm} layout="vertical" preserve={false}>
             <Form.Item label="QQ" name="qq">
-              <Input placeholder="QQ 号" />
+              <Input placeholder={m("adminManagement.qqNumber")} />
             </Form.Item>
             <Form.Item label="QQUniID" name="qq_uni_id">
-              <Input placeholder="QQ 唯一认证 ID" />
+              <Input placeholder={m("adminManagement.qqUniqueId")} />
             </Form.Item>
           </Form>
         </Modal>
 
         <Modal
-          title={`修改用户${curUpdatePlayer?.Name} WCAID`}
+          title={m("adminManagement.userWcaTitle", { name: curUpdatePlayer?.Name ?? "" })}
           open={updatePlayerWcaModal}
           onOk={() => void handleUpdateWCA()}
           confirmLoading={confirmLoading}
@@ -797,17 +809,17 @@ export function AdminUsersPageView() {
               name="wca_id"
               initialValue={curUpdatePlayer?.WcaID}
               rules={[
-                { required: true, message: "请输入wcaID" },
-                { len: 10, message: "长度必须为10" },
+                { required: true, message: m("adminManagement.enterWcaId") },
+                { len: 10, message: t("shared.error.wcaId") },
               ]}
             >
-              <Input placeholder="请输入WCAID" />
+              <Input placeholder={m("adminManagement.enterWcaId")} />
             </Form.Item>
           </Form>
         </Modal>
 
         <Modal
-          title={`修改权限 — ${curUpdatePlayer?.Name} (${curUpdatePlayer?.CubeID})`}
+          title={m("adminManagement.permissionsTitle", { name: curUpdatePlayer?.Name ?? "", cubeId: curUpdatePlayer?.CubeID ?? "" })}
           open={authModalOpen}
           onCancel={() => setAuthModalOpen(false)}
           onOk={() => void handleSaveAuth()}
@@ -816,7 +828,7 @@ export function AdminUsersPageView() {
           destroyOnHidden
         >
           <p style={{ marginBottom: 12, color: "var(--muted-foreground)" }}>
-            按位更新权限；撤销主办前请确认用户已从主办团队中移出。
+            {m("adminManagement.permissionsHint")}
           </p>
           <Checkbox.Group
             style={{ display: "flex", flexDirection: "column", gap: 8 }}
@@ -825,14 +837,14 @@ export function AdminUsersPageView() {
           >
             {AUTH_MANAGE_BITS.map((b) => (
               <Checkbox key={b.value} value={b.value}>
-                {b.label}
+                {t(b.label)}
               </Checkbox>
             ))}
           </Checkbox.Group>
         </Modal>
 
         <Modal
-          title={`合并用户 ${curUpdatePlayer?.Name}`}
+          title={m("adminManagement.mergeUserTitle", { name: curUpdatePlayer?.Name ?? "" })}
           open={mergePlayerWcaModal}
           onOk={() => void handleMergePlayer()}
           confirmLoading={confirmLoading}
@@ -841,14 +853,14 @@ export function AdminUsersPageView() {
         >
           <Form form={mergePlayerForm} layout="vertical" preserve={false}>
             <Form.Item
-              label="合并到账号（被合并方）"
+              label={m("adminManagement.mergedAccount")}
               name="other_cube_id"
               rules={[
-                { required: true, message: "请搜索并选择用户" },
-                { len: 10, message: "CubeID 长度须为 10" },
+                { required: true, message: m("adminManagement.chooseUser") },
+                { len: 10, message: m("adminManagement.cubeIdLength") },
               ]}
             >
-              <AdminUserSearchSelect placeholder="输入姓名或 CubeID 搜索被合并用户" />
+              <AdminUserSearchSelect placeholder={m("adminManagement.searchMergeUser")} />
             </Form.Item>
           </Form>
         </Modal>

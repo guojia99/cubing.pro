@@ -13,11 +13,11 @@
   height: 8px;
 }
 .wca-chart-container::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.25);
+  background: var(--border-default);
   border-radius: 4px;
 }
 .wca-chart-container::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.4);
+  background: var(--accent);
 }
 /* 内层：PC 端 100% 铺满，窄屏时最小 500px 保证可读并触发横向滚动 */
 .wca-chart-inner {

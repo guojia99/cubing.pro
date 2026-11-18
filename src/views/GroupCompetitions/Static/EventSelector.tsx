@@ -6,9 +6,12 @@ import type { SelectProps } from "antd";
 import { useEffect, useState } from "react";
 
 import { CubeIcon } from "@/components/CubeIcon/cube_icon";
+import { CubesCn } from "@/components/CubeIcon/cube";
+import { useI18n } from "@/contexts/I18nProvider";
 import {
   CountryAvatar,
   countryIso2ToChinese,
+  getCountryDisplayName,
 } from "@/views/Wca/PlayerComponents/region/all_contiry";
 
 export const allEvents = [
@@ -44,6 +47,7 @@ export function EventSelector({
   isCountry = false,
   onConfirm,
 }: EventSelectorProps) {
+  const { t, tf, locale } = useI18n();
   const [selectingEvents, setSelectingEvents] = useState<string[]>([]);
   const [age, setAge] = useState<number>(40);
   const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
@@ -54,13 +58,13 @@ export function EventSelector({
 
   const presets = new Map<string, string[]>([
     [
-      "速拧",
+      t('competitionAdmin.speed'),
       ["333", "222", "444", "555", "666", "777", "pyram", "skewb", "minx", "sq1", "clock", "333oh"],
     ],
-    ["安静", ["333bf", "333mbf", "444bf", "555bf", "333fm"]],
-    ["盲拧", ["333bf", "333mbf", "444bf", "555bf"]],
-    ["正阶", ["333", "222", "444", "555", "666", "777", "333oh"]],
-    ["异型", ["pyram", "skewb", "minx", "sq1", "clock"]],
+    [t('competitionAdmin.quiet'), ["333bf", "333mbf", "444bf", "555bf", "333fm"]],
+    [t('competitionAdmin.blind'), ["333bf", "333mbf", "444bf", "555bf"]],
+    [t('competitionAdmin.cubes'), ["333", "222", "444", "555", "666", "777", "333oh"]],
+    [t('competitionAdmin.otherPuzzles'), ["pyram", "skewb", "minx", "sq1", "clock"]],
   ]);
 
   const handleSelectAll = () => {
@@ -74,7 +78,7 @@ export function EventSelector({
   const handleSetWithPresets = (name: string) => {
     const ps = presets.get(name);
     if (ps) {
-      setSelectingEvents([...ps]);
+      setSelectingEvents(ps.filter((event) => events.includes(event)));
     }
   };
 
@@ -84,16 +88,16 @@ export function EventSelector({
 
   const placeholderCountryText =
     selectedCountries.length === 0
-      ? "全部国家或地区"
-      : `${selectedCountries.length} 个国家已选择`;
+      ? t('competitionExtra.allCountries')
+      : tf('competitionExtra.selectedCountries', { count: selectedCountries.length });
 
   const countryOptions: SelectProps["options"] = Object.entries(countryIso2ToChinese).map(
-    ([code, name]) => ({
+    ([code]) => ({
       value: code,
       label: (
         <div style={{ display: "flex", alignItems: "center" }}>
           {CountryAvatar(code)}
-          {name} ({code})
+          {getCountryDisplayName(code, undefined, locale)} ({code})
         </div>
       ),
     }),
@@ -118,7 +122,7 @@ export function EventSelector({
             onClick={handleSelectAll}
             disabled={events.length === 0}
           >
-            全选
+            {t('competitionAdmin.selectAll')}
           </Button>
           <Button
             size="small"
@@ -126,7 +130,7 @@ export function EventSelector({
             onClick={handleUnselectAll}
             disabled={events.length === 0}
           >
-            取消全选
+            {t('competitionAdmin.deselectAll')}
           </Button>
           {[...presets.keys()].map((presetName) => (
             <Button key={presetName} size="small" onClick={() => handleSetWithPresets(presetName)}>
@@ -136,11 +140,9 @@ export function EventSelector({
         </Space>
 
         <div style={{ fontSize: "14px" }}>
-          已选择{" "}
           <Tag color="blue">
-            {selectingEvents.length}/{events.length}
-          </Tag>{" "}
-          个项目
+            {tf('competitionAdmin.selectedEvents', { selected: selectingEvents.length, total: events.length })}
+          </Tag>
         </div>
       </div>
 
@@ -154,13 +156,15 @@ export function EventSelector({
           overflowY: "auto",
           padding: "10px",
           border: "1px solid var(--border-default)",
-          borderRadius: "4px",
+          borderRadius: "var(--radius-card)",
+          background: "var(--muted)",
         }}
       >
         {events.map((event) => (
           <div key={event} style={{ textAlign: "center" }}>
             <Checkbox
               value={event}
+              aria-label={CubesCn(event, locale)}
               checked={selectingEvents.includes(event)}
               onChange={(e) => {
                 if (e.target.checked) {
@@ -178,8 +182,8 @@ export function EventSelector({
 
       {isSenior && (
         <div style={{ marginBottom: "20px" }}>
-          <div style={{ marginBottom: "8px", fontWeight: "bold" }}>年龄: {age}岁</div>
-          <Slider min={40} max={100} step={10} value={age} onChange={setAge} />
+          <div style={{ marginBottom: "8px", fontWeight: "bold" }}>{tf('competitionExtra.age', { count: age })}</div>
+          <Slider min={40} max={100} step={10} value={age} onChange={setAge} aria-label={tf('competitionExtra.age', { count: age })} />
           <div
             style={{
               display: "flex",
@@ -188,8 +192,8 @@ export function EventSelector({
               color: "var(--faint-foreground)",
             }}
           >
-            <span>40岁</span>
-            <span>100岁</span>
+            <span>{tf('competitionExtra.yearsOld', { count: 40 })}</span>
+            <span>{tf('competitionExtra.yearsOld', { count: 100 })}</span>
           </div>
         </div>
       )}
@@ -200,6 +204,7 @@ export function EventSelector({
             mode="multiple"
             style={{ width: "100%", maxWidth: 480, marginBottom: "10px" }}
             placeholder={placeholderCountryText}
+            aria-label={t('competitionExtra.region')}
             value={selectedCountries}
             onChange={setSelectedCountries}
             options={countryOptions}
@@ -209,7 +214,7 @@ export function EventSelector({
       )}
 
       <Button type="primary" onClick={handleUpdateTable} size="small" style={{ float: "right" }}>
-        提交
+        {t('competitionAdmin.submit')}
       </Button>
       <div style={{ clear: "both" }} />
     </Card>

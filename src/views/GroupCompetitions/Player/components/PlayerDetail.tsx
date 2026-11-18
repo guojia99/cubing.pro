@@ -1,4 +1,6 @@
 import { CubesCn } from '@/components/CubeIcon/cube';
+import { useI18n } from '@/contexts/I18nProvider';
+import { PageHeader, SectionHeader } from '@/components/ui/page';
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import { eventRouteM } from '@/components/Data/cube_result/event_route';
 import { Result, resultString, resultTimeString } from '@/components/Data/types/result';
@@ -19,14 +21,14 @@ interface PlayerDetailProps {
   player?: PlayersAPI.Player;
 }
 
-const detailCol: ColumnsType<{
+const getDetailCol = (t: ReturnType<typeof useI18n>['t']): ColumnsType<{
   key: string;
   cubeId?: string;
   wcaId?: string;
   compNum?: number;
   resultNum: string;
   topNum?: number;
-}> = [
+}> => [
   {
     title: 'CubeID',
     dataIndex: 'cubeId',
@@ -48,14 +50,14 @@ const detailCol: ColumnsType<{
     width: 150,
   },
   {
-    title: '比赛场次',
+    title: t('competitionExtra.matches'),
     dataIndex: 'compNum',
     key: 'compNum',
     align: 'center',
     width: 130,
   },
   {
-    title: '还原次数',
+    title: t('competitionExtra.solves'),
     dataIndex: 'resultNum',
     key: 'resultNum',
     align: 'center',
@@ -85,16 +87,16 @@ const rankRender = (dom: number) => {
   );
 };
 
-const bestCol: ColumnsType<BestTableRow> = [
+const getBestCol = (t: ReturnType<typeof useI18n>['t'], locale: ReturnType<typeof useI18n>['locale']): ColumnsType<BestTableRow> => [
   {
-    title: '项目',
+    title: t('competitionAdmin.event'),
     dataIndex: 'event',
     key: 'event',
     fixed: 'left',
     render: (value: any) => {
       return (
         <strong>
-          {CubeIcon(value, value + '_best_col', {})} {CubesCn(value)}
+          {CubeIcon(value, value + '_best_col', {})} {CubesCn(value, locale)}
         </strong>
       );
     },
@@ -109,14 +111,14 @@ const bestCol: ColumnsType<BestTableRow> = [
     render: rankRender,
   },
   {
-    title: '单次',
+    title: t('competitionAdmin.single'),
     dataIndex: 'bestResult',
     key: 'bestResult',
     align: 'center',
     width: 180,
   },
   {
-    title: '平均',
+    title: t('competitionAdmin.average'),
     dataIndex: 'avgResult',
     key: 'avgResult',
     align: 'center',
@@ -134,6 +136,9 @@ const bestCol: ColumnsType<BestTableRow> = [
 ];
 
 const PlayerDetail: React.FC<PlayerDetailProps> = ({ player }) => {
+  const { t, locale } = useI18n();
+  const detailCol = getDetailCol(t);
+  const bestCol = getBestCol(t, locale);
   const [events, setEvents] = useState<EventsAPI.EventsResponse>();
 
   useEffect(() => {
@@ -219,7 +224,7 @@ const PlayerDetail: React.FC<PlayerDetailProps> = ({ player }) => {
       }
     }
     if (has) {
-      tags.push(<Tag key="all-events-complete" color="red">全项目达成</Tag>);
+      tags.push(<Tag key="all-events-complete" color="red">{t('competitionExtra.allEventsComplete')}</Tag>);
     }
   }
 
@@ -230,7 +235,7 @@ const PlayerDetail: React.FC<PlayerDetailProps> = ({ player }) => {
           {player?.Avatar && (
             <Avatar size={100} src={avatarUrl(player?.Avatar)} style={{ marginBottom: '20px' }} />
           )}
-          <h2 style={{ fontWeight: '700', wordBreak: 'break-word' }}>{player?.Name}</h2>
+          <PageHeader eyebrow={player?.CubeID} title={player?.Name} />
           <>{tags}</>
 
           <div className={styles.playerTableScroll}>
@@ -257,9 +262,7 @@ const PlayerDetail: React.FC<PlayerDetailProps> = ({ player }) => {
         <div style={{ minWidth: 0 }}>
           {wcaBestCols.length > 0 && (
             <>
-              <h3 style={{ fontWeight: '700', textAlign: 'center', marginTop: '30px' }}>
-                最佳记录
-              </h3>
+              <SectionHeader title={t('competitionExtra.bestRecords')} />
               <div className={styles.playerTableScroll}>
                 <Table
                   columns={bestCol}
@@ -278,9 +281,7 @@ const PlayerDetail: React.FC<PlayerDetailProps> = ({ player }) => {
           {bestCols.length > 0 && (
             <>
               {' '}
-              <h3 style={{ fontWeight: '700', textAlign: 'center', marginTop: '30px' }}>
-                趣味项目
-              </h3>
+              <SectionHeader title={t('competitionExtra.funEvents')} />
               <div className={styles.playerTableScroll}>
                 <Table
                   columns={bestCol}

@@ -10,9 +10,12 @@ import {
 } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useI18n } from "@/contexts/I18nProvider";
+import { getSiteContent } from "@/i18n/messages/site-content";
 import { LuChevronDown, LuChevronUp, LuSmile } from "react-icons/lu";
 
 import { toaster } from "@/components/ui/toaster";
+import { PageHeader, SectionHeader, Surface } from "@/components/ui/page";
 import { FoodFilterSelect } from "@/views/FoodShared/FoodFilterSelect";
 import { FoodMetaLink, FoodMetaRow, FoodMetaText } from "@/views/FoodShared/FoodMetaRow";
 import { MultiCheckboxSelect } from "@/views/FoodShared/MultiCheckboxSelect";
@@ -31,6 +34,7 @@ import {
 } from "./utils/favoriteStorage";
 import {
   getRecipeDisplayName,
+  getRecipeCategoryName,
   MAX_RECIPE_FAVORITES,
   MAX_RECIPE_TONIGHT,
   RECIPE_PAGE_SIZE,
@@ -53,6 +57,8 @@ import "@/views/FoodShared/food-page.css";
 type ListMode = "all" | "favorites" | "tonight";
 
 export function RecipeListView() {
+  const { locale } = useI18n();
+  const sc = getSiteContent(locale);
   const router = useRouter();
   const [data, setData] = useState<RecipesData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -72,10 +78,13 @@ export function RecipeListView() {
   const refreshTonight = useCallback(() => setTonightVersion((v) => v + 1), []);
 
   useEffect(() => {
-    fetch(RECIPES_JSON)
+    const controller = new AbortController();
+    fetch(RECIPES_JSON, { signal: controller.signal })
       .then((r) => r.json())
-      .then(setData)
-      .finally(() => setLoading(false));
+      .then((value) => { if (!controller.signal.aborted) setData(value); })
+      .catch(() => { if (!controller.signal.aborted) setData(null); })
+      .finally(() => { if (!controller.signal.aborted) setLoading(false); });
+    return () => controller.abort();
   }, []);
 
   useEffect(() => {
@@ -110,10 +119,10 @@ export function RecipeListView() {
 
   const categoryOptions = useMemo(
     () =>
-      [...new Map(recipes.map((r) => [r.category, { value: r.category, label: r.categoryName }])).values()].filter(
+      [...new Map(recipes.map((r) => [r.category, { value: r.category, label: getRecipeCategoryName(r.category, locale, r.categoryName) }])).values()].filter(
         (o) => o.value !== "template",
       ),
-    [recipes],
+    [recipes, locale],
   );
 
   const filteredRecipes = baseRecipes.filter((r) => {
@@ -188,7 +197,7 @@ export function RecipeListView() {
     if (addFavorite(recipe.category, recipe.id)) {
       refreshFavorites();
     } else {
-      toaster.create({ type: "warning", title: `最多收藏 ${MAX_RECIPE_FAVORITES} 道菜` });
+      toaster.create({ type: "warning", title: sc("siteContent.favoriteLimit", { count: MAX_RECIPE_FAVORITES }) });
     }
   };
 
@@ -200,9 +209,9 @@ export function RecipeListView() {
     }
     if (addToTonight(recipe.category, recipe.id)) {
       refreshTonight();
-      toaster.create({ type: "success", title: "已添加到今晚吃啥" });
+      toaster.create({ type: "success", title: sc("siteContent.recipeAdded") });
     } else {
-      toaster.create({ type: "warning", title: `今晚吃啥最多 ${MAX_RECIPE_TONIGHT} 道菜` });
+      toaster.create({ type: "warning", title: sc("siteContent.recipeLimit", { count: MAX_RECIPE_TONIGHT }) });
     }
   };
 
@@ -235,7 +244,12 @@ export function RecipeListView() {
     listMode === "favorites" ? "favorites" : listMode === "tonight" ? "tonight" : "all";
 
   return (
-    <Box className="food-list-page food-page" px={{ base: 4, md: 6 }} py="4" maxW="1600px" mx="auto">
+    <Box className="food-list-page food-page" px={{ base: 4, md: 6 }} py={{ base: 6, md: 10 }} maxW="1440px" mx="auto">
+      <PageHeader eyebrow={sc("siteContent.recipeEyebrow")} title={sc("siteContent.recipeTitle")} description={sc("siteContent.recipeIntro")} actions={
+        <Button colorPalette="brand" onClick={() => setTodayPickOpen(true)}><LuSmile />{sc("siteContent.pickFood")}</Button>
+      } />
+      <Surface className="food-filter-panel" p={{ base: 4, md: 5 }} mb="6">
+        <SectionHeader title={sc("siteContent.findRecipe")} description={sc("siteContent.recipeFilterIntro")} actions={listMode !== "tonight" ? <Button variant="ghost" size="sm" disabled={!filterCategory && filterDifficulty === "" && filterIngredients.length === 0 && !showOnlyWithImage} onClick={() => { setFilterCategory(""); setFilterDifficulty(""); setFilterIngredients([]); setShowOnlyWithImage(false); }}>{sc("siteContent.resetFilters")}</Button> : undefined} />
       <Flex className="food-toolbar" flexWrap="wrap" gap="3" align="center" mb="6">
         {listMode !== "tonight" ? (
           <>
@@ -246,7 +260,7 @@ export function RecipeListView() {
               value={filterCategory}
               onChange={setFilterCategory}
             >
-              <option value="">全部分类</option>
+              <option value="">{sc("siteContent.allCategories")}</option>
               {categoryOptions.map((o) => (
                 <option key={o.value} value={o.value}>
                   {o.label}
@@ -255,20 +269,21 @@ export function RecipeListView() {
             </FoodFilterSelect>
             <FoodFilterSelect
               className="food-filter-select--difficulty"
+              label={sc("siteContent.difficultyFilter")}
               w="112px"
               minW="112px"
               value={filterDifficulty === "" ? "" : String(filterDifficulty)}
               onChange={(v) => setFilterDifficulty(v ? Number(v) : "")}
             >
-              <option value="">全部难度</option>
+              <option value="">{sc("siteContent.allDifficulties")}</option>
               {[1, 2, 3, 4, 5].map((d) => (
                 <option key={d} value={d}>
-                  {d}星
+                  {sc("siteContent.stars", { count: d })}
                 </option>
               ))}
             </FoodFilterSelect>
             <MultiCheckboxSelect
-              placeholder="原材料筛选"
+              placeholder={sc("siteContent.ingredientsFilter")}
               className="food-filter-select--ingredients"
               options={allIngredients.map((i) => ({ value: i, label: i }))}
               value={filterIngredients}
@@ -279,25 +294,26 @@ export function RecipeListView() {
           </>
         ) : null}
         <SegmentGroup.Root
-          className="food-segment-group"
+          className="food-segment-group food-list-modes"
+          aria-label={sc("siteContent.recipeLists")}
           size="sm"
           value={listModeSegment}
           onValueChange={(e) => setListMode((e.value ?? "all") as ListMode)}
         >
           <SegmentGroup.Indicator />
           <SegmentGroup.Item value="all">
-            <SegmentGroup.ItemText>全部</SegmentGroup.ItemText>
+            <SegmentGroup.ItemText>{sc("siteContent.all")}</SegmentGroup.ItemText>
             <SegmentGroup.ItemHiddenInput />
           </SegmentGroup.Item>
           <SegmentGroup.Item value="favorites">
             <SegmentGroup.ItemText>
-              我喜欢的{favList.length ? ` (${favList.length})` : ""}
+              {sc("siteContent.favorites")}{favList.length ? ` (${favList.length})` : ""}
             </SegmentGroup.ItemText>
             <SegmentGroup.ItemHiddenInput />
           </SegmentGroup.Item>
           <SegmentGroup.Item value="tonight">
             <SegmentGroup.ItemText>
-              今晚吃啥{tonightRecipesList.length ? ` (${tonightRecipesList.length})` : ""}
+              {sc("siteContent.tonightFood")}{tonightRecipesList.length ? ` (${tonightRecipesList.length})` : ""}
             </SegmentGroup.ItemText>
             <SegmentGroup.ItemHiddenInput />
           </SegmentGroup.Item>
@@ -305,37 +321,37 @@ export function RecipeListView() {
         {listMode !== "tonight" ? (
           <SegmentGroup.Root
             className="food-segment-group"
+            aria-label={sc("siteContent.imageFilter")}
             size="sm"
             value={showOnlyWithImage ? "image" : "all"}
             onValueChange={(e) => setShowOnlyWithImage(e.value === "image")}
           >
             <SegmentGroup.Indicator />
             <SegmentGroup.Item value="all">
-              <SegmentGroup.ItemText>全部</SegmentGroup.ItemText>
+              <SegmentGroup.ItemText>{sc("siteContent.all")}</SegmentGroup.ItemText>
               <SegmentGroup.ItemHiddenInput />
             </SegmentGroup.Item>
             <SegmentGroup.Item value="image">
-              <SegmentGroup.ItemText>带图</SegmentGroup.ItemText>
+              <SegmentGroup.ItemText>{sc("siteContent.withImages")}</SegmentGroup.ItemText>
               <SegmentGroup.ItemHiddenInput />
             </SegmentGroup.Item>
           </SegmentGroup.Root>
         ) : null}
-        <Button colorPalette="brand" size="sm" onClick={() => setTodayPickOpen(true)}>
-          <LuSmile />
-          今天吃什么
-        </Button>
       </Flex>
+      </Surface>
 
       <FoodMetaRow>
         <FoodMetaText>
-          数据来源：
+          {sc("siteContent.source")}
           <FoodMetaLink href={RECIPES_DATA_SOURCE_URL} external ml="1">
             HowToCook
           </FoodMetaLink>
         </FoodMetaText>
-        <FoodMetaLink href="/other/kitchen-skills">厨房技能</FoodMetaLink>
-        <FoodMetaLink href="/other/cocktails">调酒</FoodMetaLink>
+        <FoodMetaLink href="/other/kitchen-skills">{sc("siteContent.kitchenSkills")}</FoodMetaLink>
+        <FoodMetaLink href="/other/cocktails">{sc("siteContent.cocktails")}</FoodMetaLink>
       </FoodMetaRow>
+
+      <SectionHeader title={sc(listMode === "tonight" ? "siteContent.tonightMenu" : listMode === "favorites" ? "siteContent.savedRecipes" : "siteContent.recipeIdeas")} description={sc("siteContent.recipeCount", { count: filteredRecipes.length })} />
 
       {listMode === "tonight" ? (
         <Box className="food-tonight-layout">
@@ -343,11 +359,11 @@ export function RecipeListView() {
             <Box className="food-tonight-receipt-inner">
               <TonightReceipt
                 key={tonightVersion}
-                title="购物小票"
-                emptyText="暂无菜谱，去添加吧"
-                clearTitle="清空今晚吃啥"
-                clearMessage="确定要清空「今晚吃啥」清单吗？已勾选的购物项也会被清除。"
-                tagLabel="菜名"
+                title={sc("siteContent.shoppingReceipt")}
+                emptyText={sc("siteContent.noRecipes")}
+                clearTitle={sc("siteContent.clearMenu")}
+                clearMessage={sc("siteContent.clearMenuConfirm")}
+                tagLabel={sc("siteContent.dishNames")}
                 items={tonightReceiptItems}
                 ingredients={tonightIngredients}
                 getCheckedIngredients={getCheckedIngredients}
@@ -365,12 +381,12 @@ export function RecipeListView() {
               onClick={() => setReceiptCollapsed(!receiptCollapsed)}
             >
               {receiptCollapsed ? <LuChevronDown /> : <LuChevronUp />}
-              {receiptCollapsed ? "展开小票" : "收起小票"}
+              {sc(receiptCollapsed ? "siteContent.expandReceipt" : "siteContent.collapseReceipt")}
             </Button>
           </Box>
           <Box className="food-tonight-items">
             {filteredRecipes.length === 0 ? (
-              <Text className="food-empty-hint">暂无菜谱，去添加吧</Text>
+              <Text className="food-empty-hint">{sc("siteContent.noRecipes")}</Text>
             ) : (
               <Box className="food-grid-responsive">
                 {filteredRecipes.map((recipe) => (
@@ -390,7 +406,7 @@ export function RecipeListView() {
           </Box>
         </Box>
       ) : filteredRecipes.length === 0 ? (
-        <Text className="food-empty-hint">暂无匹配的菜谱</Text>
+        <Text className="food-empty-hint">{sc("siteContent.noMatchingRecipes")}</Text>
       ) : (
         <>
           <Box className="food-grid-responsive">
@@ -447,16 +463,18 @@ function TodayPickModalWrapper({
   recipes: Recipe[];
   onClose: () => void;
 }) {
+  const { locale } = useI18n();
+  const sc = getSiteContent(locale);
   const router = useRouter();
   const [filterCategories, setFilterCategories] = useState<string[]>([]);
   const [filterDifficulties, setFilterDifficulties] = useState<number[]>([]);
 
   const categoryOptions = useMemo(
     () =>
-      [...new Map(recipes.map((r) => [r.category, { value: r.category, label: r.categoryName }])).values()].filter(
+      [...new Map(recipes.map((r) => [r.category, { value: r.category, label: getRecipeCategoryName(r.category, locale, r.categoryName) }])).values()].filter(
         (o) => o.value !== "template",
       ),
-    [recipes],
+    [recipes, locale],
   );
 
   const filtered = recipes.filter((r) => {
@@ -468,9 +486,9 @@ function TodayPickModalWrapper({
   return (
     <RandomPickModal
       open={open}
-      title="今天吃什么"
-      countLabel="共 {count} 道菜可选"
-      viewButtonLabel="查看菜谱"
+      title={sc("siteContent.pickFood")}
+      countLabel={sc("siteContent.pickRecipeCount")}
+      viewButtonLabel={sc("siteContent.viewRecipe")}
       items={filtered}
       getDisplayName={getRecipeDisplayName}
       onClose={onClose}
@@ -483,10 +501,10 @@ function TodayPickModalWrapper({
         <>
           <Box>
             <Text fontSize="14px" color="fg.muted" mb="2">
-              分类（可多选）
+              {sc("siteContent.multiCategories")}
             </Text>
             <MultiCheckboxSelect
-              placeholder="全部分类"
+              placeholder={sc("siteContent.allCategories")}
               options={categoryOptions}
               value={filterCategories}
               onChange={setFilterCategories}
@@ -495,11 +513,11 @@ function TodayPickModalWrapper({
           </Box>
           <Box>
             <Text fontSize="14px" color="fg.muted" mb="2">
-              难度（可多选）
+              {sc("siteContent.multiDifficulties")}
             </Text>
             <MultiCheckboxSelect
-              placeholder="全部难度"
-              options={[1, 2, 3, 4, 5].map((d) => ({ value: String(d), label: `${d}星` }))}
+              placeholder={sc("siteContent.allDifficulties")}
+              options={[1, 2, 3, 4, 5].map((d) => ({ value: String(d), label: sc("siteContent.stars", { count: d }) }))}
               value={filterDifficulties.map(String)}
               onChange={(vals) => setFilterDifficulties(vals.map(Number))}
               width="100%"

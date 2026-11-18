@@ -1,5 +1,16 @@
 .random-pick-result .random-pick-name {
   transition: transform 0.15s ease-out;
+  background: var(--chakra-colors-accent-soft);
+  border-radius: var(--radius-card);
+  margin-bottom: 24px;
+  padding-inline: 16px;
+  overflow-wrap: anywhere;
+  font-family: var(--font-heading);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .random-pick-result .random-pick-name,
+  .random-pick-result .random-pick-name.spinning { animation: none; transition: none; }
 }
 
 .random-pick-result .random-pick-name.spinning {

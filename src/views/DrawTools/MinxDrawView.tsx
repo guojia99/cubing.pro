@@ -163,6 +163,8 @@ export function MinxDrawView() {
   return (
     <DrawNavTabs
       tabsKey="minx_draw_tabs"
+      title={t("home.welcome.draw.minx.title")}
+      description={t("home.welcome.draw.minx.desc")}
       items={[
         {
           key: "minx",

@@ -1,6 +1,8 @@
 "use client";
 
-import { Grid, Heading, Spinner, Text, VStack } from "@chakra-ui/react";
+import { Grid, Spinner, Text, VStack } from "@chakra-ui/react";
+import { PageHeader } from "@/components/ui/page";
+import "./admin-ui.css";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -38,9 +40,9 @@ export function ProfilePage() {
   }
 
   return (
-    <VStack align="stretch" gap="6">
-      <Heading size="xl">{t("profile.title")}</Heading>
-      <Grid templateColumns={{ base: "1fr", lg: "320px 1fr" }} gap="6">
+    <VStack className="admin-page" align="stretch" gap="6">
+      <PageHeader eyebrow={t("profile.infoTitle")} title={t("profile.title")} />
+      <Grid templateColumns={{ base: "minmax(0, 1fr)", lg: "320px minmax(0, 1fr)" }} gap="6">
         <ProfileAvatar user={currentUser} onUpdated={() => void refreshUser()} />
         <ProfileUserInfo
           initialUser={currentUser}

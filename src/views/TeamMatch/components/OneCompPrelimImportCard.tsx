@@ -1,3 +1,4 @@
+import { useTeamMatchI18n } from '@/views/TeamMatch/i18n';
 import {
   fetchAndApplyOneCompPreliminary,
   fetchOneCompPrelimPreview,
@@ -7,7 +8,7 @@ import { fetchOneCommonCompList, type OneCompItem } from '@/views/TeamMatch/oneG
 import type { TeamMatchStoreAction } from '@/views/TeamMatch/TeamMatchContext';
 import type { TeamMatchSession } from '@/views/TeamMatch/types';
 import { wcaCentisecondsToSeconds } from '@/views/TeamMatch/wcaSeeding';
-import { TEAM_MATCH_WCA_EVENT_OPTIONS } from '@/views/TeamMatch/wcaCubeEvents';
+import { teamMatchEventOptions } from '@/views/TeamMatch/wcaCubeEvents';
 import { Button, Card, Input, InputNumber, Modal, Space, Table, Tabs, Tag, Typography, message } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 
@@ -27,11 +28,9 @@ function formatOneCenti(raw: string): string {
   return `${sec.toFixed(2)}`;
 }
 
-function eventLabel(eventId: string): string {
-  return TEAM_MATCH_WCA_EVENT_OPTIONS.find((o) => o.value === eventId)?.label ?? eventId;
-}
-
 const OneCompPrelimImportCard: React.FC<Props> = ({ session, dispatch }) => {
+  const { t: tr, locale } = useTeamMatchI18n();
+  const eventLabel = (eventId: string) => teamMatchEventOptions(locale).find(o => o.value === eventId)?.label ?? eventId;
   const imp = session.oneCompImport ?? { cId: null, eRound: DEFAULT_E_ROUND };
   const [cIdDraft, setCIdDraft] = useState<number | null>(imp.cId);
   const [eRoundDraft, setERoundDraft] = useState(imp.eRound ?? DEFAULT_E_ROUND);
@@ -65,7 +64,7 @@ const OneCompPrelimImportCard: React.FC<Props> = ({ session, dispatch }) => {
       setList(data);
       setListOpen(true);
     } catch {
-      message.error('加载失败');
+      message.error(tr('teamMatch.loadFailed'));
     } finally {
       setLoadingList(false);
     }
@@ -84,11 +83,11 @@ const OneCompPrelimImportCard: React.FC<Props> = ({ session, dispatch }) => {
   const runPreview = async () => {
     const cId = cIdDraft ?? imp.cId;
     if (cId === null || cId === undefined || !Number.isFinite(Number(cId))) {
-      message.warning('请填写或选择比赛ID');
+      message.warning(tr('teamMatch.needCompetitionId'));
       return;
     }
     if (!session.players.some((p) => p.oneId?.trim() && /^\d+$/.test(p.oneId.trim()))) {
-      message.warning('请至少为一名选手填写 One ID（与平台参赛选手 u_id 一致）');
+      message.warning(tr('teamMatch.needOneParticipant'));
       return;
     }
     dispatch({
@@ -102,7 +101,7 @@ const OneCompPrelimImportCard: React.FC<Props> = ({ session, dispatch }) => {
       setPreviewUnassigned(unassignedApi);
       setPreviewOpen(true);
     } catch {
-      message.error('拉取初赛数据失败');
+      message.error(tr('teamMatch.prelimFetchFailed'));
     } finally {
       setPreviewLoading(false);
     }
@@ -115,10 +114,10 @@ const OneCompPrelimImportCard: React.FC<Props> = ({ session, dispatch }) => {
     try {
       const seeding = await fetchAndApplyOneCompPreliminary(session, Number(cId), eRoundDraft);
       dispatch({ type: 'SET_SEEDING', seeding });
-      message.success('已写入初赛成绩');
+      message.success(tr('teamMatch.prelimImported'));
       setPreviewOpen(false);
     } catch {
-      message.error('导入失败');
+      message.error(tr('teamMatch.importFailed'));
     } finally {
       setImporting(false);
     }
@@ -126,9 +125,9 @@ const OneCompPrelimImportCard: React.FC<Props> = ({ session, dispatch }) => {
 
   return (
     <>
-      <Card size="small" type="inner" title="初赛导入" style={{ marginBottom: 12 }}>
+      <Card size="small" type="inner" title={tr('teamMatch.importPrelim')} style={{ marginBottom: 12 }}>
         <Space wrap align="center">
-          <span>比赛ID</span>
+          <span>{tr('teamMatch.competitionId')}</span>
           <InputNumber
             min={1}
             value={cIdDraft ?? undefined}
@@ -142,7 +141,7 @@ const OneCompPrelimImportCard: React.FC<Props> = ({ session, dispatch }) => {
             }}
             style={{ width: 120 }}
           />
-          <span>轮次</span>
+          <span>{tr('teamMatch.round')}</span>
           <InputNumber
             min={1}
             max={20}
@@ -157,38 +156,27 @@ const OneCompPrelimImportCard: React.FC<Props> = ({ session, dispatch }) => {
             }}
             style={{ width: 72 }}
           />
-          <Button loading={loadingList} onClick={() => void openListModal()}>
-            选比赛
-          </Button>
-          <Button type="primary" loading={previewLoading} onClick={() => void runPreview()}>
-            导入
-          </Button>
+          <Button loading={loadingList} onClick={() => void openListModal()}>{tr('teamMatch.selectCompetition')}</Button>
+          <Button type="primary" loading={previewLoading} onClick={() => void runPreview()}>{tr('teamMatch.import')}</Button>
         </Space>
-        <Typography.Paragraph type="secondary" style={{ marginTop: 8, marginBottom: 0, fontSize: 12 }}>
-          成绩按平台返回的 <strong>u_id</strong>（参赛选手）与本地选手的 <strong>One ID</strong> 对齐；录入人
-          input_u_id 不参与匹配。导入前会弹出预览，确认后再写入。
-        </Typography.Paragraph>
+        <Typography.Paragraph type="secondary" style={{ marginTop: 8, marginBottom: 0, fontSize: 12 }}>{tr('teamMatch.prelimMatchingHelp')}</Typography.Paragraph>
       </Card>
 
       <Modal
-        title="初赛导入预览（确认后写入）"
+        className="tm-workbench-modal"
+        title={tr('teamMatch.prelimPreviewTitle')}
         open={previewOpen}
         onCancel={() => setPreviewOpen(false)}
         width={900}
         destroyOnHidden
         footer={
           <Space>
-            <Button onClick={() => setPreviewOpen(false)}>取消</Button>
-            <Button type="primary" loading={importing} onClick={() => void confirmImport()}>
-              确认导入
-            </Button>
+            <Button onClick={() => setPreviewOpen(false)}>{tr('teamMatch.cancel')}</Button>
+            <Button type="primary" loading={importing} onClick={() => void confirmImport()}>{tr('teamMatch.confirmImport')}</Button>
           </Space>
         }
       >
-        <Typography.Paragraph type="secondary" style={{ marginBottom: 12 }}>
-          <strong>已参加初赛</strong>：本地有 One ID 且在当场比赛成绩表中存在对应 u_id；<strong>未参加</strong>
-          ：无 One ID，或平台无该 u_id 的成绩。
-        </Typography.Paragraph>
+        <Typography.Paragraph type="secondary" style={{ marginBottom: 12 }}>{tr('teamMatch.prelimParticipationHelp')}</Typography.Paragraph>
         <Tabs
           items={previewEvents.map((ev) => ({
             key: ev.eventId,
@@ -201,23 +189,23 @@ const OneCompPrelimImportCard: React.FC<Props> = ({ session, dispatch }) => {
                 dataSource={ev.playerRows}
                 scroll={{ y: 320 }}
                 columns={[
-                  { title: '选手', width: 120, render: (_, r) => r.player.name },
+                  { title: tr('teamMatch.players'), width: 120, render: (_, r) => r.player.name },
                   {
                     title: 'One ID',
                     width: 100,
                     render: (_, r) => r.player.oneId ?? '—',
                   },
                   {
-                    title: '状态',
+                    title: tr('teamMatch.status'),
                     width: 140,
                     render: (_, r) => {
-                      if (r.status === 'matched') return <Tag color="success">已参加初赛</Tag>;
-                      if (r.status === 'no_one_id') return <Tag>无 One ID</Tag>;
-                      return <Tag color="warning">未找到成绩</Tag>;
+                      if (r.status === 'matched') return <Tag color="success">{tr('teamMatch.participated')}</Tag>;
+                      if (r.status === 'no_one_id') return <Tag>{tr('teamMatch.noOneId')}</Tag>;
+                      return <Tag color="warning">{tr('teamMatch.noResult')}</Tag>;
                     },
                   },
                   {
-                    title: '初赛单次',
+                    title: tr('teamMatch.prelimSingle'),
                     width: 100,
                     render: (_, r) =>
                       r.preliminary?.single === 'DNF'
@@ -227,7 +215,7 @@ const OneCompPrelimImportCard: React.FC<Props> = ({ session, dispatch }) => {
                           : '—',
                   },
                   {
-                    title: '初赛平均',
+                    title: tr('teamMatch.prelimAverage'),
                     width: 100,
                     render: (_, r) =>
                       r.preliminary?.average === 'DNF'
@@ -237,7 +225,7 @@ const OneCompPrelimImportCard: React.FC<Props> = ({ session, dispatch }) => {
                           : '—',
                   },
                   {
-                    title: '平台 u_id / 姓名',
+                    title: tr('teamMatch.platformIdName'),
                     ellipsis: true,
                     render: (_, r) =>
                       r.row ? `${r.row.u_id}${r.row.u_name ? ` · ${r.row.u_name}` : ''}` : '—',
@@ -249,30 +237,26 @@ const OneCompPrelimImportCard: React.FC<Props> = ({ session, dispatch }) => {
         />
         {previewUnassigned.length > 0 && (
           <>
-            <Typography.Title level={5} style={{ marginTop: 16 }}>
-              平台有成绩、当前名单无对应 One ID
-            </Typography.Title>
-            <Typography.Paragraph type="secondary" style={{ fontSize: 12 }}>
-              以下 u_id 在平台有本场成绩，但本地没有填写相同 One ID 的选手，不会写入任何人；需要时请补全选手 One ID 后再导入。
-            </Typography.Paragraph>
+            <Typography.Title level={5} style={{ marginTop: 16 }}>{tr('teamMatch.unmatchedPlatform')}</Typography.Title>
+            <Typography.Paragraph type="secondary" style={{ fontSize: 12 }}>{tr('teamMatch.unmatchedPlatformHelp')}</Typography.Paragraph>
             <Table
               size="small"
               pagination={{ pageSize: 8 }}
               rowKey={(r) => `${r.eventId}-${r.eidOne}-${r.u_id}`}
               dataSource={previewUnassigned}
               columns={[
-                { title: '项目', width: 120, render: (_, r) => eventLabel(r.eventId) },
+                { title: tr('teamMatch.eventShort'), width: 120, render: (_, r) => eventLabel(r.eventId) },
                 { title: 'u_id', dataIndex: 'u_id', width: 88 },
-                { title: '平台姓名', dataIndex: 'u_name', ellipsis: true },
-                { title: '单次(0.01s)', render: (_, r) => formatOneCenti(r.t_single) },
-                { title: '平均(0.01s)', render: (_, r) => formatOneCenti(r.t_avg) },
+                { title: tr('teamMatch.platformName'), dataIndex: 'u_name', ellipsis: true },
+                { title: tr('teamMatch.singleSeconds'), render: (_, r) => formatOneCenti(r.t_single) },
+                { title: tr('teamMatch.averageSeconds'), render: (_, r) => formatOneCenti(r.t_avg) },
               ]}
             />
           </>
         )}
       </Modal>
 
-      <Modal title="选比赛" open={listOpen} onCancel={() => setListOpen(false)} width={720} footer={null} destroyOnHidden>
+      <Modal className="tm-workbench-modal" title={tr('teamMatch.selectCompetition')} open={listOpen} onCancel={() => setListOpen(false)} width={720} footer={null} destroyOnHidden>
         <Input
           value={nameFilter}
           onChange={(e) => setNameFilter(e.target.value)}
@@ -286,17 +270,15 @@ const OneCompPrelimImportCard: React.FC<Props> = ({ session, dispatch }) => {
           dataSource={filteredList}
           scroll={{ y: 360 }}
           columns={[
-            { title: '比赛ID', dataIndex: 'c_id', width: 88 },
-            { title: '名称', dataIndex: 'c_name', ellipsis: true },
-            { title: '日期', dataIndex: 'c_date', width: 120 },
+            { title: tr('teamMatch.competitionId'), dataIndex: 'c_id', width: 88 },
+            { title: tr('teamMatch.label'), dataIndex: 'c_name', ellipsis: true },
+            { title: tr('teamMatch.date'), dataIndex: 'c_date', width: 120 },
             {
               title: '',
               key: 'act',
               width: 72,
               render: (_, row) => (
-                <Button type="link" size="small" onClick={() => pickComp(row)}>
-                  选择
-                </Button>
+                <Button type="link" size="small" onClick={() => pickComp(row)}>{tr('teamMatch.select')}</Button>
               ),
             },
           ]}

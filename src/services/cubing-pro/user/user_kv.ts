@@ -1,5 +1,6 @@
 import { AuthHeader } from "@/services/cubing-pro/auth/token";
 import { Request } from "@/services/cubing-pro/request";
+import { ClientMessageError } from "../clientError";
 
 export const USER_KV_MAX_BYTES = 2 * 1024 * 1024;
 
@@ -28,10 +29,10 @@ type ApiEnvelope<T> = {
 export function assertPayloadWithinLimit(raw: string): void {
   if (typeof Blob !== "undefined") {
     if (new Blob([raw]).size > USER_KV_MAX_BYTES) {
-      throw new Error(`数据超过 ${USER_KV_MAX_BYTES} 字节上限`);
+      throw new ClientMessageError("shared.error.payloadLimit", { limit: USER_KV_MAX_BYTES });
     }
   } else if (raw.length > USER_KV_MAX_BYTES) {
-    throw new Error(`数据超过 ${USER_KV_MAX_BYTES} 字节上限`);
+    throw new ClientMessageError("shared.error.payloadLimit", { limit: USER_KV_MAX_BYTES });
   }
 }
 

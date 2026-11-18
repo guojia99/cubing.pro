@@ -5,6 +5,9 @@
   line-height: 1.5;
 }
 .milestone-scale-viewport {
+  background: var(--card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-card);
   width: 100%;
   max-width: 100%;
   min-height: 450px;
@@ -52,7 +55,7 @@
 }
 /* 里程碑筛选区域 - 手机端适配 */
 @media (max-width: 1199px) {
-  .ant-card .ant-form-item-control-input .ant-select {
+  .wca-page .ant-card .ant-form-item-control-input .ant-select {
     max-width: 100% !important;
   }
 }

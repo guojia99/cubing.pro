@@ -2,15 +2,17 @@
 
 import "antd/dist/reset.css";
 
-import { Typography } from "antd";
+import { PageHeader } from "@/components/ui/page";
+import "../competition-ui.css";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
 import { KinCh } from "./Kinsor";
+import { useI18n } from "@/contexts/I18nProvider";
 
-const { Title } = Typography;
 
 export function GcStaticView() {
+  const { t } = useI18n();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -31,11 +33,9 @@ export function GcStaticView() {
   }, [router, searchParams]);
 
   return (
-    <>
-      <Title level={2} style={{ textAlign: "center", marginBottom: 16 }}>
-        成绩统计
-      </Title>
+    <div className="competition-page">
+      <PageHeader eyebrow={t('competitionExtra.statistics')} title={t('competitionExtra.resultStatistics')} />
       <KinCh isSenior={false} isCountry={false} otherDataFn={undefined} />
-    </>
+    </div>
   );
 }

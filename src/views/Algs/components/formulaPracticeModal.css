@@ -93,6 +93,19 @@
 .fp-dialog .fp-confirm { display: flex; flex-direction: column; gap: 12px; min-height: 200px; justify-content: center; }
 .fp-dialog :is(button, input, select):focus-visible { outline: 2px solid var(--fp-accent); outline-offset: 3px; }
 .fp-dialog .fp-fieldset:disabled { opacity: .65; }
+.formula-practice-modal.fp-dialog { font-family: var(--font-body); }
+.fp-dialog .fp-header { background: var(--card); box-shadow: var(--shadow-card); }
+.fp-dialog .fp-header [data-part="title"] { font-family: var(--font-heading); }
+.fp-dialog .fp-stage { background: var(--background); }
+.fp-dialog .fp-timer { border-radius: var(--radius-card, 1rem); box-shadow: var(--shadow-card); }
+.fp-dialog .fp-sidebar { background: var(--card); }
+.fp-dialog .fp-reminder, .fp-dialog .fp-notice { border-radius: 12px; }
+.fp-dialog .fp-config { background: var(--background); }
+.fp-dialog .fp-fieldset { padding: 16px; border: 1px solid var(--border-default); background: var(--card); border-radius: var(--radius-card, 1rem); }
+.fp-dialog .fp-fieldset legend { padding-inline: 6px; color: var(--accent); }
+.fp-dialog .fp-mode { border-radius: 12px; background: var(--card); }
+.fp-dialog .fp-mode.fp-selected { background: var(--accent-soft); }
+.fp-dialog .fp-record-open:hover { background: var(--accent-soft); }
 .fp-running .fp-answer-content { display: none; }
 /* Keep the layout slot: hiding the diagram with display:none would shift the
    timer upward under a held touch, and the synthesized tap could land on

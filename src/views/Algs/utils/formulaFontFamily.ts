@@ -1,3 +1,6 @@
+import type { Locale } from '@/i18n/locales';
+import { translateTutorialExtra } from '@/i18n/messages/tutorial-extra';
+
 const STORAGE_KEY = 'algs_formula_font_family';
 
 export type FormulaFontFamilyId =
@@ -78,30 +81,9 @@ export function getFormulaFontFamilyCSSValue(id?: FormulaFontFamilyId): string {
   return FONT_FAMILY_CSS[resolved] ?? FONT_FAMILY_CSS[DEFAULT_FONT_FAMILY];
 }
 
-const FONT_FAMILY_LABEL_ZH: Record<FormulaFontFamilyId, string> = {
-  system: "系统默认",
-  monospace: "等宽",
-  heiti: "黑体",
-  yahei: "微软雅黑",
-  songti: "宋体",
-  kaiti: "楷体",
-  fangsong: "仿宋",
-  pingfang: "苹方",
-  notoSansSc: "Noto Sans SC",
-  sourceHanSans: "思源黑体",
-  arial: "Arial",
-  helvetica: "Helvetica",
-  timesNewRoman: "Times New Roman",
-  georgia: "Georgia",
-  courierNew: "Courier New",
-};
-
 export function getFormulaFontFamilyLabel(
   id: FormulaFontFamilyId,
-  locale: "zh-CN" | "en-US",
+  locale: Locale,
 ): string {
-  if (locale === "zh-CN") {
-    return FONT_FAMILY_LABEL_ZH[id] ?? id;
-  }
-  return id;
+  return translateTutorialExtra(locale, `tutorialExtra.font.${id}`);
 }

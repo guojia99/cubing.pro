@@ -2,6 +2,8 @@
 
 import "antd/dist/reset.css";
 import "flag-icons/css/flag-icons.min.css";
+import "./wca-ui.css";
+import { Surface } from "@/components/ui/page";
 
 import { Col, Row, Spin } from "antd";
 import { useRouteParam } from "@/hooks/useRouteParam";
@@ -113,25 +115,25 @@ export function WcaPlayerView() {
 
   if (is404) {
     return (
-      <div style={{ textAlign: "center", color: "var(--faint-foreground)", marginTop: 50 }}>
+      <Surface p="10" textAlign="center" color="var(--muted-foreground)">
         {intl.formatMessage({ id: "wca.player.notFound" })}
-      </div>
+      </Surface>
     );
   }
 
   if (loading || !wcaProfile) {
     return (
-      <div style={{ textAlign: "center", marginTop: 100 }}>
+      <Surface p="10" textAlign="center">
         <Spin
           size="large"
           description={intl.formatMessage({ id: "wca.player.loading" })}
         />
-      </div>
+      </Surface>
     );
   }
 
   return (
-    <div
+    <div className="wca-page"
       style={{
         width: "100%",
         maxWidth: 1200,

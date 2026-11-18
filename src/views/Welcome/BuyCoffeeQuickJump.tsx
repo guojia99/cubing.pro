@@ -1,31 +1,33 @@
 "use client";
 
 import {
-  Card,
+  Box,
+  Button,
   Dialog,
   Flex,
-  Heading,
   Link,
   Portal,
   Text,
   VStack,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { FiX } from "react-icons/fi";
+import { SectionHeader, Surface } from "@/components/ui/page";
 
 import { useI18n } from "@/contexts/I18nProvider";
 
 function QrImage({ sources, alt }: { sources: string[]; alt: string }) {
   const [imgSrc, setImgSrc] = useState(sources[0]);
-  const nextIdxRef = { current: 1 };
+  const nextIdxRef = useRef(1);
 
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
       src={imgSrc}
       alt={alt}
-      width={120}
-      height={120}
+      width={64}
+      height={64}
       style={{ objectFit: "contain", cursor: "pointer", borderRadius: 12 }}
       onError={() => {
         if (nextIdxRef.current < sources.length) {
@@ -43,9 +45,8 @@ export function BuyCoffeeQuickJump() {
 
   return (
     <>
-      <Card.Root mb="6" borderRadius="xl">
-        <Card.Body>
-          <Flex flexWrap="wrap" gap="6" align="center">
+      <Surface as="section" p={{ base: "4", md: "5" }} bg="accent.soft">
+          <Flex flexWrap="wrap" gap="4" align="center">
             <button
               type="button"
               onClick={() => setPreviewOpen(true)}
@@ -54,8 +55,8 @@ export function BuyCoffeeQuickJump() {
             >
               <QrImage sources={["/coffee-icon.svg"]} alt={t("home.buyCoffee.title")} />
             </button>
-            <VStack align="start" flex="1" minW="200px" gap="2">
-              <Heading size="lg">☕ {t("home.buyCoffee.title")}</Heading>
+            <VStack align="start" flex="1" minW="0" gap="2">
+              <SectionHeader title={t("home.buyCoffee.title")} />
               <Text fontSize="sm" color="fg.muted">
                 {t("home.buyCoffee.cardDesc")}
               </Text>
@@ -64,8 +65,7 @@ export function BuyCoffeeQuickJump() {
               </Link>
             </VStack>
           </Flex>
-        </Card.Body>
-      </Card.Root>
+      </Surface>
 
       <Dialog.Root open={previewOpen} onOpenChange={(e) => setPreviewOpen(e.open)} size="md">
         <Portal>
@@ -77,12 +77,12 @@ export function BuyCoffeeQuickJump() {
               </Dialog.Header>
               <Dialog.Body textAlign="center">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/coffee-icon.svg" alt="" width={200} height={200} />
+                <Box display="flex" justifyContent="center"><img src="/coffee-icon.svg" alt="" width={200} height={200} /></Box>
                 <Text mt="3" fontSize="sm" color="fg.muted">
                   {t("home.buyCoffee.remarkTip")}
                 </Text>
               </Dialog.Body>
-              <Dialog.CloseTrigger />
+              <Dialog.CloseTrigger asChild><Button variant="ghost" size="sm" position="absolute" top="2" right="2" aria-label={t("algs.modal.close")}><FiX /></Button></Dialog.CloseTrigger>
             </Dialog.Content>
           </Dialog.Positioner>
         </Portal>

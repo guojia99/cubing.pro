@@ -83,7 +83,7 @@ export function ProfileAvatar({ user, onUpdated }: ProfileAvatarProps) {
 
   return (
     <>
-      <Card.Root textAlign="center">
+      <Card.Root textAlign="center" minW="0" bg="var(--card)" borderColor="var(--border-default)" borderRadius="var(--radius-card)" boxShadow="var(--shadow-card)">
         <Card.Body py="8">
           <VStack gap="4">
             <Avatar.Root
@@ -179,7 +179,7 @@ export function ProfileAvatar({ user, onUpdated }: ProfileAvatarProps) {
             <Dialog.Footer>
               <Dialog.ActionTrigger asChild>
                 <Button variant="outline" disabled={uploading}>
-                  Cancel
+                  {t("algs.practiceHistoryStats.clearConfirmCancel")}
                 </Button>
               </Dialog.ActionTrigger>
               <Button
@@ -187,7 +187,7 @@ export function ProfileAvatar({ user, onUpdated }: ProfileAvatarProps) {
                 loading={uploading}
                 onClick={() => void handleSubmit()}
               >
-                {uploading ? t("profile.uploading") : "OK"}
+                {uploading ? t("profile.uploading") : t("competitionAdmin.confirm")}
               </Button>
             </Dialog.Footer>
           </Dialog.Content>

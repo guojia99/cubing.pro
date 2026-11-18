@@ -1,0 +1,50 @@
+.nav-tabs {
+  min-width: 0;
+  color: var(--foreground);
+  font-family: var(--font-body);
+}
+
+.nav-tabs > .ant-tabs-nav::before {
+  border-color: var(--border-default);
+}
+
+.nav-tabs > .ant-tabs-nav .ant-tabs-tab {
+  color: var(--muted-foreground);
+  font-weight: 500;
+}
+
+.nav-tabs > .ant-tabs-nav .ant-tabs-tab:hover,
+.nav-tabs > .ant-tabs-nav .ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: var(--accent);
+}
+
+.nav-tabs > .ant-tabs-nav .ant-tabs-ink-bar {
+  background: var(--accent);
+  border-radius: 999px;
+}
+
+.nav-tabs.ant-tabs-card > .ant-tabs-nav .ant-tabs-tab {
+  background: var(--muted);
+  border-color: var(--border-default);
+}
+
+.nav-tabs.ant-tabs-card > .ant-tabs-nav .ant-tabs-tab-active {
+  background: var(--card);
+}
+
+.nav-tabs > .ant-tabs-nav .ant-tabs-tab-disabled {
+  color: var(--faint-foreground);
+}
+
+.nav-tabs > .ant-tabs-nav .ant-tabs-tab-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: .25rem;
+}
+
+@media (max-width: 640px) {
+  .nav-tabs > .ant-tabs-nav .ant-tabs-tab {
+    padding-block: .75rem;
+    font-size: .875rem;
+  }
+}

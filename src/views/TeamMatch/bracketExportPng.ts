@@ -1,6 +1,6 @@
-import html2canvas from 'html2canvas';
 import { saveAs } from 'file-saver';
 
+import { html2canvasWithColors } from '@/lib/html2canvasColors';
 import { readCssVarFrom } from '@/theme/chartColors';
 
 function safeFileBase(name: string): string {
@@ -28,13 +28,13 @@ export async function exportBracketElementToPng(element: HTMLElement, filename: 
     readCssVarFrom(element, '--card') ||
     '#f7fafb';
 
-  const canvas = await html2canvas(element, {
+  const canvas = await html2canvasWithColors(element, {
     scale: 2,
     backgroundColor,
     logging: false,
     useCORS: true,
     onclone: (_doc, cloned) => {
-      const wrap = cloned.querySelector('.tmBracketExportBlock .tmBracketScaleWrap') as HTMLElement | null;
+      const wrap = cloned.querySelector('.tmBracketScaleWrap') as HTMLElement | null;
       if (wrap) {
         wrap.style.transform = 'none';
         wrap.style.transformOrigin = 'top center';

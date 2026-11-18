@@ -22,7 +22,7 @@ export function WCALink(wcaId: unknown, name: string | null = null) {
   if (wca !== undefined && wca !== "" && wca !== "-") {
     return (
       <strong>
-        <NextLink href={`/wca/player/${wca}`}>{dataName}</NextLink>
+        <NextLink href={`/wca/player/${wca}`} style={{ color: "var(--accent)" }}>{dataName}</NextLink>
       </strong>
     );
   }

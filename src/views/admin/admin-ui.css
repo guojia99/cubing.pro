@@ -1,0 +1,19 @@
+@import "../GroupCompetitions/competition-ui.css";
+
+.admin-page { min-width: 0; width: 100%; max-width: 1440px; margin-inline: auto; color: var(--foreground); font-family: var(--font-body); }
+.admin-page > :is(.ant-table-wrapper, .admin-toolbar) { padding: clamp(12px, 2vw, 24px); border: 1px solid var(--border-default); border-radius: var(--radius-card); background: var(--card); box-shadow: var(--shadow-card); }
+.admin-page .admin-toolbar { padding: clamp(12px, 2vw, 24px); border: 1px solid var(--border-default); border-radius: var(--radius-card); background: var(--muted); box-shadow: none; }
+.admin-page .ant-table-content { overflow-x: auto; }
+.admin-page .ant-table-placeholder .ant-table-cell,
+.admin-page .ant-empty-description { color: var(--muted-foreground); }
+.admin-page .ant-table-tbody > tr.lightitem > td { background: var(--card) !important; }
+.admin-page .ant-table-tbody > tr.darkitem > td { background: var(--muted) !important; }
+.admin-page .ant-table-tbody > tr:hover > td { background: var(--accent-soft) !important; }
+.admin-page .ant-table-sticky-holder { top: var(--header-height) !important; }
+.admin-page .ant-card { border-radius: var(--radius-card); border-color: var(--border-default); background: var(--card); box-shadow: var(--shadow-card); }
+.admin-page :is(.ant-card-head, h1, h2, h3) { font-family: var(--font-heading); }
+.admin-page .ant-tabs-content-holder, .admin-page .ant-tabs-tabpane { min-width: 0; }
+.admin-page .ant-space { max-width: 100%; }
+.admin-page .ant-form-inline { gap: 12px; }
+.admin-page .ant-card-head-wrapper { flex-wrap: wrap; gap: 12px; }
+.admin-page .ant-card-head-title { white-space: normal; }

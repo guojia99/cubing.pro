@@ -1,5 +1,8 @@
 "use client";
 
+import { translateWcaPuzzleExtra } from "@/i18n/messages/wca-puzzle-extra";
+import { localizePuzzleError } from "./localizePuzzleError";
+
 import { Box, Button, Flex, Text } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 import type { Alg, Move } from "cubing/alg";
@@ -7,6 +10,7 @@ import type { KPuzzle, KPattern } from "cubing/kpuzzle";
 import type * as THREE from "three";
 
 import { useI18n } from "@/contexts/I18nProvider";
+import { translatePuzzleExtra as extra } from "@/i18n/messages/puzzle-extra";
 
 type Props = {
   setup: string;
@@ -246,8 +250,10 @@ function createPuzzle(T: typeof THREE, palette: typeof DEFAULT_COLORS) {
 
 export default function Square1Player({ setup, alg, colors, height }: Props) {
   const { locale } = useI18n();
-  const zh = locale !== "en-US";
   const host = useRef<HTMLDivElement>(null);
+  const canvas = useRef<HTMLCanvasElement | null>(null);
+  const label = translateWcaPuzzleExtra(locale, "wcaPuzzleExtra.squarePlayer");
+  const currentLabel = useRef(label);
   const player = useRef<Player | null>(null);
   const speed = useRef(1);
   const [rate, setRate] = useState(1);
@@ -259,6 +265,11 @@ export default function Square1Player({ setup, alg, colors, height }: Props) {
   const B = colors.B || DEFAULT_COLORS.B;
   const L = colors.L || DEFAULT_COLORS.L;
   const R = colors.R || DEFAULT_COLORS.R;
+
+  useEffect(() => {
+    currentLabel.current = label;
+    canvas.current?.setAttribute("aria-label", label);
+  }, [label]);
 
   useEffect(() => {
     const container = host.current;
@@ -297,13 +308,15 @@ export default function Square1Player({ setup, alg, colors, height }: Props) {
         scene.clear();
         renderer.dispose();
         renderer.forceContextLoss();
+        if (canvas.current === renderer.domElement) canvas.current = null;
         renderer.domElement.remove();
       };
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
       renderer.setClearColor(0, 0);
       renderer.domElement.style.cssText = "display:block;width:100%;height:100%;touch-action:none";
       renderer.domElement.setAttribute("role", "img");
-      renderer.domElement.setAttribute("aria-label", "Interactive Square-1 3D puzzle");
+      canvas.current = renderer.domElement;
+      renderer.domElement.setAttribute("aria-label", currentLabel.current);
       container.appendChild(renderer.domElement);
       const puzzle = createPuzzle(T, { U, D, F, B, L, R });
       resources.puzzle = puzzle;
@@ -435,28 +448,28 @@ export default function Square1Player({ setup, alg, colors, height }: Props) {
         <Box ref={host} position="absolute" inset="0" />
         {!ui.ready && !error ? (
           <Flex position="absolute" inset="0" align="center" justify="center" pointerEvents="none">
-            <Text role="status" fontSize="sm" color="fg.muted">{zh ? "正在加载 3D..." : "Loading 3D..."}</Text>
+            <Text role="status" fontSize="sm" color="fg.muted">{extra(locale, "puzzleExtra.loading3d")}</Text>
           </Flex>
         ) : null}
         {error ? (
           <Flex position="absolute" inset="0" align="center" justify="center" p="4" overflowY="auto">
-            <Text role="alert" fontSize="sm" color="fg.error" overflowWrap="anywhere">
-              {zh ? "无法播放：" : "Cannot play: "}{error}
+            <Text role="alert" title={error} fontSize="sm" color="fg.error" overflowWrap="anywhere">
+              {extra(locale, "puzzleExtra.cannotPlay")}{localizePuzzleError(error, locale)}
             </Text>
           </Flex>
         ) : null}
         <Text position="absolute" left="3" bottom="2" fontSize="xs" color="fg.muted" pointerEvents="none">
-          {zh ? "拖动旋转 · 双指缩放" : "Drag to orbit · Pinch to zoom"}
+          {extra(locale, "puzzleExtra.orbit")}
         </Text>
       </Box>
       <Box p={{ base: "2", md: "3" }} borderTopWidth="1px" borderColor="border.subtle">
         <Flex align="center" gap="2" mb="2">
           <Box as="label" flex="1" minW="0">
-            <Box as="span" srOnly>{zh ? "播放进度" : "Playback progress"}</Box>
+            <Box as="span" srOnly>{extra(locale, "puzzleExtra.progress")}</Box>
             <input
               type="range" min={0} max={Math.max(1, ui.count)} step={0.001}
               value={ui.position} disabled={disabled}
-              aria-label={zh ? "播放进度" : "Playback progress"}
+              aria-label={extra(locale, "puzzleExtra.progress")}
               aria-valuetext={`${ui.position.toFixed(2)} / ${ui.count}`}
               onChange={(event) => seek(Number(event.target.value))}
               style={{ width: "100%", minHeight: 32, accentColor: "#0891b2", display: "block" }}
@@ -468,27 +481,27 @@ export default function Square1Player({ setup, alg, colors, height }: Props) {
         </Flex>
         <Flex gap="1.5" align="center" wrap="wrap">
           <Button size="sm" minH="10" variant="ghost" disabled={disabled || ui.position === 0}
-            aria-label={zh ? "回到公式初态" : "Return to setup"} onClick={() => seek(0)}>
-            {zh ? "初态" : "Start"}
+            aria-label={extra(locale, "puzzleExtra.returnSetup")} onClick={() => seek(0)}>
+            {extra(locale, "puzzleExtra.start")}
           </Button>
           <Button size="sm" minH="10" variant="outline" disabled={disabled || ui.position === 0}
-            aria-label={zh ? "上一步" : "Previous step"}
+            aria-label={extra(locale, "puzzleExtra.previous")}
             onClick={() => seek(Math.max(0, Math.ceil(ui.position - 0.00001) - 1))}>
-            {zh ? "上步" : "Back"}
+            {extra(locale, "puzzleExtra.back")}
           </Button>
           <Button size="sm" minH="10" colorPalette="cyan" disabled={disabled}
-            aria-label={ui.playing ? (zh ? "暂停" : "Pause") : (zh ? "播放" : "Play")}
+            aria-label={extra(locale, ui.playing ? "puzzleExtra.pause" : "puzzleExtra.play")}
             aria-pressed={ui.playing} onClick={() => player.current?.toggle()}>
-            {ui.playing ? (zh ? "暂停" : "Pause") : (zh ? "播放" : "Play")}
+            {extra(locale, ui.playing ? "puzzleExtra.pause" : "puzzleExtra.play")}
           </Button>
           <Button size="sm" minH="10" variant="outline" disabled={disabled || ui.position >= ui.count}
-            aria-label={zh ? "下一步" : "Next step"}
+            aria-label={extra(locale, "puzzleExtra.nextStep")}
             onClick={() => seek(Math.min(ui.count, Math.floor(ui.position + 0.00001) + 1))}>
-            {zh ? "下步" : "Next"}
+            {extra(locale, "puzzleExtra.next")}
           </Button>
           <Box as="label" display="flex" alignItems="center" gap="1" fontSize="xs" minH="10">
-            <Box as="span" srOnly>{zh ? "播放速度" : "Playback speed"}</Box>
-            <select value={rate} aria-label={zh ? "播放速度" : "Playback speed"}
+            <Box as="span" srOnly>{extra(locale, "puzzleExtra.speed")}</Box>
+            <select value={rate} aria-label={extra(locale, "puzzleExtra.speed")}
               onChange={(event) => { const value = Number(event.target.value); speed.current = value; setRate(value); }}
               style={{ minHeight: 40, maxWidth: 80, background: "transparent", color: "inherit", borderRadius: 4 }}>
               {[0.25, 0.5, 1, 1.5, 2, 3].map((value) => <option key={value} value={value}>{value}x</option>)}
@@ -496,12 +509,12 @@ export default function Square1Player({ setup, alg, colors, height }: Props) {
           </Box>
           <Button size="sm" minH="10" variant="ghost" disabled={!ui.ready} ms={{ base: "0", md: "auto" }}
             onClick={() => player.current?.resetView()}>
-            {zh ? "复位视角" : "Reset view"}
+            {extra(locale, "puzzleExtra.resetView")}
           </Button>
         </Flex>
         <Text mt="2" fontSize="xs" fontFamily="mono" color="fg.muted" minH="4" aria-live="off">
-          {ui.position === 0 ? (zh ? "初态 (setup)" : "Initial state (setup)")
-            : ui.position === ui.count ? (zh ? "完成" : "Complete") : ui.label}
+          {ui.position === 0 ? extra(locale, "puzzleExtra.initial")
+            : ui.position === ui.count ? extra(locale, "puzzleExtra.complete") : ui.label}
         </Text>
       </Box>
     </Box>

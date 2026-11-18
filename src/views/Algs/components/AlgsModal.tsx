@@ -16,6 +16,7 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useI18n } from "@/contexts/I18nProvider";
+import { toaster } from "@/components/ui/toaster";
 import { useReleaseOverlayOnUnmount } from "@/lib/overlayCleanup";
 import type { AlgItem } from "@/services/cubing-pro/algs/algs";
 import {
@@ -154,9 +155,9 @@ export default function AlgsModal({
       if (format === "png") await downloadDiagramPng(svg, diagramName);
       else await downloadDiagramSvg(svg, diagramName);
     } catch {
-      // Downloads are best-effort; the buttons stay available for a retry.
+      toaster.create({ title: t("teamMatch.exportFailed"), type: "error" });
     }
-  }, [diagramName]);
+  }, [diagramName, t]);
 
   const loadState = useCallback(() => {
     if (!storageKey) return;
@@ -667,7 +668,7 @@ export default function AlgsModal({
               disabled={!hasPrev}
               colorPalette="brand"
             >
-              &larr; Prev
+              &larr; {t("algs.modal.prev")}
             </Button>
 
             <Text fontSize="11px" color="fg.muted">
@@ -683,7 +684,7 @@ export default function AlgsModal({
               disabled={!hasNext}
               colorPalette="brand"
             >
-              Next &rarr;
+              {t("algs.modal.next")} &rarr;
             </Button>
           </Box>
         </Dialog.Content>

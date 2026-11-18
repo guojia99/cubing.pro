@@ -2,6 +2,8 @@ import { BorderOutlined, CheckSquareOutlined } from '@ant-design/icons';
 import { Button, Card, Checkbox, Space, Tag } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 import { CubeIcon } from '@/components/CubeIcon/cube_icon';
+import { CubesCn } from '@/components/CubeIcon/cube';
+import { useI18n } from '@/contexts/I18nProvider';
 
 /** 仅项目多选：无年龄、国家；交互与 EventSelector 一致 */
 interface EventSelectorEventsOnlyProps {
@@ -15,28 +17,30 @@ function eventsCatalogSignature(list: string[]): string {
 }
 
 const EventSelectorEventsOnly: React.FC<EventSelectorEventsOnlyProps> = ({ events, onConfirm }) => {
+  const { t, tf, locale } = useI18n();
   const catalogSig = useMemo(() => eventsCatalogSignature(events), [events]);
   const [selectingEvents, setSelectingEvents] = useState<string[]>(() => [...events]);
 
   // 仅当「可选项目」集合内容变化时同步；不依赖 events 引用，避免父组件重渲染后误重置勾选
   useEffect(() => {
     setSelectingEvents((prev) => {
-      const allowed = new Set(events);
+      const catalog: string[] = catalogSig.split('\0').filter(Boolean);
+      const allowed = new Set(catalog);
       const kept = prev.filter((e) => allowed.has(e));
       if (kept.length > 0) return kept;
-      return [...events];
+      return catalog;
     });
   }, [catalogSig]);
 
   const presets = new Map<string, string[]>([
     [
-      '速拧',
+      t('competitionAdmin.speed'),
       ['333', '222', '444', '555', '666', '777', 'pyram', 'skewb', 'minx', 'sq1', 'clock', '333oh'],
     ],
-    ['安静', ['333bf', '333mbf', '444bf', '555bf', '333fm']],
-    ['盲拧', ['333bf', '333mbf', '444bf', '555bf']],
-    ['正阶', ['333', '222', '444', '555', '666', '777', '333oh']],
-    ['异型', ['pyram', 'skewb', 'minx', 'sq1', 'clock']],
+    [t('competitionAdmin.quiet'), ['333bf', '333mbf', '444bf', '555bf', '333fm']],
+    [t('competitionAdmin.blind'), ['333bf', '333mbf', '444bf', '555bf']],
+    [t('competitionAdmin.cubes'), ['333', '222', '444', '555', '666', '777', '333oh']],
+    [t('competitionAdmin.otherPuzzles'), ['pyram', 'skewb', 'minx', 'sq1', 'clock']],
   ]);
 
   const handleSelectAll = () => {
@@ -77,7 +81,7 @@ const EventSelectorEventsOnly: React.FC<EventSelectorEventsOnlyProps> = ({ event
             onClick={handleSelectAll}
             disabled={events.length === 0}
           >
-            全选
+            {t('competitionAdmin.selectAll')}
           </Button>
           <Button
             size="small"
@@ -85,7 +89,7 @@ const EventSelectorEventsOnly: React.FC<EventSelectorEventsOnlyProps> = ({ event
             onClick={handleUnselectAll}
             disabled={events.length === 0}
           >
-            取消全选
+            {t('competitionAdmin.deselectAll')}
           </Button>
           {[...presets.keys()].map((presetName) => (
             <Button key={presetName} size="small" onClick={() => handleSetWithPresets(presetName)}>
@@ -95,11 +99,7 @@ const EventSelectorEventsOnly: React.FC<EventSelectorEventsOnlyProps> = ({ event
         </Space>
 
         <div style={{ fontSize: '14px' }}>
-          已选择{' '}
-          <Tag color="blue">
-            {selectingEvents.length}/{events.length}
-          </Tag>{' '}
-          个项目
+          <Tag color="blue">{tf('competitionAdmin.selectedEvents', { selected: selectingEvents.length, total: events.length })}</Tag>
         </div>
       </div>
 
@@ -120,6 +120,7 @@ const EventSelectorEventsOnly: React.FC<EventSelectorEventsOnlyProps> = ({ event
           <div key={event} style={{ textAlign: 'center' }}>
             <Checkbox
               value={event}
+              aria-label={CubesCn(event, locale)}
               checked={selectingEvents.includes(event)}
               onChange={(e) => {
                 if (e.target.checked) {
@@ -136,7 +137,7 @@ const EventSelectorEventsOnly: React.FC<EventSelectorEventsOnlyProps> = ({ event
       </div>
 
       <Button type="primary" onClick={handleUpdateTable} size="small" style={{ float: 'right' }}>
-        提交
+        {t('competitionAdmin.submit')}
       </Button>
       <div style={{ clear: 'both' }} />
     </Card>

@@ -1,0 +1,54 @@
+:root {
+  --page-max: 1440px;
+  --header-height: 4rem;
+  --radius-card: 1rem;
+  --radius-control: .75rem;
+  --font-body: "Avenir Next", "Trebuchet MS", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-heading: "Avenir Next", "Trebuchet MS", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --shadow-card: 0 .2rem 1rem color-mix(in srgb, var(--foreground) 4%, transparent);
+  --shadow-float: 0 .75rem 2.5rem color-mix(in srgb, var(--foreground) 10%, transparent);
+}
+
+html { scroll-padding-top: calc(var(--header-height) + 2rem); }
+body { font-family: var(--font-body); -webkit-font-smoothing: antialiased; }
+::selection { background: color-mix(in srgb, var(--accent) 22%, transparent); }
+button, input, select, textarea { font: inherit; }
+button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
+img, svg, canvas { max-width: 100%; }
+[data-app-main] { min-width: 0; }
+[data-app-container] > * { min-width: 0; }
+.page-heading { padding-top: .5rem; }
+.page-description, .section-description { color: var(--muted-foreground); font-size: .875rem; line-height: 1.85; }
+.page-description { max-width: 65ch; }
+
+/* Ant and Chakra consume the same surface and interaction vocabulary. */
+.ant-app, .ant-typography { color: var(--foreground); font-family: var(--font-body); }
+.ant-card { box-shadow: var(--shadow-card); }
+.ant-card .ant-card-head { border-color: var(--border-default); }
+.ant-table-wrapper { min-width: 0; }
+.ant-table-wrapper .ant-table { scrollbar-color: var(--border-strong) transparent; }
+.ant-table-wrapper .ant-table-container { border-radius: var(--radius-card); }
+.ant-table-wrapper .ant-table-thead > tr > th { font-weight: 600; }
+.ant-table-wrapper .ant-table-tbody > tr > td { border-bottom-color: var(--border-default); }
+.ant-tabs > .ant-tabs-nav::before { border-color: var(--border-default); }
+.ant-tabs .ant-tabs-tab { font-weight: 500; }
+.ant-modal .ant-modal-content, .ant-drawer .ant-drawer-content { box-shadow: var(--shadow-float); }
+.ant-modal .ant-modal-content { border: 1px solid var(--border-default); }
+.ant-form-item .ant-form-item-label > label { color: var(--foreground); }
+.ant-input::placeholder, .ant-select-selection-placeholder { color: var(--faint-foreground); }
+.ant-empty-description, .ant-pagination-total-text { color: var(--muted-foreground); }
+.ant-popover-inner, .ant-select-dropdown, .ant-dropdown-menu { border: 1px solid var(--border-default); }
+
+@media (max-width: 640px) {
+  .ant-table-wrapper .ant-table { font-size: .8125rem; }
+  .ant-table-wrapper .ant-table-cell { padding: .75rem .625rem; }
+  .ant-pagination { flex-wrap: wrap; row-gap: .5rem; }
+  .ant-modal { max-width: calc(100vw - 1rem); margin-inline: auto; }
+  .ant-form-inline { row-gap: .75rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto !important; }
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}

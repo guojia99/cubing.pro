@@ -270,6 +270,7 @@ export function PracticePanel({
                     {t("fr.practice.solutionInput")}
                   </Text>
                   <Textarea
+                    aria-label={t("fr.practice.solutionInput")}
                     value={userSolution}
                     onChange={(e) => setUserSolution(e.target.value)}
                     placeholder={t("fr.practice.solutionPlaceholder")}

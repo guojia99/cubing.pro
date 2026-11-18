@@ -1,5 +1,3 @@
-import { CubesCn } from '@/components/CubeIcon/cube';
-import { CubeIcon } from '@/components/CubeIcon/cube_icon';
 import { eventRouteM } from '@/components/Data/cube_result/event_route';
 import { Result, resultStringPro, resultTimeString } from '@/components/Data/types/result';
 import { Table } from 'antd';
@@ -11,6 +9,7 @@ import { Record } from '@/components/Data/types/record';
 import { CompetitionLink, PlayerLink } from '@/components/Link/GcLinks';
 import '@/components/Data/table_fixed_column.css';
 import './result_tables.css';
+import { CompetitionEvent, CompetitionMessage, CompetitionRound, DomainMessage } from '@/components/Data/CompetitionMessage';
 
 export const playerResultKeys = ['EventNameOnlyOne', 'Round', 'Best', 'Average', 'Result'];
 
@@ -27,7 +26,7 @@ export const ResultsTable = (
     [
       'Index',
       {
-        title: '序号',
+        title: <CompetitionMessage name="competitionAdmin.index" />,
         dataIndex: 'Index',
         key: 'Index',
         width: 100,
@@ -36,16 +35,17 @@ export const ResultsTable = (
     [
       'Round',
       {
-        title: '轮次',
+        title: <CompetitionMessage name="competitionAdmin.round" />,
         dataIndex: 'Round',
         key: 'Round',
         width: 80,
+        render: (value: string) => <CompetitionRound value={value} />,
       },
     ],
     [
       'PersonName',
       {
-        title: '玩家名',
+        title: <CompetitionMessage name="competitionAdmin.player" />,
         dataIndex: 'PersonName',
         key: 'PersonName',
         width: 150,
@@ -61,7 +61,7 @@ export const ResultsTable = (
     [
       'CubeID',
       {
-        title: 'CubeID',
+        title: <DomainMessage name="domain.data.cubeId" />,
         dataIndex: 'CubeID',
         key: 'CubeID',
         width: 100,
@@ -70,7 +70,7 @@ export const ResultsTable = (
     [
       'Best',
       {
-        title: '单次',
+        title: <CompetitionMessage name="competitionAdmin.single" />,
         dataIndex: 'Best',
         key: 'Best',
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -119,7 +119,7 @@ export const ResultsTable = (
     [
       'Average',
       {
-        title: '平均',
+        title: <CompetitionMessage name="competitionAdmin.average" />,
         dataIndex: 'Average',
         key: 'Average',
         width: 135,
@@ -157,7 +157,7 @@ export const ResultsTable = (
     [
       'Result',
       {
-        title: '成绩',
+        title: <CompetitionMessage name="competitionAdmin.result" />,
         dataIndex: 'Result',
         key: 'Result',
         render: (results: number[], result: Result) => {
@@ -179,7 +179,7 @@ export const ResultsTable = (
     [
       'Result_with_repeatedly',
       {
-        title: '成绩',
+        title: <CompetitionMessage name="competitionAdmin.result" />,
         dataIndex: 'Result',
         key: 'Result',
         render: (results: number[], result: Result) => {
@@ -201,7 +201,7 @@ export const ResultsTable = (
     [
       'EventName',
       {
-        title: '项目',
+        title: <CompetitionMessage name="competitionAdmin.event" />,
         dataIndex: 'EventID',
         key: 'EventID',
         width: 80,
@@ -209,10 +209,10 @@ export const ResultsTable = (
         onCell: (result: any, rowIndex: number) => ({
           className: 'custom-cell',
         }),
-        render: (value: string, result: Result) => {
+        render: (value: string) => {
           return (
             <span style={{ minWidth: '80px', width: '80px', display: 'inline-block' }}>
-              {CubeIcon(result.EventID, result.EventID, {})} {CubesCn(value)}
+              <CompetitionEvent event={value} />
             </span>
           );
         },
@@ -221,7 +221,7 @@ export const ResultsTable = (
     [
       'EventNameOnlyOne',
       {
-        title: '项目',
+        title: <CompetitionMessage name="competitionAdmin.event" />,
         dataIndex: 'EventID',
         key: 'EventID',
         width: 80,
@@ -232,10 +232,9 @@ export const ResultsTable = (
           if (result.RoundNumber !== 1) {
             return null;
           }
-          // todo 中英文？
           return (
             <span style={{ minWidth: '80px', width: '80px', display: 'inline-block' }}>
-              {CubeIcon(result.EventID, result.EventID, {})} {CubesCn(value)}
+              <CompetitionEvent event={value} />
             </span>
           );
         },
@@ -244,7 +243,7 @@ export const ResultsTable = (
     [
       'Rank',
       {
-        title: '排名',
+        title: <CompetitionMessage name="competitionAdmin.rank" />,
         dataIndex: 'Rank',
         key: 'Rank',
         width: 65,
@@ -260,7 +259,7 @@ export const ResultsTable = (
     [
       'CompetitionName',
       {
-        title: '比赛',
+        title: <CompetitionMessage name="competitionAdmin.competition" />,
         dataIndex: 'CompetitionName',
         key: 'CompetitionName',
         render: (value: string, record: Result) => {

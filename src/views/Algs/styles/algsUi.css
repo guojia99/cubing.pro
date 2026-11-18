@@ -1,0 +1,71 @@
+.algs-library, .algs-detail-shell, .algs-dialog, .algs-detail-drawer {
+  font-family: var(--font-body);
+  color: var(--foreground);
+  min-width: 0;
+}
+.algs-library .chakra-card__root,
+.algs-detail-workbench .algs-detail-header,
+.algs-detail-workbench .algs-detail-group,
+.algs-detail-workbench .algs-detail-navigation {
+  border-radius: var(--radius-card, 1rem);
+  background: var(--card);
+  border-color: var(--border-default);
+  box-shadow: var(--shadow-card);
+}
+.algs-library .chakra-card__header { padding: 22px 24px 14px; }
+.algs-library .chakra-card__body { min-width: 0; }
+.algs-library :is(h1, h2, h3), .algs-detail-header h1 { font-family: var(--font-heading); }
+.algs-library .algs-card-float { transition: border-color 150ms, box-shadow 150ms; }
+.algs-library .algs-card-float:hover { transform: none; box-shadow: var(--shadow-float); }
+.algs-library .algs-card-float:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.algs-library button, .algs-detail-workbench button, .algs-dialog button, .algs-detail-drawer button { border-radius: 10px; }
+.algs-library select, .algs-detail-workbench input, .algs-dialog :is(input, textarea, select) { border-radius: 10px; }
+.algs-detail-workbench { gap: 16px; }
+.algs-detail-workbench .algs-detail-header { padding: 20px; }
+.algs-detail-workbench .algs-detail-heading { flex-wrap: wrap; }
+.algs-detail-workbench .algs-detail-toolbar { padding: 10px; background: var(--card); border: 1px solid var(--border-default); border-radius: 12px; }
+.algs-detail-workbench .algs-detail-group { scroll-margin-top: calc(var(--header-height, 4rem) + 20px); }
+.algs-detail-workbench .algs-formula-card { border-radius: var(--radius-card, 1rem); border-color: var(--border-default); background: var(--card); transition: border-color 150ms, box-shadow 150ms; }
+.algs-detail-workbench .algs-formula-card:hover { border-color: var(--accent); box-shadow: var(--shadow-card); transform: none; }
+.algs-detail-workbench .algs-formula-card-formula { border-radius: 8px; }
+.algs-practice-tools-panel { border-radius: var(--radius-card, 1rem); background: var(--card); box-shadow: var(--shadow-card); }
+.algs-detail-tools .algs-practice-tool-cell, .algs-practice-tool-cell { border-radius: 12px; padding: 12px; background: var(--background); }
+.algs-practice-tool-cell--practice { background: var(--accent-soft); }
+.algs-filter-panel .algs-filter-section { padding-block: 10px; border-bottom: 1px solid var(--border-default); }
+.algs-filter-panel .algs-filter-section:last-child { border-bottom: 0; }
+.algs-filter-panel .algs-filter-section button.algs-filter-choice { border-radius: 9px; min-height: 34px; }
+.algs-filter-panel .algs-filter-section button.algs-filter-choice[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--foreground); }
+.algs-dialog, .algs-formula-detail-modal, .formula-random-pick-modal, .batch-custom-formula-modal {
+  border-radius: 24px;
+  border: 1px solid var(--border-default);
+  background: var(--card);
+  color: var(--foreground);
+  box-shadow: var(--shadow-float);
+  font-family: var(--font-body);
+}
+.algs-dialog [data-part="header"], .algs-formula-detail-modal > [data-part="header"],
+.formula-random-pick-modal > [data-part="header"], .batch-custom-formula-modal > [data-part="header"] { border-bottom: 1px solid var(--border-default); }
+.algs-dialog [data-part="body"], .batch-custom-formula-modal > [data-part="body"] { min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.algs-dialog [data-part="title"], .algs-detail-drawer [data-part="title"] { font-family: var(--font-heading); }
+.algs-detail-drawer { background: var(--card); }
+.algs-formula-detail-modal .algs-formula-detail-modal__preview { border-radius: 12px; background: var(--background); border: 1px solid var(--border-default); }
+.algs-formula-detail-modal button { border-radius: 9px; }
+.random-pick-option-card, .formula-random-history-item { border-radius: 12px; box-shadow: var(--shadow-card); }
+.random-pick-option-card { border-width: 1px; }
+.random-pick-option-card:hover { box-shadow: var(--shadow-float); }
+.batch-custom-formula-modal { max-height: calc(100dvh - 24px); }
+.batch-custom-formula-modal .batch-custom-column { padding: 12px; border: 1px solid var(--border-default); border-radius: 12px; background: var(--background); min-width: 0; }
+.batch-custom-formula-modal .batch-custom-add-row > input { min-width: 0; }
+@container algs-page (min-width: 880px) {
+  .algs-detail-workbench .algs-detail-navigation { top: calc(var(--header-height, 4rem) + 16px); max-height: calc(100dvh - var(--header-height, 4rem) - 32px); }
+}
+@media (max-width: 640px) {
+  .algs-library .chakra-card__header { padding: 16px 16px 12px; }
+  .algs-detail-workbench .algs-detail-header { padding: 14px; }
+  .algs-detail-header > :last-child { width: 100%; }
+  .algs-library :is(input, textarea, select), .algs-dialog :is(input, textarea, select) { font-size: 16px; }
+  .algs-dialog { max-width: calc(100vw - 20px); max-height: calc(100dvh - 24px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .algs-library *, .algs-dialog *, .algs-detail-shell * { transition: none !important; animation: none !important; }
+}

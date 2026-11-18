@@ -1,4 +1,4 @@
-/* 群赛计时器：使用 ant token，适配明暗主题 */
+/* Portal content uses site tokens, independent of Ant's component-scoped variables. */
 .group-timer-fs {
   position: fixed;
   inset: 0;
@@ -7,11 +7,12 @@
   min-height: 100dvh;
   width: 100%;
   box-sizing: border-box;
-  background-color: var(--ant-color-bg-base, var(--ant-color-bg-layout, #f5f5f5));
+  background-color: var(--background);
   background-image: none;
   opacity: 1;
   isolation: isolate;
-  color: var(--ant-color-text);
+  color: var(--foreground);
+  font-family: var(--font-body);
   display: flex;
   flex-direction: column;
   padding: 16px;
@@ -57,7 +58,7 @@
 }
 
 .group-timer-muted {
-  color: var(--ant-color-text-secondary);
+  color: var(--muted-foreground);
   font-size: 13px;
 }
 
@@ -70,25 +71,22 @@
 }
 
 .group-timer-scramble-box {
-  border: 1px solid var(--ant-color-border-secondary, var(--ant-color-border));
+  border: 1px solid var(--border-default);
   border-radius: 10px;
   padding: 14px 16px;
-  background: var(--ant-color-fill-quaternary, var(--ant-color-bg-container));
+  background: var(--muted);
   font-size: clamp(14px, 2.2vw, 20px);
   line-height: 1.45;
   white-space: pre-wrap;
   word-break: break-word;
   max-height: calc(1.45em * 5 + 28px);
   overflow-y: auto;
-  box-shadow:
-    inset 0 3px 12px rgba(0, 0, 0, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04),
-    0 1px 0 rgba(0, 0, 0, 0.04);
+  box-shadow: var(--shadow-card);
 }
 
 .group-timer-spare-label {
   margin-top: 8px;
-  color: var(--ant-color-warning);
+  color: var(--signal-warning);
   font-weight: 500;
 }
 
@@ -100,8 +98,8 @@
   margin: 0 auto 12px;
   padding: 6px 8px;
   border-radius: 10px;
-  border: 1px solid var(--ant-color-border-secondary, var(--ant-color-border));
-  background: var(--ant-color-bg-container);
+  border: 1px solid var(--border-default);
+  background: var(--card);
   box-sizing: border-box;
   min-width: 0;
 }
@@ -139,9 +137,9 @@
   margin: 0 auto 12px;
   padding: 12px 16px;
   border-radius: 8px;
-  border: 1px solid var(--ant-color-info-border, var(--ant-color-border));
-  background: var(--ant-color-info-bg, var(--ant-color-bg-container));
-  color: var(--ant-color-text);
+  border: 1px solid var(--signal-info);
+  background: color-mix(in srgb, var(--signal-info) 12%, var(--card));
+  color: var(--foreground);
 }
 
 .group-timer-stack {
@@ -163,9 +161,9 @@
   width: 100%;
   box-sizing: border-box;
   padding: 12px 14px 14px;
-  border: 1px solid var(--ant-color-border-secondary, var(--ant-color-border));
+  border: 1px solid var(--border-default);
   border-radius: 12px;
-  background: var(--ant-color-bg-container);
+  background: var(--card);
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -200,7 +198,7 @@
 .group-timer-hold-overlay__text {
   font-size: clamp(22px, 5.5vw, 38px);
   font-weight: 650;
-  color: var(--ant-color-success, #237804);
+  color: var(--signal-success);
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
   letter-spacing: 0.04em;
 }
@@ -209,27 +207,27 @@
   font-size: clamp(28px, 7vw, 52px);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  color: var(--ant-color-text);
+  color: var(--foreground);
   line-height: 1.15;
   margin-top: 4px;
 }
 
 .group-timer-btn-dnf.ant-btn {
-  background: var(--ant-color-error-bg) !important;
-  color: var(--ant-color-error) !important;
-  border-color: var(--ant-color-error-border, var(--ant-color-error)) !important;
+  background: color-mix(in srgb, var(--destructive) 12%, var(--card)) !important;
+  color: var(--destructive) !important;
+  border-color: var(--destructive) !important;
 }
 
 .group-timer-btn-plus2.ant-btn {
-  background: var(--ant-color-warning-bg) !important;
-  color: var(--ant-color-warning) !important;
-  border-color: var(--ant-color-warning-border, var(--ant-color-warning)) !important;
+  background: color-mix(in srgb, var(--signal-warning) 12%, var(--card)) !important;
+  color: var(--signal-warning) !important;
+  border-color: var(--signal-warning) !important;
 }
 
 .group-timer-btn-dns.ant-btn {
-  background: var(--ant-color-info-bg) !important;
-  color: var(--ant-color-info) !important;
-  border-color: var(--ant-color-info-border, var(--ant-color-info)) !important;
+  background: color-mix(in srgb, var(--signal-info) 12%, var(--card)) !important;
+  color: var(--signal-info) !important;
+  border-color: var(--signal-info) !important;
 }
 
 .group-timer-mbf {
@@ -285,13 +283,13 @@
 .group-timer-tap-area {
   box-sizing: border-box;
   min-height: 140px;
-  border: 1px dashed var(--ant-color-border);
+  border: 1px dashed var(--border-default);
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  background: var(--ant-color-fill-quaternary);
+  background: var(--muted);
   touch-action: none;
   user-select: none;
 }
@@ -324,12 +322,12 @@
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   line-height: 1.1;
-  color: var(--ant-color-text);
+  color: var(--foreground);
 }
 
 /* 观察倒数：深红 */
 .group-timer-inspection__value--countdown {
-  color: #7a0a0a;
+  color: var(--destructive);
 }
 
 .group-timer-inspection__value--warn-blink {
@@ -359,7 +357,7 @@
   margin-top: 10px;
   padding-top: 8px;
   padding-bottom: 0;
-  border-top: 1px solid var(--ant-color-border-secondary, var(--ant-color-border));
+  border-top: 1px solid var(--border-default);
 }
 
 .group-timer-overview-rounds {
@@ -369,14 +367,14 @@
 
 .group-timer-overview-round-line {
   font-size: 12px;
-  color: var(--ant-color-text-secondary);
+  color: var(--muted-foreground);
   line-height: 1.55;
   padding: 2px 0;
   text-align: left;
 }
 
 .group-timer-overview-round-done {
-  color: var(--ant-color-success);
+  color: var(--signal-success);
   font-weight: 500;
 }
 
@@ -412,7 +410,7 @@
   padding-bottom: max(10px, env(safe-area-inset-bottom, 0px));
   box-sizing: border-box;
   background-color: inherit;
-  border-top: 1px solid var(--ant-color-border-secondary, var(--ant-color-border));
+  border-top: 1px solid var(--border-default);
   z-index: 3;
 }
 
@@ -453,15 +451,15 @@
 
 .group-timer-bl {
   font-size: 13px;
-  color: var(--ant-color-text-secondary);
+  color: var(--muted-foreground);
 }
 
 .group-timer-bl--stats {
   text-align: left;
   padding: 10px 12px;
   border-radius: 10px;
-  border: 1px solid var(--ant-color-border-secondary, var(--ant-color-border));
-  background: var(--ant-color-fill-quaternary, var(--ant-color-bg-container));
+  border: 1px solid var(--border-default);
+  background: var(--muted);
   margin-bottom: 10px;
 }
 
@@ -477,10 +475,10 @@
 }
 
 .group-timer-scramble-preview__img {
-  border: 1px solid var(--ant-color-border);
+  border: 1px solid var(--border-default);
   border-radius: 8px;
   padding: 6px;
-  background: var(--ant-color-bg-container);
+  background: var(--card);
 }
 
 .group-timer-scramble-preview__img img {
@@ -557,8 +555,8 @@
 }
 
 .group-timer-history-item--current {
-  background: var(--ant-color-primary-bg, var(--ant-color-fill-secondary));
-  outline: 1px solid var(--ant-color-primary-border, transparent);
+  background: var(--accent-soft);
+  outline: 1px solid var(--accent);
 }
 
 .group-timer-history-item__main {
@@ -580,7 +578,7 @@
 }
 
 .group-timer-history-item__main:hover {
-  background: var(--ant-color-fill-tertiary);
+  background: var(--muted);
 }
 
 .group-timer-history-item--current .group-timer-history-item__main:hover {
@@ -590,13 +588,13 @@
 .group-timer-history-item__time {
   font-size: 11px;
   font-variant-numeric: tabular-nums;
-  color: var(--ant-color-text-tertiary);
+  color: var(--muted-foreground);
   line-height: 1.3;
 }
 
 .group-timer-history-item__label {
   font-size: 12px;
-  color: var(--ant-color-text-secondary);
+  color: var(--muted-foreground);
   line-height: 1.35;
   word-break: break-word;
 }
@@ -605,7 +603,7 @@
   font-size: 14px;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
-  color: var(--ant-color-text);
+  color: var(--foreground);
 }
 
 .group-timer-running {
@@ -624,7 +622,7 @@
   font-size: clamp(48px, 15vw, 120px);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  color: var(--ant-color-text);
+  color: var(--foreground);
 }
 
 .group-timer-running__hint {
@@ -633,12 +631,12 @@
 
 .group-timer-list-row {
   padding: 10px 0;
-  border-bottom: 1px solid var(--ant-color-border-secondary);
+  border-bottom: 1px solid var(--border-default);
   cursor: pointer;
 }
 
 .group-timer-list-row:hover {
-  background: var(--ant-color-fill-quaternary);
+  background: var(--muted);
 }
 
 .group-timer-popup-z {
@@ -672,25 +670,20 @@
   background: transparent;
 }
 
-/* 弹窗内：双写底色，避免仅有 var() 在 token 未注入时整条声明失效 */
+/* Progress states retain their meaning in both site themes. */
 .group-timer-overview-modal-root .group-timer-overview-row--done {
-  background-color: #f6ffed;
-  background-color: var(--ant-color-success-bg, #f6ffed);
-  border: 1px solid #b7eb8f;
-  border-color: var(--ant-color-success-border, #b7eb8f);
+  background-color: color-mix(in srgb, var(--signal-success) 12%, var(--card));
+  border: 1px solid var(--signal-success);
 }
 
 .group-timer-overview-modal-root .group-timer-overview-row--idle {
-  background-color: #fffbe6;
-  background-color: var(--ant-color-warning-bg, #fffbe6);
-  border: 1px solid #ffe58f;
-  border-color: var(--ant-color-warning-border, #ffe58f);
+  background-color: color-mix(in srgb, var(--signal-warning) 12%, var(--card));
+  border: 1px solid var(--signal-warning);
 }
 
 .group-timer-overview-modal-root .group-timer-overview-row--progress {
-  background-color: #fff2e8;
-  border: 1px solid #ffd8bf;
-  border-color: var(--ant-color-warning-border, #ffd8bf);
+  background-color: color-mix(in srgb, var(--signal-warning) 12%, var(--card));
+  border: 1px solid var(--signal-warning);
 }
 
 .group-timer-overview-row:hover {
@@ -700,7 +693,7 @@
 .group-timer-spare-tag {
   margin-left: 8px;
   font-size: 12px;
-  color: var(--ant-color-warning);
+  color: var(--signal-warning);
 }
 
 .group-timer-list-event {
@@ -711,19 +704,19 @@
   font-size: 15px;
   font-weight: 600;
   margin-bottom: 10px;
-  color: var(--ant-color-text-heading);
+  color: var(--foreground);
 }
 
 .group-timer-list-round {
   margin-bottom: 12px;
   padding-left: 4px;
-  border-left: 2px solid var(--ant-color-border-secondary);
+  border-left: 2px solid var(--border-default);
 }
 
 .group-timer-list-round-label {
   display: block;
   font-size: 12px;
-  color: var(--ant-color-text-secondary);
+  color: var(--muted-foreground);
   margin-bottom: 6px;
 }
 
@@ -739,15 +732,15 @@
   padding: 4px 10px;
   font-size: 13px;
   cursor: pointer;
-  border: 1px solid var(--ant-color-border);
+  border: 1px solid var(--border-default);
   border-radius: 6px;
-  background: var(--ant-color-bg-container);
-  color: var(--ant-color-primary);
+  background: var(--card);
+  color: var(--accent);
   text-align: left;
 }
 
 .group-timer-list-score-chip:hover {
-  background: var(--ant-color-fill-quaternary);
+  background: var(--muted);
 }
 
 /* 导出弹窗：轮次勾选列表过长时可滚动 */
@@ -766,6 +759,39 @@
   flex-direction: column;
   gap: 8px;
   width: 100%;
+}
+.group-timer-scramble-box, .group-timer-meta-bar, .group-timer-work, .group-timer-banner,
+.group-timer-bl--stats, .group-timer-scramble-preview__img { border-radius: var(--radius-card, 1rem); border-color: var(--border-default); background: var(--card); }
+.group-timer-work { padding: 16px; box-shadow: var(--shadow-card); }
+.group-timer-meta-bar { padding: 8px; }
+.group-timer-tap-area { border: 1px solid var(--border-default); border-radius: 12px; background: var(--accent-soft); }
+.group-timer-tap-area:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.group-timer-current-result, .group-timer-running__value { font-family: var(--font-heading); letter-spacing: -.04em; }
+.group-timer-fs .ant-btn, .group-timer-popup-z .ant-btn { border-radius: 10px; box-shadow: none; }
+.group-timer-fs :is(.ant-input, .ant-input-number, .ant-select-selector) { border-radius: 10px; }
+.group-timer-history-modal :is(.ant-modal-content, .ant-modal-container), .group-timer-popup-z :is(.ant-modal-content, .ant-modal-container) { border-radius: var(--radius-card, 1rem); background: var(--card); box-shadow: var(--shadow-float); }
+.group-timer-popup-z .ant-card { border-radius: 12px; border-color: var(--border-default); }
+.group-timer-popup-z .ant-modal-header { background: transparent; }
+.group-timer-popup-z .ant-modal-title { font-family: var(--font-heading); }
+.group-timer-popup-z :is(.ant-input, .ant-input-number, .ant-select-selector) { border-radius: 10px; }
+.group-timer-popup-z .ant-drawer-section { background: var(--card); color: var(--foreground); }
+.group-timer-popup-z .ant-drawer-content-wrapper { max-width: 100vw; }
+.group-timer-popup-z .ant-drawer-header, .group-timer-popup-z .ant-drawer-footer { border-color: var(--border-default); }
+.group-timer-popup-z .ant-form-item-label > label { color: var(--muted-foreground); }
+.group-timer-history-item, .group-timer-overview-row { border-radius: 12px; }
+.group-timer-history-item__main { padding: 12px; border-radius: 12px; }
+.group-timer-list-score-chip { border-radius: 9px; min-height: 36px; }
+.group-timer-overview-modal-root .group-timer-overview-row--progress { background: color-mix(in srgb, var(--signal-warning) 12%, var(--card)); }
+@media (max-width: 640px) {
+  .group-timer-fs:not(.group-timer-fs--minimal) { padding-inline: 10px; padding-top: max(56px, calc(env(safe-area-inset-top) + 48px)); }
+  .group-timer-fs .ant-input { font-size: 16px; }
+  .group-timer-fs .ant-btn { min-height: 36px; }
+  .group-timer-work { padding: 12px; }
+  .group-timer-actions { gap: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .group-timer-inspection__value--warn-blink { animation: none; }
+  .group-timer-overview-row { transition: none; }
 }
 
 @media (max-height: 720px) {

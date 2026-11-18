@@ -1,55 +1,35 @@
 "use client";
 
-import { Box, Flex, Heading, Text } from "@chakra-ui/react";
+import { Box, Flex, Link, Text } from "@chakra-ui/react";
 import NextLink from "next/link";
+import { useI18n } from "@/contexts/I18nProvider";
+import { getSiteContent, type SiteContentKey } from "@/i18n/messages/site-content";
 
-import { useColorModeValue } from "@/components/ui/color-mode";
+import { SectionHeader, Surface } from "@/components/ui/page";
 import contentData from "@/views/Advertisement/ads/cuberwenjun.json";
 
 const THUMBNAIL_IMG =
   (contentData as { src: string; caption: string }[])[0]?.src ||
   "/advertisement/cuberwenjun/价目表.jpg";
 
-const ORANGE_LIGHT = {
-  bgLight: "color-mix(in srgb, var(--signal-warning) 8%, var(--background))",
-  bgMid: "color-mix(in srgb, var(--signal-warning) 14%, var(--background))",
-  bgAccent: "color-mix(in srgb, var(--signal-warning) 22%, var(--card))",
-  border: "color-mix(in srgb, var(--signal-warning) 35%, transparent)",
-  text: "color-mix(in srgb, var(--signal-warning) 65%, var(--foreground))",
-  textLight: "color-mix(in srgb, var(--signal-warning) 45%, var(--muted-foreground))",
-};
-
-const ORANGE_DARK = {
-  bgLight: "color-mix(in srgb, var(--signal-warning) 12%, var(--background))",
-  bgMid: "color-mix(in srgb, var(--signal-warning) 18%, var(--background))",
-  bgAccent: "color-mix(in srgb, var(--signal-warning) 24%, var(--card))",
-  border: "color-mix(in srgb, var(--signal-warning) 28%, transparent)",
-  text: "color-mix(in srgb, var(--signal-warning) 40%, var(--foreground))",
-  textLight: "color-mix(in srgb, var(--signal-warning) 30%, var(--muted-foreground))",
-};
-
-function useOrangePalette() {
-  return useColorModeValue(ORANGE_LIGHT, ORANGE_DARK);
-}
-
 export function CuberwenjunThumbnail() {
-  const orange = useOrangePalette();
-
+  const { locale } = useI18n();
+  const sc = getSiteContent(locale);
   return (
     <Box
       asChild
       h="full"
       borderRadius="md"
       overflow="hidden"
-      bg={orange.bgLight}
+      bg="bg.subtle"
     >
       <NextLink href="/advertisement?key=cuberwenjun">
-        <Flex h="full">
-          <Box flex="1" minW="0" bg={orange.bgMid} position="relative">
+        <Flex h="full" direction={{ base: "column", sm: "row" }}>
+          <Box flex="1" minW="0" minH="0" bg="bg.muted" position="relative">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={THUMBNAIL_IMG}
-              alt="俊改魔方"
+              alt={sc("siteContent.cuberwenjun")}
               style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
               onError={(e) => {
                 (e.target as HTMLImageElement).style.display = "none";
@@ -57,32 +37,36 @@ export function CuberwenjunThumbnail() {
             />
           </Box>
           <Flex
-            flex="1"
+            flex={{ base: "0 0 auto", sm: "1" }}
             minW="0"
             direction="column"
             justify="center"
             align="center"
-            bg={`linear-gradient(180deg, ${orange.bgLight} 0%, ${orange.bgMid} 100%)`}
-            borderLeftWidth="1px"
-            borderLeftColor={orange.border}
+            bg="accent.soft"
+            p={{ base: "3", sm: "4" }}
+            borderColor="border"
+            borderLeftWidth={{ base: "0", sm: "1px" }}
+            borderTopWidth={{ base: "1px", sm: "0" }}
           >
-            <Text fontSize="xl" fontWeight="semibold" color={orange.text} mb="2">
-              俊改魔方
+            <Text fontSize={{ base: "lg", md: "xl" }} fontWeight="semibold" color="fg" mb="1">
+              {sc("siteContent.cuberwenjun")}
             </Text>
-            <Text fontSize="sm" color={orange.textLight} mb="4">
-              专业魔方改装
+            <Text fontSize="sm" color="fg.muted" mb="2">
+              {sc("siteContent.modification")}
             </Text>
             <Box
               fontSize="sm"
-              color={orange.text}
-              px="4"
-              py="2"
+              color="accent"
+              px="3"
+              py="1"
               borderRadius="md"
-              bg={orange.bgAccent}
+              bg="bg"
               borderWidth="1px"
-              borderColor={orange.border}
+              borderColor="border"
+              textAlign="center"
+              overflowWrap="anywhere"
             >
-              微信 / 闲鱼：Cuberwenjun
+              {sc("siteContent.adContact")}
             </Box>
           </Flex>
         </Flex>
@@ -92,48 +76,45 @@ export function CuberwenjunThumbnail() {
 }
 
 export function CuberwenjunFullContent() {
-  const orange = useOrangePalette();
+  const { locale } = useI18n();
+  const sc = getSiteContent(locale);
+  const captions: SiteContentKey[] = ["siteContent.adPrice", "siteContent.adTuning", "siteContent.adStock", "siteContent.adThree", "siteContent.adFour", "siteContent.adShowcase"];
   const items = contentData as { src: string; caption: string }[];
 
   return (
-    <Box
-      borderRadius="xl"
-      p="6"
-      bg={orange.bgLight}
-      borderWidth="1px"
-      borderColor={orange.border}
-    >
+    <Surface p={{ base: "4", md: "6" }}>
       <Flex direction="column" gap="6" align="center">
-        <Heading size="xl" color={orange.text} textAlign="center">
-          俊改魔方 - 专业魔方改装服务
-        </Heading>
+        <SectionHeader title={sc("siteContent.modificationService")} />
         <Box
           fontSize="md"
-          color={orange.textLight}
+          color="fg.muted"
           textAlign="center"
           px="5"
           py="3"
           borderRadius="md"
-          bg={orange.bgAccent}
+          bg="accent.soft"
           borderWidth="1px"
-          borderColor={orange.border}
+          borderColor="border"
         >
-          微信 / 闲鱼：<Text as="strong" color={orange.text}>Cuberwenjun</Text>
+          {sc("siteContent.adContact")}
         </Box>
         {items.map((item, index) => (
           <Flex key={index} direction="column" align="center" w="full" maxW="600px">
+            <Link href={item.src} target="_blank" rel="noopener noreferrer" aria-label={sc(captions[index])} display="block" w="full">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={item.src}
-              alt={item.caption}
-              style={{ width: "100%", maxWidth: 600, borderRadius: 8, display: "block" }}
+              alt={sc(captions[index])}
+              loading="lazy"
+              style={{ width: "100%", maxWidth: 600, borderRadius: "var(--radius-card)", display: "block" }}
             />
-            <Text mt="2" fontSize="sm" color={orange.textLight} textAlign="center">
-              {item.caption}
+            </Link>
+            <Text mt="2" fontSize="sm" color="fg.muted" textAlign="center">
+              {sc(captions[index])}
             </Text>
           </Flex>
         ))}
       </Flex>
-    </Box>
+    </Surface>
   );
 }
