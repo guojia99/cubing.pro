@@ -42,6 +42,7 @@ const routeNames = {
   "admin-manage-groups": ["管理群组", "Manage groups", "グループ管理", "管理群組", "그룹 관리", "Gérer les groupes", "Gestionar grupos"],
   "admin-diy-ranking": ["DIY 榜单", "Custom rankings", "カスタムランキング", "自訂排行榜", "사용자 지정 순위", "Classements personnalisés", "Clasificaciones personalizadas"],
   "admin-acknowledgments": ["致谢管理", "Acknowledgments management", "謝辞管理", "鳴謝管理", "감사 명단 관리", "Gestion des remerciements", "Gestión de agradecimientos"],
+  "admin-advertisements": ["广告管理", "Advertisements", "広告管理", "廣告管理", "광고 관리", "Gestion des publicités", "Gestión de anuncios"],
   "admin-other-links": ["外链管理", "External link management", "外部リンク管理", "外部連結管理", "외부 링크 관리", "Gestion des liens externes", "Gestión de enlaces externos"],
   "admin-sports": ["体育赛事", "Sports competitions", "スポーツ大会", "體育賽事", "스포츠 대회", "Compétitions sportives", "Competiciones deportivas"],
   "admin-sports-events": ["体育项目", "Sports events", "スポーツ種目", "體育項目", "스포츠 종목", "Disciplines sportives", "Disciplinas deportivas"],

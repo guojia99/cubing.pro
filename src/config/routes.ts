@@ -50,6 +50,7 @@ export const APP_ROUTES: AppRoute[] = [
   { id: "admin-manage-groups", name: "管理群组", pattern: "/admin/manage/groups", implType: "api-driven", renderMode: "client-spa", pageComponent: "Admin/AdminComponent/AdminCompetitionGroups.tsx", tags: ["admin"] },
   { id: "admin-diy-ranking", name: "DIY 榜单", pattern: "/admin/diy-ranking", implType: "api-driven", renderMode: "client-spa", pageComponent: "Admin/AdminComponent/DiyRanking.tsx", tags: ["admin"] },
   { id: "admin-acknowledgments", name: "致谢管理", pattern: "/admin/acknowledgments", implType: "api-driven", renderMode: "client-spa", pageComponent: "Admin/AdminComponent/AdminAcknowledgments.tsx", tags: ["admin"] },
+  { id: "admin-advertisements", name: "广告管理", pattern: "/admin/advertisements", implType: "api-driven", renderMode: "client-spa", pageComponent: "admin/AdminAdvertisementsPageView.tsx", tags: ["admin"] },
   { id: "admin-other-links", name: "外链管理", pattern: "/admin/other-links", implType: "api-driven", renderMode: "client-spa", pageComponent: "Admin/AdminComponent/AdminExternalLinks.tsx", tags: ["admin"] },
   { id: "admin-sports", name: "体育赛事", pattern: "/admin/sports", implType: "api-driven", renderMode: "client-spa", pageComponent: "Admin/SportsComponents/Sports.tsx", tags: ["admin"] },
   { id: "admin-sports-events", name: "体育项目", pattern: "/admin/sports/events", implType: "api-driven", renderMode: "client-spa", pageComponent: "Admin/SportsComponents/Events.tsx", tags: ["admin"] },

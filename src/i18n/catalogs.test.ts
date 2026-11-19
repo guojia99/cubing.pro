@@ -14,12 +14,22 @@ import {
   type MessageKey,
 } from "./index";
 import { applyPlural } from "./plurals";
+import { advertisementZhCN, getAdvertisementMessages, type AdvertisementMessageKey } from "./messages/advertisements";
 
 const localeKeys = ["zh-CN", "en-US", "ja", "yue-Hant-HK", "ko", "fr", "es"] as const;
 const emptyAllowlist = [
   { locale: "en-US", key: "wca.results.prStreakBreakAtSuffix", reason: "English uses the preceding 'Broken at' label; no suffix after the competition name." },
   { locale: "en-US", key: "wca.results.prStreakBreakPrevSuffix", reason: "English uses the preceding 'Previous streak' label; no suffix after the count." },
 ] as const;
+
+test("advertisement domain messages are registered in all seven root catalogs", () => {
+  for (const locale of localeKeys) {
+    for (const key of Object.keys(advertisementZhCN) as AdvertisementMessageKey[]) {
+      assert.equal(translate(locale, key), getAdvertisementMessages(locale)(key));
+      assert.notEqual(translate(locale, key), key);
+    }
+  }
+});
 
 function placeholders(value: string) {
   return [...new Set([...value.matchAll(/\{(\w+)\}/g)].map(match => match[1]))].sort();

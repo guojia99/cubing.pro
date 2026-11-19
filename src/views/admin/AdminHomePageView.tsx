@@ -36,6 +36,12 @@ export function AdminHomePageView() {
             avatar: "❤️",
           },
           {
+            title: t("advertisements.adminTitle"),
+            description: t("advertisements.adminDescription"),
+            to: "/admin/advertisements",
+            avatar: "🖼️",
+          },
+          {
             title: t("admin.admins.externalLinks"),
             description: t("externalLinks.adminCardDesc"),
             to: "/admin/other-links",

@@ -33,8 +33,8 @@
 .welcome-food-description { min-height: 3.4em; line-height: 1.7; }
 .welcome-ad-stage { min-width: 0; }
 .welcome-ad-content { height: clamp(240px, 32vw, 340px); overflow: hidden; border-radius: calc(var(--radius-card, 1rem) - 4px); }
-.welcome-ad-controls { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 12px; }
-.welcome-ad-dots { display: flex; gap: 4px; }
+.welcome-ad-controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding-top: 12px; min-width: 0; }
+.welcome-ad-dots { display: flex; flex-wrap: wrap; gap: 4px; min-width: 0; }
 .welcome-ad-dot { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; color: var(--muted-foreground); font-size: 12px; cursor: pointer; }
 .welcome-ad-dot[aria-current="true"] { background: var(--accent); color: var(--accent-foreground); }
 .welcome-ad-dot:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }

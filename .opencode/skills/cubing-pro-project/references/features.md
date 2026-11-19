@@ -26,11 +26,12 @@
 | `/admin/competition/approvals`、`manage` | `admin/OrganizersCompsPageView.tsx` 导出的 `AdminCompetitionApprovalsPageView`、复用 Results View | 管理员模式列表审批与成绩管理 |
 | `/admin/admins`、`users`、`manage/organizers`、`manage/groups` | `admin/` 对应管理 View | 用户权限、主办、群组和成员 |
 | `/admin/diy-ranking`、`acknowledgments`、`other-links` | `admin/` 对应管理 View | 自定义人员榜、致谢、外链 |
+| `/admin/advertisements` | `admin/AdminAdvertisementsPageView.tsx`、`advertisementDraft.ts` | 显式 SuperAdmin Guard；动态广告完整列表编辑、图片上传、排序和真实组件草稿预览；共用 service 与 ManagedAdvertisement 由展示侧维护 |
 | `/other/recipes`、`/other/recipes/:category/:id` | `Recipes/` | 静态索引、Markdown、收藏、今晚清单 |
 | `/other/kitchen-skills`、详情 | `KitchenSkills/` | tips 索引与 Markdown |
 | `/other/cocktails`、`/other/cocktails/:slug` | `Cocktails/` | IBA JSON、收藏、随机选择、今晚清单 |
 | 内容类共享模块（无单独路由） | `FoodShared/` | 筛选、随机选择、分页、收据、材料勾选 |
-| `/external-links`、`/buy-coffee`、`/changelog`、`/advertisement` | `ExternalLinks/`、`BuyCoffee/`、`Changelog/`、`Advertisement/` | API 外链、赞助、本地 changelog、本地广告注册表 |
+| `/external-links`、`/buy-coffee`、`/changelog`、`/advertisement` | `ExternalLinks/`、`BuyCoffee/`、`Changelog/`、`Advertisement/` | API 外链、赞助、本地 changelog、固定广告注册表与公开广告 API |
 | 共享项目筛选（无单独路由） | `Static/EventSelectorEventsOnly.tsx` | WCA 赛事与统计复用；不是当前群赛统计主目录 |
 
 ### 尚未完成或未接入的部分
@@ -95,6 +96,12 @@ FR 链路在 `FloppyReduction/fr/`，入口 `analyzeScramble` 验证 HTR，再�
 真实群赛计时入口在比赛打乱页，可通过 `comps_tabs=scrambles&groupTimer=1` 打开，源码位于 `Competition/CompetitionComponents/groupTimer/`。支持观察、长按、手输、多盲、备用打乱、导航、本地历史和文本导出。按比赛 ID 保存，导出未记录项按 DNS；云 KV `group_timer_ui_config` 同步设置，不直接提交正式比赛成绩。
 
 后台主链：`OrganizersResultsPageView → auth/groupCompetition.ts → competitionService(mode, orgId, compId)`。它根据主办/管理员模式选 URL，支持完整比赛管理、单条/批量录入、预成绩审批和轮次操作。`lib/groupCompetition.ts` 管理状态、北京时间日期、成绩解析等规则。
+
+动态广告后台入口紧跟赞助，`admin-advertisements` 由 catch-all 接入。管理页仅在 GET 成功后允许编辑和 PUT 完整列表；保存和上传期间锁定编辑，保存失败保留草稿，离页链接和刷新提示未保存修改。图片上传保存原始 `url`，缩略图通过共用 `resolveAdvertisementImage` 显示；不编辑或替换原固定广告。词典 `i18n/messages/advertisements.ts` 导出 `getAdvertisementMessages(locale)`，七语及公共展示 keys 均以 `advertisements.` 开头并注册至根 catalogs。
+
+广告编辑器桌面布局为左侧列表 1/4、右侧编辑 3/4；左侧仅显示选择与状态，当前广告操作在右侧。基础信息（含封面）与详细内容分别展示，商品及展示图采用响应式卡片网格。顶部保存栏吸顶，详情底部另有保存修改入口，两者均保存完整列表。
+
+首页广告紧跟赞助致谢名单，顺序为固定俊改广告、启用的动态广告、固定联系广告。公开 API 失败时仍展示固定广告；动态详情页区分加载、失败重试和未找到。`ManagedAdvertisement` 同时用于后台预览及公开展示，支持封面、商品、展示图、放大预览及站内/外链跳转；未配置目标地址则进入 `/advertisement?key=...`。
 
 维护关键点：
 

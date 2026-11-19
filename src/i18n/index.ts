@@ -21,6 +21,7 @@ import * as wcaPuzzle from "./messages/wca-puzzle-extra";
 import * as management from "./messages/admin-management";
 import * as finishing from "./messages/finishing";
 import { formatMessage } from "./formatMessage";
+import * as advertisements from "./messages/advertisements";
 export { SUPPORTED_LOCALES, LOCALE_STORAGE_KEY, isLocale, getIntlLocale, readStoredLocale, writeStoredLocale } from "./locales";
 export type { Locale } from "./locales";
 
@@ -34,16 +35,16 @@ const additions = {
   fr: { ...adminExtra.adminExtraFr, ...tutorial.tutorialExtraFr, ...shell.shellFr, ...competitionExtra.competitionExtraFr, ...competitionPublic.competitionPublicFr, ...domain.domainFr, ...wcaPuzzle.wcaPuzzleExtraFr, ...management.adminManagementFr },
   es: { ...adminExtra.adminExtraEs, ...tutorial.tutorialExtraEs, ...shell.shellEs, ...competitionExtra.competitionExtraEs, ...competitionPublic.competitionPublicEs, ...domain.domainEs, ...wcaPuzzle.wcaPuzzleExtraEs, ...management.adminManagementEs },
 };
-export type MessageKey = LegacyMessageKey | keyof typeof languageNames | keyof typeof team.teamMatchZhCN | keyof typeof competition.competitionAdminZhCN | keyof typeof puzzle.puzzleExtraZhCN | keyof typeof site.siteContentZhCN | keyof typeof shared.sharedZhCN | keyof typeof additions["zh-CN"] | keyof typeof finishing.finishingZhCN;
+export type MessageKey = LegacyMessageKey | keyof typeof languageNames | keyof typeof team.teamMatchZhCN | keyof typeof competition.competitionAdminZhCN | keyof typeof puzzle.puzzleExtraZhCN | keyof typeof site.siteContentZhCN | keyof typeof shared.sharedZhCN | keyof typeof additions["zh-CN"] | keyof typeof finishing.finishingZhCN | advertisements.AdvertisementMessageKey;
 
 export const catalogs: Record<Locale, Record<MessageKey, string>> = {
-  "zh-CN": { ...zhCN, ...languageNames, ...team.teamMatchZhCN, ...competition.competitionAdminZhCN, ...puzzle.puzzleExtraZhCN, ...site.siteContentZhCN, ...shared.sharedZhCN, ...additions["zh-CN"], ...finishing.finishingZhCN },
-  "en-US": { ...enUS, ...languageNames, ...team.teamMatchEnUS, ...competition.competitionAdminEnUS, ...puzzle.puzzleExtraEnUS, ...site.siteContentEnUS, ...shared.sharedEnUS, ...additions["en-US"], ...finishing.finishingEnUS },
-  ja: { ...ja, ...languageNames, ...team.teamMatchJa, ...competition.competitionAdminJa, ...puzzle.puzzleExtraJa, ...site.siteContentJa, ...shared.sharedJa, ...additions.ja, ...finishing.finishingJa },
-  "yue-Hant-HK": { ...yue, ...languageNames, ...team.teamMatchYue, ...competition.competitionAdminYue, ...puzzle.puzzleExtraYue, ...site.siteContentYue, ...shared.sharedYue, ...additions["yue-Hant-HK"], ...finishing.finishingYue },
-  ko: { ...ko, ...languageNames, ...team.teamMatchKo, ...competition.competitionAdminKo, ...puzzle.puzzleExtraKo, ...site.siteContentKo, ...shared.sharedKo, ...additions.ko, ...finishing.finishingKo },
-  fr: { ...fr, ...languageNames, ...team.teamMatchFr, ...competition.competitionAdminFr, ...puzzle.puzzleExtraFr, ...site.siteContentFr, ...shared.sharedFr, ...additions.fr, ...finishing.finishingFr },
-  es: { ...es, ...languageNames, ...team.teamMatchEs, ...competition.competitionAdminEs, ...puzzle.puzzleExtraEs, ...site.siteContentEs, ...shared.sharedEs, ...additions.es, ...finishing.finishingEs },
+  "zh-CN": { ...zhCN, ...languageNames, ...team.teamMatchZhCN, ...competition.competitionAdminZhCN, ...puzzle.puzzleExtraZhCN, ...site.siteContentZhCN, ...shared.sharedZhCN, ...additions["zh-CN"], ...finishing.finishingZhCN, ...advertisements.advertisementZhCN },
+  "en-US": { ...enUS, ...languageNames, ...team.teamMatchEnUS, ...competition.competitionAdminEnUS, ...puzzle.puzzleExtraEnUS, ...site.siteContentEnUS, ...shared.sharedEnUS, ...additions["en-US"], ...finishing.finishingEnUS, ...advertisements.advertisementEnUS },
+  ja: { ...ja, ...languageNames, ...team.teamMatchJa, ...competition.competitionAdminJa, ...puzzle.puzzleExtraJa, ...site.siteContentJa, ...shared.sharedJa, ...additions.ja, ...finishing.finishingJa, ...advertisements.advertisementJa },
+  "yue-Hant-HK": { ...yue, ...languageNames, ...team.teamMatchYue, ...competition.competitionAdminYue, ...puzzle.puzzleExtraYue, ...site.siteContentYue, ...shared.sharedYue, ...additions["yue-Hant-HK"], ...finishing.finishingYue, ...advertisements.advertisementYue },
+  ko: { ...ko, ...languageNames, ...team.teamMatchKo, ...competition.competitionAdminKo, ...puzzle.puzzleExtraKo, ...site.siteContentKo, ...shared.sharedKo, ...additions.ko, ...finishing.finishingKo, ...advertisements.advertisementKo },
+  fr: { ...fr, ...languageNames, ...team.teamMatchFr, ...competition.competitionAdminFr, ...puzzle.puzzleExtraFr, ...site.siteContentFr, ...shared.sharedFr, ...additions.fr, ...finishing.finishingFr, ...advertisements.advertisementFr },
+  es: { ...es, ...languageNames, ...team.teamMatchEs, ...competition.competitionAdminEs, ...puzzle.puzzleExtraEs, ...site.siteContentEs, ...shared.sharedEs, ...additions.es, ...finishing.finishingEs, ...advertisements.advertisementEs },
 };
 
 export function translate(locale: Locale, key: MessageKey): string {

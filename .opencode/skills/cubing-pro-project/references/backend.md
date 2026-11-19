@@ -69,6 +69,7 @@ Go robot   → 共用业务服务、群赛逻辑、数据库
 | DIY 榜单及其 Kinch/SOR | `statistics/diy_ranking.ts` 等 | `src/api/routes/static.go` |
 | `/public/pkTimers` | `pktimer/pktimer.ts` | `src/api/app/pktimer/pktimer.go` |
 | 致谢、外链、公开群组 | `public/`、`auth/` 对应管理 service | public/admin 路由及系统内容 Handler |
+| 广告公开读取、超级管理员列表与上传 | `advertisements.ts` | `src/api/app/advertisements/`；`GET /public/advertisements`、`GET/PUT /admin/system_result/advertisements`、`POST /admin/system_result/advertisements/image` |
 
 后端关闭了 Gin 自动尾斜杠跳转；`/public/algorithm/`、`POST /user/kv/` 等保留精确路径。前端 Axios interceptor 只补 baseURL，不全局注入 `AuthHeader()`、刷新或解包。通用成功 envelope 常见 `{code:"200", data, msg}`，公式和部分 WCA 直接返回对象/数组；错误还可能使用 `http_code/message/error/data`。不能全局强行统一为 `.data.data`。
 
@@ -81,6 +82,8 @@ Go robot   → 共用业务服务、群赛逻辑、数据库
 JWT 使用 Bearer Authorization；前端 token 在 localStorage，刷新检查每五分钟触发。权限是 Player/Organizers/Delegates/Admin/SuperAdmin 位集合，不是等级自动继承。后端不同路由可要求不同权限位，主办还校验团队成员和资源归属；前端卡片/Guard 不足以保证操作被授权。
 
 业务数据库按配置选择 MySQL/SQLite；WCA 查询使用独立 MySQL 导入库，通过 `wca.txt` 切换。缓存包括进程内 go-cache、业务表、文件和浏览器存储；本次未发现 Redis 或对象存储客户端。图片当前可存本地磁盘+模型元数据，也可引用外链。
+
+广告完整有序列表存系统 KV `__advertisements__`，公开接口仅返回启用项。上传 JPEG/PNG（最多 5 MiB、单边 8192 像素、总计 2000 万像素），保存到 `api.staticPath/advertisements/`，与头像目录同级；复用 `system.Image` 和 `/static/image/:uid`。未配置 StaticPath 时相对于 API 进程工作目录，部署需核实持久化路径及权限。GET 返回数组；上传返回成功 envelope 的 `data: {uid,url,width,height}`。前端把 API 图片路径解析到当前 API 根地址，支持异源静态站。详见后端 `docs/advertisements-api.md`。
 
 比赛嵌套赛程通过数据库 JSON 还原成 `comp_json`；成绩保留 Result/Penalty 与计算字段，前后端各自有模型/格式化。修改字段、单位或枚举需同时检查序列化、全量编辑和旧数据。
 

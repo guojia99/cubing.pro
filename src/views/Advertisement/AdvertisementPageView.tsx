@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, EmptyState, Stack } from "@chakra-ui/react";
+import { Button, EmptyState, Spinner, Stack, Text } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { PageHeader, Surface } from "@/components/ui/page";
 import { useSearchParams } from "next/navigation";
@@ -8,6 +8,9 @@ import { useSearchParams } from "next/navigation";
 import { useI18n } from "@/contexts/I18nProvider";
 import { getSiteContent } from "@/i18n/messages/site-content";
 import { getAdByKey } from "@/views/Advertisement/config";
+import { ManagedAdFullContent } from "./ManagedAdvertisement";
+import { useAdvertisements } from "./useAdvertisements";
+import { getAdvertisementMessages } from "@/i18n/messages/advertisements";
 
 export function AdvertisementPageView() {
   const searchParams = useSearchParams();
@@ -15,6 +18,19 @@ export function AdvertisementPageView() {
   const { t, tf, locale } = useI18n();
   const sc = getSiteContent(locale);
   const ad = getAdByKey(key);
+  const m = getAdvertisementMessages(locale);
+  const { items, loading, failed, retry } = useAdvertisements(!ad);
+  const managed = items.find(item => item.key === key);
+
+  if (!ad && (loading || failed)) return <Stack gap="5" maxW="var(--page-max)" w="full" mx="auto">
+    <PageHeader eyebrow={sc("siteContent.partners")} title={sc("siteContent.community")} />
+    <Surface><Stack align="start" role={failed ? "alert" : "status"}>{loading ? <Spinner /> : null}<Text>{m(loading ? "advertisements.loading" : "advertisements.publicLoadError")}</Text>{failed ? <Button onClick={retry}>{m("advertisements.retry")}</Button> : null}</Stack></Surface>
+  </Stack>;
+
+  if (managed) return <Stack gap="5" maxW="var(--page-max)" w="full" mx="auto">
+    <PageHeader eyebrow={sc("siteContent.partners")} title={managed.title} actions={<Button asChild variant="outline" size="sm"><NextLink href="/welcome">{t("nav.home")}</NextLink></Button>} />
+    <ManagedAdFullContent ad={managed} />
+  </Stack>;
 
   if (!ad) {
     return (

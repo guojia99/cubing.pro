@@ -57,6 +57,7 @@ export function WelcomePageView() {
         </SimpleGrid>
       </Box>
       <ThanksSection />
+      <AdvertisementCarousel />
       <WelcomeInfoCards />
       <Surface as="section" p="4">
         <Flex className="welcome-event-tools" align="center" justify="space-between" gap="3" wrap="wrap">
@@ -71,7 +72,6 @@ export function WelcomePageView() {
       <HomeFoodSection />
       <ExternalLinksHomeSection />
       <BuyCoffeeQuickJump />
-      <AdvertisementCarousel />
     </Stack>
   );
 }

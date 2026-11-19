@@ -69,6 +69,7 @@ CUBE_API_UPSTREAM=http://127.0.0.1:20000/v3/cube-api
 | TypeScript | `npx tsc --noEmit` | 可能依赖已有 Next 生成声明；区分环境/历史错误 |
 | lint | `npm run lint` | 全仓 eslint；小改动可对实际目标文件运行 eslint |
 | 七语/复数/内容合同 | `npm run test:i18n`、`npm run check:i18n` | 真实根词典、领域 formatter 与 Provider hooks；数量参数用 number；AST 精确例外防倒退；详见 `docs/project/internationalization.md` |
+| 动态广告后台 | `npx tsx --test src/views/admin/advertisementDraft.test.ts`、`node --test src/views/admin/advertisements.browser.test.mjs` | 校验、排序、七语、入口及权限；离线浏览器覆盖真实管理页，service/公共预览使用契约替身，不接触真实 API |
 | 公式计时/历史 | `npm run test:algs` | 状态机、IndexedDB/历史相关 |
 | 图示/动作/setup | `npm run test:puzzles` | 包含部分使用 Playwright 的测试，不是纯 Node 单元集 |
 | 二阶算法/练习/深链接 | `npm run test:two-solver` | engine、统计、格式、i18n、公式链接等 |
