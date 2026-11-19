@@ -4,6 +4,8 @@ import { isLocale } from "../locales";
 // Columns: Simplified Chinese, English, Japanese, Hong Kong Cantonese,
 // Korean, French, Spanish. Keep every column explicit: no English fallback.
 const messages = {
+  "siteContent.githubRepository": ["GitHub 仓库", "GitHub repository", "GitHub リポジトリ", "GitHub 倉庫", "GitHub 저장소", "Dépôt GitHub", "Repositorio de GitHub"],
+  "siteContent.githubDescription": ["查看源码、反馈问题或参与贡献", "Explore the source, report issues or contribute", "ソースコードの閲覧、不具合の報告、開発への参加", "睇源碼、回報問題或者參與貢獻", "소스 코드 보기, 문제 제보 및 기여하기", "Consultez le code, signalez un problème ou contribuez", "Consulta el código, informa de problemas o contribuye"],
   "siteContent.categoryUnforgettable": ["难忘经典", "The unforgettables", "忘れられない名作", "難忘經典", "잊을 수 없는 명작", "Les incontournables", "Los inolvidables"],
   "siteContent.categoryContemporary": ["当代经典", "Contemporary Classics", "現代の定番", "當代經典", "현대의 클래식", "Classiques contemporains", "Clásicos contemporáneos"],
   "siteContent.categoryNewEra": ["新纪元", "New Era", "新時代", "新紀元", "새로운 시대", "Nouvelle ère", "Nueva era"],

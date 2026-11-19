@@ -1,4 +1,8 @@
 {
+  "322": "Ajout de l’internationalisation (i18n) en sept langues : chinois simplifié, anglais, japonais, cantonais, coréen, français et espagnol, avec changement de langue et formats de date et de nombre localisés.",
+  "323": "Refonte de l’interface sur l’ensemble du site : harmonisation de la navigation, des mises en page et des composants, et amélioration des thèmes clair et sombre, de l’affichage mobile et de l’accessibilité au clavier.",
+  "320": "Ajout d’un lien vers le dépôt GitHub sur la page d’accueil, disponible en sept langues, pour consulter le code, signaler des problèmes et contribuer plus facilement.",
+  "321": "Refonte de la présentation et de la navigation du README, ajout d’un aperçu des fonctionnalités et de guides de développement, de déploiement et de contribution, et correction des indications sur les répertoires et la configuration de l’API.",
   "001": "Version 4.0.0 : remplacement du framework de l’interface et migration de toutes les fonctionnalités.",
   "002": "Mise à jour de la bibliothèque d’algorithmes.\n  - Ajout de colonnes libres.\n  - Personnalisation des polices.\n  - Rendu des cubes NxNxN avec visualCube.\n  - Prise en charge des algorithmes personnalisés.",
   "003": "Toutes les URL utilisent désormais des tirets.",

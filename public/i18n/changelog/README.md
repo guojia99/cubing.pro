@@ -6,7 +6,7 @@ Failed HTTP requests, invalid JSON, missing translations, and invalid manifests
 produce a localized error; they never fall back to Chinese or English content.
 
 The version 1 manifest contains `[date, scope, itemKeys]` groups in source order.
-Its 339 records use 319 translated texts because identical source messages share
+Its 343 records use 323 translated texts because identical source messages share
 a message key. Each record has the unique identity `date/scope/itemKey`.
 Keys are permanent: append new keys instead of renumbering existing ones. The
 manifest controls scope and dates independently of translated headings or text.

@@ -1,4 +1,8 @@
 {
+  "322": "Added internationalization (i18n) for seven interface languages: Simplified Chinese, English, Japanese, Cantonese, Korean, French and Spanish, with language switching and localized date and number formatting.",
+  "323": "Refreshed the frontend across the site with consistent navigation, page layouts and component styles, and improved light and dark themes, mobile layouts and keyboard accessibility.",
+  "320": "Added a GitHub repository link to the homepage with labels in seven languages, making it easier to browse the source, report issues and contribute.",
+  "321": "Refreshed the README layout and navigation, added feature, development, deployment and contribution guides, and corrected directory and API configuration details.",
   "001": "v4.0.0: replaced the frontend framework and completed migration of all features.",
   "002": "Updated the algorithm library.\n  - Added flexible columns.\n  - Added font customization.\n  - Switched NxNxN puzzles to visualCube rendering.\n  - Added custom algorithms.",
   "003": "Changed all URLs to use dashes.",

@@ -2,7 +2,7 @@
 
 import { Box, Button, Flex, Image, Link, SimpleGrid, Stack, Text } from "@chakra-ui/react";
 import NextLink from "next/link";
-import { FiBookOpen, FiGrid, FiActivity, FiAward, FiArrowUpRight } from "react-icons/fi";
+import { FiBookOpen, FiGrid, FiActivity, FiAward, FiArrowUpRight, FiGithub } from "react-icons/fi";
 
 import { FeatureLink, PageHeader, SectionHeader, Surface } from "@/components/ui/page";
 import { useI18n } from "@/contexts/I18nProvider";
@@ -37,6 +37,11 @@ export function WelcomePageView() {
               <Flex gap="2" wrap="wrap">
                 <Button asChild colorPalette="brand" size="sm"><NextLink href="/algs"><FiBookOpen />{t("nav.algs")}</NextLink></Button>
                 <Button asChild variant="outline" size="sm"><NextLink href="/group-competitions/competitions"><FiAward />{t("nav.groupCompetitions")}</NextLink></Button>
+                <Button asChild variant="outline" size="sm">
+                  <a href="https://github.com/guojia99/cubing.pro" target="_blank" rel="noopener noreferrer" title={sc("siteContent.githubDescription")}>
+                    <FiGithub aria-hidden="true" />{sc("siteContent.githubRepository")}<FiArrowUpRight aria-hidden="true" />
+                  </a>
+                </Button>
               </Flex>
             </PageHeader>
           </Box>

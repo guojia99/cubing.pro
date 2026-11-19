@@ -26,10 +26,16 @@ try {
         });
         const response = await page.goto(origin, { waitUntil: "domcontentloaded" });
         assert.equal(response.status(), 200);
-        await page.waitForFunction(({ locale, mode }) => document.documentElement.lang === (locale === "en-US" ? "en" : "zh-CN") && document.documentElement.classList.contains(mode), { locale, mode });
+        await page.waitForFunction(({ locale, mode }) => document.documentElement.lang === locale && document.documentElement.classList.contains(mode), { locale, mode });
         const title = page.locator(".welcome-hero h1");
         await assert.doesNotReject(() => title.waitFor());
         assert.match(await title.innerText(), locale === "zh-CN" ? /魔方公式、练习与赛事/ : /Cube algorithms, practice and competitions/);
+        const github = page.locator('.welcome-hero a[href="https://github.com/guojia99/cubing.pro"]');
+        assert.equal(await github.count(), 1);
+        assert.equal(await github.innerText(), locale === "zh-CN" ? "GitHub 仓库" : "GitHub repository");
+        assert.equal(await github.getAttribute("target"), "_blank");
+        assert.equal(await github.getAttribute("rel"), "noopener noreferrer");
+        assert.equal(await github.getAttribute("title"), locale === "zh-CN" ? "查看源码、反馈问题或参与贡献" : "Explore the source, report issues or contribute");
         const shortcuts = await page.locator(".welcome-shortcuts a").evaluateAll((links) => links.map((link) => link.getAttribute("href").replace(/\/$/, "")));
         assert.deepEqual(shortcuts.sort(), ["/algs", "/tools/floppy-reduction", "/tools/solver/222"].sort());
         const groups = page.locator(".welcome-directory-group");

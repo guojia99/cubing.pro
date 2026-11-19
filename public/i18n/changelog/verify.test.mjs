@@ -18,28 +18,43 @@ const messages = Object.fromEntries(changelogLocales.map((locale) => [locale, JS
 
 test("manifest matches every source date, scope, item, and position", () => {
   const keys = new Map();
+  // Preserve the original 319 message keys when newer entries are prepended.
+  const historical = source.filter((entry) => entry.date <= "2026-06-10");
+  for (const entry of historical) {
+    for (const item of entry.items) {
+      const text = item.text.trim();
+      if (!keys.has(text)) keys.set(text, String(keys.size + 1).padStart(3, "0"));
+    }
+  }
+  const actual = manifest.groups.flatMap(([date, scope, items]) => items.map((item) => ({ date, scope, item })));
+  const usedKeys = new Set(keys.values());
   const expected = [];
   for (const entry of source) {
     for (const item of entry.items) {
       const text = item.text.trim();
-      if (!keys.has(text)) keys.set(text, String(keys.size + 1).padStart(3, "0"));
+      if (!keys.has(text)) {
+        const key = actual[expected.length]?.item;
+        assert.match(key ?? "", /^\d{3}$/);
+        assert.ok(Number(key) > 319 && !usedKeys.has(key), `Reused message key: ${key}`);
+        keys.set(text, key);
+        usedKeys.add(key);
+      }
       expected.push({ date: entry.date, scope: item.scope, item: keys.get(text) });
     }
   }
-  const actual = manifest.groups.flatMap(([date, scope, items]) => items.map((item) => ({ date, scope, item })));
-  assert.equal(expected.length, 339);
-  assert.equal(keys.size, 319);
-  assert.equal(manifest.itemCount, 339);
+  assert.equal(expected.length, 343);
+  assert.equal(keys.size, 323);
+  assert.equal(manifest.itemCount, 343);
   assert.deepEqual(actual, expected);
-  assert.equal(new Set(actual.map(({ date, scope, item }) => `${date}/${scope}/${item}`)).size, 339);
+  assert.equal(new Set(actual.map(({ date, scope, item }) => `${date}/${scope}/${item}`)).size, 343);
 });
 
 for (const locale of changelogLocales) {
-  test(`${locale}: all 339 records, 319 texts, identities and nested bullets`, () => {
+  test(`${locale}: all 343 records, 323 texts, identities and nested bullets`, () => {
     const entries = parseLocalizedChangelog(manifest, messages[locale]);
     const items = entries.flatMap((entry) => entry.items);
-    assert.equal(items.length, 339);
-    assert.equal(Object.keys(messages[locale]).length, 319);
+    assert.equal(items.length, 343);
+    assert.equal(Object.keys(messages[locale]).length, 323);
     assert.deepEqual(entries.map((entry) => entry.date), source.map((entry) => entry.date));
     assert.deepEqual(items.map((item) => item.scope), sourceItems.map((item) => item.scope));
     const identities = manifest.groups.flatMap(([date, scope, keys]) => keys.map((key) => `${date}/${scope}/${key}`));
@@ -88,7 +103,7 @@ test("locale requests, HTTP/JSON/schema failures and aborts never fall back to C
     for (const locale of [...changelogLocales, "zh-CN", "es", "ja", "en-US"]) {
       calls.length = 0;
       const entries = await loadChangelog(locale, new AbortController().signal);
-      assert.equal(entries.flatMap((entry) => entry.items).length, 339);
+      assert.equal(entries.flatMap((entry) => entry.items).length, 343);
       assert.equal(getChangelogLocale(locale), locale === "zh-CN" ? null : locale);
       assert.deepEqual(calls, locale === "zh-CN" ? ["/CHANGELOG.md"] : ["/i18n/changelog/manifest.json", `/i18n/changelog/${locale}.json`]);
       assert.ok(getChangelogLoadError(locale).length > 10);
