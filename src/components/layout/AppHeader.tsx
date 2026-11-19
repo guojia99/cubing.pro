@@ -27,6 +27,7 @@ import { useI18n } from "@/contexts/I18nProvider";
 import { buildMainNav, isNavGroupActive, isNavLinkActive, type NavGroupDef, type NavLinkDef } from "@/lib/navigation";
 
 const nav = buildMainNav();
+// The singleton header uses stable widget IDs across SSR, hydration and route remounts.
 
 function navButtonProps(active: boolean) {
   return {
@@ -93,6 +94,7 @@ function NavMenuGroup({ group, pathname, open, onOpenChange }: {
   const links = group.children.filter((item) => !item.children?.length);
   return (
     <Menu.Root
+      id={`app-header-nav-${group.id}`}
       open={open}
       onOpenChange={(details) => onOpenChange(details.open)}
       // Restore after the closing panel unmounts, including reduced motion.
@@ -172,7 +174,7 @@ function RouteHeader({ pathname }: { pathname: string }) {
   }, []);
 
   return (
-    <Drawer.Root open={mobileOpen} onOpenChange={({ open }) => setPanel(open ? "mobile" : null)} placement="end" initialFocusEl={() => closeButtonRef.current} lazyMount unmountOnExit>
+    <Drawer.Root id="app-header-mobile-nav" open={mobileOpen} onOpenChange={({ open }) => setPanel(open ? "mobile" : null)} placement="end" initialFocusEl={() => closeButtonRef.current} lazyMount unmountOnExit>
       <Box as="header" data-app-header position="sticky" top="0" zIndex="sticky" bg="bg.elevated/85" backdropFilter="blur(20px) saturate(150%)" borderBottomWidth="1px" borderColor="border" fontSize={NAV_FONT_SIZE} fontFamily="var(--font-body, inherit)">
         <Flex
           align="center" justify="space-between" gap={{ base: "2", xl: "5" }}

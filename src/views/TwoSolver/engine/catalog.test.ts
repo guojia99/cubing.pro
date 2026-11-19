@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { before, test } from "node:test";
@@ -7,6 +8,8 @@ import type { KPattern, KPuzzle } from "cubing/kpuzzle";
 import type { CubeModel } from "./state";
 import type { Library } from "./library";
 import type { MethodData, MethodId, SearchOptions, Solution } from "./types";
+import { evaluateErgonomics } from "./ergonomics";
+import { DATA } from "./twoToolData";
 
 type Engine = typeof import("./state") & typeof import("./structure") &
   typeof import("./library") & typeof import("./search") & typeof import("./types");
@@ -399,4 +402,74 @@ test("maxSolutions 1 retains the best result after traversing every selected dep
   assert.equal(limited.solutions[0].ergonomics.cost, full.solutions[0].ergonomics.cost);
   assert.equal(limited.solutions[0].moves, full.solutions[0].moves);
   verify(source.inverse, limited.solutions, limitedOptions);
+});
+
+test("fixed percentage calibration spreads real formulas and preserves complete search candidates", async t => {
+  const moveCost = Object.values(DATA).reduce((sum, value) => sum + value, 0) / 324 / 3;
+  const formulas: { old: number; score: number; method: MethodId }[] = [];
+  let invalid = 0;
+  for (const [method, dataset] of datasets) for (const record of dataset.records) for (const raw of record.algs) {
+    let tokens: string[];
+    try { tokens = engine.parseMoves(raw); } catch { invalid++; continue; }
+    const turns = engine.moveCount(tokens);
+    if (!turns) continue;
+    const { score, cost } = evaluateErgonomics(tokens);
+    formulas.push({ old: 100 / (1 + cost / turns / moveCost), score, method });
+  }
+  assert.equal(formulas.length, 8671);
+  assert.equal(invalid, 13);
+  const distribution = (rows: { old: number; score: number }[]) => {
+    const summarize = (values: number[]) => {
+      const sorted = [...values].sort((a, b) => a - b);
+      const buckets = new Map<number, number>();
+      for (const value of values) {
+        assert.ok(Number.isFinite(value) && value >= 1 && value <= 100);
+        const integer = Math.round(value);
+        buckets.set(integer, (buckets.get(integer) ?? 0) + 1);
+      }
+      return {
+        quantiles: [0, 0.05, 0.25, 0.5, 0.75, 0.95, 1].map(p => Number(sorted[Math.round((sorted.length - 1) * p)].toFixed(2))),
+        integers: buckets.size,
+        middle: values.filter(value => value >= 50 && value < 60).length / values.length,
+        largestBucket: Math.max(...buckets.values()) / values.length,
+        endpoints: values.filter(value => Math.round(value) === 1 || Math.round(value) === 100).length / values.length,
+      };
+    };
+    return { old: summarize(rows.map(row => row.old)), current: summarize(rows.map(row => row.score)) };
+  };
+  for (const [name, rows] of [["ALL21 formulas", formulas], ["default EG formulas", formulas.filter(row => ["CLL", "EG1", "EG2", "LEG1"].includes(row.method))]] as const) {
+    const stats = distribution(rows);
+    assert.ok(stats.current.integers >= 85, name);
+    assert.ok(stats.current.middle < 0.2, name);
+    assert.ok(stats.current.largestBucket < 0.08, name);
+    assert.ok(stats.current.endpoints < 0.02, name);
+    assert.ok(stats.current.quantiles[5] - stats.current.quantiles[1] >= 75, name);
+    t.diagnostic(`${name} (${rows.length}): ${JSON.stringify(stats)}`);
+  }
+
+  // Captured before the v2 score-only change: includes every solution property
+  // except score, preserving order, identities, costs and source provenance.
+  const fixtures = [
+    { methods: ["CLL", "EG1", "EG2", "LEG1"] as MethodId[], count: 151, hash: "279fa9ccee7dcddc6750ff4644fbf5646e117a2d5fbd5f40c6fa17636dfd505d" },
+    { methods: engine.METHODS.map(({ id }) => id), count: 985, hash: "e2e5c5fb530346f077fd62545050170b87e1511d8680988e4e705dd7c3666c2f" },
+  ];
+  for (const fixture of fixtures) {
+    const result = await engine.search(model, library, "R U R' F2 U' R2 F U2 R'", options({ methods: fixture.methods, maxDepth: 4, maxSolutions: 2000, timeLimitMs: 60000, forbidTransitionRotations: true }));
+    assert.equal(result.reason, "complete");
+    assert.equal(result.nodes, 47640);
+    assert.equal(result.depthReached, 4);
+    assert.equal(result.solutions.length, fixture.count);
+    const stable = result.solutions.map(({ ergonomics: { score, ...ergonomics }, ...solution }) => {
+      assert.ok(score >= 1 && score <= 100);
+      return { ...solution, ergonomics };
+    });
+    assert.equal(createHash("sha256").update(JSON.stringify(stable)).digest("hex"), fixture.hash);
+    const rows = result.solutions.map(solution => ({ score: solution.ergonomics.score, old: 100 / (1 + solution.ergonomics.cost / solution.moves / moveCost) }));
+    const stats = distribution(rows);
+    assert.ok(stats.current.integers >= 60);
+    assert.ok(stats.current.middle < 0.2);
+    assert.ok(stats.current.endpoints < 0.02);
+    assert.ok(stats.current.quantiles[5] - stats.current.quantiles[1] >= 60);
+    t.diagnostic(`depth-four ${fixture.methods.length} methods (${rows.length}): ${JSON.stringify(stats)}`);
+  }
 });

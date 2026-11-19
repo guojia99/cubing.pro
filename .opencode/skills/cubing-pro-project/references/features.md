@@ -76,6 +76,10 @@ AlgsListView / AlgsDetailView
 
 搜索受时间、深度、结果预算影响，必须保留 `complete/reason/depthReached` 语义；不能把有结果写成穷尽最优。手感分数不是实测秒数，`maxOverlap` 是边界交互预算。`formulaLink.ts` 使用源公式身份，不能拿消步后的 execution 构造原公式链接。
 
+顺手度 v2 在现有 token/三连 `cost` 之上使用 `engine/ergonomicsScale.ts` 的固定分段标尺显示 1%–100%，相同执行 token 不受候选集合影响。总成本、推荐排序与候选保留逻辑不变。UI 配置保存 `scoreVersion`，旧版本仅重置顺手度最低阈值，保留其余偏好；校准锚点及全库/固定搜索分布回归见 `TwoSolver/SOURCES.md` 和 `engine/catalog.test.ts`。
+
+分析页打乱随现有 UI 配置的 `scramble` 字段本地保存，首次自动搜索前完成恢复；手输、随机、空白及未完成草稿均保留，旧配置无此字段时使用示例。练习题及复盘打乱不覆盖分析页输入。
+
 练习链在 `uiPractice.ts`、`practiceStatistics.ts`、`PracticeStats.tsx`；本地保留有限记录，ao5/ao12 先按完整历史计算再截取显示。随机打乱从本地 scrambler 模块生成；条件无命中不证明不存在解。`SolverCube` 有独立播放器所有权。
 
 FR 链路在 `FloppyReduction/fr/`，入口 `analyzeScramble` 验证 HTR，再按 ud/fb/rl 三轴分类真/假 FR，BFS 返回参考解；是前端同步分析，非远程 API 或二阶 Worker。`FrCube3D` 的视角旋转和解法面重标定需配套修改。`services/cubing-pro/fr/practiceHistory.ts` 保存有限本地历史，不与公式 IndexedDB 混用。

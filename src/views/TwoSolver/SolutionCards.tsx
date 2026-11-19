@@ -158,7 +158,7 @@ export default function SolutionCards({ solutions, scramble }: { solutions: Solu
         <div className={styles.solutionMetrics}>
           <span>{t("two.detail.baseMoves")} <strong>{solution.baseMoves}</strong> {t("two.detail.moves")}</span>
           <span>{t("two.detail.cancelledMoves")} <strong>{solution.cancelled}</strong> {t("two.detail.moves")}</span>
-          <span>{t("two.detail.ergonomics")} <strong>{solution.ergonomics.score.toFixed(0)}</strong></span>
+          <span>{t("two.detail.ergonomics")} <strong>{solution.ergonomics.score.toFixed(0)}%</strong></span>
         </div>
         <details className={styles.details}>
           <summary>{t("two.detail.details")}</summary>

@@ -14,6 +14,7 @@ export function LanguageSelect() {
 
   return (
     <Menu.Root
+      id="app-header-language"
       open={open}
       onOpenChange={({ open }) => setOpen(open)}
       positioning={{ placement: "bottom-end", gutter: 8, strategy: "fixed" }}

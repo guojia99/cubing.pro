@@ -6,6 +6,7 @@ import { useI18n } from "@/contexts/I18nProvider";
 import { SUPPORTED_LOCALES, type Locale } from "@/i18n";
 import type { twoSolverMainZhCN } from "@/i18n/messages/two-solver-main";
 import { parseMoves } from "./engine/state";
+import { SCORE_VERSION } from "./engine/ergonomicsScale";
 import { METHODS, DEFAULT_METHODS, DEFAULT_FAMILY_DEPTHS, COLORS, familyOf, type FamilyDepths, type MethodFamily, type MethodId, type SearchOptions, type SearchResult, type Solution } from "./engine/types";
 import { useTwoSolver } from "./useTwoSolver";
 import SolutionCards from "./SolutionCards";
@@ -220,8 +221,9 @@ export default function TwoSolverView() {
       const stored: unknown = JSON.parse(localStorage.getItem(UI_KEY) || "null");
       if (stored !== null) {
         if (typeof stored !== "object" || Array.isArray(stored)) throw new Error();
-        const value = stored as { version?: number; display?: Partial<Display>; filters?: Partial<Filters>; sort?: string; sampling?: Partial<Sampling>; inspection?: boolean };
+        const value = stored as { version?: number; scoreVersion?: string; scramble?: string; display?: Partial<Display>; filters?: Partial<Filters>; sort?: string; sampling?: Partial<Sampling>; inspection?: boolean };
         if (value.version !== 1) throw new Error();
+        if (typeof value.scramble === "string" && value.scramble.length <= 4000) setScramble(value.scramble);
         const d = value.display;
         if (d && typeof d === "object") setDisplay({
           timerFont: Number.isInteger(d.timerFont) && d.timerFont! >= 80 && d.timerFont! <= 200 ? d.timerFont! : 120,
@@ -241,6 +243,9 @@ export default function TwoSolverView() {
             const item = value.filters[key];
             if (typeof item === "string") f[key] = item;
           }
+          const threshold = Number(f.ergonomics);
+          if (value.scoreVersion !== SCORE_VERSION || (f.ergonomics !== "" && (!Number.isInteger(threshold)
+            || threshold < 1 || threshold > 100 || String(threshold) !== f.ergonomics))) f.ergonomics = "";
           setFilters(f);
         }
         if (SORTS.includes(value.sort ?? "")) setSort(value.sort!);
@@ -260,9 +265,9 @@ export default function TwoSolverView() {
   }, []);
   useEffect(() => {
     if (!uiHydrated) return;
-    try { localStorage.setItem(UI_KEY, JSON.stringify({ version: 1, display, filters, sort, sampling, inspection })); }
+    try { localStorage.setItem(UI_KEY, JSON.stringify({ version: 1, scoreVersion: SCORE_VERSION, scramble, display, filters, sort, sampling, inspection })); }
     catch { setSettingsError(message("two.main.settings.saveUi")); }
-  }, [uiHydrated, display, filters, sort, sampling, inspection]);
+  }, [uiHydrated, scramble, display, filters, sort, sampling, inspection]);
   useEffect(() => { analyzeRef.current = analyze; });
   useEffect(() => { nextQuestionRef.current = nextQuestion; });
   useEffect(() => {
@@ -326,7 +331,7 @@ export default function TwoSolverView() {
     };
   }, [practiceFullscreen]);
   useEffect(() => {
-    if (tab !== "analysis" || !settingsHydrated) return;
+    if (tab !== "analysis" || !settingsHydrated || !uiHydrated) return;
     const currentOperation = operation;
     setShown(null);
     const timeout = window.setTimeout(() => {
@@ -345,7 +350,7 @@ export default function TwoSolverView() {
         setActivity(null);
       }
     };
-  }, [tab, settingsHydrated, scramble, options]);
+  }, [tab, settingsHydrated, uiHydrated, scramble, options]);
 
   function startOperation(kind: Activity) {
     if (!settingsHydrated || running.current || solver.busy || timer.isTimingNow()) return null;
@@ -734,7 +739,7 @@ export default function TwoSolverView() {
               <Field label={t("two.main.color")}><select value={draftFilters.color} onChange={event => filter("color", event.target.value)}><option value="">{t("two.main.allColors")}</option>{COLORS.map(color => <option key={color.id} value={color.id}>{t(COLOR_KEYS[color.id])}</option>)}</select></Field>
               <Field label={t("two.main.group")}><select value={draftFilters.group} onChange={event => filter("group", event.target.value)}><option value="">{t("two.main.allGroups")}</option>{[...new Set([...solutions.map(solution => solution.group), draftFilters.group].filter(Boolean))].sort().map(group => <option key={group} value={group}>{group}</option>)}</select></Field>
               <Field label={t("two.main.sort")}><select value={draftSort} onChange={event => setDraftSort(event.target.value)}><option value="recommended">{t("two.main.sortRecommended")}</option><option value="moves">{t("two.main.sortMoves")}</option><option value="base">{t("two.main.sortBase")}</option><option value="ergonomics">{t("two.main.sortErgonomics")}</option></select></Field>
-              {([["base", t("two.main.filterBase")], ["moves", t("two.main.filterMoves")], ["ergonomics", t("two.main.filterErgonomics")], ["cancelled", t("two.main.filterCancelled")], ["regrips", t("two.main.filterRegrips")]] as const).map(([key, label]) => <Field key={key} label={label}><input type="number" min={0} step={1} placeholder={t("two.main.unlimited")} value={draftFilters[key]} onChange={event => filter(key, event.target.value === "" ? "" : String(Math.max(0, Math.trunc(Number(event.target.value)))))} /></Field>)}
+              {([["base", t("two.main.filterBase")], ["moves", t("two.main.filterMoves")], ["ergonomics", t("two.main.filterErgonomics")], ["cancelled", t("two.main.filterCancelled")], ["regrips", t("two.main.filterRegrips")]] as const).map(([key, label]) => <Field key={key} label={key === "ergonomics" && !/[%％]/.test(label) ? `${label} (%)` : label}><input type="number" min={key === "ergonomics" ? 1 : 0} max={key === "ergonomics" ? 100 : undefined} step={1} placeholder={t("two.main.unlimited")} value={draftFilters[key]} onChange={event => filter(key, event.target.value === "" ? "" : String(key === "ergonomics" ? Math.max(1, Math.min(100, Math.trunc(Number(event.target.value)))) : Math.max(0, Math.trunc(Number(event.target.value)))))} /></Field>)}
               <Field label={t("two.main.findCase")}><input type="search" value={draftFilters.text} placeholder={t("two.main.findPlaceholder")} onChange={event => filter("text", event.target.value)} /></Field>
             </div></>}
 

@@ -58,6 +58,8 @@ CUBE_API_UPSTREAM=http://127.0.0.1:20000/v3/cube-api
 
 就近复用组件和业务类型；`@/*` 只指向当前 `src`。保留原生列表/表格的业务语义、取消请求和组件卸载清理，避免为了局部修复重写整套 UI。
 
+页头是单实例，全局导航菜单、语言、外观和移动抽屉在 Chakra Root 上显式设置 `app-header-*` 稳定 ID，避免自动 ID 路径变化影响 hydration/ARIA 关联。`APP_HEADER_URL=http://127.0.0.1:3129 node src/components/layout/appHeader.browser.test.mjs` 验证真实 SSR HTML 与水合后 ID 一致、刷新、无重复 ID、桌面/手机菜单交互及控制台错误；测试需已有 Next 服务。
+
 ## 3. 检查与测试矩阵
 
 仓库没有统一 `npm test` 或独立 typecheck script；通过 `package.json` 选择任务。文档/技能变更优先验证路径、frontmatter、命令和 diff，不要求启动应用。

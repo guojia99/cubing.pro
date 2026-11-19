@@ -1,8 +1,9 @@
 import { DATA } from "./twoToolData";
+import { ergonomicsPercentage } from "./ergonomicsScale";
 
 // Weighting adapted from WACWCA/two-tool src/util/algSorter.js,
 // commit 0e5dd1b849be031af7b698113a4eeb48bbdd0fa4; see ../SOURCES.md.
-export const SCORE_VERSION = "two-tool-0e5dd1b-ergonomics-v1";
+export { SCORE_VERSION } from "./ergonomicsScale";
 
 const weights = Object.values(DATA);
 const MEAN_TRIPLET = weights.reduce((sum, value) => sum + value, 0) / weights.length;
@@ -111,7 +112,7 @@ export function evaluateErgonomics(tokens: string[]): {
   }
   return {
     // Normalize by layer-turn count: smoothness is separate from total cost.
-    score: layerTurns ? 100 / (1 + cost / layerTurns / MOVE_COST) : 100,
+    score: layerTurns ? ergonomicsPercentage(cost / layerTurns / MOVE_COST) : 100,
     cost,
     regrips: rotations + pairRegrips,
     rotations,

@@ -3,6 +3,7 @@ import { createHash } from "node:crypto";
 import test from "node:test";
 import { evaluateErgonomics, SCORE_VERSION } from "./ergonomics";
 import { DATA } from "./twoToolData";
+import { ergonomicsPercentage } from "./ergonomicsScale";
 
 const evaluate = (algorithm: string) => evaluateErgonomics(algorithm ? algorithm.split(" ") : []);
 const close = (actual: number, expected: number) => assert.ok(Math.abs(actual - expected) < 1e-12, `${actual} != ${expected}`);
@@ -33,7 +34,7 @@ test("zero, one, and two turns have finite sensible estimated results", () => {
   for (const algorithm of ["", "R", "R2", "B", "R U", "R2 B", "F2 R'"]) {
     const result = evaluate(algorithm);
     assert.ok(Number.isFinite(result.cost) && result.cost >= 0);
-    assert.ok(Number.isFinite(result.score) && result.score >= 0 && result.score <= 100);
+    assert.ok(Number.isFinite(result.score) && result.score >= 1 && result.score <= 100);
     assert.equal(result.confidence, "estimated");
     assert.ok(result.notes.length > 0 && result.notes.length <= 4);
   }
@@ -95,6 +96,33 @@ test("smoothness normalizes cost per layer turn rather than total length", () =>
   assert.ok(long.cost > short.cost);
   close(short.score, long.score);
   assert.ok(SCORE_VERSION.includes("0e5dd1b"));
+});
+
+test("fixed percentage scale spans 1 to 100 and is monotone through every anchor", () => {
+  for (const [cost, score] of [[0.4, 100], [0.58, 99], [0.62, 95], [0.71, 80], [0.81, 60], [0.92, 35], [1.11, 10], [1.23, 3], [1.75, 1]]) {
+    close(ergonomicsPercentage(cost), score);
+  }
+  close(ergonomicsPercentage(0.76), 70);
+  let previous = 100;
+  for (let i = 0; i <= 2500; i++) {
+    const score = ergonomicsPercentage(i / 1000);
+    assert.ok(score >= 1 && score <= 100 && score <= previous);
+    if (i > 400 && i <= 1750) assert.ok(score < previous);
+    previous = score;
+  }
+  assert.equal(evaluate("R' U' R").score, 100);
+  assert.equal(evaluate("F2 x2 R2 x2 U2 x2").score, 1);
+  assert.equal(SCORE_VERSION, "two-tool-0e5dd1b-ergonomics-v2");
+});
+
+test("same-case variants have visible fixed differences without order-dependent scores", () => {
+  const algorithms = ["R U R' U R U2 R'", "R' U2 R U R' U R", "R U R2 U' R2 U R", "R' U2 R U2 R U R U' R'", "R U2 R' F2 R U R' F"];
+  const results = algorithms.map(evaluate);
+  const integers = results.map(result => Math.round(result.score));
+  assert.equal(new Set(integers).size, algorithms.length);
+  assert.ok(Math.max(...integers) - Math.min(...integers) >= 40);
+  assert.deepEqual([...algorithms].reverse().map(evaluate).reverse(), results);
+  assert.deepEqual(evaluate(`x y2 ${algorithms[0]}`), results[0]);
 });
 
 test("all pinned reference records are finite, exact and immutable", () => {

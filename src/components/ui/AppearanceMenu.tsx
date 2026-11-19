@@ -83,7 +83,7 @@ export function AppearanceMenu() {
   const currentMode = theme ?? "light";
 
   return (
-    <Menu.Root>
+    <Menu.Root id="app-header-appearance">
       <Menu.Trigger asChild>
         <IconButton
           variant="ghost"

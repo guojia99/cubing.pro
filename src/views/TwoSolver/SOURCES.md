@@ -35,6 +35,26 @@ The following are local heuristics, not upstream measurements. Any use changes c
 - An initial F, F2, or F' adds M/2 once for startup grip. Interior F moves receive no startup supplement. This assumption can slightly favor a U x' entry into a suitable remainder despite the internal rotation cost. There is no global equivalence, rewrite, or special discount for U x'; relative ranking still depends on the rest of the algorithm.
 - `regrips` is an ESTIMATED count: one per explicit execution rotation plus one per literal adjacent `F2 R'` pair within a run. The pair adds M/6 cost once per occurrence, beyond its existing triplet contribution. This intentionally small heuristic does not model hands, grip states, or an inferred optimal grip path. A zero count does not establish that no regrip is needed.
 
-`cost` is the total dimensionless length-sensitive ranking cost (lower is better). `score = 100 / (1 + (cost / layerTurns) / m)` is continuous normalized smoothness from 0 to 100 (higher is better), with empty execution defined as 100. It measures average cost per layer turn rather than total algorithm length; rotations still contribute to its numerator. Neither output is seconds, TPS, probability, or measured human speed. Inputs must already be canonical tokens, with exactly one optional `2` or apostrophe suffix; malformed tokens throw `RangeError`. Inputs are never mutated.
+`cost` is the total dimensionless length-sensitive ranking cost (lower is better). It retains the original token weights and still drives recommended ordering, grip alternatives and the retained-result cap. The v2 percentage changes only the `score` mapping; no additional candidate filtering is performed.
 
-`SCORE_VERSION` identifies the data pin and local scoring revision. Bump it whenever ranking semantics or data change. Returned explanations are Chinese and limited to four notes.
+For nonempty execution, let `r = (cost / layerTurns) / m`. `engine/ergonomicsScale.ts` maps r to a continuous 1-100 smoothness percentage (higher is better) by linear interpolation between these fixed anchors:
+
+| Normalized cost r | Score (%) |
+| --- | --- |
+| 0.40 | 100 |
+| 0.58 | 99 |
+| 0.62 | 95 |
+| 0.71 | 80 |
+| 0.81 | 60 |
+| 0.92 | 35 |
+| 1.11 | 10 |
+| 1.23 | 3 |
+| 1.75 | 1 |
+
+Costs below/above the outer anchors clamp to 100/1. Empty execution remains 100. Anchors were calibrated on the pinned ALL21 snapshot's 8,671 parseable formulas (13 fail the existing notation parser), checked separately against the 797 default EG formulas and depth-four searches for `R U R' F2 U' R2 F U2 R'`. The interior anchors approximate the formula corpus's cost P1/P5/P25/P50/P75/P95/P99, rounded to fixed values; the tails reserve room for unusually easy or awkward executions. They are local calibration choices, not new upstream measurements. Formula tables are not loaded or recalibrated at runtime. Scores depend only on execution tokens, never candidate count, ordering, methods selected or the current best/worst result. True ties remain ties; each search need not span the entire scale.
+
+The score measures average cost per layer turn rather than total algorithm length; rotations still contribute to its numerator. Neither output is seconds, TPS, probability, or measured human speed. Reference coverage and the existing fallback assumptions are unchanged. In particular, the scale cannot distinguish sequences with identical estimated per-turn cost. Inputs must already be canonical tokens, with exactly one optional `2` or apostrophe suffix; malformed tokens throw `RangeError`. Inputs are never mutated. Cards round only for percentage display; sorting retains the continuous score, while the explicit minimum filter compares the displayed integer percentage.
+
+`SCORE_VERSION` identifies the data pin and local scoring revision. Bump it whenever ranking semantics or data change. The lightweight scale module exports it and `ergonomics.ts` re-exports it. UI preferences persist `scoreVersion`; missing or mismatched versions clear only the old minimum-ergonomics threshold, preserving other preferences. Current thresholds must be integer strings from 1 to 100, or empty for no filtering. Returned explanations are Chinese and limited to four notes.
+
+`catalog.test.ts` verifies distribution and score-independent candidate preservation. ALL21 integer score coverage increases from 31 to 100 bins, with the 50-60 interval decreasing from 72.7% to 10.4%; the default EG subset increases from 25 to 96 bins. The depth-four default-EG and ALL21 searches retain exactly 151 and 985 results, respectively, and match pre-v2 SHA256 digests of all solution properties except `score` (including order, cost, source identity and execution). These fixtures finish without time or result truncation.

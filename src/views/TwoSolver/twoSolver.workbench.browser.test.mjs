@@ -383,17 +383,38 @@ try {
     const before = await snapshot();
     const observed = await activity();
     const method = before.result.solutions[0].method;
+    const threshold = String(Math.round(before.result.solutions[0].ergonomics.score));
+    assert.deepEqual(await cards.locator('[class*="solutionMetrics"] > span:last-child strong').allTextContents(),
+      before.result.solutions.slice(0, 20).map(solution => `${solution.ergonomics.score.toFixed(0)}%`));
     await main.getByRole('button', { name: '筛选与排序', exact: true }).click();
     assert.equal(await config.getByRole('tab', { name: '筛选', exact: true }).getAttribute('aria-selected'), 'true');
+    const ergonomics = config.getByRole('spinbutton', { name: '最低顺手度（整数） (%)', exact: true });
+    assert.equal(await ergonomics.getAttribute('min'), '1');
+    assert.equal(await ergonomics.getAttribute('max'), '100');
+    assert.equal(await ergonomics.getAttribute('step'), '1');
+    assert.equal(await ergonomics.getAttribute('placeholder'), '不限');
+    for (const [input, expected] of [['0', '1'], ['101', '100'], ['42.8', '42'], ['', '']]) {
+      await ergonomics.fill(input);
+      assert.equal(await ergonomics.inputValue(), expected);
+    }
+    const moves = config.getByRole('spinbutton', { name: '总步数上限', exact: true });
+    assert.equal(await moves.getAttribute('min'), '0');
+    assert.equal(await moves.getAttribute('max'), null);
+    await moves.fill('101');
+    assert.equal(await moves.inputValue(), '101', 'other numeric fields retain their existing range');
+    await moves.fill('');
+    await ergonomics.fill(threshold);
     await config.getByRole('combobox', { name: '方法', exact: true }).selectOption(method);
     await config.getByRole('combobox', { name: '排序', exact: true }).selectOption('moves');
     assert.equal(await cards.count(), 20, 'draft filter leaves visible cards intact');
     await apply();
-    const expected = before.result.solutions.filter(solution => solution.method === method).sort((a, b) => a.moves - b.moves || b.ergonomics.score - a.ergonomics.score);
+    const expected = before.result.solutions.filter(solution => solution.method === method && Math.round(solution.ergonomics.score) >= Number(threshold)).sort((a, b) => a.moves - b.moves || b.ergonomics.score - a.ergonomics.score);
     await poll(async () => await cards.count() === Math.min(20, expected.length), 'applied filter cards');
     assert.deepEqual(await cards.evaluateAll(elements => elements.map(element => element.dataset.method)), expected.slice(0, 20).map(solution => solution.method));
     assert.deepEqual(await cards.locator('[class*="moveCount"] strong').allTextContents(), expected.slice(0, 20).map(solution => String(solution.moves)));
+    assert.equal((await stored(uiKey)).filters.ergonomics, threshold);
     await openConfig('筛选');
+    assert.equal(await ergonomics.inputValue(), threshold);
     await config.getByRole('searchbox').fill('no-such-workbench-case-982371');
     await apply();
     assert.equal(await cards.count(), 0);
@@ -407,7 +428,7 @@ try {
     assert.equal((await activity()).busyStarts, observed.busyStarts);
     assert.deepEqual((await activity()).results, observed.results);
     assert.equal(await main.locator('select,input[type="search"]').count(), 0);
-    return { method, matched: expected.length, resultIdentity: before.identity, workerReruns: 0 };
+    return { method, threshold, matched: expected.length, resultIdentity: before.identity, workerReruns: 0 };
   });
 
   await check('Both actual clipboard actions independently replay with cubing', async () => {
@@ -545,7 +566,84 @@ try {
       assert.ok(kp.defaultPattern().applyAlg(manual).applyAlg(algorithm === '无需转动' ? '' : algorithm)
         .experimentalIsSolved({ ignorePuzzleOrientation: true, ignoreCenterOrientation: true }));
     }
+    assert.equal((await stored(uiKey)).scramble, manual);
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    const restored = await settled(50);
+    assert.equal(await main.locator('#two-scramble').inputValue(), manual);
+    assert.equal(restored.scramble, manual);
+    assert.equal((await activity()).results.length, 1, 'restore before the initial search instead of solving the example first');
     return { generated: random.scramble, manual, randomSolutions: random.result.solutions.length, manualSolutions: custom.result.solutions.length };
+  });
+
+  await check('Empty and unfinished scramble drafts survive reload without replacing other preferences', async () => {
+    const search = await stored(settingsKey);
+    const ui = await stored(uiKey);
+    const draft = await context.newPage();
+    try {
+      for (const scramble of ['', 'R (U']) {
+        await page.evaluate(({ settingsKey, uiKey, search, ui, scramble }) => {
+          localStorage.setItem(settingsKey, JSON.stringify({ ...search, methods: [] }));
+          localStorage.setItem(uiKey, JSON.stringify({ ...ui, scramble }));
+        }, { settingsKey, uiKey, search, ui, scramble });
+        await draft.goto(url, { waitUntil: 'domcontentloaded' });
+        const input = draft.locator('#two-scramble');
+        await poll(async () => !await input.isDisabled(), 'restored draft hydrated');
+        assert.equal(await input.inputValue(), scramble);
+        assert.deepEqual(await stored(uiKey), { ...ui, scramble });
+      }
+    } finally {
+      await draft.close();
+      await page.evaluate(({ settingsKey, uiKey, search, ui }) => {
+        localStorage.setItem(settingsKey, JSON.stringify(search));
+        localStorage.setItem(uiKey, JSON.stringify(ui));
+      }, { settingsKey, uiKey, search, ui });
+    }
+    return { drafts: ['', 'R (U'], otherPreferencesPreserved: true };
+  });
+
+  await check('Score-version migration clears only obsolete or invalid ergonomics thresholds', async () => {
+    const search = await stored(settingsKey);
+    const ui = await stored(uiKey);
+    assert.equal(typeof ui.scoreVersion, 'string');
+    assert.ok(ui.scoreVersion.length > 0);
+    const migration = await context.newPage();
+    const cases = [
+      { version: undefined, threshold: '800', expected: '' },
+      { version: `${ui.scoreVersion}-old`, threshold: '75', expected: '' },
+      ...['', '1', '75', '100'].map(threshold => ({ version: ui.scoreVersion, threshold, expected: threshold })),
+      ...['0', '101', '-1', '75.5', '1e2', 'NaN', ' 75 ', '75\n', '01', 75, null].map(threshold => ({ version: ui.scoreVersion, threshold, expected: '' })),
+    ];
+    try {
+      for (const { version, threshold, expected } of cases) {
+        const seed = { ...ui, scoreVersion: version,
+          filters: { method: 'CLL', color: 'U', base: '3', moves: '30', ergonomics: threshold, cancelled: '2', regrips: '1', text: 'retained text', group: 'retained group' },
+          sort: 'moves', inspection: false,
+          display: { ...ui.display, timerFont: 140, precision: 3, showCube: false },
+          sampling: { special: true, method: 'CLL', base: '2', moves: '25', cancelled: 1, attempts: 7 } };
+        await page.evaluate(({ settingsKey, uiKey, search, seed }) => {
+          localStorage.setItem(settingsKey, JSON.stringify({ ...search, methods: [] }));
+          localStorage.setItem(uiKey, JSON.stringify(seed));
+        }, { settingsKey, uiKey, search, seed });
+        // Empty methods avoid solving on each reload; this check exercises real UI hydration and persistence.
+        await migration.goto(url, { waitUntil: 'domcontentloaded' });
+        await migration.getByRole('button', { name: '分析配置', exact: true }).click();
+        const dialog = migration.getByRole('dialog', { name: '分析配置', exact: true });
+        await dialog.getByRole('tab', { name: '筛选', exact: true }).click();
+        assert.equal(await dialog.getByRole('spinbutton', { name: '最低顺手度（整数） (%)', exact: true }).inputValue(), expected);
+        await poll(async () => {
+          const saved = await stored(uiKey);
+          return saved.scoreVersion === ui.scoreVersion && saved.filters.ergonomics === expected;
+        }, 'migrated UI saved');
+        assert.deepEqual(await stored(uiKey), { ...seed, scoreVersion: ui.scoreVersion, filters: { ...seed.filters, ergonomics: expected } });
+      }
+    } finally {
+      await migration.close();
+      await page.evaluate(({ settingsKey, uiKey, search, ui }) => {
+        localStorage.setItem(settingsKey, JSON.stringify(search));
+        localStorage.setItem(uiKey, JSON.stringify(ui));
+      }, { settingsKey, uiKey, search, ui });
+    }
+    return { cases: cases.length, scoreVersion: ui.scoreVersion, otherPreferencesPreserved: true };
   });
 
   await check('No browser errors, solver alerts or failed dataset responses', async () => {
