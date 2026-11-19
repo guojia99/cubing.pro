@@ -1,26 +1,50 @@
 [
   {
-    "src": "/advertisement/cuberwenjun/价目表.jpg",
-    "caption": "价目表(具体请联系cuberwenjun获取最新价目表)"
+    "src": "/advertisement/cuberwenjun/13358a1ce032f0fd52d87a1a3e2a6d49.jpg",
+    "captionKey": "siteContent.adPrice"
+  },
+  {
+    "src": "/advertisement/cuberwenjun/img.png",
+    "captionKey": "siteContent.adWechat"
+  },
+  {
+    "src": "/advertisement/cuberwenjun/2ce3aec7849aa86e03a76236abebbfa0.jpg",
+    "captionKey": "siteContent.adProductFour",
+    "href": "https://e.tb.cn/h.jmcdrYdp9J1XOxh?tk=RWPf6fLCOkg"
+  },
+  {
+    "src": "/advertisement/cuberwenjun/804033fc75816c4033fd9865e76a13dd.jpg",
+    "captionKey": "siteContent.adProductFive",
+    "href": "https://e.tb.cn/h.jPlFnJy4mfheJrn?tk=V3rJ6fp13hm"
+  },
+  {
+    "src": "/advertisement/cuberwenjun/dba09d44f140631910f2a428edbd9851.jpg",
+    "captionKey": "siteContent.adProductSix",
+    "href": "https://e.tb.cn/h.jlpUY4p9ixvc55r?tk=uxlR6fpcRvr"
+  },
+  {
+    "src": "/advertisement/cuberwenjun/5277d4bf619a82e0182143a456e2ebf1.jpg",
+    "captionKey": "siteContent.adProductSeven",
+    "href": "https://e.tb.cn/h.jlp5Nrn0ZxS3Ohq?tk=fg526fpdPXt"
   },
   {
     "src": "/advertisement/cuberwenjun/个人水平.jpg",
-    "caption": "2024LUOW02 && 高水平手感调试"
+    "captionKey": "siteContent.adTuning"
   },
   {
     "src": "/advertisement/cuberwenjun/存货.jpg",
-    "caption": "热门魔方改造均有存货"
+    "captionKey": "siteContent.adStock"
   },
   {
     "src": "/advertisement/cuberwenjun/三阶.jpg",
-    "caption": "球轴三阶改装示意"
+    "captionKey": "siteContent.adThree"
   },
   {
     "src": "/advertisement/cuberwenjun/四阶.jpg",
-    "caption": "球轴四阶改装示意"
+    "captionKey": "siteContent.adFour"
   },
   {
     "src": "/advertisement/cuberwenjun/展示1.jpg",
-    "caption": "军火展示"
+    "captionKey": "siteContent.adShowcase"
   }
 ]
