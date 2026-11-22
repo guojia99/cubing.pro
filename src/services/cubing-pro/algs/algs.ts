@@ -15,6 +15,8 @@ export type AlgCubeMap = {
 export type AlgItem = {
   name: string;
   algs: string[];
+  caseId?: string;
+  solutionIds?: (string | null)[];
   image?: string;
   scrambles?: string[];
   [key: string]: unknown;
@@ -22,6 +24,7 @@ export type AlgItem = {
 
 export type AlgGroupItem = {
   name: string;
+  groupId?: string;
   algs: AlgItem[];
 };
 
@@ -86,7 +89,7 @@ export async function getAlgCubeClass(
   if (cached) return cached;
 
   const res = await Request.get<AlgClassDetail>(
-    `/public/algorithm/${cube}/${classID}`,
+    `/public/algorithm/${encodeURIComponent(cube)}/${encodeURIComponent(classID)}`,
   );
   setCached(cacheKey, res.data);
   return res.data;

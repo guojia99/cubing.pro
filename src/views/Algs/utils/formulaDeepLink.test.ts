@@ -3,6 +3,7 @@ import { test } from "node:test";
 import type { AlgClassDetail } from "@/services/cubing-pro/algs/algs";
 import { algDeepLinkEnUS, algDeepLinkZhCN } from "@/i18n/messages/algs-deep-link";
 import { parseFormulaDeepLink, resolveFormulaDeepLink, type FormulaDeepLinkTarget } from "./formulaDeepLink";
+import { getAlgsSelection, setAlgsSelection } from "./storage";
 
 const target: FormulaDeepLinkTarget = {
   set: "TCLL+ 中文",
@@ -123,6 +124,33 @@ test("duplicate labels with different raw formulas are resolved by the complete 
   const data = dataset();
   data.sets[1].groups[1].algs.push({ name: target.name, algs: ["F R F'"] });
   assert.equal(resolveFormulaDeepLink(data, target).kind, "found");
+});
+
+test("stored library selections follow solution IDs and keep indexes for older records", (t) => {
+  const values = new Map<string, string>();
+  const original = Object.getOwnPropertyDescriptor(globalThis, "localStorage");
+  Object.defineProperty(globalThis, "localStorage", { configurable: true, value: {
+    getItem: (key: string) => values.get(key) ?? null,
+    setItem: (key: string, value: string) => values.set(key, value),
+  } });
+  t.after(() => {
+    if (original) Object.defineProperty(globalThis, "localStorage", original);
+    else Reflect.deleteProperty(globalThis, "localStorage");
+  });
+  const alg = { name: "OLL 45", algs: ["second", "first"], solutionIds: ["b", "a"] };
+  const legacySelection = { source: "library", index: 1 };
+  for (const record of [1, legacySelection, { ...legacySelection, solutionId: null }]) {
+    values.set("algs_user_selection", JSON.stringify({ key: record }));
+    assert.deepEqual(getAlgsSelection("key", alg), legacySelection);
+    assert.deepEqual(getAlgsSelection("key"), legacySelection);
+  }
+  setAlgsSelection("key", { source: "library", index: 1, solutionId: "b" });
+  assert.deepEqual(getAlgsSelection("key", alg), { source: "library", index: 0, solutionId: "b" });
+  assert.deepEqual(getAlgsSelection("key", { ...alg, solutionIds: ["b", "b"] }), { source: "library", index: 0, solutionId: "b" });
+  assert.equal(getAlgsSelection("key", { ...alg, solutionIds: ["a"] }), null);
+  assert.deepEqual(getAlgsSelection("key", { name: alg.name, algs: alg.algs }), legacySelection);
+  setAlgsSelection("key", { source: "custom", index: 1 });
+  assert.deepEqual(getAlgsSelection("key", alg), { source: "custom", index: 1 });
 });
 
 test("all failure statuses and dismiss actions have matching Chinese and English messages", () => {

@@ -43,6 +43,7 @@ import {
   getFormulaProficiency,
 } from "@/services/cubing-pro/algs/formulaPracticeProficiency";
 
+import { DiscussionButton, ForumScope } from "./forum/ForumScope";
 import AlgsFormulaCard from "./components/AlgsFormulaCard";
 import AlgsFormulaCardWide from "./components/AlgsFormulaCardWide";
 import AlgsFilterPanel from "./components/AlgsFilterPanel";
@@ -101,6 +102,14 @@ interface Props {
 }
 
 export function AlgsDetailView({ cube, classId }: Props) {
+  return (
+    <ForumScope cube={cube} classId={classId}>
+      <AlgsDetailContent cube={cube} classId={classId} />
+    </ForumScope>
+  );
+}
+
+function AlgsDetailContent({ cube, classId }: Props) {
   const { t, locale } = useI18n();
   const query = useSearchParams()?.toString() ?? "";
   const routeKey = JSON.stringify([cube, classId]);
@@ -250,6 +259,7 @@ export function AlgsDetailView({ cube, classId }: Props) {
     const result: {
       setName: string;
       groupName: string;
+      groupId?: string;
       setColorIndex: number;
       algs: AlgItem[];
     }[] = [];
@@ -269,6 +279,7 @@ export function AlgsDetailView({ cube, classId }: Props) {
           result.push({
             setName: set.name,
             groupName: gName,
+            groupId: groups[gi]?.groupId,
             setColorIndex: si,
             algs,
           });
@@ -320,6 +331,7 @@ export function AlgsDetailView({ cube, classId }: Props) {
     }
     const sel = getAlgsSelection(
       buildAlgsKey(cube, classId, first.setName, first.groupName, first.alg.name),
+      first.alg,
     );
     const formulas = sel?.source === "custom"
       ? getCustomAlgs(buildAlgsKey(cube, classId, first.setName, first.groupName, first.alg.name))
@@ -550,6 +562,7 @@ export function AlgsDetailView({ cube, classId }: Props) {
             >
               {group.groupName}
             </Heading>
+            {group.groupId && <DiscussionButton kind="group" id={group.groupId} />}
             <Text fontSize="11px" lineHeight="22px" color="fg.muted" ml="auto" flexShrink={0}>
               {group.algs.length}
             </Text>

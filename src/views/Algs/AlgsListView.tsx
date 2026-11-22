@@ -10,6 +10,7 @@ import {
   NativeSelect,
   Skeleton,
   Tag,
+  Tabs,
   Text,
   VStack,
 } from "@chakra-ui/react";
@@ -45,6 +46,8 @@ import {
   assertPayloadWithinLimit,
 } from "@/services/cubing-pro/user/user_kv";
 
+import { ForumScope } from "./forum/ForumScope";
+import { RecentDiscussions } from "./forum/ForumLists";
 import AlgsCubeDiagram from "./components/AlgsCubeDiagram";
 import RandomPickModal from "./components/RandomPickModal";
 import { RANDOM_PICK_ICON_SVG } from "./utils/randomPickIcon";
@@ -182,7 +185,7 @@ function ToolMiniCard({
   );
 }
 
-export function AlgsListView() {
+function AlgorithmCatalog() {
   const { t, tf, locale } = useI18n();
   const router = useRouter();
   const { currentUser } = useAuth();
@@ -277,18 +280,10 @@ export function AlgsListView() {
     e.target.value = "";
   };
 
-  if (error) {
-    return (
-      <VStack gap="4" py="12">
-        <Text color="fg.muted">{t("algs.loadError")}</Text>
-      </VStack>
-    );
-  }
+  if (error) return <Text role="alert" color="fg.muted">{t("algs.loadError")}</Text>;
 
   return (
-    <VStack className="algs-library" align="stretch" gap="6">
-      <PageHeader title={t("algs.title")} />
-
+    <VStack align="stretch" gap="6">
       <Flex align="center" gap="3" flexWrap="wrap">
         <NativeSelect.Root maxW={{ base: "full", md: "220px" }} size="sm">
           <NativeSelect.Field
@@ -478,4 +473,21 @@ export function AlgsListView() {
 
     </VStack>
   );
+}
+
+export function AlgsListView() {
+  const { t } = useI18n();
+  return <ForumScope>
+    <VStack className="algs-library" align="stretch" gap="6">
+      <PageHeader title={t("algs.title")} />
+      <Tabs.Root defaultValue="library" lazyMount>
+        <Tabs.List>
+          <Tabs.Trigger value="library">{t("shell.route.algs-list")}</Tabs.Trigger>
+          <Tabs.Trigger value="recent">{t("forum.recent")}</Tabs.Trigger>
+        </Tabs.List>
+        <Tabs.Content value="library"><AlgorithmCatalog /></Tabs.Content>
+        <Tabs.Content value="recent"><RecentDiscussions /></Tabs.Content>
+      </Tabs.Root>
+    </VStack>
+  </ForumScope>;
 }
