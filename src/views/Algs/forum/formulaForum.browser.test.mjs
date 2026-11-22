@@ -8,14 +8,15 @@ page.setDefaultNavigationTimeout(110000);
 const errors = [];
 page.on("pageerror", error => errors.push(error.message));
 
-const groupId = "a".repeat(64);
-const first = "b".repeat(64);
-const second = "c".repeat(64);
+const groupId = "a".repeat(16);
+const first = "b".repeat(16);
+const second = "c".repeat(16);
 const moves = ["R U R'", "F U F'"];
 const target = { id: first, kind: "solution", cube: "333", className: "OLL", setName: "OLL", groupName: "T", caseName: "OLL 45", moves: moves[0] };
 const parent = { id: 40, authorName: "Jia", replyToName: "", parentId: null, body: "How do you grip this?", deleted: false, createdAt: "2026-11-18T01:02:03Z" };
 const reply = { ...parent, id: 42, parentId: 40, replyToName: "Jia", authorName: "Xi", body: "I use my index finger." };
 const writes = [];
+const postDeleteReads = [];
 let read = false;
 let removed = false;
 
@@ -35,12 +36,16 @@ try {
     if (path === "/public/algorithm/333/OLL") return send({ name: "OLL", sets: [{ name: "OLL", groups: [{ groupId, name: "T", algs: [{ name: "OLL 45", algs: moves, solutionIds: [first, second] }] }] }] });
     if (path === "/public/algorithm/") return send({ CubeKeys: ["333"], ClassMap: { 333: [{ name: "OLL" }] } });
     if (path === "/public/formula-forum/counts") return ok({ groups: {}, solutions: { [first]: 1 } });
-    if (path === "/public/formula-forum/recent") return ok({ items: [{ target, count: 2, lastActivity: reply.createdAt }], page: 1, total: 1 });
+    if (path === "/public/formula-forum/recent") return ok({ items: [{ target, count: 2, lastActivity: reply.createdAt, lastCommentId: reply.id }], page: 1, total: 1 });
     if (path === "/user/formula-forum/notifications") return ok({ items: [{ id: 2, target, commentId: 42, body: reply.body, authorName: "Xi", createdAt: reply.createdAt, readAt: read ? reply.createdAt : null }], page: 1, total: 1, unread: read ? 0 : 1 });
     if (path === "/admin/formula-forum/comments") return ok({ items: [{ ...parent, target }], page: 1, total: 1 });
     if (path === "/admin/formula-forum/comments/42") { assert.equal(req.method(), "DELETE"); removed = true; return ok({}); }
     if (path === "/user/formula-forum/notifications/2/read") { assert.equal(req.method(), "PUT"); read = true; return ok({}); }
     if (path === `/public/formula-forum/targets/solution/${first}/comments`) {
+      if (removed) {
+        postDeleteReads.push({ page: url.searchParams.get("page"), commentId: url.searchParams.get("commentId") });
+        return ok({ items: [parent], target, page: 1, total: 20, count: 20 });
+      }
       const centered = url.searchParams.get("commentId") === "42";
       return ok({ items: centered ? [reply] : [parent], target, page: centered ? 2 : 1, total: 21, count: 21 });
     }
@@ -62,6 +67,7 @@ try {
   await group.click();
   const groupDialog = page.getByRole("dialog", { name: "Discuss group", exact: true });
   await groupDialog.getByText("No comments yet", { exact: true }).waitFor();
+  assert.equal(await groupDialog.getByRole("link", { name: "View formula" }).count(), 0);
   assert.equal(page.url(), catalogUrl);
   await groupDialog.getByRole("button", { name: "Close", exact: true }).click();
   await groupDialog.waitFor({ state: "hidden" });
@@ -72,6 +78,7 @@ try {
   await detail.getByRole("button", { name: /^Discuss/ }).first().click();
   const dialog = page.getByRole("dialog", { name: "Discuss", exact: true });
   await dialog.getByRole("button", { name: "Reply", exact: true }).click();
+  assert.equal(await dialog.getByRole("link", { name: "View formula" }).count(), 0);
   const input = dialog.getByRole("textbox", { name: "Write a comment" });
   await input.fill("blocked draft");
   await dialog.getByRole("button", { name: "Post", exact: true }).click();
@@ -90,7 +97,8 @@ try {
   await page.goto(base + "/algs/", { waitUntil: "domcontentloaded" });
   await page.getByRole("tab", { name: "Recent discussions" }).click();
   await page.getByRole("button").filter({ hasText: "OLL 45" }).click();
-  await dialog.getByText(parent.body).waitFor();
+  await dialog.locator("#formula-comment-42").getByText(reply.body).waitFor();
+  assert.equal(await dialog.getByRole("link", { name: "View formula" }).getAttribute("href"), "/algs/333/OLL/?set=OLL&group=T&case=OLL+45&alg=R+U+R%27");
   await dialog.getByRole("button", { name: "Close", exact: true }).click();
   await dialog.waitFor({ state: "hidden" });
   await page.getByRole("tab", { name: "Recent discussions", selected: true }).waitFor();
@@ -105,6 +113,7 @@ try {
   await dialog.locator("#formula-comment-42").getByRole("button", { name: "Delete", exact: true }).click();
   await dialog.getByText(parent.body).waitFor();
   assert.equal(removed, true);
+  assert.ok(postDeleteReads.some(({ page, commentId }) => page === "2" && commentId === null), "Reload page 2 without the deleted commentId");
   await dialog.getByRole("button", { name: "Close" }).click();
   await dialog.waitFor({ state: "hidden" });
   await page.getByRole("button").filter({ hasText: reply.body }).waitFor();

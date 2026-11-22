@@ -36,7 +36,8 @@ export function ForumScope({ children, cube, classId }: { children: ReactNode; c
         <Dialog.Positioner>
           <Dialog.Content maxH="100dvh">
             {thread && <ForumThread key={`${thread.kind}/${thread.id}/${thread.commentId ?? ""}`}
-              thread={thread} onChange={refresh} />}
+              thread={thread} currentCube={cube} currentClassId={classId}
+              onChange={refresh} onClose={() => setThread(null)} />}
           </Dialog.Content>
         </Dialog.Positioner>
       </Portal>

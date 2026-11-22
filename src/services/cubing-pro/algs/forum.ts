@@ -45,7 +45,7 @@ export interface ForumNotification {
   readAt: string | null;
 }
 
-export type RecentDiscussion = { target: ForumTarget; count: number; lastActivity: string };
+export type RecentDiscussion = { target: ForumTarget; count: number; lastActivity: string; lastCommentId: number };
 export const FORUM_PAGE_SIZE = 20;
 type Result<T> = { data: T };
 const publicApi = "/public/formula-forum";

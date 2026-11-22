@@ -42,7 +42,7 @@ export function RecentDiscussions() {
   if (!data) return <ForumLoadState error={error} retry={refresh} />;
   return <Stack>
     {data.items.length === 0 && <Text color="fg.muted">{t("forum.noRecent")}</Text>}
-    {data.items.map(item => <TargetRow key={item.target.id} target={item.target} onOpen={() => open(item.target)}>
+    {data.items.map(item => <TargetRow key={item.target.id} target={item.target} onOpen={() => open({ ...item.target, commentId: item.lastCommentId })}>
       <Text fontSize="xs" color="fg.muted">{t("forum.comments")} · {item.count} · {forumDate(item.lastActivity, locale)}</Text>
     </TargetRow>)}
     <ForumPagination page={data.page} total={data.total} onPage={setPage} />
@@ -113,7 +113,7 @@ function ModerationList() {
     setBusy(true);
     try {
       await deleteForumComment(id);
-      if (data?.items.length === 1 && page > 1) setPage(page - 1);
+      if (data) setPage(data.page);
       changed();
     } catch (error) {
       toaster.create({ type: "error", title: message(error) });

@@ -6,6 +6,7 @@ type Translations = readonly [string, string, string, string, string, string, st
 const messages = {
   "forum.discuss": ["讨论", "Discuss", "議論", "討論", "토론", "Discussion", "Debate"],
   "forum.group": ["讨论本组", "Discuss group", "グループで議論", "討論本組", "그룹 토론", "Discuter du groupe", "Debatir el grupo"],
+  "forum.viewFormula": ["查看公式", "View formula", "手順を見る", "查看公式", "해법 보기", "Voir la formule", "Ver fórmula"],
   "forum.recent": ["最近讨论", "Recent discussions", "最近の議論", "最近討論", "최근 토론", "Discussions récentes", "Debates recientes"],
   "forum.replies": ["回复我的", "Replies to me", "自分への返信", "回覆我嘅留言", "내게 온 답글", "Mes réponses reçues", "Respuestas recibidas"],
   "forum.moderation": ["公式发言管理", "Algorithm comment moderation", "手順のコメント管理", "公式留言管理", "해법 댓글 관리", "Modération des commentaires", "Moderación de comentarios"],

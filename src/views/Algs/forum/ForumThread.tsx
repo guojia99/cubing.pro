@@ -6,7 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useI18n } from "@/contexts/I18nProvider";
 import { Auth, hasAnyAuth } from "@/lib/auth";
-import { addForumComment, deleteForumComment, getForumComments, type ForumComment, type ForumKind } from "@/services/cubing-pro/algs/forum";
+import { addForumComment, deleteForumComment, getForumComments, type ForumComment, type ForumKind, type ForumTarget } from "@/services/cubing-pro/algs/forum";
 import { forumDate, ForumLoadState, ForumPagination, targetLabel, useForumErrorMessage, useForumQuery } from "./forumUi";
 
 export interface OpenThread {
@@ -15,9 +15,21 @@ export interface OpenThread {
   commentId?: number;
 }
 
-export function ForumThread({ thread, onChange }: {
+function formulaHref(target: ForumTarget) {
+  const base = `/algs/${encodeURIComponent(target.cube)}/${encodeURIComponent(target.className)}/`;
+  if (target.kind === "solution" && target.setName && target.groupName && target.caseName && target.moves) {
+    const params = new URLSearchParams({ set: target.setName, group: target.groupName, case: target.caseName, alg: target.moves });
+    return `${base}?${params}`;
+  }
+  return base;
+}
+
+export function ForumThread({ thread, currentCube, currentClassId, onChange, onClose }: {
   thread: OpenThread;
+  currentCube?: string;
+  currentClassId?: string;
   onChange: () => void;
+  onClose: () => void;
 }) {
   const { t, tf, locale } = useI18n();
   const { currentUser } = useAuth();
@@ -33,6 +45,7 @@ export function ForumThread({ thread, onChange }: {
   const message = useForumErrorMessage();
   const load = useCallback((signal: AbortSignal) => getForumComments(thread.kind, thread.id, page, focusId, signal), [thread.kind, thread.id, page, focusId]);
   const { data, error, refresh } = useForumQuery(load);
+  const viewHref = data && (currentCube !== data.target.cube || currentClassId !== data.target.className) ? formulaHref(data.target) : null;
   const length = Array.from(draft.trim()).length;
   const loginHref = "/login?redirect=" + encodeURIComponent(window.location.pathname + window.location.search + window.location.hash);
 
@@ -64,9 +77,7 @@ export function ForumThread({ thread, onChange }: {
     try {
       await deleteForumComment(commentId);
       if (reply?.id === commentId) setReply(null);
-      // Deletion may remove an entire leaf and its page.
-      const visiblePage = data?.page ?? 1;
-      setPage(data?.items.length === 1 ? Math.max(1, visiblePage - 1) : visiblePage);
+      setPage(data?.page ?? 1);
       setFocusId(undefined);
       refresh();
       onChange();
@@ -80,7 +91,10 @@ export function ForumThread({ thread, onChange }: {
   return <>
       <Dialog.Header>
         <Stack gap="1" minW="0" pr="8">
-          <Dialog.Title>{t(thread.kind === "group" ? "forum.group" : "forum.discuss")}</Dialog.Title>
+          <HStack gap="2" flexWrap="wrap">
+            <Dialog.Title>{t(thread.kind === "group" ? "forum.group" : "forum.discuss")}</Dialog.Title>
+            {viewHref && <Button asChild size="xs" variant="outline"><Link href={viewHref} onClick={onClose}>{t("forum.viewFormula")}</Link></Button>}
+          </HStack>
           {data && <>
             <Text fontSize="sm" color="fg.muted" overflowWrap="anywhere">{targetLabel(data.target)}</Text>
             {data.target.moves && <Text fontFamily="mono" overflowWrap="anywhere">{data.target.moves}</Text>}
