@@ -11,7 +11,8 @@ page.on("pageerror", error => errors.push(error.message));
 const groupId = "a".repeat(16);
 const first = "b".repeat(16);
 const second = "c".repeat(16);
-const moves = ["R U R'", "F U F'"];
+const third = "d".repeat(16);
+const moves = ["R U R'", "F U F'", "R U R'"];
 const target = { id: first, kind: "solution", cube: "333", className: "OLL", setName: "OLL", groupName: "T", caseName: "OLL 45", moves: moves[0] };
 const parent = { id: 40, authorName: "Jia", replyToName: "", parentId: null, body: "How do you grip this?", deleted: false, createdAt: "2026-11-18T01:02:03Z" };
 const reply = { ...parent, id: 42, parentId: 40, replyToName: "Jia", authorName: "Xi", body: "I use my index finger." };
@@ -33,7 +34,7 @@ try {
     const send = (data, status = 200) => route.fulfill({ status, json: data });
     const ok = data => send({ data, code: "200", msg: "ok" });
     if (path === "/auth/current") return ok({ id: 7, Name: "Xi", CubeID: "LOCAL", Auth: 9 });
-    if (path === "/public/algorithm/333/OLL") return send({ name: "OLL", sets: [{ name: "OLL", groups: [{ groupId, name: "T", algs: [{ name: "OLL 45", algs: moves, solutionIds: [first, second] }] }] }] });
+    if (path === "/public/algorithm/333/OLL") return send({ name: "OLL", sets: [{ name: "OLL", groups: [{ groupId, name: "T", algs: [{ name: "OLL 45", algs: moves, solutionIds: [first, second, third] }] }] }] });
     if (path === "/public/algorithm/") return send({ CubeKeys: ["333"], ClassMap: { 333: [{ name: "OLL" }] } });
     if (path === "/public/formula-forum/counts") return ok({ groups: {}, solutions: { [first]: 1 } });
     if (path === "/public/formula-forum/recent") return ok({ items: [{ target, count: 2, lastActivity: reply.createdAt, lastCommentId: reply.id }], page: 1, total: 1 });
@@ -98,7 +99,7 @@ try {
   await page.getByRole("tab", { name: "Recent discussions" }).click();
   await page.getByRole("button").filter({ hasText: "OLL 45" }).click();
   await dialog.locator("#formula-comment-42").getByText(reply.body).waitFor();
-  assert.equal(await dialog.getByRole("link", { name: "View formula" }).getAttribute("href"), "/algs/333/OLL/?set=OLL&group=T&case=OLL+45&alg=R+U+R%27");
+  assert.equal(await dialog.getByRole("link", { name: "View formula" }).getAttribute("href"), "/algs/333/OLL/?solutionId=" + first);
   await dialog.getByRole("button", { name: "Close", exact: true }).click();
   await dialog.waitFor({ state: "hidden" });
   await page.getByRole("tab", { name: "Recent discussions", selected: true }).waitFor();
@@ -122,6 +123,13 @@ try {
   await page.getByRole("button").filter({ hasText: parent.body }).waitFor();
   await page.getByRole("button", { name: "Delete", exact: true }).waitFor();
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+
+  await page.goto(base + "/algs/333/OLL/?solutionId=" + third, { waitUntil: "domcontentloaded" });
+  await detail.waitFor();
+  const duplicates = detail.getByRole("button", { name: moves[0], exact: true });
+  await duplicates.nth(1).and(detail.getByRole("button", { pressed: true })).waitFor();
+  assert.equal(await duplicates.nth(0).getAttribute("aria-pressed"), "false");
+  assert.equal(await duplicates.nth(1).getAttribute("aria-pressed"), "true");
   assert.deepEqual(errors, []);
   console.log("PASS mobile group and solution dialogs, reply drafts, centered pages, recent discussions, inbox and moderation.");
 } finally {

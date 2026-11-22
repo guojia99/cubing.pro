@@ -17,9 +17,8 @@ export interface OpenThread {
 
 function formulaHref(target: ForumTarget) {
   const base = `/algs/${encodeURIComponent(target.cube)}/${encodeURIComponent(target.className)}/`;
-  if (target.kind === "solution" && target.setName && target.groupName && target.caseName && target.moves) {
-    const params = new URLSearchParams({ set: target.setName, group: target.groupName, case: target.caseName, alg: target.moves });
-    return `${base}?${params}`;
+  if (target.kind === "solution" && target.id) {
+    return `${base}?${new URLSearchParams({ solutionId: target.id })}`;
   }
   return base;
 }

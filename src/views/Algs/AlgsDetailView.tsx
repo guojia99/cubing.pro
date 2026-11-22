@@ -239,7 +239,7 @@ function AlgsDetailContent({ cube, classId }: Props) {
     // A route can render once with the previous route's data before its fetch effect runs.
     if (loading || !data || loadedRoute !== routeKey) return;
     handledDeepLink.current = deepLinkFingerprint;
-    const result = resolveFormulaDeepLink(data, parsed.target);
+    const result = resolveFormulaDeepLink(data, parsed.kind === "solution" ? { solutionId: parsed.solutionId } : parsed.target);
     if (result.kind !== "found") {
       setDeepLinkNotice(result.kind);
       return;

@@ -45,6 +45,20 @@ test("parses the encoded source tuple losslessly, including plus signs and smart
   assert.deepEqual(parseFormulaDeepLink(query().replaceAll("+", "%20")), { kind: "target", target });
 });
 
+test("parses a solution ID alongside unrelated params or a source tuple", () => {
+  const solutionId = "0123456789abcdef";
+  for (const search of [`?locale=en&solutionId=${solutionId}`, `${query()}&solutionId=${solutionId}`]) {
+    assert.deepEqual(parseFormulaDeepLink(search), { kind: "solution", solutionId });
+  }
+});
+
+test("rejects invalid, duplicate or malformed solution IDs even alongside a valid tuple", () => {
+  const id = "0123456789abcdef";
+  for (const value of ["", id.toUpperCase(), id.slice(1), `${id}0`, `g${id.slice(1)}`, `${id}&solutionId=${id}`, "%GG", `${id}&other=%C3%28`]) {
+    assert.deepEqual(parseFormulaDeepLink(`${query()}&solutionId=${value}`), { kind: "invalid" }, value);
+  }
+});
+
 test("ignores unrelated queries but rejects every incomplete or duplicate tuple", () => {
   for (const search of ["", "?page=2", "?sourceId=only", "?setting=value"]) {
     assert.deepEqual(parseFormulaDeepLink(search), { kind: "none" });
@@ -118,6 +132,29 @@ test("rejects duplicate tuples across cases, groups, sets and raw variants", () 
     if (duplicate === "variant") alg.algs.push(target.rawAlg);
     assert.deepEqual(resolveFormulaDeepLink(data, target), { kind: "ambiguous" }, duplicate);
   }
+});
+
+test("solution IDs distinguish identical moves and only resolve nonempty library slots", () => {
+  const data = dataset();
+  const alg = data.sets[1].groups[1].algs[1];
+  const first = "a".repeat(16), third = "c".repeat(16);
+  const empty = "b".repeat(16), beyondEnd = "d".repeat(16);
+  alg.algs = [target.rawAlg, "", target.rawAlg];
+  alg.solutionIds = [first, empty, third, beyondEnd];
+  for (const [libraryIndex, solutionId] of [[0, first], [2, third]] as const) {
+    const result = resolveFormulaDeepLink(data, { solutionId });
+    assert.ok(result.kind === "found");
+    assert.equal(result.libraryIndex, libraryIndex);
+    assert.equal(result.index, 3);
+    assert.equal(result.items.length, 4);
+    assert.equal(result.items[result.index], result.item);
+    assert.equal(result.item.alg, alg);
+  }
+  for (const solutionId of [empty, beyondEnd, "f".repeat(16)]) {
+    assert.deepEqual(resolveFormulaDeepLink(data, { solutionId }), { kind: "missing" }, solutionId);
+  }
+  alg.solutionIds[2] = first;
+  assert.deepEqual(resolveFormulaDeepLink(data, { solutionId: first }), { kind: "ambiguous" });
 });
 
 test("duplicate labels with different raw formulas are resolved by the complete tuple", () => {

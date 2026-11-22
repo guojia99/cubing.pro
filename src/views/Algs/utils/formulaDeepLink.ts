@@ -11,6 +11,7 @@ export interface FormulaDeepLinkTarget {
 export type ParsedFormulaDeepLink =
   | { kind: "none" }
   | { kind: "invalid" }
+  | { kind: "solution"; solutionId: string }
   | { kind: "target"; target: FormulaDeepLinkTarget };
 
 export type ResolvedFormulaDeepLink =
@@ -21,12 +22,19 @@ export function parseFormulaDeepLink(search: string): ParsedFormulaDeepLink {
   if (search.length > 16000) return { kind: "invalid" };
   const params = new URLSearchParams(search);
   const keys = ["set", "group", "case", "alg"] as const;
-  if (!keys.some((key) => params.has(key))) return { kind: "none" };
+  const hasSolutionId = params.has("solutionId");
+  const hasTuple = keys.some((key) => params.has(key));
+  if (!hasSolutionId && !hasTuple) return { kind: "none" };
   // URLSearchParams silently repairs malformed escapes; reject those links instead.
   try {
     decodeURIComponent(search.replace(/\+/g, " "));
   } catch {
     return { kind: "invalid" };
+  }
+  if (hasSolutionId) {
+    const ids = params.getAll("solutionId");
+    if (ids.length !== 1 || !/^[0-9a-f]{16}$/.test(ids[0])) return { kind: "invalid" };
+    return { kind: "solution", solutionId: ids[0] };
   }
   const values = keys.map((key) => params.getAll(key));
   if (values.some((entries, index) => entries.length !== 1
@@ -39,21 +47,25 @@ export function parseFormulaDeepLink(search: string): ParsedFormulaDeepLink {
   return { kind: "target", target: { set, group, name, rawAlg } };
 }
 
-/** Match retained source strings across the full dataset, never display/filter aliases. */
+/** Resolve a solution ID or exact source tuple across the full dataset. */
 export function resolveFormulaDeepLink(
   data: AlgClassDetail,
-  target: FormulaDeepLinkTarget,
+  target: FormulaDeepLinkTarget | { solutionId: string },
 ): ResolvedFormulaDeepLink {
   const items: FormulaItem[] = [];
   const matches: { index: number; libraryIndex: number }[] = [];
+  const byId = "solutionId" in target;
   for (const set of data.sets) {
     for (const group of set.groups) {
       for (const alg of group.algs) {
         const item = { alg, setName: set.name, groupName: group.name };
         const index = items.push(item) - 1;
-        if (set.name !== target.set || group.name !== target.group || alg.name !== target.name) continue;
+        if (!byId && (set.name !== target.set || group.name !== target.group || alg.name !== target.name)) continue;
         alg.algs.forEach((formula, libraryIndex) => {
-          if (formula === target.rawAlg) matches.push({ index, libraryIndex });
+          const match = byId
+            ? formula !== "" && alg.solutionIds?.[libraryIndex] === target.solutionId
+            : formula === target.rawAlg;
+          if (match) matches.push({ index, libraryIndex });
         });
       }
     }
