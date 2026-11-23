@@ -10,26 +10,28 @@ import { useAuth } from "@/contexts/AuthProvider";
 import { useI18n } from "@/contexts/I18nProvider";
 import {
   deleteForumComment, getModerationComments, getRecentDiscussions, getReplyNotifications, markReplyRead,
-  type ForumNotification, type ForumTarget,
+  type ForumTarget,
 } from "@/services/cubing-pro/algs/forum";
 import { ForumScope, useFormulaForum } from "./ForumScope";
 import { forumDate, ForumLoadState, ForumPagination, targetLabel, useForumErrorMessage, useForumQuery } from "./forumUi";
 
-function TargetRow({ target, onOpen, children, disabled }: {
+function TargetRow({ target, onOpen, children }: {
   target: ForumTarget;
   onOpen: () => void;
   children?: ReactNode;
-  disabled?: boolean;
 }) {
+  const { t } = useI18n();
+  const content = <Stack gap="1">
+    <HStack gap="2" flexWrap="wrap">
+      <Text fontSize="sm" fontWeight="semibold" overflowWrap="anywhere">{targetLabel(target) || target.id}</Text>
+      {target.unavailable && <Badge>{t("forum.targetUnavailable")}</Badge>}
+    </HStack>
+    {target.moves && <Text fontFamily="mono" overflowWrap="anywhere">{target.moves}</Text>}
+    {children}
+  </Stack>;
   return <Box asChild textAlign="start" width="full" p="3" borderWidth="1px" borderRadius="md"
-    _hover={{ bg: "bg.subtle", borderColor: "brand.500" }}>
-    <button type="button" onClick={onOpen} disabled={disabled}>
-      <Stack gap="1">
-        <Text fontSize="sm" fontWeight="semibold" overflowWrap="anywhere">{targetLabel(target)}</Text>
-        {target.moves && <Text fontFamily="mono" overflowWrap="anywhere">{target.moves}</Text>}
-        {children}
-      </Stack>
-    </button>
+    _hover={target.unavailable ? undefined : { bg: "bg.subtle", borderColor: "brand.500" }}>
+    {target.unavailable ? content : <button type="button" onClick={onOpen}>{content}</button>}
   </Box>;
 }
 
@@ -58,15 +60,12 @@ function ReplyInbox() {
   const load = useCallback((signal: AbortSignal) => getReplyNotifications(page, signal), [page]);
   const { data, error, refresh } = useForumQuery(load, version);
 
-  async function viewReply(item: ForumNotification) {
+  async function markUnavailableRead(id: number) {
     if (busy) return;
     setBusy(true);
     try {
-      if (!item.readAt) {
-        await markReplyRead(item.id);
-        changed();
-      }
-      open({ ...item.target, commentId: item.commentId });
+      await markReplyRead(id);
+      changed();
     } catch (error) {
       toaster.create({ type: "error", title: message(error) });
     } finally {
@@ -77,13 +76,17 @@ function ReplyInbox() {
   if (!data) return <ForumLoadState error={error} retry={refresh} />;
   return <Stack>
     {data.items.length === 0 && <Text color="fg.muted">{t("forum.noReplies")}</Text>}
-    {data.items.map(item => <TargetRow key={item.id} target={item.target} disabled={busy} onOpen={() => void viewReply(item)}>
+    {data.items.map(item => <TargetRow key={item.id} target={item.target} onOpen={() => open({
+      kind: item.target.kind, id: item.target.id, commentId: item.commentId, notificationId: item.readAt ? undefined : item.id,
+    })}>
       <HStack gap="2">
         {!item.readAt && <Badge colorPalette="brand">{t("forum.unread")}</Badge>}
         <Text fontWeight="medium" fontSize="sm">{item.authorName}</Text>
         <Text fontSize="xs" color="fg.muted">{forumDate(item.createdAt, locale)}</Text>
       </HStack>
       <Text lineClamp={2} overflowWrap="anywhere">{item.body}</Text>
+      {item.target.unavailable && !item.readAt && <Button alignSelf="start" size="xs" variant="outline"
+        disabled={busy} onClick={() => void markUnavailableRead(item.id)}>{t("forum.markRead")}</Button>}
     </TargetRow>)}
     <ForumPagination page={data.page} total={data.total} onPage={setPage} />
   </Stack>;

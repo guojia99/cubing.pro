@@ -6,6 +6,7 @@ export type ForumKind = "group" | "solution";
 export interface ForumTarget {
   kind: ForumKind;
   id: string;
+  unavailable?: boolean;
   cube: string;
   className: string;
   setName: string;

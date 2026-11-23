@@ -23,7 +23,7 @@ import {
   type ChangeEvent,
   type ReactNode,
 } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { UserCloudKvPanel } from "@/components/UserData/UserCloudKvPanel";
 import { toaster } from "@/components/ui/toaster";
@@ -48,6 +48,7 @@ import {
 
 import { ForumScope } from "./forum/ForumScope";
 import { RecentDiscussions } from "./forum/ForumLists";
+import { readForumLoginResume } from "./forum/forumResume";
 import AlgsCubeDiagram from "./components/AlgsCubeDiagram";
 import RandomPickModal from "./components/RandomPickModal";
 import { RANDOM_PICK_ICON_SVG } from "./utils/randomPickIcon";
@@ -477,17 +478,23 @@ function AlgorithmCatalog() {
 
 export function AlgsListView() {
   const { t } = useI18n();
-  return <ForumScope>
+  const queryTab = useSearchParams()?.get("tab");
+  const [tab, setTab] = useState<string | null>(null);
+  useEffect(() => {
+    const recent = queryTab === "recent" || readForumLoginResume(window.location.pathname)?.tab === "recent";
+    setTab(recent ? "recent" : "library");
+  }, [queryTab]);
+  return <ForumScope resumeReady={tab !== null}>
     <VStack className="algs-library" align="stretch" gap="6">
       <PageHeader title={t("algs.title")} />
-      <Tabs.Root defaultValue="library" lazyMount>
+      {tab !== null && <Tabs.Root value={tab} onValueChange={({ value }) => setTab(value)} lazyMount>
         <Tabs.List>
           <Tabs.Trigger value="library">{t("shell.route.algs-list")}</Tabs.Trigger>
           <Tabs.Trigger value="recent">{t("forum.recent")}</Tabs.Trigger>
         </Tabs.List>
         <Tabs.Content value="library"><AlgorithmCatalog /></Tabs.Content>
         <Tabs.Content value="recent"><RecentDiscussions /></Tabs.Content>
-      </Tabs.Root>
+      </Tabs.Root>}
     </VStack>
   </ForumScope>;
 }

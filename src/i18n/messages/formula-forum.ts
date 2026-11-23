@@ -22,6 +22,8 @@ const messages = {
   "forum.noRecent": ["还没有公开讨论", "No public discussions yet", "公開された議論はまだありません", "暫時未有公開討論", "아직 공개 토론이 없습니다", "Aucune discussion publique", "Aún no hay debates públicos"],
   "forum.noReplies": ["还没有人回复你", "No replies yet", "返信はまだありません", "暫時未有人回覆你", "아직 받은 답글이 없습니다", "Vous n’avez pas encore reçu de réponse", "Aún no has recibido respuestas"],
   "forum.unread": ["未读", "Unread", "未読", "未讀", "읽지 않음", "Non lu", "Sin leer"],
+  "forum.targetUnavailable": ["公式不可用", "Formula unavailable", "手順を表示できません", "公式無法顯示", "해법을 볼 수 없습니다", "Formule indisponible", "Fórmula no disponible"],
+  "forum.markRead": ["标为已读", "Mark as read", "既読にする", "標示為已讀", "읽음으로 표시", "Marquer comme lu", "Marcar como leída"],
   "forum.comments": ["发言数", "Comments", "コメント数", "留言數", "댓글 수", "Commentaires", "Comentarios"],
   "forum.error": ["操作失败，请重试。", "Request failed. Please try again.", "処理に失敗しました。再試行してください。", "操作失敗，請再試。", "실패했습니다. 다시 시도하세요.", "La requête a échoué. Réessayez.", "La solicitud falló. Inténtalo de nuevo."],
   "forum.blocked": ["评论包含受限词，请修改后再发表。", "Please edit the restricted wording before posting.", "制限語を編集してから投稿してください。", "留言包含受限詞，請修改後再發表。", "제한 단어를 수정한 후 게시하세요.", "Modifiez les termes interdits avant de publier.", "Modifica los términos restringidos antes de publicar."],

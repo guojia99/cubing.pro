@@ -1,10 +1,13 @@
 "use client";
 
 import { Button, Dialog, Portal } from "@chakra-ui/react";
-import { createContext, useCallback, useContext, useReducer, useState, type ReactNode } from "react";
+import { usePathname } from "next/navigation";
+import { createContext, useCallback, useContext, useEffect, useReducer, useState, type ReactNode } from "react";
+import { useAuth } from "@/contexts/AuthProvider";
 import { useI18n } from "@/contexts/I18nProvider";
 import { getForumCounts, type ForumCounts, type ForumKind } from "@/services/cubing-pro/algs/forum";
 import { ForumThread, type OpenThread } from "./ForumThread";
+import { consumeForumLoginResume } from "./forumResume";
 import { useForumQuery } from "./forumUi";
 
 const ForumContext = createContext<{
@@ -20,8 +23,17 @@ export function useFormulaForum() {
   return context;
 }
 
-export function ForumScope({ children, cube, classId }: { children: ReactNode; cube?: string; classId?: string }) {
+export function ForumScope({ children, cube, classId, resumeReady = true }: {
+  children: ReactNode; cube?: string; classId?: string; resumeReady?: boolean;
+}) {
   const [thread, setThread] = useState<OpenThread | null>(null);
+  const { currentUser } = useAuth();
+  const pathname = usePathname();
+  useEffect(() => {
+    if (!currentUser?.id || !resumeReady || !pathname) return;
+    const payload = consumeForumLoginResume(pathname);
+    if (payload) setThread(payload.thread);
+  }, [currentUser?.id, pathname, resumeReady]);
   const [version, refresh] = useReducer((value: number) => value + 1, 0);
   const load = useCallback((signal: AbortSignal) => cube && classId
     ? getForumCounts(cube, classId, signal) : Promise.resolve(undefined), [cube, classId]);
@@ -35,7 +47,7 @@ export function ForumScope({ children, cube, classId }: { children: ReactNode; c
         <Dialog.Backdrop />
         <Dialog.Positioner>
           <Dialog.Content maxH="100dvh">
-            {thread && <ForumThread key={`${thread.kind}/${thread.id}/${thread.commentId ?? ""}`}
+            {thread && <ForumThread key={`${thread.kind}/${thread.id}/${thread.commentId ?? ""}/${thread.notificationId ?? ""}`}
               thread={thread} currentCube={cube} currentClassId={classId}
               onChange={refresh} onClose={() => setThread(null)} />}
           </Dialog.Content>

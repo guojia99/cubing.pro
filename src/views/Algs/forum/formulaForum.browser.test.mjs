@@ -16,39 +16,96 @@ const moves = ["R U R'", "F U F'", "R U R'"];
 const target = { id: first, kind: "solution", cube: "333", className: "OLL", setName: "OLL", groupName: "T", caseName: "OLL 45", moves: moves[0] };
 const parent = { id: 40, authorName: "Jia", replyToName: "", parentId: null, body: "How do you grip this?", deleted: false, createdAt: "2026-11-18T01:02:03Z" };
 const reply = { ...parent, id: 42, parentId: 40, replyToName: "Jia", authorName: "Xi", body: "I use my index finger." };
+const unavailable = { kind: "solution", id: "e".repeat(16), unavailable: true };
+const tombstoneBody = "A reply on a removed formula.";
 const writes = [];
 const postDeleteReads = [];
-let read = false;
+const markReads = [];
+let catalogRequests = 0;
+let unavailableThreadRequests = 0;
+let failInboxComments = false;
+let firstTargetUnavailable = false;
 let removed = false;
+let tombstoneDeleted = false;
+
+async function signInFromDiscussion(redirect) {
+  const expected = new URL(redirect, base);
+  await page.getByRole("link", { name: "Sign in to join the discussion" }).click();
+  await page.waitForURL(url => url.pathname.replace(/\/$/, "") === "/login");
+  assert.equal(new URL(page.url()).searchParams.get("redirect"), redirect);
+  await page.getByRole("button", { name: "Continue with WCA" }).click();
+  await page.waitForURL(expected.href);
+  const resumed = page.getByRole("dialog", { name: "Discuss", exact: true });
+  await resumed.getByRole("textbox", { name: "Write a comment" }).waitFor();
+  assert.equal(await page.evaluate(() => sessionStorage.getItem("cubing_pro_forum_login_resume")), null);
+}
 
 try {
-  await page.addInitScript(() => {
+  await page.addInitScript(moves => {
     localStorage.setItem("cubing_pro_locale", "en-US");
     localStorage.setItem("algs_hide_formula_diagram", "1");
-    localStorage.setItem("authToken_cubing_pro", JSON.stringify({ token: "local-forum-fixture", expire: "", status: "" }));
-  });
+    if (!localStorage.getItem("alg_class_cache_v2_333_OLL")) {
+      const data = { name: "OLL", sets: [{ name: "OLL", groups: [{ name: "T", algs: [{ name: "OLL 45", algs: moves }] }] }] };
+      localStorage.setItem("alg_class_cache_333_OLL", JSON.stringify({ data, ts: Date.now() }));
+    }
+  }, moves);
   await page.route("**/v3/cube-api/**", async route => {
     const req = route.request();
     const url = new URL(req.url());
     const path = url.pathname.split("/v3/cube-api")[1];
     const send = (data, status = 200) => route.fulfill({ status, json: data });
     const ok = data => send({ data, code: "200", msg: "ok" });
-    if (path === "/auth/current") return ok({ id: 7, Name: "Xi", CubeID: "LOCAL", Auth: 9 });
-    if (path === "/public/algorithm/333/OLL") return send({ name: "OLL", sets: [{ name: "OLL", groups: [{ groupId, name: "T", algs: [{ name: "OLL 45", algs: moves, solutionIds: [first, second, third] }] }] }] });
+    if (path === "/auth/wca") {
+      const callback = new URL(url.searchParams.get("redirect"));
+      assert.equal(callback.origin, new URL(base).origin);
+      assert.equal(callback.pathname, "/auth/callback");
+      callback.searchParams.set("token", "local-forum-fixture");
+      return route.fulfill({ status: 302, headers: { location: callback.href } });
+    }
+    if (path === "/auth/current") {
+      assert.equal(req.headers().authorization, "Bearer local-forum-fixture");
+      return ok({ id: 7, Name: "Xi", CubeID: "LOCAL", Auth: 9 });
+    }
+    if (path === "/public/algorithm/333/OLL") {
+      catalogRequests++;
+      return send({ name: "OLL", sets: [{ name: "OLL", groups: [{ groupId, name: "T", algs: [{ name: "OLL 45", algs: moves, solutionIds: [first, second, third] }] }] }] });
+    }
     if (path === "/public/algorithm/") return send({ CubeKeys: ["333"], ClassMap: { 333: [{ name: "OLL" }] } });
     if (path === "/public/formula-forum/counts") return ok({ groups: {}, solutions: { [first]: 1 } });
     if (path === "/public/formula-forum/recent") return ok({ items: [{ target, count: 2, lastActivity: reply.createdAt, lastCommentId: reply.id }], page: 1, total: 1 });
-    if (path === "/user/formula-forum/notifications") return ok({ items: [{ id: 2, target, commentId: 42, body: reply.body, authorName: "Xi", createdAt: reply.createdAt, readAt: read ? reply.createdAt : null }], page: 1, total: 1, unread: read ? 0 : 1 });
-    if (path === "/admin/formula-forum/comments") return ok({ items: [{ ...parent, target }], page: 1, total: 1 });
+    if (path === "/user/formula-forum/notifications") {
+      const items = [{ id: 2, target, commentId: 42, body: reply.body }, { id: 3, target: unavailable, commentId: 43, body: tombstoneBody }]
+        .map(item => ({ ...item, authorName: "Xi", createdAt: reply.createdAt, readAt: markReads.includes(item.id) ? reply.createdAt : null }));
+      return ok({ items, page: 1, total: items.length, unread: items.filter(item => !item.readAt).length });
+    }
+    if (path === "/admin/formula-forum/comments") {
+      const items = [{ ...parent, target }];
+      if (!tombstoneDeleted) items.push({ ...reply, id: 43, body: tombstoneBody, target: unavailable });
+      return ok({ items, page: 1, total: items.length });
+    }
     if (path === "/admin/formula-forum/comments/42") { assert.equal(req.method(), "DELETE"); removed = true; return ok({}); }
-    if (path === "/user/formula-forum/notifications/2/read") { assert.equal(req.method(), "PUT"); read = true; return ok({}); }
+    if (path === "/admin/formula-forum/comments/43") { assert.equal(req.method(), "DELETE"); tombstoneDeleted = true; return ok({}); }
+    if (path === "/user/formula-forum/notifications/2/read" || path === "/user/formula-forum/notifications/3/read") {
+      assert.equal(req.method(), "PUT");
+      markReads.push(Number(path.split("/").at(-2)));
+      return ok({});
+    }
     if (path === `/public/formula-forum/targets/solution/${first}/comments`) {
+      if (failInboxComments) return send({ message: "Comments temporarily unavailable" }, 500);
+      if (firstTargetUnavailable) return ok({ items: [parent], target: { ...target, unavailable: true }, page: 1, total: 1, count: 1 });
       if (removed) {
         postDeleteReads.push({ page: url.searchParams.get("page"), commentId: url.searchParams.get("commentId") });
         return ok({ items: [parent], target, page: 1, total: 20, count: 20 });
       }
       const centered = url.searchParams.get("commentId") === "42";
       return ok({ items: centered ? [reply] : [parent], target, page: centered ? 2 : 1, total: 21, count: 21 });
+    }
+    if (path === `/public/formula-forum/targets/solution/${third}/comments`) {
+      return ok({ items: [parent], target: { ...target, id: third }, page: 1, total: 1, count: 1 });
+    }
+    if (path === `/public/formula-forum/targets/solution/${unavailable.id}/comments`) {
+      unavailableThreadRequests++;
+      return ok({ items: [], target: unavailable, page: 1, total: 0, count: 0 });
     }
     if (path === `/public/formula-forum/targets/group/${groupId}/comments`) {
       return ok({ items: [], target: { ...target, caseName: "", moves: "", id: groupId, kind: "group" }, page: 1, total: 0, count: 0 });
@@ -62,7 +119,32 @@ try {
     return ok({});
   });
 
-  await page.goto(base + "/algs/333/OLL/", { waitUntil: "domcontentloaded" });
+  const classPath = "/algs/333/OLL/";
+  const duplicateHref = `${classPath}?solutionId=${third}`;
+  const detail = page.locator(".algs-formula-detail-modal");
+  const duplicates = detail.getByRole("button", { name: moves[0], exact: true });
+  const dialog = page.getByRole("dialog", { name: "Discuss", exact: true });
+  await page.goto(base + duplicateHref, { waitUntil: "domcontentloaded" });
+  await duplicates.nth(1).and(detail.getByRole("button", { pressed: true })).waitFor();
+  assert.ok(catalogRequests > 0, "Fresh legacy cache must refetch stable catalog IDs");
+  assert.equal(await page.evaluate(() => localStorage.getItem("alg_class_cache_333_OLL")), null);
+  assert.equal(await detail.getByRole("button", { name: /^Discuss/ }).count(), moves.length);
+  await detail.locator(".algs-formula-detail-modal__close").click();
+  await page.goto(base + classPath, { waitUntil: "domcontentloaded" });
+  await page.locator(".algs-formula-card").filter({ hasText: "OLL 45" }).click();
+  await detail.getByRole("button", { name: /^Discuss/ }).nth(2).click();
+  await signInFromDiscussion(duplicateHref);
+  await detail.waitFor();
+  await dialog.getByRole("button", { name: "Reply", exact: true }).click();
+  await dialog.getByRole("textbox", { name: "Write a comment" }).fill("Returned to the duplicate solution");
+  await dialog.getByRole("button", { name: "Close", exact: true }).click();
+  await dialog.waitFor({ state: "hidden" });
+  await duplicates.nth(1).and(detail.getByRole("button", { pressed: true })).waitFor();
+  assert.equal(await duplicates.nth(0).getAttribute("aria-pressed"), "false");
+  await detail.locator(".algs-formula-detail-modal__close").click();
+  await detail.waitFor({ state: "hidden" });
+  console.log("PASS legacy cache refetch, duplicate solution deep link, and interactive stacked dialogs after login.");
+
   const group = page.getByRole("button", { name: /^Discuss group/ });
   const catalogUrl = page.url();
   await group.click();
@@ -74,10 +156,8 @@ try {
   await groupDialog.waitFor({ state: "hidden" });
   assert.equal(page.url(), catalogUrl);
   await page.locator(".algs-formula-card").filter({ hasText: "OLL 45" }).click();
-  const detail = page.locator(".algs-formula-detail-modal");
   await detail.getByRole("button", { name: moves[1], exact: true }).click();
   await detail.getByRole("button", { name: /^Discuss/ }).first().click();
-  const dialog = page.getByRole("dialog", { name: "Discuss", exact: true });
   await dialog.getByRole("button", { name: "Reply", exact: true }).click();
   assert.equal(await dialog.getByRole("link", { name: "View formula" }).count(), 0);
   const input = dialog.getByRole("textbox", { name: "Write a comment" });
@@ -95,20 +175,35 @@ try {
   assert.equal(await detail.getByRole("button", { name: moves[1], exact: true }).getAttribute("aria-pressed"), "true");
   await detail.locator(".algs-formula-detail-modal__close").click();
 
+  await page.getByRole("button", { name: "Xi", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Sign out", exact: true }).click();
+  await page.waitForURL(url => url.pathname.replace(/\/$/, "") === "/login");
   await page.goto(base + "/algs/", { waitUntil: "domcontentloaded" });
   await page.getByRole("tab", { name: "Recent discussions" }).click();
   await page.getByRole("button").filter({ hasText: "OLL 45" }).click();
   await dialog.locator("#formula-comment-42").getByText(reply.body).waitFor();
   assert.equal(await dialog.getByRole("link", { name: "View formula" }).getAttribute("href"), "/algs/333/OLL/?solutionId=" + first);
+  await signInFromDiscussion("/algs/?tab=recent");
+  await dialog.locator("#formula-comment-42").getByText(reply.body).waitFor();
   await dialog.getByRole("button", { name: "Close", exact: true }).click();
   await dialog.waitFor({ state: "hidden" });
   await page.getByRole("tab", { name: "Recent discussions", selected: true }).waitFor();
 
   await page.getByRole("button", { name: "Xi", exact: true }).click();
-  await page.getByRole("menuitem", { name: "Replies to me (1)" }).click();
-  await page.getByRole("button").filter({ hasText: reply.body }).click();
+  await page.getByRole("menuitem", { name: "Replies to me (2)" }).click();
+  const inboxRow = page.getByRole("button").filter({ hasText: reply.body });
+  await inboxRow.getByText("Unread", { exact: true }).waitFor();
+  failInboxComments = true;
+  await inboxRow.click();
+  await dialog.getByRole("alert").getByText("Comments temporarily unavailable").waitFor();
+  assert.equal(await page.getByText("Unread", { exact: true }).count(), 2);
+  assert.deepEqual(markReads, []);
+  failInboxComments = false;
+  const readResponse = page.waitForResponse(response => response.url().endsWith("/notifications/2/read") && response.request().method() === "PUT" && response.ok());
+  await dialog.getByRole("button", { name: "Retry", exact: true }).click();
   await dialog.locator("#formula-comment-42").getByText(reply.body).waitFor();
-  assert.equal(read, true);
+  await readResponse;
+  assert.deepEqual(markReads, [2]);
 
   page.once("dialog", prompt => prompt.accept());
   await dialog.locator("#formula-comment-42").getByRole("button", { name: "Delete", exact: true }).click();
@@ -117,21 +212,46 @@ try {
   assert.ok(postDeleteReads.some(({ page, commentId }) => page === "2" && commentId === null), "Reload page 2 without the deleted commentId");
   await dialog.getByRole("button", { name: "Close" }).click();
   await dialog.waitFor({ state: "hidden" });
-  await page.getByRole("button").filter({ hasText: reply.body }).waitFor();
+  await inboxRow.waitFor();
+  assert.equal(await inboxRow.getByText("Unread", { exact: true }).count(), 0);
+  assert.deepEqual(markReads, [2]);
+  const unavailableBadge = page.getByText("Formula unavailable", { exact: true });
+  const unavailableTitle = page.getByText(unavailable.id, { exact: true });
+  await unavailableBadge.waitFor();
+  await unavailableTitle.waitFor();
+  await page.getByText(tombstoneBody, { exact: true }).click();
+  assert.equal(await dialog.count(), 0);
+  const markRead = page.getByRole("button", { name: "Mark as read", exact: true });
+  await markRead.click();
+  await markRead.waitFor({ state: "hidden" });
+  await unavailableBadge.waitFor();
+  assert.equal(await page.getByText("Unread", { exact: true }).count(), 0);
+  assert.deepEqual(markReads, [2, 3]);
+  assert.equal(await dialog.count(), 0);
   await page.goto(base + "/admin/admins/", { waitUntil: "domcontentloaded" });
   await page.getByRole("link", { name: /Algorithm comment moderation/ }).click();
   await page.getByRole("button").filter({ hasText: parent.body }).waitFor();
-  await page.getByRole("button", { name: "Delete", exact: true }).waitFor();
+  await unavailableBadge.waitFor();
+  await unavailableTitle.waitFor();
+  const unavailableComment = page.getByText(tombstoneBody, { exact: true });
+  await unavailableComment.click();
+  assert.equal(await dialog.count(), 0);
+  page.once("dialog", prompt => prompt.accept());
+  await page.getByRole("button", { name: "Delete", exact: true }).nth(1).click();
+  await unavailableComment.waitFor({ state: "hidden" });
+  await page.getByRole("button").filter({ hasText: parent.body }).waitFor();
+  assert.ok(tombstoneDeleted);
+  assert.equal(await unavailableBadge.count(), 0);
+  assert.equal(unavailableThreadRequests, 0);
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
 
-  await page.goto(base + "/algs/333/OLL/?solutionId=" + third, { waitUntil: "domcontentloaded" });
-  await detail.waitFor();
-  const duplicates = detail.getByRole("button", { name: moves[0], exact: true });
-  await duplicates.nth(1).and(detail.getByRole("button", { pressed: true })).waitFor();
-  assert.equal(await duplicates.nth(0).getAttribute("aria-pressed"), "false");
-  assert.equal(await duplicates.nth(1).getAttribute("aria-pressed"), "true");
+  firstTargetUnavailable = true;
+  await page.goto(base + "/algs/?tab=recent", { waitUntil: "domcontentloaded" });
+  await page.getByRole("button").filter({ hasText: "OLL 45" }).click();
+  await dialog.getByText(parent.body).waitFor();
+  assert.equal(await dialog.getByRole("link", { name: "View formula" }).count(), 0);
   assert.deepEqual(errors, []);
-  console.log("PASS mobile group and solution dialogs, reply drafts, centered pages, recent discussions, inbox and moderation.");
+  console.log("PASS recent-tab login resume, reply drafts, retry before marking read, and unavailable inbox/moderation targets.");
 } finally {
   await browser.close();
 }

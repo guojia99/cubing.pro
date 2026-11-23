@@ -102,16 +102,9 @@ interface Props {
 }
 
 export function AlgsDetailView({ cube, classId }: Props) {
-  return (
-    <ForumScope cube={cube} classId={classId}>
-      <AlgsDetailContent cube={cube} classId={classId} />
-    </ForumScope>
-  );
-}
-
-function AlgsDetailContent({ cube, classId }: Props) {
   const { t, locale } = useI18n();
   const query = useSearchParams()?.toString() ?? "";
+  const deepLink = useMemo(() => parseFormulaDeepLink(query), [query]);
   const routeKey = JSON.stringify([cube, classId]);
   const deepLinkFingerprint = JSON.stringify([cube, classId, query]);
   const handledDeepLink = useRef<string | null>(null);
@@ -226,12 +219,11 @@ function AlgsDetailContent({ cube, classId }: Props) {
 
   useEffect(() => {
     if (handledDeepLink.current === deepLinkFingerprint) return;
-    const parsed = parseFormulaDeepLink(query);
-    if (parsed.kind === "none") {
+    if (deepLink.kind === "none") {
       handledDeepLink.current = deepLinkFingerprint;
       return;
     }
-    if (parsed.kind === "invalid") {
+    if (deepLink.kind === "invalid") {
       handledDeepLink.current = deepLinkFingerprint;
       setDeepLinkNotice("invalid");
       return;
@@ -239,13 +231,13 @@ function AlgsDetailContent({ cube, classId }: Props) {
     // A route can render once with the previous route's data before its fetch effect runs.
     if (loading || !data || loadedRoute !== routeKey) return;
     handledDeepLink.current = deepLinkFingerprint;
-    const result = resolveFormulaDeepLink(data, parsed.kind === "solution" ? { solutionId: parsed.solutionId } : parsed.target);
+    const result = resolveFormulaDeepLink(data, deepLink.kind === "solution" ? { solutionId: deepLink.solutionId } : deepLink.target);
     if (result.kind !== "found") {
       setDeepLinkNotice(result.kind);
       return;
     }
     setModalState({ items: result.items, index: result.index, initialLibraryIndex: result.libraryIndex });
-  }, [query, deepLinkFingerprint, loading, data, loadedRoute, routeKey]);
+  }, [deepLink, deepLinkFingerprint, loading, data, loadedRoute, routeKey]);
 
   const setKeys = useMemo(
     () => data?.setKeys ?? data?.sets.map((s) => s.name) ?? [],
@@ -698,7 +690,9 @@ function AlgsDetailContent({ cube, classId }: Props) {
   );
 
   return (
-    <>
+    <ForumScope cube={cube} classId={classId} resumeReady={loadedRoute === routeKey && (
+      deepLink.kind === "none" || modalState !== null || deepLinkNotice !== null
+    )}>
       <Box className="algs-detail-shell">
       {deepLinkNotice && (
         <HStack role="alert" borderWidth="1px" borderRadius="md" p={3} mb={3}>
@@ -1228,6 +1222,6 @@ function AlgsDetailContent({ cube, classId }: Props) {
         hideFormulaDiagram={hideFormulaDiagram}
         onChanged={handleChanged}
       />
-    </>
+    </ForumScope>
   );
 }

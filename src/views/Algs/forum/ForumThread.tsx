@@ -3,16 +3,19 @@
 import { Badge, Box, Button, CloseButton, Dialog, HStack, Stack, Text, Textarea } from "@chakra-ui/react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { toaster } from "@/components/ui/toaster";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useI18n } from "@/contexts/I18nProvider";
 import { Auth, hasAnyAuth } from "@/lib/auth";
-import { addForumComment, deleteForumComment, getForumComments, type ForumComment, type ForumKind, type ForumTarget } from "@/services/cubing-pro/algs/forum";
+import { addForumComment, deleteForumComment, getForumComments, markReplyRead, type ForumComment, type ForumKind, type ForumTarget } from "@/services/cubing-pro/algs/forum";
+import { normalizeForumPath, saveForumLoginResume } from "./forumResume";
 import { forumDate, ForumLoadState, ForumPagination, targetLabel, useForumErrorMessage, useForumQuery } from "./forumUi";
 
 export interface OpenThread {
   kind: ForumKind;
   id: string;
   commentId?: number;
+  notificationId?: number;
 }
 
 function formulaHref(target: ForumTarget) {
@@ -41,12 +44,27 @@ export function ForumThread({ thread, currentCube, currentClassId, onChange, onC
   const [notice, setNotice] = useState("");
   const editor = useRef<HTMLTextAreaElement>(null);
   const focused = useRef<HTMLDivElement>(null);
+  const markedRead = useRef(false);
   const message = useForumErrorMessage();
   const load = useCallback((signal: AbortSignal) => getForumComments(thread.kind, thread.id, page, focusId, signal), [thread.kind, thread.id, page, focusId]);
   const { data, error, refresh } = useForumQuery(load);
-  const viewHref = data && (currentCube !== data.target.cube || currentClassId !== data.target.className) ? formulaHref(data.target) : null;
+  const onTargetClass = currentCube !== undefined && currentClassId !== undefined &&
+    currentCube === data?.target.cube && currentClassId === data.target.className;
+  const viewHref = data && !data.target.unavailable && !onTargetClass ? formulaHref(data.target) : null;
   const length = Array.from(draft.trim()).length;
-  const loginHref = "/login?redirect=" + encodeURIComponent(window.location.pathname + window.location.search + window.location.hash);
+  const returnUrl = new URL(window.location.href);
+  const tab = normalizeForumPath(returnUrl.pathname) === "/algs" ? "recent" : undefined;
+  if (tab) returnUrl.searchParams.set("tab", tab);
+  if (onTargetClass && thread.kind === "solution") returnUrl.searchParams.set("solutionId", thread.id);
+  const loginHref = "/login?redirect=" + encodeURIComponent(returnUrl.pathname + returnUrl.search + returnUrl.hash);
+
+  useEffect(() => {
+    if (!data || thread.notificationId === undefined || markedRead.current) return;
+    markedRead.current = true;
+    void markReplyRead(thread.notificationId).then(onChange, error => {
+      toaster.create({ type: "error", title: message(error) });
+    });
+  }, [data, thread.notificationId, onChange, message]);
 
   useEffect(() => {
     if (data && focusId) focused.current?.scrollIntoView({ block: "nearest" });
@@ -137,7 +155,9 @@ export function ForumThread({ thread, currentCube, currentClassId, onChange, onC
             onChange={event => { setDraft(event.target.value); setNotice(""); }} />
           <HStack justify="space-between"><Text fontSize="xs" color={length > 400 ? "fg.error" : "fg.muted"}>{length} / 400</Text>
             <Button size="sm" colorPalette="brand" disabled={busy || !length || length > 400} onClick={() => void post()}>{t("forum.post")}</Button></HStack>
-        </Stack> : <Button asChild size="sm" variant="outline"><Link href={loginHref}>{t("forum.login")}</Link></Button>)}
+        </Stack> : <Button asChild size="sm" variant="outline"><Link href={loginHref} onClick={() => {
+          saveForumLoginResume({ pathname: returnUrl.pathname, thread, tab });
+        }}>{t("forum.login")}</Link></Button>)}
       </Dialog.Footer>
   </>;
 }
