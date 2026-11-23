@@ -1,3 +1,4 @@
+import { PlayerCardView } from "@/views/DrawTools/PlayerCard/PlayerCardView";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -124,6 +125,8 @@ function CatchAllContent({ routeId, path }: { routeId: string; path: string[] })
       return <OrganizersResultsPageView />;
     case "admin-organizers-comp-result":
       return <OrganizersResultsPageView />;
+    case "draw-player-card":
+      return <PlayerCardView />;
     case "draw-sq1":
       return <SQ1DrawView />;
     case "draw-minx":

@@ -1,3 +1,4 @@
+import { playerCardCatalogs, type PlayerCardMessageKey } from "./messages/player-card";
 import enUS from "@/i18n/messages/en-US";
 import zhCN, { type MessageKey as LegacyMessageKey } from "@/i18n/messages/zh-CN";
 import ja from "@/i18n/messages/ja";
@@ -35,16 +36,16 @@ const additions = {
   fr: { ...adminExtra.adminExtraFr, ...tutorial.tutorialExtraFr, ...shell.shellFr, ...competitionExtra.competitionExtraFr, ...competitionPublic.competitionPublicFr, ...domain.domainFr, ...wcaPuzzle.wcaPuzzleExtraFr, ...management.adminManagementFr },
   es: { ...adminExtra.adminExtraEs, ...tutorial.tutorialExtraEs, ...shell.shellEs, ...competitionExtra.competitionExtraEs, ...competitionPublic.competitionPublicEs, ...domain.domainEs, ...wcaPuzzle.wcaPuzzleExtraEs, ...management.adminManagementEs },
 };
-export type MessageKey = LegacyMessageKey | keyof typeof languageNames | keyof typeof team.teamMatchZhCN | keyof typeof competition.competitionAdminZhCN | keyof typeof puzzle.puzzleExtraZhCN | keyof typeof site.siteContentZhCN | keyof typeof shared.sharedZhCN | keyof typeof additions["zh-CN"] | keyof typeof finishing.finishingZhCN | advertisements.AdvertisementMessageKey;
+export type MessageKey = PlayerCardMessageKey | LegacyMessageKey | keyof typeof languageNames | keyof typeof team.teamMatchZhCN | keyof typeof competition.competitionAdminZhCN | keyof typeof puzzle.puzzleExtraZhCN | keyof typeof site.siteContentZhCN | keyof typeof shared.sharedZhCN | keyof typeof additions["zh-CN"] | keyof typeof finishing.finishingZhCN | advertisements.AdvertisementMessageKey;
 
 export const catalogs: Record<Locale, Record<MessageKey, string>> = {
-  "zh-CN": { ...zhCN, ...languageNames, ...team.teamMatchZhCN, ...competition.competitionAdminZhCN, ...puzzle.puzzleExtraZhCN, ...site.siteContentZhCN, ...shared.sharedZhCN, ...additions["zh-CN"], ...finishing.finishingZhCN, ...advertisements.advertisementZhCN },
-  "en-US": { ...enUS, ...languageNames, ...team.teamMatchEnUS, ...competition.competitionAdminEnUS, ...puzzle.puzzleExtraEnUS, ...site.siteContentEnUS, ...shared.sharedEnUS, ...additions["en-US"], ...finishing.finishingEnUS, ...advertisements.advertisementEnUS },
-  ja: { ...ja, ...languageNames, ...team.teamMatchJa, ...competition.competitionAdminJa, ...puzzle.puzzleExtraJa, ...site.siteContentJa, ...shared.sharedJa, ...additions.ja, ...finishing.finishingJa, ...advertisements.advertisementJa },
-  "yue-Hant-HK": { ...yue, ...languageNames, ...team.teamMatchYue, ...competition.competitionAdminYue, ...puzzle.puzzleExtraYue, ...site.siteContentYue, ...shared.sharedYue, ...additions["yue-Hant-HK"], ...finishing.finishingYue, ...advertisements.advertisementYue },
-  ko: { ...ko, ...languageNames, ...team.teamMatchKo, ...competition.competitionAdminKo, ...puzzle.puzzleExtraKo, ...site.siteContentKo, ...shared.sharedKo, ...additions.ko, ...finishing.finishingKo, ...advertisements.advertisementKo },
-  fr: { ...fr, ...languageNames, ...team.teamMatchFr, ...competition.competitionAdminFr, ...puzzle.puzzleExtraFr, ...site.siteContentFr, ...shared.sharedFr, ...additions.fr, ...finishing.finishingFr, ...advertisements.advertisementFr },
-  es: { ...es, ...languageNames, ...team.teamMatchEs, ...competition.competitionAdminEs, ...puzzle.puzzleExtraEs, ...site.siteContentEs, ...shared.sharedEs, ...additions.es, ...finishing.finishingEs, ...advertisements.advertisementEs },
+  "zh-CN": { ...playerCardCatalogs["zh-CN"], ...zhCN, ...languageNames, ...team.teamMatchZhCN, ...competition.competitionAdminZhCN, ...puzzle.puzzleExtraZhCN, ...site.siteContentZhCN, ...shared.sharedZhCN, ...additions["zh-CN"], ...finishing.finishingZhCN, ...advertisements.advertisementZhCN },
+  "en-US": { ...playerCardCatalogs["en-US"], ...enUS, ...languageNames, ...team.teamMatchEnUS, ...competition.competitionAdminEnUS, ...puzzle.puzzleExtraEnUS, ...site.siteContentEnUS, ...shared.sharedEnUS, ...additions["en-US"], ...finishing.finishingEnUS, ...advertisements.advertisementEnUS },
+  ja: { ...playerCardCatalogs["ja"], ...ja, ...languageNames, ...team.teamMatchJa, ...competition.competitionAdminJa, ...puzzle.puzzleExtraJa, ...site.siteContentJa, ...shared.sharedJa, ...additions.ja, ...finishing.finishingJa, ...advertisements.advertisementJa },
+  "yue-Hant-HK": { ...playerCardCatalogs["yue-Hant-HK"], ...yue, ...languageNames, ...team.teamMatchYue, ...competition.competitionAdminYue, ...puzzle.puzzleExtraYue, ...site.siteContentYue, ...shared.sharedYue, ...additions["yue-Hant-HK"], ...finishing.finishingYue, ...advertisements.advertisementYue },
+  ko: { ...playerCardCatalogs["ko"], ...ko, ...languageNames, ...team.teamMatchKo, ...competition.competitionAdminKo, ...puzzle.puzzleExtraKo, ...site.siteContentKo, ...shared.sharedKo, ...additions.ko, ...finishing.finishingKo, ...advertisements.advertisementKo },
+  fr: { ...playerCardCatalogs["fr"], ...fr, ...languageNames, ...team.teamMatchFr, ...competition.competitionAdminFr, ...puzzle.puzzleExtraFr, ...site.siteContentFr, ...shared.sharedFr, ...additions.fr, ...finishing.finishingFr, ...advertisements.advertisementFr },
+  es: { ...playerCardCatalogs["es"], ...es, ...languageNames, ...team.teamMatchEs, ...competition.competitionAdminEs, ...puzzle.puzzleExtraEs, ...site.siteContentEs, ...shared.sharedEs, ...additions.es, ...finishing.finishingEs, ...advertisements.advertisementEs },
 };
 
 export function translate(locale: Locale, key: MessageKey): string {

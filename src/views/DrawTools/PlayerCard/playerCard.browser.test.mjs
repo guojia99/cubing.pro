@@ -1,0 +1,144 @@
+// Run after the parent's offline static build:
+// node --test src/views/DrawTools/PlayerCard/playerCard.browser.test.mjs
+// Optional: SITE_PLAYER_CARD_STATIC_DIR (default dist), SITE_PLAYER_CARD_CHROMIUM_EXECUTABLE.
+import assert from "node:assert/strict";
+import { readFile, stat } from "node:fs/promises";
+import { createServer } from "node:http";
+import path from "node:path";
+import test from "node:test";
+import { chromium } from "playwright";
+
+test("static player card: local photo, touch crop, preview fidelity and real PNG download", { timeout: 90000 }, async () => {
+  const root = path.resolve(process.env.SITE_PLAYER_CARD_STATIC_DIR || "dist");
+  await stat(path.join(root, "draw-tools/player-card/index.html"));
+  const server = createServer(async (req, res) => {
+    try {
+      const pathname = decodeURIComponent(new URL(req.url, "http://localhost").pathname);
+      let file = path.resolve(root, `.${pathname}`);
+      if (!file.startsWith(`${root}${path.sep}`)) { res.writeHead(403).end(); return; }
+      if ((await stat(file)).isDirectory()) file = path.join(file, "index.html");
+      const mime = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".txt": "text/plain", ".png": "image/png", ".svg": "image/svg+xml", ".woff2": "font/woff2" };
+      res.setHeader("Content-Type", mime[path.extname(file)] || "application/octet-stream");
+      res.end(await readFile(file));
+    } catch { res.writeHead(404).end(); }
+  });
+  await new Promise(resolve => server.listen(0, "127.0.0.1", resolve));
+  let browser;
+  try {
+    const origin = `http://127.0.0.1:${server.address().port}`;
+    browser = await chromium.launch({ executablePath: process.env.SITE_PLAYER_CARD_CHROMIUM_EXECUTABLE || undefined });
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, acceptDownloads: true });
+    await context.addInitScript((origin) => { if (location.origin === origin) localStorage.setItem("cubing_pro_locale", "en-US"); }, origin);
+    const uploads = [];
+    const external = [];
+    await context.route("**/*", route => {
+      const request = route.request();
+      if (!["GET", "HEAD"].includes(request.method())) uploads.push(request.url());
+      if (request.url().includes("/v3/cube-api/")) return route.fulfill({ json: { data: [] } });
+      if (new URL(request.url()).origin !== origin) { external.push(request.url()); return route.abort(); }
+      return route.continue();
+    });
+    const page = await context.newPage();
+    const errors = [];
+    page.on("pageerror", error => errors.push(error.message));
+    assert.equal((await page.goto(`${origin}/draw-tools/player-card/`)).status(), 200);
+    await page.getByRole("heading", { name: "Player card maker", exact: true }).waitFor();
+    const downloadButton = page.getByRole("button", { name: "Download PNG · 1080 × 1080", exact: true });
+    assert.equal(await downloadButton.isDisabled(), true);
+    assert.equal(await page.getByRole("slider").isDisabled(), true);
+    const photo = page.locator('#player-card-photo');
+    await photo.setInputFiles({ name: "empty.png", mimeType: "image/png", buffer: Buffer.alloc(0) });
+    await page.getByRole("alert").filter({ hasText: "Cannot read this photo." }).waitFor();
+    assert.equal(await downloadButton.isDisabled(), true);
+    await photo.setInputFiles({ name: "text.txt", mimeType: "text/plain", buffer: Buffer.from("text") });
+    await page.getByRole("alert").filter({ hasText: "Cannot read this photo." }).waitFor();
+    assert.equal(await downloadButton.isDisabled(), true);
+    const selectPhoto = page.getByRole("button", { name: "Choose photo", exact: true });
+    const chooseBounds = await selectPhoto.boundingBox();
+    assert.ok(chooseBounds && chooseBounds.y >= 0 && chooseBounds.y + chooseBounds.height <= 844, "Choose photo is visible without scrolling");
+    const [chooser] = await Promise.all([page.waitForEvent("filechooser"), selectPhoto.click()]);
+    await chooser.setFiles({ name: "broken.png", mimeType: "image/png", buffer: Buffer.from("not a photo") });
+    await page.getByRole("alert").filter({ hasText: "Cannot read this photo." }).waitFor();
+    assert.equal(await downloadButton.isDisabled(), true);
+    // Generate a real raster fixture with known quadrant colors, no files or network.
+    const fixture = await page.evaluate(() => {
+      const canvas = document.createElement("canvas"); canvas.width = 200; canvas.height = 200;
+      const ctx = canvas.getContext("2d");
+      for (const [x, y, color] of [[0, 0, "#ff0000"], [100, 0, "#00ff00"], [0, 100, "#0000ff"], [100, 100, "#ffff00"]]) {
+        ctx.fillStyle = color; ctx.fillRect(x, y, 100, 100);
+      }
+      return canvas.toDataURL().split(",")[1];
+    });
+    await photo.setInputFiles({ name: "quadrants.png", mimeType: "image/png", buffer: Buffer.from(fixture, "base64") });
+    await page.waitForFunction(() => !document.querySelector('#player-card-zoom').disabled);
+    const canvas = page.getByRole("img", { name: "Card preview", exact: true });
+    const sample = () => canvas.evaluate(el => [...el.getContext("2d").getImageData(400, 200, 1, 1).data]);
+    assert.deepEqual(await sample(), [255, 0, 0, 255], "Photo paints immediately after decode");
+    const emptyName = await canvas.evaluate(el => el.toDataURL());
+    const slider = page.getByRole("slider");
+    await slider.scrollIntoViewIfNeeded();
+    await slider.tap();
+    assert.ok(Number(await slider.inputValue()) > 1, "Native slider responds to touch");
+    await slider.focus(); await slider.press("Home"); await slider.press("ArrowRight");
+    assert.equal(Number(await slider.inputValue()), 1.01, "Slider supports keyboard");
+    await slider.press("End");
+    await canvas.scrollIntoViewIfNeeded();
+    const rect = await canvas.boundingBox();
+    const cdp = await context.newCDPSession(page);
+    await canvas.evaluate(el => {
+      el.addEventListener("gotpointercapture", event => { el.dataset.captured = String(event.pointerType === "touch" && el.hasPointerCapture(event.pointerId)); }, { once: true });
+    });
+    await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: rect.x + rect.width * 0.8, y: rect.y + rect.height * 0.4 }] });
+    for (let i = 1; i <= 5; i++) await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x: rect.x + rect.width * (0.8 - i * 0.1), y: rect.y + rect.height * 0.4 }] });
+    assert.equal(await canvas.getAttribute("data-captured"), "true", "Touch drag captures its pointer");
+    await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+    await page.waitForFunction(() => document.querySelector('canvas[role="img"]').getContext("2d").getImageData(400, 200, 1, 1).data[1] === 255);
+    assert.deepEqual(await sample(), [0, 255, 0, 255], "Touch drag moves the photo in output coordinates");
+    const beforeName = await canvas.evaluate(el => el.toDataURL());
+    await page.locator('#player-card-name').fill("小明/Blue");
+    assert.notEqual(await canvas.evaluate(el => el.toDataURL()), beforeName, "Entered name is painted");
+    const preview = await canvas.evaluate(el => el.toDataURL());
+    const [download] = await Promise.all([page.waitForEvent("download"), downloadButton.click()]);
+    assert.equal(download.suggestedFilename(), "小明-Blue-card.png");
+    const bytes = await readFile(await download.path());
+    assert.equal(bytes.subarray(0, 8).toString("hex"), "89504e470d0a1a0a");
+    assert.equal(bytes.toString("ascii", 12, 16), "IHDR");
+    assert.equal(bytes.readUInt32BE(16), 1080); assert.equal(bytes.readUInt32BE(20), 1080);
+    assert.deepEqual(bytes, Buffer.from(preview.split(",")[1], "base64"), "Download is exactly the preview canvas");
+    const pixel = await page.evaluate(async base64 => {
+      const img = new Image(); img.src = `data:image/png;base64,${base64}`; await img.decode();
+      const c = document.createElement("canvas"); c.width = 1080; c.height = 1080;
+      c.getContext("2d").drawImage(img, 0, 0);
+      return [...c.getContext("2d").getImageData(400, 200, 1, 1).data];
+    }, bytes.toString("base64"));
+    assert.deepEqual(pixel, [0, 255, 0, 255], "Decoded download contains the cropped photo");
+    await page.getByRole("button", { name: "Reset position and zoom" }).click();
+    await page.locator('#player-card-name').fill("");
+    assert.equal(await canvas.evaluate(el => el.toDataURL()), emptyName, "Reset and empty name restore the photo with no placeholder text");
+    const [fallback] = await Promise.all([page.waitForEvent("download"), downloadButton.click()]);
+    assert.equal(fallback.suggestedFilename(), "player-card.png");
+    await page.locator('#player-card-name').fill("很长的选手显示名称".repeat(8));
+    const textBounds = await canvas.evaluate(el => {
+      const data = el.getContext("2d").getImageData(0, 850, 1080, 230).data;
+      const xs = [];
+      for (let i = 0; i < data.length; i += 4) {
+        if (data[i] > 240 && data[i + 1] > 240 && data[i + 2] > 240) xs.push((i / 4) % 1080);
+      }
+      return { count: xs.length, min: Math.min(...xs), max: Math.max(...xs) };
+    });
+    assert.ok(textBounds.count > 0 && textBounds.min >= 60 && textBounds.max <= 1020, "Long CJK names fit inside the card");
+    await page.locator('#player-card-name').fill("");
+    for (const width of [390, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `No overflow at ${width}px`);
+      assert.equal(await canvas.evaluate(el => el.toDataURL()), emptyName, "Viewport does not change output");
+    }
+    assert.deepEqual(uploads, [], "No photo or other data uploaded");
+    assert.deepEqual(external, [], "No external image/font/provider requests");
+    assert.deepEqual(errors, []);
+    await context.close();
+  } finally {
+    await browser?.close();
+    await new Promise(resolve => server.close(resolve));
+  }
+});

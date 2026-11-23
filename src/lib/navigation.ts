@@ -50,6 +50,7 @@ export const MAIN_NAV: NavGroupDef[] = [
       {
         labelKey: "nav.tools.draw",
         children: [
+          { labelKey: "playerCard.title", href: "/draw-tools/player-card" },
           { labelKey: "nav.tools.sq1", href: "/draw-tools/sq1-d" },
           { labelKey: "nav.tools.minx", href: "/draw-tools/minx-d" },
           { labelKey: "nav.tools.sk", href: "/draw-tools/sk-d" },
