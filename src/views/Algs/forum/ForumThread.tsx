@@ -1,8 +1,9 @@
 "use client";
 
-import { Badge, Box, Button, CloseButton, Dialog, HStack, Stack, Text, Textarea } from "@chakra-ui/react";
+import { Box, Button, CloseButton, Dialog, HStack, Stack, Text, Textarea } from "@chakra-ui/react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { LuMessageCircle } from "react-icons/lu";
 import { toaster } from "@/components/ui/toaster";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useI18n } from "@/contexts/I18nProvider";
@@ -106,36 +107,43 @@ export function ForumThread({ thread, currentCube, currentClassId, onChange, onC
   }
 
   return <>
-      <Dialog.Header flexShrink={0} px={{ base: "4", md: "6" }} pt="4" pb="3">
-        <Stack gap="1" minW="0" pr="8">
+      <Dialog.Header flexShrink={0} bg="bg.subtle" borderBottomWidth="1px" borderColor="border.subtle" px={{ base: "4", md: "6" }} pt="4" pb="3">
+        <Stack gap="2" minW="0" pr="8">
           <HStack gap="2" flexWrap="wrap">
-            <Dialog.Title>{t(thread.kind === "group" ? "forum.group" : "forum.discuss")}</Dialog.Title>
-            {viewHref && <Button asChild size="xs" variant="outline"><Link href={viewHref} onClick={onClose}>{t("forum.viewFormula")}</Link></Button>}
+            <Dialog.Title fontSize="lg" fontWeight="semibold" letterSpacing="tight">{t(thread.kind === "group" ? "forum.group" : "forum.discuss")}</Dialog.Title>
+            {viewHref && <Button asChild size="xs" variant="ghost" color="fg.muted"><Link href={viewHref} onClick={onClose}>{t("forum.viewFormula")}</Link></Button>}
           </HStack>
           {data && <>
             <Text fontSize="sm" color="fg.muted" overflowWrap="anywhere">{targetLabel(data.target, true)}</Text>
-            {data.target.moves && <Text fontFamily="mono" overflowWrap="anywhere">{data.target.moves}</Text>}
+            {data.target.moves && <Text fontFamily="mono" fontSize="sm" lineHeight="tall" color="fg" bg="bg.elevated"
+              borderWidth="1px" borderColor="border.subtle" borderRadius="lg" px="3" py="1.5" alignSelf="start" maxW="full"
+              overflowWrap="anywhere">{data.target.moves}</Text>}
           </>}
         </Stack>
-        <Dialog.CloseTrigger asChild><CloseButton aria-label={t("algs.modal.close")} size="sm" /></Dialog.CloseTrigger>
+        <Dialog.CloseTrigger asChild><CloseButton aria-label={t("algs.modal.close")} size="sm" color="fg.muted" borderRadius="full" /></Dialog.CloseTrigger>
       </Dialog.Header>
-      <Dialog.Body data-testid="forum-comments" flex="0 1 auto" minH="0" overflowY="auto" overscrollBehavior="contain" px={{ base: "4", md: "6" }} pt="1" pb="4">
-        {!data ? <ForumLoadState error={error} retry={refresh} /> : <Stack gap="3">
-          <Text fontWeight="semibold" fontSize="sm">{t("forum.comments")} · {data.count}</Text>
-          {data.items.length === 0 && <Text color="fg.muted">{t("forum.empty")}</Text>}
+      <Dialog.Body data-testid="forum-comments" flex="0 1 auto" minH="0" overflowY="auto" overscrollBehavior="contain" px={{ base: "4", md: "6" }} pt="3" pb="3">
+        {!data ? <ForumLoadState error={error} retry={refresh} /> : <Stack gap="0">
+          <Text fontWeight="medium" fontSize="xs" color="fg.muted" pb="2">{t("forum.comments")} · {data.count}</Text>
+          {data.items.length === 0 && <HStack gap="3" py="3">
+            <Box aria-hidden="true" display="grid" placeItems="center" flexShrink={0} boxSize="9" borderRadius="full" bg="bg.subtle" color="fg.muted">
+              <LuMessageCircle size={18} strokeWidth={1.5} />
+            </Box>
+            <Text color="fg.muted" fontSize="sm">{t("forum.empty")}</Text>
+          </HStack>}
           {data.items.map(comment => <Box key={comment.id} id={`formula-comment-${comment.id}`}
             ref={comment.id === focusId ? focused : undefined}
-            borderWidth="1px" borderColor={comment.id === focusId ? "brand.500" : "border"}
-            borderRadius="md" p="3" ms={comment.parentId ? "3" : "0"}>
+            borderTopWidth="1px" borderColor={comment.id === focusId ? "brand.border" : "border.subtle"}
+            py="3" ms={comment.parentId ? "3" : "0"} minW="0">
             {comment.deleted ? <Text color="fg.muted" fontSize="sm">{t("forum.deleted")}</Text> : <>
               <HStack gap="2" flexWrap="wrap">
-                <Text fontWeight="semibold" fontSize="sm">{comment.authorName}</Text>
-                {comment.replyToName && <Badge>{tf("forum.replyTo", { name: comment.replyToName })}</Badge>}
-                <Text as="time" fontSize="xs" color="fg.muted" ms="auto">{forumDate(comment.createdAt, locale)}</Text>
+                <Text fontWeight="semibold" fontSize="sm" overflowWrap="anywhere" minW="0">{comment.authorName}</Text>
+                {comment.replyToName && <Text fontSize="xs" color="fg.muted" overflowWrap="anywhere" minW="0">{tf("forum.replyTo", { name: comment.replyToName })}</Text>}
+                <Text as="time" fontSize="xs" color="fg.muted" ms="auto" flexShrink={0}>{forumDate(comment.createdAt, locale)}</Text>
               </HStack>
-              <Text whiteSpace="pre-wrap" overflowWrap="anywhere" py="1">{comment.body}</Text>
-              <HStack>
-                {currentUser?.id ? <Button size="xs" variant="ghost" disabled={busy} onClick={() => {
+              <Text whiteSpace="pre-wrap" overflowWrap="anywhere" fontSize="sm" lineHeight="tall" color="fg" pt="2" pb="1">{comment.body}</Text>
+              <HStack gap="1">
+                {currentUser?.id ? <Button size="xs" variant="ghost" color="fg.muted" disabled={busy} onClick={() => {
                   setReply(comment);
                   editor.current?.focus();
                 }}>{t("forum.reply")}</Button> : null}
@@ -146,16 +154,17 @@ export function ForumThread({ thread, currentCube, currentClassId, onChange, onC
           <ForumPagination page={data.page} total={data.total} onPage={next => { setFocusId(undefined); setPage(next); }} />
         </Stack>}
       </Dialog.Body>
-      <Dialog.Footer data-testid="forum-composer" display="block" flexShrink={0} borderTopWidth="1px" px={{ base: "4", md: "6" }} py="3">
+      <Dialog.Footer data-testid="forum-composer" display="block" flexShrink={0} bg="bg.subtle" borderTopWidth="1px" borderColor="border.subtle" px={{ base: "4", md: "6" }} py="3">
         {notice && <Text role="alert" color="fg.error" mb="2">{notice}</Text>}
         {data && (currentUser?.id ? <Stack gap="2">
-          {reply && <HStack><Text fontSize="sm">{tf("forum.replyTo", { name: reply.authorName })}</Text>
-            <Button size="xs" variant="ghost" disabled={busy} onClick={() => setReply(null)}>{t("siteContent.cancel")}</Button></HStack>}
+          {reply && <HStack><Text fontSize="sm" color="fg.muted" overflowWrap="anywhere" minW="0">{tf("forum.replyTo", { name: reply.authorName })}</Text>
+            <Button size="xs" variant="ghost" flexShrink={0} disabled={busy} onClick={() => setReply(null)}>{t("siteContent.cancel")}</Button></HStack>}
           <Textarea ref={editor} rows={2} minH="14" resize="none" value={draft} disabled={busy} aria-label={t("forum.write")} placeholder={t("forum.write")}
+            bg="bg.elevated" borderColor="border.subtle" borderRadius="lg" fontSize="sm" lineHeight="tall" _placeholder={{ color: "fg.muted" }}
             onChange={event => { setDraft(event.target.value); setNotice(""); }} />
           <HStack justify="space-between"><Text fontSize="xs" color={length > 400 ? "fg.error" : "fg.muted"}>{length} / 400</Text>
-            <Button size="sm" colorPalette="brand" disabled={busy || !length || length > 400} onClick={() => void post()}>{t("forum.post")}</Button></HStack>
-        </Stack> : <Button asChild size="sm" variant="outline"><Link href={loginHref} onClick={() => {
+            <Button size="sm" colorPalette="brand" borderRadius="lg" px="5" disabled={busy || !length || length > 400} onClick={() => void post()}>{t("forum.post")}</Button></HStack>
+        </Stack> : <Button asChild size="sm" variant="outline" bg="bg.elevated" borderColor="border.subtle"><Link href={loginHref} onClick={() => {
           saveForumLoginResume({ pathname: returnUrl.pathname, thread, tab });
         }}>{t("forum.login")}</Link></Button>)}
       </Dialog.Footer>
