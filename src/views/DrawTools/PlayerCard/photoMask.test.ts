@@ -1,53 +1,44 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { brushMask, segmentPhoto } from "./photoMask";
+import { eraseMask, rectangleMask } from "./photoMask";
 
-function scene(width: number, height: number) {
-  const data = new Uint8ClampedArray(width * height * 4);
-  for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
-    const subject = ((x - width * .5) / (width * .16)) ** 2 + ((y - height * .5) / (height * .37)) ** 2 < 1;
-    const color = subject ? [160 + (x % 9), 60 + (y % 12), 35] : x < width / 2 ? [35 + y % 25, 130, 170] : [70, 170 + y % 25, 80];
-    data.set([...color, 255], (y * width + x) * 4);
-  }
-  return data;
-}
-
-test("nonuniform background preserves textured silhouette, including edges, deterministically", () => {
-  const w = 120, h = 180, data = scene(w, h);
-  const box = { x: .28, y: .08, width: .44, height: .84 };
-  const mask = segmentPhoto(data, w, h, box);
-  assert.deepEqual(mask, segmentPhoto(data, w, h, box));
-  let correct = 0, total = 0;
-  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
-    const subject = data[(y * w + x) * 4] >= 160;
-    if ((mask[y * w + x] > 127) === subject) correct++;
-    total++;
-  }
-  assert.ok(correct / total > .98);
-  assert.equal(mask[90 * w + 60], 255);
-  assert.equal(mask[90 * w + 38], 0);
-  assert.ok(mask[90 * w + 41] > 245, "High contrast edge remains crisp");
-  assert.equal(data[4 * (90 * w + 60)], 166, "Source pixels are untouched");
+test("normalized rectangle retains exactly pixel centers inside its half-open bounds", () => {
+  const mask = rectangleMask(8, 4, { x: .1875, y: .125, width: .5, height: .5 });
+  assert.deepEqual([...mask], [
+    0,255,255,255,255,0,0,0,
+    0,255,255,255,255,0,0,0,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+  ]);
 });
 
-test("continuous round strokes use independent x/y scales, keep/erase and immutable undo", () => {
-  const w = 200, h = 80, original = new Uint8ClampedArray(w * h);
-  const kept = brushMask(original, w, h, { x: .1, y: .5 }, { x: .9, y: .5 }, 5, 255);
-  for (let x = 20; x < 180; x++) assert.equal(kept[40 * w + x], 255);
-  assert.equal(kept[34 * w + 100], 0);
-  assert.ok(kept[40 * w + 15] > 240, "Round endpoint has a lightly antialiased edge");
-  const erased = brushMask(kept, w, h, { x: .5, y: .1 }, { x: .5, y: .9 }, 4, 0);
-  assert.equal(erased[40 * w + 100], 0);
-  assert.equal(kept[40 * w + 100], 255, "Previous mask is a complete one-step undo snapshot");
-  assert.ok(original.every(v => v === 0));
-  const repaired = brushMask(erased, w, h, { x: .5, y: .5 }, { x: .5, y: .5 }, 5, 255);
-  assert.equal(repaired[40 * w + 100], 255);
+test("full resolution normalized photo has only 255 inside and 0 outside", () => {
+  const width = 1620, height = 2160;
+  const rect = { x: .25, y: .125, width: .5, height: .75 };
+  const mask = rectangleMask(width, height, rect);
+  for (let y = 0; y < height; y++) {
+    const row = mask.subarray(y * width, (y + 1) * width);
+    if (y >= 270 && y < 1890) {
+      assert.ok(row.subarray(0,405).every(v => v === 0));
+      assert.ok(row.subarray(405,1215).every(v => v === 255));
+      assert.ok(row.subarray(1215).every(v => v === 0));
+    } else assert.ok(row.every(v => v === 0));
+  }
+  assert.deepEqual(mask, rectangleMask(width, height, rect));
+  assert.ok(rectangleMask(8, 4, { x: 0, y: 0, width: 1, height: 1 }).every(v => v === 255));
+  assert.ok(rectangleMask(8, 4, { x: .5, y: .5, width: 0, height: 0 }).every(v => v === 0));
 });
 
-test("when both sides have the same color, the person box remains editable rather than disappearing", () => {
-  const width = 40, height = 40;
-  const pixels = new Uint8ClampedArray(width * height * 4).fill(120);
-  const result = segmentPhoto(pixels, width, height, { x: .2, y: .2, width: .6, height: .6 });
-  assert.equal(result[20 * width + 20], 255);
-  assert.equal(result[0], 0);
+test("continuous round erasing respects independent axes and immutable undo snapshots", () => {
+  const w = 200, h = 80;
+  const original = rectangleMask(w, h, { x: 0, y: 0, width: 1, height: 1 });
+  const erased = eraseMask(original, w, h, { x: .1, y: .5 }, { x: .9, y: .5 }, 5);
+  for (let x = 20; x < 180; x++) assert.equal(erased[40 * w + x], 0);
+  assert.equal(erased[34 * w + 100], 255);
+  assert.ok(erased[40 * w + 15] < 15, "Round endpoint is lightly antialiased");
+  assert.ok(original.every(v => v === 255), "Undo snapshot is unchanged");
+  const small = eraseMask(original, w, h, { x: .5, y: .5 }, { x: .5, y: .5 }, 2);
+  const large = eraseMask(original, w, h, { x: .5, y: .5 }, { x: .5, y: .5 }, 8);
+  assert.equal(small[40 * w + 105], 255);
+  assert.equal(large[40 * w + 105], 0);
 });

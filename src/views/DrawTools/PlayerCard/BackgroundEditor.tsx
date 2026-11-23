@@ -3,7 +3,7 @@
 import { Box, Button, Field, Flex, Input, Stack, Text } from "@chakra-ui/react";
 import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent } from "react";
 import { useI18n } from "@/contexts/I18nProvider";
-import { brushMask, segmentPhoto, type Point, type Rect } from "./photoMask";
+import { eraseMask, rectangleMask, type Point, type Rect } from "./photoMask";
 
 export function BackgroundEditor({ image, onChange, onPending }: {
   image: HTMLImageElement;
@@ -12,17 +12,19 @@ export function BackgroundEditor({ image, onChange, onPending }: {
 }) {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
-  const [work] = useState(() => {
-    const c = document.createElement("canvas");
-    const scale = Math.min(1, 350 / Math.max(image.naturalWidth, image.naturalHeight));
-    c.width = Math.max(1, Math.round(image.naturalWidth * scale)); c.height = Math.max(1, Math.round(image.naturalHeight * scale));
-    const ctx = c.getContext("2d")!; ctx.drawImage(image, 0, 0, c.width, c.height);
-    return ctx.getImageData(0, 0, c.width, c.height);
+  const [source] = useState(() => {
+    const scale = Math.min(1, 2160 / Math.max(image.naturalWidth, image.naturalHeight));
+    return { width: Math.max(1, Math.round(image.naturalWidth * scale)), height: Math.max(1, Math.round(image.naturalHeight * scale)) };
   });
+  const displayScale = Math.min(1, 350 / Math.max(source.width, source.height));
+  const workWidth = Math.max(1, Math.round(source.width * displayScale));
+  const workHeight = Math.max(1, Math.round(source.height * displayScale));
+  const [eraserSize, setEraserSize] = useState(5);
+  const radius = Math.max(source.width, source.height) * eraserSize / 200;
   const [mask, setMask] = useState<Uint8ClampedArray | null>(null);
   const [undo, setUndo] = useState<Uint8ClampedArray | null>(null);
   const [rect, setRect] = useState<Rect | null>(null);
-  const [mode, setMode] = useState<"box" | "keep" | "erase">("box");
+  const [mode, setMode] = useState<"box" | "erase">("box");
   const [color, setColor] = useState("#081933");
   const [backdropFile, setBackdropFile] = useState<File | null>(null);
   const [backdrop, setBackdrop] = useState<HTMLImageElement | null>(null);
@@ -49,16 +51,24 @@ export function BackgroundEditor({ image, onChange, onPending }: {
 
   useLayoutEffect(() => {
     if (!mask) { setComposite(null); onChange(null); return; }
-    const alpha = document.createElement("canvas"); alpha.width = work.width; alpha.height = work.height;
-    const actx = alpha.getContext("2d")!, pixels = actx.createImageData(work.width, work.height);
-    for (let i = 0; i < mask.length; i++) pixels.data[i * 4 + 3] = mask[i];
+    // Work at the displayed size during touch strokes, then paint the full
+    // selection once at the end so the exported edge stays pixel-accurate.
+    const width = drawing ? workWidth : source.width;
+    const height = drawing ? workHeight : source.height;
+    const alpha = document.createElement("canvas"); alpha.width = width; alpha.height = height;
+    const actx = alpha.getContext("2d")!, pixels = actx.createImageData(width, height);
+    if (width === source.width && height === source.height) {
+      for (let i = 0; i < mask.length; i++) pixels.data[i * 4 + 3] = mask[i];
+    } else {
+      for (let y = 0; y < height; y++) {
+        const row = Math.floor((y + .5) * source.height / height) * source.width;
+        for (let x = 0; x < width; x++) {
+          pixels.data[(y * width + x) * 4 + 3] = mask[row + Math.floor((x + .5) * source.width / width)];
+        }
+      }
+    }
     actx.putImageData(pixels, 0, 0);
-    const result = document.createElement("canvas");
-    // During brushing only the editor's small canvas needs a fresh frame.
-    // The card gets a bounded high-resolution composite when the stroke ends.
-    const scale = Math.min(1, 2160 / Math.max(image.naturalWidth, image.naturalHeight));
-    result.width = drawing ? work.width : Math.max(1, Math.round(image.naturalWidth * scale));
-    result.height = drawing ? work.height : Math.max(1, Math.round(image.naturalHeight * scale));
+    const result = document.createElement("canvas"); result.width = width; result.height = height;
     const ctx = result.getContext("2d")!;
     ctx.drawImage(image, 0, 0, result.width, result.height);
     ctx.globalCompositeOperation = "destination-in";
@@ -73,7 +83,7 @@ export function BackgroundEditor({ image, onChange, onPending }: {
     ctx.globalCompositeOperation = "source-over";
     setComposite(result);
     if (!drawing) onChange(result);
-  }, [mask, color, backdrop, image, work, drawing, onChange]);
+  }, [mask, color, backdrop, image, source, drawing, workWidth, workHeight, onChange]);
 
   useLayoutEffect(() => {
     const c = surface.current;
@@ -99,7 +109,7 @@ export function BackgroundEditor({ image, onChange, onPending }: {
     if (mode === "box") setRect({ x: Math.min(current.start.x, next.x), y: Math.min(current.start.y, next.y), width: Math.abs(next.x - current.start.x), height: Math.abs(next.y - current.start.y) });
     else {
       const previous = current.last;
-      setMask(value => brushMask(value!, work.width, work.height, previous, next, Math.max(work.width, work.height) * .025, mode === "keep" ? 255 : 0));
+      setMask(value => eraseMask(value!, source.width, source.height, previous, next, radius));
     }
     current.last = next;
   }
@@ -115,32 +125,35 @@ export function BackgroundEditor({ image, onChange, onPending }: {
   }
 
   return <Stack gap="3">
-    <Button variant="outline" aria-expanded={open} aria-controls="background-editor" onClick={() => { if (open) { setRect(null); setMode(mask ? "keep" : "box"); } setOpen(!open); }}>{t("playerCard.background")}</Button>
+    <Button variant="outline" aria-expanded={open} aria-controls="background-editor" onClick={() => { if (open) { setRect(null); setMode(mask ? "erase" : "box"); } setOpen(!open); }}>{t("playerCard.background")}</Button>
     {open && <Stack id="background-editor" gap="3">
       <Text fontSize="sm" color="fg.muted">{t("playerCard.backgroundHelp")}</Text>
-      <Box maxW={`${work.width}px`} alignSelf="center" width="100%">
-        <canvas ref={surface} width={work.width} height={work.height} aria-label={t("playerCard.editSurface")} role="img"
+      <Box maxW={`${workWidth}px`} alignSelf="center" width="100%">
+        <canvas ref={surface} width={workWidth} height={workHeight} aria-label={t("playerCard.editSurface")} role="img"
           style={{ display: "block", width: "100%", height: "auto", touchAction: "none", cursor: "crosshair" }}
           onPointerDown={event => {
             if (!event.isPrimary || event.button !== 0 || loading) return;
             const p = point(event); event.currentTarget.setPointerCapture(event.pointerId);
             stroke.current = { id: event.pointerId, start: p, last: p, before: mask }; setDrawing(true);
-            if (mode !== "box") { setUndo(mask); setMask(brushMask(mask!, work.width, work.height, p, p, Math.max(work.width, work.height) * .025, mode === "keep" ? 255 : 0)); }
+            if (mode !== "box") { setUndo(mask); setMask(eraseMask(mask!, source.width, source.height, p, p, radius)); }
           }} onPointerMove={move} onPointerUp={event => finish(event)} onPointerCancel={event => finish(event, true)}
           onLostPointerCapture={() => { stroke.current = null; setDrawing(false); }} />
       </Box>
       <Flex gap="2" wrap="wrap">
-        <Button size="sm" variant="outline" aria-pressed={mode === "box"} onClick={() => { setMode("box"); setRect(null); }}>{t("playerCard.box")}</Button>
-        <Button size="sm" disabled={!rect || rect.width * work.width < 3 || rect.height * work.height < 3 || drawing || loading || mode !== "box"} onClick={() => {
-          setMask(segmentPhoto(work.data, work.width, work.height, rect!)); setUndo(null); setMode("keep");
-        }}>{t("playerCard.cutout")}</Button>
+        {mask && <Button size="sm" variant="outline" aria-pressed={mode === "box"} onClick={() => { setMode("box"); setRect(null); }}>{t("playerCard.redraw")}</Button>}
+        {mode === "box" && <Button size="sm" disabled={!rect || rect.width * workWidth < 3 || rect.height * workHeight < 3 || drawing || loading} onClick={() => {
+          setMask(rectangleMask(source.width, source.height, rect!)); setUndo(null); setMode("erase");
+        }}>{t("playerCard.useSelection")}</Button>}
         {mask && <>
-          <Button size="sm" variant="outline" aria-pressed={mode === "keep"} onClick={() => { setMode("keep"); setRect(null); }}>{t("playerCard.keep")}</Button>
-          <Button size="sm" variant="outline" aria-pressed={mode === "erase"} onClick={() => { setMode("erase"); setRect(null); }}>{t("playerCard.erase")}</Button>
           <Button size="sm" variant="outline" disabled={!undo} onClick={() => { setMask(undo); setUndo(null); }}>{t("playerCard.undo")}</Button>
         </>}
       </Flex>
       {mask && <>
+        {mode === "erase" && <Field.Root>
+          <Field.Label htmlFor="eraser-size">{t("playerCard.eraserSize")}</Field.Label>
+          <input id="eraser-size" type="range" min="1" max="15" step="1" value={eraserSize}
+            style={{ width: "100%", minHeight: 44, accentColor: "var(--accent)" }} onChange={event => setEraserSize(Number(event.target.value))} />
+        </Field.Root>}
         <Field.Root><Field.Label htmlFor="background-color">{t("playerCard.color")}</Field.Label>
           <Input id="background-color" type="color" value={color} onChange={event => { setColor(event.target.value); setBackdropFile(null); setBackdrop(null); setLoading(false); setError(false); }} />
         </Field.Root>

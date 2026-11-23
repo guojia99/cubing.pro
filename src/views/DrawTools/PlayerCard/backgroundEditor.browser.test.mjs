@@ -7,7 +7,7 @@ import { build } from 'esbuild';
 import { chromium } from 'playwright';
 
 const root = fileURLToPath(new URL('../../../../', import.meta.url));
-test('mobile local background: touch box, refine, undo, cover backdrop, crop and exact PNG', { timeout: 90000 }, async () => {
+test('mobile local background: touch rectangle, erase, undo, cover backdrop, crop and exact PNG', { timeout: 90000 }, async () => {
   const bundle = await build({
     stdin: { resolveDir: root, loader: 'tsx', contents: `
       import React from 'react'; import {createRoot} from 'react-dom/client';
@@ -46,8 +46,8 @@ test('mobile local background: touch box, refine, undo, cover backdrop, crop and
     await page.getByRole('heading', { name: 'Player card maker' }).waitFor();
     assert.equal(await button('Change background').count(), 0);
     const fixture = await page.evaluate(() => {
-      const c = document.createElement('canvas'); c.width = 240; c.height = 320;
-      const ctx = c.getContext('2d'); const gradient = ctx.createLinearGradient(0,0,240,0);
+      const c = document.createElement('canvas'); c.width = 720; c.height = 960;
+      const ctx = c.getContext('2d'); ctx.scale(3,3); const gradient = ctx.createLinearGradient(0,0,240,0);
       gradient.addColorStop(0,'#4693b0'); gradient.addColorStop(1,'#62b36b'); ctx.fillStyle=gradient; ctx.fillRect(0,0,240,320);
       ctx.fillStyle='#c06a38'; ctx.beginPath(); ctx.ellipse(120,155,50,115,0,0,Math.PI*2); ctx.fill();
       ctx.fillStyle='#cb7843'; ctx.fillRect(110,120,20,60);
@@ -73,19 +73,26 @@ test('mobile local background: touch box, refine, undo, cover backdrop, crop and
     const sample = (x,y) => surface.evaluate((c,[x,y]) => [...c.getContext('2d').getImageData(Math.floor(c.width*x),Math.floor(c.height*y),1,1).data], [x,y]);
     await stroke([.23,.07],[.77,.9]);
     assert.equal(await button('Download PNG · 1080 × 1080').isDisabled(),true,'Unfinished box blocks export');
-    await button('Extract person').click();
+    await button('Use selection').click();
     await page.locator('#background-color').fill('#e02080');
     assert.deepEqual(await sample(.1,.3),[224,32,128,255]);
     assert.deepEqual(await sample(.5,.4),[203,120,67,255], 'Original foreground texture retained');
+    assert.notDeepEqual(await sample(.25,.3),[224,32,128,255], 'Background colors inside the rectangle are retained');
     const beforeErase = await snapshot();
-    await button('Erase').click(); await stroke([.5,.3],[.5,.65]);
+    await button('Redraw selection').click();
+    await stroke([.77,.9],[.23,.07]);
+    await button('Use selection').click();
+    assert.equal(await snapshot(),beforeErase,'Reversed touch gesture produces the identical rectangle');
+    const size = page.getByRole('slider', { name: 'Eraser size' });
+    await size.scrollIntoViewIfNeeded(); await size.tap();
+    assert.ok(Number(await size.inputValue()) > 1, 'Eraser size responds to touch');
+    await size.focus(); await size.press('Home');
+    for (let i=0;i<4;i++) await size.press('ArrowRight');
+    assert.equal(await size.inputValue(), '5');
+    await stroke([.5,.3],[.5,.65]);
     assert.deepEqual(await sample(.5,.4),[224,32,128,255]);
     await button('Undo last stroke').click();
     assert.equal(await snapshot(),beforeErase,'Undo restores the exact mask/composite');
-    await button('Keep').click(); await stroke([.1,.3],[.1,.6]);
-    assert.notDeepEqual(await sample(.1,.4),[224,32,128,255]);
-    await button('Undo last stroke').click();
-    assert.equal(await snapshot(),beforeErase);
     await page.getByLabel('Choose local backdrop', {exact:true}).setInputFiles({name:'broken.png',mimeType:'image/png',buffer:Buffer.from('invalid image')});
     await page.getByRole('alert').waitFor();
     assert.equal(await button('Download PNG · 1080 × 1080').isDisabled(),false,'Decode failure allows exporting the previous result');

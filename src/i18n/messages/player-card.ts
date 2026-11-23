@@ -3,12 +3,11 @@ import type { Locale } from "../locales";
 // Column order: zh-CN, en-US, ja, yue-Hant-HK, ko, fr, es.
 const messages = {
   "playerCard.background": ["换背景", "Change background", "背景を変更", "換背景", "배경 바꾸기", "Changer le fond", "Cambiar fondo"],
-  "playerCard.backgroundHelp": ["框住人物，框外留些背景；点击提取，再用保留／擦除修正。颜色相近、头发或复杂背景可能需要手动修补。图片仅在本地处理。", "Box the person, leaving some background outside; extract, then refine with Keep / Erase. Similar colors, hair and busy backgrounds may need correction. Images stay local.", "背景を枠外に残して人物を囲み、抽出後に残す／消すで修正します。似た色や髪、複雑な背景は手動修正が必要な場合があります。画像は端末内で処理します。", "框住人物，框外留啲背景；擷取後用保留／擦除修正。相近顏色、頭髮同複雜背景可能要手動修補。圖片只喺本機處理。", "배경 일부를 상자 밖에 남겨 인물을 감싼 후 추출하고 유지 / 지우기로 수정하세요. 비슷한 색, 머리카락, 복잡한 배경은 수정이 필요할 수 있습니다. 이미지는 기기에서만 처리됩니다.", "Encadrez la personne en laissant du fond à l’extérieur, extrayez puis corrigez avec Garder / Effacer. Les couleurs proches, cheveux et fonds complexes peuvent nécessiter des retouches. Traitement local.", "Rodea a la persona dejando algo de fondo fuera, extrae y retoca con Conservar / Borrar. Colores parecidos, pelo y fondos complejos pueden necesitar retoques. Procesamiento local."],
+  "playerCard.backgroundHelp": ["拖动框选，点击「使用选区」，再直接擦除多余部分。图片仅在本地处理。", "Drag a rectangle, use the selection, then erase unwanted areas directly. Images stay local.", "枠をドラッグし、選択範囲を適用してから不要な部分を直接消します。画像は端末内で処理します。", "拖動框選，撳「使用選區」，再直接擦走多餘部分。圖片只喺本機處理。", "사각형을 드래그하고 선택 영역을 적용한 뒤 불필요한 부분을 바로 지우세요. 이미지는 기기에서만 처리됩니다.", "Tracez un rectangle, appliquez la sélection, puis effacez directement les zones inutiles. Traitement local.", "Arrastra un rectángulo, aplica la selección y borra directamente las zonas sobrantes. Las imágenes permanecen en tu dispositivo."],
+  "playerCard.redraw": ["重新框选", "Redraw selection", "選択範囲を描き直す", "重新框選", "선택 영역 다시 그리기", "Retracer la sélection", "Redibujar selección"],
+  "playerCard.useSelection": ["使用选区", "Use selection", "選択範囲を適用", "使用選區", "선택 영역 적용", "Appliquer la sélection", "Usar selección"],
+  "playerCard.eraserSize": ["橡皮擦大小", "Eraser size", "消しゴムのサイズ", "擦膠大小", "지우개 크기", "Taille de la gomme", "Tamaño del borrador"],
   "playerCard.editSurface": ["背景编辑照片", "Background editing photo", "背景編集用写真", "背景編輯相片", "배경 편집 사진", "Photo à retoucher", "Foto para editar el fondo"],
-  "playerCard.box": ["框选人物", "Select person", "人物を囲む", "框選人物", "인물 선택", "Encadrer la personne", "Seleccionar persona"],
-  "playerCard.cutout": ["提取人物", "Extract person", "人物を抽出", "擷取人物", "인물 추출", "Extraire la personne", "Extraer persona"],
-  "playerCard.keep": ["保留", "Keep", "残す", "保留", "유지", "Garder", "Conservar"],
-  "playerCard.erase": ["擦除", "Erase", "消す", "擦除", "지우기", "Effacer", "Borrar"],
   "playerCard.undo": ["撤销上一笔", "Undo last stroke", "直前の操作を戻す", "復原上一筆", "마지막 획 취소", "Annuler le dernier trait", "Deshacer último trazo"],
   "playerCard.color": ["背景颜色", "Background color", "背景色", "背景顏色", "배경색", "Couleur du fond", "Color de fondo"],
   "playerCard.backdrop": ["选择本地背景图", "Choose local backdrop", "端末の背景画像を選択", "揀本機背景圖", "기기 배경 이미지 선택", "Choisir un fond local", "Elegir fondo local"],
