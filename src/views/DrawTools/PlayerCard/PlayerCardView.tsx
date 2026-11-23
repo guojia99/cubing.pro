@@ -6,11 +6,14 @@ import { PageHeader, Surface } from "@/components/ui/page";
 import { useI18n } from "@/contexts/I18nProvider";
 import { CARD_SIZE, INITIAL_CROP, cardFilename, clampCrop, paintCard, zoomCrop } from "./composition";
 import { loadNicknameFont, NICKNAME_FALLBACK } from "./nicknameFont";
+import { BackgroundEditor } from "./BackgroundEditor";
 
 export function PlayerCardView() {
   const { t } = useI18n();
   const [file, setFile] = useState<File | null>(null);
   const [image, setImage] = useState<HTMLImageElement | null>(null);
+  const [composite, setComposite] = useState<HTMLCanvasElement | null>(null);
+  const [backgroundPending, setBackgroundPending] = useState(false);
   const [crop, setCrop] = useState(INITIAL_CROP);
   const [name, setName] = useState("");
   const [nicknameFont, setNicknameFont] = useState<string | null>(null);
@@ -43,11 +46,11 @@ export function PlayerCardView() {
   }, [needsNicknameFont]);
 
   useLayoutEffect(() => {
-    if (image && canvas.current) paintCard(canvas.current, image, crop, nicknamePending ? "" : name, nicknameFont ?? NICKNAME_FALLBACK);
-  }, [image, crop, name, nicknamePending, nicknameFont]);
+    if (image && canvas.current) paintCard(canvas.current, image, crop, nicknamePending ? "" : name, nicknameFont ?? NICKNAME_FALLBACK, composite ?? image);
+  }, [image, crop, name, nicknamePending, nicknameFont, composite]);
 
   function download() {
-    if (!image || !canvas.current || nicknamePending) return;
+    if (!image || !canvas.current || nicknamePending || backgroundPending) return;
     try {
       const link = document.createElement("a");
       link.download = cardFilename(name);
@@ -67,7 +70,7 @@ export function PlayerCardView() {
         onChange={(event) => {
           const selected = event.target.files?.[0];
           if (!selected) return;
-          setImage(null); setFile(null); setCrop(INITIAL_CROP); setError(null); drag.current = null;
+          setImage(null); setComposite(null); setBackgroundPending(false); setFile(null); setCrop(INITIAL_CROP); setError(null); drag.current = null;
           if (!/^image\/(png|jpeg|webp|avif|gif|bmp)$/.test(selected.type) || selected.size === 0) setError("decode");
           else setFile(selected);
           event.target.value = "";
@@ -115,6 +118,7 @@ export function PlayerCardView() {
         <Surface>
           <Stack gap="6">
             {image && <Button variant="outline" onClick={() => photoInput.current?.click()}>{t("playerCard.photo")}</Button>}
+            {image && <BackgroundEditor image={image} onChange={setComposite} onPending={setBackgroundPending} />}
             <Field.Root>
               <Field.Label htmlFor="player-card-name">{t("playerCard.name")}</Field.Label>
               <Input id="player-card-name" value={name} onChange={event => setName(event.target.value)} />
@@ -126,7 +130,7 @@ export function PlayerCardView() {
               }} />
             </Field.Root>
             <Button variant="outline" disabled={!image} onClick={() => setCrop(INITIAL_CROP)}>{t("playerCard.reset")}</Button>
-            <Button colorPalette="brand" disabled={!image || nicknamePending} onClick={download}>{t("playerCard.download")}</Button>
+            <Button colorPalette="brand" disabled={!image || nicknamePending || backgroundPending} onClick={download}>{t("playerCard.download")}</Button>
             {error === "export" && <Text role="alert" color="fg.error">{t("playerCard.exportError")}</Text>}
           </Stack>
         </Surface>

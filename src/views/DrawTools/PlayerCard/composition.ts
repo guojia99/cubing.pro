@@ -21,7 +21,7 @@ export function cardFilename(name: string): string {
   return `${safe || "player"}-card.png`;
 }
 
-export function paintCard(canvas: HTMLCanvasElement, image: HTMLImageElement, crop: Crop, name: string, font: string) {
+export function paintCard(canvas: HTMLCanvasElement, image: HTMLImageElement, crop: Crop, name: string, font: string, source: CanvasImageSource = image) {
   const ctx = canvas.getContext("2d")!;
   const scale = CARD_SIZE / Math.min(image.naturalWidth, image.naturalHeight) * crop.zoom;
   const width = image.naturalWidth * scale;
@@ -29,7 +29,7 @@ export function paintCard(canvas: HTMLCanvasElement, image: HTMLImageElement, cr
   ctx.clearRect(0, 0, CARD_SIZE, CARD_SIZE);
   ctx.fillStyle = "#eaf0f5";
   ctx.fillRect(0, 0, CARD_SIZE, CARD_SIZE);
-  ctx.drawImage(image, (CARD_SIZE - width) / 2 + crop.x, (CARD_SIZE - height) / 2 + crop.y, width, height);
+  ctx.drawImage(source, (CARD_SIZE - width) / 2 + crop.x, (CARD_SIZE - height) / 2 + crop.y, width, height);
   const gradient = ctx.createLinearGradient(0, CARD_SIZE * 0.55, 0, CARD_SIZE);
   gradient.addColorStop(0, "rgba(8, 25, 51, 0)");
   gradient.addColorStop(1, "rgba(8, 25, 51, 0.8)");

@@ -2,6 +2,19 @@ import type { Locale } from "../locales";
 
 // Column order: zh-CN, en-US, ja, yue-Hant-HK, ko, fr, es.
 const messages = {
+  "playerCard.background": ["换背景", "Change background", "背景を変更", "換背景", "배경 바꾸기", "Changer le fond", "Cambiar fondo"],
+  "playerCard.backgroundHelp": ["框住人物，框外留些背景；点击提取，再用保留／擦除修正。颜色相近、头发或复杂背景可能需要手动修补。图片仅在本地处理。", "Box the person, leaving some background outside; extract, then refine with Keep / Erase. Similar colors, hair and busy backgrounds may need correction. Images stay local.", "背景を枠外に残して人物を囲み、抽出後に残す／消すで修正します。似た色や髪、複雑な背景は手動修正が必要な場合があります。画像は端末内で処理します。", "框住人物，框外留啲背景；擷取後用保留／擦除修正。相近顏色、頭髮同複雜背景可能要手動修補。圖片只喺本機處理。", "배경 일부를 상자 밖에 남겨 인물을 감싼 후 추출하고 유지 / 지우기로 수정하세요. 비슷한 색, 머리카락, 복잡한 배경은 수정이 필요할 수 있습니다. 이미지는 기기에서만 처리됩니다.", "Encadrez la personne en laissant du fond à l’extérieur, extrayez puis corrigez avec Garder / Effacer. Les couleurs proches, cheveux et fonds complexes peuvent nécessiter des retouches. Traitement local.", "Rodea a la persona dejando algo de fondo fuera, extrae y retoca con Conservar / Borrar. Colores parecidos, pelo y fondos complejos pueden necesitar retoques. Procesamiento local."],
+  "playerCard.editSurface": ["背景编辑照片", "Background editing photo", "背景編集用写真", "背景編輯相片", "배경 편집 사진", "Photo à retoucher", "Foto para editar el fondo"],
+  "playerCard.box": ["框选人物", "Select person", "人物を囲む", "框選人物", "인물 선택", "Encadrer la personne", "Seleccionar persona"],
+  "playerCard.cutout": ["提取人物", "Extract person", "人物を抽出", "擷取人物", "인물 추출", "Extraire la personne", "Extraer persona"],
+  "playerCard.keep": ["保留", "Keep", "残す", "保留", "유지", "Garder", "Conservar"],
+  "playerCard.erase": ["擦除", "Erase", "消す", "擦除", "지우기", "Effacer", "Borrar"],
+  "playerCard.undo": ["撤销上一笔", "Undo last stroke", "直前の操作を戻す", "復原上一筆", "마지막 획 취소", "Annuler le dernier trait", "Deshacer último trazo"],
+  "playerCard.color": ["背景颜色", "Background color", "背景色", "背景顏色", "배경색", "Couleur du fond", "Color de fondo"],
+  "playerCard.backdrop": ["选择本地背景图", "Choose local backdrop", "端末の背景画像を選択", "揀本機背景圖", "기기 배경 이미지 선택", "Choisir un fond local", "Elegir fondo local"],
+  "playerCard.original": ["恢复原图", "Restore original", "元の写真に戻す", "還原原相", "원본 복원", "Restaurer l’original", "Restaurar original"],
+  "playerCard.done": ["完成编辑", "Finish editing", "編集を終了", "完成編輯", "편집 완료", "Terminer la retouche", "Terminar edición"],
+
   "playerCard.title": ["小卡生成器", "Player card maker", "選手カード作成", "小卡製作工具", "선수 카드 만들기", "Créateur de carte de joueur", "Creador de tarjetas de jugador"],
   "playerCard.description": ["一张照片，一个名字。制作属于你的方形小卡。", "One photo, one name. Make your own square portrait card.", "写真と名前で、自分だけの正方形カードを。", "一張相，一個名。整一張屬於你嘅正方形小卡。", "사진과 이름으로 나만의 정사각형 카드를 만드세요.", "Une photo, un nom. Créez votre carte portrait carrée.", "Una foto, un nombre. Crea tu tarjeta de retrato cuadrada."],
   "playerCard.preview": ["小卡预览", "Card preview", "カードのプレビュー", "小卡預覽", "카드 미리보기", "Aperçu de la carte", "Vista previa de la tarjeta"],
