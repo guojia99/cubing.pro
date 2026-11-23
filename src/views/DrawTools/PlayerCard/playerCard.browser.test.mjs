@@ -142,16 +142,26 @@ test("static player card: local photo, touch crop, preview fidelity and real PNG
     assert.equal(await canvas.evaluate(el => el.toDataURL()), emptyName, "Reset and empty name restore the photo with no placeholder text");
     const [fallback] = await Promise.all([page.waitForEvent("download"), downloadButton.click()]);
     assert.equal(fallback.suggestedFilename(), "player-card.png");
-    await page.locator('#player-card-name').fill("很长的选手显示名称".repeat(8));
-    const textBounds = await canvas.evaluate(el => {
-      const data = el.getContext("2d").getImageData(0, 850, 1080, 230).data;
-      const xs = [];
+    const nicknameBounds = () => canvas.evaluate(el => {
+      const { width, height } = el;
+      const data = el.getContext("2d").getImageData(0, height * 0.55, width, height * 0.45).data;
+      let left = width, right = -1, top = height, bottom = -1;
       for (let i = 0; i < data.length; i += 4) {
-        if (data[i] > 240 && data[i + 1] > 240 && data[i + 2] > 240) xs.push((i / 4) % 1080);
+        if (data[i] <= 240 || data[i + 1] <= 240 || data[i + 2] <= 240) continue;
+        const x = (i / 4) % width;
+        const y = Math.floor(i / 4 / width) + height * 0.55;
+        left = Math.min(left, x); right = Math.max(right, x);
+        top = Math.min(top, y); bottom = Math.max(bottom, y);
       }
-      return { count: xs.length, min: Math.min(...xs), max: Math.max(...xs) };
+      return { left, right, top, bottom, inkHeight: bottom - top + 1 };
     });
-    assert.ok(textBounds.count > 0 && textBounds.min >= 60 && textBounds.max <= 1020, "Long CJK names fit inside the card");
+    for (const [name, minHeight] of [["清风速拧", 125], ["RiverBlue", 80], ["很长的选手显示名称".repeat(8), 1]]) {
+      await page.locator('#player-card-name').fill(name);
+      const bounds = await nicknameBounds();
+      assert.ok(bounds.inkHeight >= minHeight, `Nickname ink has the intended size: ${name}`);
+      assert.ok(bounds.left >= 60 && bounds.right <= 1020 && bounds.top >= 870 && bounds.bottom <= 1050,
+        `Nickname ink fits the lower part of the card: ${JSON.stringify(bounds)}`);
+    }
     await page.locator('#player-card-name').fill("");
     for (const width of [390, 1440]) {
       await page.setViewportSize({ width, height: 900 });

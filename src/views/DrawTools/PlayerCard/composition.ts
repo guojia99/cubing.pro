@@ -37,11 +37,25 @@ export function paintCard(canvas: HTMLCanvasElement, image: HTMLImageElement, cr
   ctx.fillRect(0, CARD_SIZE * 0.55, CARD_SIZE, CARD_SIZE * 0.45);
   const label = name.trim();
   if (!label) return;
-  ctx.font = `400 112px ${font}`;
-  const size = Math.min(112, 112 * 936 / ctx.measureText(label).width);
-  ctx.font = `400 ${size}px ${font}`;
   ctx.fillStyle = "#ffffff";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText(label, CARD_SIZE / 2, 960, 936);
+  let size = 170;
+  ctx.font = `400 ${size}px ${font}`;
+  let metrics = ctx.measureText(label);
+  // Fit actual ink as well as advance width; fallback glyphs can exceed the em box.
+  while (Math.max(metrics.width, metrics.actualBoundingBoxLeft + metrics.actualBoundingBoxRight) > 936
+    || metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent > 168) {
+    size = Math.min(size - 1, size * Math.min(
+      936 / Math.max(metrics.width, metrics.actualBoundingBoxLeft + metrics.actualBoundingBoxRight),
+      168 / (metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent),
+    ));
+    ctx.font = `400 ${size}px ${font}`;
+    metrics = ctx.measureText(label);
+  }
+  // Center ink at the existing lower position, leaving at least 36px below it.
+  ctx.fillText(label,
+    CARD_SIZE / 2 + (metrics.actualBoundingBoxLeft - metrics.actualBoundingBoxRight) / 2,
+    960 + (metrics.actualBoundingBoxAscent - metrics.actualBoundingBoxDescent) / 2,
+  );
 }
