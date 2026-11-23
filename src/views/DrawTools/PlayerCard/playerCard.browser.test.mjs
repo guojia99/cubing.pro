@@ -40,7 +40,7 @@ test("static player card: local photo, touch crop, preview fidelity and real PNG
       if (!["GET", "HEAD"].includes(request.method())) uploads.push(request.url());
       if (request.url().includes("/v3/cube-api/")) return route.fulfill({ json: { data: [] } });
       if (new URL(request.url()).origin !== origin) { external.push(request.url()); return route.abort(); }
-      if (new URL(request.url()).pathname === "/fonts/player-card/liu-jian-mao-cao.woff2") {
+      if (new URL(request.url()).pathname === "/fonts/player-card/lxgw-wenkai-lite.woff2") {
         fontRequests.push(request.url());
         fontRequested.resolve();
         await fontRelease.promise;
@@ -118,7 +118,7 @@ test("static player card: local photo, touch crop, preview fidelity and real PNG
     await page.locator('#player-card-name').fill("小明/Blue");
     assert.equal(await downloadButton.isDisabled(), true);
     fontRelease.resolve();
-    await page.waitForFunction(() => [...document.fonts].some(face => face.family.includes("Player Card Liu Jian Mao Cao") && face.weight === "400" && face.status === "loaded"));
+    await page.waitForFunction(() => [...document.fonts].some(face => face.family.includes("Player Card LXGW WenKai Lite") && face.weight === "400" && face.status === "loaded"));
     await page.waitForFunction(() => ![...document.querySelectorAll("button")].find(button => button.textContent === "Download PNG · 1080 × 1080").disabled);
     assert.notEqual(await canvas.evaluate(el => el.toDataURL()), beforeName, "Entered name is painted");
     const preview = await canvas.evaluate(el => el.toDataURL());
@@ -177,7 +177,7 @@ test("static player card: local photo, touch crop, preview fidelity and real PNG
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `No overflow at ${width}px`);
       assert.equal(await canvas.evaluate(el => el.toDataURL()), emptyName, "Viewport does not change output");
     }
-    assert.deepEqual(fontRequests, [`${origin}/fonts/player-card/liu-jian-mao-cao.woff2`], "One shared static same-origin font request with no nickname data");
+    assert.deepEqual(fontRequests, [`${origin}/fonts/player-card/lxgw-wenkai-lite.woff2`], "One shared static same-origin font request with no nickname data");
     // A fresh document exercises a real font load failure and local fallback export.
     failFont = true;
     await page.reload();
@@ -185,7 +185,7 @@ test("static player card: local photo, touch crop, preview fidelity and real PNG
     await page.locator('#player-card-name').fill("小明/Blue");
     await page.waitForFunction(() => ![...document.querySelectorAll("button")].find(button => button.textContent === "Download PNG · 1080 × 1080").disabled);
     assert.equal(fontRequests.length, 2);
-    assert.equal(await page.evaluate(() => [...document.fonts].some(face => face.family.includes("Player Card Liu Jian Mao Cao"))), false);
+    assert.equal(await page.evaluate(() => [...document.fonts].some(face => face.family.includes("Player Card LXGW WenKai Lite"))), false);
     const fallbackBounds = await nicknameBounds();
     assert.ok(fallbackBounds.inkHeight >= 80 && fallbackBounds.left >= 60 && fallbackBounds.right <= 1020 && fallbackBounds.top >= 740 && fallbackBounds.bottom <= 1045, "Fallback inks also fit");
     const fallbackPreview = await canvas.evaluate(el => el.toDataURL());
