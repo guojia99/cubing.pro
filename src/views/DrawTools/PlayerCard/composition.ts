@@ -44,9 +44,6 @@ export function paintCard(canvas: HTMLCanvasElement, image: HTMLImageElement, cr
   ctx.lineJoin = "round";
   ctx.textAlign = "left";
   ctx.textBaseline = "alphabetic";
-  const angle = -Math.PI / 30;
-  const cos = Math.cos(angle);
-  const sin = Math.abs(Math.sin(angle));
   const centerY = 895;
   // Reserve space for the outline and antialiasing inside the ink margins.
   const padding = 2;
@@ -59,8 +56,8 @@ export function paintCard(canvas: HTMLCanvasElement, image: HTMLImageElement, cr
     const inkWidth = metrics.actualBoundingBoxLeft + metrics.actualBoundingBoxRight;
     const inkHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
     const fit = Math.min(
-      maxWidth / (inkWidth * cos + inkHeight * sin),
-      maxHeight / (inkWidth * sin + inkHeight * cos),
+      maxWidth / inkWidth,
+      maxHeight / inkHeight,
       220 / inkHeight,
     );
     if (fit >= 1) break;
@@ -69,11 +66,9 @@ export function paintCard(canvas: HTMLCanvasElement, image: HTMLImageElement, cr
     ctx.font = `400 ${size}px ${font}`;
     metrics = ctx.measureText(label);
   }
-  ctx.translate(CARD_SIZE / 2, centerY);
-  ctx.rotate(angle);
-  // Center the ink before rotation; advance width does not include glyph overhangs.
-  const x = (metrics.actualBoundingBoxLeft - metrics.actualBoundingBoxRight) / 2;
-  const y = (metrics.actualBoundingBoxAscent - metrics.actualBoundingBoxDescent) / 2;
+  // Center actual ink; advance width does not include glyph overhangs.
+  const x = CARD_SIZE / 2 + (metrics.actualBoundingBoxLeft - metrics.actualBoundingBoxRight) / 2;
+  const y = centerY + (metrics.actualBoundingBoxAscent - metrics.actualBoundingBoxDescent) / 2;
   ctx.strokeText(label, x, y);
   ctx.fillText(label, x, y);
   ctx.restore();
