@@ -1,14 +1,9 @@
-LXGW WenKai Lite Regular (霞鹜文楷轻便版), from LXGW's v1.530 source:
-https://github.com/lxgw/LxgwWenKai-Lite/tree/b712c83d98acf977bacfb7fb010207802808bda9
-Original: fonts/TTF/LXGWWenKaiLite-Regular.ttf
-SHA-256: f799a538a3355877e597a0ae04050e897932c9ae7689eb9227c2953c5dd549ea.
+Zhi Mang Xing Regular (志莽行书), from Google Fonts at:
+https://github.com/google/fonts/tree/06bfe0d62a98375cb09c942fa18e68bd32cff057/ofl/zhimangxing
+Original: ZhiMangXing-Regular.ttf
+SHA-256: 644e0cae9b40f0b10ab729a01bd32032e3973bac22be3dccae01bf6ae7fde969.
 
-The shipped WOFF2 is a web-only subset (11,787 mapped code points).
-Selection: the source cmap intersected with GB2312, Big5 common level
-(two-byte lead A4–C6), U+0000–052F, U+2000–31FF and U+FF00–FFEF.
-fontTools 4.68.0 and Brotli 1.2.1, preserving included glyph outlines.
-Other characters are rendered by the platform's fallback fonts.
-
-License: OFL.txt. The author's additional permission explicitly allows
-Reserved Font Names for web-only subset and WOFF2 conversion. This file
-is for web delivery only, not an installable desktop font release.
+The original was converted to WOFF2 using fontTools 4.68.0 and Brotli 1.2.1
+without subsetting. All 7,015 mapped code points and their glyph outlines
+were preserved. Uncovered characters fall back to platform fonts.
+License: OFL.txt (SIL Open Font License 1.1; no Reserved Font Name declared).
