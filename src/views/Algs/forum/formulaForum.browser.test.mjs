@@ -26,6 +26,7 @@ let unavailableThreadRequests = 0;
 let failInboxComments = false;
 let firstTargetUnavailable = false;
 let removed = false;
+let longGroup = false;
 let tombstoneDeleted = false;
 
 async function signInFromDiscussion(redirect) {
@@ -34,7 +35,8 @@ async function signInFromDiscussion(redirect) {
   await page.waitForURL(url => url.pathname.replace(/\/$/, "") === "/login");
   assert.equal(new URL(page.url()).searchParams.get("redirect"), redirect);
   await page.getByRole("button", { name: "Continue with WCA" }).click();
-  await page.waitForURL(expected.href);
+  await page.waitForURL(url => url.origin === expected.origin &&
+    url.pathname.replace(/\/$/, "") === expected.pathname.replace(/\/$/, "") && url.search === expected.search);
   const resumed = page.getByRole("dialog", { name: "Discuss", exact: true });
   await resumed.getByRole("textbox", { name: "Write a comment" }).waitFor();
   assert.equal(await page.evaluate(() => sessionStorage.getItem("cubing_pro_forum_login_resume")), null);
@@ -79,7 +81,7 @@ try {
       return ok({ items, page: 1, total: items.length, unread: items.filter(item => !item.readAt).length });
     }
     if (path === "/admin/formula-forum/comments") {
-      const items = [{ ...parent, target }];
+      const items = [{ ...parent, body: parent.body.repeat(12), target }];
       if (!tombstoneDeleted) items.push({ ...reply, id: 43, body: tombstoneBody, target: unavailable });
       return ok({ items, page: 1, total: items.length });
     }
@@ -108,7 +110,7 @@ try {
       return ok({ items: [], target: unavailable, page: 1, total: 0, count: 0 });
     }
     if (path === `/public/formula-forum/targets/group/${groupId}/comments`) {
-      return ok({ items: [], target: { ...target, caseName: "", moves: "", id: groupId, kind: "group" }, page: 1, total: 0, count: 0 });
+      return ok({ items: longGroup ? Array.from({ length: 20 }, (_, index) => ({ ...parent, id: 100 + index, body: parent.body.repeat(8) })) : [], target: { ...target, caseName: "", moves: "", id: groupId, kind: "group" }, page: 1, total: longGroup ? 20 : 0, count: longGroup ? 20 : 0 });
     }
     if (path === `/user/formula-forum/targets/solution/${first}/comments`) {
       assert.equal(req.method(), "POST");
@@ -129,6 +131,12 @@ try {
   assert.ok(catalogRequests > 0, "Fresh legacy cache must refetch stable catalog IDs");
   assert.equal(await page.evaluate(() => localStorage.getItem("alg_class_cache_333_OLL")), null);
   assert.equal(await detail.getByRole("button", { name: /^Discuss/ }).count(), moves.length);
+  const discussionActions = detail.getByRole("button", { name: /^Discuss this solution/ });
+  await discussionActions.first().getByText("1", { exact: true }).waitFor();
+  assert.match(await discussionActions.first().innerText(), /^Discuss this solution\s+1$/);
+  assert.equal(await discussionActions.nth(1).innerText(), "Discuss this solution");
+  assert.equal(await discussionActions.first().locator("svg").count(), 1);
+  assert.equal(await discussionActions.first().evaluate(el => getComputedStyle(el).borderTopStyle), "solid");
   await detail.locator(".algs-formula-detail-modal__close").click();
   await page.goto(base + classPath, { waitUntil: "domcontentloaded" });
   await page.locator(".algs-formula-card").filter({ hasText: "OLL 45" }).click();
@@ -147,11 +155,54 @@ try {
 
   const group = page.getByRole("button", { name: /^Discuss group/ });
   const catalogUrl = page.url();
+  assert.equal(await group.innerText(), "Discuss group");
+  assert.equal(await group.locator("svg").count(), 1);
   await group.click();
   const groupDialog = page.getByRole("dialog", { name: "Discuss group", exact: true });
   await groupDialog.getByText("No comments yet", { exact: true }).waitFor();
   assert.equal(await groupDialog.getByRole("link", { name: "View formula" }).count(), 0);
   assert.equal(page.url(), catalogUrl);
+  assert.equal(await groupDialog.getByText("333 · OLL · T", { exact: true }).count(), 1);
+  const compact = await groupDialog.boundingBox();
+  assert.ok(compact.height < 420, `Empty mobile sheet should be compact: ${compact.height}`);
+  assert.ok(compact.y > 400);
+  const comments = groupDialog.getByTestId("forum-comments");
+  const composer = groupDialog.getByTestId("forum-composer");
+  const shortBody = await comments.boundingBox();
+  const shortComposer = await composer.boundingBox();
+  assert.ok(Math.abs(shortBody.y + shortBody.height - shortComposer.y) < 2);
+  assert.equal(await comments.evaluate(el => el.scrollHeight > el.clientHeight), false);
+  await page.screenshot({ path: "/tmp/forum-mobile-empty.png" });
+  await page.setViewportSize({ width: 1280, height: 900 });
+  const desktop = await groupDialog.boundingBox();
+  assert.ok(Math.abs(desktop.y + desktop.height / 2 - 450) < 3);
+  assert.ok(Math.abs(desktop.x + desktop.width / 2 - 640) < 3);
+  await groupDialog.getByRole("button", { name: "Close", exact: true }).click();
+  await groupDialog.waitFor({ state: "hidden" });
+  await group.waitFor();
+  await page.screenshot({ path: "/tmp/forum-desktop-group.png" });
+  await page.setViewportSize({ width: 390, height: 844 });
+  longGroup = true;
+  await group.click();
+  await groupDialog.getByText(parent.body.repeat(8), { exact: true }).first().waitFor();
+  assert.ok((await groupDialog.boundingBox()).height <= 844 * .85 + 1);
+  assert.equal(await comments.evaluate(el => el.scrollHeight > el.clientHeight), true);
+  const composerBefore = await composer.boundingBox();
+  await comments.evaluate(el => { el.scrollTop = el.scrollHeight; });
+  assert.deepEqual(await composer.boundingBox(), composerBefore);
+  await page.screenshot({ path: "/tmp/forum-mobile-long.png" });
+  await page.setViewportSize({ width: 390, height: 420 });
+  await groupDialog.getByRole("textbox").focus();
+  await page.waitForTimeout(150);
+  const smallComposer = await composer.boundingBox();
+  const closeBox = await groupDialog.getByRole("button", { name: "Close", exact: true }).boundingBox();
+  assert.ok(smallComposer.y + smallComposer.height <= 420);
+  assert.ok(closeBox.y >= 0 && closeBox.y + closeBox.height < smallComposer.y);
+  assert.equal(await comments.evaluate(el => el.scrollHeight > el.clientHeight), true);
+  await page.screenshot({ path: "/tmp/forum-mobile-small.png" });
+  await page.setViewportSize({ width: 390, height: 844 });
+  longGroup = false;
+  console.log("PASS compact empty sheet, centered desktop dialog, internal long-list scrolling and small-height composer.");
   await groupDialog.getByRole("button", { name: "Close", exact: true }).click();
   await groupDialog.waitFor({ state: "hidden" });
   assert.equal(page.url(), catalogUrl);
@@ -173,6 +224,11 @@ try {
   await dialog.getByRole("button", { name: "Close" }).click();
   await dialog.waitFor({ state: "hidden" });
   assert.equal(await detail.getByRole("button", { name: moves[1], exact: true }).getAttribute("aria-pressed"), "true");
+  await detail.getByText("Custom algorithms", { exact: true }).click();
+  await detail.getByRole("textbox", { name: "Custom algorithms", exact: true }).fill("R U2 R'");
+  await detail.getByRole("button", { name: "Add", exact: true }).click();
+  await detail.getByRole("button", { name: "R U2 R'", exact: true }).waitFor();
+  assert.equal(await detail.getByRole("button", { name: /^Discuss this solution/ }).count(), 0);
   await detail.locator(".algs-formula-detail-modal__close").click();
 
   await page.getByRole("button", { name: "Xi", exact: true }).click();
@@ -230,16 +286,37 @@ try {
   assert.equal(await dialog.count(), 0);
   await page.goto(base + "/admin/admins/", { waitUntil: "domcontentloaded" });
   await page.getByRole("link", { name: /Algorithm comment moderation/ }).click();
-  await page.getByRole("button").filter({ hasText: parent.body }).waitFor();
+  await page.getByTestId("moderation-comment").filter({ hasText: parent.body }).waitFor();
   await unavailableBadge.waitFor();
   await unavailableTitle.waitFor();
+  const adminItem = page.getByTestId("moderation-comment").filter({ hasText: parent.body });
+  await adminItem.getByRole("button", { name: "View context", exact: true }).waitFor();
+  await adminItem.getByText("333 · OLL · T · OLL 45", { exact: true }).waitFor();
+  await adminItem.getByText(moves[0], { exact: true }).waitFor();
+  const preview = adminItem.getByText(parent.body.repeat(12), { exact: true });
+  assert.equal(await preview.evaluate(el => {
+    const lineHeight = parseFloat(getComputedStyle(el).lineHeight);
+    return el.clientHeight > lineHeight && el.clientHeight <= lineHeight * 3 + 1 && el.scrollWidth <= el.clientWidth;
+  }), true);
+  const contextBox = await adminItem.getByRole("button", { name: "View context", exact: true }).boundingBox();
+  const deleteBox = await adminItem.getByRole("button", { name: "Delete", exact: true }).boundingBox();
+  assert.ok(Math.abs(contextBox.y - deleteBox.y) < 2);
+  assert.ok(deleteBox.x + deleteBox.width <= 390);
+  await page.screenshot({ path: "/tmp/forum-admin-mobile.png" });
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.screenshot({ path: "/tmp/forum-admin-desktop.png" });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await adminItem.getByRole("button", { name: "View context", exact: true }).click();
+  await dialog.getByText(parent.body, { exact: true }).waitFor();
+  await dialog.getByRole("button", { name: "Close", exact: true }).click();
+  await dialog.waitFor({ state: "hidden" });
   const unavailableComment = page.getByText(tombstoneBody, { exact: true });
   await unavailableComment.click();
   assert.equal(await dialog.count(), 0);
   page.once("dialog", prompt => prompt.accept());
   await page.getByRole("button", { name: "Delete", exact: true }).nth(1).click();
   await unavailableComment.waitFor({ state: "hidden" });
-  await page.getByRole("button").filter({ hasText: parent.body }).waitFor();
+  await page.getByTestId("moderation-comment").filter({ hasText: parent.body }).waitFor();
   assert.ok(tombstoneDeleted);
   assert.equal(await unavailableBadge.count(), 0);
   assert.equal(unavailableThreadRequests, 0);

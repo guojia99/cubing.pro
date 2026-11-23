@@ -106,20 +106,20 @@ export function ForumThread({ thread, currentCube, currentClassId, onChange, onC
   }
 
   return <>
-      <Dialog.Header>
+      <Dialog.Header flexShrink={0} px={{ base: "4", md: "6" }} pt="4" pb="3">
         <Stack gap="1" minW="0" pr="8">
           <HStack gap="2" flexWrap="wrap">
             <Dialog.Title>{t(thread.kind === "group" ? "forum.group" : "forum.discuss")}</Dialog.Title>
             {viewHref && <Button asChild size="xs" variant="outline"><Link href={viewHref} onClick={onClose}>{t("forum.viewFormula")}</Link></Button>}
           </HStack>
           {data && <>
-            <Text fontSize="sm" color="fg.muted" overflowWrap="anywhere">{targetLabel(data.target)}</Text>
+            <Text fontSize="sm" color="fg.muted" overflowWrap="anywhere">{targetLabel(data.target, true)}</Text>
             {data.target.moves && <Text fontFamily="mono" overflowWrap="anywhere">{data.target.moves}</Text>}
           </>}
         </Stack>
         <Dialog.CloseTrigger asChild><CloseButton aria-label={t("algs.modal.close")} size="sm" /></Dialog.CloseTrigger>
       </Dialog.Header>
-      <Dialog.Body>
+      <Dialog.Body data-testid="forum-comments" flex="0 1 auto" minH="0" overflowY="auto" overscrollBehavior="contain" px={{ base: "4", md: "6" }} pt="1" pb="4">
         {!data ? <ForumLoadState error={error} retry={refresh} /> : <Stack gap="3">
           <Text fontWeight="semibold" fontSize="sm">{t("forum.comments")} · {data.count}</Text>
           {data.items.length === 0 && <Text color="fg.muted">{t("forum.empty")}</Text>}
@@ -146,12 +146,12 @@ export function ForumThread({ thread, currentCube, currentClassId, onChange, onC
           <ForumPagination page={data.page} total={data.total} onPage={next => { setFocusId(undefined); setPage(next); }} />
         </Stack>}
       </Dialog.Body>
-      <Dialog.Footer display="block" borderTopWidth="1px">
+      <Dialog.Footer data-testid="forum-composer" display="block" flexShrink={0} borderTopWidth="1px" px={{ base: "4", md: "6" }} py="3">
         {notice && <Text role="alert" color="fg.error" mb="2">{notice}</Text>}
         {data && (currentUser?.id ? <Stack gap="2">
           {reply && <HStack><Text fontSize="sm">{tf("forum.replyTo", { name: reply.authorName })}</Text>
             <Button size="xs" variant="ghost" disabled={busy} onClick={() => setReply(null)}>{t("siteContent.cancel")}</Button></HStack>}
-          <Textarea ref={editor} rows={2} value={draft} disabled={busy} aria-label={t("forum.write")} placeholder={t("forum.write")}
+          <Textarea ref={editor} rows={2} minH="14" resize="none" value={draft} disabled={busy} aria-label={t("forum.write")} placeholder={t("forum.write")}
             onChange={event => { setDraft(event.target.value); setNotice(""); }} />
           <HStack justify="space-between"><Text fontSize="xs" color={length > 400 ? "fg.error" : "fg.muted"}>{length} / 400</Text>
             <Button size="sm" colorPalette="brand" disabled={busy || !length || length > 400} onClick={() => void post()}>{t("forum.post")}</Button></HStack>

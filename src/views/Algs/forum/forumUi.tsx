@@ -59,8 +59,9 @@ export function ForumPagination({ page, total, onPage }: { page: number; total: 
   </HStack>;
 }
 
-export function targetLabel(target: ForumTarget) {
-  return [target.cube, target.className, target.setName, target.groupName, target.caseName].filter(Boolean).join(" · ");
+export function targetLabel(target: ForumTarget, compact = false) {
+  const parts = [target.cube, target.className, target.setName, target.groupName, target.caseName].filter(Boolean);
+  return (compact ? parts.filter((part, index) => parts.indexOf(part) === index) : parts).join(" · ");
 }
 
 export function forumDate(date: string, locale: Locale) {

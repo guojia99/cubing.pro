@@ -1,6 +1,6 @@
 "use client";
 
-import { Badge, Box, Button, HStack, Stack, Text } from "@chakra-ui/react";
+import { Badge, Box, Button, Heading, HStack, Stack, Text } from "@chakra-ui/react";
 import Link from "next/link";
 import { useCallback, useState, type ReactNode } from "react";
 import { AdminGuard } from "@/components/admin/AdminGuard";
@@ -128,20 +128,36 @@ function ModerationList() {
   if (!data) return <ForumLoadState error={error} retry={refresh} />;
   return <Stack>
     {data.items.length === 0 && <Text color="fg.muted">{t("forum.empty")}</Text>}
-    {data.items.map(item => <HStack key={item.id} align="center">
-      <TargetRow target={item.target} onOpen={() => open({ ...item.target, commentId: item.id })}>
-        <Text fontSize="sm" color="fg.muted">{item.authorName} · {forumDate(item.createdAt, locale)}</Text>
-        <Text whiteSpace="pre-wrap" overflowWrap="anywhere">{item.body}</Text>
-      </TargetRow>
-      <Button size="xs" variant="ghost" colorPalette="red" disabled={busy} onClick={() => void remove(item.id)}>{t("draws.delete")}</Button>
-    </HStack>)}
+    {data.items.map(item => <Stack as="article" data-testid="moderation-comment" key={item.id}
+      gap="2" p={{ base: "3", md: "4" }} borderWidth="1px" borderRadius="lg" minW="0">
+      <HStack gap="2" flexWrap="wrap">
+        <Text fontSize="sm" fontWeight="semibold" overflowWrap="anywhere">{targetLabel(item.target, true) || item.target.id}</Text>
+        {item.target.unavailable && <Badge>{t("forum.targetUnavailable")}</Badge>}
+      </HStack>
+      {item.target.moves && <Text fontSize="sm" fontFamily="mono" overflowWrap="anywhere">{item.target.moves}</Text>}
+      <HStack gap="2" flexWrap="wrap" fontSize="xs" color="fg.muted">
+        <Text fontWeight="medium" color="fg">{item.authorName}</Text>
+        <Text asChild><time dateTime={item.createdAt}>{forumDate(item.createdAt, locale)}</time></Text>
+      </HStack>
+      <Text fontSize="sm" whiteSpace="pre-wrap" overflowWrap="anywhere" lineClamp={3}>{item.body}</Text>
+      <HStack gap="2" flexWrap="wrap">
+        <Button size="xs" variant="outline" colorPalette="brand" disabled={item.target.unavailable}
+          onClick={() => open({ ...item.target, commentId: item.id })}>{t("forum.viewContext")}</Button>
+        <Button size="xs" variant="outline" colorPalette="red" disabled={busy}
+          onClick={() => void remove(item.id)}>{t("draws.delete")}</Button>
+      </HStack>
+    </Stack>)}
     <ForumPagination page={data.page} total={data.total} onPage={setPage} />
   </Stack>;
 }
 
 export function FormulaModerationPage() {
   const { t } = useI18n();
-  return <AdminGuard><Stack gap="5"><PageHeader title={t("forum.moderation")} />
+  return <AdminGuard><Stack gap="4">
+    <Stack as="header" gap="1">
+      <Heading as="h1" fontSize={{ base: "xl", md: "2xl" }}>{t("forum.moderation")}</Heading>
+      <Text fontSize="sm" color="fg.muted">{t("forum.moderationHint")}</Text>
+    </Stack>
     <ForumScope><ModerationList /></ForumScope>
   </Stack></AdminGuard>;
 }

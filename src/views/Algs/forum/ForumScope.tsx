@@ -1,8 +1,9 @@
 "use client";
 
-import { Button, Dialog, Portal } from "@chakra-ui/react";
+import { Badge, Button, Dialog, Portal } from "@chakra-ui/react";
+import { LuMessageCircle } from "react-icons/lu";
 import { usePathname } from "next/navigation";
-import { createContext, useCallback, useContext, useEffect, useReducer, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useReducer, useRef, useState, type ReactNode } from "react";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useI18n } from "@/contexts/I18nProvider";
 import { getForumCounts, type ForumCounts, type ForumKind } from "@/services/cubing-pro/algs/forum";
@@ -34,6 +35,23 @@ export function ForumScope({ children, cube, classId, resumeReady = true }: {
     const payload = consumeForumLoginResume(pathname);
     if (payload) setThread(payload.thread);
   }, [currentUser?.id, pathname, resumeReady]);
+  const positioner = useRef<HTMLDivElement>(null);
+  const isOpen = thread !== null;
+  useEffect(() => {
+    if (!isOpen || !window.visualViewport) return;
+    const viewport = window.visualViewport;
+    const resize = () => {
+      positioner.current?.style.setProperty("--forum-viewport-height", `${viewport.height}px`);
+      positioner.current?.style.setProperty("--forum-viewport-top", `${viewport.offsetTop}px`);
+    };
+    resize();
+    viewport.addEventListener("resize", resize);
+    viewport.addEventListener("scroll", resize);
+    return () => {
+      viewport.removeEventListener("resize", resize);
+      viewport.removeEventListener("scroll", resize);
+    };
+  }, [isOpen]);
   const [version, refresh] = useReducer((value: number) => value + 1, 0);
   const load = useCallback((signal: AbortSignal) => cube && classId
     ? getForumCounts(cube, classId, signal) : Promise.resolve(undefined), [cube, classId]);
@@ -41,12 +59,16 @@ export function ForumScope({ children, cube, classId, resumeReady = true }: {
 
   return <ForumContext.Provider value={{ counts, open: setThread, version, refresh }}>
     {children}
-    <Dialog.Root open={thread !== null} lazyMount unmountOnExit placement="center" scrollBehavior="inside"
-      size={{ base: "full", md: "lg" }} onOpenChange={({ open }) => { if (!open) setThread(null); }}>
+    <Dialog.Root open={thread !== null} lazyMount unmountOnExit placement={{ base: "bottom", md: "center" }} scrollBehavior="inside"
+      size="lg" onOpenChange={({ open }) => { if (!open) setThread(null); }}>
       <Portal>
         <Dialog.Backdrop />
-        <Dialog.Positioner>
-          <Dialog.Content maxH="100dvh">
+        <Dialog.Positioner ref={positioner} height="var(--forum-viewport-height, 100dvh)"
+          top="var(--forum-viewport-top, 0px)" px={{ base: "2", md: "4" }}
+          pb={{ base: "max(8px, env(safe-area-inset-bottom))", md: "0" }}>
+          <Dialog.Content data-testid="forum-dialog" my="0" minH="0"
+            maxH="min(85dvh, calc(var(--forum-viewport-height, 100dvh) - 24px))"
+            borderRadius="xl" overflow="hidden">
             {thread && <ForumThread key={`${thread.kind}/${thread.id}/${thread.commentId ?? ""}/${thread.notificationId ?? ""}`}
               thread={thread} currentCube={cube} currentClassId={classId}
               onChange={refresh} onClose={() => setThread(null)} />}
@@ -61,7 +83,11 @@ export function DiscussionButton({ kind, id }: { kind: ForumKind; id: string }) 
   const { t } = useI18n();
   const { counts, open } = useFormulaForum();
   const count = counts && ((kind === "group" ? counts.groups : counts.solutions)[id] ?? 0);
-  return <Button variant="ghost" colorPalette="brand" size="xs" flexShrink={0} onClick={() => open({ kind, id })}>
-    {t(kind === "group" ? "forum.group" : "forum.discuss")}{count !== undefined && <span>{count}</span>}
+  return <Button variant="outline" colorPalette="brand" size="xs" flexShrink={0}
+    borderColor="colorPalette.border" bg={kind === "group" ? "colorPalette.subtle" : undefined}
+    color="colorPalette.fg" maxW="full" height="auto" minH="8" py="1" whiteSpace="normal" onClick={() => open({ kind, id })}>
+    <LuMessageCircle aria-hidden="true" />
+    {t(kind === "group" ? "forum.group" : "forum.solution")}
+    {count !== undefined && count > 0 && <Badge colorPalette="brand" size="sm">{count}</Badge>}
   </Button>;
 }

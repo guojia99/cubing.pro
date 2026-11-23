@@ -571,6 +571,7 @@ export default function AlgsModal({
                     return (
                       <HStack
                         key={`${tab}-${idx}`}
+                        flexWrap="wrap"
                         gap={2}
                         px="10px"
                         py={1.5}
@@ -596,7 +597,7 @@ export default function AlgsModal({
                           textAlign="left"
                           minW={0}
                           p={1}
-                          flex={1}
+                          flex="1 1 140px"
                           fontFamily={fontCss}
                           fontSize="sm"
                           lineHeight={1.5}

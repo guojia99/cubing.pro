@@ -530,7 +530,7 @@ export function AlgsDetailView({ cube, classId }: Props) {
         minW={0}
       >
         <Card.Body p={3} gap={0}>
-          <HStack className="algs-detail-group-heading" gap={2} mb={2} align="center" minW={0}>
+          <HStack className="algs-detail-group-heading" flexWrap="wrap" gap={2} mb={2} align="center" minW={0}>
             <Badge
               colorPalette="brand"
               variant="subtle"
