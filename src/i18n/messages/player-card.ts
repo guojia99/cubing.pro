@@ -2,18 +2,6 @@ import type { Locale } from "../locales";
 
 // Column order: zh-CN, en-US, ja, yue-Hant-HK, ko, fr, es.
 const messages = {
-  "playerCard.background": ["换背景", "Change background", "背景を変更", "換背景", "배경 바꾸기", "Changer le fond", "Cambiar fondo"],
-  "playerCard.backgroundHelp": ["拖动框选，点击「使用选区」，再直接擦除多余部分。图片仅在本地处理。", "Drag a rectangle, use the selection, then erase unwanted areas directly. Images stay local.", "枠をドラッグし、選択範囲を適用してから不要な部分を直接消します。画像は端末内で処理します。", "拖動框選，撳「使用選區」，再直接擦走多餘部分。圖片只喺本機處理。", "사각형을 드래그하고 선택 영역을 적용한 뒤 불필요한 부분을 바로 지우세요. 이미지는 기기에서만 처리됩니다.", "Tracez un rectangle, appliquez la sélection, puis effacez directement les zones inutiles. Traitement local.", "Arrastra un rectángulo, aplica la selección y borra directamente las zonas sobrantes. Las imágenes permanecen en tu dispositivo."],
-  "playerCard.redraw": ["重新框选", "Redraw selection", "選択範囲を描き直す", "重新框選", "선택 영역 다시 그리기", "Retracer la sélection", "Redibujar selección"],
-  "playerCard.useSelection": ["使用选区", "Use selection", "選択範囲を適用", "使用選區", "선택 영역 적용", "Appliquer la sélection", "Usar selección"],
-  "playerCard.eraserSize": ["橡皮擦大小", "Eraser size", "消しゴムのサイズ", "擦膠大小", "지우개 크기", "Taille de la gomme", "Tamaño del borrador"],
-  "playerCard.editSurface": ["背景编辑照片", "Background editing photo", "背景編集用写真", "背景編輯相片", "배경 편집 사진", "Photo à retoucher", "Foto para editar el fondo"],
-  "playerCard.undo": ["撤销上一笔", "Undo last stroke", "直前の操作を戻す", "復原上一筆", "마지막 획 취소", "Annuler le dernier trait", "Deshacer último trazo"],
-  "playerCard.color": ["背景颜色", "Background color", "背景色", "背景顏色", "배경색", "Couleur du fond", "Color de fondo"],
-  "playerCard.backdrop": ["选择本地背景图", "Choose local backdrop", "端末の背景画像を選択", "揀本機背景圖", "기기 배경 이미지 선택", "Choisir un fond local", "Elegir fondo local"],
-  "playerCard.original": ["恢复原图", "Restore original", "元の写真に戻す", "還原原相", "원본 복원", "Restaurer l’original", "Restaurar original"],
-  "playerCard.done": ["完成编辑", "Finish editing", "編集を終了", "完成編輯", "편집 완료", "Terminer la retouche", "Terminar edición"],
-
   "playerCard.title": ["小卡生成器", "Player card maker", "選手カード作成", "小卡製作工具", "선수 카드 만들기", "Créateur de carte de joueur", "Creador de tarjetas de jugador"],
   "playerCard.description": ["一张照片，一个名字。制作属于你的方形小卡。", "One photo, one name. Make your own square portrait card.", "写真と名前で、自分だけの正方形カードを。", "一張相，一個名。整一張屬於你嘅正方形小卡。", "사진과 이름으로 나만의 정사각형 카드를 만드세요.", "Une photo, un nom. Créez votre carte portrait carrée.", "Una foto, un nombre. Crea tu tarjeta de retrato cuadrada."],
   "playerCard.preview": ["小卡预览", "Card preview", "カードのプレビュー", "小卡預覽", "카드 미리보기", "Aperçu de la carte", "Vista previa de la tarjeta"],

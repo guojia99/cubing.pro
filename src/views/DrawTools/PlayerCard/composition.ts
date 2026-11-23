@@ -1,4 +1,24 @@
 export const CARD_SIZE = 1080;
+
+export function hasTransparentBackground(image: HTMLImageElement): boolean {
+  const scale = Math.min(1, 256 / Math.max(image.naturalWidth, image.naturalHeight));
+  const sample = document.createElement("canvas");
+  sample.width = Math.max(1, Math.round(image.naturalWidth * scale));
+  sample.height = Math.max(1, Math.round(image.naturalHeight * scale));
+  const ctx = sample.getContext("2d")!;
+  ctx.drawImage(image, 0, 0, sample.width, sample.height);
+  const { data } = ctx.getImageData(0, 0, sample.width, sample.height);
+  let transparent = 0;
+  let visible = 0;
+  for (let i = 3; i < data.length; i += 4) {
+    if (data[i] <= 16) transparent++;
+    if (data[i] >= 32) visible++;
+  }
+  // Ignore tiny alpha defects and empty images; require a visible subject and
+  // at least 1% nearly transparent area in the bounded raster sample.
+  const minimum = Math.ceil(sample.width * sample.height * 0.01);
+  return transparent >= minimum && visible >= minimum;
+}
 export type Crop = { zoom: number; x: number; y: number };
 export const INITIAL_CROP: Crop = { zoom: 1, x: 0, y: 0 };
 
@@ -21,15 +41,39 @@ export function cardFilename(name: string): string {
   return `${safe || "player"}-card.png`;
 }
 
-export function paintCard(canvas: HTMLCanvasElement, image: HTMLImageElement, crop: Crop, name: string, font: string, source: CanvasImageSource = image) {
+// Abstract lighting inspired by the single-portrait reference; no photo asset.
+function paintStageBackdrop(ctx: CanvasRenderingContext2D) {
+  const ambient = ctx.createRadialGradient(625, 220, 30, 625, 220, 995);
+  ambient.addColorStop(0, "#1b2343");
+  ambient.addColorStop(1, "#0b1021");
+  ctx.fillStyle = ambient;
+  ctx.fillRect(0, 0, CARD_SIZE, CARD_SIZE);
+
+  ctx.save();
+  ctx.translate(227, 123);
+  ctx.rotate(-Math.PI * .30);
+  ctx.scale(1, .21);
+  const beam = ctx.createRadialGradient(0, 0, 0, 0, 0, 302);
+  beam.addColorStop(0, "rgba(47, 87, 255, 0.74)");
+  beam.addColorStop(.45, "rgba(29, 66, 232, 0.40)");
+  beam.addColorStop(1, "rgba(23, 50, 206, 0)");
+  ctx.fillStyle = beam;
+  ctx.fillRect(-302, -302, 604, 604);
+  ctx.restore();
+}
+
+export function paintCard(canvas: HTMLCanvasElement, image: HTMLImageElement, crop: Crop, name: string, font: string, transparentBackground = false) {
   const ctx = canvas.getContext("2d")!;
   const scale = CARD_SIZE / Math.min(image.naturalWidth, image.naturalHeight) * crop.zoom;
   const width = image.naturalWidth * scale;
   const height = image.naturalHeight * scale;
   ctx.clearRect(0, 0, CARD_SIZE, CARD_SIZE);
-  ctx.fillStyle = "#eaf0f5";
-  ctx.fillRect(0, 0, CARD_SIZE, CARD_SIZE);
-  ctx.drawImage(source, (CARD_SIZE - width) / 2 + crop.x, (CARD_SIZE - height) / 2 + crop.y, width, height);
+  if (transparentBackground) paintStageBackdrop(ctx);
+  else {
+    ctx.fillStyle = "#eaf0f5";
+    ctx.fillRect(0, 0, CARD_SIZE, CARD_SIZE);
+  }
+  ctx.drawImage(image, (CARD_SIZE - width) / 2 + crop.x, (CARD_SIZE - height) / 2 + crop.y, width, height);
   const gradient = ctx.createLinearGradient(0, CARD_SIZE * 0.55, 0, CARD_SIZE);
   gradient.addColorStop(0, "rgba(8, 25, 51, 0)");
   gradient.addColorStop(1, "rgba(8, 25, 51, 0.8)");
