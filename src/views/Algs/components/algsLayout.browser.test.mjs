@@ -22,7 +22,7 @@ try {
       { name: 'Group B', groupId: 'bbbbbbbbbbbbbbbb', algs: cases.slice(11, 18) },
       { name: 'Group C', groupId: 'cccccccccccccccc', algs: cases.slice(18) },
     ] }] };
-    localStorage.setItem('alg_class_cache_v2_333_PLL', JSON.stringify({ data, ts: Date.now() }));
+    localStorage.setItem('alg_class_cache_v3_333_PLL', JSON.stringify({ data, ts: Date.now() }));
     localStorage.setItem('algs_use_visualcube_renderer', '0');
     localStorage.setItem('algs_columns_per_row_by_repo', JSON.stringify({ '333::PLL': 8 }));
     localStorage.setItem('algs_formula_font_size', '18');

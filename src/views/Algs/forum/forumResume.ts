@@ -5,7 +5,7 @@ const TTL = 30 * 60 * 1000;
 
 export interface ForumLoginResume {
   pathname: string;
-  thread: { kind: ForumKind; id: string; commentId?: number; origin?: "library" };
+  thread: { kind: ForumKind; id: string; commentId?: number };
   tab?: "recent";
   ts: number;
 }
@@ -14,10 +14,10 @@ export function normalizeForumPath(pathname: string) {
   return pathname.replace(/\/+$/, "") || "/";
 }
 
-export function saveForumLoginResume({ pathname, thread: { kind, id, commentId, origin }, tab }: Omit<ForumLoginResume, "ts">) {
+export function saveForumLoginResume({ pathname, thread: { kind, id, commentId }, tab }: Omit<ForumLoginResume, "ts">) {
   try {
     window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
-      pathname: normalizeForumPath(pathname), thread: { kind, id, commentId, origin }, tab, ts: Date.now(),
+      pathname: normalizeForumPath(pathname), thread: { kind, id, commentId }, tab, ts: Date.now(),
     }));
     return true;
   } catch {
@@ -44,8 +44,7 @@ export function readForumLoginResume(pathname: string): ForumLoginResume | null 
     if (!payload || typeof payload.pathname !== "string" || !Number.isFinite(payload.ts)
       || now - payload.ts >= TTL || payload.ts > now
       || (payload.tab !== undefined && payload.tab !== "recent")
-      || (thread?.kind !== "solution" && thread?.kind !== "group" && thread?.kind !== "class")
-      || (thread.origin !== undefined && thread.origin !== "library")
+      || (thread?.kind !== "solution" && thread?.kind !== "group" && thread?.kind !== "set")
       || typeof thread.id !== "string" || !/^[0-9a-f]{16}$/.test(thread.id)
       || (thread.commentId !== undefined && !(Number.isSafeInteger(thread.commentId) && thread.commentId > 0))) {
       clearForumLoginResume();

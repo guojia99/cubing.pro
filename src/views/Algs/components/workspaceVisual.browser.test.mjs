@@ -27,7 +27,7 @@ await context.route('**/public/formula-forum/counts?*', route => route.fulfill({
 await context.addInitScript(() => {
   window.addEventListener('unhandledrejection', event => window.reportWorkspaceRejection({ message: String(event.reason), type: event.reason?.constructor?.name, target: event.reason?.target?.src ?? event.reason?.target?.url, stack: event.reason?.stack }));
   const cases = Array.from({ length: 12 }, (_, index) => ({ name: `Case ${index + 1}`, algs: ["R U R' U'"], solutionIds: [(index + 1).toString(16).padStart(16, '0')], scrambles: ["R U R'"], image: '' }));
-  localStorage.setItem('alg_class_cache_v2_333_PLL', JSON.stringify({ ts: Date.now(), data: { name: 'PLL', sets: [{ name: 'Main', groups: [{ name: 'Group', groupId: 'aaaaaaaaaaaaaaaa', algs: cases }] }] } }));
+  localStorage.setItem('alg_class_cache_v3_333_PLL', JSON.stringify({ ts: Date.now(), data: { name: 'PLL', sets: [{ name: 'Main', groups: [{ name: 'Group', groupId: 'aaaaaaaaaaaaaaaa', algs: cases }] }] } }));
 });
 
 async function fit(label, selector) {

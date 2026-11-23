@@ -6,7 +6,7 @@ import { getAlgCubeClass, hasStableCatalogIds, type AlgClassDetail, type AlgItem
 const groupId = "abcdef0123456789";
 const solutionId = "0123456789abcdef";
 const oldKey = "alg_class_cache_333_OLL";
-const newKey = "alg_class_cache_v2_333_OLL";
+const newKey = "alg_class_cache_v3_333_OLL";
 
 function catalog(item: Partial<AlgItem> = {}): AlgClassDetail {
   return { name: "OLL", sets: [{ name: "S", groups: [{ name: "G", groupId, algs: [
@@ -51,7 +51,7 @@ function cacheFixture(t: TestContext, response = catalog()) {
   return { entries, seed, requests, response };
 }
 
-test("a legacy class entry is bypassed and removed only for the class saved in v2", async t => {
+test("a legacy class entry is bypassed and removed only for the class saved in v3", async t => {
   const { entries, seed, requests, response } = cacheFixture(t);
   seed(oldKey, catalog({ solutionIds: undefined }));
   seed("alg_class_cache_222_CLL", {});
@@ -62,7 +62,7 @@ test("a legacy class entry is bypassed and removed only for the class saved in v
   assert.equal(entries.has("alg_class_cache_222_CLL"), true);
 });
 
-test("a malformed v2 entry is bypassed and replaced with fresh IDs", async t => {
+test("a malformed v3 entry is bypassed and replaced with fresh IDs", async t => {
   const { entries, seed, requests, response } = cacheFixture(t);
   for (const malformed of [catalog({ solutionIds: [solutionId] }), { sets: [{ groups: [null] }] }]) {
     seed(newKey, malformed);
@@ -72,7 +72,7 @@ test("a malformed v2 entry is bypassed and replaced with fresh IDs", async t => 
   assert.deepEqual(requests, Array(2).fill("get /public/algorithm/333/OLL"));
 });
 
-test("a valid v2 entry is served without a request", async t => {
+test("a valid v3 entry is served without a request", async t => {
   const { seed, requests } = cacheFixture(t);
   const cached = { ...catalog(), name: "From cache" };
   seed(newKey, cached);
@@ -80,11 +80,22 @@ test("a valid v2 entry is served without a request", async t => {
   assert.deepEqual(requests, []);
 });
 
-test("a response missing stable IDs can be displayed but does not populate v2 or remove legacy data", async t => {
+test("a response missing stable IDs can be displayed but does not populate v3 or remove legacy data", async t => {
   const { entries, seed, requests, response } = cacheFixture(t, catalog({ solutionIds: undefined }));
   seed(oldKey, response);
   assert.deepEqual(await getAlgCubeClass("333", "OLL"), response);
   assert.equal(entries.has(newKey), false);
   assert.equal(entries.has(oldKey), true);
   assert.deepEqual(requests, ["get /public/algorithm/333/OLL"]);
+});
+
+
+test("a v2 catalog is refreshed once for optional set IDs; ID-less responses still cache", async t => {
+  const { seed, entries, requests } = cacheFixture(t);
+  seed("alg_class_cache_v2_333_OLL", catalog());
+  await getAlgCubeClass("333", "OLL");
+  await getAlgCubeClass("333", "OLL");
+  assert.equal(requests.length, 1);
+  assert.equal(entries.has("alg_class_cache_v2_333_OLL"), false);
+  assert.equal(entries.has(newKey), true);
 });

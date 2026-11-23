@@ -52,9 +52,9 @@ test("unavailable browser storage does not prevent login", () => {
   assert.equal(clearForumLoginResume(), false);
 });
 
-test("class login resume preserves the raw stable ID and focused comment", context => {
+test("set login resume preserves the raw stable ID and focused comment", context => {
   withSessionStorage(context);
-  const payload = { ...resume, thread: { ...resume.thread, kind: "class" as const } };
+  const payload = { ...resume, thread: { ...resume.thread, kind: "set" as const } };
   assert.equal(saveForumLoginResume(payload), true);
   assert.deepEqual(consumeForumLoginResume("/algs/")?.thread, payload.thread);
   assert.equal(consumeForumLoginResume("/algs/"), null);

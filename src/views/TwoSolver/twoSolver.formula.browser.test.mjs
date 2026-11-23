@@ -80,7 +80,7 @@ await context.addInitScript(({ origin, data, preferences }) => {
   if (location.origin !== origin || localStorage.getItem("two-solver-formula-seeded")) return;
   localStorage.setItem("two-solver-formula-seeded", "1");
   localStorage.setItem("cubing_pro_locale", "zh-CN");
-  localStorage.setItem("alg_class_cache_v2_222_CLL", JSON.stringify({ data, ts: Date.now() }));
+  localStorage.setItem("alg_class_cache_v3_222_CLL", JSON.stringify({ data, ts: Date.now() }));
   for (const [key, value] of Object.entries(preferences)) localStorage.setItem(key, value);
 }, { origin, data: classes.get("CLL"), preferences });
 const page = await context.newPage();

@@ -4,8 +4,8 @@ type Translations = readonly [string, string, string, string, string, string, st
 
 // zh-CN, en-US, ja, yue-Hant-HK, ko, fr, es
 const messages = {
-  "forum.class": ["{className} 讨论", "{className} discussion", "{className} の議論", "{className} 討論", "{className} 토론", "Discussion {className}", "Debate de {className}"],
-  "forum.classScope": ["讨论整个 {className} 分类", "Discuss the entire {className} class", "{className} カテゴリ全体について議論", "討論成個 {className} 分類", "{className} 분류 전체 토론", "Discuter de toute la catégorie {className}", "Debatir toda la categoría {className}"],
+  "forum.set": ["讨论本套", "Discuss this set", "このセットについて議論", "討論本套", "이 세트 토론", "Discuter de cet ensemble", "Debatir este conjunto"],
+  "forum.setScope": ["讨论本套：{setName}", "Discuss this set: {setName}", "このセットについて議論：{setName}", "討論本套：{setName}", "이 세트 토론: {setName}", "Discuter de cet ensemble : {setName}", "Debatir este conjunto: {setName}"],
   "forum.discuss": ["讨论", "Discuss", "議論", "討論", "토론", "Discussion", "Debate"],
   "forum.group": ["分组讨论", "Discuss group", "グループで議論", "分組討論", "그룹 토론", "Discuter du groupe", "Debatir el grupo"],
   "forum.solution": ["讨论这条解法", "Discuss this solution", "この解法について議論", "討論呢個解法", "이 해법 토론", "Discuter de cette solution", "Debatir esta solución"],

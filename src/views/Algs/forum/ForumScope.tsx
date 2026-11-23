@@ -24,8 +24,8 @@ export function useFormulaForum() {
   return context;
 }
 
-export function ForumScope({ children, cube, classId, resumeReady = true, onNavigateLibrary }: {
-  children: ReactNode; cube?: string; classId?: string; resumeReady?: boolean; onNavigateLibrary?: () => void;
+export function ForumScope({ children, cube, classId, resumeReady = true }: {
+  children: ReactNode; cube?: string; classId?: string; resumeReady?: boolean;
 }) {
   const [thread, setThread] = useState<OpenThread | null>(null);
   const { currentUser } = useAuth();
@@ -71,7 +71,7 @@ export function ForumScope({ children, cube, classId, resumeReady = true, onNavi
             borderRadius="xl" overflow="hidden">
             {thread && <ForumThread key={`${thread.kind}/${thread.id}/${thread.commentId ?? ""}/${thread.notificationId ?? ""}`}
               thread={thread} currentCube={cube} currentClassId={classId}
-              onNavigateLibrary={onNavigateLibrary} onChange={refresh} onClose={() => setThread(null)} />}
+              onChange={refresh} onClose={() => setThread(null)} />}
           </Dialog.Content>
         </Dialog.Positioner>
       </Portal>
@@ -79,7 +79,7 @@ export function ForumScope({ children, cube, classId, resumeReady = true, onNavi
   </ForumContext.Provider>;
 }
 
-export function DiscussionButton({ kind, id }: { kind: Exclude<ForumKind, "class">; id: string }) {
+export function DiscussionButton({ kind, id }: { kind: Exclude<ForumKind, "set">; id: string }) {
   const { t } = useI18n();
   const { counts, open } = useFormulaForum();
   const count = counts && ((kind === "group" ? counts.groups : counts.solutions)[id] ?? 0);
@@ -92,28 +92,18 @@ export function DiscussionButton({ kind, id }: { kind: Exclude<ForumKind, "class
   </Button>;
 }
 
-export function EgDiscussionButton() {
-  const { version } = useFormulaForum();
-  const load = useCallback((signal: AbortSignal) => getForumCounts("222", "EG", signal), []);
-  const { data: counts } = useForumQuery(load, version);
-  return <ClassDiscussionButton className="EG" counts={counts} origin="library" />;
-}
-
-export function ClassDiscussionButton({ className, counts: explicitCounts, origin }: {
-  className: string; counts?: ForumCounts; origin?: OpenThread["origin"];
-}) {
-  const { tf } = useI18n();
-  const { counts: scopeCounts, open } = useFormulaForum();
-  const counts = origin === "library" ? explicitCounts : scopeCounts;
-  if (!counts?.classId) return null;
-  const id = counts.classId;
+export function SetDiscussionButton({ id, name }: { id?: string; name: string }) {
+  const { t, tf } = useI18n();
+  const { counts, open } = useFormulaForum();
+  if (!id) return null;
+  const count = counts?.sets?.[id];
   return <Button variant="outline" colorPalette="brand" size="sm" flexShrink={0}
     borderColor="colorPalette.border" bg="colorPalette.subtle" color="colorPalette.fg"
     maxW="full" height="auto" minH="9" py="1" whiteSpace="normal"
-    aria-label={tf("forum.classScope", { className })}
-    onClick={() => open({ kind: "class", id, origin })}>
+    aria-label={tf("forum.setScope", { setName: name })}
+    onClick={() => open({ kind: "set", id })}>
     <LuMessageCircle aria-hidden="true" />
-    {tf("forum.class", { className })}
-    {counts.classCount !== undefined && counts.classCount > 0 && <Badge colorPalette="brand" size="sm">{counts.classCount}</Badge>}
+    {t("forum.set")}
+    {count !== undefined && count > 0 && <Badge colorPalette="brand" size="sm">{count}</Badge>}
   </Button>;
 }

@@ -21,7 +21,7 @@ try {
       { name: "Exact case", algs: ["R U R' U'", rawAlg], solutionIds: ["bbbbbbbbbbbbbbbb", "cccccccccccccccc"] },
       { name: "Visible case", algs: ["R2 U2"], solutionIds: ["dddddddddddddddd"] },
     ] }] }] };
-    localStorage.setItem("alg_class_cache_v2_333_PLL", JSON.stringify({ data, ts: Date.now() }));
+    localStorage.setItem("alg_class_cache_v3_333_PLL", JSON.stringify({ data, ts: Date.now() }));
     localStorage.setItem("algs_hide_formula_diagram", "1");
     localStorage.setItem("algs_hidden_formulas_by_repo", JSON.stringify({ "333::PLL": ["Source+:Group &:Exact case"] }));
     localStorage.setItem("algs_user_selection", JSON.stringify({ [storageKey]: { source: "custom", index: 0 } }));

@@ -46,7 +46,7 @@ import {
   assertPayloadWithinLimit,
 } from "@/services/cubing-pro/user/user_kv";
 
-import { EgDiscussionButton, ForumScope } from "./forum/ForumScope";
+import { ForumScope } from "./forum/ForumScope";
 import { RecentDiscussions } from "./forum/ForumLists";
 import { readForumLoginResume } from "./forum/forumResume";
 import AlgsCubeDiagram from "./components/AlgsCubeDiagram";
@@ -186,7 +186,7 @@ function ToolMiniCard({
   );
 }
 
-function AlgorithmCatalog({ active }: { active: boolean }) {
+function AlgorithmCatalog() {
   const { t, tf, locale } = useI18n();
   const router = useRouter();
   const { currentUser } = useAuth();
@@ -213,18 +213,6 @@ function AlgorithmCatalog({ active }: { active: boolean }) {
   }, []);
 
   const cubeKeys = data?.CubeKeys ?? [];
-  useEffect(() => {
-    if (!active || !data) return;
-    const scrollToEg = () => {
-      if (window.location.hash === "#algs-eg") document.getElementById("algs-eg")?.scrollIntoView({ block: "start" });
-    };
-    const frame = requestAnimationFrame(scrollToEg);
-    window.addEventListener("hashchange", scrollToEg);
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("hashchange", scrollToEg);
-    };
-  }, [active, data]);
   const classMap = data?.ClassMap ?? {};
 
   const filteredCubes = useMemo(
@@ -453,13 +441,10 @@ function AlgorithmCatalog({ active }: { active: boolean }) {
                   </Card.Header>
                   <Card.Body pt={0}>
                     <VStack align="stretch" gap="6">
-                    {groups.map((group) => <Box key={group.id} as="section" id={cube === "222" && group.id === "eg" ? "algs-eg" : undefined} scrollMarginTop="24" data-algs-subcategory={cube === "222" ? group.id : undefined}>
-                      {cube === "222" && <Flex align="center" justify="space-between" gap="3" flexWrap="wrap" mb="3">
-                        <Heading as="h3" size="sm" color="fg.muted">
-                          {group.label || extra(locale, "puzzleExtra.other")}
-                        </Heading>
-                        {group.id === "eg" && <EgDiscussionButton />}
-                      </Flex>}
+                    {groups.map((group) => <Box key={group.id} as="section" data-algs-subcategory={cube === "222" ? group.id : undefined}>
+                      {cube === "222" && <Heading as="h3" size="sm" mb="3" color="fg.muted">
+                        {group.label || extra(locale, "puzzleExtra.other")}
+                      </Heading>}
                     <Grid templateColumns="repeat(auto-fill, minmax(min(180px, 100%), 1fr))" gap="4">
                       {group.items.map((item) => (
                         <AlgsSetCard
@@ -499,7 +484,7 @@ export function AlgsListView() {
     const recent = queryTab === "recent" || readForumLoginResume(window.location.pathname)?.tab === "recent";
     setTab(recent ? "recent" : "library");
   }, [queryTab]);
-  return <ForumScope resumeReady={tab !== null} onNavigateLibrary={() => setTab("library")}>
+  return <ForumScope resumeReady={tab !== null}>
     <VStack className="algs-library" align="stretch" gap="6">
       <PageHeader title={t("algs.title")} />
       {tab !== null && <Tabs.Root value={tab} onValueChange={({ value }) => setTab(value)} lazyMount>
@@ -507,7 +492,7 @@ export function AlgsListView() {
           <Tabs.Trigger value="library">{t("shell.route.algs-list")}</Tabs.Trigger>
           <Tabs.Trigger value="recent">{t("forum.recent")}</Tabs.Trigger>
         </Tabs.List>
-        <Tabs.Content value="library"><AlgorithmCatalog active={tab === "library"} /></Tabs.Content>
+        <Tabs.Content value="library"><AlgorithmCatalog /></Tabs.Content>
         <Tabs.Content value="recent"><RecentDiscussions /></Tabs.Content>
       </Tabs.Root>}
     </VStack>

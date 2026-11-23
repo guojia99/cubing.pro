@@ -30,6 +30,7 @@ export type AlgGroupItem = {
 
 export type AlgSetItem = {
   name: string;
+  setId?: string;
   groups: AlgGroupItem[];
   groups_keys?: string[];
 };
@@ -42,7 +43,8 @@ export type AlgClassDetail = {
 };
 
 const CACHE_KEY_MAP = "alg_cubemap_cache";
-const CACHE_KEY_CLASS_PREFIX = "alg_class_cache_v2_";
+// Refresh pre-set-ID catalogs once while preserving the existing cache lifetime.
+const CACHE_KEY_CLASS_PREFIX = "alg_class_cache_v3_";
 const CACHE_TTL_MAP = 10 * 60 * 1000;
 const CACHE_TTL_CLASS = 12 * 60 * 60 * 1000;
 const CATALOG_ID = /^[0-9a-f]{16}$/;
@@ -87,11 +89,11 @@ function getCached<T>(key: string, ttl: number): T | null {
   }
 }
 
-function setCached<T>(key: string, data: T, legacyKey?: string) {
+function setCached<T>(key: string, data: T, ...legacyKeys: string[]) {
   if (typeof window === "undefined") return;
   try {
     localStorage.setItem(key, JSON.stringify({ data, ts: Date.now() }));
-    if (legacyKey) localStorage.removeItem(legacyKey);
+    for (const legacyKey of legacyKeys) localStorage.removeItem(legacyKey);
   } catch {
     // storage full
   }
@@ -118,7 +120,7 @@ export async function getAlgCubeClass(
     `/public/algorithm/${encodeURIComponent(cube)}/${encodeURIComponent(classID)}`,
   );
   if (hasStableCatalogIds(res.data)) {
-    setCached(cacheKey, res.data, `alg_class_cache_${cube}_${classID}`);
+    setCached(cacheKey, res.data, `alg_class_cache_${cube}_${classID}`, `alg_class_cache_v2_${cube}_${classID}`);
   }
   return res.data;
 }
