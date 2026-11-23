@@ -8,6 +8,13 @@ page.setDefaultNavigationTimeout(110000);
 const errors = [];
 page.on("pageerror", error => errors.push(error.message));
 
+const eg1Id = "0987654321abcdef";
+const egId = "1234567890abcdef";
+const egTarget = { kind: "class", id: egId, cube: "222", className: "EG", setName: "", groupName: "", caseName: "", moves: "" };
+let egActivity = false;
+let oldEgCounts = false;
+const egReads = [];
+const egWrites = [];
 const classId = "f".repeat(16);
 const groupId = "a".repeat(16);
 const first = "b".repeat(16);
@@ -44,7 +51,7 @@ async function signInFromDiscussion(redirect, title = "Discuss") {
   assert.equal(new URL(page.url()).searchParams.get("redirect"), redirect);
   await page.getByRole("button", { name: "Continue with WCA" }).click();
   await page.waitForURL(url => url.origin === expected.origin &&
-    url.pathname.replace(/\/$/, "") === expected.pathname.replace(/\/$/, "") && url.search === expected.search);
+    url.pathname.replace(/\/$/, "") === expected.pathname.replace(/\/$/, "") && url.search === expected.search && url.hash === expected.hash);
   const resumed = page.getByRole("dialog", { name: title, exact: true });
   await resumed.getByRole("textbox", { name: "Write a comment" }).waitFor();
   assert.equal(await page.evaluate(() => sessionStorage.getItem("cubing_pro_forum_login_resume")), null);
@@ -80,10 +87,25 @@ try {
       catalogRequests++;
       return send({ name: "OLL", sets: [{ name: "OLL", groups: [{ groupId, name: "T", algs: [{ name: "OLL 45", algs: moves, solutionIds: [first, second, third] }] }] }] });
     }
-    if (path === "/public/algorithm/") return send({ CubeKeys: ["333"], ClassMap: { 333: [{ name: "OLL" }] } });
+    if (path === "/public/algorithm/") return send({ CubeKeys: ["222", "333"], ClassMap: { 222: ["CLL", "EG1", "EG2", "LEG"].map(name => ({ name })), 333: [{ name: "OLL" }] } });
+    if (path.startsWith("/public/algorithm/222/")) return send({ name: path.split("/").at(-1), sets: [] });
+    if (path === "/public/formula-forum/counts" && url.searchParams.get("cube") === "222") {
+      return ok({ ...(oldEgCounts ? {} : { classId: url.searchParams.get("class") === "EG" ? egId : eg1Id, classCount: 3 }), groups: {}, solutions: {} });
+    }
+    if (path === `/public/formula-forum/targets/class/${eg1Id}/comments`) {
+      return ok({ items: [parent], target: { ...egTarget, id: eg1Id, className: "EG1" }, page: 1, total: 1, count: 1 });
+    }
+    if (path === `/public/formula-forum/targets/class/${egId}/comments`) {
+      egReads.push(url.searchParams.get("commentId"));
+      return ok({ items: [reply], target: egTarget, page: 1, total: 1, count: 3 });
+    }
+    if (path === `/user/formula-forum/targets/class/${egId}/comments`) {
+      egWrites.push(req.postDataJSON());
+      return ok({ id: 42 });
+    }
     if (path === "/public/formula-forum/counts") return ok({ ...(classCounts ? { classId, ...(omitClassCount ? {} : { classCount: 7 }) } : {}), groups: {}, solutions: { [first]: 1 } });
     if (path === "/public/formula-forum/recent") {
-      const items = classActivity ? [{ target: classTarget, count: 7, lastActivity: reply.createdAt, lastCommentId: 42 }] : recentEmpty ? [] : [
+      const items = egActivity ? [{ target: egTarget, count: 3, lastActivity: reply.createdAt, lastCommentId: 42 }] : classActivity ? [{ target: classTarget, count: 7, lastActivity: reply.createdAt, lastCommentId: 42 }] : recentEmpty ? [] : [
         { target, count: 2, lastActivity: reply.createdAt, lastCommentId: reply.id },
         { target: { ...target, id: third, caseName: "OLL 46" }, count: 1, lastActivity: parent.createdAt, lastCommentId: parent.id },
         { target: unavailable, count: 1, lastActivity: parent.createdAt },
@@ -442,6 +464,76 @@ try {
   await page.getByText("Unread", { exact: true }).waitFor({ state: "hidden" });
   assert.ok(markReads.includes(4));
   console.log("PASS class counts independent of cached catalog/group, class replies, recent login focus, exact class URL roundtrip, and class notification.");
+  await classDialog.getByRole("button", { name: "Close", exact: true }).click();
+  await page.getByRole("button", { name: "Xi", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Sign out", exact: true }).click();
+  await page.waitForURL(url => url.pathname.replace(/\/$/, "") === "/login");
+  await page.goto(base + "/algs/#algs-eg", { waitUntil: "domcontentloaded" });
+  const egSection = page.locator("#algs-eg");
+  await egSection.getByRole("heading", { name: "CLL / EG", exact: true }).waitFor();
+  const egButton = egSection.getByRole("button", { name: "Discuss the entire EG class", exact: true });
+  await egButton.getByText("3", { exact: true }).waitFor();
+  assert.equal(await page.getByRole("button", { name: "Discuss the entire EG class", exact: true }).count(), 1);
+  assert.equal(await egSection.getByRole("button", { name: "EG", exact: true }).count(), 0);
+  await page.waitForFunction(() => {
+    const top = document.getElementById("algs-eg")?.getBoundingClientRect().top;
+    return top >= 0 && top < innerHeight;
+  });
+  for (const name of ["CLL", "EG1", "EG2", "LEG"]) {
+    await egSection.getByRole("button", { name, exact: true }).click();
+    await page.waitForURL(url => url.pathname.replace(/\/$/, "") === `/algs/222/${name}`);
+    await page.getByRole("button", { name: `Discuss the entire ${name} class`, exact: true }).waitFor();
+    if (name === "EG1") {
+      await page.getByRole("button", { name: "Discuss the entire EG1 class", exact: true }).click();
+      const physical = page.getByRole("dialog", { name: "Discuss the entire EG1 class", exact: true });
+      await physical.getByText("222 · EG1", { exact: true }).waitFor();
+      assert.equal(await physical.getByRole("link", { name: "View formula" }).count(), 0);
+      assert.equal(egReads.length, 0);
+    }
+    await page.goto(base + "/algs/#algs-eg", { waitUntil: "domcontentloaded" });
+    await egButton.waitFor();
+  }
+  await egButton.click();
+  const egDialog = page.getByRole("dialog", { name: "Discuss the entire EG class", exact: true });
+  await egDialog.getByText("222 · EG", { exact: true }).waitFor();
+  assert.equal(egReads.at(-1), null);
+  assert.equal(await egDialog.getByRole("link", { name: "View formula" }).getAttribute("href"), "/algs/#algs-eg");
+  await signInFromDiscussion("/algs/#algs-eg", "Discuss the entire EG class");
+  await egDialog.getByRole("button", { name: "Reply", exact: true }).click();
+  await egDialog.getByRole("textbox").fill("Overall EG question");
+  await egDialog.getByRole("button", { name: "Post", exact: true }).click();
+  await page.waitForFunction(() => document.querySelector('[data-testid="forum-composer"] textarea')?.value === "");
+  assert.deepEqual(egWrites, [{ body: "Overall EG question", parentId: 42 }]);
+  assert.deepEqual(classWrites, [{ body: "Entire class question", parentId: 42 }]);
+  await egDialog.getByRole("button", { name: "Close", exact: true }).click();
+  await page.getByRole("tab", { name: "Algorithms", selected: true }).waitFor();
+  egActivity = true;
+  // Enter recent without a URL query, then follow a same-page Next link.
+  await page.getByRole("tab", { name: "Recent discussions" }).click();
+  await recentPanel.getByRole("button").filter({ hasText: "222 · EG" }).click();
+  await egDialog.locator("#formula-comment-42").waitFor();
+  assert.equal(egReads.at(-1), "42");
+  await egDialog.getByRole("link", { name: "View formula" }).click();
+  await egButton.waitFor();
+  await page.waitForFunction(() => {
+    const top = document.getElementById("algs-eg")?.getBoundingClientRect().top;
+    return top >= 0 && top < innerHeight;
+  });
+  await page.getByRole("button", { name: "Xi", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Sign out", exact: true }).click();
+  await page.waitForURL(url => url.pathname.replace(/\/$/, "") === "/login");
+  await page.goto(base + "/algs/?tab=recent", { waitUntil: "domcontentloaded" });
+  await recentPanel.getByRole("button").filter({ hasText: "222 · EG" }).click();
+  await egDialog.locator("#formula-comment-42").waitFor();
+  await signInFromDiscussion("/algs/?tab=recent", "Discuss the entire EG class");
+  await egDialog.getByRole("link", { name: "View formula" }).click();
+  await egButton.waitFor();
+  oldEgCounts = true;
+  await page.reload({ waitUntil: "domcontentloaded" });
+  await egSection.getByRole("heading", { name: "CLL / EG", exact: true }).waitFor();
+  assert.equal(await egButton.count(), 0);
+  assert.equal(await egSection.getByRole("button").count(), 4);
+  console.log("PASS true EG heading, physical card routes, virtual class thread isolation, hydrated anchors, library/recent login resume, and old counts.");
   assert.deepEqual(errors, []);
   console.log("PASS recent-tab login resume, reply drafts, retry before marking read, and unavailable inbox/moderation targets.");
 } finally {

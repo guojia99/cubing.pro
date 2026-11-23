@@ -17,9 +17,11 @@ export interface OpenThread {
   id: string;
   commentId?: number;
   notificationId?: number;
+  origin?: "library";
 }
 
 function formulaHref(target: ForumTarget) {
+  if (target.kind === "class" && target.cube === "222" && target.className === "EG") return "/algs/#algs-eg";
   const base = `/algs/${encodeURIComponent(target.cube)}/${encodeURIComponent(target.className)}/`;
   if (target.kind === "solution" && target.id) {
     return `${base}?${new URLSearchParams({ solutionId: target.id })}`;
@@ -27,12 +29,13 @@ function formulaHref(target: ForumTarget) {
   return base;
 }
 
-export function ForumThread({ thread, currentCube, currentClassId, onChange, onClose }: {
+export function ForumThread({ thread, currentCube, currentClassId, onChange, onClose, onNavigateLibrary }: {
   thread: OpenThread;
   currentCube?: string;
   currentClassId?: string;
   onChange: () => void;
   onClose: () => void;
+  onNavigateLibrary?: () => void;
 }) {
   const { t, tf, locale } = useI18n();
   const { currentUser } = useAuth();
@@ -54,7 +57,11 @@ export function ForumThread({ thread, currentCube, currentClassId, onChange, onC
   const viewHref = data && !data.target.unavailable && !onTargetClass ? formulaHref(data.target) : null;
   const length = Array.from(draft.trim()).length;
   const returnUrl = new URL(window.location.href);
-  const tab = normalizeForumPath(returnUrl.pathname) === "/algs" ? "recent" : undefined;
+  const tab = thread.origin !== "library" && normalizeForumPath(returnUrl.pathname) === "/algs" ? "recent" : undefined;
+  if (thread.origin === "library") {
+    returnUrl.searchParams.delete("tab");
+    returnUrl.hash = "algs-eg";
+  }
   if (tab) returnUrl.searchParams.set("tab", tab);
   if (onTargetClass && thread.kind === "solution") returnUrl.searchParams.set("solutionId", thread.id);
   const loginHref = "/login?redirect=" + encodeURIComponent(returnUrl.pathname + returnUrl.search + returnUrl.hash);
@@ -111,7 +118,10 @@ export function ForumThread({ thread, currentCube, currentClassId, onChange, onC
         <Stack gap="2" minW="0" pr="8">
           <HStack gap="2" flexWrap="wrap">
             <Dialog.Title fontSize="lg" fontWeight="semibold" letterSpacing="tight">{thread.kind === "class" && data ? tf("forum.classScope", { className: data.target.className }) : t(thread.kind === "group" ? "forum.group" : "forum.discuss")}</Dialog.Title>
-            {viewHref && <Button asChild size="xs" variant="ghost" color="fg.muted"><Link href={viewHref} onClick={onClose}>{t("forum.viewFormula")}</Link></Button>}
+            {viewHref && <Button asChild size="xs" variant="ghost" color="fg.muted"><Link href={viewHref} onClick={() => {
+              onClose();
+              if (viewHref === "/algs/#algs-eg") onNavigateLibrary?.();
+            }}>{t("forum.viewFormula")}</Link></Button>}
           </HStack>
           {data && <>
             <Text fontSize="sm" color="fg.muted" overflowWrap="anywhere">{targetLabel(data.target, true)}</Text>
