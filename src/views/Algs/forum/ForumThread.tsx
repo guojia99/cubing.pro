@@ -110,7 +110,7 @@ export function ForumThread({ thread, currentCube, currentClassId, onChange, onC
       <Dialog.Header flexShrink={0} bg="bg.subtle" borderBottomWidth="1px" borderColor="border.subtle" px={{ base: "4", md: "6" }} pt="4" pb="3">
         <Stack gap="2" minW="0" pr="8">
           <HStack gap="2" flexWrap="wrap">
-            <Dialog.Title fontSize="lg" fontWeight="semibold" letterSpacing="tight">{t(thread.kind === "group" ? "forum.group" : "forum.discuss")}</Dialog.Title>
+            <Dialog.Title fontSize="lg" fontWeight="semibold" letterSpacing="tight">{thread.kind === "class" && data ? tf("forum.classScope", { className: data.target.className }) : t(thread.kind === "group" ? "forum.group" : "forum.discuss")}</Dialog.Title>
             {viewHref && <Button asChild size="xs" variant="ghost" color="fg.muted"><Link href={viewHref} onClick={onClose}>{t("forum.viewFormula")}</Link></Button>}
           </HStack>
           {data && <>

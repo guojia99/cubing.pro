@@ -44,7 +44,7 @@ export function readForumLoginResume(pathname: string): ForumLoginResume | null 
     if (!payload || typeof payload.pathname !== "string" || !Number.isFinite(payload.ts)
       || now - payload.ts >= TTL || payload.ts > now
       || (payload.tab !== undefined && payload.tab !== "recent")
-      || (thread?.kind !== "solution" && thread?.kind !== "group")
+      || (thread?.kind !== "solution" && thread?.kind !== "group" && thread?.kind !== "class")
       || typeof thread.id !== "string" || !/^[0-9a-f]{16}$/.test(thread.id)
       || (thread.commentId !== undefined && !(Number.isSafeInteger(thread.commentId) && thread.commentId > 0))) {
       clearForumLoginResume();

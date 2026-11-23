@@ -8,12 +8,19 @@ page.setDefaultNavigationTimeout(110000);
 const errors = [];
 page.on("pageerror", error => errors.push(error.message));
 
+const classId = "f".repeat(16);
 const groupId = "a".repeat(16);
 const first = "b".repeat(16);
 const second = "c".repeat(16);
 const third = "d".repeat(16);
 const moves = ["R U R'", "F U F'", "R U R'"];
 const target = { id: first, kind: "solution", cube: "333", className: "OLL", setName: "OLL", groupName: "T", caseName: "OLL 45", moves: moves[0] };
+const classTarget = { ...target, kind: "class", id: classId, setName: "", groupName: "", caseName: "", moves: "" };
+const classReads = [];
+const classWrites = [];
+let classCounts = false;
+let omitClassCount = false;
+let classActivity = false;
 const parent = { id: 40, authorName: "Jia", replyToName: "", parentId: null, body: "How do you grip this?", deleted: false, createdAt: "2026-11-18T01:02:03Z" };
 const reply = { ...parent, id: 42, parentId: 40, replyToName: "Jia", authorName: "Xi", body: "I use my index finger." };
 const unavailable = { kind: "solution", id: "e".repeat(16), unavailable: true };
@@ -30,7 +37,7 @@ let longGroup = false;
 let tombstoneDeleted = false;
 let recentEmpty = false;
 
-async function signInFromDiscussion(redirect) {
+async function signInFromDiscussion(redirect, title = "Discuss") {
   const expected = new URL(redirect, base);
   await page.getByRole("link", { name: "Sign in to join the discussion" }).click();
   await page.waitForURL(url => url.pathname.replace(/\/$/, "") === "/login");
@@ -38,7 +45,7 @@ async function signInFromDiscussion(redirect) {
   await page.getByRole("button", { name: "Continue with WCA" }).click();
   await page.waitForURL(url => url.origin === expected.origin &&
     url.pathname.replace(/\/$/, "") === expected.pathname.replace(/\/$/, "") && url.search === expected.search);
-  const resumed = page.getByRole("dialog", { name: "Discuss", exact: true });
+  const resumed = page.getByRole("dialog", { name: title, exact: true });
   await resumed.getByRole("textbox", { name: "Write a comment" }).waitFor();
   assert.equal(await page.evaluate(() => sessionStorage.getItem("cubing_pro_forum_login_resume")), null);
 }
@@ -74,9 +81,9 @@ try {
       return send({ name: "OLL", sets: [{ name: "OLL", groups: [{ groupId, name: "T", algs: [{ name: "OLL 45", algs: moves, solutionIds: [first, second, third] }] }] }] });
     }
     if (path === "/public/algorithm/") return send({ CubeKeys: ["333"], ClassMap: { 333: [{ name: "OLL" }] } });
-    if (path === "/public/formula-forum/counts") return ok({ groups: {}, solutions: { [first]: 1 } });
+    if (path === "/public/formula-forum/counts") return ok({ ...(classCounts ? { classId, ...(omitClassCount ? {} : { classCount: 7 }) } : {}), groups: {}, solutions: { [first]: 1 } });
     if (path === "/public/formula-forum/recent") {
-      const items = recentEmpty ? [] : [
+      const items = classActivity ? [{ target: classTarget, count: 7, lastActivity: reply.createdAt, lastCommentId: 42 }] : recentEmpty ? [] : [
         { target, count: 2, lastActivity: reply.createdAt, lastCommentId: reply.id },
         { target: { ...target, id: third, caseName: "OLL 46" }, count: 1, lastActivity: parent.createdAt, lastCommentId: parent.id },
         { target: unavailable, count: 1, lastActivity: parent.createdAt },
@@ -84,7 +91,7 @@ try {
       return ok({ items, page: 1, total: items.length });
     }
     if (path === "/user/formula-forum/notifications") {
-      const items = [{ id: 2, target, commentId: 42, body: reply.body }, { id: 3, target: unavailable, commentId: 43, body: tombstoneBody }]
+      const items = (classActivity ? [{ id: 4, target: classTarget, commentId: 42, body: reply.body }] : [{ id: 2, target, commentId: 42, body: reply.body }, { id: 3, target: unavailable, commentId: 43, body: tombstoneBody }])
         .map(item => ({ ...item, authorName: "Xi", createdAt: reply.createdAt, readAt: markReads.includes(item.id) ? reply.createdAt : null }));
       return ok({ items, page: 1, total: items.length, unread: items.filter(item => !item.readAt).length });
     }
@@ -95,7 +102,7 @@ try {
     }
     if (path === "/admin/formula-forum/comments/42") { assert.equal(req.method(), "DELETE"); removed = true; return ok({}); }
     if (path === "/admin/formula-forum/comments/43") { assert.equal(req.method(), "DELETE"); tombstoneDeleted = true; return ok({}); }
-    if (path === "/user/formula-forum/notifications/2/read" || path === "/user/formula-forum/notifications/3/read") {
+    if (path === "/user/formula-forum/notifications/4/read" || path === "/user/formula-forum/notifications/2/read" || path === "/user/formula-forum/notifications/3/read") {
       assert.equal(req.method(), "PUT");
       markReads.push(Number(path.split("/").at(-2)));
       return ok({});
@@ -124,6 +131,15 @@ try {
       assert.equal(req.method(), "POST");
       writes.push(req.postDataJSON());
       return writes.length === 1 ? send({ code: "keyword_blocked" }, 422) : ok({ id: 42 });
+    }
+    if (path === `/public/formula-forum/targets/class/${classId}/comments`) {
+      classReads.push(url.searchParams.get("commentId"));
+      return ok({ items: [reply], target: classTarget, page: 1, total: 1, count: 7 });
+    }
+    if (path === `/user/formula-forum/targets/class/${classId}/comments`) {
+      assert.equal(req.method(), "POST");
+      classWrites.push(req.postDataJSON());
+      return ok({ id: 42 });
     }
     if (path.includes("/formula-forum/")) throw new Error("Unexpected forum request " + path);
     return ok({});
@@ -163,6 +179,7 @@ try {
 
   const group = page.getByRole("button", { name: /^Discuss group/ });
   const catalogUrl = page.url();
+  assert.equal(await page.getByRole("button", { name: "Discuss the entire OLL class", exact: true }).count(), 0, "Old counts without class fields keep group actions usable");
   assert.equal(await group.innerText(), "Discuss group");
   assert.equal(await group.locator("svg").count(), 1);
   await group.click();
@@ -379,6 +396,52 @@ try {
   await page.getByRole("button").filter({ hasText: "OLL 45" }).click();
   await dialog.getByText(parent.body).waitFor();
   assert.equal(await dialog.getByRole("link", { name: "View formula" }).count(), 0);
+  // The cached v2 catalog has group/solution IDs but no class ID: counts supplies it.
+  classCounts = true;
+  classActivity = true;
+  await page.goto(base + classPath, { waitUntil: "domcontentloaded" });
+  const classButton = page.getByRole("button", { name: "Discuss the entire OLL class", exact: true });
+  await classButton.getByText("7", { exact: true }).waitFor();
+  assert.match(await classButton.innerText(), /OLL discussion/);
+  assert.equal(await classButton.locator('svg[aria-hidden="true"]').count(), 1);
+  assert.equal(await classButton.evaluate(el => getComputedStyle(el).borderTopStyle), "solid");
+  assert.equal(await group.innerText(), "Discuss group");
+  await classButton.click();
+  const classDialog = page.getByRole("dialog", { name: "Discuss the entire OLL class", exact: true });
+  await classDialog.getByText("333 · OLL", { exact: true }).waitFor();
+  assert.equal(await classDialog.getByRole("link", { name: "View formula" }).count(), 0);
+  await classDialog.getByRole("button", { name: "Reply", exact: true }).click();
+  await classDialog.getByRole("textbox").fill("Entire class question");
+  await classDialog.getByRole("button", { name: "Post", exact: true }).click();
+  await page.waitForFunction(() => document.querySelector('[data-testid="forum-composer"] textarea')?.value === "");
+  assert.deepEqual(classWrites, [{ body: "Entire class question", parentId: 42 }]);
+  await classDialog.getByRole("button", { name: "Close", exact: true }).click();
+  await page.getByRole("button", { name: "Xi", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Sign out", exact: true }).click();
+  await page.waitForURL(url => url.pathname.replace(/\/$/, "") === "/login");
+  await page.goto(base + "/algs/?tab=recent", { waitUntil: "domcontentloaded" });
+  await recentPanel.getByRole("button").filter({ hasText: "333 · OLL" }).click();
+  await classDialog.locator("#formula-comment-42").waitFor();
+  assert.equal(classReads.at(-1), "42");
+  assert.equal(await classDialog.getByRole("link", { name: "View formula" }).getAttribute("href"), classPath);
+  await signInFromDiscussion("/algs/?tab=recent", "Discuss the entire OLL class");
+  await classDialog.locator("#formula-comment-42").waitFor();
+  assert.equal(classReads.at(-1), "42");
+  await classDialog.getByRole("link", { name: "View formula" }).click();
+  await page.waitForURL(url => url.pathname.replace(/\/$/, "") === classPath.replace(/\/$/, "") && url.search === "");
+  await classButton.waitFor();
+  omitClassCount = true;
+  await page.reload({ waitUntil: "domcontentloaded" });
+  await classButton.waitFor();
+  assert.equal(await classButton.innerText(), "OLL discussion", "Missing optional classCount does not disable class discussion");
+  await page.getByRole("button", { name: "Xi", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Replies to me (1)" }).click();
+  await page.getByRole("button").filter({ hasText: reply.body }).click();
+  await classDialog.locator("#formula-comment-42").waitFor();
+  assert.equal(await classDialog.getByRole("link", { name: "View formula" }).getAttribute("href"), classPath);
+  await page.getByText("Unread", { exact: true }).waitFor({ state: "hidden" });
+  assert.ok(markReads.includes(4));
+  console.log("PASS class counts independent of cached catalog/group, class replies, recent login focus, exact class URL roundtrip, and class notification.");
   assert.deepEqual(errors, []);
   console.log("PASS recent-tab login resume, reply drafts, retry before marking read, and unavailable inbox/moderation targets.");
 } finally {

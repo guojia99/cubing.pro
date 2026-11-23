@@ -1,7 +1,7 @@
 import { AuthHeader } from "@/services/cubing-pro/auth/token";
 import { Request } from "@/services/cubing-pro/request";
 
-export type ForumKind = "group" | "solution";
+export type ForumKind = "class" | "group" | "solution";
 
 export interface ForumTarget {
   kind: ForumKind;
@@ -26,6 +26,8 @@ export interface ForumComment {
 }
 
 export interface ForumCounts {
+  classId?: string;
+  classCount?: number;
   groups: Record<string, number>;
   solutions: Record<string, number>;
 }

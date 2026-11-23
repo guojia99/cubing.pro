@@ -79,7 +79,7 @@ export function ForumScope({ children, cube, classId, resumeReady = true }: {
   </ForumContext.Provider>;
 }
 
-export function DiscussionButton({ kind, id }: { kind: ForumKind; id: string }) {
+export function DiscussionButton({ kind, id }: { kind: Exclude<ForumKind, "class">; id: string }) {
   const { t } = useI18n();
   const { counts, open } = useFormulaForum();
   const count = counts && ((kind === "group" ? counts.groups : counts.solutions)[id] ?? 0);
@@ -89,5 +89,21 @@ export function DiscussionButton({ kind, id }: { kind: ForumKind; id: string }) 
     <LuMessageCircle aria-hidden="true" />
     {t(kind === "group" ? "forum.group" : "forum.solution")}
     {count !== undefined && count > 0 && <Badge colorPalette="brand" size="sm">{count}</Badge>}
+  </Button>;
+}
+
+export function ClassDiscussionButton({ className }: { className: string }) {
+  const { tf } = useI18n();
+  const { counts, open } = useFormulaForum();
+  if (!counts?.classId) return null;
+  const id = counts.classId;
+  return <Button variant="outline" colorPalette="brand" size="sm" flexShrink={0}
+    borderColor="colorPalette.border" bg="colorPalette.subtle" color="colorPalette.fg"
+    maxW="full" height="auto" minH="9" py="1" whiteSpace="normal"
+    aria-label={tf("forum.classScope", { className })}
+    onClick={() => open({ kind: "class", id })}>
+    <LuMessageCircle aria-hidden="true" />
+    {tf("forum.class", { className })}
+    {counts.classCount !== undefined && counts.classCount > 0 && <Badge colorPalette="brand" size="sm">{counts.classCount}</Badge>}
   </Button>;
 }

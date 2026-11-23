@@ -43,7 +43,7 @@ import {
   getFormulaProficiency,
 } from "@/services/cubing-pro/algs/formulaPracticeProficiency";
 
-import { DiscussionButton, ForumScope } from "./forum/ForumScope";
+import { ClassDiscussionButton, DiscussionButton, ForumScope } from "./forum/ForumScope";
 import AlgsFormulaCard from "./components/AlgsFormulaCard";
 import AlgsFormulaCardWide from "./components/AlgsFormulaCardWide";
 import AlgsFilterPanel from "./components/AlgsFilterPanel";
@@ -708,7 +708,7 @@ export function AlgsDetailView({ cube, classId }: Props) {
           flexWrap="wrap"
           gap={3}
         >
-          <HStack className="algs-detail-heading" gap={2} flex={1} minW={0} align="center">
+          <HStack className="algs-detail-heading" flexWrap="wrap" gap={2} flex={1} minW={0} align="center">
             <Button
               variant="ghost"
               size="sm"
@@ -727,6 +727,7 @@ export function AlgsDetailView({ cube, classId }: Props) {
             <Badge colorPalette="brand" fontSize="11px" lineHeight="20px" h="22px" flexShrink={0}>
               {cube}
             </Badge>
+            <ClassDiscussionButton className={data.name} />
           </HStack>
 
           <HStack gap={2} flexWrap="wrap" minW={0}>
