@@ -3,10 +3,10 @@ import test from "node:test";
 
 import { CLOSED_REVISIONS_KEY, readClosedRevisions, rememberClosedRevisions, unseenAnnouncements } from "./announcementDismissal";
 
-const oldA = { id: "a", revision: "a-1", text: "A", href: "" };
-const oldB = { id: "b", revision: "b-1", text: "B", href: "/welcome/" };
+const oldA = { id: "a", revision: "a-1", text: "A", title: "Notice", publishedAt: "2026-11-23T10:00:00Z" };
+const oldB = { id: "b", revision: "b-1", text: "B", title: "Notice", publishedAt: "2026-11-23T10:00:00Z" };
 const newB = { ...oldB, revision: "b-2", text: "B changed" };
-const announcementC = { id: "c", revision: "c-1", text: "C", href: "" };
+const announcementC = { id: "c", revision: "c-1", text: "C", title: "Notice", publishedAt: "2026-11-23T10:00:00Z" };
 
 function makeStorage(value: string | null = null) {
   return {
@@ -31,4 +31,17 @@ test("empty or malformed browser storage does not suppress an active announcemen
   for (const bad of [null, "", "{", "[]", "42", '{"a":false}']) {
     assert.deepEqual(unseenAnnouncements([oldA], readClosedRevisions(makeStorage(bad))), [oldA]);
   }
+});
+
+test("closing a snapshot does not acknowledge a newer revision or a later publication", () => {
+  const storage = makeStorage();
+  rememberClosedRevisions(storage, [oldB, oldA]);
+  assert.deepEqual(unseenAnnouncements([announcementC, newB, oldA], readClosedRevisions(storage)), [announcementC, newB]);
+});
+
+test("visibility depends only on id and revision", () => {
+  const storage = makeStorage();
+  rememberClosedRevisions(storage, [oldA]);
+  assert.deepEqual(unseenAnnouncements([{ ...oldA, title: "Changed title", text: "Changed body", publishedAt: "2026-11-24T10:00:00Z" }], readClosedRevisions(storage)), []);
+  assert.deepEqual(unseenAnnouncements([{ ...oldA, revision: "a-2" }], readClosedRevisions(storage)), [{ ...oldA, revision: "a-2" }]);
 });

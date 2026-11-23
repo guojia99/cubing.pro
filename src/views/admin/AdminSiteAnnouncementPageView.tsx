@@ -6,6 +6,7 @@ import { useEffect, useRef, useState, type SubmitEvent } from "react";
 import { AdminGuard } from "@/components/admin/AdminGuard";
 import { PageHeader, Surface } from "@/components/ui/page";
 import { useI18n } from "@/contexts/I18nProvider";
+import { getIntlLocale } from "@/i18n";
 import { Auth } from "@/lib/auth";
 import { getApiErrorDisplayMessage, isRequestCanceled } from "@/services/cubing-pro/request";
 import {
@@ -13,19 +14,20 @@ import {
   type AdminSiteAnnouncement,
 } from "@/services/cubing-pro/siteAnnouncement";
 
-const MAX_TEXT = 300;
+const MAX_TEXT = 1500;
+const MAX_TITLE = 80;
 
 function responseMessage(error: unknown) {
   return getApiErrorDisplayMessage((error as { response?: { data?: unknown } } | null)?.response?.data);
 }
 
 function AnnouncementForm() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [announcements, setAnnouncements] = useState<AdminSiteAnnouncement[] | null>(null);
   const [selectedId, setSelectedId] = useState<string | undefined>();
-  const textField = useRef<HTMLTextAreaElement>(null);
+  const titleField = useRef<HTMLInputElement>(null);
   const [text, setText] = useState("");
-  const [href, setHref] = useState("");
+  const [title, setTitle] = useState("");
   const [loadFailed, setLoadFailed] = useState(false);
   const [loadAttempt, setLoadAttempt] = useState(0);
   const [pending, setPending] = useState(false);
@@ -44,6 +46,10 @@ function AnnouncementForm() {
   }, [loadAttempt]);
 
   const selected = announcements?.find((item) => item.id === selectedId);
+  const normalizedTitle = title.trim();
+  const titleCount = Array.from(normalizedTitle).length;
+  const invalidTitle = titleCount === 0 || titleCount > MAX_TITLE;
+  const dateFormat = new Intl.DateTimeFormat(getIntlLocale(locale), { dateStyle: "medium", timeStyle: "short" });
   const normalizedText = text.trim();
   const count = Array.from(normalizedText).length;
   const invalidText = count === 0 || count > MAX_TEXT;
@@ -51,10 +57,10 @@ function AnnouncementForm() {
   function select(item?: AdminSiteAnnouncement) {
     setSelectedId(item?.id);
     setText(item?.text ?? "");
-    setHref(item?.href ?? "");
+    setTitle(item?.title ?? "");
     setError("");
     setFeedback(null);
-    textField.current?.focus();
+    titleField.current?.focus();
   }
 
   function replaceAnnouncement(item: AdminSiteAnnouncement) {
@@ -70,16 +76,16 @@ function AnnouncementForm() {
 
   async function save(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!announcements || pending || invalidText) return;
+    if (!announcements || pending || invalidTitle || invalidText) return;
     setPending(true);
     setError("");
     setFeedback(null);
     try {
-      const item = await publishSiteAnnouncement({ text: normalizedText, href: href.trim() }, selectedId);
+      const item = await publishSiteAnnouncement({ title: normalizedTitle, text: normalizedText }, selectedId);
       replaceAnnouncement(item);
       setSelectedId(item.id);
       setText(item.text);
-      setHref(item.href);
+      setTitle(item.title);
       setFeedback(selected?.active ? "siteAnnouncement.saved" : "siteAnnouncement.published");
     } catch (error) {
       setError(responseMessage(error) || t("siteAnnouncement.writeError"));
@@ -125,20 +131,20 @@ function AnnouncementForm() {
                   {t("siteAnnouncement.new")}
                 </Button>}
               </HStack>
+              <Field.Root required invalid={titleCount > MAX_TITLE} disabled={pending}>
+                <Field.Label>{t("siteAnnouncement.fieldTitle")}</Field.Label>
+                <Input ref={titleField} value={title} onChange={(event) => setTitle(event.target.value)} />
+                <Field.HelperText>{titleCount} / {MAX_TITLE}</Field.HelperText>
+              </Field.Root>
               <Field.Root required invalid={count > MAX_TEXT} disabled={pending}>
                 <Field.Label>{t("siteAnnouncement.text")}</Field.Label>
-                <Textarea ref={textField} value={text} onChange={(event) => setText(event.target.value)} rows={5} resize="vertical" />
+                <Textarea value={text} onChange={(event) => setText(event.target.value)} rows={5} resize="vertical" />
                 <Field.HelperText>{count} / {MAX_TEXT}</Field.HelperText>
-              </Field.Root>
-              <Field.Root disabled={pending}>
-                <Field.Label>{t("siteAnnouncement.link")}</Field.Label>
-                <Input value={href} onChange={(event) => setHref(event.target.value)} inputMode="url" />
-                <Field.HelperText>{t("siteAnnouncement.linkHint")}</Field.HelperText>
               </Field.Root>
               {error && <Text role="alert" color="fg.error">{error}</Text>}
               {feedback && <Text role="status">{t(feedback)}</Text>}
               <HStack gap="3" flexWrap="wrap">
-                <Button type="submit" disabled={pending || invalidText}>
+                <Button type="submit" disabled={pending || invalidTitle || invalidText}>
                   {t(selected?.active ? "siteAnnouncement.save" : selected ? "siteAnnouncement.republish" : "siteAnnouncement.publish")}
                 </Button>
                 {selected?.active && (
@@ -160,7 +166,8 @@ function AnnouncementForm() {
                 {announcements.map((item) => (
                   <Box as="li" key={item.id} p="3" borderWidth="1px" borderColor={selectedId === item.id ? "brand.solid" : "border"} borderRadius="md">
                     <Stack data-announcement-id={item.id} gap="2">
-                      <Text lineClamp={3} whiteSpace="pre-wrap" overflowWrap="anywhere">{item.text}</Text>
+                      <Text fontWeight="semibold" overflowWrap="anywhere">{item.title}</Text>
+                      <Text asChild fontSize="sm" color="fg.muted"><time dateTime={item.publishedAt}>{dateFormat.format(new Date(item.publishedAt))}</time></Text>
                       <HStack justify="space-between" flexWrap="wrap">
                         <Badge colorPalette={item.active ? "green" : "gray"}>
                           {t(item.active ? "siteAnnouncement.active" : "siteAnnouncement.inactive")}

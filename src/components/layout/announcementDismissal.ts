@@ -13,7 +13,7 @@ export function readClosedRevisions(storage: Pick<Storage, "getItem">): Map<stri
 }
 
 export function unseenAnnouncements(items: SiteAnnouncement[], revisions: ReadonlyMap<string, string>) {
-  return items.filter((item) => item.id && item.revision && item.text && revisions.get(item.id) !== item.revision);
+  return items.filter((item) => revisions.get(item.id) !== item.revision);
 }
 
 export function rememberClosedRevisions(

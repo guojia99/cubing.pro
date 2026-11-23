@@ -1,6 +1,7 @@
 const messages = {
-  "siteAnnouncement.title": ["网站公告", "Site announcement", "サイトのお知らせ", "網站公告", "사이트 공지", "Annonce du site", "Aviso del sitio"],
-  "siteAnnouncement.details": ["查看详情", "View details", "詳細を見る", "睇詳情", "자세히 보기", "Voir les détails", "Ver detalles"],
+  "siteAnnouncement.title": ["公告", "Site announcement", "サイトのお知らせ", "網站公告", "사이트 공지", "Annonce du site", "Aviso del sitio"],
+  "siteAnnouncement.fieldTitle": ["标题", "Title", "タイトル", "標題", "제목", "Titre", "Título"],
+  "siteAnnouncement.back": ["返回公告列表", "Back to announcements", "お知らせ一覧に戻る", "返回公告列表", "공지 목록으로 돌아가기", "Retour aux annonces", "Volver a los avisos"],
   "siteAnnouncement.close": ["关闭", "Close", "閉じる", "關閉", "닫기", "Fermer", "Cerrar"],
   "siteAnnouncement.adminHint": ["访客进站时会看到还没关闭的公告。", "Visitors see announcements they have not dismissed.", "閉じていないお知らせが来訪者に表示されます。", "訪客入站會睇到未關閉嘅公告。", "방문자는 아직 닫지 않은 공지를 봅니다.", "Les visiteurs voient les annonces qu’ils n’ont pas fermées.", "Los visitantes ven los avisos que todavía no han cerrado."],
   "siteAnnouncement.new": ["新建公告", "New announcement", "新しいお知らせ", "新增公告", "새 공지", "Nouvelle annonce", "Nuevo aviso"],
@@ -10,8 +11,6 @@ const messages = {
   "siteAnnouncement.active": ["已发布", "Published", "公開中", "展示中", "게시 중", "Publié", "Publicado"],
   "siteAnnouncement.inactive": ["已下线", "Unpublished", "非公開", "未展示", "게시 안 됨", "Non publié", "Sin publicar"],
   "siteAnnouncement.text": ["公告正文", "Message", "お知らせ本文", "公告正文", "공지 내용", "Message", "Mensaje"],
-  "siteAnnouncement.link": ["详情链接（选填）", "Details link (optional)", "詳細リンク（任意）", "詳情連結（選填）", "상세 링크(선택)", "Lien vers les détails (facultatif)", "Enlace a los detalles (opcional)"],
-  "siteAnnouncement.linkHint": ["填写后显示「查看详情」。", "Adds a “View details” link.", "入力すると「詳細を見る」が表示されます。", "填咗就會顯示「睇詳情」。", "입력하면 ‘자세히 보기’가 표시됩니다.", "Affiche un lien « Voir les détails ».", "Añade el enlace «Ver detalles»."],
   "siteAnnouncement.save": ["保存修改", "Save changes", "変更を保存", "儲存修改", "변경 사항 저장", "Enregistrer les modifications", "Guardar cambios"],
   "siteAnnouncement.publish": ["发布", "Publish", "公開", "發布", "게시", "Publier", "Publicar"],
   "siteAnnouncement.withdraw": ["下线", "Unpublish", "公開を取り消す", "下線", "게시 취소", "Dépublier", "Retirar"],

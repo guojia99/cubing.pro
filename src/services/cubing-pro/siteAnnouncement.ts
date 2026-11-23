@@ -1,21 +1,25 @@
 import { AuthHeader } from "./auth/token";
 import { Request } from "./request";
 
-export type SiteAnnouncement = { id: string; revision: string; text: string; href: string };
+export type SiteAnnouncement = { id: string; revision: string; title: string; text: string; publishedAt: string };
 export type AdminSiteAnnouncement = SiteAnnouncement & { active: boolean };
 type Envelope<T> = { data: T };
-type AnnouncementDraft = Pick<SiteAnnouncement, "text" | "href">;
+type AnnouncementDraft = Pick<SiteAnnouncement, "title" | "text">;
 const ADMIN_TIMEOUT = 10000;
 const adminPath = "/admin/system_result/site-announcement";
 
+function isDisplayable(item: SiteAnnouncement): boolean {
+  return Boolean(item?.id && item.revision && item.title && item.text && Number.isFinite(Date.parse(item.publishedAt)));
+}
+
 export async function getSiteAnnouncements(): Promise<SiteAnnouncement[]> {
   const { data } = await Request.get<Envelope<SiteAnnouncement[]>>("/public/site-announcement", { timeout: 2500 });
-  return Array.isArray(data.data) ? data.data : [];
+  return Array.isArray(data.data) ? data.data.filter(isDisplayable) : [];
 }
 
 export async function getAdminSiteAnnouncements(signal: AbortSignal): Promise<AdminSiteAnnouncement[]> {
   const { data } = await Request.get<Envelope<AdminSiteAnnouncement[]>>(adminPath, { headers: AuthHeader(), timeout: ADMIN_TIMEOUT, signal });
-  if (!Array.isArray(data.data)) throw new Error("Invalid site announcement list");
+  if (!Array.isArray(data.data) || !data.data.every(isDisplayable)) throw new Error("Invalid site announcement list");
   return data.data;
 }
 

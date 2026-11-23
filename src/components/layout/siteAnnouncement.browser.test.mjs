@@ -83,25 +83,29 @@ async function setup(t) {
           return route.fulfill({ response: upstream, headers: { ...upstream.headers(), ...headers } });
         }
         if (apiPath === publicEndpoint) {
-          const visible = state.items.filter((item) => item.active).map(({ id, revision, text, href }) => ({ id, revision, text, href }));
+          const visible = state.items.filter((item) => item.active).map(({ id, revision, title, text, publishedAt }) => ({ id, revision, title, text, publishedAt }));
           return route.fulfill({ headers: { ...headers, "cache-control": "no-store" }, json: { data: visible } });
         }
         if (method === "GET") return json({ data: state.items });
         const id = apiPath.slice(adminEndpoint.length + 1);
         const existing = state.items.find((item) => item.id === id);
         if (method === "POST" || method === "PUT") {
-          const { text, href } = request.postDataJSON();
+          const draft = request.postDataJSON();
+          assert.deepEqual(Object.keys(draft).sort(), ["text", "title"]);
+          const { title, text } = draft;
           assert.equal(typeof text, "string");
-          assert.equal(typeof href, "string");
+          assert.equal(typeof title, "string");
           if (method === "POST") {
-            const item = { id: `message-${++state.nextId}`, active: true, revision: `revision-${++state.version}`, text, href };
+            const item = { id: `message-${++state.nextId}`, active: true, revision: `revision-${++state.version}`, title, text, publishedAt: new Date(Date.UTC(2026, 10, 23, 0, state.version)).toISOString() };
             state.items.unshift(item);
             return json({ data: item });
           }
           if (!existing) return json({ data: null }, 404);
-          if (!existing.active || text !== existing.text || href !== existing.href) {
+          if (!existing.active || text !== existing.text || title !== existing.title) {
             if (!existing.active) state.items = [existing, ...state.items.filter((item) => item.id !== id)];
-            Object.assign(existing, { active: true, revision: `revision-${++state.version}`, text, href });
+            const revision = `revision-${++state.version}`;
+            const publishedAt = existing.active ? existing.publishedAt : new Date(Date.UTC(2026, 10, 23, 0, state.version)).toISOString();
+            Object.assign(existing, { active: true, revision, title, text, publishedAt });
           }
           return json({ data: existing });
         }
@@ -143,32 +147,46 @@ test("site announcement: publish and independently dismiss, edit and withdraw mu
   });
   const result = async (response) => (await (await response).json()).data;
   const text = admin.getByRole("textbox", { name: "Message" });
-  const href = admin.getByRole("textbox", { name: "Details link (optional)" });
+  const title = admin.getByRole("textbox", { name: "Title", exact: true });
   const row = (value) => admin.getByRole("listitem").filter({ hasText: value });
   const storedRevisions = () => visitor.evaluate((key) => JSON.parse(localStorage.getItem(key)), closeKey);
 
   await visit(admin, "/admin/site-announcement/");
   await admin.getByText("No announcements yet").waitFor();
   assert.equal(state.publicGets, 0, "direct admin page does not load the visitor popup");
-  await text.fill("😀".repeat(301));
+  await title.fill("😀".repeat(81));
+  await text.fill(first);
+  assert.ok(await admin.getByRole("button", { name: "Publish", exact: true }).isDisabled());
+  await title.fill("😀".repeat(80));
+  assert.ok(await admin.getByRole("button", { name: "Publish", exact: true }).isEnabled());
+  await text.fill("😀".repeat(1500));
+  assert.ok(await admin.getByRole("button", { name: "Publish", exact: true }).isEnabled());
+  await text.fill(" \n ");
+  assert.ok(await admin.getByRole("button", { name: "Publish", exact: true }).isDisabled());
+  await text.fill("😀".repeat(1501));
   assert.ok(await admin.getByRole("button", { name: "Publish", exact: true }).isDisabled());
   await text.fill(first);
-  await href.fill("/changelog/");
+  await title.fill("  Maintenance  ");
+  await text.fill(`  ${first}  `);
   const publishFirst = adminResponse("POST");
   await admin.getByRole("button", { name: "Publish", exact: true }).click();
   const a = await result(publishFirst);
   assert.ok(a.id && a.revision);
+  assert.equal(a.title, "Maintenance");
+  assert.equal(a.text, first);
+  assert.ok(Number.isFinite(Date.parse(a.publishedAt)));
   await admin.getByRole("status").filter({ hasText: /^Published$/ }).waitFor();
 
   await admin.getByRole("button", { name: "New announcement" }).click();
+  await title.fill("Registration");
   await text.fill(second);
   const publishSecond = adminResponse("POST");
   await admin.getByRole("button", { name: "Publish", exact: true }).click();
   const b = await result(publishSecond);
   assert.notEqual(a.id, b.id);
   assert.ok(b.revision);
-  await row(second).getByText("Published", { exact: true }).waitFor();
-  await row("**Maintenance**").getByText("Published", { exact: true }).waitFor();
+  await row("Registration").getByText("Published", { exact: true }).waitFor();
+  await row("Maintenance").getByText("Published", { exact: true }).waitFor();
 
   const firstPublic = checkPublic(visitor);
   await visit(visitor, "/settings/");
@@ -180,22 +198,32 @@ test("site announcement: publish and independently dismiss, edit and withdraw mu
   assert.equal(await dialog(visitor).count(), 1, "both announcements share the same dialog");
   const shown = dialog(visitor).getByRole("listitem");
   assert.deepEqual(await shown.count(), 2);
-  assert.match((await shown.nth(0).innerText()), new RegExp(second));
-  assert.match((await shown.nth(1).innerText()), /\*\*Maintenance\*\* <example>/);
+  assert.match(await shown.nth(0).innerText(), /Registration/);
+  assert.match(await shown.nth(1).innerText(), /Maintenance/);
+  assert.equal(await shown.nth(0).locator("time").getAttribute("datetime"), b.publishedAt);
+  assert.ok((await shown.nth(0).locator("time").innerText()).length > 0);
+  assert.equal(await dialog(visitor).getByText(first, { exact: true }).count(), 0);
+  assert.equal(await dialog(visitor).getByText(second, { exact: true }).count(), 0);
   assert.equal(await visitor.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
   await visitor.waitForFunction(() => document.activeElement?.textContent?.trim() === "Close");
   await visitor.mouse.click(5, 5);
   await visitor.keyboard.press("Escape");
   assert.ok(await dialog(visitor).isVisible(), "backdrop and Escape do not dismiss the notice");
   assert.equal(await storedRevisions(), null);
-  const detailsTab = visitor.waitForEvent("popup");
-  await shown.nth(1).getByRole("link", { name: "View details" }).click();
-  const details = await detailsTab;
-  await details.waitForURL("**/changelog/");
-  await details.close();
-  assert.ok(await dialog(visitor).isVisible(), "detail link leaves notice open");
+  await shown.nth(1).getByRole("button").focus();
+  await visitor.keyboard.press("Enter");
+  await dialog(visitor).getByRole("heading", { name: "Maintenance", exact: true }).waitFor();
+  assert.equal(await dialog(visitor).count(), 1);
+  assert.equal(await dialog(visitor).getByText(first, { exact: true }).innerText(), first);
+  assert.equal(await dialog(visitor).getByText(second, { exact: true }).count(), 0);
+  assert.equal(await dialog(visitor).locator("strong, example").count(), 0, "body is plain text");
+  assert.equal(await dialog(visitor).locator("time").getAttribute("datetime"), a.publishedAt);
+  await dialog(visitor).getByRole("button", { name: "Back to announcements" }).click();
+  assert.equal(await shown.count(), 2);
+  assert.ok(await dialog(visitor).isVisible());
   assert.equal(await storedRevisions(), null);
-  await dialog(visitor).getByRole("button", { name: "Close" }).click();
+  assert.ok(await shown.nth(1).getByRole("button").evaluate((el) => el === document.activeElement));
+  await dialog(visitor).getByRole("button", { name: "Close", exact: true }).last().click();
   await dialog(visitor).waitFor({ state: "hidden" });
   assert.deepEqual(await storedRevisions(), { [a.id]: a.revision, [b.id]: b.revision });
 
@@ -207,7 +235,9 @@ test("site announcement: publish and independently dismiss, edit and withdraw mu
 
   const noop = adminResponse("PUT");
   await admin.getByRole("button", { name: "Save changes", exact: true }).click();
-  assert.equal((await result(noop)).revision, b.revision, "no-op save has stable revision");
+  const unchangedB = await result(noop);
+  assert.equal(unchangedB.revision, b.revision, "no-op save has stable revision");
+  assert.equal(unchangedB.publishedAt, b.publishedAt);
   const secondReload = checkPublic(visitor);
   await visitor.reload();
   await secondReload;
@@ -220,9 +250,10 @@ test("site announcement: publish and independently dismiss, edit and withdraw mu
   const editedB = await result(edit);
   assert.equal(editedB.id, b.id);
   assert.notEqual(editedB.revision, b.revision);
+  assert.equal(editedB.publishedAt, b.publishedAt, "an ordinary edit retains the publication date");
   const getsBeforeNav = state.publicGets;
   await visitor.evaluate(() => { window.announcementTestDocument = true; });
-  await visitor.locator('[data-app-header] a[href="/"]').first().click();
+  await visitor.locator('[data-app-header] a').first().click();
   await visitor.waitForURL((url) => url.pathname === "/");
   await visitor.waitForLoadState("networkidle");
   assert.equal(await visitor.evaluate(() => window.announcementTestDocument), true, "used real SPA navigation");
@@ -234,9 +265,11 @@ test("site announcement: publish and independently dismiss, edit and withdraw mu
   await thirdReload;
   await dialog(visitor).waitFor();
   assert.equal(await dialog(visitor).getByRole("listitem").count(), 1);
-  assert.match(await dialog(visitor).innerText(), new RegExp(changed));
+  assert.match(await dialog(visitor).innerText(), /Registration/);
+  await dialog(visitor).getByRole("listitem").getByRole("button").click();
+  assert.equal(await dialog(visitor).getByText(changed, { exact: true }).innerText(), changed);
   assert.doesNotMatch(await dialog(visitor).innerText(), /Maintenance/);
-  await dialog(visitor).getByRole("button", { name: "Close" }).click();
+  await dialog(visitor).getByRole("button", { name: "Close", exact: true }).last().click();
   assert.deepEqual(await storedRevisions(), { [a.id]: a.revision, [b.id]: editedB.revision });
 
   const withdraw = adminResponse("DELETE");
@@ -244,7 +277,7 @@ test("site announcement: publish and independently dismiss, edit and withdraw mu
   const withdrawnB = await result(withdraw);
   assert.equal(withdrawnB.id, b.id);
   assert.equal(withdrawnB.active, false);
-  await row(changed).getByText("Unpublished", { exact: true }).waitFor();
+  await row("Registration").getByText("Unpublished", { exact: true }).waitFor();
   assert.equal(await text.inputValue(), changed);
   const withdrawnPublic = checkPublic(visitor);
   await visitor.reload();
@@ -260,9 +293,9 @@ test("site announcement: publish and independently dismiss, edit and withdraw mu
   await visitor.reload();
   await dialog(visitor).waitFor();
   assert.equal(await dialog(visitor).getByRole("listitem").count(), 1);
-  await dialog(visitor).getByRole("button", { name: "Close" }).click();
+  await dialog(visitor).getByRole("button", { name: "Close", exact: true }).last().click();
 
-  await row("**Maintenance**").getByRole("button", { name: "Edit announcement" }).click();
+  await row("Maintenance").getByRole("button", { name: "Edit announcement" }).click();
   const olderWithdrawal = adminResponse("DELETE");
   await admin.getByRole("button", { name: "Unpublish", exact: true }).click();
   await result(olderWithdrawal);
@@ -276,9 +309,9 @@ test("site announcement: publish and independently dismiss, edit and withdraw mu
   await dialog(visitor).waitFor();
   assert.match(await dialog(visitor).innerText(), /Maintenance/);
   assert.doesNotMatch(await dialog(visitor).innerText(), /Event registration/);
-  await dialog(visitor).getByRole("button", { name: "Close" }).click();
+  await dialog(visitor).getByRole("button", { name: "Close", exact: true }).last().click();
 
-  for (const content of [changed, "**Maintenance**"]) {
+  for (const content of ["Registration", "Maintenance"]) {
     await row(content).getByRole("button", { name: "Edit announcement" }).click();
     const withdrawal = adminResponse("DELETE");
     await admin.getByRole("button", { name: "Unpublish", exact: true }).click();
@@ -309,6 +342,7 @@ test("site announcement: guard, network failure and late response", { skip: Bool
   await admin.getByText("No announcements yet").waitFor();
   state.adminWriteFailed = true;
   const text = admin.getByRole("textbox", { name: "Message" });
+  await admin.getByRole("textbox", { name: "Title", exact: true }).fill("Failure test");
   await text.fill("Preserve administrator input");
   await admin.getByRole("button", { name: "Publish" }).click();
   await admin.getByRole("alert").filter({ hasText: "write rejected" }).waitFor();
@@ -323,7 +357,7 @@ test("site announcement: guard, network failure and late response", { skip: Bool
   assert.equal(await dialog(visitor).count(), 0);
 
   state.publicError = false;
-  state.items = [{ id: "one", active: true, revision: "pending", text: "Show within the entry window", href: "" }];
+  state.items = [{ id: "one", active: true, revision: "pending", text: "Show within the entry window", title: "Notice", publishedAt: "2026-11-23T10:00:00Z" }];
   let release;
   state.holdPublic = new Promise((resolve) => { release = resolve; });
   const pendingPublic = checkPublic(visitor);
@@ -333,9 +367,9 @@ test("site announcement: guard, network failure and late response", { skip: Bool
   release();
   await pendingPublic;
   await dialog(visitor).waitFor();
-  await dialog(visitor).getByRole("button", { name: "Close" }).click();
+  await dialog(visitor).getByRole("button", { name: "Close", exact: true }).last().click();
 
-  state.items = [{ id: "one", active: true, revision: "late", text: "Do not interrupt later activity", href: "" }];
+  state.items = [{ id: "one", active: true, revision: "late", text: "Do not interrupt later activity", title: "Notice", publishedAt: "2026-11-23T10:00:00Z" }];
   state.holdPublic = new Promise((resolve) => { release = resolve; });
   const timedOut = visitor.waitForEvent("requestfailed", {
     predicate: (request) => new URL(request.url()).pathname.endsWith(publicEndpoint),
@@ -349,7 +383,7 @@ test("site announcement: guard, network failure and late response", { skip: Bool
   state.holdPublic = null;
   state.items = Array.from({ length: 8 }, (_, index) => ({
     id: String(index), active: true, revision: `many-${index}`,
-    text: `Notice ${index} — ${"Long mobile announcement content. ".repeat(5)}`, href: "",
+    text: `Notice ${index} — ${"Long mobile announcement content. \n".repeat(40)}`, title: "Notice", publishedAt: "2026-11-23T10:00:00Z",
   }));
   await visitor.reload();
   await dialog(visitor).waitFor();
@@ -358,7 +392,15 @@ test("site announcement: guard, network failure and late response", { skip: Bool
   assert.ok(await content.evaluate((element) => element.scrollHeight > element.clientHeight));
   await content.evaluate((element) => { element.scrollTop = element.scrollHeight; });
   assert.ok(await content.evaluate((element) => element.scrollTop > 0));
-  await dialog(visitor).getByRole("button", { name: "Close" }).click();
+  await dialog(visitor).getByRole("listitem").last().getByRole("button").click();
+  const body = dialog(visitor).getByRole("heading", { name: "Notice", exact: true }).locator("../..");
+  assert.ok(await body.evaluate((element) => element.scrollHeight > element.clientHeight));
+  await body.evaluate((element) => { element.scrollTop = element.scrollHeight; });
+  assert.ok(await body.evaluate((element) => element.scrollTop > 0));
+  const close = dialog(visitor).getByRole("button", { name: "Close", exact: true }).first();
+  const bounds = await close.boundingBox();
+  assert.ok(bounds.y >= 0 && bounds.y + bounds.height <= 700);
+  await close.click();
   await dialog(visitor).waitFor({ state: "hidden" });
   assert.deepEqual(state.pageErrors, []);
 });
