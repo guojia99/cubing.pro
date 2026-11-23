@@ -15,6 +15,7 @@ import {
 } from "@chakra-ui/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { DiscussionButton } from "../forum/ForumScope";
 import { useI18n } from "@/contexts/I18nProvider";
 import { toaster } from "@/components/ui/toaster";
 import { useReleaseOverlayOnUnmount } from "@/lib/overlayCleanup";
@@ -167,7 +168,7 @@ export default function AlgsModal({
       && initialLibraryIndex >= 0
       && initialLibraryIndex < (alg?.algs.length ?? 0)
       ? { source: "library" as const, index: initialLibraryIndex }
-      : getAlgsSelection(storageKey);
+      : getAlgsSelection(storageKey, alg);
     setSelection(sel);
     if (sel?.source === "custom") {
       setTab("custom");
@@ -219,12 +220,14 @@ export default function AlgsModal({
   const handleSelectFormula = useCallback(
     (index: number, source: "library" | "custom" = tab) => {
       if (!storageKey) return;
-      const value: AlgsSelectionValue = { source, index };
+      const value: AlgsSelectionValue = {
+        source, index, solutionId: source === "library" ? alg?.solutionIds?.[index] : undefined,
+      };
       setAlgsSelection(storageKey, value);
       setSelection(value);
       onChanged?.();
     },
-    [storageKey, tab, onChanged],
+    [storageKey, tab, onChanged, alg],
   );
 
   const handleAddCustom = useCallback(() => {
@@ -252,7 +255,7 @@ export default function AlgsModal({
       setCustomFormulas(updated);
       if (selection?.source === "custom") {
         if (updated.length === 0) {
-          const fallback: AlgsSelectionValue = { source: "library", index: 0 };
+          const fallback: AlgsSelectionValue = { source: "library", index: 0, solutionId: alg?.solutionIds?.[0] };
           setAlgsSelection(storageKey, fallback);
           setSelection(fallback);
           setTab("library");
@@ -269,7 +272,7 @@ export default function AlgsModal({
       }
       onChanged?.();
     },
-    [storageKey, customFormulas, selection, onChanged],
+    [storageKey, customFormulas, selection, onChanged, alg],
   );
 
   const handleProficiencyChange = useCallback(
@@ -563,10 +566,12 @@ export default function AlgsModal({
                     </Text>
                   )}
                   {activeFormulas.map((formula, idx) => {
+                    const solutionId = tab === "library" ? alg?.solutionIds?.[idx] : null;
                     const isActive = (selection?.source ?? "library") === tab && (selection?.index ?? 0) === idx;
                     return (
                       <HStack
                         key={`${tab}-${idx}`}
+                        flexWrap="wrap"
                         gap={2}
                         px="10px"
                         py={1.5}
@@ -592,7 +597,7 @@ export default function AlgsModal({
                           textAlign="left"
                           minW={0}
                           p={1}
-                          flex={1}
+                          flex="1 1 140px"
                           fontFamily={fontCss}
                           fontSize="sm"
                           lineHeight={1.5}
@@ -602,6 +607,7 @@ export default function AlgsModal({
                         >
                           {formula}
                         </Box>
+                        {solutionId && <DiscussionButton kind="solution" id={solutionId} />}
                         <IconButton
                           aria-label={t("algs.modal.copyFormula")}
                           title={copiedKey === `${tab}-${idx}` ? t("algs.modal.copied") : t("algs.modal.copyFormula")}

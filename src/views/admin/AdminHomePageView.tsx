@@ -123,6 +123,12 @@ export function AdminHomePageView() {
         title: m("adminManagement.resources"),
         children: [
           {
+            title: t("forum.moderation"),
+            description: t("forum.moderationHint"),
+            to: "/admin/formula-comments",
+            avatar: "💬",
+          },
+          {
             title: m("adminManagement.usersTitle"),
             description: m("adminManagement.usersDesc"),
             to: "/admin/users",

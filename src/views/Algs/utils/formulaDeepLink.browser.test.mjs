@@ -13,14 +13,15 @@ const url = `${process.env.ALGS_TEST_URL ?? "http://127.0.0.1:3000"}${path}`;
 const storageKey = "333-PLL-Source+-Group_&-Exact_case";
 const preferenceKeys = ["algs_user_selection", "algs_hidden_formulas_by_repo", `algs_custom_${storageKey}`, "algs:formula_practice_proficiency:333-PLL"];
 try {
+  await page.route("**/public/formula-forum/counts?*", route => route.fulfill({ json: { data: { groups: {}, solutions: {} } } }));
   await page.addInitScript(({ storageKey, rawAlg }) => {
     if (localStorage.getItem("formula-deep-link-seeded")) return;
     localStorage.setItem("formula-deep-link-seeded", "1");
-    const data = { name: "Deep link fixture", sets: [{ name: "Source+", groups: [{ name: "Group &", algs: [
-      { name: "Exact case", algs: ["R U R' U'", rawAlg] },
-      { name: "Visible case", algs: ["R2 U2"] },
+    const data = { name: "Deep link fixture", sets: [{ name: "Source+", groups: [{ name: "Group &", groupId: "aaaaaaaaaaaaaaaa", algs: [
+      { name: "Exact case", algs: ["R U R' U'", rawAlg], solutionIds: ["bbbbbbbbbbbbbbbb", "cccccccccccccccc"] },
+      { name: "Visible case", algs: ["R2 U2"], solutionIds: ["dddddddddddddddd"] },
     ] }] }] };
-    localStorage.setItem("alg_class_cache_333_PLL", JSON.stringify({ data, ts: Date.now() }));
+    localStorage.setItem("alg_class_cache_v3_333_PLL", JSON.stringify({ data, ts: Date.now() }));
     localStorage.setItem("algs_hide_formula_diagram", "1");
     localStorage.setItem("algs_hidden_formulas_by_repo", JSON.stringify({ "333::PLL": ["Source+:Group &:Exact case"] }));
     localStorage.setItem("algs_user_selection", JSON.stringify({ [storageKey]: { source: "custom", index: 0 } }));

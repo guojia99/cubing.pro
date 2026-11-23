@@ -21,6 +21,8 @@ const routeNames = {
   "external-links": ["外链", "External links", "外部リンク", "外部連結", "외부 링크", "Liens externes", "Enlaces externos"],
   advertisement: ["广告", "Advertisements", "広告", "廣告", "광고", "Publicités", "Anuncios"],
   settings: ["设置", "Settings", "設定", "設定", "설정", "Paramètres", "Configuración"],
+  "user-formula-replies": ["回复我的", "Replies to me", "自分への返信", "回覆我嘅留言", "내게 온 답글", "Réponses reçues", "Respuestas recibidas"],
+  "admin-formula-comments": ["公式发言管理", "Algorithm comment moderation", "手順のコメント管理", "公式留言管理", "해법 댓글 관리", "Modération des commentaires", "Moderación de comentarios"],
   "user-kv-data": ["用户 KV", "User data", "ユーザーデータ", "用戶資料", "사용자 데이터", "Données utilisateur", "Datos de usuario"],
   login: ["WCA 登录", "WCA sign in", "WCA ログイン", "WCA 登入", "WCA 로그인", "Connexion WCA", "Iniciar sesión con WCA"],
   "auth-callback": ["WCA 回调", "WCA authentication", "WCA 認証", "WCA 驗證", "WCA 인증", "Authentification WCA", "Autenticación WCA"],

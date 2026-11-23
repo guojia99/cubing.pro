@@ -18,6 +18,8 @@
     "test:algs": "node --test src/views/Algs/components/formulaPracticeTimer.test.mjs && tsx --test src/services/cubing-pro/algs/formulaPracticeHistory.test.mjs",
     "test:algs:browser": "node src/views/Algs/components/formulaPracticeTimer.browser.test.mjs",
     "test:algs:layout": "node src/views/Algs/components/algsLayout.browser.test.mjs",
+    "test:algs:forum": "node src/views/Algs/forum/formulaForum.browser.test.mjs",
+    "test:algs:deeplink": "node src/views/Algs/utils/formulaDeepLink.browser.test.mjs",
     "test:puzzles": "node --test src/components/puzzles/model.test.mjs src/components/puzzles/practiceSetup.test.mjs src/components/puzzles/notation.test.mjs src/components/puzzles/cubeDiagrams.test.mjs src/components/puzzles/specialDiagrams.test.mjs src/views/Algs/utils/twoByTwoCategories.test.mjs",
     "test:puzzles:browser": "node src/components/puzzles/puzzleDiagram.browser.test.mjs",
     "test:two-solver": "tsx --test src/views/TwoSolver/engine/engine.test.ts src/views/TwoSolver/engine/catalog.test.ts src/views/TwoSolver/engine/ergonomics.test.ts src/views/TwoSolver/engine/cancellation.test.ts src/views/TwoSolver/engine/axisSearch.test.ts src/views/TwoSolver/engine/transition.test.ts src/views/TwoSolver/engine/settings.test.ts src/views/TwoSolver/engine/scramble.test.ts src/views/TwoSolver/solutionFormat.test.ts src/views/TwoSolver/uiPractice.test.ts src/views/TwoSolver/practiceStats.test.ts src/views/TwoSolver/solverMessages.test.ts src/views/TwoSolver/i18n.test.ts src/views/TwoSolver/formulaLink.test.ts src/views/Algs/utils/formulaDeepLink.test.ts",

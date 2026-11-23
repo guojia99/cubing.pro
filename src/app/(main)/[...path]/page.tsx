@@ -7,6 +7,7 @@ import { ExportPathMarker } from "@/components/routing/ExportPathMarker";
 import { matchRoute } from "@/config/routes";
 import { getDefaultMetadata } from "@/lib/defaultMetadata";
 import { getAllCatchAllStaticParams } from "@/lib/staticExportPaths";
+import { FormulaModerationPage, FormulaRepliesPage } from "@/views/Algs/forum/ForumLists";
 import { AlgsListView } from "@/views/Algs/AlgsListView";
 import { AlgsDetailView } from "@/views/Algs/AlgsDetailView";
 import { AdvertisementPageView } from "@/views/Advertisement/AdvertisementPageView";
@@ -80,6 +81,10 @@ export async function generateMetadata({
 
 function CatchAllContent({ routeId, path }: { routeId: string; path: string[] }) {
   switch (routeId) {
+    case "admin-formula-comments":
+      return <FormulaModerationPage />;
+    case "user-formula-replies":
+      return <FormulaRepliesPage />;
     case "algs-list":
       return <AlgsListView />;
     case "buy-coffee":
