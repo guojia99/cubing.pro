@@ -39,8 +39,8 @@ export function paintCard(canvas: HTMLCanvasElement, image: HTMLImageElement, cr
   if (!label) return;
   ctx.save();
   ctx.fillStyle = "#ffffff";
-  ctx.strokeStyle = "rgba(8, 25, 51, 0.28)";
-  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = "rgba(8, 25, 51, 0.4)";
+  ctx.lineWidth = 2;
   ctx.lineJoin = "round";
   ctx.textAlign = "left";
   ctx.textBaseline = "alphabetic";
@@ -52,7 +52,7 @@ export function paintCard(canvas: HTMLCanvasElement, image: HTMLImageElement, cr
   const padding = 2;
   const maxWidth = CARD_SIZE - 72 * 2 - padding * 2;
   const maxHeight = (CARD_SIZE - 36 - centerY - padding) * 2;
-  let size = 170;
+  let size = 220;
   ctx.font = `400 ${size}px ${font}`;
   let metrics = ctx.measureText(label);
   while (true) {
@@ -61,7 +61,7 @@ export function paintCard(canvas: HTMLCanvasElement, image: HTMLImageElement, cr
     const fit = Math.min(
       maxWidth / (inkWidth * cos + inkHeight * sin),
       maxHeight / (inkWidth * sin + inkHeight * cos),
-      168 / inkHeight,
+      220 / inkHeight,
     );
     if (fit >= 1) break;
     // Whole-pixel font sizes avoid fractional-size rounding differences at paint time.

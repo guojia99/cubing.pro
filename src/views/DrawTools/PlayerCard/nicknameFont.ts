@@ -1,11 +1,11 @@
 export const NICKNAME_FALLBACK = '"Kaiti SC", "KaiTi", "STKaiti", "Yu Mincho", "Noto Serif CJK SC", serif';
-const NICKNAME_FONT = `"Player Card Long Cang", ${NICKNAME_FALLBACK}`;
+const NICKNAME_FONT = `"Player Card Liu Jian Mao Cao", ${NICKNAME_FALLBACK}`;
 let fontPromise: Promise<string> | undefined;
 
 export function loadNicknameFont(): Promise<string> {
   return fontPromise ??= new FontFace(
-    "Player Card Long Cang",
-    'url("/fonts/player-card/long-cang.woff2") format("woff2")',
+    "Player Card Liu Jian Mao Cao",
+    'url("/fonts/player-card/liu-jian-mao-cao.woff2") format("woff2")',
     { weight: "400", style: "normal" },
   ).load().then(face => {
     document.fonts.add(face);
