@@ -7,7 +7,7 @@ const messages = {
   "siteAnnouncement.inactive": ["未展示", "Not published", "非公開", "未展示", "게시 안 됨", "Non publié", "Sin publicar"],
   "siteAnnouncement.text": ["公告正文", "Message", "お知らせ本文", "公告正文", "공지 내용", "Message", "Mensaje"],
   "siteAnnouncement.link": ["详情链接（选填）", "Details link (optional)", "詳細リンク（任意）", "詳情連結（選填）", "상세 링크(선택)", "Lien vers les détails (facultatif)", "Enlace a los detalles (opcional)"],
-  "siteAnnouncement.linkHint": ["填写以 / 开头的站内路径或完整 HTTPS 地址。", "Use a site path starting with / or a full HTTPS URL.", "/ から始まるサイト内パス、または完全な HTTPS URL を入力してください。", "填 / 開頭嘅站內路徑或完整 HTTPS 網址。", "/로 시작하는 사이트 경로 또는 전체 HTTPS 주소를 입력하세요.", "Saisissez un chemin du site commençant par / ou une URL HTTPS complète.", "Introduce una ruta del sitio que empiece por / o una URL HTTPS completa."],
+  "siteAnnouncement.linkHint": ["填写后显示「查看详情」。", "Adds a “View details” link.", "入力すると「詳細を見る」が表示されます。", "填咗就會顯示「睇詳情」。", "입력하면 ‘자세히 보기’가 표시됩니다.", "Affiche un lien « Voir les détails ».", "Añade el enlace «Ver detalles»."],
   "siteAnnouncement.save": ["保存", "Save", "保存", "儲存", "저장", "Enregistrer", "Guardar"],
   "siteAnnouncement.publish": ["发布", "Publish", "公開", "發布", "게시", "Publier", "Publicar"],
   "siteAnnouncement.withdraw": ["下线", "Unpublish", "公開を取り消す", "下線", "게시 취소", "Dépublier", "Retirar"],
