@@ -3,7 +3,7 @@ const messages = {
   "siteAnnouncement.fieldTitle": ["标题", "Title", "タイトル", "標題", "제목", "Titre", "Título"],
   "siteAnnouncement.back": ["返回公告列表", "Back to announcements", "お知らせ一覧に戻る", "返回公告列表", "공지 목록으로 돌아가기", "Retour aux annonces", "Volver a los avisos"],
   "siteAnnouncement.close": ["关闭", "Close", "閉じる", "關閉", "닫기", "Fermer", "Cerrar"],
-  "siteAnnouncement.adminHint": ["访客进站时会看到还没关闭的公告。", "Visitors see announcements they have not dismissed.", "閉じていないお知らせが来訪者に表示されます。", "訪客入站會睇到未關閉嘅公告。", "방문자는 아직 닫지 않은 공지를 봅니다.", "Les visiteurs voient les annonces qu’ils n’ont pas fermées.", "Los visitantes ven los avisos que todavía no han cerrado."],
+  "siteAnnouncement.adminHint": ["公告发布后可通过顶栏铃铛和通知中心查看。", "Published announcements appear in the header bell and notification center.", "公開したお知らせはヘッダーのベルと通知センターに表示されます。", "公告發佈後可喺頂欄鈴鐺同通知中心查看。", "게시된 공지는 상단 알림 벨과 알림 센터에서 확인할 수 있습니다.", "Les annonces publiées sont accessibles via la cloche et le centre de notifications.", "Los avisos publicados aparecen en la campana y el centro de notificaciones."],
   "siteAnnouncement.new": ["新建公告", "New announcement", "新しいお知らせ", "新增公告", "새 공지", "Nouvelle annonce", "Nuevo aviso"],
   "siteAnnouncement.edit": ["编辑公告", "Edit announcement", "お知らせを編集", "編輯公告", "공지 편집", "Modifier l’annonce", "Editar aviso"],
   "siteAnnouncement.list": ["公告列表", "Announcements", "お知らせ一覧", "公告列表", "공지 목록", "Annonces", "Avisos"],

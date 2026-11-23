@@ -4,6 +4,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import type { ReactNode } from "react";
 
 import { AuthProvider } from "@/contexts/AuthProvider";
+import { NotificationsProvider } from "@/contexts/NotificationsProvider";
 import { I18nProvider } from "@/contexts/I18nProvider";
 import { StaticExportRouteSync } from "@/components/routing/StaticExportRouteSync";
 import { system } from "@/theme";
@@ -23,9 +24,11 @@ export function Provider({ children }: { children: ReactNode }) {
           <LocalizedMetadata />
           <AntThemeProvider>
           <AuthProvider>
+          <NotificationsProvider>
             <StaticExportRouteSync />
             <AppToaster />
             {children}
+          </NotificationsProvider>
           </AuthProvider>
           </AntThemeProvider>
         </I18nProvider>

@@ -69,7 +69,7 @@ export function ForumScope({ children, cube, classId, resumeReady = true }: {
           <Dialog.Content data-testid="forum-dialog" my="0" minH="0"
             maxH="min(85dvh, calc(var(--forum-viewport-height, 100dvh) - 24px))"
             borderRadius="xl" overflow="hidden">
-            {thread && <ForumThread key={`${thread.kind}/${thread.id}/${thread.commentId ?? ""}/${thread.notificationId ?? ""}`}
+            {thread && <ForumThread key={`${thread.kind}/${thread.id}/${thread.commentId ?? ""}`}
               thread={thread} currentCube={cube} currentClassId={classId}
               onChange={refresh} onClose={() => setThread(null)} />}
           </Dialog.Content>

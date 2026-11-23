@@ -94,9 +94,9 @@ try {
       ];
       return ok({ items, page: 1, total: items.length });
     }
-    if (path === "/user/formula-forum/notifications") {
+    if (path === "/user/notifications") {
       const items = (setActivity ? [{ id: 4, target: setTarget, commentId: 42, body: reply.body }] : [{ id: 2, target, commentId: 42, body: reply.body }, { id: 3, target: unavailable, commentId: 43, body: tombstoneBody }])
-        .map(item => ({ ...item, authorName: "Xi", createdAt: reply.createdAt, readAt: markReads.includes(item.id) ? reply.createdAt : null }));
+        .map(item => ({ ...item, id: `formula-reply:${item.id}`, type: "formula-reply", authorName: "Xi", createdAt: reply.createdAt, readAt: markReads.includes(item.id) ? reply.createdAt : null }));
       return ok({ items, page: 1, total: items.length, unread: items.filter(item => !item.readAt).length });
     }
     if (path === "/admin/formula-forum/comments") {
@@ -106,9 +106,10 @@ try {
     }
     if (path === "/admin/formula-forum/comments/42") { assert.equal(req.method(), "DELETE"); removed = true; return ok({}); }
     if (path === "/admin/formula-forum/comments/43") { assert.equal(req.method(), "DELETE"); tombstoneDeleted = true; return ok({}); }
-    if (path === "/user/formula-forum/notifications/4/read" || path === "/user/formula-forum/notifications/2/read" || path === "/user/formula-forum/notifications/3/read") {
+    if (path.startsWith("/user/notifications/") && path.endsWith("/read")) {
       assert.equal(req.method(), "PUT");
-      markReads.push(Number(path.split("/").at(-2)));
+      const id = path.split("/").at(-2)?.replace("formula-reply%3A", "").replace("formula-reply:", "");
+      markReads.push(Number(id));
       return ok({});
     }
     if (path === `/public/formula-forum/targets/solution/${first}/comments`) {
@@ -326,17 +327,18 @@ try {
   await dialog.waitFor({ state: "hidden" });
   await page.getByRole("tab", { name: "Recent discussions", selected: true }).waitFor();
 
-  await page.getByRole("button", { name: "Xi", exact: true }).click();
-  await page.getByRole("menuitem", { name: "Replies to me (2)" }).click();
+  await page.getByRole("button", { name: /Notifications/ }).click();
+  await page.getByRole("link", { name: "View all", exact: true }).click();
+  await page.waitForURL(url => url.pathname.replace(/\/$/, "") === "/user/notifications");
   const inboxRow = page.getByRole("button").filter({ hasText: reply.body });
-  await inboxRow.getByText("Unread", { exact: true }).waitFor();
+  await inboxRow.getByText("unread", { exact: true }).waitFor();
   failInboxComments = true;
   await inboxRow.click();
   await dialog.getByRole("alert").getByText("Comments temporarily unavailable").waitFor();
-  assert.equal(await page.getByText("Unread", { exact: true }).count(), 2);
+  assert.equal(await page.getByText("unread", { exact: true }).count(), 2);
   assert.deepEqual(markReads, []);
   failInboxComments = false;
-  const readResponse = page.waitForResponse(response => response.url().endsWith("/notifications/2/read") && response.request().method() === "PUT" && response.ok());
+  const readResponse = page.waitForResponse(response => response.url().includes("/user/notifications/formula-reply") && response.url().endsWith("/read") && response.request().method() === "PUT" && response.ok());
   await dialog.getByRole("button", { name: "Retry", exact: true }).click();
   await dialog.locator("#formula-comment-42").getByText(reply.body).waitFor();
   await readResponse;
@@ -350,7 +352,7 @@ try {
   await dialog.getByRole("button", { name: "Close" }).click();
   await dialog.waitFor({ state: "hidden" });
   await inboxRow.waitFor();
-  assert.equal(await inboxRow.getByText("Unread", { exact: true }).count(), 0);
+  assert.equal(await inboxRow.getByText("unread", { exact: true }).count(), 0);
   assert.deepEqual(markReads, [2]);
   const unavailableBadge = page.getByText("Formula unavailable", { exact: true });
   const unavailableTitle = page.getByText(unavailable.id, { exact: true });
@@ -362,7 +364,7 @@ try {
   await markRead.click();
   await markRead.waitFor({ state: "hidden" });
   await unavailableBadge.waitFor();
-  assert.equal(await page.getByText("Unread", { exact: true }).count(), 0);
+  assert.equal(await page.getByText("unread", { exact: true }).count(), 0);
   assert.deepEqual(markReads, [2, 3]);
   assert.equal(await dialog.count(), 0);
   await page.goto(base + "/admin/admins/", { waitUntil: "domcontentloaded" });
@@ -450,12 +452,13 @@ try {
   await page.reload({ waitUntil: "domcontentloaded" });
   await setButton.waitFor();
   assert.equal(await setButton.innerText(), "Discuss this set", "Missing optional sets counts does not disable set discussion");
-  await page.getByRole("button", { name: "Xi", exact: true }).click();
-  await page.getByRole("menuitem", { name: "Replies to me (1)" }).click();
+  await page.getByRole("button", { name: /Notifications/ }).click();
+  await page.getByRole("link", { name: "View all", exact: true }).click();
+  await page.waitForURL(url => url.pathname.replace(/\/$/, "") === "/user/notifications");
   await page.getByRole("button").filter({ hasText: reply.body }).click();
   await setDialog.locator("#formula-comment-42").waitFor();
   assert.equal(await setDialog.getByRole("link", { name: "View formula" }).getAttribute("href"), `${classPath}#set-${setId}`);
-  await page.getByText("Unread", { exact: true }).waitFor({ state: "hidden" });
+  await page.getByText("unread", { exact: true }).waitFor({ state: "hidden" });
   assert.ok(markReads.includes(4));
   console.log("PASS real set replies, optional counts, recent login focus, set anchor roundtrip, and set notification.");
   await setDialog.getByRole("button", { name: "Close", exact: true }).click();

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 
-import { SiteAnnouncementDialog } from "@/components/layout/SiteAnnouncementDialog";
 import { Provider } from "@/components/ui/provider";
 import { getDefaultMetadata } from "@/lib/defaultMetadata";
 import { PALETTE_STORAGE_KEY } from "@/lib/websiteUiConfig";
@@ -29,7 +28,6 @@ export default function RootLayout({
       <body suppressHydrationWarning>
         <Provider>
           {children}
-          <SiteAnnouncementDialog />
         </Provider>
       </body>
     </html>

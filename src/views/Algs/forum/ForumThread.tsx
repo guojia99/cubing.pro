@@ -4,11 +4,10 @@ import { Box, Button, CloseButton, Dialog, HStack, Stack, Text, Textarea } from 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { LuMessageCircle } from "react-icons/lu";
-import { toaster } from "@/components/ui/toaster";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useI18n } from "@/contexts/I18nProvider";
 import { Auth, hasAnyAuth } from "@/lib/auth";
-import { addForumComment, deleteForumComment, getForumComments, markReplyRead, type ForumComment, type ForumKind, type ForumTarget } from "@/services/cubing-pro/algs/forum";
+import { addForumComment, deleteForumComment, getForumComments, type ForumComment, type ForumKind, type ForumTarget } from "@/services/cubing-pro/algs/forum";
 import { normalizeForumPath, saveForumLoginResume } from "./forumResume";
 import { forumDate, ForumLoadState, ForumPagination, targetLabel, useForumErrorMessage, useForumQuery } from "./forumUi";
 
@@ -16,7 +15,7 @@ export interface OpenThread {
   kind: ForumKind;
   id: string;
   commentId?: number;
-  notificationId?: number;
+  onLoaded?: () => void;
 }
 
 function formulaHref(target: ForumTarget) {
@@ -37,6 +36,7 @@ export function ForumThread({ thread, currentCube, currentClassId, onChange, onC
 }) {
   const { t, tf, locale } = useI18n();
   const { currentUser } = useAuth();
+  const onLoaded = thread.onLoaded;
   const moderator = hasAnyAuth(currentUser?.Auth ?? 0, [Auth.AuthAdmin, Auth.AuthSuperAdmin]);
   const [page, setPage] = useState(1);
   const [focusId, setFocusId] = useState(thread.commentId);
@@ -46,7 +46,7 @@ export function ForumThread({ thread, currentCube, currentClassId, onChange, onC
   const [notice, setNotice] = useState("");
   const editor = useRef<HTMLTextAreaElement>(null);
   const focused = useRef<HTMLDivElement>(null);
-  const markedRead = useRef(false);
+  const loaded = useRef(false);
   const message = useForumErrorMessage();
   const load = useCallback((signal: AbortSignal) => getForumComments(thread.kind, thread.id, page, focusId, signal), [thread.kind, thread.id, page, focusId]);
   const { data, error, refresh } = useForumQuery(load);
@@ -61,12 +61,10 @@ export function ForumThread({ thread, currentCube, currentClassId, onChange, onC
   const loginHref = "/login?redirect=" + encodeURIComponent(returnUrl.pathname + returnUrl.search + returnUrl.hash);
 
   useEffect(() => {
-    if (!data || thread.notificationId === undefined || markedRead.current) return;
-    markedRead.current = true;
-    void markReplyRead(thread.notificationId).then(onChange, error => {
-      toaster.create({ type: "error", title: message(error) });
-    });
-  }, [data, thread.notificationId, onChange, message]);
+    if (!data || loaded.current) return;
+    loaded.current = true;
+    onLoaded?.();
+  }, [data, onLoaded]);
 
   useEffect(() => {
     if (data && focusId) focused.current?.scrollIntoView({ block: "nearest" });

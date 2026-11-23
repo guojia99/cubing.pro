@@ -2,8 +2,7 @@
 
 import { Menu, Portal } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, type ReactNode } from "react";
-import { getReplyNotifications } from "@/services/cubing-pro/algs/forum";
+import { type ReactNode } from "react";
 
 import { useAuth } from "@/contexts/AuthProvider";
 import { navMenuContentProps, navMenuItemProps } from "@/components/layout/navStyles";
@@ -19,17 +18,6 @@ export function UserMenu({ children }: { children: ReactNode }) {
 
   const loggedIn = isLoggedIn(currentUser?.id);
   const auth = currentUser?.Auth ?? 0;
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [unread, setUnread] = useState<number | null>(null);
-  useEffect(() => {
-    if (!loggedIn || !menuOpen) return;
-    const request = new AbortController();
-    getReplyNotifications(1, request.signal, 1).then(
-      (page) => { if (!request.signal.aborted) setUnread(page.unread); },
-      (error) => { if (!request.signal.aborted) console.warn("[UserMenu] Unread count refresh failed", error); },
-    );
-    return () => request.abort();
-  }, [loggedIn, currentUser?.id, menuOpen]);
 
   const handleSelect = async (key: string) => {
     if (key === "logout") {
@@ -59,13 +47,15 @@ export function UserMenu({ children }: { children: ReactNode }) {
   if (currentUser?.CubeID) {
     items.push({ key: `player/${currentUser.CubeID}`, label: t("user.myHome") });
   }
-  items.push({ key: "user/formula-replies", label: t("forum.replies") + (unread ? ` (${unread})` : "") });
   items.push({ key: "user/profile", label: t("user.profile") });
   if (currentUser?.WcaID?.trim()) {
     items.push({ key: "wca", label: t("user.wcaProfile") });
   }
   items.push({ key: "user/kv-data", label: t("user.kvData") });
   items.push({ key: "_d1", label: "", divider: true });
+  items.push({ key: "user/formula-discussions", label: t("forum.myDiscussions") });
+  items.push({ key: "user/comments", label: t("forum.myComments") });
+  items.push({ key: "_discussions", label: "", divider: true });
 
   if (hasAuth(auth, Auth.AuthOrganizers)) {
     items.push({ key: "admin/organizers", label: t("user.organizers") });
@@ -81,7 +71,7 @@ export function UserMenu({ children }: { children: ReactNode }) {
   items.push({ key: "logout", label: t("user.logout") });
 
   return (
-    <Menu.Root onOpenChange={({ open }) => setMenuOpen(open)} positioning={{ placement: "bottom-end" }}>
+    <Menu.Root id="app-header-user" positioning={{ placement: "bottom-end" }}>
       <Menu.Trigger asChild>{children}</Menu.Trigger>
       <Portal>
         <Menu.Positioner>

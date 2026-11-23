@@ -8,6 +8,8 @@ import { matchRoute } from "@/config/routes";
 import { getDefaultMetadata } from "@/lib/defaultMetadata";
 import { getAllCatchAllStaticParams } from "@/lib/staticExportPaths";
 import { FormulaModerationPage, FormulaRepliesPage } from "@/views/Algs/forum/ForumLists";
+import { FormulaDiscussionsPage, MyCommentsPage } from "@/views/Algs/forum/PersonalForumLists";
+import { NotificationsPage } from "@/views/Notifications/NotificationsPage";
 import { AlgsListView } from "@/views/Algs/AlgsListView";
 import { AlgsDetailView } from "@/views/Algs/AlgsDetailView";
 import { AdvertisementPageView } from "@/views/Advertisement/AdvertisementPageView";
@@ -84,6 +86,12 @@ function CatchAllContent({ routeId, path }: { routeId: string; path: string[] })
   switch (routeId) {
     case "admin-formula-comments":
       return <FormulaModerationPage />;
+    case "user-formula-discussions":
+      return <FormulaDiscussionsPage />;
+    case "user-comments":
+      return <MyCommentsPage />;
+    case "user-notifications":
+      return <NotificationsPage />;
     case "user-formula-replies":
       return <FormulaRepliesPage />;
     case "algs-list":

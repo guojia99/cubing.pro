@@ -87,6 +87,20 @@ export async function getRecentDiscussions(page: number, signal: AbortSignal) {
   return response.data.data;
 }
 
+export async function getMyDiscussions(page: number, signal: AbortSignal) {
+  const response = await Request.get<Result<Page<RecentDiscussion>>>(userApi + "/discussions", {
+    params: { page, size: FORUM_PAGE_SIZE }, headers: AuthHeader(), signal,
+  });
+  return response.data.data;
+}
+
+export async function getMyComments(page: number, signal: AbortSignal) {
+  const response = await Request.get<Result<Page<ForumComment & { target: ForumTarget }>>>(userApi + "/comments", {
+    params: { page, size: FORUM_PAGE_SIZE }, headers: AuthHeader(), signal,
+  });
+  return response.data.data;
+}
+
 export async function getReplyNotifications(page: number, signal: AbortSignal, size = FORUM_PAGE_SIZE) {
   const response = await Request.get<Result<Page<ForumNotification> & { unread: number }>>(userApi + "/notifications", {
     params: { page, size }, headers: AuthHeader(), signal,

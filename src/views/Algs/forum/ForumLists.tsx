@@ -1,16 +1,14 @@
 "use client";
 
 import { Badge, Box, Button, Heading, HStack, Stack, Text } from "@chakra-ui/react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { LuChevronRight } from "react-icons/lu";
-import { useCallback, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { AdminGuard } from "@/components/admin/AdminGuard";
-import { PageHeader } from "@/components/ui/page";
 import { toaster } from "@/components/ui/toaster";
-import { useAuth } from "@/contexts/AuthProvider";
 import { useI18n } from "@/contexts/I18nProvider";
 import {
-  deleteForumComment, getModerationComments, getRecentDiscussions, getReplyNotifications, markReplyRead,
+  deleteForumComment, getModerationComments, getRecentDiscussions,
   type ForumTarget,
 } from "@/services/cubing-pro/algs/forum";
 import { ForumScope, useFormulaForum } from "./ForumScope";
@@ -64,55 +62,12 @@ export function RecentDiscussions() {
   </Stack>;
 }
 
-function ReplyInbox() {
-  const { t, locale } = useI18n();
-  const { open, version, refresh: changed } = useFormulaForum();
-  const [page, setPage] = useState(1);
-  const [busy, setBusy] = useState(false);
-  const message = useForumErrorMessage();
-  const load = useCallback((signal: AbortSignal) => getReplyNotifications(page, signal), [page]);
-  const { data, error, refresh } = useForumQuery(load, version);
-
-  async function markUnavailableRead(id: number) {
-    if (busy) return;
-    setBusy(true);
-    try {
-      await markReplyRead(id);
-      changed();
-    } catch (error) {
-      toaster.create({ type: "error", title: message(error) });
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  if (!data) return <ForumLoadState error={error} retry={refresh} />;
-  return <Stack>
-    {data.items.length === 0 && <Text color="fg.muted">{t("forum.noReplies")}</Text>}
-    {data.items.map(item => <TargetRow key={item.id} target={item.target} onOpen={() => open({
-      kind: item.target.kind, id: item.target.id, commentId: item.commentId, notificationId: item.readAt ? undefined : item.id,
-    })}>
-      <HStack gap="2">
-        {!item.readAt && <Badge colorPalette="brand">{t("forum.unread")}</Badge>}
-        <Text fontWeight="medium" fontSize="sm">{item.authorName}</Text>
-        <Text fontSize="xs" color="fg.muted">{forumDate(item.createdAt, locale)}</Text>
-      </HStack>
-      <Text lineClamp={2} overflowWrap="anywhere">{item.body}</Text>
-      {item.target.unavailable && !item.readAt && <Button alignSelf="start" size="xs" variant="outline"
-        disabled={busy} onClick={() => void markUnavailableRead(item.id)}>{t("forum.markRead")}</Button>}
-    </TargetRow>)}
-    <ForumPagination page={data.page} total={data.total} onPage={setPage} />
-  </Stack>;
-}
-
 export function FormulaRepliesPage() {
-  const { t } = useI18n();
-  const { currentUser, loading } = useAuth();
-  return <Stack gap="5"><PageHeader title={t("forum.replies")} />
-    {currentUser?.id ? <ForumScope><ReplyInbox key={currentUser.id} /></ForumScope>
-      : loading ? <Text>{t("algs.loading")}</Text>
-      : <Button asChild alignSelf="start"><Link href="/login?redirect=%2Fuser%2Fformula-replies">{t("user.login")}</Link></Button>}
-  </Stack>;
+  const router = useRouter();
+  useEffect(() => {
+    router.replace("/user/notifications?type=formula-reply");
+  }, [router]);
+  return null;
 }
 
 function ModerationList() {
