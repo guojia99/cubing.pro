@@ -21,6 +21,7 @@ import * as wcaPuzzle from "./messages/wca-puzzle-extra";
 import * as management from "./messages/admin-management";
 import * as finishing from "./messages/finishing";
 import { formatMessage } from "./formatMessage";
+import { siteAnnouncementCatalog, type SiteAnnouncementMessageKey } from "./messages/site-announcement";
 import { forumCatalog, type ForumMessageKey } from "./messages/formula-forum";
 import * as advertisements from "./messages/advertisements";
 export { SUPPORTED_LOCALES, LOCALE_STORAGE_KEY, isLocale, getIntlLocale, readStoredLocale, writeStoredLocale } from "./locales";
@@ -36,18 +37,18 @@ const additions = {
   fr: { ...adminExtra.adminExtraFr, ...tutorial.tutorialExtraFr, ...shell.shellFr, ...competitionExtra.competitionExtraFr, ...competitionPublic.competitionPublicFr, ...domain.domainFr, ...wcaPuzzle.wcaPuzzleExtraFr, ...management.adminManagementFr },
   es: { ...adminExtra.adminExtraEs, ...tutorial.tutorialExtraEs, ...shell.shellEs, ...competitionExtra.competitionExtraEs, ...competitionPublic.competitionPublicEs, ...domain.domainEs, ...wcaPuzzle.wcaPuzzleExtraEs, ...management.adminManagementEs },
 };
-export type MessageKey = LegacyMessageKey | keyof typeof languageNames | keyof typeof team.teamMatchZhCN | keyof typeof competition.competitionAdminZhCN | keyof typeof puzzle.puzzleExtraZhCN | keyof typeof site.siteContentZhCN | keyof typeof shared.sharedZhCN | keyof typeof additions["zh-CN"] | keyof typeof finishing.finishingZhCN | advertisements.AdvertisementMessageKey | ForumMessageKey;
+
+export type MessageKey = LegacyMessageKey | keyof typeof languageNames | keyof typeof team.teamMatchZhCN | keyof typeof competition.competitionAdminZhCN | keyof typeof puzzle.puzzleExtraZhCN | keyof typeof site.siteContentZhCN | keyof typeof shared.sharedZhCN | keyof typeof additions["zh-CN"] | keyof typeof finishing.finishingZhCN | advertisements.AdvertisementMessageKey | SiteAnnouncementMessageKey | ForumMessageKey;
 
 export const catalogs: Record<Locale, Record<MessageKey, string>> = {
-  "zh-CN": { ...forumCatalog("zh-CN"), ...zhCN, ...languageNames, ...team.teamMatchZhCN, ...competition.competitionAdminZhCN, ...puzzle.puzzleExtraZhCN, ...site.siteContentZhCN, ...shared.sharedZhCN, ...additions["zh-CN"], ...finishing.finishingZhCN, ...advertisements.advertisementZhCN },
-  "en-US": { ...forumCatalog("en-US"), ...enUS, ...languageNames, ...team.teamMatchEnUS, ...competition.competitionAdminEnUS, ...puzzle.puzzleExtraEnUS, ...site.siteContentEnUS, ...shared.sharedEnUS, ...additions["en-US"], ...finishing.finishingEnUS, ...advertisements.advertisementEnUS },
-  ja: { ...forumCatalog("ja"), ...ja, ...languageNames, ...team.teamMatchJa, ...competition.competitionAdminJa, ...puzzle.puzzleExtraJa, ...site.siteContentJa, ...shared.sharedJa, ...additions.ja, ...finishing.finishingJa, ...advertisements.advertisementJa },
-  "yue-Hant-HK": { ...forumCatalog("yue-Hant-HK"), ...yue, ...languageNames, ...team.teamMatchYue, ...competition.competitionAdminYue, ...puzzle.puzzleExtraYue, ...site.siteContentYue, ...shared.sharedYue, ...additions["yue-Hant-HK"], ...finishing.finishingYue, ...advertisements.advertisementYue },
-  ko: { ...forumCatalog("ko"), ...ko, ...languageNames, ...team.teamMatchKo, ...competition.competitionAdminKo, ...puzzle.puzzleExtraKo, ...site.siteContentKo, ...shared.sharedKo, ...additions.ko, ...finishing.finishingKo, ...advertisements.advertisementKo },
-  fr: { ...forumCatalog("fr"), ...fr, ...languageNames, ...team.teamMatchFr, ...competition.competitionAdminFr, ...puzzle.puzzleExtraFr, ...site.siteContentFr, ...shared.sharedFr, ...additions.fr, ...finishing.finishingFr, ...advertisements.advertisementFr },
-  es: { ...forumCatalog("es"), ...es, ...languageNames, ...team.teamMatchEs, ...competition.competitionAdminEs, ...puzzle.puzzleExtraEs, ...site.siteContentEs, ...shared.sharedEs, ...additions.es, ...finishing.finishingEs, ...advertisements.advertisementEs },
+  "zh-CN": { ...forumCatalog("zh-CN"), ...zhCN, ...languageNames, ...team.teamMatchZhCN, ...competition.competitionAdminZhCN, ...puzzle.puzzleExtraZhCN, ...site.siteContentZhCN, ...shared.sharedZhCN, ...additions["zh-CN"], ...finishing.finishingZhCN, ...advertisements.advertisementZhCN, ...siteAnnouncementCatalog(0) },
+  "en-US": { ...forumCatalog("en-US"), ...enUS, ...languageNames, ...team.teamMatchEnUS, ...competition.competitionAdminEnUS, ...puzzle.puzzleExtraEnUS, ...site.siteContentEnUS, ...shared.sharedEnUS, ...additions["en-US"], ...finishing.finishingEnUS, ...advertisements.advertisementEnUS, ...siteAnnouncementCatalog(1) },
+  ja: { ...forumCatalog("ja"), ...ja, ...languageNames, ...team.teamMatchJa, ...competition.competitionAdminJa, ...puzzle.puzzleExtraJa, ...site.siteContentJa, ...shared.sharedJa, ...additions.ja, ...finishing.finishingJa, ...advertisements.advertisementJa, ...siteAnnouncementCatalog(2) },
+  "yue-Hant-HK": { ...forumCatalog("yue-Hant-HK"), ...yue, ...languageNames, ...team.teamMatchYue, ...competition.competitionAdminYue, ...puzzle.puzzleExtraYue, ...site.siteContentYue, ...shared.sharedYue, ...additions["yue-Hant-HK"], ...finishing.finishingYue, ...advertisements.advertisementYue, ...siteAnnouncementCatalog(3) },
+  ko: { ...forumCatalog("ko"), ...ko, ...languageNames, ...team.teamMatchKo, ...competition.competitionAdminKo, ...puzzle.puzzleExtraKo, ...site.siteContentKo, ...shared.sharedKo, ...additions.ko, ...finishing.finishingKo, ...advertisements.advertisementKo, ...siteAnnouncementCatalog(4) },
+  fr: { ...forumCatalog("fr"), ...fr, ...languageNames, ...team.teamMatchFr, ...competition.competitionAdminFr, ...puzzle.puzzleExtraFr, ...site.siteContentFr, ...shared.sharedFr, ...additions.fr, ...finishing.finishingFr, ...advertisements.advertisementFr, ...siteAnnouncementCatalog(5) },
+  es: { ...forumCatalog("es"), ...es, ...languageNames, ...team.teamMatchEs, ...competition.competitionAdminEs, ...puzzle.puzzleExtraEs, ...site.siteContentEs, ...shared.sharedEs, ...additions.es, ...finishing.finishingEs, ...advertisements.advertisementEs, ...siteAnnouncementCatalog(6) },
 };
-
 export function translate(locale: Locale, key: MessageKey): string {
   const catalog = catalogs[isLocale(locale) ? locale : "zh-CN"];
   if (Object.hasOwn(catalog, key)) return catalog[key];

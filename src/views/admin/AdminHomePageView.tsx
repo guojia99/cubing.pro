@@ -60,10 +60,10 @@ export function AdminHomePageView() {
             disabled: true,
           },
           {
-            title: m("adminManagement.notices"),
-            description: m("adminManagement.noticesDesc"),
+            title: t("siteAnnouncement.title"),
+            description: t("siteAnnouncement.adminHint"),
             avatar: "📢",
-            disabled: true,
+            to: "/admin/site-announcement",
           },
           {
             title: m("adminManagement.comments"),
