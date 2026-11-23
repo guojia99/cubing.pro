@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { SiteAnnouncementDialog } from "@/components/layout/SiteAnnouncementDialog";
 import { Provider } from "@/components/ui/provider";
 import { getDefaultMetadata } from "@/lib/defaultMetadata";
 import { PALETTE_STORAGE_KEY } from "@/lib/websiteUiConfig";
@@ -26,7 +27,10 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: palettePrehydrateScript }} />
       </head>
       <body suppressHydrationWarning>
-        <Provider>{children}</Provider>
+        <Provider>
+          {children}
+          <SiteAnnouncementDialog />
+        </Provider>
       </body>
     </html>
   );

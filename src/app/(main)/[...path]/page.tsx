@@ -13,6 +13,7 @@ import { AdvertisementPageView } from "@/views/Advertisement/AdvertisementPageVi
 import { BuyCoffeePageView } from "@/views/BuyCoffee/BuyCoffeePageView";
 import { ExternalLinksPageView } from "@/views/ExternalLinks/ExternalLinksPageView";
 import { AdminAcknowledgmentsPageView } from "@/views/admin/AdminAcknowledgmentsPageView";
+import { AdminSiteAnnouncementPageView } from "@/views/admin/AdminSiteAnnouncementPageView";
 import { AdminAdvertisementsPageView } from "@/views/admin/AdminAdvertisementsPageView";
 import { AdminCompetitionGroupsPageView } from "@/views/admin/AdminCompetitionGroupsPageView";
 import { AdminDiyRankingPageView } from "@/views/admin/AdminDiyRankingPageView";
@@ -96,6 +97,8 @@ function CatchAllContent({ routeId, path }: { routeId: string; path: string[] })
       return <OrganizersResultsPageView admin />;
     case "admin-acknowledgments":
       return <AdminAcknowledgmentsPageView />;
+    case "admin-site-announcement":
+      return <AdminSiteAnnouncementPageView />;
     case "admin-advertisements":
       return <AdminAdvertisementsPageView />;
     case "admin-other-links":
