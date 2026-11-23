@@ -27,7 +27,7 @@ Go robot   → 共用业务服务、群赛逻辑、数据库
 
 ## 2. Go 项目定位图
 
-后端 `go.mod` 声明 Go `1.25.0`，核心为 Gin、Cobra、GORM、MySQL/SQLite、gin-jwt、go-cache 和 WebSocket。具体版本以该仓库锁定为准，不推断生产工具链。
+后端 `go.mod` 声明 Go `1.25.0`，核心为 Gin、Cobra、GORM、MySQL、gin-jwt、go-cache 和 WebSocket。具体版本以该仓库锁定为准，不推断生产工具链。
 
 | 后端路径（均带 ../cubing-pro/ 前缀） | 职责 |
 | --- | --- |
@@ -81,7 +81,7 @@ Go robot   → 共用业务服务、群赛逻辑、数据库
 
 JWT 使用 Bearer Authorization；前端 token 在 localStorage，刷新检查每五分钟触发。权限是 Player/Organizers/Delegates/Admin/SuperAdmin 位集合，不是等级自动继承。后端不同路由可要求不同权限位，主办还校验团队成员和资源归属；前端卡片/Guard 不足以保证操作被授权。
 
-业务数据库按配置选择 MySQL/SQLite；WCA 查询使用独立 MySQL 导入库，通过 `wca.txt` 切换。缓存包括进程内 go-cache、业务表、文件和浏览器存储；本次未发现 Redis 或对象存储客户端。图片当前可存本地磁盘+模型元数据，也可引用外链。
+业务数据库唯一指定为 MySQL 8.0.16+，不添加 SQLite 保护性兼容或额外操作；业务数据库测试也使用隔离 MySQL 库。WCA 查询使用独立 MySQL 导入库，通过 `wca.txt` 切换；WCA 离线 SQLite 导出工具保留，不作为业务数据库兼容依据。缓存包括进程内 go-cache、业务表、文件和浏览器存储；本次未发现 Redis 或对象存储客户端。图片当前可存本地磁盘+模型元数据，也可引用外链。
 
 广告完整有序列表存系统 KV `__advertisements__`，公开接口仅返回启用项。上传 JPEG/PNG（最多 5 MiB、单边 8192 像素、总计 2000 万像素），保存到 `api.staticPath/advertisements/`，与头像目录同级；复用 `system.Image` 和 `/static/image/:uid`。未配置 StaticPath 时相对于 API 进程工作目录，部署需核实持久化路径及权限。GET 返回数组；上传返回成功 envelope 的 `data: {uid,url,width,height}`。前端把 API 图片路径解析到当前 API 根地址，支持异源静态站。详见后端 `docs/advertisements-api.md`。
 

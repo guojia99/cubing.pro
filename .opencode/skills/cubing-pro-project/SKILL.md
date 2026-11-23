@@ -61,6 +61,10 @@ description: cubing.pro 项目全景、目录职责、功能分布、依赖关�
 
 ### 数据与维护
 
+后端业务数据库唯一指定为 **MySQL 8.0.16+**。不要为 SQLite 添加任何保护性兼容、迁移、表重建、索引/触发器保留、自增序列恢复、锁冲突处理、驱动回退或其他额外操作；不要为了 SQLite 测试改变 MySQL 业务实现。业务数据库测试使用 MySQL，缺少隔离测试库时报告跳过，不回退到 SQLite。用户明确保留 WCA 离线 SQLite 导出工具，它不代表业务库支持 SQLite。
+
+后端表迁移统一放在 `../cubing-pro/src/internel/convenient/`；公式目录数据导入由 API 子模块引导，不放在 cmd 中。
+
 修改 localStorage key、IndexedDB schema、公式身份、导入导出格式时，保留旧数据读取/迁移能力并验证失败恢复。不要通过清空用户数据来掩盖兼容问题。
 
 生成文件从来源和脚本维护：求解数据用 `two-solver:sync`，scrambler 用 `two-solver:prepare`，菜谱用 HowToCook 脚本；保留 vendor 来源、许可证和 NOTICE。
