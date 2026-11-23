@@ -37,25 +37,44 @@ export function paintCard(canvas: HTMLCanvasElement, image: HTMLImageElement, cr
   ctx.fillRect(0, CARD_SIZE * 0.55, CARD_SIZE, CARD_SIZE * 0.45);
   const label = name.trim();
   if (!label) return;
+  ctx.save();
   ctx.fillStyle = "#ffffff";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
+  ctx.strokeStyle = "rgba(8, 25, 51, 0.28)";
+  ctx.lineWidth = 1.5;
+  ctx.lineJoin = "round";
+  ctx.textAlign = "left";
+  ctx.textBaseline = "alphabetic";
+  const angle = -Math.PI / 30;
+  const cos = Math.cos(angle);
+  const sin = Math.abs(Math.sin(angle));
+  const centerY = 895;
+  // Reserve space for the outline and antialiasing inside the ink margins.
+  const padding = 2;
+  const maxWidth = CARD_SIZE - 72 * 2 - padding * 2;
+  const maxHeight = (CARD_SIZE - 36 - centerY - padding) * 2;
   let size = 170;
   ctx.font = `400 ${size}px ${font}`;
   let metrics = ctx.measureText(label);
-  // Fit actual ink as well as advance width; fallback glyphs can exceed the em box.
-  while (Math.max(metrics.width, metrics.actualBoundingBoxLeft + metrics.actualBoundingBoxRight) > 936
-    || metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent > 168) {
-    size = Math.min(size - 1, size * Math.min(
-      936 / Math.max(metrics.width, metrics.actualBoundingBoxLeft + metrics.actualBoundingBoxRight),
-      168 / (metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent),
-    ));
+  while (true) {
+    const inkWidth = metrics.actualBoundingBoxLeft + metrics.actualBoundingBoxRight;
+    const inkHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+    const fit = Math.min(
+      maxWidth / (inkWidth * cos + inkHeight * sin),
+      maxHeight / (inkWidth * sin + inkHeight * cos),
+      168 / inkHeight,
+    );
+    if (fit >= 1) break;
+    // Whole-pixel font sizes avoid fractional-size rounding differences at paint time.
+    size = Math.min(size - 1, Math.floor(size * fit));
     ctx.font = `400 ${size}px ${font}`;
     metrics = ctx.measureText(label);
   }
-  // Center ink at the existing lower position, leaving at least 36px below it.
-  ctx.fillText(label,
-    CARD_SIZE / 2 + (metrics.actualBoundingBoxLeft - metrics.actualBoundingBoxRight) / 2,
-    960 + (metrics.actualBoundingBoxAscent - metrics.actualBoundingBoxDescent) / 2,
-  );
+  ctx.translate(CARD_SIZE / 2, centerY);
+  ctx.rotate(angle);
+  // Center the ink before rotation; advance width does not include glyph overhangs.
+  const x = (metrics.actualBoundingBoxLeft - metrics.actualBoundingBoxRight) / 2;
+  const y = (metrics.actualBoundingBoxAscent - metrics.actualBoundingBoxDescent) / 2;
+  ctx.strokeText(label, x, y);
+  ctx.fillText(label, x, y);
+  ctx.restore();
 }

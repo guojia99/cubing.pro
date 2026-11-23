@@ -120,7 +120,6 @@ test("static player card: local photo, touch crop, preview fidelity and real PNG
     fontRelease.resolve();
     await page.waitForFunction(() => [...document.fonts].some(face => face.family.includes("Player Card Long Cang") && face.weight === "400" && face.status === "loaded"));
     await page.waitForFunction(() => ![...document.querySelectorAll("button")].find(button => button.textContent === "Download PNG · 1080 × 1080").disabled);
-    assert.match(await canvas.evaluate(el => el.getContext("2d").font), /Player Card Long Cang/);
     assert.notEqual(await canvas.evaluate(el => el.toDataURL()), beforeName, "Entered name is painted");
     const preview = await canvas.evaluate(el => el.toDataURL());
     const [download] = await Promise.all([page.waitForEvent("download"), downloadButton.click()]);
@@ -146,22 +145,27 @@ test("static player card: local photo, touch crop, preview fidelity and real PNG
       const { width, height } = el;
       const data = el.getContext("2d").getImageData(0, height * 0.55, width, height * 0.45).data;
       let left = width, right = -1, top = height, bottom = -1;
+      let leftRows = 0, rightRows = 0, leftCount = 0, rightCount = 0;
       for (let i = 0; i < data.length; i += 4) {
         if (data[i] <= 240 || data[i + 1] <= 240 || data[i + 2] <= 240) continue;
         const x = (i / 4) % width;
         const y = Math.floor(i / 4 / width) + height * 0.55;
         left = Math.min(left, x); right = Math.max(right, x);
         top = Math.min(top, y); bottom = Math.max(bottom, y);
+        if (x < width * 0.4) { leftRows += y; leftCount++; }
+        if (x > width * 0.6) { rightRows += y; rightCount++; }
       }
-      return { left, right, top, bottom, inkHeight: bottom - top + 1 };
+      return { left, right, top, bottom, inkHeight: bottom - top + 1, rise: leftRows / leftCount - rightRows / rightCount };
     });
-    for (const [name, minHeight] of [["清风速拧", 125], ["RiverBlue", 80], ["很长的选手显示名称".repeat(8), 1]]) {
+    for (const [name, minHeight] of [["清风速拧", 125], ["RiverBlue", 80], ["很长的选手显示名称".repeat(8), 1], ["髙㐀𝓡🧊Á", 80]]) {
       await page.locator('#player-card-name').fill(name);
       const bounds = await nicknameBounds();
       assert.ok(bounds.inkHeight >= minHeight, `Nickname ink has the intended size: ${name}`);
-      assert.ok(bounds.left >= 60 && bounds.right <= 1020 && bounds.top >= 870 && bounds.bottom <= 1050,
+      assert.ok(bounds.left >= 60 && bounds.right <= 1020 && bounds.top >= 740 && bounds.bottom <= 1045,
         `Nickname ink fits the lower part of the card: ${JSON.stringify(bounds)}`);
     }
+    await page.locator('#player-card-name').fill("风风风风");
+    assert.ok((await nicknameBounds()).rise > 30, "Repeated glyphs visibly rise across the signature");
     await page.locator('#player-card-name').fill("");
     for (const width of [390, 1440]) {
       await page.setViewportSize({ width, height: 900 });
@@ -177,7 +181,8 @@ test("static player card: local photo, touch crop, preview fidelity and real PNG
     await page.waitForFunction(() => ![...document.querySelectorAll("button")].find(button => button.textContent === "Download PNG · 1080 × 1080").disabled);
     assert.equal(fontRequests.length, 2);
     assert.equal(await page.evaluate(() => [...document.fonts].some(face => face.family.includes("Player Card Long Cang"))), false);
-    assert.match(await canvas.evaluate(el => el.getContext("2d").font), /Kaiti SC/);
+    const fallbackBounds = await nicknameBounds();
+    assert.ok(fallbackBounds.inkHeight >= 80 && fallbackBounds.left >= 60 && fallbackBounds.right <= 1020 && fallbackBounds.top >= 740 && fallbackBounds.bottom <= 1045, "Fallback inks also fit");
     const fallbackPreview = await canvas.evaluate(el => el.toDataURL());
     const [fallbackDownload] = await Promise.all([page.waitForEvent("download"), downloadButton.click()]);
     assert.equal(fallbackDownload.suggestedFilename(), "小明-Blue-card.png");
