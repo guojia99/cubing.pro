@@ -21,7 +21,7 @@ export function cardFilename(name: string): string {
   return `${safe || "player"}-card.png`;
 }
 
-export function paintCard(canvas: HTMLCanvasElement, image: HTMLImageElement, crop: Crop, name: string) {
+export function paintCard(canvas: HTMLCanvasElement, image: HTMLImageElement, crop: Crop, name: string, font: string) {
   const ctx = canvas.getContext("2d")!;
   const scale = CARD_SIZE / Math.min(image.naturalWidth, image.naturalHeight) * crop.zoom;
   const width = image.naturalWidth * scale;
@@ -37,10 +37,9 @@ export function paintCard(canvas: HTMLCanvasElement, image: HTMLImageElement, cr
   ctx.fillRect(0, CARD_SIZE * 0.55, CARD_SIZE, CARD_SIZE * 0.45);
   const label = name.trim();
   if (!label) return;
-  const font = '"Kaiti SC", "KaiTi", "STKaiti", "Yu Mincho", "Noto Serif CJK SC", serif';
-  ctx.font = `600 112px ${font}`;
+  ctx.font = `400 112px ${font}`;
   const size = Math.min(112, 112 * 936 / ctx.measureText(label).width);
-  ctx.font = `600 ${size}px ${font}`;
+  ctx.font = `400 ${size}px ${font}`;
   ctx.fillStyle = "#ffffff";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";

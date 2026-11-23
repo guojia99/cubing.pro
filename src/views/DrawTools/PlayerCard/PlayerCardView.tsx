@@ -5,6 +5,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { PageHeader, Surface } from "@/components/ui/page";
 import { useI18n } from "@/contexts/I18nProvider";
 import { CARD_SIZE, INITIAL_CROP, cardFilename, clampCrop, paintCard, zoomCrop } from "./composition";
+import { loadNicknameFont, NICKNAME_FALLBACK } from "./nicknameFont";
 
 export function PlayerCardView() {
   const { t } = useI18n();
@@ -12,6 +13,9 @@ export function PlayerCardView() {
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const [crop, setCrop] = useState(INITIAL_CROP);
   const [name, setName] = useState("");
+  const [nicknameFont, setNicknameFont] = useState<string | null>(null);
+  const needsNicknameFont = !!image && !!name.trim();
+  const nicknamePending = needsNicknameFont && nicknameFont === null;
   const [error, setError] = useState<"decode" | "export" | null>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const photoInput = useRef<HTMLInputElement>(null);
@@ -31,12 +35,19 @@ export function PlayerCardView() {
     return () => { active = false; URL.revokeObjectURL(url); };
   }, [file]);
 
+  useEffect(() => {
+    if (!needsNicknameFont) return;
+    let active = true;
+    loadNicknameFont().then(font => { if (active) setNicknameFont(font); });
+    return () => { active = false; };
+  }, [needsNicknameFont]);
+
   useLayoutEffect(() => {
-    if (image && canvas.current) paintCard(canvas.current, image, crop, name);
-  }, [image, crop, name]);
+    if (image && canvas.current) paintCard(canvas.current, image, crop, nicknamePending ? "" : name, nicknameFont ?? NICKNAME_FALLBACK);
+  }, [image, crop, name, nicknamePending, nicknameFont]);
 
   function download() {
-    if (!image || !canvas.current) return;
+    if (!image || !canvas.current || nicknamePending) return;
     try {
       const link = document.createElement("a");
       link.download = cardFilename(name);
@@ -115,7 +126,7 @@ export function PlayerCardView() {
               }} />
             </Field.Root>
             <Button variant="outline" disabled={!image} onClick={() => setCrop(INITIAL_CROP)}>{t("playerCard.reset")}</Button>
-            <Button colorPalette="brand" disabled={!image} onClick={download}>{t("playerCard.download")}</Button>
+            <Button colorPalette="brand" disabled={!image || nicknamePending} onClick={download}>{t("playerCard.download")}</Button>
             {error === "export" && <Text role="alert" color="fg.error">{t("playerCard.exportError")}</Text>}
           </Stack>
         </Surface>

@@ -31,11 +31,21 @@ test("static player card: local photo, touch crop, preview fidelity and real PNG
     await context.addInitScript((origin) => { if (location.origin === origin) localStorage.setItem("cubing_pro_locale", "en-US"); }, origin);
     const uploads = [];
     const external = [];
-    await context.route("**/*", route => {
+    const fontRequests = [];
+    const fontRequested = Promise.withResolvers();
+    const fontRelease = Promise.withResolvers();
+    let failFont = false;
+    await context.route("**/*", async route => {
       const request = route.request();
       if (!["GET", "HEAD"].includes(request.method())) uploads.push(request.url());
       if (request.url().includes("/v3/cube-api/")) return route.fulfill({ json: { data: [] } });
       if (new URL(request.url()).origin !== origin) { external.push(request.url()); return route.abort(); }
+      if (new URL(request.url()).pathname === "/fonts/player-card/long-cang.woff2") {
+        fontRequests.push(request.url());
+        fontRequested.resolve();
+        await fontRelease.promise;
+        if (failFont) return route.abort();
+      }
       return route.continue();
     });
     const page = await context.newPage();
@@ -75,6 +85,7 @@ test("static player card: local photo, touch crop, preview fidelity and real PNG
     const sample = () => canvas.evaluate(el => [...el.getContext("2d").getImageData(400, 200, 1, 1).data]);
     assert.deepEqual(await sample(), [255, 0, 0, 255], "Photo paints immediately after decode");
     const emptyName = await canvas.evaluate(el => el.toDataURL());
+    assert.deepEqual(fontRequests, [], "Empty nickname does not load the font");
     const slider = page.getByRole("slider");
     await slider.scrollIntoViewIfNeeded();
     await slider.tap();
@@ -96,6 +107,20 @@ test("static player card: local photo, touch crop, preview fidelity and real PNG
     assert.deepEqual(await sample(), [0, 255, 0, 255], "Touch drag moves the photo in output coordinates");
     const beforeName = await canvas.evaluate(el => el.toDataURL());
     await page.locator('#player-card-name').fill("小明/Blue");
+    await fontRequested.promise;
+    assert.equal(await downloadButton.isDisabled(), true, "Pending font blocks export");
+    assert.equal(await canvas.evaluate(el => el.toDataURL()), beforeName, "No fallback nickname painted while the font is pending");
+    await page.locator('#player-card-name').fill("");
+    assert.equal(await downloadButton.isDisabled(), false, "Clearing the nickname allows immediate export even while font is pending");
+    const [emptyDownload] = await Promise.all([page.waitForEvent("download"), downloadButton.click()]);
+    assert.equal(emptyDownload.suggestedFilename(), "player-card.png");
+    assert.deepEqual(await readFile(await emptyDownload.path()), Buffer.from(beforeName.split(",")[1], "base64"));
+    await page.locator('#player-card-name').fill("小明/Blue");
+    assert.equal(await downloadButton.isDisabled(), true);
+    fontRelease.resolve();
+    await page.waitForFunction(() => [...document.fonts].some(face => face.family.includes("Player Card Long Cang") && face.weight === "400" && face.status === "loaded"));
+    await page.waitForFunction(() => ![...document.querySelectorAll("button")].find(button => button.textContent === "Download PNG · 1080 × 1080").disabled);
+    assert.match(await canvas.evaluate(el => el.getContext("2d").font), /Player Card Long Cang/);
     assert.notEqual(await canvas.evaluate(el => el.toDataURL()), beforeName, "Entered name is painted");
     const preview = await canvas.evaluate(el => el.toDataURL());
     const [download] = await Promise.all([page.waitForEvent("download"), downloadButton.click()]);
@@ -133,6 +158,20 @@ test("static player card: local photo, touch crop, preview fidelity and real PNG
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `No overflow at ${width}px`);
       assert.equal(await canvas.evaluate(el => el.toDataURL()), emptyName, "Viewport does not change output");
     }
+    assert.deepEqual(fontRequests, [`${origin}/fonts/player-card/long-cang.woff2`], "One shared static same-origin font request with no nickname data");
+    // A fresh document exercises a real font load failure and local fallback export.
+    failFont = true;
+    await page.reload();
+    await photo.setInputFiles({ name: "quadrants.png", mimeType: "image/png", buffer: Buffer.from(fixture, "base64") });
+    await page.locator('#player-card-name').fill("小明/Blue");
+    await page.waitForFunction(() => ![...document.querySelectorAll("button")].find(button => button.textContent === "Download PNG · 1080 × 1080").disabled);
+    assert.equal(fontRequests.length, 2);
+    assert.equal(await page.evaluate(() => [...document.fonts].some(face => face.family.includes("Player Card Long Cang"))), false);
+    assert.match(await canvas.evaluate(el => el.getContext("2d").font), /Kaiti SC/);
+    const fallbackPreview = await canvas.evaluate(el => el.toDataURL());
+    const [fallbackDownload] = await Promise.all([page.waitForEvent("download"), downloadButton.click()]);
+    assert.equal(fallbackDownload.suggestedFilename(), "小明-Blue-card.png");
+    assert.deepEqual(await readFile(await fallbackDownload.path()), Buffer.from(fallbackPreview.split(",")[1], "base64"), "Failed font still exports the exact fallback preview");
     assert.deepEqual(uploads, [], "No photo or other data uploaded");
     assert.deepEqual(external, [], "No external image/font/provider requests");
     assert.deepEqual(errors, []);
