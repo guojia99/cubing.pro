@@ -3,7 +3,7 @@ import { chromium } from "playwright";
 
 const base = process.env.ALGS_TEST_URL ?? "http://127.0.0.1:3000";
 const browser = await chromium.launch({ headless: true });
-const page = await browser.newPage({ viewport: { width: 390, height: 844 }, reducedMotion: "reduce" });
+const page = await browser.newPage({ viewport: { width: 390, height: 844 }, hasTouch: true, reducedMotion: "reduce" });
 page.setDefaultNavigationTimeout(110000);
 const errors = [];
 page.on("pageerror", error => errors.push(error.message));
@@ -28,6 +28,7 @@ let firstTargetUnavailable = false;
 let removed = false;
 let longGroup = false;
 let tombstoneDeleted = false;
+let recentEmpty = false;
 
 async function signInFromDiscussion(redirect) {
   const expected = new URL(redirect, base);
@@ -74,7 +75,14 @@ try {
     }
     if (path === "/public/algorithm/") return send({ CubeKeys: ["333"], ClassMap: { 333: [{ name: "OLL" }] } });
     if (path === "/public/formula-forum/counts") return ok({ groups: {}, solutions: { [first]: 1 } });
-    if (path === "/public/formula-forum/recent") return ok({ items: [{ target, count: 2, lastActivity: reply.createdAt, lastCommentId: reply.id }], page: 1, total: 1 });
+    if (path === "/public/formula-forum/recent") {
+      const items = recentEmpty ? [] : [
+        { target, count: 2, lastActivity: reply.createdAt, lastCommentId: reply.id },
+        { target: { ...target, id: third, caseName: "OLL 46" }, count: 1, lastActivity: parent.createdAt, lastCommentId: parent.id },
+        { target: unavailable, count: 1, lastActivity: parent.createdAt },
+      ];
+      return ok({ items, page: 1, total: items.length });
+    }
     if (path === "/user/formula-forum/notifications") {
       const items = [{ id: 2, target, commentId: 42, body: reply.body }, { id: 3, target: unavailable, commentId: 43, body: tombstoneBody }]
         .map(item => ({ ...item, authorName: "Xi", createdAt: reply.createdAt, readAt: markReads.includes(item.id) ? reply.createdAt : null }));
@@ -234,8 +242,52 @@ try {
   await page.getByRole("button", { name: "Xi", exact: true }).click();
   await page.getByRole("menuitem", { name: "Sign out", exact: true }).click();
   await page.waitForURL(url => url.pathname.replace(/\/$/, "") === "/login");
+  recentEmpty = true;
   await page.goto(base + "/algs/", { waitUntil: "domcontentloaded" });
   await page.getByRole("tab", { name: "Recent discussions" }).click();
+  const recentTab = page.getByRole("tab", { name: "Recent discussions", selected: true });
+  await recentTab.waitFor();
+  const recentPanel = page.getByRole("tabpanel", { name: "Recent discussions" });
+  await recentPanel.getByText("No public discussions yet", { exact: true }).waitFor();
+  assert.equal(await recentPanel.getByRole("button").count(), 0);
+  recentEmpty = false;
+  await page.goto(base + "/algs/?tab=recent", { waitUntil: "domcontentloaded" });
+  await recentTab.waitFor();
+  const recentRow = recentPanel.getByRole("button").filter({ hasText: "OLL 45" });
+  await recentRow.waitFor();
+  await recentPanel.getByText("Formula unavailable", { exact: true }).waitFor();
+  assert.equal(await recentPanel.getByRole("button").count(), 2);
+  assert.match(await recentRow.innerText(), /Comments · 2 ·/);
+  const recentTime = await page.evaluate(date => new Date(date).toLocaleString("en-US", { dateStyle: "short", timeStyle: "short" }), reply.createdAt);
+  assert.ok((await recentRow.innerText()).includes(recentTime));
+  assert.equal(await recentRow.locator('svg[aria-hidden="true"]').count(), 1);
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await recentTab.focus();
+  // The tab panel itself is a keyboard stop before its first native button.
+  await page.keyboard.press("Tab");
+  if (await recentPanel.evaluate(el => el === document.activeElement)) await page.keyboard.press("Tab");
+  assert.equal(await recentRow.evaluate(el => el === document.activeElement && el.matches(":focus-visible")), true);
+  assert.equal(await recentRow.evaluate(el => getComputedStyle(el).outlineStyle), "solid");
+  for (const key of ["Enter", "Space"]) {
+    await recentRow.focus();
+    await page.keyboard.press(key);
+    await dialog.locator("#formula-comment-42").getByText(reply.body).waitFor();
+    assert.equal(await dialog.getByRole("link", { name: "View formula" }).getAttribute("href"), "/algs/333/OLL/?solutionId=" + first);
+    assert.equal(await dialog.evaluate(el => el.contains(document.activeElement)), true);
+    await page.keyboard.press("Escape");
+    await dialog.waitFor({ state: "hidden" });
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
+  const otherRecentRow = recentPanel.getByRole("button").filter({ hasText: "OLL 46" });
+  const tapBox = await otherRecentRow.boundingBox();
+  assert.ok(tapBox.height >= 56 && tapBox.width >= 44);
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+  await otherRecentRow.tap({ position: { x: tapBox.width - 16, y: tapBox.height / 2 } });
+  await dialog.locator("#formula-comment-40").getByText(parent.body).waitFor();
+  assert.equal(await dialog.getByRole("link", { name: "View formula" }).getAttribute("href"), "/algs/333/OLL/?solutionId=" + third);
+  await dialog.getByRole("button", { name: "Close", exact: true }).tap();
+  await dialog.waitFor({ state: "hidden" });
+  console.log("PASS recent selected tab, empty/list states, keyboard focus, Enter/Space activation, and mobile trailing-edge tap to the correct target.");
   await page.getByRole("button").filter({ hasText: "OLL 45" }).click();
   await dialog.locator("#formula-comment-42").getByText(reply.body).waitFor();
   assert.equal(await dialog.getByRole("link", { name: "View formula" }).getAttribute("href"), "/algs/333/OLL/?solutionId=" + first);

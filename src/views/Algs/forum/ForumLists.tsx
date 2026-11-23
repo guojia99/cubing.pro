@@ -2,6 +2,7 @@
 
 import { Badge, Box, Button, Heading, HStack, Stack, Text } from "@chakra-ui/react";
 import Link from "next/link";
+import { LuChevronRight } from "react-icons/lu";
 import { useCallback, useState, type ReactNode } from "react";
 import { AdminGuard } from "@/components/admin/AdminGuard";
 import { PageHeader } from "@/components/ui/page";
@@ -15,20 +16,32 @@ import {
 import { ForumScope, useFormulaForum } from "./ForumScope";
 import { forumDate, ForumLoadState, ForumPagination, targetLabel, useForumErrorMessage, useForumQuery } from "./forumUi";
 
-function TargetRow({ target, onOpen, children }: {
+function TargetRow({ target, onOpen, children, recent = false }: {
   target: ForumTarget;
   onOpen: () => void;
   children?: ReactNode;
+  recent?: boolean;
 }) {
   const { t } = useI18n();
-  const content = <Stack gap="1">
+  const content = <Stack gap="1" minW="0" flex={recent ? "1" : undefined}>
     <HStack gap="2" flexWrap="wrap">
-      <Text fontSize="sm" fontWeight="semibold" overflowWrap="anywhere">{targetLabel(target) || target.id}</Text>
+      <Text fontSize={recent ? "md" : "sm"} color={recent ? "fg" : undefined} fontWeight="semibold" overflowWrap="anywhere">{targetLabel(target) || target.id}</Text>
       {target.unavailable && <Badge>{t("forum.targetUnavailable")}</Badge>}
     </HStack>
     {target.moves && <Text fontFamily="mono" overflowWrap="anywhere">{target.moves}</Text>}
     {children}
   </Stack>;
+  if (recent) return <Box asChild textAlign="start" width="full" minH="14" p="4" borderWidth="1px" borderRadius="md"
+    cursor={target.unavailable ? undefined : "pointer"}
+    _hover={target.unavailable ? undefined : { bg: "accent.soft", borderColor: "brand.border" }}
+    _focusVisible={{ outline: "2px solid", outlineColor: "brand.focusRing", outlineOffset: "2px", bg: "accent.soft" }}>
+    {target.unavailable ? content : <button type="button" onClick={onOpen}>
+      <HStack gap="3">
+        {content}
+        <Box asChild color="accent" flexShrink="0"><LuChevronRight aria-hidden="true" size={20} /></Box>
+      </HStack>
+    </button>}
+  </Box>;
   return <Box asChild textAlign="start" width="full" p="3" borderWidth="1px" borderRadius="md"
     _hover={target.unavailable ? undefined : { bg: "bg.subtle", borderColor: "brand.500" }}>
     {target.unavailable ? content : <button type="button" onClick={onOpen}>{content}</button>}
@@ -44,7 +57,7 @@ export function RecentDiscussions() {
   if (!data) return <ForumLoadState error={error} retry={refresh} />;
   return <Stack>
     {data.items.length === 0 && <Text color="fg.muted">{t("forum.noRecent")}</Text>}
-    {data.items.map(item => <TargetRow key={item.target.id} target={item.target} onOpen={() => open({ ...item.target, commentId: item.lastCommentId })}>
+    {data.items.map(item => <TargetRow recent key={item.target.id} target={item.target} onOpen={() => open({ ...item.target, commentId: item.lastCommentId })}>
       <Text fontSize="xs" color="fg.muted">{t("forum.comments")} · {item.count} · {forumDate(item.lastActivity, locale)}</Text>
     </TargetRow>)}
     <ForumPagination page={data.page} total={data.total} onPage={setPage} />
