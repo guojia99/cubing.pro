@@ -23,10 +23,11 @@ const schedule = { Round: '决赛', RoundNum: 1, Format: 'ao5', IsComp: true, Sc
 const competition = { id: 987654, Name: '工作台视觉回归赛', Genre: 5, GroupId: 1, City: '线上', EventMin: '333', Count: 100, RegisterNum: 10, CompedNum: 8, Org: {}, Group: {}, OrganizersID: 0, EarliestID: 0, LatestID: 0, IsDone: false, CompStartTime: '2026-11-01T00:00:00+08:00', CompEndTime: '2026-12-01T00:00:00+08:00', Illustrate: '比赛信息与项目工作台。', RuleMD: '请按顺序完成各把打乱。', comp_json: { Events: [{ EventID: '333', EventName: '三阶', EventRoute: 7, IsComp: true, Schedule: [schedule, { ...schedule, Round: '第二轮', RoundNum: 2 }] }] } };
 await context.route('**/public/comps/987654*', (route) => route.fulfill({ json: { code: '200', data: new URL(route.request().url()).pathname.replace(/\/$/, '').endsWith('987654') ? competition : [], msg: '' } }));
 await context.route('**/public/events*', (route) => route.fulfill({ json: { code: '200', data: { Events: [event], UpdateTime: new Date().toISOString() }, msg: '' } }));
+await context.route('**/public/formula-forum/counts?*', route => route.fulfill({ json: { data: { groups: {}, solutions: {} } } }));
 await context.addInitScript(() => {
   window.addEventListener('unhandledrejection', event => window.reportWorkspaceRejection({ message: String(event.reason), type: event.reason?.constructor?.name, target: event.reason?.target?.src ?? event.reason?.target?.url, stack: event.reason?.stack }));
-  const cases = Array.from({ length: 12 }, (_, index) => ({ name: `Case ${index + 1}`, algs: ["R U R' U'"], scrambles: ["R U R'"], image: '' }));
-  localStorage.setItem('alg_class_cache_333_PLL', JSON.stringify({ ts: Date.now(), data: { name: 'PLL', sets: [{ name: 'Main', groups: [{ name: 'Group', algs: cases }] }] } }));
+  const cases = Array.from({ length: 12 }, (_, index) => ({ name: `Case ${index + 1}`, algs: ["R U R' U'"], solutionIds: [(index + 1).toString(16).padStart(16, '0')], scrambles: ["R U R'"], image: '' }));
+  localStorage.setItem('alg_class_cache_v3_333_PLL', JSON.stringify({ ts: Date.now(), data: { name: 'PLL', sets: [{ name: 'Main', groups: [{ name: 'Group', groupId: 'aaaaaaaaaaaaaaaa', algs: cases }] }] } }));
 });
 
 async function fit(label, selector) {

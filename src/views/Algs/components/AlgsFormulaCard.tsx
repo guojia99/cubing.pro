@@ -44,7 +44,7 @@ export default function AlgsFormulaCard({
 }: AlgsFormulaCardProps) {
   const { locale } = useI18n();
   const storageKey = buildAlgsKey(cube, classId, setName, groupName, alg.name);
-  const selection = getAlgsSelection(storageKey);
+  const selection = getAlgsSelection(storageKey, alg);
   const customFormulas = useMemo(() => {
     void refreshVersion;
     return getCustomAlgs(storageKey);

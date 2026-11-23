@@ -1,3 +1,4 @@
+import type { AlgItem } from "@/services/cubing-pro/algs/algs";
 import {
   clampDiagramSize,
   DEFAULT_DIAGRAM_SIZE,
@@ -29,6 +30,7 @@ export function setFormulaFontSize(size: number): void {
 export type AlgsSelectionValue = {
   source: 'library' | 'custom';
   index: number;
+  solutionId?: string | null;
 };
 
 export function buildAlgsKey(
@@ -41,21 +43,22 @@ export function buildAlgsKey(
   return `${cube}-${classId}-${set}-${group}-${algName}`.replace(/\s+/g, '_');
 }
 
-export function getAlgsSelection(key: string): AlgsSelectionValue | null {
+export function getAlgsSelection(key: string, alg?: AlgItem): AlgsSelectionValue | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const data: Record<string, unknown> = JSON.parse(raw);
     const val = data[key];
-    if (val == null) return null;
-    if (typeof val === 'number') return { source: 'library', index: val };
-    if (typeof val === 'object' && val !== null) {
-      const obj = val as Record<string, unknown>;
-      if (typeof obj.source === 'string' && typeof obj.index === 'number') {
-        return { source: obj.source === 'custom' ? 'custom' : 'library', index: obj.index };
-      }
+    const saved = typeof val === 'number' ? { source: 'library', index: val } : val;
+    if (!saved || typeof saved !== 'object' || !('index' in saved) || typeof saved.index !== 'number'
+      || !('source' in saved)) return null;
+    if (saved.source === 'custom') return { source: 'custom', index: saved.index };
+    if (saved.source !== 'library') return null;
+    if ('solutionId' in saved && typeof saved.solutionId === 'string' && alg?.solutionIds) {
+      const index = alg.solutionIds.indexOf(saved.solutionId);
+      return index < 0 ? null : { source: 'library', index, solutionId: saved.solutionId };
     }
-    return null;
+    return { source: 'library', index: saved.index };
   } catch {
     return null;
   }

@@ -68,7 +68,7 @@ adminManagement.invalidPerson adminManagement.editRanking adminManagement.delete
 adminManagement.deleteSponsor adminManagement.softDeleteConfirm adminManagement.purgeConfirm
 adminManagement.userCubeIdTitle adminManagement.userQqTitle adminManagement.userWcaTitle
 adminManagement.permissionsTitle adminManagement.mergeUserTitle adminManagement.organizerName
-finishing.organizerOption
+finishing.organizerOption forum.replyTo
 `.trim().split(/\s+/);
 
 test("audit covers every parameterized key in the complete root catalogs", () => {

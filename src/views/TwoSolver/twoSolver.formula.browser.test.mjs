@@ -27,6 +27,8 @@ const bundle = await build({
 const helpers = await import(`data:text/javascript;base64,${Buffer.from(bundle.outputFiles[0].text).toString("base64")}`);
 const datasets = new Map();
 const classes = new Map();
+let nextId = 0;
+const fixtureId = () => (++nextId).toString(16).padStart(16, "0");
 for (const { id, api } of helpers.METHODS) {
   const data = JSON.parse(await readFile(new URL(`../../../public/two-solver/data/${id}.json`, import.meta.url), "utf8"));
   datasets.set(id, data);
@@ -43,11 +45,11 @@ for (const { id, api } of helpers.METHODS) {
     }
     let group = set.groups.find(group => group.name === record.group);
     if (!group) {
-      group = { name: record.group, algs: [] };
+      group = { name: record.group, groupId: fixtureId(), algs: [] };
       set.groups.push(group);
       set.groups_keys.push(group.name);
     }
-    group.algs.push({ name: record.name, algs: [...record.algs], scrambles: [] });
+    group.algs.push({ name: record.name, algs: [...record.algs], solutionIds: record.algs.map(fixtureId), scrambles: [] });
   }
   classes.set(api, detail);
 }
@@ -73,11 +75,12 @@ context.on("page", page => {
   page.on("pageerror", error => errors.push(error.message));
   page.on("worker", worker => workers.push(worker.url()));
 });
+await context.route("**/public/formula-forum/counts?*", route => route.fulfill({ json: { data: { groups: {}, solutions: {} } } }));
 await context.addInitScript(({ origin, data, preferences }) => {
   if (location.origin !== origin || localStorage.getItem("two-solver-formula-seeded")) return;
   localStorage.setItem("two-solver-formula-seeded", "1");
   localStorage.setItem("cubing_pro_locale", "zh-CN");
-  localStorage.setItem("alg_class_cache_222_CLL", JSON.stringify({ data, ts: Date.now() }));
+  localStorage.setItem("alg_class_cache_v3_222_CLL", JSON.stringify({ data, ts: Date.now() }));
   for (const [key, value] of Object.entries(preferences)) localStorage.setItem(key, value);
 }, { origin, data: classes.get("CLL"), preferences });
 const page = await context.newPage();

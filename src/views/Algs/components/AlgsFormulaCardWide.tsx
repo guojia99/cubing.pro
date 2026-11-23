@@ -49,7 +49,7 @@ export default function AlgsFormulaCardWide({
 }: AlgsFormulaCardWideProps) {
   const { locale } = useI18n();
   const storageKey = buildAlgsKey(cube, classId, setName, groupName, alg.name);
-  const selection = getAlgsSelection(storageKey);
+  const selection = getAlgsSelection(storageKey, alg);
 
   const activeSource = selection?.source ?? "library";
   const selectedIdx = selection?.index ?? 0;

@@ -7,18 +7,22 @@ const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
 const errors = [];
 page.on('pageerror', (error) => errors.push(error.message));
 try {
+  await page.route('**/public/formula-forum/counts?*', route => route.fulfill({ json: { data: { groups: {}, solutions: {} } } }));
   await page.addInitScript(() => {
     if (localStorage.getItem('algs-layout-seeded')) return;
     const cases = Array.from({ length: 19 }, (_, i) => ({
       name: i % 3 ? `Case ${i + 1}` : `Long subcase name ${i + 1} with detailed label`,
       algs: Array.from({ length: 1 + i % 4 }, (_, j) => j === 0 ? Array.from({ length: i % 5 === 0 ? 28 : 3 }, () => "R U R' U'").join(' ') : "F R U R' U' F'"),
+      solutionIds: Array.from({ length: 1 + i % 4 }, (_, index) => (i * 4 + index + 1).toString(16).padStart(16, '0')),
       scrambles: ["R U R' U'"],
       image: `<svg xmlns="http://www.w3.org/2000/svg" width="${i % 2 ? 90 : 180}" height="90"><rect width="90" height="90" fill="#22a8cb"/></svg>`,
     }));
     const data = { name: 'PLL Formula Workbench', sets: [{ name: 'Main', groups: [
-      { name: 'Group A', algs: cases.slice(0, 11) }, { name: 'Group B', algs: cases.slice(11, 18) }, { name: 'Group C', algs: cases.slice(18) },
+      { name: 'Group A', groupId: 'aaaaaaaaaaaaaaaa', algs: cases.slice(0, 11) },
+      { name: 'Group B', groupId: 'bbbbbbbbbbbbbbbb', algs: cases.slice(11, 18) },
+      { name: 'Group C', groupId: 'cccccccccccccccc', algs: cases.slice(18) },
     ] }] };
-    localStorage.setItem('alg_class_cache_333_PLL', JSON.stringify({ data, ts: Date.now() }));
+    localStorage.setItem('alg_class_cache_v3_333_PLL', JSON.stringify({ data, ts: Date.now() }));
     localStorage.setItem('algs_use_visualcube_renderer', '0');
     localStorage.setItem('algs_columns_per_row_by_repo', JSON.stringify({ '333::PLL': 8 }));
     localStorage.setItem('algs_formula_font_size', '18');

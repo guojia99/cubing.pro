@@ -27,7 +27,7 @@ import {
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { Fragment, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 
 import { useI18n } from "@/contexts/I18nProvider";
 import { translatePuzzleExtra as extra } from "@/i18n/messages/puzzle-extra";
@@ -43,6 +43,7 @@ import {
   getFormulaProficiency,
 } from "@/services/cubing-pro/algs/formulaPracticeProficiency";
 
+import { SetDiscussionButton, DiscussionButton, ForumScope } from "./forum/ForumScope";
 import AlgsFormulaCard from "./components/AlgsFormulaCard";
 import AlgsFormulaCardWide from "./components/AlgsFormulaCardWide";
 import AlgsFilterPanel from "./components/AlgsFilterPanel";
@@ -103,6 +104,7 @@ interface Props {
 export function AlgsDetailView({ cube, classId }: Props) {
   const { t, locale } = useI18n();
   const query = useSearchParams()?.toString() ?? "";
+  const deepLink = useMemo(() => parseFormulaDeepLink(query), [query]);
   const routeKey = JSON.stringify([cube, classId]);
   const deepLinkFingerprint = JSON.stringify([cube, classId, query]);
   const handledDeepLink = useRef<string | null>(null);
@@ -217,12 +219,11 @@ export function AlgsDetailView({ cube, classId }: Props) {
 
   useEffect(() => {
     if (handledDeepLink.current === deepLinkFingerprint) return;
-    const parsed = parseFormulaDeepLink(query);
-    if (parsed.kind === "none") {
+    if (deepLink.kind === "none") {
       handledDeepLink.current = deepLinkFingerprint;
       return;
     }
-    if (parsed.kind === "invalid") {
+    if (deepLink.kind === "invalid") {
       handledDeepLink.current = deepLinkFingerprint;
       setDeepLinkNotice("invalid");
       return;
@@ -230,13 +231,13 @@ export function AlgsDetailView({ cube, classId }: Props) {
     // A route can render once with the previous route's data before its fetch effect runs.
     if (loading || !data || loadedRoute !== routeKey) return;
     handledDeepLink.current = deepLinkFingerprint;
-    const result = resolveFormulaDeepLink(data, parsed.target);
+    const result = resolveFormulaDeepLink(data, deepLink.kind === "solution" ? { solutionId: deepLink.solutionId } : deepLink.target);
     if (result.kind !== "found") {
       setDeepLinkNotice(result.kind);
       return;
     }
     setModalState({ items: result.items, index: result.index, initialLibraryIndex: result.libraryIndex });
-  }, [query, deepLinkFingerprint, loading, data, loadedRoute, routeKey]);
+  }, [deepLink, deepLinkFingerprint, loading, data, loadedRoute, routeKey]);
 
   const setKeys = useMemo(
     () => data?.setKeys ?? data?.sets.map((s) => s.name) ?? [],
@@ -249,7 +250,9 @@ export function AlgsDetailView({ cube, classId }: Props) {
     if (!data) return [];
     const result: {
       setName: string;
+      setId?: string;
       groupName: string;
+      groupId?: string;
       setColorIndex: number;
       algs: AlgItem[];
     }[] = [];
@@ -268,7 +271,9 @@ export function AlgsDetailView({ cube, classId }: Props) {
         if (algs.length > 0) {
           result.push({
             setName: set.name,
+            setId: set.setId,
             groupName: gName,
+            groupId: groups[gi]?.groupId,
             setColorIndex: si,
             algs,
           });
@@ -320,6 +325,7 @@ export function AlgsDetailView({ cube, classId }: Props) {
     }
     const sel = getAlgsSelection(
       buildAlgsKey(cube, classId, first.setName, first.groupName, first.alg.name),
+      first.alg,
     );
     const formulas = sel?.source === "custom"
       ? getCustomAlgs(buildAlgsKey(cube, classId, first.setName, first.groupName, first.alg.name))
@@ -513,10 +519,22 @@ export function AlgsDetailView({ cube, classId }: Props) {
 
   const handleModalClose = useCallback(() => setModalState(null), []);
 
-  const formulaGroups = useMemo(() => displayedGroups.map((group) => {
+  useEffect(() => {
+    if (loading || !data) return;
+    const anchor = window.location.hash.slice(1);
+    if (anchor.startsWith("set-")) document.getElementById(anchor)?.scrollIntoView({ block: "start" });
+  }, [loading, data]);
+
+  const formulaGroups = useMemo(() => displayedGroups.map((group, index) => {
     return (
+      <Fragment key={`${group.setId ?? group.setColorIndex}::${group.groupId ?? group.groupName}`}>
+        {data!.sets.length > 1 && (index === 0 || displayedGroups[index - 1].setColorIndex !== group.setColorIndex) && (
+          <HStack id={group.setId ? `set-${group.setId}` : undefined} scrollMarginTop="24" flexWrap="wrap" gap={2} mt={2}>
+            <Heading as="h2" fontSize="md">{group.setName}</Heading>
+            <SetDiscussionButton id={group.setId} name={group.setName} />
+          </HStack>
+        )}
       <Card.Root
-        key={`${group.setName}::${group.groupName}`}
         id={`algs-group-${encodeURIComponent(buildGroupKey(group.setName, group.groupName))}`}
         className="algs-detail-group"
         variant="outline"
@@ -526,7 +544,7 @@ export function AlgsDetailView({ cube, classId }: Props) {
         minW={0}
       >
         <Card.Body p={3} gap={0}>
-          <HStack className="algs-detail-group-heading" gap={2} mb={2} align="center" minW={0}>
+          <HStack className="algs-detail-group-heading" flexWrap="wrap" gap={2} mb={2} align="center" minW={0}>
             <Badge
               colorPalette="brand"
               variant="subtle"
@@ -550,6 +568,7 @@ export function AlgsDetailView({ cube, classId }: Props) {
             >
               {group.groupName}
             </Heading>
+            {group.groupId && <DiscussionButton kind="group" id={group.groupId} />}
             <Text fontSize="11px" lineHeight="22px" color="fg.muted" ml="auto" flexShrink={0}>
               {group.algs.length}
             </Text>
@@ -615,8 +634,9 @@ export function AlgsDetailView({ cube, classId }: Props) {
           </Grid>
         </Card.Body>
       </Card.Root>
+      </Fragment>
     );
-  }), [displayedGroups, columnsPerRow, cube, classId, formulaFontSize, formulaFontFamily, useVisualCube, diagramSize, hideFormulaDiagram, hideAltFormulas, refreshVersion, handleOpenModal]);
+  }), [data, displayedGroups, columnsPerRow, cube, classId, formulaFontSize, formulaFontFamily, useVisualCube, diagramSize, hideFormulaDiagram, hideAltFormulas, refreshVersion, handleOpenModal]);
 
   const showVisualCubeSwitch = isVisualCubeCube(cube);
   const showHideAltFormulas = columnsPerRow === 1;
@@ -685,7 +705,9 @@ export function AlgsDetailView({ cube, classId }: Props) {
   );
 
   return (
-    <>
+    <ForumScope cube={cube} classId={classId} resumeReady={loadedRoute === routeKey && (
+      deepLink.kind === "none" || modalState !== null || deepLinkNotice !== null
+    )}>
       <Box className="algs-detail-shell">
       {deepLinkNotice && (
         <HStack role="alert" borderWidth="1px" borderRadius="md" p={3} mb={3}>
@@ -701,7 +723,7 @@ export function AlgsDetailView({ cube, classId }: Props) {
           flexWrap="wrap"
           gap={3}
         >
-          <HStack className="algs-detail-heading" gap={2} flex={1} minW={0} align="center">
+          <HStack className="algs-detail-heading" flexWrap="wrap" gap={2} flex={1} minW={0} align="center">
             <Button
               variant="ghost"
               size="sm"
@@ -720,6 +742,10 @@ export function AlgsDetailView({ cube, classId }: Props) {
             <Badge colorPalette="brand" fontSize="11px" lineHeight="20px" h="22px" flexShrink={0}>
               {cube}
             </Badge>
+            {data.sets.length === 1 && <HStack id={data.sets[0].setId ? `set-${data.sets[0].setId}` : undefined} scrollMarginTop="24" flexWrap="wrap" gap={2}>
+              {data.sets[0].name !== data.name && <Text fontWeight="medium">{data.sets[0].name}</Text>}
+              <SetDiscussionButton id={data.sets[0].setId} name={data.sets[0].name} />
+            </HStack>}
           </HStack>
 
           <HStack gap={2} flexWrap="wrap" minW={0}>
@@ -767,7 +793,7 @@ export function AlgsDetailView({ cube, classId }: Props) {
               />
           <nav aria-label={t("algs.detail.group")} className="algs-detail-group-links">
             {displayedGroups.map((group) => (
-              <a key={buildGroupKey(group.setName, group.groupName)} href={`#algs-group-${encodeURIComponent(buildGroupKey(group.setName, group.groupName))}`}>
+              <a key={`${group.setId ?? group.setColorIndex}::${group.groupId ?? group.groupName}`} href={`#algs-group-${encodeURIComponent(buildGroupKey(group.setName, group.groupName))}`}>
                 <span>{group.setName} · {group.groupName}</span><span>{group.algs.length}</span>
               </a>
             ))}
@@ -1215,6 +1241,6 @@ export function AlgsDetailView({ cube, classId }: Props) {
         hideFormulaDiagram={hideFormulaDiagram}
         onChanged={handleChanged}
       />
-    </>
+    </ForumScope>
   );
 }
