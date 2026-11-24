@@ -5,6 +5,7 @@ import { CompAPI } from '@/services/cubing-pro/comps/typings';
 import { parseDateTime } from '@/utils/time/data_time';
 import { beijingDate, competitionWindow, isGroupCompetition } from '@/lib/groupCompetition';
 import { Card, Descriptions, Table, Tag } from 'antd';
+import { Image as ChakraImage } from '@chakra-ui/react';
 import React from 'react';
 import '@wangeditor/editor/dist/css/style.css';
 import {EditorView} from "@/components/Markdown/editer";
@@ -57,9 +58,10 @@ const CompetitionDetail: React.FC<CompetitionDetailProps> = ({ comp }) => {
           {wca && (
             <Descriptions.Item label={t('competitionAdmin.certification')}>
               {t('competitionAdmin.wcaCertified')}
-              <img
+              <ChakraImage
                 src="/images/wca.svg"
                 alt="WCA"
+                fit="fill"
                 style={{ width: 16, marginLeft: 8 }}
               />
             </Descriptions.Item>

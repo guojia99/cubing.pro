@@ -1,4 +1,4 @@
-import { PK_BRACKET_WING, PK_TEAM_COLORS } from '@/theme/domainColors';
+import { PK_TEAM_COLORS } from '@/theme/domainColors';
 
 /** 全屏对战动画可配置项（由 liveUiSettings 统一持久化） */
 export type PkArenaSettings = {

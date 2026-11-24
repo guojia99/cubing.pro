@@ -49,13 +49,13 @@ const BracketFitTeamName: React.FC<BracketFitTeamNameProps> = ({
       size -= 0.25;
       el.style.fontSize = `${size}px`;
     }
-  }, [text, maxPx, minPx]);
+  }, [maxPx, minPx]);
 
   useLayoutEffect(() => {
     fit();
     const id = requestAnimationFrame(() => fit());
     return () => cancelAnimationFrame(id);
-  }, [fit]);
+  }, [fit, text]);
 
   useLayoutEffect(() => {
     const el = ref.current;

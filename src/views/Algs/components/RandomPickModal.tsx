@@ -18,7 +18,6 @@ import { isLocal } from "@/services/cubing-pro/request";
 
 import AlgsCubeDiagram from "./AlgsCubeDiagram";
 import RandomWheel, { type WheelSegment } from "./RandomWheel";
-import { RANDOM_PICK_ICON_SVG } from "../utils/randomPickIcon";
 import "./randomPickModal.css";
 
 const WHEEL_SEGMENT_COUNT = 12;

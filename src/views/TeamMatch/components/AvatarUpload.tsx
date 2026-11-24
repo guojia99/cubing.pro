@@ -1,5 +1,6 @@
 import { useTeamMatchI18n } from '@/views/TeamMatch/i18n';
 import { Button, Modal, Upload } from 'antd';
+import { Image } from '@chakra-ui/react';
 import React, { useState } from 'react';
 import ReactCrop, { type Crop, type PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
@@ -80,7 +81,7 @@ const AvatarUpload: React.FC<Props> = ({ value, onChange }) => {
     <div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         {value ? (
-          <img alt="" src={value} style={{ width: 48, height: 48, borderRadius: 8, objectFit: 'cover' }} />
+          <Image alt="" src={value} style={{ width: 48, height: 48, borderRadius: 8, objectFit: 'cover' }} />
         ) : (
           <div style={{ width: 48, height: 48, borderRadius: 8, background: 'var(--muted)' }} />
         )}
@@ -121,7 +122,7 @@ const AvatarUpload: React.FC<Props> = ({ value, onChange }) => {
             onComplete={(c) => setPixelCrop(c)}
             aspect={1}
           >
-            <img ref={imgRef} alt="" src={src} onLoad={onImageLoad} style={{ maxWidth: '100%' }} />
+            <Image ref={imgRef} alt="" src={src} onLoad={onImageLoad} fit="contain" style={{ maxWidth: '100%' }} />
           </ReactCrop>
         )}
       </Modal>

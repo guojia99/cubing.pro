@@ -8,6 +8,7 @@ import { CompAPI } from '@/services/cubing-pro/comps/typings';
 import { apiEvents } from '@/services/cubing-pro/events/events';
 import { EventsAPI } from '@/services/cubing-pro/events/typings';
 import { Alert, Button, Grid, message, Select, Table, Tooltip } from 'antd';
+import { Image as ChakraImage } from '@chakra-ui/react';
 import dynamic from 'next/dynamic';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
@@ -95,7 +96,7 @@ const ScrambleImage: React.FC<ScrambleImageProps> = ({ sc, ev }) => {
 
   return (
     <div className={'svg-container'}>
-      <img src={pngData} alt={p('competitionPublic.diagramAlt', { scramble: sc })} />
+      <ChakraImage src={pngData} alt={p('competitionPublic.diagramAlt', { scramble: sc })} fit="fill" />
     </div>
   );
 };

@@ -262,7 +262,6 @@ ${intl.formatMessage({ id: 'wca.resultTable.competitionCount' })}: ${wcaProfile.
 // 从 PersonBestRank 构建单排序模式表格数据
 function buildSingleSortTableData(
   rankData: PersonBestRank,
-  _intl: ReturnType<typeof useIntl>,
 ): TableData[] {
   const { best, average } = rankData;
   const tableData: TableData[] = [];
@@ -322,7 +321,6 @@ function buildSingleSortTableData(
 // 构建「最佳」模式表格数据：综合 NR/CR/WR 各自最佳排名
 function buildBestModeTableData(
   personBestRanks: PersonBestRanks,
-  _intl: ReturnType<typeof useIntl>,
 ): TableData[] {
   const { withNR, withCR, withWR } = personBestRanks;
   const tableData: TableData[] = [];
@@ -381,13 +379,12 @@ function buildBestModeTableData(
 function buildHistoricalTableData(
   personBestRanks: PersonBestRanks,
   sortMode: HistoricalSortMode,
-  intl: ReturnType<typeof useIntl>,
 ): TableData[] {
   if (sortMode === 'best') {
-    return buildBestModeTableData(personBestRanks, intl);
+    return buildBestModeTableData(personBestRanks);
   }
   const rankData = personBestRanks[sortMode];
-  return buildSingleSortTableData(rankData, intl);
+  return buildSingleSortTableData(rankData);
 }
 
 const WCAPlayerResultTable: React.FC<WCAPlayerResultTableProps> = ({
@@ -433,8 +430,8 @@ const WCAPlayerResultTable: React.FC<WCAPlayerResultTableProps> = ({
 
   const historicalData = useMemo(() => {
     if (!personBestRanks) return [];
-    return buildHistoricalTableData(personBestRanks, historicalSortMode, intl);
-  }, [personBestRanks, historicalSortMode, intl]);
+    return buildHistoricalTableData(personBestRanks, historicalSortMode);
+  }, [personBestRanks, historicalSortMode]);
 
   const tableData = viewMode === 'current' ? currentData : historicalData;
   const isHistorical = viewMode === 'historical';

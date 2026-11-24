@@ -188,7 +188,6 @@ export function createFirst333AverageSub10Milestone(
         { id: 'wca.milestone.line333Round' },
         {
           date: c.start_date,
-          // eslint-disable-next-line @typescript-eslint/no-use-before-define
           comp: getCompName(c.name),
           round: roundLabel,
           avg: avgStr,

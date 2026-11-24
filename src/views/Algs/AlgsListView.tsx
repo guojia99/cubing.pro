@@ -212,8 +212,8 @@ function AlgorithmCatalog() {
     };
   }, []);
 
-  const cubeKeys = data?.CubeKeys ?? [];
-  const classMap = data?.ClassMap ?? {};
+  const cubeKeys = useMemo(() => data?.CubeKeys ?? [], [data]);
+  const classMap = useMemo(() => data?.ClassMap ?? {}, [data]);
 
   const filteredCubes = useMemo(
     () => (filterCube ? [filterCube] : cubeKeys),

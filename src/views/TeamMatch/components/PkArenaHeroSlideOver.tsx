@@ -1,5 +1,6 @@
 import type { PkArenaSettings } from '@/views/TeamMatch/pkArenaSettings';
 import { Button, Typography } from 'antd';
+import { Image } from '@chakra-ui/react';
 import classNames from 'classnames';
 import React, { useEffect, useState } from 'react';
 import '../TeamMatch.css';
@@ -75,7 +76,7 @@ function PkArenaHeroSlideOver({ open, anchor, onClose, settings, data }: Props) 
 
           <div className="tmPkArenaHeroAvatarBlock">
             {data.avatarDataUrl ? (
-              <img
+              <Image
                 alt=""
                 src={data.avatarDataUrl}
                 className="tmPkArenaHeroAvatar"

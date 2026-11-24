@@ -31,7 +31,7 @@ test('Data tables, icon tooltips, chart and copied results switch through seven 
           <section id="results">{ResultsTable([result], ['EventName', 'Round', 'CubeID', 'Best', 'Average', 'Result'], [])}</section>
           <section id="records">{RecordsTable([record], ['EventId', 'Best', 'Average'])}</section>
           <section id="comps">{CompsTable([comp], ['EventMin', 'Genre', 'Status'])}</section>
-          <section id="chart">{ResultGraphChart('333', [result], [])}</section>
+          <section id="chart">{ResultGraphChart('333', [result])}</section>
         </I18nProvider>);
         window.domainTest = {
           locales: SUPPORTED_LOCALES.map(x => x.key),

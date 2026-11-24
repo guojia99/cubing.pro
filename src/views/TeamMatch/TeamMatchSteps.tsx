@@ -48,6 +48,7 @@ import {
   message,
 } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
+import { Image } from '@chakra-ui/react';
 import { v4 as uuidv4 } from 'uuid';
 
 type TeamMatchStepsProps = {
@@ -212,7 +213,7 @@ const TeamMatchSteps: React.FC<TeamMatchStepsProps> = ({ liveUISettings, onLiveU
                 title: tr('teamMatch.avatar'),
                 render: (_, r: Player) =>
                   r.avatarDataUrl ? (
-                    <img alt="" src={r.avatarDataUrl} style={{ width: 36, height: 36, borderRadius: 6, objectFit: 'cover' }} />
+                    <Image alt="" src={r.avatarDataUrl} style={{ width: 36, height: 36, borderRadius: 6, objectFit: 'cover' }} />
                   ) : (
                     <span style={{ color: 'var(--faint-foreground)' }}>—</span>
                   ),

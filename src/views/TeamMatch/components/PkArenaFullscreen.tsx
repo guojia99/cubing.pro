@@ -8,6 +8,7 @@ import { buildPkArenaHeroDetail } from '@/views/TeamMatch/pkArenaHeroBuild';
 import type { PkArenaSettings } from '@/views/TeamMatch/pkArenaSettings';
 import type { PkPlayerResult, Team } from '@/views/TeamMatch/types';
 import { Button, Space, Typography } from 'antd';
+import { Image } from '@chakra-ui/react';
 import classNames from 'classnames';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { DarkMode } from '@/components/ui/color-mode';
@@ -131,8 +132,7 @@ function PkArenaFullscreen({
     return () => window.clearTimeout(tid);
   }, [
     heroOpen,
-    carousel?.side,
-    carousel?.idx,
+    carousel,
     settings.heroCarouselIntervalMs,
     playersA,
     playersB,
@@ -259,7 +259,7 @@ function PkArenaFullscreen({
                       }}
                     >
                       {p.avatarDataUrl ? (
-                        <img
+                        <Image
                           alt=""
                           src={p.avatarDataUrl}
                           className="tmPkArenaFsAvatar"
@@ -351,7 +351,7 @@ function PkArenaFullscreen({
                       }}
                     >
                       {p.avatarDataUrl ? (
-                        <img
+                        <Image
                           alt=""
                           src={p.avatarDataUrl}
                           className="tmPkArenaFsAvatar"

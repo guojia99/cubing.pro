@@ -1,7 +1,6 @@
 import { eventRouteM } from '@/components/Data/cube_result/event_route';
 import { Result, resultStringPro, resultTimeString } from '@/components/Data/types/result';
 import { Table } from 'antd';
-import type { ReactNode } from 'react';
 
 import { RecordTagWithResult } from '@/components/Data/cube_record/record_tag';
 import { generateRecordMap } from '@/components/Data/cube_record/record_utils';
@@ -161,17 +160,12 @@ export const ResultsTable = (
         dataIndex: 'Result',
         key: 'Result',
         render: (results: number[], result: Result) => {
-          let body: ReactNode[] = [];
-          // eslint-disable-next-line array-callback-return
           const data = resultStringPro(results, result.EventRoute);
-          // eslint-disable-next-line array-callback-return
-          data.map((value: string, idx: number) => {
-            body.push(
-              <span key={idx} className="cube_result_result_cell" style={{ minWidth: '80px', display: 'inline-block' }}>
-                {value}
-              </span>,
-            );
-          });
+          const body = data.map((value: string, idx: number) => (
+            <span key={idx} className="cube_result_result_cell" style={{ minWidth: '80px', display: 'inline-block' }}>
+              {value}
+            </span>
+          ));
           return <div className={'cube_result_results_col'}>{body}</div>;
         },
       },
@@ -183,17 +177,12 @@ export const ResultsTable = (
         dataIndex: 'Result',
         key: 'Result',
         render: (results: number[], result: Result) => {
-          let body: ReactNode[] = [];
-          // eslint-disable-next-line array-callback-return
           const data = resultStringPro(results, result.EventRoute);
-          // eslint-disable-next-line array-callback-return
-          data.map((value: string, idx: number) => {
-            body.push(
-              <span key={idx} className="cube_result_result_cell" style={{ minWidth: '80px', display: 'inline-block' }}>
-                {RecordTagWithResult(value, result.id + '_repeatedly', true, false, recordsMap)}
-              </span>,
-            );
-          });
+          const body = data.map((value: string, idx: number) => (
+            <span key={idx} className="cube_result_result_cell" style={{ minWidth: '80px', display: 'inline-block' }}>
+              {RecordTagWithResult(value, result.id + '_repeatedly', true, false, recordsMap)}
+            </span>
+          ));
           return <div className={'cube_result_results_col'}>{body}</div>;
         },
       },

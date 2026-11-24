@@ -115,7 +115,6 @@ export function resultsTimeFormat(value: number, event: string, isAvg: boolean):
 
   switch (event) {
     case '333fm':
-      // eslint-disable-next-line no-case-declarations
       let dd: number = value;
       if (dd >= 1000) {
         dd /= 100;
@@ -128,13 +127,11 @@ export function resultsTimeFormat(value: number, event: string, isAvg: boolean):
 
     case '333mbf':
       // 多盲：解析 DD TTTTT MM
-      // eslint-disable-next-line no-case-declarations
       const { solved, attempted, formattedTime } = get333MBFResult(value);
       return `${solved}/${attempted} ${formattedTime}`;
 
     default:
       // 其他项目：转换为秒并格式化
-      // eslint-disable-next-line no-case-declarations
       const seconds = value / 100;
       return secondTimeFormat(seconds, false);
   }

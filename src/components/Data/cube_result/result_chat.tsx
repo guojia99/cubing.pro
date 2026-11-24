@@ -1,4 +1,3 @@
-import { Record } from '@/components/Data/types/record';
 import {DAvg, DBest, Result, resultTimeString} from '@/components/Data/types/result';
 
 import { eventRouteM } from '@/components/Data/cube_result/event_route';
@@ -7,14 +6,12 @@ import ScoreLineChart from '@/components/Data/cube_result/result_echarts';
 export const ResultGraphChart = (
   eventID: string,
   dataSource: Result[],
-  records: Record[] | undefined,
 ) => {
   if (dataSource.length === 0) {
     return <></>;
   }
 
   const ev = eventRouteM(dataSource[0].EventRoute);
-  // const recordsMap = generateRecordMap(records); // map[resultsID]Record
 
   const data: {
     index: number;
@@ -47,7 +44,6 @@ export const ResultGraphChart = (
         type: 'average',
         round,
         competition,
-        // valueStr: recordsMap?.[dataSource[i].ID]?.AverageStr, // 同上
       });
     }
   }

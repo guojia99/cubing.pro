@@ -60,7 +60,7 @@ export const PlayerEventResultPanel: React.FC<PlayerEventResultPanelProps> = ({
     <div style={{ minWidth: 0, maxWidth: '100%' }}>
       <SectionHeader title={CubesCn(eventId, locale)} />
 
-      {ResultGraphChart(eventId, res, records)}
+      {ResultGraphChart(eventId, res)}
 
 
 

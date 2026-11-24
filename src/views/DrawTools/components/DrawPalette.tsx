@@ -42,6 +42,8 @@ const SHAPE_POINTER_STYLE = {
   pointerEvents: "all" as const,
 };
 
+const EMPTY_SVG_POINTS: PathSvg[] = [];
+
 function getFormattedDate(): string {
   const now = new Date();
   const year = now.getFullYear().toString().slice(2);
@@ -82,7 +84,7 @@ function DownloadIcon() {
 export function DrawPalette({
   presetColors = [],
   storageKey = "color-history",
-  svgPoints = [],
+  svgPoints = EMPTY_SVG_POINTS,
   viewBox,
   strokeWidthNum = 1,
   buttons,
@@ -91,7 +93,6 @@ export function DrawPalette({
 }: DrawPaletteProps) {
   const { t, locale } = useI18n();
   const [colors, setColors] = useState<Record<string, string>>({});
-  const [keys, setKeys] = useState<string[]>([]);
   const [selectedColor, setSelectedColor] = useState<string>();
   const svgRef = useRef<SVGSVGElement>(null);
   const [downloadName, setDownloadName] = useState("");
@@ -104,7 +105,10 @@ export function DrawPalette({
     }));
   }, []);
 
-  const svgPointsKey = JSON.stringify(svgPoints);
+  const keys = useMemo(
+    () => svgPoints.map((elem) => buildRenderKey(storageKey, elem.key, elem.disableDrawing)),
+    [svgPoints, storageKey],
+  );
 
   const keyDefaults = useMemo(() => {
     const defaults: Record<string, string> = {};
@@ -113,30 +117,20 @@ export function DrawPalette({
       defaults[buildRenderKey(storageKey, elem.key, elem.disableDrawing)] = elem.defaultFill;
     }
     return defaults;
-  }, [svgPointsKey, storageKey]);
+  }, [svgPoints, storageKey]);
 
   useEffect(() => {
-    const nextKeys: string[] = [];
-    for (let i = 0; i < svgPoints.length; i++) {
-      nextKeys.push(
-        buildRenderKey(storageKey, svgPoints[i].key, svgPoints[i].disableDrawing),
-      );
-    }
-    setKeys(nextKeys);
-
     setColors((prevColors) => {
-      let changed = false;
-      const next = { ...prevColors };
-      for (let i = 0; i < nextKeys.length; i++) {
-        const key = nextKeys[i];
-        if (next[key] === undefined) {
-          next[key] = defaultColorForKey(key, svgPoints[i]?.defaultFill);
-          changed = true;
+      let next = prevColors;
+      for (const key of keys) {
+        if (prevColors[key] === undefined) {
+          if (next === prevColors) next = { ...prevColors };
+          next[key] = defaultColorForKey(key, keyDefaults[key]);
         }
       }
-      return changed ? next : prevColors;
+      return next;
     });
-  }, [svgPointsKey, storageKey]);
+  }, [keys, keyDefaults]);
 
   const paintShape = useCallback(
     (key: string, unbindKey: string | null | undefined) => {

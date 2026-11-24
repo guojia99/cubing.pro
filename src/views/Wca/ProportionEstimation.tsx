@@ -116,7 +116,7 @@ export function ProportionEstimationView() {
   }, [load]);
 
   const backendAnchor = data?.events[0] ?? "";
-  const globalMap = data?.global_ratio ?? {};
+  const globalMap = useMemo(() => data?.global_ratio ?? {}, [data?.global_ratio]);
 
   const inferResolved = useMemo(() => {
     if (!data?.events?.length || !backendAnchor || !anchorEvent) {

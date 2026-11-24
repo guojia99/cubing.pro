@@ -592,7 +592,7 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
     });
   };
 
-  const onDnf = () => {
+  const onDnf = useCallback(() => {
     if (!ctx || !currentRow) {
       return;
     }
@@ -619,7 +619,7 @@ const GroupTimer: React.FC<Props> = ({ comp, baseEvents, open, onClose }) => {
         : undefined,
       updatedAt: new Date().toISOString(),
     });
-  };
+  }, [ctx, currentRow, inputLocked, pendingSpare, isMbf, mbfAttemptedStr, commitRecord]);
 
   const clearCurrentDns = () => {
     if (!slotKey) {

@@ -128,7 +128,7 @@ const GrandSlamRank: React.FC = () => {
       { value: WORLD_KEY, label: intl.formatMessage({ id: 'wca.historicalRank.worldwide' }) },
       ...list,
     ];
-  }, [countries, countryIdsInData, intl.locale, intl]);
+  }, [countries, countryIdsInData, intl]);
 
   const filteredData = useMemo(() => {
     let result = data.filter((r) => !EXCLUDED_EVENTS.includes(r.eventID));

@@ -1,4 +1,5 @@
 import cstimer from 'cstimer_module';
+import { Image as ChakraImage } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import { useCompetitionPublicI18n } from '../../i18n';
 
@@ -62,7 +63,7 @@ export const ScrambleImageMini: React.FC<Props> = ({ scramble, puzzleId, classNa
   }
   return (
     <div className={className}>
-      <img src={pngData} alt={p('competitionPublic.diagramAlt', { scramble })} style={{ maxWidth: '100%', height: 'auto' }} />
+      <ChakraImage src={pngData} alt={p('competitionPublic.diagramAlt', { scramble })} fit="fill" style={{ maxWidth: '100%', height: 'auto' }} />
     </div>
   );
 };

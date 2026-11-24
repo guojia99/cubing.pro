@@ -144,7 +144,7 @@ const EliminationStage: React.FC<EliminationStageProps> = ({ liveSettings, onOpe
     } else {
       setPkDraft(buildPkGroupTemplateRows(m.teamIds, teams));
     }
-  }, [pkOpen, focused?.id, focused?.pk?.teamIds, teams]);
+  }, [pkOpen, focused, teams]);
 
   const openArenaForMatch = (id: string) => {
     dispatch({ type: 'SET_UI_FOCUS', matchId: id });

@@ -212,7 +212,7 @@ const BracketStage: React.FC<BracketStageProps> = ({ liveSettings, onOpenLiveSet
     } else {
       setPkDraft(buildPkTemplateRows(ta.id, tb.id, ta, tb));
     }
-  }, [pkOpen, focused?.id, teams]);
+  }, [pkOpen, focused, teams]);
 
   const openArenaForMatch = (id: string) => {
     dispatch({ type: 'SET_UI_FOCUS', matchId: id });

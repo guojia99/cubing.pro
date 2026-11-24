@@ -16,7 +16,16 @@ const staticExport =
 const nextConfig: NextConfig = {
   ...(staticExport
     ? { output: "export" as const, distDir: "dist" }
-    : {}),
+    : {
+        async rewrites() {
+          return [
+            {
+              source: "/v3/cube-api/:path*",
+              destination: `${CUBE_API_UPSTREAM}/:path*`,
+            },
+          ];
+        },
+      }),
   trailingSlash: true,
   images: {
     unoptimized: true,
@@ -27,15 +36,6 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     optimizePackageImports: ["@chakra-ui/react", "react-icons"],
-  },
-  async rewrites() {
-    // 仅 next dev / next start 生效；output: export 产物不经过 rewrites
-    return [
-      {
-        source: "/v3/cube-api/:path*",
-        destination: `${CUBE_API_UPSTREAM}/:path*`,
-      },
-    ];
   },
 };
 

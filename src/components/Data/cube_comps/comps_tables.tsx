@@ -3,6 +3,7 @@
 import "@/components/Data/table_fixed_column.css";
 
 import { Badge, Table, Tag } from "antd";
+import { Image as ChakraImage } from "@chakra-ui/react";
 import type { ColumnsType } from "antd/es/table";
 import NextLink from "next/link";
 import { Fragment } from "react";
@@ -104,7 +105,7 @@ export const CompsTableColumns: ColumnsType<Comp> = [
       return (
         <>
           <Tag color={color}>{label}</Tag>
-          {icon && <img src={icon} alt="WCA" style={{ width: 16, marginRight: 8 }} />}
+          {icon && <ChakraImage src={icon} alt="WCA" fit="fill" style={{ width: 16, marginRight: 8 }} />}
         </>
       );
     },
@@ -120,9 +121,10 @@ export const CompsTableColumns: ColumnsType<Comp> = [
           {result.Name}
         </NextLink>
         {result.logo && (
-          <img
+          <ChakraImage
             src={result.logo}
             alt={result.Name}
+            fit="fill"
             style={{ width: "1em", height: "1em", marginLeft: "0.5em", verticalAlign: "middle" }}
           />
         )}

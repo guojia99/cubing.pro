@@ -21,19 +21,21 @@ const WCAPlayerStaticsTabResultsWithEvent: React.FC<WCAPlayerStaticsTabResultsWi
 }) => {
   const intl = useIntl();
   // 按 event_id 分组成绩
-  const resultsByEvent = new Map<string, WCAResult[]>();
-
-  wcaResults.forEach((result) => {
-    if (!resultsByEvent.has(result.event_id)) {
-      resultsByEvent.set(result.event_id, []);
-    }
-    resultsByEvent.get(result.event_id)!.push(result);
-  });
+  const resultsByEvent = useMemo(() => {
+    const grouped = new Map<string, WCAResult[]>();
+    wcaResults.forEach((result) => {
+      if (!grouped.has(result.event_id)) {
+        grouped.set(result.event_id, []);
+      }
+      grouped.get(result.event_id)!.push(result);
+    });
+    return grouped;
+  }, [wcaResults]);
 
   // 获取选手实际参加过的项目，并按 eventOrder 排序
-  const userEvents = Array.from(resultsByEvent.keys())
+  const userEvents = useMemo(() => Array.from(resultsByEvent.keys())
     .filter((event) => eventOrder.includes(event))
-    .sort((a, b) => eventOrder.indexOf(a) - eventOrder.indexOf(b))
+    .sort((a, b) => eventOrder.indexOf(a) - eventOrder.indexOf(b)), [resultsByEvent]);
 
   const tabItems: TabsProps['items'] = useMemo(
     () =>
@@ -49,7 +51,7 @@ const WCAPlayerStaticsTabResultsWithEvent: React.FC<WCAPlayerStaticsTabResultsWi
           />
         ),
       })),
-    [userEvents, comps, wcaRankTimer, wcaResults],
+    [userEvents, resultsByEvent, comps, wcaRankTimer],
   );
 
   if (userEvents.length === 0) {
