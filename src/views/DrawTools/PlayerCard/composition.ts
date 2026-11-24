@@ -81,6 +81,11 @@ export function paintCard(canvas: HTMLCanvasElement, image: HTMLImageElement, cr
   gradient.addColorStop(1, "rgba(8, 25, 51, 0.8)");
   ctx.fillStyle = gradient;
   ctx.fillRect(0, CARD_SIZE * 0.55, CARD_SIZE, CARD_SIZE * 0.45);
+  ctx.save();
+  ctx.strokeStyle = "rgba(225, 235, 248, 0.45)";
+  ctx.lineWidth = 2;
+  ctx.strokeRect(24, 24, CARD_SIZE - 48, CARD_SIZE - 48);
+  ctx.restore();
   const label = name.trim();
   if (!label) return;
   ctx.save();

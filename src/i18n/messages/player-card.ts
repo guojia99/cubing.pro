@@ -2,6 +2,9 @@ import type { Locale } from "../locales";
 
 // Column order: zh-CN, en-US, ja, yue-Hant-HK, ko, fr, es.
 const messages = {
+  "playerCard.repair": ["修复擦除", "Repair eraser", "修復消しゴム", "修補擦除", "보정 지우개", "Gomme de retouche", "Borrador de retoque"],
+  "playerCard.undoStroke": ["撤销上一笔", "Undo latest stroke", "最後のストロークを元に戻す", "復原上一筆", "마지막 획 취소", "Annuler le dernier trait", "Deshacer último trazo"],
+  "playerCard.repairHint": ["涂抹擦除残留背景，露出舞台。关闭修复擦除可移动照片。", "Brush away leftover background to reveal the stage. Turn off the eraser to move the photo.", "背景の残りを消してステージを表示。写真を動かすには消しゴムをオフにします。", "塗抹擦走剩低嘅背景，露出舞台。關閉擦除就可以移動相片。", "남은 배경을 지워 무대를 드러내세요. 사진을 움직이려면 지우개를 끄세요.", "Effacez les restes du fond pour révéler la scène. Désactivez la gomme pour déplacer la photo.", "Borra los restos del fondo para revelar el escenario. Desactiva el borrador para mover la foto."],
   "playerCard.replaceBackground": ["替换纯色背景", "Replace solid background", "単色の背景を置換", "替換純色背景", "단색 배경 바꾸기", "Remplacer le fond uni", "Reemplazar fondo liso"],
   "playerCard.cancelBackground": ["取消替换", "Cancel replacement", "置換をキャンセル", "取消替換", "바꾸기 취소", "Annuler le remplacement", "Cancelar reemplazo"],
   "playerCard.pickBackground": ["轻点预览中清晰的纯色背景区域。", "Tap a clear solid background area in the preview.", "プレビューの単色の背景部分をタップしてください。", "輕點預覽入面清晰嘅純色背景位置。", "미리보기에서 선명한 단색 배경을 탭하세요.", "Touchez une zone de fond uni dans l’aperçu.", "Toca una zona de fondo liso en la vista previa."],

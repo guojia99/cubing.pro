@@ -7,6 +7,7 @@ import { useI18n } from "@/contexts/I18nProvider";
 import { CARD_SIZE, INITIAL_CROP, cardFilename, clampCrop, inspectPhoto, paintCard, zoomCrop } from "./composition";
 import { replaceSolidBackground, sourcePoint } from "./solidBackground";
 import { loadNicknameFont, NICKNAME_FALLBACK } from "./nicknameFont";
+import { eraseSegment, repairPoint, REPAIR_RADIUS, type BrushPoint } from "./repairBrush";
 
 export function PlayerCardView() {
   const { t } = useI18n();
@@ -17,6 +18,11 @@ export function PlayerCardView() {
   const [replacement, setReplacement] = useState<HTMLCanvasElement | null>(null);
   const [picking, setPicking] = useState(false);
   const [retry, setRetry] = useState(false);
+  const [repairing, setRepairing] = useState(false);
+  const [canUndo, setCanUndo] = useState(false);
+  const undo = useRef<ImageData | null>(null);
+  const stroke = useRef<{ id: number; point: BrushPoint } | null>(null);
+  const ring = useRef<SVGSVGElement>(null);
   const tap = useRef<{ id: number; x: number; y: number; moved: boolean } | null>(null);
   const [crop, setCrop] = useState(INITIAL_CROP);
   const [name, setName] = useState("");
@@ -58,6 +64,26 @@ export function PlayerCardView() {
     if (image && canvas.current) paintCard(canvas.current, image, crop, nicknamePending ? "" : name, nicknameFont ?? NICKNAME_FALLBACK, transparentBackground, replacement);
   }, [image, crop, name, nicknamePending, nicknameFont, transparentBackground, replacement]);
 
+  function resetRepair() {
+    setRepairing(false); setCanUndo(false); undo.current = null; stroke.current = null;
+    if (ring.current) ring.current.style.display = "none";
+  }
+
+  function repaint() {
+    if (image && canvas.current) paintCard(canvas.current, image, crop, nicknamePending ? "" : name, nicknameFont ?? NICKNAME_FALLBACK, transparentBackground, replacement);
+  }
+
+  function showRing(clientX: number, clientY: number) {
+    const rect = canvas.current!.getBoundingClientRect();
+    const x = clientX - rect.left, y = clientY - rect.top;
+    if (ring.current) {
+      ring.current.style.display = x >= 0 && y >= 0 && x <= rect.width && y <= rect.height ? "block" : "none";
+      ring.current.style.left = `${x - REPAIR_RADIUS - 1}px`;
+      ring.current.style.top = `${y - REPAIR_RADIUS - 1}px`;
+    }
+    return repairPoint(image!.naturalWidth, image!.naturalHeight, replacement!.width, replacement!.height, crop, rect, clientX, clientY);
+  }
+
   function download() {
     if (!image || !canvas.current || nicknamePending) return;
     try {
@@ -80,6 +106,7 @@ export function PlayerCardView() {
           const selected = event.target.files?.[0];
           if (!selected) return;
           setReplacement(null); setPicking(false); setRetry(false); tap.current = null;
+          resetRepair();
           setImage(null); setFile(null); setCrop(INITIAL_CROP); setError(null); drag.current = null;
           if (!/^image\/(png|jpeg|webp|avif|gif|bmp)$/.test(selected.type) || selected.size === 0) setError("decode");
           else setFile(selected);
@@ -89,10 +116,18 @@ export function PlayerCardView() {
         <Surface p={{ base: 3, md: 4 }}>
           <Box position="relative" aspectRatio="1" bg="bg.subtle" overflow="hidden" borderRadius="lg">
             <canvas ref={canvas} width={CARD_SIZE} height={CARD_SIZE} role="img" aria-label={t("playerCard.preview")}
-              style={{ display: "block", width: "100%", height: "100%", visibility: image ? "visible" : "hidden", touchAction: "none", cursor: picking ? "crosshair" : image ? "grab" : "default" }}
+              style={{ display: "block", width: "100%", height: "100%", visibility: image ? "visible" : "hidden", touchAction: "none", cursor: repairing ? "none" : picking ? "crosshair" : image ? "grab" : "default" }}
               onPointerDown={(event) => {
                 if (!image || !event.isPrimary || event.button !== 0) return;
                 event.currentTarget.setPointerCapture(event.pointerId);
+                if (repairing && replacement) {
+                  event.preventDefault();
+                  undo.current = replacement.getContext("2d")!.getImageData(0, 0, replacement.width, replacement.height);
+                  const point = showRing(event.clientX, event.clientY);
+                  stroke.current = { id: event.pointerId, point };
+                  eraseSegment(replacement, point); repaint(); setCanUndo(true);
+                  return;
+                }
                 if (picking) {
                   tap.current = { id: event.pointerId, x: event.clientX, y: event.clientY, moved: false };
                   return;
@@ -100,6 +135,17 @@ export function PlayerCardView() {
                 drag.current = { id: event.pointerId, x: event.clientX, y: event.clientY };
               }}
               onPointerMove={(event) => {
+                if (repairing && replacement) {
+                  if (!event.isPrimary) return;
+                  const point = showRing(event.clientX, event.clientY);
+                  if (stroke.current?.id === event.pointerId) {
+                    event.preventDefault();
+                    eraseSegment(replacement, point, stroke.current.point);
+                    stroke.current.point = point;
+                    repaint();
+                  }
+                  return;
+                }
                 if (picking) {
                   const start = tap.current;
                   if (start?.id === event.pointerId && Math.hypot(event.clientX - start.x, event.clientY - start.y) > 6) start.moved = true;
@@ -114,6 +160,13 @@ export function PlayerCardView() {
                 setCrop(value => clampCrop(image.naturalWidth, image.naturalHeight, { ...value, x: value.x + dx, y: value.y + dy }));
               }}
               onPointerUp={(event) => {
+                if (stroke.current?.id === event.pointerId) {
+                  stroke.current = null;
+                  event.currentTarget.releasePointerCapture(event.pointerId);
+                  if (event.pointerType === "mouse") showRing(event.clientX, event.clientY);
+                  else if (ring.current) ring.current.style.display = "none";
+                  return;
+                }
                 const start = tap.current;
                 if (image && picking && start?.id === event.pointerId) {
                   tap.current = null;
@@ -132,9 +185,18 @@ export function PlayerCardView() {
                   event.currentTarget.releasePointerCapture(event.pointerId);
                 }
               }}
-              onPointerCancel={() => { drag.current = null; tap.current = null; }}
-              onLostPointerCapture={() => { drag.current = null; tap.current = null; }}
+              onPointerLeave={() => { if (ring.current) ring.current.style.display = "none"; }}
+              onPointerCancel={() => { drag.current = null; tap.current = null; stroke.current = null; if (ring.current) ring.current.style.display = "none"; }}
+              onLostPointerCapture={() => {
+                if (stroke.current && ring.current) ring.current.style.display = "none";
+                drag.current = null; tap.current = null; stroke.current = null;
+              }}
             />
+            <svg ref={ring} data-testid="repair-ring" aria-hidden="true" width={REPAIR_RADIUS * 2 + 2} height={REPAIR_RADIUS * 2 + 2}
+              style={{ display: "none", position: "absolute", pointerEvents: "none", overflow: "visible" }}>
+              <circle cx={REPAIR_RADIUS + 1} cy={REPAIR_RADIUS + 1} r={REPAIR_RADIUS} fill="none" stroke="white" strokeWidth="1" />
+              <circle cx={REPAIR_RADIUS + 1} cy={REPAIR_RADIUS + 1} r={REPAIR_RADIUS} fill="none" stroke="#18253b" strokeWidth="1" strokeDasharray="3 3" />
+            </svg>
             {!image && (
               <Stack position="absolute" inset="0" align="center" justify="center" p="5" gap="3" textAlign="center">
                 {file && !error ? <Text color="fg.muted" role="status">{t("playerCard.loading")}</Text> : <>
@@ -145,13 +207,23 @@ export function PlayerCardView() {
               </Stack>
             )}
           </Box>
-          {image && <Text role="status" fontSize="sm" color="fg.muted" mt="3">{t(picking ? retry ? "playerCard.retryBackground" : "playerCard.pickBackground" : "playerCard.move")}</Text>}
+          {image && <Text role="status" fontSize="sm" color="fg.muted" mt="3">{t(repairing ? "playerCard.repairHint" : picking ? retry ? "playerCard.retryBackground" : "playerCard.pickBackground" : "playerCard.move")}</Text>}
         </Surface>
         <Surface>
           <Stack gap="6">
             {image && <Button variant="outline" onClick={() => photoInput.current?.click()}>{t("playerCard.photo")}</Button>}
             {image && opaque && <Stack gap="2">
-              {replacement ? <Button variant="outline" onClick={() => { setReplacement(null); setRetry(false); }}>{t("playerCard.restoreBackground")}</Button> :
+              {replacement ? <>
+                <Button variant={repairing ? "solid" : "outline"} aria-pressed={repairing} onClick={() => {
+                  setRepairing(!repairing); drag.current = null; stroke.current = null;
+                  if (ring.current) ring.current.style.display = "none";
+                }}>{t("playerCard.repair")}</Button>
+                <Button variant="outline" disabled={!canUndo} onClick={() => {
+                  replacement.getContext("2d")!.putImageData(undo.current!, 0, 0);
+                  undo.current = null; setCanUndo(false); repaint();
+                }}>{t("playerCard.undoStroke")}</Button>
+                <Button variant="outline" onClick={() => { resetRepair(); setReplacement(null); setRetry(false); }}>{t("playerCard.restoreBackground")}</Button>
+              </> :
                 <Button variant="outline" aria-pressed={picking} onClick={() => { setPicking(!picking); setRetry(false); drag.current = null; tap.current = null; }}>{t(picking ? "playerCard.cancelBackground" : "playerCard.replaceBackground")}</Button>}
             </Stack>}
             <Field.Root>
