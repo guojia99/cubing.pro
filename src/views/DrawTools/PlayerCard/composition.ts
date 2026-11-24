@@ -72,6 +72,10 @@ export function paintCard(canvas: HTMLCanvasElement, image: HTMLImageElement, cr
   const width = image.naturalWidth * scale;
   const height = image.naturalHeight * scale;
   ctx.clearRect(0, 0, CARD_SIZE, CARD_SIZE);
+  ctx.save();
+  ctx.beginPath();
+  ctx.roundRect(0, 0, CARD_SIZE, CARD_SIZE, 44);
+  ctx.clip();
   if (transparentBackground || replacement) paintStageBackdrop(ctx);
   else {
     ctx.fillStyle = "#eaf0f5";
@@ -95,13 +99,26 @@ export function paintCard(canvas: HTMLCanvasElement, image: HTMLImageElement, cr
   gradient.addColorStop(1, "rgba(8, 25, 51, 0.8)");
   ctx.fillStyle = gradient;
   ctx.fillRect(0, CARD_SIZE * 0.55, CARD_SIZE, CARD_SIZE * 0.45);
+  ctx.restore();
+
+  // All three rounded paths share corner centers at (44, 44) and its mirrors.
+  const rim = ctx.createLinearGradient(0, 0, CARD_SIZE, CARD_SIZE);
+  rim.addColorStop(0, "#467bc4");
+  rim.addColorStop(1, "#202747");
   ctx.save();
-  ctx.strokeStyle = "#103b70";
-  ctx.lineWidth = 24;
-  ctx.strokeRect(12, 12, CARD_SIZE - 24, CARD_SIZE - 24);
-  ctx.strokeStyle = "#bce6ff";
+  ctx.fillStyle = rim;
+  ctx.beginPath();
+  ctx.roundRect(0, 0, CARD_SIZE, CARD_SIZE, 44);
+  ctx.roundRect(16, 16, CARD_SIZE - 32, CARD_SIZE - 32, 28);
+  ctx.fill("evenodd");
+  const keyline = ctx.createLinearGradient(0, 0, CARD_SIZE, CARD_SIZE);
+  keyline.addColorStop(0, "#d4e6fa");
+  keyline.addColorStop(1, "#73849e");
+  ctx.strokeStyle = keyline;
   ctx.lineWidth = 2;
-  ctx.strokeRect(31, 31, CARD_SIZE - 62, CARD_SIZE - 62);
+  ctx.beginPath();
+  ctx.roundRect(17, 17, CARD_SIZE - 34, CARD_SIZE - 34, 27);
+  ctx.stroke();
   ctx.restore();
   const label = name.trim();
   if (!label) return;

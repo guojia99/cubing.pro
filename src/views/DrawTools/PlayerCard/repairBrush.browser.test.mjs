@@ -55,12 +55,14 @@ test('real hover, desktop/touch repair, bounded undo, restore and exact PNG', { 
       const original = await canvas.evaluate(c => c.toDataURL());
       const border = await canvas.evaluate(c => {
         const ctx = c.getContext('2d');
-        return [0, 12, 23, 24, 30, 31, 32].map(x => [...ctx.getImageData(x, 100, 1, 1).data]);
+        return [0, 12, 15, 16, 17, 18, 32].map(x => [...ctx.getImageData(x, 100, 1, 1).data]);
       });
-      for (const pixel of border.slice(0, 3)) assert.deepEqual(pixel, [16, 59, 112, 255], '24px dark blue outer frame');
-      assert.deepEqual(border[4], [188, 230, 255, 255], 'light blue inset');
-      assert.deepEqual(border[4], border[5]);
-      assert.deepEqual(border[3], border[6], 'image between and inside frame is sharp');
+      for (const pixel of border.slice(0, 3)) {
+        assert.equal(pixel[3], 255);
+        assert.ok(pixel[2] > pixel[1] && pixel[1] > pixel[0], 'blue rim');
+      }
+      for (const pixel of border.slice(3, 5)) assert.ok(pixel[0] > 190 && pixel[2] > 230, '2px silver-blue keyline');
+      assert.deepEqual(border[5], border[6], 'photo stays sharp immediately inside the keyline');
       await replace.click(); await canvas.scrollIntoViewIfNeeded();
       let rect = await canvas.boundingBox();
       await page.mouse.click(rect.x + rect.width * .1, rect.y + rect.height * .2);

@@ -162,7 +162,7 @@ export function PlayerCardView() {
         }} />
       <Grid templateColumns={{ base: "minmax(0, 1fr)", md: "minmax(0, 1.3fr) minmax(0, 1fr)" }} gap={{ base: 5, md: 8 }} alignItems="start">
         <Surface p={{ base: 3, md: 4 }}>
-          <Box position="relative" aspectRatio="1" bg="bg.subtle" overflow="hidden" borderRadius="lg">
+          <Box position="relative" aspectRatio="1" bg="bg.subtle" overflow="hidden">
             <canvas ref={canvas} width={CARD_SIZE} height={CARD_SIZE} role="img" aria-label={t("playerCard.preview")} tabIndex={selecting ? 0 : undefined}
               aria-describedby={selecting ? "player-card-box-hint" : undefined}
               onKeyDown={event => {

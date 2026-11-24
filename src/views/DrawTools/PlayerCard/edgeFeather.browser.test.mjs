@@ -58,8 +58,8 @@ for (const mobile of [false, true]) test(`output mask pixels: ${mobile ? 'mobile
             const reference = render(opaque, null, zoom, 17).card;
             checks.push(same(card.getContext('2d').getImageData(440, 780, 200, 250).data,
               reference.getContext('2d').getImageData(440, 780, 200, 250).data));
-            checks.push(same(card.getContext('2d').getImageData(0, 0, 24, 1080).data,
-              reference.getContext('2d').getImageData(0, 0, 24, 1080).data));
+            checks.push(same(card.getContext('2d').getImageData(0, 44, 18, 992).data,
+              reference.getContext('2d').getImageData(0, 44, 18, 992).data));
             const decoded = await decode(card), roundtrip = canvas(); roundtrip.getContext('2d').drawImage(decoded, 0, 0);
             checks.push(card.toDataURL() === roundtrip.toDataURL());
           }

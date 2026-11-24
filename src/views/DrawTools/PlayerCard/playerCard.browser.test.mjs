@@ -85,6 +85,51 @@ test("static player card: local photo, touch crop, preview fidelity and real PNG
     const sample = () => canvas.evaluate(el => [...el.getContext("2d").getImageData(400, 200, 1, 1).data]);
     assert.deepEqual(await sample(), [255, 0, 0, 255], "Photo paints immediately after decode");
     const emptyName = await canvas.evaluate(el => el.toDataURL());
+    // Narrow frame probe: actual 390px page preview, using only the quadrant fixture.
+    const frame = await canvas.evaluate(el => {
+      const ctx = el.getContext("2d");
+      const pixel = (x, y) => [...ctx.getImageData(x, y, 1, 1).data];
+      const parent = getComputedStyle(el.parentElement);
+      return {
+        radius: parent.borderTopLeftRadius,
+        width: el.getBoundingClientRect().width,
+        rim: [100, 300, 540, 780, 980].map(y => pixel(8, y)),
+        line: [100, 300, 540, 780, 980].map(y => pixel(16, y)),
+        topLeft: pixel(100, 8), bottomRight: pixel(979, 1071),
+        corners: [[10, 10], [1069, 10], [10, 1069], [1069, 1069]].map(([x, y]) => pixel(x, y)),
+        roundRim: pixel(14, 14), roundLine: pixel(24, 24),
+        inside: pixel(26, 26),
+        strip: [15, 16, 17, 18].map(x => pixel(x, 100)),
+      };
+    });
+    assert.equal(frame.radius, "0px", "Canvas owns rounded geometry; no CSS clipping disagreement");
+    assert.ok(frame.width > 280 && frame.width <= 390);
+    for (const pixel of frame.corners) assert.equal(pixel[3], 0, "All exported corners are transparent");
+    assert.equal(frame.roundRim[3], 255, "44px outer arc includes diagonal rim");
+    assert.ok(frame.roundLine[0] > 150 && frame.roundLine[2] > 180, "Concentric inner arc carries the keyline");
+    assert.deepEqual(frame.inside, [255, 0, 0, 255], "Photo begins inside the rounded keyline");
+    for (const samples of [frame.rim, frame.line]) {
+      for (let i = 1; i < samples.length; i++) {
+        assert.ok(samples[i][0] < samples[i - 1][0], "Gradient fades gradually towards bottom-right");
+        assert.ok(samples[i - 1][0] - samples[i][0] < 20, "No abrupt gradient step");
+      }
+    }
+    assert.ok(frame.topLeft[2] > frame.bottomRight[2] + 60);
+    assert.ok(frame.strip[0][0] < 100);
+    for (const pixel of frame.strip.slice(1, 3)) assert.ok(pixel[0] > 190 && pixel[2] > 230);
+    assert.deepEqual(frame.strip[3], [255, 0, 0, 255], "16px rim and 2px keyline have no intervening black ring");
+    // Read the displayed raster, not just the full-resolution backing canvas.
+    const displayed = await canvas.screenshot();
+    const mobilePixels = await page.evaluate(async base64 => {
+      const im = new Image(); im.src = `data:image/png;base64,${base64}`; await im.decode();
+      const c = document.createElement("canvas"); c.width = im.width; c.height = im.height;
+      const ctx = c.getContext("2d"); ctx.drawImage(im, 0, 0);
+      const y = Math.round(im.height * .25);
+      return Array.from({ length: 8 }, (_, x) => [...ctx.getImageData(x, y, 1, 1).data]);
+    }, displayed.toString("base64"));
+    assert.ok(mobilePixels[2][2] > mobilePixels[2][0] + 50, "Blue rim remains visible on mobile");
+    assert.ok(mobilePixels.slice(4, 7).some(p => p[1] > mobilePixels[2][1] + 15 && p[0] > 150 && p[2] > 100), "Thin keyline remains visible on mobile");
+
     assert.deepEqual(fontRequests, [], "Empty nickname does not load the font");
     const slider = page.getByRole("slider");
     await slider.scrollIntoViewIfNeeded();

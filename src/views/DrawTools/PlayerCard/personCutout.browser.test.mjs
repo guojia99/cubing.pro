@@ -132,8 +132,10 @@ for (const mobile of [false, true]) test(`real GrabCut editor: ${mobile ? 'touch
     const [download] = await Promise.all([page.waitForEvent('download'), downloadButton.click()]);
     assert.deepEqual(await readFile(await download.path()), Buffer.from(segmented.split(',')[1], 'base64'));
     assert.equal(download.suggestedFilename(), 'Player-card.png');
-    const frame = await canvas.evaluate(c => [0, 12, 30, 31].map(x => [...c.getContext('2d').getImageData(x, 100, 1, 1).data]));
-    assert.deepEqual(frame, [[16, 59, 112, 255], [16, 59, 112, 255], [188, 230, 255, 255], [188, 230, 255, 255]]);
+    const frame = await canvas.evaluate(c => [0, 12, 16, 17].map(x => [...c.getContext('2d').getImageData(x, 100, 1, 1).data]));
+    for (const pixel of frame) assert.equal(pixel[3], 255);
+    for (const pixel of frame.slice(0, 2)) assert.ok(pixel[2] > pixel[1] && pixel[1] > pixel[0], 'blue rim survives repair');
+    for (const pixel of frame.slice(2)) assert.ok(pixel[0] > 190 && pixel[2] > 230, 'silver-blue keyline survives repair');
     await mkdir('output/playwright', { recursive: true });
     await page.screenshot({ path: `output/playwright/person-cutout-${mobile ? 'touch' : 'desktop'}.png`, fullPage: true });
     await page.getByRole('button', { name: 'Restore original background', exact: true }).click();
