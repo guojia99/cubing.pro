@@ -60,17 +60,6 @@
 | [algs-list](#algs-list) | 公式总览：按魔方分类展示算法组 |
 | [algs-detail](#algs-detail) | 公式详情：筛选、练习、随机抽公式、熟练度追踪（后端 + 本地存储混合） |
 
-## 生活内容（other/*）
-
-| id | 说明 |
-|----|------|
-| [recipes](#recipes) | 菜谱列表：静态 JSON + localStorage 收藏 |
-| [recipe-detail](#recipe-detail) | 菜谱详情：加载 Markdown 正文 |
-| [kitchen-skills](#kitchen-skills) | 厨房技巧列表 |
-| [kitchen-skill-detail](#kitchen-skill-detail) | 厨房技巧详情 |
-| [cocktails](#cocktails) | 鸡尾酒列表：IBA 标准配方 |
-| [cocktail-detail](#cocktail-detail) | 鸡尾酒详情 |
-
 ## 工具（tools/*）
 
 | id | 说明 |
@@ -125,12 +114,6 @@
 | admin-organizers | 主办导航 |
 | admin-organizers-details | 主办详情（占位，空页） |
 | admin-admins | 后台导航 |
-| recipes | 菜谱列表 |
-| recipe-detail | 菜谱详情 |
-| kitchen-skills | 厨房技巧列表 |
-| kitchen-skill-detail | 厨房技巧详情 |
-| cocktails | 鸡尾酒列表 |
-| cocktail-detail | 鸡尾酒详情 |
 | tool-bld-d | BLD 德语记忆 |
 | tool-bld-pingyin | BLD 拼音记忆 |
 | tool-associative-words | BLD 联想词 |
@@ -141,7 +124,7 @@
 | draw-py | Pyraminx 打图 |
 | test | 测试页 |
 
-共 **24** 项。
+共 **18** 项。
 
 ### `frontend-heavy`（前端为主）
 

@@ -8,8 +8,7 @@ function run(command, args, env = process.env) {
 
 let status = 1;
 try {
-  status = run("npm", ["run", "howtocook:prepare"]);
-  if (status === 0) status = run(process.execPath, ["scripts/prepare-static-export.mjs"]);
+  status = run(process.execPath, ["scripts/prepare-static-export.mjs"]);
   if (status === 0) status = run(process.execPath, ["node_modules/next/dist/bin/next", "build"], { ...process.env, NEXT_OUTPUT_EXPORT: "1" });
   if (status === 0) status = run(process.execPath, ["scripts/post-static-export.mjs"]);
 } catch (error) {

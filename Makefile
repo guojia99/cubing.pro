@@ -12,9 +12,6 @@ dev:
 	CUBE_API_UPSTREAM=$(LOCAL_DEV_API_BASE) \
 	npm run dev
 
-# 静态导出到 dist/（HowToCook 见 scripts/sync-howtocook.mjs）
-# 指定本地目录：HOWTOCOOK_SOURCE_DIR=/path/to/HowToCook make build
-# 跳过 HowToCook 同步与解析（使用仓库内已有数据）：make build SKIP_HOWTOCOOK=1
-# 仅跳过同步（需 public/HowToCook 已存在）：make build SKIP_HOWTOCOOK_SYNC=1
+# 静态导出到 dist/
 build:
-	SKIP_HOWTOCOOK=$(SKIP_HOWTOCOOK) npm run build:static
+	npm run build:static

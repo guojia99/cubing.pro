@@ -12,7 +12,6 @@
 | project | `project/pages-welcome-misc.md` | done | |
 | project | `project/pages-algs.md` | done | |
 | project | `project/pages-tools.md` | done | |
-| project | `project/pages-recipes.md` | done | |
 | project | `project/pages-wca.md` | done | |
 | project | `project/pages-competition.md` | done | |
 | project | `project/pages-player.md` | done | |
@@ -40,12 +39,11 @@
 
 | 项 | 状态 |
 |----|------|
-| `routes.ts` 叶子路由 ↔ `_index.md` | 已对齐（60 项；不含 redirect） |
+| `routes.ts` 叶子路由 ↔ `_index.md` | 已移除 6 项生活路由；当前完整路由以 `src/config/routes.ts` 为准 |
 | `public.go` ↔ `public-api.md`（含 14 条 stub） | 已对齐（42 条） |
 | `services/cubing-pro` 导出 ↔ `frontend-services.md` | 已覆盖（含纯函数与 localStorage 模块） |
-| `implType` 汇总 ↔ `brief.md` | 已对齐（24+1+5+30=60，含 wca-statistics） |
+| `implType` 汇总 ↔ `brief.md` | 已移除 6 项纯前端生活模块；本手册汇总为 18+1+5+30=54 |
 | `project/` 无 `backend/` | 是 |
-| `static-assets` 未展开 HowToCook 树 | 是 |
 | 框架表述标注 *当前：Umi* | 见 `project/app-and-config.md` 等 |
 
 **可选后续**：`notify` / `forum` 等仅后端 Public 端点待产品接入时再写前端封装；`admin/organizers/details` 可考虑重定向至 `comps` 或 `result`。

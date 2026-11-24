@@ -6,7 +6,7 @@
 npm run build:static
 ```
 
-输出目录：`dist/`（勿提交 git）。也可执行 `make build SKIP_HOWTOCOOK=1` 使用仓库中已有的菜谱数据。
+输出目录：`dist/`（勿提交 git）。也可执行 `make build`。
 
 ## API
 
@@ -32,10 +32,7 @@ npm run build:static
 ### 固定与可枚举路由
 
 - 构建时会为**无** `:param` 的路由生成 HTML（见 `src/lib/staticExportPaths.ts`）。
-- 以下路由在构建时**全量预生成**（数据来自本地 JSON 或构建时 API），**不需要** `__dynamic__` 占位：
-  - `/other/recipes/:category/:id` — `public/recipes.json`（约 350+）
-  - `/other/kitchen-skills/:category/:id` — `public/tips.json`
-  - `/other/cocktails/:slug` — `public/iba/cocktails.json`
+- 以下路由在构建时**全量预生成**（数据来自构建时 API），**不需要** `__dynamic__` 占位：
   - `/algs/:cube/:class` — 每次构建使用 `cache: no-store` 请求最新 `/public/algorithm/`，不复用 Next 的持久请求缓存
 - 路径段使用**原始中文/明文**生成目录名（勿 `encodeURIComponent`），与浏览器地址栏一致。
 - 若尚未重新构建，gateway 会对未命中路径再尝试 `%XX` 编码目录名（兼容旧产物）。

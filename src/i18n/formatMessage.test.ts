@@ -40,9 +40,9 @@ test("formatMessage selects grammar before one-pass literal interpolation", () =
   assert.equal(formatMessage("en-US", "teamMatch.records", "{count} records"), "{count} records");
 });
 
-test("real root tf formats all 130 plural keys with 1 and 2 while plain t stays raw", () => {
+test("real root tf formats all registered plural keys with 1 and 2 while plain t stays raw", () => {
   const keys = [...Object.keys(pluralMessages), ...Object.keys(pluralFragments)] as MessageKey[];
-  assert.equal(new Set(keys).size, 130);
+  assert.equal(new Set(keys).size, 118);
   for (const { key: locale } of SUPPORTED_LOCALES) {
     for (const key of keys) {
       const source = catalogs[locale][key];
@@ -63,9 +63,6 @@ test("independent pure entry points produce singular/plural sentences", () => {
     assert.equal(tm("en-US", "teamMatch.records", { count }), `${count} record${s}`);
     assert.equal(tm("fr", "teamMatch.records", { count }), `${count} entrée${s}`);
     assert.equal(tm("es", "teamMatch.records", { count }), `${count} registro${s}`);
-    assert.equal(getSiteContent("en-US")("siteContent.recipeCount", { count }), `${count} recipe${s}`);
-    assert.equal(getSiteContent("fr")("siteContent.recipeCount", { count }), `${count} recette${s}`);
-    assert.equal(getSiteContent("es")("siteContent.recipeCount", { count }), `${count} receta${s}`);
     assert.equal(translateShared("fr", "shared.error.payloadLimit", { limit: count }), `Les données dépassent la limite de ${count} octet${s}`);
     assert.equal(translatePuzzleExtra("en-US", "puzzleExtra.filterWidth", { width: count }), `Filter width ${count} pixel${s}`);
     assert.equal(translateWcaPuzzleExtra("en-US", "wcaPuzzleExtra.groups", { count }), `${count} group${s}`);
@@ -76,7 +73,6 @@ test("independent pure entry points produce singular/plural sentences", () => {
     assert.equal(formatRoundName(`Round ${count}`, "fr"), `Tour ${count}`);
   }
   assert.equal(tm("fr", "teamMatch.records", { count: 0 }), "0 entrée");
-  assert.equal(getSiteContent("fr")("siteContent.recipeCount", { count: 0 }), "0 recette");
   assert.equal(translateShared("fr", "shared.error.payloadLimit", { limit: 0 }), "Les données dépassent la limite de 0 octet");
   assert.equal(translatePuzzleExtra("fr", "puzzleExtra.filterWidth", { width: 0 }), "Largeur des filtres : 0 pixel");
   assert.equal(translateWcaPuzzleExtra("fr", "wcaPuzzleExtra.groups", { count: 0 }), "0 groupe");
@@ -97,7 +93,7 @@ test("shipped TeamMatch and puzzle aliases keep grammar and catalog selection al
   for (const locale of ["unknown", "__proto__", "constructor"]) {
     assert.equal(tm(locale as TeamMatchLocale, "teamMatch.records", { count: 1 }), tm("zh-CN", "teamMatch.records", { count: 1 }));
     assert.equal(translatePuzzleExtra(locale, "puzzleExtra.filterWidth", { width: 1 }), translatePuzzleExtra("zh-CN", "puzzleExtra.filterWidth", { width: 1 }));
-    assert.equal(getSiteContent(locale)("siteContent.recipeCount", { count: 1 }), getSiteContent("zh-CN")("siteContent.recipeCount", { count: 1 }));
+    assert.equal(getSiteContent(locale)("siteContent.slide", { count: 1 }), getSiteContent("zh-CN")("siteContent.slide", { count: 1 }));
     assert.equal(translateShared(locale, "shared.error.http", { status: "001" }), translateShared("zh-CN", "shared.error.http", { status: "001" }));
   }
 });
@@ -110,7 +106,7 @@ test("ordinary messages remain raw through every standalone dictionary entry poi
     assert.equal(translatePuzzleExtra(locale, "puzzleExtra.filterWidth"), catalogs[locale]["puzzleExtra.filterWidth"]);
     assert.equal(translateWcaPuzzleExtra(locale, "wcaPuzzleExtra.groups"), catalogs[locale]["wcaPuzzleExtra.groups"]);
     assert.equal(translateDomain(locale, "domain.event.sliding"), catalogs[locale]["domain.event.sliding"]);
-    assert.equal(getSiteContent(locale)("siteContent.recipeCount"), catalogs[locale]["siteContent.recipeCount"]);
+    assert.equal(getSiteContent(locale)("siteContent.slide"), catalogs[locale]["siteContent.slide"]);
     assert.equal(tDetail(locale, "two.detail.current", {}, key => catalogs[locale][key]), catalogs[locale]["two.detail.current"]);
   }
 });
@@ -118,7 +114,7 @@ test("ordinary messages remain raw through every standalone dictionary entry poi
 test("all independent entry points keep strings, dollars and inserted placeholders literal", () => {
   for (const { key: locale } of SUPPORTED_LOCALES) {
     assert.equal(tm(locale, "teamMatch.teamTotal", { name: "{total}", total: dollars }), formatMessage(locale, "teamMatch.teamTotal", catalogs[locale]["teamMatch.teamTotal"], { name: "{total}", total: dollars }));
-    assert.equal(getSiteContent(locale)("siteContent.pageCount", { current: "{total}", pages: "001", total: dollars }), catalogs[locale]["siteContent.pageCount"].replace(/\{(\w+)\}/g, (_, name: string) => ({ current: "{total}", pages: "001", total: dollars })[name]!));
+    assert.equal(getSiteContent(locale)("siteContent.slide", { count: dollars }), catalogs[locale]["siteContent.slide"].replace("{count}", () => dollars));
     assert.equal(competitionPublicMessage(locale, "competitionPublic.diagramAlt", { scramble: dollars }), catalogs[locale]["competitionPublic.diagramAlt"].replace("{scramble}", () => dollars));
     assert.equal(translateShared(locale, "shared.error.http", { status: dollars }), catalogs[locale]["shared.error.http"].replace("{status}", () => dollars));
     assert.equal(translatePuzzleExtra(locale, "puzzleExtra.filterWidth", { width: "001" }), catalogs[locale]["puzzleExtra.filterWidth"].replace("{width}", "001"));

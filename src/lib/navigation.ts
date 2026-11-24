@@ -42,7 +42,7 @@ export const MAIN_NAV: NavGroupDef[] = [
   {
     id: "tools",
     labelKey: "nav.tools",
-    activePaths: ["/tools", "/draw-tools", "/other"],
+    activePaths: ["/tools", "/draw-tools"],
     children: [
       { labelKey: "nav.tools.teamMatch", href: "/tools/team-match" },
       { labelKey: "nav.tools.fr", href: "/tools/floppy-reduction" },
@@ -55,14 +55,6 @@ export const MAIN_NAV: NavGroupDef[] = [
           { labelKey: "nav.tools.sk", href: "/draw-tools/sk-d" },
           { labelKey: "nav.tools.py", href: "/draw-tools/py-d" },
           { labelKey: "nav.tools.fto", href: "/draw-tools/fto-d" },
-        ],
-      },
-      {
-        labelKey: "nav.other",
-        children: [
-          { labelKey: "nav.other.recipes", href: "/other/recipes" },
-          { labelKey: "nav.other.kitchen", href: "/other/kitchen-skills" },
-          { labelKey: "nav.other.cocktails", href: "/other/cocktails" },
         ],
       },
     ],

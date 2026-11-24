@@ -40,6 +40,5 @@ next-env.d.ts
 .vercel
 .next
 .idea
-public/HowToCook
 var/
 dist

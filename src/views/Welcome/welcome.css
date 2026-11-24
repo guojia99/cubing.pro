@@ -27,10 +27,6 @@
 .welcome-shortcuts .feature-link > div:last-child > div { font-size: .85rem; line-height: 1.65; }
 .welcome-shortcuts .feature-link > div:last-child > div { min-height: 3.3em; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .welcome-shortcuts .feature-link > div:last-child { min-width: 0; }
-.welcome-food-link { display: block; height: 100%; }
-.welcome-food-image { display: block; width: 100%; height: 150px; object-fit: cover; }
-.welcome-food-link[href*="cocktails"] .welcome-food-image { object-position: center 72%; }
-.welcome-food-description { min-height: 3.4em; line-height: 1.7; }
 .welcome-ad-stage { min-width: 0; }
 .welcome-ad-content { height: clamp(240px, 32vw, 340px); overflow: hidden; border-radius: calc(var(--radius-card, 1rem) - 4px); }
 .welcome-ad-controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding-top: 12px; min-width: 0; }
@@ -44,9 +40,6 @@
   .welcome-shortcuts .feature-link { flex-direction: row; align-items: center; min-height: 116px; }
   .welcome-shortcuts .feature-link > div:first-child { flex-shrink: 0; }
   .welcome-shortcuts .feature-link > div:first-child > svg { display: none; }
-  .welcome-food-link { display: grid; grid-template-columns: 96px minmax(0, 1fr); }
-  .welcome-food-image { height: 100%; min-height: 132px; }
-  .welcome-food-description { font-size: .85rem; }
   .welcome-event-tools > div { gap: 12px; }
 }
 @media (max-width: 420px) {

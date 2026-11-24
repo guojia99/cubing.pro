@@ -36,12 +36,6 @@
 | admin-sports-events | 体育项目配置 | `/admin/sports/events` | api-driven | `admin` | `Admin/SportsComponents/Events.tsx` | `apiGetSportEvents`、`apiCreateSportEvent`、`apiDeleteSportEvent` | `/sports/admin/events` | `client-spa` | | done |
 | algs-list | 公式列表 | `/algs` | frontend-heavy | | `Algs/AlgsList.tsx` | `getAlgCubeMap` | `/public/algorithm/` | `client-spa` | | done |
 | algs-detail | 公式详情 | `/algs/:cube/:class` | hybrid | | `Algs/AlgsDetail.tsx` | `getAlgCubeClass` | `/public/algorithm/{cube}/{classID}` | `client-spa` | [detail/algs.md](detail/algs.md) | done |
-| recipes | 菜谱列表 | `/other/recipes` | frontend-only | | `Recipes/RecipeList.tsx` | - | - | `static-first` | | done |
-| recipe-detail | 菜谱详情 | `/other/recipes/:category/:id` | frontend-only | | `Recipes/RecipeDetail.tsx` | - | - | `static-first` | | done |
-| kitchen-skills | 厨房技巧列表 | `/other/kitchen-skills` | frontend-only | | `KitchenSkills/KitchenSkillList.tsx` | - | - | `static-first` | | done |
-| kitchen-skill-detail | 厨房技巧详情 | `/other/kitchen-skills/:category/:id` | frontend-only | | `KitchenSkills/KitchenSkillDetail.tsx` | - | - | `static-first` | | done |
-| cocktails | 鸡尾酒列表 | `/other/cocktails` | frontend-only | | `Cocktails/CocktailList.tsx` | - | - | `static-first` | | done |
-| cocktail-detail | 鸡尾酒详情 | `/other/cocktails/:slug` | frontend-only | | `Cocktails/CocktailDetail.tsx` | - | - | `static-first` | | done |
 | tool-bld-d | BLD 德语记忆法 | `/tools/bld-d` | frontend-only | `tool` | `Tools/Bld/BldMeor.tsx` | - | - | `client-spa` | | done |
 | tool-bld-pingyin | BLD 拼音记忆法 | `/tools/bld-pingyin` | frontend-only | `tool` | `Tools/Bld/BldPingYin.tsx` | - | - | `client-spa` | | done |
 | tool-associative-words | BLD 联想词 | `/tools/associative-words` | frontend-only | `tool` | `Tools/Bld/Bld_Associative_Words.tsx` | - | - | `client-spa` | | done |

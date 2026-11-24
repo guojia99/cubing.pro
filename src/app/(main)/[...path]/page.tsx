@@ -40,12 +40,6 @@ import { FloppyReductionView } from "@/views/FloppyReduction/FloppyReductionView
 import TwoSolverView from "@/views/TwoSolver/TwoSolverView";
 import { TeamMatchView } from "@/views/TeamMatch/TeamMatchView";
 import { ChangelogPageView } from "@/views/Changelog/ChangelogPageView";
-import { CocktailDetailView } from "@/views/Cocktails/CocktailDetailView";
-import { CocktailListView } from "@/views/Cocktails/CocktailListView";
-import { KitchenSkillDetailView } from "@/views/KitchenSkills/KitchenSkillDetailView";
-import { KitchenSkillListView } from "@/views/KitchenSkills/KitchenSkillListView";
-import { RecipeDetailView } from "@/views/Recipes/RecipeDetailView";
-import { RecipeListView } from "@/views/Recipes/RecipeListView";
 import { ProportionEstimationView } from "@/views/Wca/ProportionEstimation";
 import { WcaCompsView } from "@/views/Wca/WcaComps/WcaCompsView";
 import { WcaPlayersSearchView } from "@/views/Wca/WcaPlayersSearchView";
@@ -184,27 +178,6 @@ function CatchAllContent({ routeId, path }: { routeId: string; path: string[] })
       return <GcPlayerView />;
     case "wca-player":
       return <WcaPlayerView />;
-    case "recipes":
-      return <RecipeListView />;
-    case "recipe-detail":
-      if (path.length >= 4) {
-        return <RecipeDetailView category={path[2]} id={path.slice(3).join("/")} />;
-      }
-      return null;
-    case "kitchen-skills":
-      return <KitchenSkillListView />;
-    case "kitchen-skill-detail":
-      if (path.length >= 4) {
-        return <KitchenSkillDetailView category={path[2]} id={path.slice(3).join("/")} />;
-      }
-      return null;
-    case "cocktails":
-      return <CocktailListView />;
-    case "cocktail-detail":
-      if (path.length >= 3) {
-        return <CocktailDetailView slug={path.slice(2).join("/")} />;
-      }
-      return null;
     case "algs-detail":
       if (path.length >= 3) {
         const cube = path[1];

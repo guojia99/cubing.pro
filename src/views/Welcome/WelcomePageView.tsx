@@ -13,7 +13,6 @@ import { BuyCoffeeQuickJump } from "@/views/Welcome/BuyCoffeeQuickJump";
 import { WelcomeView as WelcomeInfoCards } from "@/views/Welcome/WelcomeInfoCards";
 import { ThanksSection } from "@/views/Welcome/ThanksSection";
 import { ExternalLinksHomeSection } from "@/views/ExternalLinks/ExternalLinksHomeSection";
-import { HomeFoodSection } from "./HomeFoodSection";
 import "./welcome.css";
 
 export function WelcomePageView() {
@@ -69,7 +68,6 @@ export function WelcomePageView() {
           </Flex>
         </Flex>
       </Surface>
-      <HomeFoodSection />
       <ExternalLinksHomeSection />
       <BuyCoffeeQuickJump />
     </Stack>

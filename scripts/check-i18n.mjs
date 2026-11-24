@@ -80,7 +80,6 @@ export const ALLOWLIST = [
   ["src/views/GroupCompetitions/Players/GcPlayersView.tsx", "property:title", "WcaID", "WCA competitor identifier column."],
   ["src/views/GroupCompetitions/Records/RecordWithBest.tsx", "property:label", "CubingPro", "Record source organization name."],
   ["src/views/GroupCompetitions/Records/RecordWithEvents.tsx", "property:label", "CubingPro", "Event record source organization name."],
-  ["src/views/Recipes/RecipeListView.tsx", "jsx", "HowToCook", "Upstream recipe project's proper name and attribution."],
   ["src/views/TeamMatch/components/BracketStage.tsx", "jsx", "VS", "Conventional bracket matchup separator."],
   ["src/views/TeamMatch/components/LiveSettingsModal.tsx", "attribute:placeholder", "linear-gradient(...)", "CSS function syntax example, not explanatory prose."],
   ["src/views/TeamMatch/components/OneCompPrelimImportCard.tsx", "property:title", "One ID", "One competition platform identifier."],
@@ -300,7 +299,7 @@ function selfTest() {
       <span>R U R' U'</span><span>× 222 / +2</span><span>{'WCA'}</span></>;
     const options = [{ label: '选项', value: '技术值' }];
     toast.success('完成'); toaster.create({ title: '错误' }); message.error(\`失败\${id}\`);
-    console.log('诊断'); const recipeId = '红烧肉';
+    console.log('诊断'); const competitionId = '线上赛';
     message('two.main.search'); // Local message descriptor, not an Ant toast.
     const encoded = <span>&#20013;&#x6587;</span>;
     const words = <><button>buy</button><button>full</button><span>&unknown;</span></>;

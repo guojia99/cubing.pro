@@ -49,10 +49,8 @@ try {
         assert.ok(Math.max(...size.heights) - Math.min(...size.heights) <= 1, `Unequal directory heights: ${JSON.stringify(size)}`);
         assert.ok(Math.max(...size.rows) - Math.min(...size.rows) <= 1, `Unequal entry heights: ${JSON.stringify(size)}`);
         assert.ok(size.overflow <= 1, `Page overflow: ${size.overflow}px`);
-        assert.equal(await page.locator(".welcome-food a").count(), 3);
-        assert.equal(await page.locator(".welcome-directory .welcome-food").count(), 0);
-        await page.locator(".welcome-food").scrollIntoViewIfNeeded();
-        for (const image of await page.locator(".welcome-food img, .welcome-group-image img, .welcome-hero-mark img").all()) {
+        assert.equal(await page.locator('a[href^="/other/"]').count(), 0);
+        for (const image of await page.locator(".welcome-group-image img, .welcome-hero-mark img").all()) {
           await image.evaluate((element) => element.decode());
           assert.ok(await image.evaluate((element) => element.naturalWidth > 0));
         }

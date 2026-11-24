@@ -10,7 +10,7 @@ const covered = new Set([...Object.keys(pluralMessages), ...Object.keys(pluralFr
 const values = [0, -0, 1, -1, 2, 0.5, 1.5, 2.1, 1_000_000];
 const placeholders = (text: string) => [...text.matchAll(/\{(\w+)\}/g)].map(match => match[1]).sort();
 
-// Reviewed against all 299 parameterized messages in the real merged root.
+// Reviewed against every parameterized message in the real merged root.
 // These are IDs/ordinals, names, ratios, formulas, percentages or fixed labels.
 // Keep an explicit inventory so newly added parameterized messages need review.
 const invariantKeys = `
@@ -49,7 +49,7 @@ competitionAdmin.scoreFormat competitionAdmin.minutesSeconds competitionAdmin.po
 competitionAdmin.missingRound competitionAdmin.closedRound competitionAdmin.invalidEventRoute
 competitionAdmin.sequentialRounds competitionAdmin.nonnegativeSettings competitionAdmin.roundNumber
 competitionAdmin.beijingRange competitionAdmin.attempt puzzleExtra.colorSummary
-puzzleExtra.annotation siteContent.enlargeDrink siteContent.hideTags siteContent.showTags
+puzzleExtra.annotation
 siteContent.slide shared.error.http shared.editor.uploadImgModule.uploadError
 adminExtra.approvalTitle adminExtra.competitionNumber adminExtra.rejectedReason
 adminExtra.optionsFailed adminExtra.missingResultType adminExtra.playersFailed
@@ -72,7 +72,7 @@ finishing.organizerOption forum.replyTo forum.setScope
 `.trim().split(/\s+/);
 
 test("audit covers every parameterized key in the complete root catalogs", () => {
-  assert.ok(Object.keys(catalogs["en-US"]).length >= 3379);
+  assert.ok(Object.keys(catalogs["en-US"]).length >= 3360);
   const parameterized = Object.keys(catalogs["en-US"]).filter(key => placeholders(catalogs["en-US"][key as MessageKey]).length);
   const reviewed = [...covered, ...invariantKeys];
   assert.equal(new Set(reviewed).size, reviewed.length, "No duplicate/stale audit classifications");

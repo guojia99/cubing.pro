@@ -35,7 +35,6 @@ cubingPro/                # 仓库根
 | [pages-welcome-misc.md](pages-welcome-misc.md) | Welcome、设置、404、外链等 |
 | [pages-algs.md](pages-algs.md) | 公式库 |
 | [pages-tools.md](pages-tools.md) | tools / draw-tools |
-| [pages-recipes.md](pages-recipes.md) | 菜谱 / 厨房技巧 / 鸡尾酒 |
 | [pages-wca.md](pages-wca.md) | WCA 相关页 |
 | [pages-competition.md](pages-competition.md) | 赛事与计时器 |
 | [pages-player.md](pages-player.md) | 站内选手 |

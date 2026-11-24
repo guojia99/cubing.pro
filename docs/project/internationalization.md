@@ -1,6 +1,6 @@
 # 国际化架构与维护
 
-核实日期：2026-11-18。本文以当前源码和可执行检查为准；词典齐全不等于正文、远端数据或浏览器交互均已验收。
+维护规则更新于 2026-11-24。本文以当前源码和可执行检查为准；词典齐全不等于正文、远端数据或浏览器交互均已验收。
 
 ## 七语与入口
 
@@ -27,13 +27,10 @@ Chakra 的 `LocaleProvider` 使用 `getIntlLocale`。`AntThemeProvider` 为七�
 ## 文案和正文规则
 
 - 新增界面文案需同时提供七语 key，包含按钮、表格、空态、错误、toast、输入提示、图片 alt、标题和无障碍名称。不能用英文代替其他五语，也不能通过中文残留或 `defaultMessage` 掩盖漏译。
-- 使用整句与命名参数，例如 `tf(key, { count, name })`，避免拼接各语言顺序不同的短语。占位符语法是 `{word}`，不是 ICU plural/select。七语的参数名称集合必须一致；重复次数可因语法而不同。`formatMessage.ts` 在单次插值前调用 `plurals.ts`，按 `Intl.PluralRules` 选择已审核的英语、法语、西班牙语词形；东亚语言保留原模板。当前审核了全部 299 个带参数键，其中 130 个需要复数处理，新增带参数键必须更新分类测试。
+- 使用整句与命名参数，例如 `tf(key, { count, name })`，避免拼接各语言顺序不同的短语。占位符语法是 `{word}`，不是 ICU plural/select。七语的参数名称集合必须一致；重复次数可因语法而不同。`formatMessage.ts` 在单次插值前调用 `plurals.ts`，按 `Intl.PluralRules` 选择已审核的英语、法语、西班牙语词形；东亚语言保留原模板。带参数键的复数分类由测试核对，新增带参数键必须更新分类测试。
 - 数量参数传有限的原生 `number`，不要预先转换为字符串；字符串数字、ID、公式和计时字符串不作复数推断。同一句包含多个数量时分别选择词形。语言中的 `one` 不等于 `count === 1`，例如法语的 0 和部分小数也属于 `one`。根 `tf`、领域 formatter、后台 hooks 与求解器诊断均使用同一格式化入口。
 - 参数值是数据。`$&`、``$` ``、`$'`、花括号和魔方公式必须原样保留，单次回调替换不得再次解释参数中的占位符。数值和日期按页面语言调用 Intl，不能翻译持久化 ID、URL 或成绩编码。
 - 合法专名、来源署名、邮箱、WCA ID、公式动作、DNF/DNS、ao5/ao12 等可保留原样，但不能把同句的说明文字一起豁免。界面中的中文、英文、日文等一视同仁，不能只禁中文。
-- 菜谱正文与源菜名、食材来自 HowToCook，当前 `useRecipeMarkdown` 请求 `/HowToCook/...` 原文，**切换界面语言不会翻译菜谱正文**。有限的菜谱分类属于界面筛选标签，已通过 `finishing.recipeCategory.*` 七语显示，原分类值不变。来源名称、原始 Markdown、路径身份是合法源内容；外围操作和加载失败提示仍需本地化。不能把这个内容规则扩展为整个 Recipes 目录免检。
-- 厨房技能正文使用 `/i18n/kitchen-skills/{locale}/index.json` 与对应 Markdown。`kitchenSkillContent.ts` 按 `category/id` 匹配译文，保留原始身份、图片基址和链接语义；新正文必须补齐七语，不能静默回退英文。
-- 鸡尾酒使用 `cocktailContent.ts`：简体中文读取原始资源，其他六语读取 `/i18n/cocktails/{locale}.json`，按 slug 校验译文、材料、步骤和装饰。`originalName` / `originalIngredients` 保留源身份，显示内容使用译文，不改收藏键。
 - 更新日志由 `parseChangelog.ts` 加载本地化正文资源 `/i18n/changelog/`，不能只翻译年份筛选和标题。正文资源、远端比赛名、用户输入与 API 错误不在源码字面量扫描覆盖内，需分别验证其来源和展示边界。
 - 求解器保留历史诊断协议和公式来源数据，在展示边界由 `solverMessages.ts` 及词典转换。未知源名称不得通过通用正则乱翻译；新增诊断需要补齐有界映射和相应领域测试。
 - API 动态正文与静态词典分开管理。可选读侧合同、资源/字段/语言绑定及源 hash/version 校验见 [站点 API 内容多语言展示合同](internationalization-content-contract.md)。`resolveLocalizedContent` 返回 `translated` / `original` / `missing`；原文或过期译文回退不能计作目标语言翻译完成。当前后端没有这些字段，helper 尚未接入生产页面，合同和单测通过不代表动态内容已七语化。
@@ -47,7 +44,6 @@ npm run test:i18n
 node scripts/check-i18n.mjs --self-test
 npm run check:i18n
 npx tsx --test public/i18n/changelog/verify.test.mjs
-node public/i18n/kitchen-skills/verify.mjs
 ./node_modules/.bin/eslint src/i18n/catalogs.test.ts scripts/check-i18n.mjs
 ./node_modules/.bin/tsc --noEmit --incremental false
 git diff --check
@@ -75,13 +71,13 @@ git diff --check
 
 例外只适用于已经核实的用途。例如 `MilestoneContent` 的中文源标签在 `Milestone.tsx` 展示前被 `wca.milestone.type.*` 覆盖，二阶 `engine/types.ts` 颜色与方法说明在 `TwoSolverView.tsx` 展示时使用词典。后续若改变这些消费路径，必须复查例外原因，不能把源文本直接显示出来。
 
-## 本次审计与剩余缺口
+## 历史审计记录与剩余缺口
 
-首次执行未建豁免的扫描报告了 237 个候选。审查后合法专名、技术记法、翻译 key、显示前本地化的源数据逐项记录，真实缺口继续报错。工作区存在并行集成，下面是 2026-11-18 核对时的快照，修复进度以重新运行检查为准。
+首次执行未建豁免的扫描报告了 237 个候选。审查后合法专名、技术记法、翻译 key、显示前本地化的源数据逐项记录，真实缺口继续报错。工作区存在并行集成，下面是 2026-11-18 核对时的快照，包含后续移除的生活模块；其中命令、数量和检查范围不代表当前仓库，修复进度以重新运行检查为准。
 
 2026-11-18 集成核验：`npm run test:i18n` 的 43 项（根词典、复数、独立入口与真实 Provider hooks 浏览器验证、内容合同）全部通过；相关领域定向测试 18 项通过；全仓扫描为 **0 处未审核字面值、166 处审核后的精确例外、0 个 allowlist 错误**。全仓 `tsc --noEmit --incremental false` 和目标 ESLint 通过。厨房技巧 133 篇与七份索引校验、更新日志 9 项和静态路由/脚本 75 项回归通过。
 
-使用当前源码的隔离副本执行 `SKIP_HOWTOCOOK=1 npm run build`，compile、lint/type、629/629 页面预渲染及收尾通过；保留 45 条既有构建警告，未覆盖用户 `dist`。生产浏览器严格测试覆盖七语菜单、跨标签同步、键盘、七种视口、三种 storage 禁用情形及 metadata；另完成 60 个独立上下文回归，其中 30 次延迟 chunk 加载。测试期间发现并修复 next-themes 脚本与 Chakra/Emotion 样式顺序造成的生产 hydration 错误，未屏蔽异常。最终生产测试零 `pageerror` / `console.error`；隔离 dev 在人为延迟 chunk 时曾出现 Field ID 属性 hydration 警告，最终 production 未复现。
+当时使用源码的隔离副本执行 `SKIP_HOWTOCOOK=1 npm run build`，compile、lint/type、629/629 页面预渲染及收尾通过；保留 45 条既有构建警告，未覆盖用户 `dist`。生产浏览器严格测试覆盖七语菜单、跨标签同步、键盘、七种视口、三种 storage 禁用情形及 metadata；另完成 60 个独立上下文回归，其中 30 次延迟 chunk 加载。测试期间发现并修复 next-themes 脚本与 Chakra/Emotion 样式顺序造成的生产 hydration 错误，未屏蔽异常。最终生产测试零 `pageerror` / `console.error`；隔离 dev 在人为延迟 chunk 时曾出现 Field ID 属性 hydration 警告，最终 production 未复现。
 
 | 核验项 | 位置 | 当前状态 |
 | --- | --- | --- |

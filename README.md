@@ -28,7 +28,7 @@
 | 查看 WCA 数据 | [WCA 统计](https://cubing.pro/wca/statistics/)：选手成绩、历史排名与多项目分析 |
 | 组织团体赛 | [团体赛工具](https://cubing.pro/tools/team-match/)：组队、抽签、对阵与导出 |
 
-此外还有魔方绘图、菜谱、厨房技巧与鸡尾酒等内容。界面支持简体中文、English、日本語、廣東話、한국어、Français 和 Español，并提供深浅色模式与主题设置。
+此外还有魔方绘图等工具。界面支持简体中文、English、日本語、廣東話、한국어、Français 和 Español，并提供深浅色模式与主题设置。
 
 ## 快速开始
 
@@ -73,7 +73,7 @@ npm run build:static
 npm run preview:static
 ```
 
-产物输出到 **`dist/`**，预览命令直接服务该目录。静态构建会准备 HowToCook 内容并请求公式目录 API，因此需要相应数据源可用。
+产物输出到 **`dist/`**，预览命令直接服务该目录。静态构建会请求公式目录 API，因此需要该数据源可用。
 
 比赛、选手等动态 ID 页面需要服务器配置对应的路径回退，才能直接访问或刷新。部署配置、环境变量和导出检查见 [静态导出说明](docs/static-export.md)。
 

@@ -203,7 +203,7 @@ test("post rejects malformed paths instead of normalizing or skipping them", asy
   }
 });
 
-// Only npm and Next are simulated. Preparation, validation, and restoration run
+// Only Next is simulated. Preparation, validation, and restoration run
 // as real child processes using the original scripts and an isolated cwd.
 const runnerHarness = `
 import assert from "node:assert/strict";
@@ -216,22 +216,15 @@ import { pathToFileURL } from "node:url";
 const { scriptsDir, pagePath, manifestPath, apiBase, routes, scenario } = JSON.parse(process.argv[1]);
 const realSpawnSync = childProcess.spawnSync;
 childProcess.spawnSync = (command, args, options) => {
-  let step;
-  if (command === "npm") {
-    assert.deepEqual(args, ["run", "howtocook:prepare"]);
-    step = "howtocook";
-  } else {
-    assert.equal(command, process.execPath);
-    step = {
-      "scripts/prepare-static-export.mjs": "prepare",
-      "node_modules/next/dist/bin/next": "build",
-      "scripts/post-static-export.mjs": "post",
-      "scripts/restore-static-export.mjs": "restore",
-    }[args[0]];
-    assert.ok(step, "Unexpected child command: " + JSON.stringify(args));
-  }
+  assert.equal(command, process.execPath);
+  const step = {
+    "scripts/prepare-static-export.mjs": "prepare",
+    "node_modules/next/dist/bin/next": "build",
+    "scripts/post-static-export.mjs": "post",
+    "scripts/restore-static-export.mjs": "restore",
+  }[args[0]];
+  assert.ok(step, "Unexpected child command: " + JSON.stringify(args));
   appendFileSync("calls.jsonl", JSON.stringify({ step, args }) + "\\n");
-  if (step === "howtocook") return { status: scenario === "howtocook-failure" ? 19 : 0 };
   if (step === "build") {
     assert.deepEqual(args, ["node_modules/next/dist/bin/next", "build"]);
     assert.equal(options.env.NEXT_OUTPUT_EXPORT, "1");
@@ -259,14 +252,13 @@ await import(pathToFileURL(path.join(scriptsDir, "build-static.mjs")).href);
 `;
 
 for (const [scenario, expectedStatus, expectedCalls] of [
-  ["success", 0, ["howtocook", "prepare", "build", "post", "restore"]],
-  ["build-failure", 17, ["howtocook", "prepare", "build", "restore"]],
-  ["post-failure", 1, ["howtocook", "prepare", "build", "post", "restore"]],
-  ["prepare-failure", 1, ["howtocook", "prepare", "restore"]],
-  ["howtocook-failure", 19, ["howtocook", "restore"]],
-  ["spawn-error", 1, ["howtocook", "prepare", "build", "restore"]],
-  ["signal-failure", 1, ["howtocook", "prepare", "build", "restore"]],
-  ["restore-failure", 23, ["howtocook", "prepare", "build", "post", "restore"]],
+  ["success", 0, ["prepare", "build", "post", "restore"]],
+  ["build-failure", 17, ["prepare", "build", "restore"]],
+  ["post-failure", 1, ["prepare", "build", "post", "restore"]],
+  ["prepare-failure", 1, ["prepare", "restore"]],
+  ["spawn-error", 1, ["prepare", "build", "restore"]],
+  ["signal-failure", 1, ["prepare", "build", "restore"]],
+  ["restore-failure", 23, ["prepare", "build", "post", "restore"]],
 ]) {
   test(`runner ${scenario}: preserves exit status and always restores and cleans the manifest`, (t) => {
     const root = fixture(t);

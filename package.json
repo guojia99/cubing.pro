@@ -5,12 +5,6 @@
   "scripts": {
     "clean": "rm -rf .next out dist",
     "dev": "next dev",
-    "howtocook:sync": "node scripts/sync-howtocook.mjs",
-    "recipes:parse": "python3 scripts/parse_recipes.py",
-    "tips:parse": "python3 scripts/parse_tips.py",
-    "howtocook:parse": "npm run recipes:parse && npm run tips:parse",
-    "howtocook:prepare": "node scripts/prepare-howtocook.mjs",
-    "prebuild": "npm run howtocook:prepare",
     "build": "next build",
     "build:static": "node scripts/build-static.mjs",
     "preview:static": "npx --yes serve@14 dist",
