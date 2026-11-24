@@ -4,7 +4,8 @@ import { Box, Button, Field, Grid, Input, Stack, Text } from "@chakra-ui/react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { PageHeader, Surface } from "@/components/ui/page";
 import { useI18n } from "@/contexts/I18nProvider";
-import { CARD_SIZE, INITIAL_CROP, cardFilename, clampCrop, hasTransparentBackground, paintCard, zoomCrop } from "./composition";
+import { CARD_SIZE, INITIAL_CROP, cardFilename, clampCrop, inspectPhoto, paintCard, zoomCrop } from "./composition";
+import { replaceSolidBackground, sourcePoint } from "./solidBackground";
 import { loadNicknameFont, NICKNAME_FALLBACK } from "./nicknameFont";
 
 export function PlayerCardView() {
@@ -12,6 +13,11 @@ export function PlayerCardView() {
   const [file, setFile] = useState<File | null>(null);
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const [transparentBackground, setTransparentBackground] = useState(false);
+  const [opaque, setOpaque] = useState(false);
+  const [replacement, setReplacement] = useState<HTMLCanvasElement | null>(null);
+  const [picking, setPicking] = useState(false);
+  const [retry, setRetry] = useState(false);
+  const tap = useRef<{ id: number; x: number; y: number; moved: boolean } | null>(null);
   const [crop, setCrop] = useState(INITIAL_CROP);
   const [name, setName] = useState("");
   const [nicknameFont, setNicknameFont] = useState<string | null>(null);
@@ -30,7 +36,9 @@ export function PlayerCardView() {
     photo.src = url;
     photo.decode().then(() => {
       if (active) {
-        setTransparentBackground(hasTransparentBackground(photo));
+        const inspection = inspectPhoto(photo);
+        setTransparentBackground(inspection.transparentBackground);
+        setOpaque(inspection.opaque);
         setImage(photo);
       }
     }, () => {
@@ -47,8 +55,8 @@ export function PlayerCardView() {
   }, [needsNicknameFont]);
 
   useLayoutEffect(() => {
-    if (image && canvas.current) paintCard(canvas.current, image, crop, nicknamePending ? "" : name, nicknameFont ?? NICKNAME_FALLBACK, transparentBackground);
-  }, [image, crop, name, nicknamePending, nicknameFont, transparentBackground]);
+    if (image && canvas.current) paintCard(canvas.current, image, crop, nicknamePending ? "" : name, nicknameFont ?? NICKNAME_FALLBACK, transparentBackground, replacement);
+  }, [image, crop, name, nicknamePending, nicknameFont, transparentBackground, replacement]);
 
   function download() {
     if (!image || !canvas.current || nicknamePending) return;
@@ -71,6 +79,7 @@ export function PlayerCardView() {
         onChange={(event) => {
           const selected = event.target.files?.[0];
           if (!selected) return;
+          setReplacement(null); setPicking(false); setRetry(false); tap.current = null;
           setImage(null); setFile(null); setCrop(INITIAL_CROP); setError(null); drag.current = null;
           if (!/^image\/(png|jpeg|webp|avif|gif|bmp)$/.test(selected.type) || selected.size === 0) setError("decode");
           else setFile(selected);
@@ -80,13 +89,22 @@ export function PlayerCardView() {
         <Surface p={{ base: 3, md: 4 }}>
           <Box position="relative" aspectRatio="1" bg="bg.subtle" overflow="hidden" borderRadius="lg">
             <canvas ref={canvas} width={CARD_SIZE} height={CARD_SIZE} role="img" aria-label={t("playerCard.preview")}
-              style={{ display: "block", width: "100%", height: "100%", visibility: image ? "visible" : "hidden", touchAction: "none", cursor: image ? "grab" : "default" }}
+              style={{ display: "block", width: "100%", height: "100%", visibility: image ? "visible" : "hidden", touchAction: "none", cursor: picking ? "crosshair" : image ? "grab" : "default" }}
               onPointerDown={(event) => {
                 if (!image || !event.isPrimary || event.button !== 0) return;
                 event.currentTarget.setPointerCapture(event.pointerId);
+                if (picking) {
+                  tap.current = { id: event.pointerId, x: event.clientX, y: event.clientY, moved: false };
+                  return;
+                }
                 drag.current = { id: event.pointerId, x: event.clientX, y: event.clientY };
               }}
               onPointerMove={(event) => {
+                if (picking) {
+                  const start = tap.current;
+                  if (start?.id === event.pointerId && Math.hypot(event.clientX - start.x, event.clientY - start.y) > 6) start.moved = true;
+                  return;
+                }
                 const previous = drag.current;
                 if (!image || previous?.id !== event.pointerId) return;
                 const ratio = CARD_SIZE / event.currentTarget.getBoundingClientRect().width;
@@ -96,13 +114,26 @@ export function PlayerCardView() {
                 setCrop(value => clampCrop(image.naturalWidth, image.naturalHeight, { ...value, x: value.x + dx, y: value.y + dy }));
               }}
               onPointerUp={(event) => {
+                const start = tap.current;
+                if (image && picking && start?.id === event.pointerId) {
+                  tap.current = null;
+                  event.currentTarget.releasePointerCapture(event.pointerId);
+                  if (start.moved || Math.hypot(event.clientX - start.x, event.clientY - start.y) > 6) return;
+                  const rect = event.currentTarget.getBoundingClientRect();
+                  const point = sourcePoint(image.naturalWidth, image.naturalHeight, crop,
+                    (event.clientX - rect.left) * CARD_SIZE / rect.width,
+                    (event.clientY - rect.top) * CARD_SIZE / rect.height);
+                  const next = replaceSolidBackground(image, point);
+                  setRetry(!next);
+                  if (next) { setReplacement(next); setPicking(false); }
+                }
                 if (drag.current?.id === event.pointerId) {
                   drag.current = null;
                   event.currentTarget.releasePointerCapture(event.pointerId);
                 }
               }}
-              onPointerCancel={() => { drag.current = null; }}
-              onLostPointerCapture={() => { drag.current = null; }}
+              onPointerCancel={() => { drag.current = null; tap.current = null; }}
+              onLostPointerCapture={() => { drag.current = null; tap.current = null; }}
             />
             {!image && (
               <Stack position="absolute" inset="0" align="center" justify="center" p="5" gap="3" textAlign="center">
@@ -114,11 +145,15 @@ export function PlayerCardView() {
               </Stack>
             )}
           </Box>
-          {image && <Text fontSize="sm" color="fg.muted" mt="3">{t("playerCard.move")}</Text>}
+          {image && <Text role="status" fontSize="sm" color="fg.muted" mt="3">{t(picking ? retry ? "playerCard.retryBackground" : "playerCard.pickBackground" : "playerCard.move")}</Text>}
         </Surface>
         <Surface>
           <Stack gap="6">
             {image && <Button variant="outline" onClick={() => photoInput.current?.click()}>{t("playerCard.photo")}</Button>}
+            {image && opaque && <Stack gap="2">
+              {replacement ? <Button variant="outline" onClick={() => { setReplacement(null); setRetry(false); }}>{t("playerCard.restoreBackground")}</Button> :
+                <Button variant="outline" aria-pressed={picking} onClick={() => { setPicking(!picking); setRetry(false); drag.current = null; tap.current = null; }}>{t(picking ? "playerCard.cancelBackground" : "playerCard.replaceBackground")}</Button>}
+            </Stack>}
             <Field.Root>
               <Field.Label htmlFor="player-card-name">{t("playerCard.name")}</Field.Label>
               <Input id="player-card-name" value={name} onChange={event => setName(event.target.value)} />

@@ -8,7 +8,7 @@ import path from "node:path";
 import test from "node:test";
 import { chromium } from "playwright";
 
-test('decoded alpha selects the fixed stage once; silent UI and exact PNG', { timeout: 90000 }, async () => {
+test('opaque and transparent paths, optional mobile solid replacement, undo and exact PNG', { timeout: 90000 }, async () => {
   const root = path.resolve(process.env.SITE_PLAYER_CARD_STATIC_DIR || "dist");
   await stat(path.join(root, "draw-tools/player-card/index.html"));
   const server = createServer(async (req, res) => {
@@ -78,6 +78,8 @@ test('decoded alpha selects the fixed stage once; silent UI and exact PNG', { ti
       if (kind === 'transparent') assert.ok(pixel[2] > pixel[0] && pixel[2] < 90 && pixel[3] === 255, 'The transparent margin gets the dark stage');
       else if (kind === 'empty') assert.deepEqual(pixel, [234, 240, 245, 255]);
       else assert.ok(Math.abs(pixel[0] - 236) <= 2 && Math.abs(pixel[1] - 64) <= 2 && Math.abs(pixel[2] - 32) <= 2 && pixel[3] === 255);
+      if (kind === 'transparent' || kind === 'empty') assert.equal(await page.getByRole('button', { name: 'Replace solid background', exact: true }).count(), 0);
+      if (kind === 'opaque' || kind === 'jpeg') await page.getByRole('button', { name: 'Replace solid background', exact: true }).waitFor();
       if (kind === 'transparent') {
         assert.deepEqual(await canvas.evaluate(c => [...c.getContext('2d').getImageData(540, 100, 1, 1).data]), [236, 64, 32, 255]);
         const [beam, unlit] = await canvas.evaluate(c => {
@@ -108,6 +110,66 @@ test('decoded alpha selects the fixed stage once; silent UI and exact PNG', { ti
       assert.equal(await page.evaluate(() => window.samples.length), count, 'No resampling on crop, nickname, reset or download');
       assert.equal(await page.getByRole('button', { name: /Change background|Use selection|Erase/i }).count(), 0);
     }
+    const solidPhoto = await page.evaluate(() => {
+      const c = document.createElement('canvas'); c.width = 1200; c.height = 800;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#f2d3dd'; ctx.fillRect(0, 0, 1200, 800);
+      ctx.fillStyle = '#dcadc1'; ctx.fillRect(450, 0, 300, 800);
+      ctx.fillStyle = '#f2d3dd'; ctx.fillRect(580, 160, 40, 80);
+      return c.toDataURL().split(',')[1];
+    });
+    await photo.setInputFiles({ name: 'pink.png', mimeType: 'image/png', buffer: Buffer.from(solidPhoto, 'base64') });
+    const replace = page.getByRole('button', { name: 'Replace solid background', exact: true });
+    await replace.waitFor();
+    await page.locator('#player-card-zoom').fill('1.5');
+    await canvas.scrollIntoViewIfNeeded();
+    let rect = await canvas.boundingBox();
+    await page.mouse.move(rect.x + rect.width / 2, rect.y + rect.height / 2);
+    await page.mouse.down(); await page.mouse.move(rect.x + rect.width / 2 + 25, rect.y + rect.height / 2); await page.mouse.up();
+    await page.locator('#player-card-name').fill('Pink');
+    await page.waitForFunction(() => ![...document.querySelectorAll('button')].find(b => b.textContent === 'Download PNG · 1080 × 1080').disabled);
+    const beforeReplacement = await canvas.evaluate(c => c.toDataURL());
+    const samplesBefore = await page.evaluate(() => window.samples.length);
+    await replace.click();
+    await canvas.scrollIntoViewIfNeeded(); rect = await canvas.boundingBox();
+    await page.mouse.move(rect.x + 20, rect.y + 30);
+    await page.mouse.down(); await page.mouse.move(rect.x + 50, rect.y + 30); await page.mouse.up();
+    assert.equal(await canvas.evaluate(c => c.toDataURL()), beforeReplacement, 'Dragging in pick mode neither crops nor replaces');
+    // This enclosed wall-colored patch touches the crop interior, not the source boundary.
+    const patchX = (-675 + 25 * 1080 / rect.width + 600 * 2.025) / 1080 * rect.width;
+    const patchY = (-270 + 200 * 2.025) / 1080 * rect.height;
+    await page.touchscreen.tap(rect.x + patchX, rect.y + patchY);
+    await page.getByText('No clear background found. Try another spot.', { exact: true }).waitFor();
+    assert.equal(await canvas.evaluate(c => c.toDataURL()), beforeReplacement);
+    await page.touchscreen.tap(rect.x + rect.width * .1, rect.y + rect.height * .2);
+    const restore = page.getByRole('button', { name: 'Restore original background', exact: true });
+    await restore.waitFor();
+    const pixels = await canvas.evaluate(c => {
+      const ctx = c.getContext('2d');
+      return [Array.from(ctx.getImageData(100, 100, 1, 1).data), Array.from(ctx.getImageData(540, 300, 1, 1).data)];
+    });
+    assert.ok(pixels[0][0] < 60 && pixels[0][2] > pixels[0][0], 'Selected wall becomes dark blue stage');
+    assert.deepEqual(pixels[1], [220, 173, 193, 255], 'Deeper pink shirt stays exact');
+    const replacedPreview = await canvas.evaluate(c => c.toDataURL());
+    const [png] = await Promise.all([page.waitForEvent('download'), download.click()]);
+    const pngBytes = await readFile(await png.path());
+    assert.equal(pngBytes.readUInt32BE(16), 1080); assert.equal(pngBytes.readUInt32BE(20), 1080);
+    assert.deepEqual(pngBytes, Buffer.from(replacedPreview.split(',')[1], 'base64'));
+    await restore.click();
+    assert.equal(await canvas.evaluate(c => c.toDataURL()), beforeReplacement, 'Undo restores original pixels, crop and nickname');
+    assert.equal(await page.locator('#player-card-zoom').inputValue(), '1.5');
+    assert.equal(await page.locator('#player-card-name').inputValue(), 'Pink');
+    assert.equal(await page.evaluate(() => window.samples.length), samplesBefore, 'No repeated eligibility sampling');
+    await replace.click();
+    await page.getByRole('button', { name: 'Cancel replacement', exact: true }).click();
+    assert.equal(await canvas.evaluate(c => c.toDataURL()), beforeReplacement);
+    await photo.setInputFiles({ name: 'uniform.png', mimeType: 'image/png', buffer: Buffer.from(fixtures.opaque, 'base64') });
+    await replace.waitFor(); await replace.click();
+    await canvas.scrollIntoViewIfNeeded(); rect = await canvas.boundingBox();
+    const uniformPreview = await canvas.evaluate(c => c.toDataURL());
+    await page.touchscreen.tap(rect.x + rect.width * .1, rect.y + rect.height * .2);
+    await page.getByText('No clear background found. Try another spot.', { exact: true }).waitFor();
+    assert.equal(await canvas.evaluate(c => c.toDataURL()), uniformPreview, 'Ambiguous entire image is unchanged');
     assert.deepEqual(unexpected, [], 'All requests fulfilled locally; no uploads or external requests');
     assert.deepEqual(errors, []);
   } finally {

@@ -1,6 +1,6 @@
 export const CARD_SIZE = 1080;
 
-export function hasTransparentBackground(image: HTMLImageElement): boolean {
+export function inspectPhoto(image: HTMLImageElement) {
   const scale = Math.min(1, 256 / Math.max(image.naturalWidth, image.naturalHeight));
   const sample = document.createElement("canvas");
   sample.width = Math.max(1, Math.round(image.naturalWidth * scale));
@@ -10,14 +10,16 @@ export function hasTransparentBackground(image: HTMLImageElement): boolean {
   const { data } = ctx.getImageData(0, 0, sample.width, sample.height);
   let transparent = 0;
   let visible = 0;
+  let opaque = true;
   for (let i = 3; i < data.length; i += 4) {
+    if (data[i] !== 255) opaque = false;
     if (data[i] <= 16) transparent++;
     if (data[i] >= 32) visible++;
   }
   // Ignore tiny alpha defects and empty images; require a visible subject and
   // at least 1% nearly transparent area in the bounded raster sample.
   const minimum = Math.ceil(sample.width * sample.height * 0.01);
-  return transparent >= minimum && visible >= minimum;
+  return { transparentBackground: transparent >= minimum && visible >= minimum, opaque };
 }
 export type Crop = { zoom: number; x: number; y: number };
 export const INITIAL_CROP: Crop = { zoom: 1, x: 0, y: 0 };
@@ -62,18 +64,18 @@ function paintStageBackdrop(ctx: CanvasRenderingContext2D) {
   ctx.restore();
 }
 
-export function paintCard(canvas: HTMLCanvasElement, image: HTMLImageElement, crop: Crop, name: string, font: string, transparentBackground = false) {
+export function paintCard(canvas: HTMLCanvasElement, image: HTMLImageElement, crop: Crop, name: string, font: string, transparentBackground = false, replacement: HTMLCanvasElement | null = null) {
   const ctx = canvas.getContext("2d")!;
   const scale = CARD_SIZE / Math.min(image.naturalWidth, image.naturalHeight) * crop.zoom;
   const width = image.naturalWidth * scale;
   const height = image.naturalHeight * scale;
   ctx.clearRect(0, 0, CARD_SIZE, CARD_SIZE);
-  if (transparentBackground) paintStageBackdrop(ctx);
+  if (transparentBackground || replacement) paintStageBackdrop(ctx);
   else {
     ctx.fillStyle = "#eaf0f5";
     ctx.fillRect(0, 0, CARD_SIZE, CARD_SIZE);
   }
-  ctx.drawImage(image, (CARD_SIZE - width) / 2 + crop.x, (CARD_SIZE - height) / 2 + crop.y, width, height);
+  ctx.drawImage(replacement ?? image, (CARD_SIZE - width) / 2 + crop.x, (CARD_SIZE - height) / 2 + crop.y, width, height);
   const gradient = ctx.createLinearGradient(0, CARD_SIZE * 0.55, 0, CARD_SIZE);
   gradient.addColorStop(0, "rgba(8, 25, 51, 0)");
   gradient.addColorStop(1, "rgba(8, 25, 51, 0.8)");
