@@ -15,10 +15,33 @@ test('preview prior maps to full source raster after crop and zoom, including po
   assert.deepEqual(sourceBox(100, 100, { zoom: 1, x: 0, y: 0 }, { x: 0, y: 0, width: 1, height: 1 }, 100, 100), { x: 1, y: 1, width: 98, height: 98 });
 });
 
-test('feather only changes alpha adjacent to mask edges; RGB and interiors remain exact', () => {
-  const data = new Uint8ClampedArray(7 * 5 * 4);
-  for (let i = 0; i < 35; i++) data.set([123, 45, 67, i % 7 < 3 ? 0 : 255], i * 4);
-  featherAlpha(data, 7, 5);
-  for (let i = 0; i < 35; i++) assert.deepEqual([...data.slice(i * 4, i * 4 + 3)], [123, 45, 67]);
-  assert.deepEqual(Array.from({ length: 7 }, (_, i) => data[(14 + i) * 4 + 3]), [0, 0, 64, 191, 255, 255, 255]);
+test('output feather has 5px coverage at 1080 and follows zoom, without RGB changes or outward halo', () => {
+  for (const radius of [5, 8, 15]) {
+    const width = 100, height = 40;
+    const data = new Uint8ClampedArray(width * height * 4);
+    for (let i = 0; i < width * height; i++) data.set([123, 45, 67, i % width < 50 ? 0 : 255], i * 4);
+    featherAlpha(data, width, height, radius);
+    const row = Array.from({ length: width }, (_, x) => data[(20 * width + x) * 4 + 3]);
+    assert.equal(row.filter(a => a > 0 && a < 255).length, radius);
+    assert.ok(row.slice(0, 50).every(a => a === 0));
+    assert.ok(row.slice(50 + radius).every(a => a === 255));
+    for (let i = 0; i < width * height; i++) assert.deepEqual([...data.slice(i * 4, i * 4 + 3)], [123, 45, 67]);
+    // Integrated loss is a modest ~1.4 output pixels at zoom 1, not a 5px erosion.
+    const loss = row.slice(50).reduce((sum, alpha) => sum + 1 - alpha / 255, 0);
+    assert.ok(loss < radius * .3);
+  }
+});
+
+test('thin mask strands survive and uniform masks stay exact, including raster boundaries', () => {
+  for (const alpha of [0, 128, 255]) {
+    const data = new Uint8ClampedArray(9 * 7 * 4).fill(alpha);
+    const before = data.slice();
+    featherAlpha(data, 9, 7);
+    assert.deepEqual(data, before);
+  }
+  const strand = new Uint8ClampedArray(21 * 21 * 4);
+  for (let y = 0; y < 21; y++) strand[(y * 21 + 10) * 4 + 3] = 255;
+  featherAlpha(strand, 21, 21);
+  assert.ok(strand[(10 * 21 + 10) * 4 + 3] > 0);
+  assert.equal(strand[(10 * 21 + 9) * 4 + 3], 0);
 });

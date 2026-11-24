@@ -1,4 +1,4 @@
-import { sourceBox, featherAlpha } from './personCutout.mjs';
+import { sourceBox } from './personCutout.mjs';
 import type { Crop } from './composition';
 
 type Box = { x: number; y: number; width: number; height: number };
@@ -35,10 +35,9 @@ export function startGrabCut(image: HTMLImageElement, crop: Crop, box: Box) {
         output.width = Math.round(image.naturalWidth * outputRatio);
         output.height = Math.round(image.naturalHeight * outputRatio);
         const outputCtx = output.getContext('2d')!;
+        outputCtx.imageSmoothingEnabled = false;
         outputCtx.drawImage(sample, 0, 0, output.width, output.height);
-        const mask = outputCtx.getImageData(0, 0, output.width, output.height);
-        featherAlpha(mask.data, output.width, output.height);
-        outputCtx.putImageData(mask, 0, 0);
+        outputCtx.imageSmoothingEnabled = true;
         outputCtx.globalCompositeOperation = 'source-in';
         outputCtx.drawImage(image, 0, 0, output.width, output.height);
         outputCtx.globalCompositeOperation = 'source-over';

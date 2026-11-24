@@ -1,3 +1,5 @@
+import { featherAlpha } from "./personCutout.mjs";
+
 export const CARD_SIZE = 1080;
 
 export function inspectPhoto(image: HTMLImageElement) {
@@ -75,7 +77,19 @@ export function paintCard(canvas: HTMLCanvasElement, image: HTMLImageElement, cr
     ctx.fillStyle = "#eaf0f5";
     ctx.fillRect(0, 0, CARD_SIZE, CARD_SIZE);
   }
-  ctx.drawImage(replacement ?? image, (CARD_SIZE - width) / 2 + crop.x, (CARD_SIZE - height) / 2 + crop.y, width, height);
+  const photo = replacement ?? image;
+  const left = (CARD_SIZE - width) / 2 + crop.x;
+  const top = (CARD_SIZE - height) / 2 + crop.y;
+  if (replacement || (transparentBackground && !hasNativeSoftAlpha(image))) {
+    const layer = document.createElement("canvas");
+    layer.width = layer.height = CARD_SIZE;
+    const photoCtx = layer.getContext("2d")!;
+    photoCtx.drawImage(photo, left, top, width, height);
+    const mask = photoCtx.getImageData(0, 0, CARD_SIZE, CARD_SIZE);
+    featherAlpha(mask.data, CARD_SIZE, CARD_SIZE, 5 * crop.zoom);
+    photoCtx.putImageData(mask, 0, 0);
+    ctx.drawImage(layer, 0, 0);
+  } else ctx.drawImage(photo, left, top, width, height);
   const gradient = ctx.createLinearGradient(0, CARD_SIZE * 0.55, 0, CARD_SIZE);
   gradient.addColorStop(0, "rgba(8, 25, 51, 0)");
   gradient.addColorStop(1, "rgba(8, 25, 51, 0.8)");
@@ -126,4 +140,24 @@ export function paintCard(canvas: HTMLCanvasElement, image: HTMLImageElement, cr
   ctx.strokeText(label, x, y);
   ctx.fillText(label, x, y);
   ctx.restore();
+}
+
+// Inspect native pixels once, before resampling can introduce its own alpha.
+// Existing semitransparent PNG edges/hair keep their authored coverage exactly.
+const nativeSoftAlpha = new WeakMap<HTMLImageElement, boolean>();
+function hasNativeSoftAlpha(image: HTMLImageElement): boolean {
+  const cached = nativeSoftAlpha.get(image);
+  if (cached !== undefined) return cached;
+  const sample = document.createElement("canvas");
+  sample.width = image.naturalWidth;
+  sample.height = image.naturalHeight;
+  const ctx = sample.getContext("2d")!;
+  ctx.drawImage(image, 0, 0);
+  const { data } = ctx.getImageData(0, 0, sample.width, sample.height);
+  let soft = false;
+  for (let i = 3; i < data.length; i += 4) {
+    if (data[i] > 0 && data[i] < 255) { soft = true; break; }
+  }
+  nativeSoftAlpha.set(image, soft);
+  return soft;
 }

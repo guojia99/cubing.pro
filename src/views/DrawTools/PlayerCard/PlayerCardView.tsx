@@ -8,7 +8,7 @@ import { useI18n } from "@/contexts/I18nProvider";
 import { CARD_SIZE, INITIAL_CROP, cardFilename, clampCrop, inspectPhoto, paintCard, zoomCrop } from "./composition";
 import { replaceSolidBackground, sourcePoint } from "./solidBackground";
 import { loadNicknameFont, NICKNAME_FALLBACK } from "./nicknameFont";
-import { eraseSegment, repairPoint, REPAIR_RADIUS, type BrushPoint } from "./repairBrush";
+import { eraseSegment, restoreSegment, repairPoint, REPAIR_RADIUS, type BrushPoint } from "./repairBrush";
 
 import { INITIAL_BOX, clampBox, drawnBox } from "./personCutout.mjs";
 import { startGrabCut } from "./grabCut";
@@ -28,7 +28,7 @@ export function PlayerCardView() {
   const selectionDrag = useRef<{ id: number; start: { x: number; y: number }; box: typeof INITIAL_BOX; kind: "move" | "draw" | "resize" } | null>(null);
   const [picking, setPicking] = useState(false);
   const [retry, setRetry] = useState(false);
-  const [repairing, setRepairing] = useState(false);
+  const [repairing, setRepairing] = useState<false | "erase" | "restore">(false);
   const [canUndo, setCanUndo] = useState(false);
   const undo = useRef<ImageData | null>(null);
   const stroke = useRef<{ id: number; point: BrushPoint } | null>(null);
@@ -190,7 +190,9 @@ export function PlayerCardView() {
                   undo.current = replacement.getContext("2d")!.getImageData(0, 0, replacement.width, replacement.height);
                   const point = showRing(event.clientX, event.clientY);
                   stroke.current = { id: event.pointerId, point };
-                  eraseSegment(replacement, point); repaint(); setCanUndo(true);
+                  if (repairing === "restore") restoreSegment(replacement, image, point);
+                  else eraseSegment(replacement, point);
+                  repaint(); setCanUndo(true);
                   return;
                 }
                 if (picking) {
@@ -216,7 +218,8 @@ export function PlayerCardView() {
                   const point = showRing(event.clientX, event.clientY);
                   if (stroke.current?.id === event.pointerId) {
                     event.preventDefault();
-                    eraseSegment(replacement, point, stroke.current.point);
+                    if (repairing === "restore") restoreSegment(replacement, image!, point, stroke.current.point);
+                    else eraseSegment(replacement, point, stroke.current.point);
                     stroke.current.point = point;
                     repaint();
                   }
@@ -294,7 +297,7 @@ export function PlayerCardView() {
               </Stack>
             )}
           </Box>
-          {image && !selecting && <Text role="status" fontSize="sm" color="fg.muted" mt="3">{t(repairing ? "playerCard.repairHint" : picking ? retry ? "playerCard.retryBackground" : "playerCard.pickBackground" : "playerCard.move")}</Text>}
+          {image && !selecting && <Text role="status" fontSize="sm" color="fg.muted" mt="3">{t(repairing === "restore" ? "playerCard.restoreHint" : repairing ? "playerCard.repairHint" : picking ? retry ? "playerCard.retryBackground" : "playerCard.pickBackground" : "playerCard.move")}</Text>}
         </Surface>
         <Surface>
           <Stack gap="6">
@@ -316,11 +319,16 @@ export function PlayerCardView() {
             </Stack>}
             {image && (opaque || replacement) && <Stack gap="2">
               {replacement ? <>
-                <Button variant={repairing ? "solid" : "outline"} aria-pressed={repairing} onClick={() => {
+                <Button variant={repairing === "erase" ? "solid" : "outline"} aria-pressed={repairing === "erase"} onClick={() => {
                   cancelCutout(); setSelecting(false); setPicking(false);
-                  setRepairing(!repairing); drag.current = null; stroke.current = null;
+                  setRepairing(repairing === "erase" ? false : "erase"); drag.current = null; stroke.current = null;
                   if (ring.current) ring.current.style.display = "none";
                 }}>{t("playerCard.repair")}</Button>
+                <Button variant={repairing === "restore" ? "solid" : "outline"} aria-pressed={repairing === "restore"} onClick={() => {
+                  cancelCutout(); setSelecting(false); setPicking(false);
+                  setRepairing(repairing === "restore" ? false : "restore"); drag.current = null; stroke.current = null;
+                  if (ring.current) ring.current.style.display = "none";
+                }}>{t("playerCard.restoreBrush")}</Button>
                 <Button variant="outline" disabled={!canUndo || cutting} onClick={() => {
                   replacement.getContext("2d")!.putImageData(undo.current!, 0, 0);
                   undo.current = null; setCanUndo(false); repaint();

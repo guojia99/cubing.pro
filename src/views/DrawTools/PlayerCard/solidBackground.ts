@@ -1,4 +1,3 @@
-import { featherAlpha } from "./personCutout.mjs";
 import { CARD_SIZE, type Crop } from "./composition";
 
 export function sourcePoint(width: number, height: number, crop: Crop, x: number, y: number) {
@@ -60,7 +59,6 @@ export function replaceSolidBackground(image: HTMLImageElement, point: { x: numb
     point.x * result.width / image.naturalWidth, point.y * result.height / image.naturalHeight);
   if (!mask) return null;
   for (let i = 0; i < mask.length; i++) if (mask[i]) pixels.data[i * 4 + 3] = 0;
-  featherAlpha(pixels.data, result.width, result.height);
   ctx.putImageData(pixels, 0, 0);
   return result;
 }

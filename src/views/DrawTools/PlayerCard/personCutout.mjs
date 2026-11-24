@@ -18,14 +18,30 @@ export function sourceBox(width, height, crop, box, bitmapWidth, bitmapHeight) {
   const bottom = Math.min(bitmapHeight - 1, Math.ceil(((box.y + box.height) * 1080 - top) / scale * bitmapHeight / height));
   return { x, y, width: right - x, height: bottom - y };
 }
-// A one-pixel binomial filter on alpha only: uniform interiors stay exact.
-export function featherAlpha(data, width, height) {
-  const alpha = Uint8ClampedArray.from({ length: width * height }, (_, i) => data[i * 4 + 3]);
-  for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
+// A separable box filter on MASK alpha only. Cap by the original coverage:
+// never resurrect removed background RGB, and retain fine strands at lower alpha.
+// Radius is measured in the raster being painted (5 pixels at 1080, before zoom).
+export function featherAlpha(data, width, height, radius = 5) {
+  radius = Math.max(1, Math.round(radius));
+  const span = radius * 2 + 1;
+  const horizontal = new Float32Array(width * height);
+  for (let y = 0; y < height; y++) {
     let sum = 0;
-    for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
-      sum += alpha[Math.max(0, Math.min(height - 1, y + dy)) * width + Math.max(0, Math.min(width - 1, x + dx))] * (dx === 0 ? 2 : 1) * (dy === 0 ? 2 : 1);
+    for (let dx = -radius; dx <= radius; dx++) sum += data[(y * width + Math.max(0, Math.min(width - 1, dx))) * 4 + 3];
+    for (let x = 0; x < width; x++) {
+      horizontal[y * width + x] = sum / span;
+      sum += data[(y * width + Math.min(width - 1, x + radius + 1)) * 4 + 3]
+        - data[(y * width + Math.max(0, x - radius)) * 4 + 3];
     }
-    data[(y * width + x) * 4 + 3] = Math.round(sum / 16);
+  }
+  for (let x = 0; x < width; x++) {
+    let sum = 0;
+    for (let dy = -radius; dy <= radius; dy++) sum += horizontal[Math.max(0, Math.min(height - 1, dy)) * width + x];
+    for (let y = 0; y < height; y++) {
+      const i = (y * width + x) * 4 + 3;
+      data[i] = Math.min(data[i], Math.round(sum / span));
+      sum += horizontal[Math.min(height - 1, y + radius + 1) * width + x]
+        - horizontal[Math.max(0, y - radius) * width + x];
+    }
   }
 }

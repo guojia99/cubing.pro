@@ -30,15 +30,23 @@ To re-fetch the exact same files, run `node scripts/prepare-player-card-opencv.m
   semantic person recognition; similar foreground/background colors and edge
   touching subjects can require manual repair or restore.
 - Five iterations, deterministic RNG seed. Result mask is scaled to a full-source
-  replacement raster up to 2160px. A 1px alpha-only feather preserves RGB detail;
-  original photo alpha is retained by compositing. Existing output remains 1080².
+  replacement raster up to 2160px, without feathering that editable raster.
+  Original photo alpha is retained by compositing. Existing output remains 1080².
 - Result identity is checked before applying async work; terminating a job also
   rejects its promise. Errors retain the current photo/replacement. On success
-  the existing eraser and one-stroke undo work, and restore returns to the original.
+  the eraser and restore brush share one-stroke undo. The restore brush brings back
+  original pixels only where painted, including thin details missed by GrabCut.
+  Restore original background exits the edit entirely.
 - Deep blue 24px outer frame + 2px light blue inset are painted into exported PNG.
   The selection overlay is DOM-only. Neither photo RGB nor nickname is blurred.
-  The solid mask gets the same small alpha feather; eraser softness affects only
-  destination-out brush coverage, never the photo/text.
+  Solid, GrabCut and eraser masks share one alpha-only feather after projection
+  into the 1080px photo layer. Radius is 5 × zoom output pixels; translation
+  does not change it. The stage stays separate; text, outline and frame are painted afterward.
+  Alpha is capped by the unfiltered coverage, so deleted background RGB cannot
+  reappear; a straight hard edge loses about 1.36px of integrated coverage at
+  zoom 1, while fine strands retain nonzero alpha. Binary native PNG alpha uses
+  the same path; native PNGs with any semitransparency retain their authored
+  alpha unchanged (including narrow antialiasing).
 
 ## Focused validation
 
@@ -48,6 +56,8 @@ node --test src/views/DrawTools/PlayerCard/grabCutWorker.browser.test.mjs
 npx tsx --test src/views/DrawTools/PlayerCard/*.test.ts
 npx tsc --noEmit
 npm run build:static
+node --test src/views/DrawTools/PlayerCard/edgeFeather.browser.test.mjs
+node --test src/views/DrawTools/PlayerCard/restoreBrush.browser.test.mjs
 node --test src/views/DrawTools/PlayerCard/personCutout.browser.test.mjs
 node --test src/views/DrawTools/PlayerCard/repairBrush.browser.test.mjs
 node --test src/views/DrawTools/PlayerCard/transparentPhoto.browser.test.mjs

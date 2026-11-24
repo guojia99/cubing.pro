@@ -105,11 +105,12 @@ test('real hover, desktop/touch repair, bounded undo, restore and exact PNG', { 
         assert.equal(await page.evaluate(() => scrollY), scroll);
         const changed = await canvas.evaluate(c => c.toDataURL());
         assert.notEqual(changed, before);
-        const pixels = await canvas.evaluate((c) => {
+        const pixels = await canvas.evaluate((c, zoom) => {
           const ctx = c.getContext('2d');
           const r = c.getBoundingClientRect();
-          return [0, 10, 14].map(d => [...ctx.getImageData(540, Math.floor(1080 * .3 + d * 1080 / r.width), 1, 1).data]);
-        });
+          const outsideFringe = 14 + 5 * zoom * r.width / 1080;
+          return [0, 10, outsideFringe].map(d => [...ctx.getImageData(540, Math.floor(1080 * .3 + d * 1080 / r.width), 1, 1).data]);
+        }, Number(zoom));
         assert.ok(pixels[0][0] < 60 && pixels[1][0] < 60, 'inside ring reveals stage');
         assert.deepEqual(pixels[2], [220, 173, 193, 255], 'outside ring stays intact');
         await page.mouse.click(x, y + 40);
