@@ -87,7 +87,7 @@ test('opaque and transparent paths, optional mobile solid replacement, undo and 
           return [ctx.getImageData(227, 123, 1, 1).data[2], ctx.getImageData(950, 123, 1, 1).data[2]];
         });
         assert.ok(beam > 130 && beam > unlit + 50, 'Only the upper left has the blue stage light');
-        assert.ok(await canvas.evaluate(c => c.getContext('2d').getImageData(100, 1070, 1, 1).data[2] < 64), 'Existing bottom gradient overlays backdrop');
+        assert.ok(await canvas.evaluate(c => c.getContext('2d').getImageData(100, 1030, 1, 1).data[2] < 64), 'Existing bottom gradient overlays backdrop');
       }
       const original = await canvas.evaluate(c => c.toDataURL());
       await page.locator('#player-card-zoom').fill('2');

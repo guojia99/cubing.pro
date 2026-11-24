@@ -19,6 +19,10 @@ export function eraseSegment(canvas: HTMLCanvasElement, point: BrushPoint, previ
   const ctx = canvas.getContext("2d")!;
   ctx.save();
   ctx.globalCompositeOperation = "destination-out";
+  // Only the destination-out brush gets a subpixel soft fringe. Photo RGB
+  // and typography are never filtered; softness is in bitmap pixels.
+  ctx.shadowColor = "#000";
+  ctx.shadowBlur = 1;
   ctx.scale(point.rx, point.ry);
   ctx.lineWidth = 2;
   ctx.lineCap = "round";

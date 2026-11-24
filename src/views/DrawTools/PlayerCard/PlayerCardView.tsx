@@ -1,6 +1,7 @@
 "use client";
 
 import { Box, Button, Field, Grid, Input, Stack, Text } from "@chakra-ui/react";
+import type { PointerEvent as ReactPointerEvent } from "react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { PageHeader, Surface } from "@/components/ui/page";
 import { useI18n } from "@/contexts/I18nProvider";
@@ -9,6 +10,9 @@ import { replaceSolidBackground, sourcePoint } from "./solidBackground";
 import { loadNicknameFont, NICKNAME_FALLBACK } from "./nicknameFont";
 import { eraseSegment, repairPoint, REPAIR_RADIUS, type BrushPoint } from "./repairBrush";
 
+import { INITIAL_BOX, clampBox, drawnBox } from "./personCutout.mjs";
+import { startGrabCut } from "./grabCut";
+
 export function PlayerCardView() {
   const { t } = useI18n();
   const [file, setFile] = useState<File | null>(null);
@@ -16,6 +20,12 @@ export function PlayerCardView() {
   const [transparentBackground, setTransparentBackground] = useState(false);
   const [opaque, setOpaque] = useState(false);
   const [replacement, setReplacement] = useState<HTMLCanvasElement | null>(null);
+  const [selecting, setSelecting] = useState(false);
+  const [box, setBox] = useState(INITIAL_BOX);
+  const [cutting, setCutting] = useState(false);
+  const [cutoutError, setCutoutError] = useState(false);
+  const cutoutJob = useRef<ReturnType<typeof startGrabCut> | null>(null);
+  const selectionDrag = useRef<{ id: number; start: { x: number; y: number }; box: typeof INITIAL_BOX; kind: "move" | "draw" | "resize" } | null>(null);
   const [picking, setPicking] = useState(false);
   const [retry, setRetry] = useState(false);
   const [repairing, setRepairing] = useState(false);
@@ -64,8 +74,45 @@ export function PlayerCardView() {
     if (image && canvas.current) paintCard(canvas.current, image, crop, nicknamePending ? "" : name, nicknameFont ?? NICKNAME_FALLBACK, transparentBackground, replacement);
   }, [image, crop, name, nicknamePending, nicknameFont, transparentBackground, replacement]);
 
-  function resetRepair() {
-    setRepairing(false); setCanUndo(false); undo.current = null; stroke.current = null;
+  useEffect(() => () => { cutoutJob.current?.cancel(); cutoutJob.current = null; }, []);
+
+  function cancelCutout() {
+    const job = cutoutJob.current;
+    cutoutJob.current = null;
+    job?.cancel();
+    setCutting(false);
+    setCutoutError(false);
+    selectionDrag.current = null;
+  }
+
+  async function cutout() {
+    if (!image) return;
+    cancelCutout(); resetRepair(false); setPicking(false);
+    setCutting(true);
+    let job: ReturnType<typeof startGrabCut> | null = null;
+    try {
+      job = startGrabCut(image, crop, box);
+      cutoutJob.current = job;
+      const next = await job.result;
+      // Upload, restore, crop edits, cancel and unmount invalidate this job.
+      if (cutoutJob.current !== job) return;
+      resetRepair(); setReplacement(next); setSelecting(false);
+    } catch {
+      if (job && cutoutJob.current !== job) return;
+      setCutoutError(true);
+    } finally {
+      if (cutoutJob.current === job) { cutoutJob.current = null; setCutting(false); }
+    }
+  }
+
+  function selectionPoint(event: ReactPointerEvent<HTMLCanvasElement>) {
+    const rect = event.currentTarget.getBoundingClientRect();
+    return { x: Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width)), y: Math.max(0, Math.min(1, (event.clientY - rect.top) / rect.height)) };
+  }
+
+  function resetRepair(clearHistory = true) {
+    setRepairing(false); stroke.current = null;
+    if (clearHistory) { setCanUndo(false); undo.current = null; }
     if (ring.current) ring.current.style.display = "none";
   }
 
@@ -105,6 +152,7 @@ export function PlayerCardView() {
         onChange={(event) => {
           const selected = event.target.files?.[0];
           if (!selected) return;
+          cancelCutout(); setSelecting(false); setBox(INITIAL_BOX);
           setReplacement(null); setPicking(false); setRetry(false); tap.current = null;
           resetRepair();
           setImage(null); setFile(null); setCrop(INITIAL_CROP); setError(null); drag.current = null;
@@ -115,11 +163,28 @@ export function PlayerCardView() {
       <Grid templateColumns={{ base: "minmax(0, 1fr)", md: "minmax(0, 1.3fr) minmax(0, 1fr)" }} gap={{ base: 5, md: 8 }} alignItems="start">
         <Surface p={{ base: 3, md: 4 }}>
           <Box position="relative" aspectRatio="1" bg="bg.subtle" overflow="hidden" borderRadius="lg">
-            <canvas ref={canvas} width={CARD_SIZE} height={CARD_SIZE} role="img" aria-label={t("playerCard.preview")}
-              style={{ display: "block", width: "100%", height: "100%", visibility: image ? "visible" : "hidden", touchAction: "none", cursor: repairing ? "none" : picking ? "crosshair" : image ? "grab" : "default" }}
+            <canvas ref={canvas} width={CARD_SIZE} height={CARD_SIZE} role="img" aria-label={t("playerCard.preview")} tabIndex={selecting ? 0 : undefined}
+              aria-describedby={selecting ? "player-card-box-hint" : undefined}
+              onKeyDown={event => {
+                if (!selecting || cutting || !["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key)) return;
+                event.preventDefault();
+                const dx = event.key === "ArrowLeft" ? -.01 : event.key === "ArrowRight" ? .01 : 0;
+                const dy = event.key === "ArrowUp" ? -.01 : event.key === "ArrowDown" ? .01 : 0;
+                setBox(value => clampBox(event.shiftKey ? { ...value, width: value.width + dx, height: value.height + dy } : { ...value, x: value.x + dx, y: value.y + dy }));
+              }}
+              style={{ display: "block", width: "100%", height: "100%", visibility: image ? "visible" : "hidden", touchAction: "none", cursor: cutting ? "wait" : selecting ? "crosshair" : repairing ? "none" : picking ? "crosshair" : image ? "grab" : "default" }}
               onPointerDown={(event) => {
-                if (!image || !event.isPrimary || event.button !== 0) return;
+                if (!image || cutting || !event.isPrimary || event.button !== 0) return;
                 event.currentTarget.setPointerCapture(event.pointerId);
+                if (selecting) {
+                  event.preventDefault();
+                  const point = selectionPoint(event);
+                  const tolerance = 24 / event.currentTarget.getBoundingClientRect().width;
+                  const resize = Math.abs(point.x - box.x - box.width) < tolerance && Math.abs(point.y - box.y - box.height) < tolerance;
+                  const inside = point.x >= box.x && point.x <= box.x + box.width && point.y >= box.y && point.y <= box.y + box.height;
+                  selectionDrag.current = { id: event.pointerId, start: point, box, kind: resize ? "resize" : inside ? "move" : "draw" };
+                  return;
+                }
                 if (repairing && replacement) {
                   event.preventDefault();
                   undo.current = replacement.getContext("2d")!.getImageData(0, 0, replacement.width, replacement.height);
@@ -135,6 +200,17 @@ export function PlayerCardView() {
                 drag.current = { id: event.pointerId, x: event.clientX, y: event.clientY };
               }}
               onPointerMove={(event) => {
+                if (selecting) {
+                  const gesture = selectionDrag.current;
+                  if (!gesture || gesture.id !== event.pointerId) return;
+                  event.preventDefault();
+                  const point = selectionPoint(event);
+                  const dx = point.x - gesture.start.x, dy = point.y - gesture.start.y;
+                  setBox(gesture.kind === "draw" ? drawnBox(gesture.start, point) : clampBox(gesture.kind === "resize"
+                    ? { ...gesture.box, width: gesture.box.width + dx, height: gesture.box.height + dy }
+                    : { ...gesture.box, x: gesture.box.x + dx, y: gesture.box.y + dy }));
+                  return;
+                }
                 if (repairing && replacement) {
                   if (!event.isPrimary) return;
                   const point = showRing(event.clientX, event.clientY);
@@ -160,6 +236,11 @@ export function PlayerCardView() {
                 setCrop(value => clampCrop(image.naturalWidth, image.naturalHeight, { ...value, x: value.x + dx, y: value.y + dy }));
               }}
               onPointerUp={(event) => {
+                if (selectionDrag.current?.id === event.pointerId) {
+                  selectionDrag.current = null;
+                  event.currentTarget.releasePointerCapture(event.pointerId);
+                  return;
+                }
                 if (stroke.current?.id === event.pointerId) {
                   stroke.current = null;
                   event.currentTarget.releasePointerCapture(event.pointerId);
@@ -186,12 +267,18 @@ export function PlayerCardView() {
                 }
               }}
               onPointerLeave={() => { if (ring.current) ring.current.style.display = "none"; }}
-              onPointerCancel={() => { drag.current = null; tap.current = null; stroke.current = null; if (ring.current) ring.current.style.display = "none"; }}
+              onPointerCancel={() => { selectionDrag.current = null; drag.current = null; tap.current = null; stroke.current = null; if (ring.current) ring.current.style.display = "none"; }}
               onLostPointerCapture={() => {
+                selectionDrag.current = null;
                 if (stroke.current && ring.current) ring.current.style.display = "none";
                 drag.current = null; tap.current = null; stroke.current = null;
               }}
             />
+            {image && selecting && <svg data-testid="person-box" aria-hidden="true" viewBox="0 0 1080 1080" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }}>
+              <rect x={box.x * CARD_SIZE} y={box.y * CARD_SIZE} width={box.width * CARD_SIZE} height={box.height * CARD_SIZE} fill="none" stroke="#082b60" strokeWidth="8" />
+              <rect x={box.x * CARD_SIZE} y={box.y * CARD_SIZE} width={box.width * CARD_SIZE} height={box.height * CARD_SIZE} fill="none" stroke="#bce6ff" strokeWidth="3" strokeDasharray="12 8" />
+              <circle cx={(box.x + box.width) * CARD_SIZE} cy={(box.y + box.height) * CARD_SIZE} r="16" fill="#bce6ff" stroke="#082b60" strokeWidth="4" />
+            </svg>}
             <svg ref={ring} data-testid="repair-ring" aria-hidden="true" width={REPAIR_RADIUS * 2 + 2} height={REPAIR_RADIUS * 2 + 2}
               style={{ display: "none", position: "absolute", pointerEvents: "none", overflow: "visible" }}>
               <circle cx={REPAIR_RADIUS + 1} cy={REPAIR_RADIUS + 1} r={REPAIR_RADIUS} fill="none" stroke="white" strokeWidth="1" />
@@ -207,24 +294,40 @@ export function PlayerCardView() {
               </Stack>
             )}
           </Box>
-          {image && <Text role="status" fontSize="sm" color="fg.muted" mt="3">{t(repairing ? "playerCard.repairHint" : picking ? retry ? "playerCard.retryBackground" : "playerCard.pickBackground" : "playerCard.move")}</Text>}
+          {image && !selecting && <Text role="status" fontSize="sm" color="fg.muted" mt="3">{t(repairing ? "playerCard.repairHint" : picking ? retry ? "playerCard.retryBackground" : "playerCard.pickBackground" : "playerCard.move")}</Text>}
         </Surface>
         <Surface>
           <Stack gap="6">
             {image && <Button variant="outline" onClick={() => photoInput.current?.click()}>{t("playerCard.photo")}</Button>}
-            {image && opaque && <Stack gap="2">
+            {image && <Stack gap="2">
+              <Button variant={selecting ? "solid" : "outline"} aria-pressed={selecting} onClick={() => {
+                cancelCutout(); resetRepair(false); setPicking(false); setRetry(false); drag.current = null; tap.current = null;
+                setSelecting(!selecting);
+              }}>{t(selecting ? "playerCard.finishBox" : "playerCard.selectPerson")}</Button>
+              {selecting && <>
+                <Text id="player-card-box-hint" fontSize="sm" color="fg.muted">{t("playerCard.boxHint")}</Text>
+                <Button disabled={cutting} onClick={cutout}>{t("playerCard.cutout")}</Button>
+              </>}
+              {cutting && <>
+                <Text role="status">{t("playerCard.cutting")}</Text>
+                <Button variant="outline" onClick={cancelCutout}>{t("playerCard.cancelCutout")}</Button>
+              </>}
+              {cutoutError && <Text role="alert" color="fg.error">{t("playerCard.cutoutError")}</Text>}
+            </Stack>}
+            {image && (opaque || replacement) && <Stack gap="2">
               {replacement ? <>
                 <Button variant={repairing ? "solid" : "outline"} aria-pressed={repairing} onClick={() => {
+                  cancelCutout(); setSelecting(false); setPicking(false);
                   setRepairing(!repairing); drag.current = null; stroke.current = null;
                   if (ring.current) ring.current.style.display = "none";
                 }}>{t("playerCard.repair")}</Button>
-                <Button variant="outline" disabled={!canUndo} onClick={() => {
+                <Button variant="outline" disabled={!canUndo || cutting} onClick={() => {
                   replacement.getContext("2d")!.putImageData(undo.current!, 0, 0);
                   undo.current = null; setCanUndo(false); repaint();
                 }}>{t("playerCard.undoStroke")}</Button>
-                <Button variant="outline" onClick={() => { resetRepair(); setReplacement(null); setRetry(false); }}>{t("playerCard.restoreBackground")}</Button>
+                <Button variant="outline" onClick={() => { cancelCutout(); setSelecting(false); resetRepair(); setReplacement(null); setRetry(false); }}>{t("playerCard.restoreBackground")}</Button>
               </> :
-                <Button variant="outline" aria-pressed={picking} onClick={() => { setPicking(!picking); setRetry(false); drag.current = null; tap.current = null; }}>{t(picking ? "playerCard.cancelBackground" : "playerCard.replaceBackground")}</Button>}
+                <Button variant="outline" aria-pressed={picking} onClick={() => { cancelCutout(); setSelecting(false); setPicking(!picking); setRetry(false); drag.current = null; tap.current = null; }}>{t(picking ? "playerCard.cancelBackground" : "playerCard.replaceBackground")}</Button>}
             </Stack>}
             <Field.Root>
               <Field.Label htmlFor="player-card-name">{t("playerCard.name")}</Field.Label>
@@ -233,10 +336,11 @@ export function PlayerCardView() {
             <Field.Root disabled={!image}>
               <Field.Label htmlFor="player-card-zoom">{t("playerCard.zoom")}</Field.Label>
               <input id="player-card-zoom" type="range" min="1" max="3" step="0.01" value={crop.zoom} disabled={!image} style={{ width: "100%", minHeight: 44, accentColor: "var(--accent)" }} onChange={event => {
+                cancelCutout(); setBox(INITIAL_BOX);
                 if (image) setCrop(value => zoomCrop(image.naturalWidth, image.naturalHeight, value, Number(event.target.value)));
               }} />
             </Field.Root>
-            <Button variant="outline" disabled={!image} onClick={() => setCrop(INITIAL_CROP)}>{t("playerCard.reset")}</Button>
+            <Button variant="outline" disabled={!image} onClick={() => { cancelCutout(); setBox(INITIAL_BOX); setCrop(INITIAL_CROP); }}>{t("playerCard.reset")}</Button>
             <Button colorPalette="brand" disabled={!image || nicknamePending} onClick={download}>{t("playerCard.download")}</Button>
             {error === "export" && <Text role="alert" color="fg.error">{t("playerCard.exportError")}</Text>}
           </Stack>

@@ -82,9 +82,12 @@ export function paintCard(canvas: HTMLCanvasElement, image: HTMLImageElement, cr
   ctx.fillStyle = gradient;
   ctx.fillRect(0, CARD_SIZE * 0.55, CARD_SIZE, CARD_SIZE * 0.45);
   ctx.save();
-  ctx.strokeStyle = "rgba(225, 235, 248, 0.45)";
+  ctx.strokeStyle = "#103b70";
+  ctx.lineWidth = 24;
+  ctx.strokeRect(12, 12, CARD_SIZE - 24, CARD_SIZE - 24);
+  ctx.strokeStyle = "#bce6ff";
   ctx.lineWidth = 2;
-  ctx.strokeRect(24, 24, CARD_SIZE - 48, CARD_SIZE - 48);
+  ctx.strokeRect(31, 31, CARD_SIZE - 62, CARD_SIZE - 62);
   ctx.restore();
   const label = name.trim();
   if (!label) return;

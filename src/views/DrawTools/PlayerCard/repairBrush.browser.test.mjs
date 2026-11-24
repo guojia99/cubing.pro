@@ -55,11 +55,12 @@ test('real hover, desktop/touch repair, bounded undo, restore and exact PNG', { 
       const original = await canvas.evaluate(c => c.toDataURL());
       const border = await canvas.evaluate(c => {
         const ctx = c.getContext('2d');
-        return [22, 23, 24, 25].map(x => [...ctx.getImageData(x, 100, 1, 1).data]);
+        return [0, 12, 23, 24, 30, 31, 32].map(x => [...ctx.getImageData(x, 100, 1, 1).data]);
       });
-      assert.deepEqual(border[0], border[3], 'border stays within its 2px rectangle');
-      assert.notDeepEqual(border[1], border[0]);
-      assert.deepEqual(border[1], border[2]);
+      for (const pixel of border.slice(0, 3)) assert.deepEqual(pixel, [16, 59, 112, 255], '24px dark blue outer frame');
+      assert.deepEqual(border[4], [188, 230, 255, 255], 'light blue inset');
+      assert.deepEqual(border[4], border[5]);
+      assert.deepEqual(border[3], border[6], 'image between and inside frame is sharp');
       await replace.click(); await canvas.scrollIntoViewIfNeeded();
       let rect = await canvas.boundingBox();
       await page.mouse.click(rect.x + rect.width * .1, rect.y + rect.height * .2);
@@ -140,5 +141,6 @@ test('real hover, desktop/touch repair, bounded undo, restore and exact PNG', { 
     }
   } finally {
     await browser?.close();
+    await new Promise(resolve => server.close(resolve));
   }
 });
