@@ -1,3 +1,4 @@
+import { MyCards } from "@/views/DrawTools/PlayerCard/MyCards";
 import { PlayerCardView } from "@/views/DrawTools/PlayerCard/PlayerCardView";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -125,6 +126,8 @@ function CatchAllContent({ routeId, path }: { routeId: string; path: string[] })
       return <OrganizersResultsPageView />;
     case "admin-organizers-comp-result":
       return <OrganizersResultsPageView />;
+    case "user-cube-cards":
+      return <MyCards />;
     case "draw-player-card":
       return <PlayerCardView />;
     case "draw-sq1":

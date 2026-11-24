@@ -59,6 +59,7 @@ const routeNames = {
   "tool-associative-words": ["BLD 联想词", "BLD associations", "目隠し用連想語", "盲解聯想詞", "블라인드 연상 단어", "Mots d’association à l’aveugle", "Palabras de asociación a ciegas"],
   "tool-mbld-d": ["多盲练习", "Multi-blind practice", "複数目隠し練習", "多盲練習", "멀티 블라인드 연습", "Entraînement multi-cubes à l’aveugle", "Práctica de múltiples cubos a ciegas"],
   "tool-team-match": ["团体赛", "Team match", "団体戦", "團體賽", "팀 대회", "Match par équipes", "Competición por equipos"],
+  "user-cube-cards": ["我的小卡", "My cards", "マイカード", "我嘅小卡", "내 카드", "Mes cartes", "Mis tarjetas"],
   "draw-player-card": ["小卡生成器", "Player card maker", "選手カード作成", "小卡製作工具", "선수 카드 만들기", "Créateur de carte de joueur", "Creador de tarjetas de jugador"],
   "draw-sq1": ["SQ1 绘图", "Square-1 drawing", "Square-1 描画", "SQ1 繪圖", "Square-1 그리기", "Dessin Square-1", "Dibujo de Square-1"],
   "draw-minx": ["五魔方绘图", "Megaminx drawing", "メガミンクス描画", "五魔方繪圖", "메가밍크스 그리기", "Dessin Megaminx", "Dibujo de Megaminx"],

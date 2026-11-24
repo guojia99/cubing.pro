@@ -67,6 +67,7 @@ export const APP_ROUTES: AppRoute[] = [
   { id: "tool-associative-words", name: "BLD 联想词", pattern: "/tools/associative-words", implType: "frontend-only", renderMode: "client-spa", pageComponent: "Tools/Bld/Bld_Associative_Words.tsx", tags: ["tool"] },
   { id: "tool-mbld-d", name: "MBLD", pattern: "/tools/mbld-d", implType: "frontend-only", renderMode: "client-spa", pageComponent: "Tools/Bld/MBld.tsx", tags: ["tool"] },
   { id: "tool-team-match", name: "团体赛", pattern: "/tools/team-match", implType: "hybrid", renderMode: "client-spa", pageComponent: "TeamMatch/TeamMatchView.tsx", tags: ["tool"] },
+  { id: "user-cube-cards", name: "我的小卡", pattern: "/user/cube-cards", implType: "frontend-only", renderMode: "client-spa", pageComponent: "DrawTools/PlayerCard/MyCards.tsx", tags: ["tool"] },
   { id: "draw-player-card", name: "小卡生成器", pattern: "/draw-tools/player-card", implType: "frontend-only", renderMode: "client-spa", pageComponent: "DrawTools/PlayerCard/PlayerCardView.tsx", tags: ["tool"] },
   { id: "draw-sq1", name: "SQ1 绘图", pattern: "/draw-tools/sq1-d", implType: "frontend-only", renderMode: "client-spa", pageComponent: "Tools/Draws/SQ1Draw.tsx", tags: ["tool"] },
   { id: "draw-minx", name: "五魔方绘图", pattern: "/draw-tools/minx-d", implType: "frontend-only", renderMode: "client-spa", pageComponent: "Tools/Draws/MinxDraw.tsx", tags: ["tool"] },

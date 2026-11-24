@@ -1,0 +1,29 @@
+.stage { perspective: 1200px; padding: 14px; }
+.artwork { position: relative; overflow: hidden; border-radius: 12px; }
+.artwork > img, .artwork > canvas { display: block; width: 100%; height: auto; }
+.motion { animation: cardFloat 16s ease-in-out infinite; transform-origin: center; box-shadow: 0 15px 35px #080c2433; }
+.motion::after {
+  content: "";
+  position: absolute;
+  inset: -50%;
+  pointer-events: none;
+  background: linear-gradient(110deg, transparent 47%, #bda7790a 48.5%, #d3b98130 49.5%, #e5e9ee52 50%, #c9b07524 50.7%, transparent 52.5%);
+  transform: translateX(-65%);
+  animation: cardSweep 12s linear infinite;
+}
+.paused, .paused::after { animation-play-state: paused; }
+@keyframes cardFloat {
+  0%, 100% { transform: rotateX(.7deg) rotateY(-1.8deg) translateY(0); }
+  50% { transform: rotateX(-.7deg) rotateY(1.8deg) translateY(-3px); }
+}
+@keyframes cardSweep {
+  0% { transform: translateX(-65%); opacity: 0; }
+  5% { opacity: 1; }
+  45% { opacity: 1; }
+  50%, 100% { transform: translateX(65%); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .controls { display: none; }
+  .motion, .motion::after { animation: none; transform: none; }
+  .motion::after { opacity: 0; }
+}

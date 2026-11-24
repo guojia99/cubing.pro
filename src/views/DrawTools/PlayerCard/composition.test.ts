@@ -41,3 +41,10 @@ test("public route is registered, statically enumerated and translated in all se
     assert.ok(catalog["shell.route.draw-player-card"]);
   }
 });
+
+
+test("saved cards route is statically enumerated and localized", () => {
+  assert.equal(matchRoute("/user/cube-cards")?.id, "user-cube-cards");
+  assert.ok(getCatchAllStaticParams().some(entry => entry.path.join("/") === "user/cube-cards"));
+  for (const catalog of Object.values(catalogs)) assert.ok(catalog["shell.route.user-cube-cards"]);
+});

@@ -1,8 +1,14 @@
 "use client";
 
-import { Box, Button, Field, Grid, Input, Stack, Text } from "@chakra-ui/react";
+import NextLink from "next/link";
+import { useAuth } from "@/contexts/AuthProvider";
+import { isLoggedIn } from "@/lib/auth";
+import { saveCubeCard, type CardTemplate } from "@/services/cubing-pro/cubeCards";
+import { MOTION_HEIGHT, paintMotionCard } from "./motionComposition";
+import { CardArtwork } from "./CardArtwork";
+import { Box, Button, Field, Grid, HStack, Input, Stack, Text } from "@chakra-ui/react";
 import type { PointerEvent as ReactPointerEvent } from "react";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { PageHeader, Surface } from "@/components/ui/page";
 import { useI18n } from "@/contexts/I18nProvider";
 import { CARD_SIZE, INITIAL_CROP, cardFilename, clampCrop, inspectPhoto, paintCard, zoomCrop } from "./composition";
@@ -15,6 +21,11 @@ import { startGrabCut } from "./grabCut";
 
 export function PlayerCardView() {
   const { t } = useI18n();
+  const { currentUser } = useAuth();
+  const [template, setTemplate] = useState<CardTemplate>("classic");
+  const motionCanvas = useRef<HTMLCanvasElement | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<"saved" | "saveError" | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const [transparentBackground, setTransparentBackground] = useState(false);
@@ -70,9 +81,16 @@ export function PlayerCardView() {
     return () => { active = false; };
   }, [needsNicknameFont]);
 
-  useLayoutEffect(() => {
+  const repaint = useCallback(() => {
     if (image && canvas.current) paintCard(canvas.current, image, crop, nicknamePending ? "" : name, nicknameFont ?? NICKNAME_FALLBACK, transparentBackground, replacement);
-  }, [image, crop, name, nicknamePending, nicknameFont, transparentBackground, replacement]);
+    if (image && template === "motion" && motionCanvas.current) {
+      paintMotionCard(motionCanvas.current, image, crop, nicknamePending ? "" : name, nicknameFont ?? NICKNAME_FALLBACK, replacement);
+    }
+  }, [image, crop, nicknamePending, name, nicknameFont, transparentBackground, replacement, template]);
+
+  useLayoutEffect(() => {
+    repaint();
+  }, [repaint]);
 
   useEffect(() => () => { cutoutJob.current?.cancel(); cutoutJob.current = null; }, []);
 
@@ -116,10 +134,6 @@ export function PlayerCardView() {
     if (ring.current) ring.current.style.display = "none";
   }
 
-  function repaint() {
-    if (image && canvas.current) paintCard(canvas.current, image, crop, nicknamePending ? "" : name, nicknameFont ?? NICKNAME_FALLBACK, transparentBackground, replacement);
-  }
-
   function showRing(clientX: number, clientY: number) {
     const rect = canvas.current!.getBoundingClientRect();
     const x = clientX - rect.left, y = clientY - rect.top;
@@ -136,7 +150,7 @@ export function PlayerCardView() {
     try {
       const link = document.createElement("a");
       link.download = cardFilename(name);
-      link.href = canvas.current.toDataURL("image/png");
+      link.href = (template === "motion" ? motionCanvas.current! : canvas.current).toDataURL("image/png");
       link.click();
       setError(null);
     } catch {
@@ -144,9 +158,25 @@ export function PlayerCardView() {
     }
   }
 
+  async function save() {
+    if (!isLoggedIn(currentUser?.id) || !image || nicknamePending || saving) return;
+    const output = template === "motion" ? motionCanvas.current : canvas.current;
+    if (!output) return;
+    setSaving(true); setSaveStatus(null);
+    try {
+      const png = await new Promise<Blob>((resolve, reject) => output.toBlob(blob => blob ? resolve(blob) : reject(new Error("PNG export failed")), "image/png"));
+      await saveCubeCard(name, png, template);
+      setSaveStatus("saved");
+    } catch { setSaveStatus("saveError"); } finally { setSaving(false); }
+  }
+
   return (
     <Box maxW="1100px" mx="auto" py={{ base: 4, md: 8 }} minW="0">
       <PageHeader eyebrow={t("nav.tools.draw")} title={t("playerCard.title")} description={t("playerCard.description")} />
+      <HStack mb="5" flexWrap="wrap">
+        {(["classic", "motion"] as const).map(mode => <Button key={mode} variant={template === mode ? "solid" : "outline"} aria-pressed={template === mode} onClick={() => { setTemplate(mode); setSaveStatus(null); }}>{t(`playerCard.${mode}`)}</Button>)}
+        <Button asChild variant="outline"><NextLink href="/user/cube-cards/">{t("playerCard.myCards")}</NextLink></Button>
+      </HStack>
       <input ref={photoInput} id="player-card-photo" type="file" hidden aria-label={t("playerCard.photo")}
         accept="image/png,image/jpeg,image/webp,image/avif,image/gif,image/bmp"
         onChange={(event) => {
@@ -162,6 +192,8 @@ export function PlayerCardView() {
         }} />
       <Grid templateColumns={{ base: "minmax(0, 1fr)", md: "minmax(0, 1.3fr) minmax(0, 1fr)" }} gap={{ base: 5, md: 8 }} alignItems="start">
         <Surface p={{ base: 3, md: 4 }}>
+          {template === "motion" && image && <CardArtwork template="motion" alt={t("playerCard.motion")}><canvas ref={motionCanvas} width={CARD_SIZE} height={MOTION_HEIGHT} role="img" aria-label={t("playerCard.motion")} /></CardArtwork>}
+          {template === "motion" && image && <Text fontSize="sm" fontWeight="semibold" mt="6" mb="3" pt="4" borderTopWidth="1px">{t("playerCard.cropEditor")}</Text>}
           <Box position="relative" aspectRatio="1" bg="bg.subtle" overflow="hidden">
             <canvas ref={canvas} width={CARD_SIZE} height={CARD_SIZE} role="img" aria-label={t("playerCard.preview")} tabIndex={selecting ? 0 : undefined}
               aria-describedby={selecting ? "player-card-box-hint" : undefined}
@@ -349,7 +381,9 @@ export function PlayerCardView() {
               }} />
             </Field.Root>
             <Button variant="outline" disabled={!image} onClick={() => { cancelCutout(); setBox(INITIAL_BOX); setCrop(INITIAL_CROP); }}>{t("playerCard.reset")}</Button>
-            <Button colorPalette="brand" disabled={!image || nicknamePending} onClick={download}>{t("playerCard.download")}</Button>
+            <Button colorPalette="brand" disabled={!image || nicknamePending} onClick={download}>{t(template === "motion" ? "playerCard.downloadMotion" : "playerCard.download")}</Button>
+            {isLoggedIn(currentUser?.id) && <Button disabled={!image || nicknamePending || saving} onClick={() => void save()}>{t("playerCard.save")}</Button>}
+            {saveStatus && <Text role={saveStatus === "saveError" ? "alert" : "status"}>{t(`playerCard.${saveStatus}`)}</Text>}
             {error === "export" && <Text role="alert" color="fg.error">{t("playerCard.exportError")}</Text>}
           </Stack>
         </Surface>

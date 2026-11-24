@@ -47,6 +47,7 @@ export function UserMenu({ children }: { children: ReactNode }) {
   if (currentUser?.CubeID) {
     items.push({ key: `player/${currentUser.CubeID}`, label: t("user.myHome") });
   }
+  items.push({ key: "user/cube-cards", label: t("playerCard.myCards") });
   items.push({ key: "user/profile", label: t("user.profile") });
   if (currentUser?.WcaID?.trim()) {
     items.push({ key: "wca", label: t("user.wcaProfile") });
