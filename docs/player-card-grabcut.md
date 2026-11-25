@@ -1,11 +1,15 @@
 # Player card: experimental person cutout
 
-The unmodified official [OpenCV.js 4.11.0 release](https://docs.opencv.org/4.11.0/opencv.js)
-is shipped with the static app. The JS includes WASM and is 11.4 MB before
-compression. It is not fetched on initial load or when viewing or adjusting
-the box. The bundled files include the OpenCV Apache 2.0 license, third-party
-licenses and recorded SHA-256 digests. Build needs no OpenCV download.
-To re-fetch the exact same files, run `node scripts/prepare-player-card-opencv.mjs`.
+A slimmed build of official [OpenCV.js 4.11.0](https://github.com/opencv/opencv/tree/4.11.0)
+(`core`, `imgproc`, `js` bindings only) is shipped with the static app. The
+single-file UMD bundle includes WASM and is ~1.48 MB raw (~496 KB gzipped, down
+from the full 11.4 MB release). It is not fetched on initial load or when
+viewing or adjusting the box. The bundled files include the OpenCV Apache 2.0
+license, third-party licenses and recorded SHA-256 digests. Build needs no
+OpenCV download. To rebuild from pinned upstream source (`4.11.0`) with
+`scripts/player-card-opencv.config.py`, run
+`node scripts/build-player-card-opencv.mjs`; to verify licenses and the
+GrabCut binding, run `node scripts/prepare-player-card-opencv.mjs`.
 
 ## Behavior and coordinates
 
