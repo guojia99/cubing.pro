@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { repairPoint, REPAIR_RADIUS } from "./repairBrush";
+import { fullImageRepairPoint, repairPoint, REPAIR_RADIUS } from "./repairBrush";
 
 test("visible brush maps through sourcePoint, zoom, offsets and rounded replacement dimensions", () => {
   for (const [width, height] of [[4032, 3025], [3025, 4032], [800, 800]]) {
@@ -17,4 +17,19 @@ test("visible brush maps through sourcePoint, zoom, offsets and rounded replacem
       assert.ok(Math.abs(p.ry * height / bh * scale * preview / 1080 - REPAIR_RADIUS) < 1e-9);
     }
   }
+});
+
+test("full-image brush reaches the bottom of a portrait at the chosen screen radius", () => {
+  const rect = { left: 17, top: 9, width: 300, height: 450 };
+  assert.deepEqual(fullImageRepairPoint(600, 900, rect, 167, 423, 26), { x: 300, y: 828, rx: 52, ry: 52 });
+  assert.deepEqual(fullImageRepairPoint(600, 450, rect, 167, 423), { x: 300, y: 414, rx: 24, ry: 12 });
+});
+
+test("classic brush size changes the footprint without moving its center", () => {
+  const rect = { left: 11, top: 20, width: 270, height: 270 };
+  const crop = { x: -27, y: 15, zoom: 2 };
+  const point = repairPoint(900, 600, 450, 300, crop, rect, 75, 152);
+  assert.deepEqual(repairPoint(900, 600, 450, 300, crop, rect, 75, 152, REPAIR_RADIUS * 2), {
+    ...point, rx: point.rx * 2, ry: point.ry * 2,
+  });
 });

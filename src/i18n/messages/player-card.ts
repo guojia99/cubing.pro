@@ -2,7 +2,11 @@ import type { Locale } from "../locales";
 
 // Column order: zh-CN, en-US, ja, yue-Hant-HK, ko, fr, es.
 const messages = {
-  "playerCard.cropEditor": ["照片编辑 · 方形裁切区域", "Photo editor · square crop area", "写真編集 · 正方形の切り抜き範囲", "相片編輯 · 方形裁切範圍", "사진 편집 · 정사각형 자르기 영역", "Retouche photo · zone de recadrage carrée", "Editor de foto · área de recorte cuadrada"],
+  "playerCard.motionMove": ["拖动卡面可直接调整人物位置（方向键微调）", "Drag on the card to adjust subject position (arrow keys to nudge)", "カードをドラッグして人物の位置を調整（矢印キーで微調整）", "拖動卡面可直接調整人物位置（方向鍵微調）", "카드를 드래그해 인물 위치 조정 (방향키로 미세 조정)", "Faites glisser la carte pour ajuster la position (flèches pour affiner)", "Arrastra la tarjeta para ajustar la posición (flechas para afinar)"],
+  "playerCard.subjectScale": ["主体比例", "Subject scale", "人物のサイズ", "主體比例", "인물 크기", "Échelle du sujet", "Escala del sujeto"],
+  "playerCard.cropEditor": ["照片编辑 · 完整原图", "Photo editor · full image", "写真編集 · 画像全体", "相片編輯 · 完整原圖", "사진 편집 · 전체 이미지", "Retouche photo · image entière", "Editor de foto · imagen completa"],
+  "playerCard.cutoutWorkbench": ["抠图修边预览 · 仅显示去背主体", "Cutout editor · isolated subject view", "切り抜き編集 · 背景除去プレビュー", "摳圖修邊預覽 · 僅顯示去背主體", "배경 제거 편집 · 피사체 단독 미리보기", "Éditeur de détourage · sujet isolé", "Editor de recorte · vista del sujeto aislado"],
+  "playerCard.brushSize": ["画笔大小", "Brush size", "ブラシサイズ", "畫筆大小", "브러시 크기", "Taille du pinceau", "Tamaño del pincel"],
   "playerCard.classic": ["经典方卡", "Classic square", "クラシック正方形", "經典方卡", "클래식 정사각형", "Carré classique", "Cuadrada clásica"],
   "playerCard.motion": ["动态竖卡", "Animated portrait", "動く縦型カード", "動態直卡", "움직이는 세로 카드", "Portrait animé", "Retrato animado"],
   "playerCard.myCards": ["我的小卡", "My cards", "マイカード", "我嘅小卡", "내 카드", "Mes cartes", "Mis tarjetas"],

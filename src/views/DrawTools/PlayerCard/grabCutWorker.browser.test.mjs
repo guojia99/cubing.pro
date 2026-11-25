@@ -4,7 +4,7 @@ import test from 'node:test';
 import { chromium } from 'playwright';
 import { servePlayerCard } from './browserTestServer.mjs';
 
-test('official 4.11.0 real worker segments person/accessory beyond box prior without uploading', { timeout: 90000 }, async () => {
+test('real GrabCut fills a torso hole and removes an exterior island without clipping a connected accessory or uploading', { timeout: 90000 }, async () => {
   await stat('public/vendor/opencv/4.11.0/opencv.js'); // Missing CV is a failure, never a mock pass.
   const server = await servePlayerCard('public');
   let browser;
@@ -21,7 +21,9 @@ test('official 4.11.0 real worker segments person/accessory beyond box prior wit
         const torso = x >= 100 && x < 200 && y >= 80 && y < 290;
         const head = (x - 150) ** 2 + (y - 60) ** 2 < 30 ** 2;
         const accessory = x >= 180 && x < 275 && y >= 145 && y < 185;
-        pixels.set(accessory ? [240, 180, 20, 255] : torso || head ? [200, 30, 40, 255] : [25 + (x % 2) * 10, 90, 160, 255], (y * width + x) * 4);
+        const hole = x >= 135 && x < 165 && y >= 215 && y < 240;
+        const island = x >= 252 && x < 268 && y >= 230 && y < 246;
+        pixels.set(accessory ? [240, 180, 20, 255] : (torso && !hole) || head || island ? [200, 30, 40, 255] : [25 + (x % 2) * 10, 90, 160, 255], (y * width + x) * 4);
       }
       const worker = new Worker('/workers/player-card-grabcut.js');
       const data = await new Promise((resolve, reject) => {
@@ -32,9 +34,13 @@ test('official 4.11.0 real worker segments person/accessory beyond box prior wit
       worker.terminate();
       if (data.error) return data;
       const alpha = new Uint8Array(data.alpha);
-      return { head: alpha[60 * width + 150], torso: alpha[200 * width + 150], accessoryOutsideBox: alpha[160 * width + 260], background: alpha[160 * width + 40], width: data.width, height: data.height };
+      return {
+        head: alpha[60 * width + 150], torso: alpha[200 * width + 150], hole: alpha[225 * width + 150],
+        accessoryOutsideBox: alpha[160 * width + 260], islandOutsideBox: alpha[238 * width + 260],
+        background: alpha[160 * width + 40], width: data.width, height: data.height,
+      };
     });
-    assert.deepEqual(result, { head: 255, torso: 255, accessoryOutsideBox: 255, background: 0, width: 320, height: 320 });
+    assert.deepEqual(result, { head: 255, torso: 255, hole: 255, accessoryOutsideBox: 255, islandOutsideBox: 0, background: 0, width: 320, height: 320 });
     assert.ok(requests.every(request => request.url.startsWith(server.origin + '/') && request.method === 'GET'));
   } finally { await browser?.close(); await server.close(); }
 });

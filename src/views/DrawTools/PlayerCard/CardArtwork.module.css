@@ -1,29 +1,35 @@
-.stage { perspective: 1200px; padding: 14px; }
-.artwork { position: relative; overflow: hidden; border-radius: 12px; }
-.artwork > img, .artwork > canvas { display: block; width: 100%; height: auto; }
-.motion { animation: cardFloat 16s ease-in-out infinite; transform-origin: center; box-shadow: 0 15px 35px #080c2433; }
-.motion::after {
-  content: "";
-  position: absolute;
-  inset: -50%;
-  pointer-events: none;
-  background: linear-gradient(110deg, transparent 47%, #bda7790a 48.5%, #d3b98130 49.5%, #e5e9ee52 50%, #c9b07524 50.7%, transparent 52.5%);
-  transform: translateX(-65%);
-  animation: cardSweep 12s linear infinite;
+.classic { padding: 14px; }
+.classic .source { overflow: hidden; border-radius: 12px; }
+.source > img, .source > canvas { display: block; width: 100%; height: auto; }
+
+.stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+  overflow: hidden;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: 12px;
+  background:
+    radial-gradient(ellipse at 35% 34%, #674b3424, transparent 65%),
+    radial-gradient(ellipse at 68% 56%, #3c325526, transparent 65%),
+    radial-gradient(ellipse at 50% 42%, #201a26, #141122 56%, #08070e 97%);
+  touch-action: pan-y;
 }
-.paused, .paused::after { animation-play-state: paused; }
-@keyframes cardFloat {
-  0%, 100% { transform: rotateX(.7deg) rotateY(-1.8deg) translateY(0); }
-  50% { transform: rotateX(-.7deg) rotateY(1.8deg) translateY(-3px); }
+.draggable { touch-action: none; cursor: grab; outline-offset: 3px; }
+.draggable[data-dragging="true"] { cursor: grabbing; }
+.stage .source { width: 74%; filter: drop-shadow(0 12px 10px #07050bd9); }
+.viewport { position: absolute; inset: 0; pointer-events: none; }
+.viewport > canvas { display: block; width: 100%; height: 100%; }
+.stage:is([data-motion-phase="running"], [data-motion-phase="paused"]) .source { opacity: 0; }
+@media (max-width: 600px) {
+  .stage .source { width: 82%; }
 }
-@keyframes cardSweep {
-  0% { transform: translateX(-65%); opacity: 0; }
-  5% { opacity: 1; }
-  45% { opacity: 1; }
-  50%, 100% { transform: translateX(65%); opacity: 0; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .controls { display: none; }
-  .motion, .motion::after { animation: none; transform: none; }
-  .motion::after { opacity: 0; }
+@media (min-width: 768px) {
+  .stage {
+    max-width: min(100%, 420px, calc((100dvh - 250px) * 0.75));
+    margin-inline: auto;
+  }
+  .draggable { width: clamp(240px, calc((100dvh - 360px) * 0.75), 100%); }
 }
