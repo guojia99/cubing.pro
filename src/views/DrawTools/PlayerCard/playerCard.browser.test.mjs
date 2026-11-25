@@ -32,18 +32,21 @@ test("static player card: local photo, touch crop, preview fidelity and real PNG
     const uploads = [];
     const external = [];
     const fontRequests = [];
+    const commonUrl = `${origin}/fonts/player-card/slices/common.woff2`;
+    const highVariantUrl = `${origin}/fonts/player-card/slices/rare-17.woff2`;
     const fontRequested = Promise.withResolvers();
     const fontRelease = Promise.withResolvers();
+    const rareRelease = Promise.withResolvers();
     let failFont = false;
     await context.route("**/*", async route => {
       const request = route.request();
       if (!["GET", "HEAD"].includes(request.method())) uploads.push(request.url());
       if (request.url().includes("/v3/cube-api/")) return route.fulfill({ json: { data: [] } });
       if (new URL(request.url()).origin !== origin) { external.push(request.url()); return route.abort(); }
-      if (new URL(request.url()).pathname === "/fonts/player-card/the-peak-font-plus.woff2") {
+      if (new URL(request.url()).pathname.startsWith("/fonts/player-card/slices/")) {
         fontRequests.push(request.url());
         fontRequested.resolve();
-        await fontRelease.promise;
+        await (request.url() === highVariantUrl ? rareRelease : fontRelease).promise;
         if (failFont) return route.abort();
       }
       return route.continue();
@@ -153,6 +156,7 @@ test("static player card: local photo, touch crop, preview fidelity and real PNG
     const beforeName = await canvas.evaluate(el => el.toDataURL());
     await page.locator('#player-card-name').fill("小明/Blue");
     await fontRequested.promise;
+    assert.deepEqual(fontRequests, [commonUrl]);
     assert.equal(await downloadButton.isDisabled(), true, "Pending font blocks export");
     assert.equal(await canvas.evaluate(el => el.toDataURL()), beforeName, "No fallback nickname painted while the font is pending");
     await page.locator('#player-card-name').fill("");
@@ -203,12 +207,25 @@ test("static player card: local photo, touch crop, preview fidelity and real PNG
       return { left, right, top, bottom, inkWidth: right - left + 1, inkHeight: bottom - top + 1, rise: leftRows / leftCount - rightRows / rightCount };
     });
     await page.locator('#player-card-name').fill("林知夏");
+    assert.equal(await downloadButton.isEnabled(), true, "Another common name is ready immediately");
+    assert.deepEqual(fontRequests, [commonUrl], "Common names reuse a single request");
     const shortBounds = await nicknameBounds();
     // Keep a prominent short name without requiring a particular font's ink width.
     assert.ok(shortBounds.inkWidth / 1080 >= 0.50 && shortBounds.inkWidth / 1080 <= 0.69,
       `Short calligraphy spans at least half the card: ${JSON.stringify(shortBounds)}`);
     for (const [name, minHeight] of [["林知夏", 125], ["罗炜城", 125], ["清风速拧", 125], ["RiverBlue", 80], ["Ágj", 80], ["很长的选手显示名称".repeat(8), 1], ["髙㐀𝓡🧊Á", 80]]) {
       await page.locator('#player-card-name').fill(name);
+      if (name.includes("髙")) {
+        assert.equal(await downloadButton.isDisabled(), true, "A new slice blocks export even with the common face loaded");
+        assert.equal(await canvas.evaluate(el => el.toDataURL()), emptyName, "No partial nickname while rare glyph is pending");
+        await page.locator('#player-card-name').fill("林知夏");
+        assert.equal(await downloadButton.isEnabled(), true, "A pending unrelated slice does not block a common name");
+        await page.locator('#player-card-name').fill(name);
+        rareRelease.resolve();
+        await page.waitForFunction(() => ![...document.querySelectorAll("button")].find(button => button.textContent === "Download PNG · 1080 × 1080").disabled);
+        assert.deepEqual(fontRequests, [commonUrl, highVariantUrl], "Only 髙 needs another slice; unmapped glyphs use fallback");
+        assert.equal(await page.evaluate(() => [...document.fonts].filter(face => face.family.includes("Player Card The Peak Font Plus") && face.status === "loaded").length), 2);
+      }
       const bounds = await nicknameBounds();
       assert.ok(bounds.inkHeight >= minHeight, `Nickname ink has the intended size: ${name}`);
       assert.ok(bounds.left >= 60 && bounds.right <= 1020 && bounds.top >= 740 && bounds.bottom <= 1045,
@@ -224,14 +241,14 @@ test("static player card: local photo, touch crop, preview fidelity and real PNG
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `No overflow at ${width}px`);
       assert.equal(await canvas.evaluate(el => el.toDataURL()), emptyName, "Viewport does not change output");
     }
-    assert.deepEqual(fontRequests, [`${origin}/fonts/player-card/the-peak-font-plus.woff2`], "One shared static same-origin font request with no nickname data");
+    assert.deepEqual(fontRequests, [commonUrl, highVariantUrl], "Each matched static same-origin slice is requested once with no nickname data");
     // A fresh document exercises a real font load failure and local fallback export.
     failFont = true;
     await page.reload();
     await photo.setInputFiles({ name: "quadrants.png", mimeType: "image/png", buffer: Buffer.from(fixture, "base64") });
     await page.locator('#player-card-name').fill("小明/Blue");
     await page.waitForFunction(() => ![...document.querySelectorAll("button")].find(button => button.textContent === "Download PNG · 1080 × 1080").disabled);
-    assert.equal(fontRequests.length, 2);
+    assert.deepEqual(fontRequests, [commonUrl, highVariantUrl, commonUrl]);
     assert.equal(await page.evaluate(() => [...document.fonts].some(face => face.family.includes("Player Card The Peak Font Plus"))), false);
     const fallbackBounds = await nicknameBounds();
     assert.ok(fallbackBounds.inkHeight >= 80 && fallbackBounds.left >= 60 && fallbackBounds.right <= 1020 && fallbackBounds.top >= 740 && fallbackBounds.bottom <= 1045, "Fallback inks also fit");

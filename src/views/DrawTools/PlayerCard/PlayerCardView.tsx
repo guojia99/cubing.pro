@@ -13,7 +13,7 @@ import { PageHeader, Surface } from "@/components/ui/page";
 import { useI18n } from "@/contexts/I18nProvider";
 import { CARD_SIZE, INITIAL_CROP, cardFilename, clampCrop, inspectPhoto, paintCard, zoomCrop, type Crop } from "./composition";
 import { replaceSolidBackground, sourcePoint } from "./solidBackground";
-import { loadNicknameFont, NICKNAME_FALLBACK } from "./nicknameFont";
+import { hasLoadedNicknameFont, loadNicknameFont, NICKNAME_FALLBACK, NICKNAME_FONT } from "./nicknameFont";
 import { eraseSegment, fullImageRepairPoint, paintCutoutWorkbench, restoreSegment, repairPoint, REPAIR_RADIUS, type BrushPoint } from "./repairBrush";
 
 import { INITIAL_BOX, clampBox, drawnBox } from "./personCutout.mjs";
@@ -63,9 +63,13 @@ export function PlayerCardView() {
   const [crop, setCrop] = useState(INITIAL_CROP);
   const [motionPlacement, setMotionPlacement] = useState(INITIAL_MOTION_PLACEMENT);
   const [name, setName] = useState("");
-  const [nicknameFont, setNicknameFont] = useState<string | null>(null);
-  const needsNicknameFont = !!image && !!name.trim();
-  const nicknamePending = needsNicknameFont && nicknameFont === null;
+  const [resolvedNickname, setResolvedNickname] = useState<{ text: string; font: string } | null>(null);
+  const trimmedName = name.trim();
+  const needsNicknameFont = !!image && !!trimmedName;
+  const nicknameFont = !needsNicknameFont ? NICKNAME_FALLBACK
+    : hasLoadedNicknameFont(trimmedName) ? NICKNAME_FONT
+    : resolvedNickname?.text === trimmedName ? resolvedNickname.font : null;
+  const nicknamePending = nicknameFont === null;
   const [error, setError] = useState<"decode" | "export" | null>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const photoInput = useRef<HTMLInputElement>(null);
@@ -91,11 +95,11 @@ export function PlayerCardView() {
   }, [file]);
 
   useEffect(() => {
-    if (!needsNicknameFont) return;
+    if (!nicknamePending) return;
     let active = true;
-    loadNicknameFont().then(font => { if (active) setNicknameFont(font); });
+    loadNicknameFont(trimmedName).then(font => { if (active) setResolvedNickname({ text: trimmedName, font }); });
     return () => { active = false; };
-  }, [needsNicknameFont]);
+  }, [nicknamePending, trimmedName]);
 
   const repaint = useCallback(() => {
     if (!image) return;
